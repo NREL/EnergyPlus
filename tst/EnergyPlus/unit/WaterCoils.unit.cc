@@ -97,7 +97,6 @@ using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::FanCoilUnits;
@@ -217,9 +216,9 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = AutoSize;
 
     state->dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(3) = "Maximum Flow Rate";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum;
 
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
@@ -456,9 +455,9 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     state->dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat = AutoSize;
 
     state->dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(2) = "Maximum Water Flow Rate";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum;
 
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
@@ -612,9 +611,9 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     state->dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat = AutoSize;
 
     state->dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(2) = "Maximum Water Flow Rate";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum;
 
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
@@ -771,9 +770,9 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     state->dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat = AutoSize;
 
     state->dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(2) = "Maximum Water Flow Rate";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum;
 
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
@@ -888,9 +887,9 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp = true;
 
     state->dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(1) = "Design Water Flow Rate";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum;
 
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
@@ -1007,9 +1006,9 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = AutoSize;
 
     state->dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(1) = "Design Water Flow Rate";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum;
 
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
@@ -1120,10 +1119,10 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = AutoSize;
 
     state->dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(1) = "Design Water Flow Rate";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = 2;
-    state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = 3;
-    state->dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = 4;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterOutNodeNum = 2;
+    state->dataWaterCoils->WaterCoil(CoilNum).AirInNodeNum = 3;
+    state->dataWaterCoils->WaterCoil(CoilNum).AirOutNodeNum = 4;
     state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopNum = 1;
     state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
     state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.branchNum = 1;
@@ -1131,10 +1130,10 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut =
-        state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataWaterCoils->WaterCoil(1).WaterInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum =
+        state->dataWaterCoils->WaterCoil(1).WaterOutNodeNum;
 
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
@@ -1174,7 +1173,8 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     // check cooling coil design water flow rate
     EXPECT_DOUBLE_EQ(DesWaterFlowRate, state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate);
 
-    state->dataLoopNodes->Node.allocate(10);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 10; ++i) dln->nodes.push_back(new Node::NodeData);
 
     InitWaterCoil(*state, 1, false);
 
@@ -1287,9 +1287,9 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp = true;
 
     state->dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(2) = "Maximum Water Flow Rate";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum;
 
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
@@ -1386,9 +1386,9 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
     state->dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat = AutoSize;
 
     state->dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(2) = "Maximum Water Flow Rate";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataWaterCoils->WaterCoil(CoilNum).WaterInNodeNum;
 
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
@@ -1598,7 +1598,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
-    EXPECT_TRUE(compare_enums(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
     EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFanCoilUnits->FanCoil(1).fanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
@@ -1614,74 +1614,85 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     HotWaterMassFlowRate = 0.0;
     ColdWaterMassFlowRate = 0.14;
 
-    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+    auto &dln = state->dataLoopNodes;
+    auto *oaMixerReturnAirInNode = dln->nodes(state->dataMixedAir->OAMixer(1).ReturnAirInNodeNum);
+    auto *oaMixerOutsideAirInNode = dln->nodes(state->dataMixedAir->OAMixer(1).OutsideAirInNodeNum);
+    auto *fanCoilAirInNode = dln->nodes(state->dataFanCoilUnits->FanCoil(1).AirInNodeNum);
+    
+    oaMixerReturnAirInNode->MassFlowRate = AirMassFlow;
+    oaMixerReturnAirInNode->MassFlowRateMax = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
-    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
-    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat =
-        PsyWFnTdbH(*state,
-                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp,
-                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
+    oaMixerReturnAirInNode->Temp = 24.0;
+    oaMixerReturnAirInNode->Enthalpy = 36000;
+    oaMixerReturnAirInNode->HumRat = PsyWFnTdbH(*state, oaMixerReturnAirInNode->Temp, oaMixerReturnAirInNode->Enthalpy);
 
-    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
-    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
-    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat =
-        PsyWFnTdbH(*state,
-                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp,
-                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
+    oaMixerOutsideAirInNode->Temp = 30.0;
+    oaMixerOutsideAirInNode->Enthalpy = 53000;
+    oaMixerOutsideAirInNode->HumRat = PsyWFnTdbH(*state, oaMixerOutsideAirInNode->Temp, oaMixerOutsideAirInNode->Enthalpy);
 
-    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
-    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+    fanCoilAirInNode->MassFlowRate = AirMassFlow;
+    fanCoilAirInNode->MassFlowRateMin = AirMassFlow;
+    fanCoilAirInNode->MassFlowRateMinAvail = AirMassFlow;
+    fanCoilAirInNode->MassFlowRateMax = MaxAirMassFlow;
+    fanCoilAirInNode->MassFlowRateMaxAvail = MaxAirMassFlow;
 
     state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
     state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
     state->dataFanCoilUnits->FanCoil(1).MaxCoolCoilFluidFlow = 0.14;
     state->dataFanCoilUnits->FanCoil(1).MaxHeatCoilFluidFlow = 0.14;
 
-    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
-    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMax = 0.14;
-    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMax = 0.14;
-    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
-    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
+    
+    auto *outsideAirInNode = dln->nodes(state->dataFanCoilUnits->FanCoil(1).OutsideAirInNodeNum);
+    outsideAirInNode->MassFlowRateMax = 0.0;
+    auto *heatCoilFluidInNode = dln->nodes(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInNodeNum);
+    auto *coolCoilFluidInNode = dln->nodes(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInNodeNum);
+    coolCoilFluidInNode->MassFlowRateMax = 0.14;
+    heatCoilFluidInNode->MassFlowRateMax = 0.14;
+    coolCoilFluidInNode->MassFlowRateMaxAvail = 0.14;
+    heatCoilFluidInNode->MassFlowRateMaxAvail = 0.14;
 
     state->dataFans->fans(1)->inletAirMassFlowRate = AirMassFlow;
     state->dataFans->fans(1)->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    auto *fanInNode = dln->nodes(state->dataFans->fans(1)->inNodeNum);
+    fanInNode->MassFlowRate = AirMassFlow;
+    fanInNode->MassFlowRateMin = AirMassFlow;
+    fanInNode->MassFlowRateMax = AirMassFlow;
+    fanInNode->MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
     state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
     state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
 
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    auto *waterCoil2AirInNode = dln->nodes(state->dataWaterCoils->WaterCoil(2).AirInNodeNum);
+    waterCoil2AirInNode->MassFlowRate = AirMassFlow;
+    waterCoil2AirInNode->MassFlowRateMin = AirMassFlow;
+    waterCoil2AirInNode->MassFlowRateMax = AirMassFlow;
+    waterCoil2AirInNode->MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
 
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    auto *waterCoil2WaterInNode = dln->nodes(state->dataWaterCoils->WaterCoil(2).WaterInNodeNum);
+    auto *waterCoil2WaterOutNode = dln->nodes(state->dataWaterCoils->WaterCoil(2).WaterOutNodeNum);
+    waterCoil2WaterInNode->MassFlowRate = ColdWaterMassFlowRate;
+    waterCoil2WaterInNode->MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    waterCoil2WaterInNode->Temp = 6.0;
+    waterCoil2WaterOutNode->MassFlowRate = ColdWaterMassFlowRate;
+    waterCoil2WaterOutNode->MassFlowRateMaxAvail = ColdWaterMassFlowRate;
 
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    auto *waterCoil1AirInNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).AirInNodeNum);
+    waterCoil1AirInNode->MassFlowRate = AirMassFlow;
+    waterCoil1AirInNode->MassFlowRateMaxAvail = AirMassFlow;
+
+    auto *waterCoil1WaterInNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).WaterInNodeNum);
+    auto *waterCoil1WaterOutNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).WaterOutNodeNum);
+    waterCoil1WaterInNode->Temp = 60.0;
+    waterCoil1WaterInNode->MassFlowRate = HotWaterMassFlowRate;
+    waterCoil1WaterInNode->MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    waterCoil1WaterOutNode->MassFlowRate = HotWaterMassFlowRate;
+    waterCoil1WaterOutNode->MassFlowRateMaxAvail = HotWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
@@ -1715,10 +1726,10 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::CoilWaterCooling;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut =
-        state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataWaterCoils->WaterCoil(2).WaterInNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum =
+        state->dataWaterCoils->WaterCoil(2).WaterOutNodeNum;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Unlocked;
 
     state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
@@ -1728,18 +1739,18 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut =
-        state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataWaterCoils->WaterCoil(1).WaterInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum =
+        state->dataWaterCoils->WaterCoil(1).WaterOutNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Unlocked;
 
     state->dataFanCoilUnits->FanCoil(1).CoolCoilPlantLoc.loopNum = 2;
     state->dataFanCoilUnits->FanCoil(1).HeatCoilPlantLoc.loopNum = 1;
     state->dataFanCoilUnits->FanCoil(1).CoolCoilPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
     state->dataFanCoilUnits->FanCoil(1).HeatCoilPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
-    state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidOutNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutNodeNum;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidOutNodeNum = state->dataWaterCoils->WaterCoil(2).WaterOutNodeNum;
     state->dataFanCoilUnits->FanCoil(1).CoolCoilPlantLoc.branchNum = 1;
     state->dataFanCoilUnits->FanCoil(1).CoolCoilPlantLoc.compNum = 1;
     state->dataFanCoilUnits->FanCoil(1).HeatCoilPlantLoc.branchNum = 1;

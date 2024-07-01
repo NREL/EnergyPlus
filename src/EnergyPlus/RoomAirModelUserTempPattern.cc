@@ -650,7 +650,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
 
     int ZoneMult = zone.Multiplier * zone.ListMultiplier;
 
-    for (int returnNodeNum : state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeInNodeNums) {
+    for (int returnNodeNum : state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeNums) {
         // BEGIN BLOCK of code from CalcZoneLeavingConditions*********************************
         auto *returnNode = dln->nodes(returnNodeNum);
 

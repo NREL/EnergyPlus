@@ -73,12 +73,12 @@ namespace AirLoopHVACDOAS {
     {
         std::string name;
         static AirLoopMixer *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
-        int numOfInletNodes = 0;
+        int numInNodes = 0;
         int m_AirLoopMixer_Num = 0;
-        int OutletNodeNum = 0;
-        std::string OutletNodeName;
-        std::vector<std::string> InletNodeName;
-        std::vector<int> InletNodeNum;
+        int OutNodeNum = 0;
+        std::string OutNodeName;
+        std::vector<std::string> InNodeNames;
+        std::vector<int> InNodeNums;
         Real64 OutletTemp = 0.0;
 
         static void getAirLoopMixer(EnergyPlusData &state);
@@ -89,13 +89,13 @@ namespace AirLoopHVACDOAS {
     {
         std::string name;
         static AirLoopSplitter *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
-        int numOfOutletNodes = 0;
+        int numOutNodes = 0;
         int m_AirLoopSplitter_Num = 0;
-        std::string InletNodeName;
-        std::vector<std::string> OutletNodeName;
-        std::vector<int> OutletNodeNum;
+        std::string InNodeName;
+        std::vector<std::string> OutNodeNames;
+        std::vector<int> OutNodeNums;
         Real64 InletTemp = 0.0;
-        int InletNodeNum = 0;
+        int InNodeNum = 0;
 
         static void getAirLoopSplitter(EnergyPlusData &state);
         void CalcAirLoopSplitter(EnergyPlusData &state, Real64 Temp, Real64 Humrat);
@@ -121,11 +121,11 @@ namespace AirLoopHVACDOAS {
         int m_AirLoopMixerIndex = -1;
         int m_AirLoopSplitterIndex = -1;
         int NumOfAirLoops = 0;
-        int m_InletNodeNum = 0;
-        int m_OutletNodeNum = 0;
+        int m_InNodeNum = 0;
+        int m_OutNodeNum = 0;
         int m_FanIndex = 0;
-        int m_FanInletNodeNum = 0;
-        int m_FanOutletNodeNum = 0;
+        int m_FanInNodeNum = 0;
+        int m_FanOutNodeNum = 0;
         SimAirServingZones::CompType m_FanTypeNum = SimAirServingZones::CompType::Invalid;
         int m_HeatCoilNum = 0;
         int m_CoolCoilNum = 0;

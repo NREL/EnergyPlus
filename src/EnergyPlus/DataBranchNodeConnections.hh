@@ -71,20 +71,19 @@ namespace DataBranchNodeConnections {
         // std::string CType;       // Component Type (Cannot be SPLITTER or MIXER)
         Node::ConnObjType ComponentObjectType = Node::ConnObjType::Invalid;
         std::string CName;          // Component Name
-        std::string InletNodeName;  // Inlet Node ID
-        std::string OutletNodeName; // Outlet Node ID
+        std::string InNodeName;  // Inlet Node ID
+        std::string OutNodeName; // Outlet Node ID
         std::string Description;    // Description of Component List Type
     };
 
     struct NodeConnectionDef
     {
         // Members
-        int NodeNumber = 0;                                                                          // Node number of this node connection
-        std::string NodeName;                                                                        // Node Name of this node connection
-        Node::ConnObjType ObjectType = Node::ConnObjType::Invalid; // Object/Component Type of this node connection
+        int NodeNum = 0;                                                                          // Node number of this node connection
+        std::string NodeName;                              // Node Name of this node connection
+        Node::ConnObjType connObjType = Node::ConnObjType::Invalid; // Object/Component Type of this node connection
         std::string ObjectName; // Name of the Object/Component Type of this node connection
-        Node::ConnType ConnectionType =
-            Node::ConnType::Invalid; // Connection Type (must be valid) for this node connection
+        Node::ConnType connType = Node::ConnType::Invalid; // Connection Type (must be valid) for this node connection
         Node::CompFluidStream FluidStream = Node::CompFluidStream::Invalid; // Fluid Stream for this node connection
         bool ObjectIsParent = false;                                                                // Indicator whether the object is a parent or not
     };
@@ -94,20 +93,19 @@ namespace DataBranchNodeConnections {
         // Members
         Node::ConnObjType ComponentType = Node::ConnObjType::Invalid; // Component Type (Cannot be SPLITTER or MIXER)
         std::string ComponentName;                       // Component Name
-        std::string InletNodeName;                       // Inlet Node ID
-        std::string OutletNodeName;                      // Outlet Node ID
+        std::string InNodeName;                       // Inlet Node ID
+        std::string OutNodeName;                      // Outlet Node ID
         std::string Description;                         // Description of Component List Type
     };
 
     struct EqNodeConnectionDef
     {
         // Members
-        std::string NodeName;                                                                        // Node Name of this node connection
-        Node::ConnObjType ObjectType = Node::ConnObjType::Invalid; // Object/Component Type of this node connection
+        std::string NodeName;                                // Node Name of this node connection
+        Node::ConnObjType connObjType = Node::ConnObjType::Invalid; // Object/Component Type of this node connection
         std::string ObjectName;     // Name of the Object/Component Type of this node connection
         std::string InputFieldName; // Input Field Name for this connection
-        Node::ConnType ConnectionType =
-            Node::ConnType::Invalid; // Connection Type (must be valid) for this node connection
+        Node::ConnType connType = Node::ConnType::Invalid; // Connection Type (must be valid) for this node connection
     };
 
 } // namespace DataBranchNodeConnections
@@ -117,11 +115,11 @@ struct BranchNodeConnectionsData : BaseGlobalStruct
 
     int NumCompSets = 0;             // Number of Component Sets found in branches
     int NumNodeConnectionErrors = 0; // Count of node connection errors
-    int NumOfNodeConnections = 0;
-    int MaxNumOfNodeConnections = 0;
-    int NumOfActualParents = 0;
-    int NumOfAirTerminalNodes = 0;
-    int MaxNumOfAirTerminalNodes = 0;
+    int NumNodeConnections = 0;
+    int MaxNodeConnections = 0;
+    int NumActualParents = 0;
+    int NumAirTerminalNodes = 0;
+    int MaxAirTerminalNodes = 0;
 
     EPVector<DataBranchNodeConnections::ComponentListData> CompSets;
     EPVector<DataBranchNodeConnections::ParentListData> ParentNodeList;

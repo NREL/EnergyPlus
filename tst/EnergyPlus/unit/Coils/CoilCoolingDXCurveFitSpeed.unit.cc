@@ -77,11 +77,11 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest)
     thisMode.ratedEvapAirFlowRate = 100;
     thisMode.ratedCondAirFlowRate = 200;
 
-    DataLoopNode::NodeData inletNode;
+    Node::NodeData inletNode;
     inletNode.Temp = 20.0;
     inletNode.HumRat = 0.008;
     inletNode.Enthalpy = 40000.0;
-    DataLoopNode::NodeData outletNode;
+    Node::NodeData outletNode;
 
     thisSpeed.PLR = 1.0;
     thisSpeed.ambPressure = 101325.0;

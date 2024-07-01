@@ -286,7 +286,7 @@ void GetPlantLoopData(EnergyPlusData &state)
     // Using/Aliasing
     using ScheduleManager::GetScheduleIndex;
     using SetPointManager::IsNodeOnSetPtManager;
-    SetPointManager::CtrlVarType localTempSetPt = SetPointManager::CtrlVarType::Temp;
+    HVAC::CtrlVarType localTempSetPt = HVAC::CtrlVarType::Temp;
     using namespace BranchInputManager;
     using DataSizing::AutoSize;
     using FluidProperties::CheckFluidPropertyName;
@@ -484,10 +484,10 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                         Node::CompFluidStream::Primary,
                                                         Node::ObjectIsParent);
 
-        this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.InNodeNum, localTempSetPt);
-        this_demand_side.OutletNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.OutNodeNum, localTempSetPt);
-        this_supply_side.InletNodeSetPt = IsNodeOnSetPtManager(state, this_supply_side.InNodeNum, localTempSetPt);
-        this_supply_side.OutletNodeSetPt = IsNodeOnSetPtManager(state, this_supply_side.OutNodeNum, localTempSetPt);
+        this_demand_side.InNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.InNodeNum, localTempSetPt);
+        this_demand_side.OutNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.OutNodeNum, localTempSetPt);
+        this_supply_side.InNodeSetPt = IsNodeOnSetPtManager(state, this_supply_side.InNodeNum, localTempSetPt);
+        this_supply_side.OutNodeSetPt = IsNodeOnSetPtManager(state, this_supply_side.OutNodeNum, localTempSetPt);
         this_loop.TempSetPointNodeNum = GetSingleNode(state,
                                                           Alpha(5),
                                                           ErrorsFound,
@@ -565,7 +565,7 @@ void GetPlantLoopData(EnergyPlusData &state)
         }
 
         if (this_loop.CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
-            if (this_demand_side.InletNodeSetPt && this_supply_side.InletNodeSetPt) {
+            if (this_demand_side.InNodeSetPt && this_supply_side.InNodeSetPt) {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                 ShowContinueError(state,
                                   "While using a two way common pipe there can be setpoint on only one node other than Plant Supply Outlet node.");
@@ -573,7 +573,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                 ShowContinueError(state, "Select one of the two nodes and rerun the simulation.");
                 ErrorsFound = true;
             }
-            if (!this_demand_side.InletNodeSetPt && !this_supply_side.InletNodeSetPt) {
+            if (!this_demand_side.InNodeSetPt && !this_supply_side.InNodeSetPt) {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                 ShowContinueError(state, "While using a two way common pipe there must be a setpoint in addition to the Plant Supply Outlet node.");
                 ShowContinueError(state, "Currently neither plant demand inlet nor plant supply inlet have setpoints.");
@@ -1419,16 +1419,16 @@ void GetPlantInput(EnergyPlusData &state)
             // Obtain the Splitter and Mixer information
             auto &dln = state.dataLoopNodes;
             if (loopSide.ConnectList.empty()) {
-                dln->NumofSplitters = 0;
-                dln->NumofMixers = 0;
+                dln->NumSplitters = 0;
+                dln->NumMixers = 0;
             } else {
                 errFlag = false;
                 GetNumSplitterMixerInConntrList(
-                    state, plantLoop.Name, loopSide.ConnectList, dln->NumofSplitters, dln->NumofMixers, errFlag);
+                    state, plantLoop.Name, loopSide.ConnectList, dln->NumSplitters, dln->NumMixers, errFlag);
                 if (errFlag) {
                     ErrorsFound = true;
                 }
-                if (dln->NumofSplitters != dln->NumofMixers) {
+                if (dln->NumSplitters != dln->NumMixers) {
                     ShowSevereError(state,
                                     "GetPlantInput: Loop Name=" + plantLoop.Name + ", ConnectorList=" + loopSide.ConnectList +
                                         ", unequal number of splitters and mixers");
@@ -1436,18 +1436,18 @@ void GetPlantInput(EnergyPlusData &state)
                 }
             }
 
-            loopSide.Splitter.Exists = dln->NumofSplitters > 0;
-            loopSide.Mixer.Exists = dln->NumofMixers > 0;
+            loopSide.Splitter.Exists = dln->NumSplitters > 0;
+            loopSide.Mixer.Exists = dln->NumMixers > 0;
 
             if (ErrorsFound) {
                 ShowFatalError(state, "GetPlantInput: Previous Severe errors cause termination.");
             }
 
-            NumConnectorsInLoop = dln->NumofSplitters + dln->NumofMixers;
+            NumConnectorsInLoop = dln->NumSplitters + dln->NumMixers;
             SplitNum = 1;
             for (ConnNum = 1; ConnNum <= NumConnectorsInLoop; ++ConnNum) {
 
-                if (SplitNum > dln->NumofSplitters) break;
+                if (SplitNum > dln->NumSplitters) break;
                 OutNodeNames.allocate(MaxNumAlphas);
                 OutNodeNums.allocate(MaxNumAlphas);
                 GetLoopSplitter(state,
@@ -1530,7 +1530,7 @@ void GetPlantInput(EnergyPlusData &state)
             MixNum = 1;
             for (ConnNum = 1; ConnNum <= NumConnectorsInLoop; ++ConnNum) {
 
-                if (MixNum > dln->NumofMixers) break;
+                if (MixNum > dln->NumMixers) break;
                 InNodeNames.allocate(MaxNumAlphas);
                 InNodeNums.allocate(MaxNumAlphas);
                 GetLoopMixer(state,
@@ -1895,11 +1895,11 @@ void SetupReports(EnergyPlusData &state)
         loop.HeatingDemand = 0.0;
         loop.DemandNotDispatched = 0.0;
         loop.UnmetDemand = 0.0;
-        loop.InletNodeTemperature = 0.0;
-        loop.OutletNodeTemperature = 0.0;
-        loop.InletNodeFlowrate = 0.0;
+        loop.InNodeTemperature = 0.0;
+        loop.OutNodeTemperature = 0.0;
+        loop.InNodeFlowrate = 0.0;
         loop.BypassFrac = 0.0;
-        loop.OutletNodeFlowrate = 0.0;
+        loop.OutNodeFlowrate = 0.0;
     }
 
     for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
@@ -1927,7 +1927,7 @@ void SetupReports(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Plant Supply Side Inlet Mass Flow Rate",
                             Constant::Units::kg_s,
-                            loop.InletNodeFlowrate,
+                            loop.InNodeFlowrate,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
@@ -1935,14 +1935,14 @@ void SetupReports(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Plant Supply Side Inlet Temperature",
                             Constant::Units::C,
-                            loop.InletNodeTemperature,
+                            loop.InNodeTemperature,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Plant Supply Side Outlet Temperature",
                             Constant::Units::C,
-                            loop.OutletNodeTemperature,
+                            loop.OutNodeTemperature,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
@@ -2156,8 +2156,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         // need call to EMS to check node
-                        CheckIfNodeSetPointManagedByEMS(
-                            state, SensedNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                        CheckIfNodeSetPointManagedByEMS(state, SensedNode, HVAC::CtrlVarType::Temp, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
                                             format("PlantManager: No Setpoint Manager Defined for Node={} in PlantLoop={}",
@@ -2342,7 +2341,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                     } else {
                         CheckIfNodeSetPointManagedByEMS(state,
                                                         loop.TempSetPointNodeNum,
-                                                        EMSManager::SPControlType::TemperatureMaxSetPoint,
+                                                        HVAC::CtrlVarType::Temp,
                                                         state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state, "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
@@ -2363,7 +2362,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                     } else {
                         CheckIfNodeSetPointManagedByEMS(state,
                                                         loop.TempSetPointNodeNum,
-                                                        EMSManager::SPControlType::TemperatureMinSetPoint,
+                                                        HVAC::CtrlVarType::Temp,
                                                         state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state, "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
@@ -2478,7 +2477,7 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
 
                 if ((loop.CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
                     (LoopSideNum == LoopSideLocation::Demand) &&
-                    (loop.LoopSide(LoopSideLocation::Demand).InletNodeSetPt)) { // get a second setpoint for
+                    (loop.LoopSide(LoopSideLocation::Demand).InNodeSetPt)) { // get a second setpoint for
                                                                                                               // secondaryLoop
                     // if the plant loop is two common pipe configured for temperature control on secondary side inlet, then
                     // we want to initialize the demand side of the loop using that setpoint
@@ -2508,10 +2507,10 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
                 loop.LoopSide(LoopSideNum).FlowRequest = 0.0;
                 loop.LoopSide(LoopSideNum).TimeElapsed = 0.0;
                 loop.LoopSide(LoopSideNum).FlowLock = DataPlant::FlowLock::Unlocked;
-                loop.LoopSide(LoopSideNum).InletNode.TemperatureHistory = 0.0;
-                loop.LoopSide(LoopSideNum).InletNode.MassFlowRateHistory = 0.0;
-                loop.LoopSide(LoopSideNum).OutletNode.TemperatureHistory = 0.0;
-                loop.LoopSide(LoopSideNum).OutletNode.MassFlowRateHistory = 0.0;
+                loop.LoopSide(LoopSideNum).InNode.TemperatureHistory = 0.0;
+                loop.LoopSide(LoopSideNum).InNode.MassFlowRateHistory = 0.0;
+                loop.LoopSide(LoopSideNum).OutNode.TemperatureHistory = 0.0;
+                loop.LoopSide(LoopSideNum).OutNode.MassFlowRateHistory = 0.0;
 
                 if (loop.fluidType != Node::FluidType::Steam) {
                     Cp = GetSpecificHeatGlycol(state,
@@ -2611,10 +2610,10 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
             loop.DemandNotDispatched = 0.0;
             loop.UnmetDemand = 0.0;
             loop.LastLoopSideSimulated = static_cast<int>(DataPlant::LoopSideLocation::Invalid);
-            loop.InletNodeFlowrate = 0.0;
-            loop.InletNodeTemperature = 0.0;
-            loop.OutletNodeFlowrate = 0.0;
-            loop.OutletNodeTemperature = 0.0;
+            loop.InNodeFlowrate = 0.0;
+            loop.InNodeTemperature = 0.0;
+            loop.OutNodeFlowrate = 0.0;
+            loop.OutNodeTemperature = 0.0;
         }
 
         state.dataPlantMgr->MyEnvrnFlag = false;
@@ -2658,7 +2657,7 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
         if (loop.CommonPipeType == DataPlant::CommonPipeType::TwoWay) { // get a second setpoint for secondaryLoop
             // if the plant loop is two common pipe configured for temperature control on secondary side inlet, then
             // we want to initialize the demand side of the loop using that setpoint
-            if (loop.LoopSide(LoopSideLocation::Demand).InletNodeSetPt) {
+            if (loop.LoopSide(LoopSideLocation::Demand).InNodeSetPt) {
                     auto const *inNode = dln->nodes(loop.LoopSide(LoopSideLocation::Demand).InNodeNum);
                 SecondaryLoopSetPointTemp = inNode->TempSetPoint;
                 SecondaryLoopSetPointTemp = min(LoopMaxTemp, SecondaryLoopSetPointTemp);
@@ -2758,7 +2757,7 @@ void UpdateNodeThermalHistory(EnergyPlusData &state)
     if (state.dataPlnt->TotNumLoops > 0 && !state.dataGlobal->WarmupFlag) {
         for (auto &loop : state.dataPlnt->PlantLoop) {
             for (auto &side : loop.LoopSide) {
-                if (loop.OutletNodeFlowrate > HVAC::SmallMassFlow) {
+                if (loop.OutNodeFlowrate > HVAC::SmallMassFlow) {
                     // Accumulate total time loop is active
                     side.LoopSideInlet_TotalTime += state.dataHVACGlobal->TimeStepSys;
                     // Determine excessive storage - if both are moving in the same direction and McpDTdt is larger than MdotCpDeltaT

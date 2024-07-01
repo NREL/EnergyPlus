@@ -87,8 +87,8 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test1)
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name = "Test";
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::NOMINAL_CAPACITY;
-    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = 1;
-    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = 1;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterInNodeNum = 1;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutNodeNum = 1;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = 50000;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = 52;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = 35;
@@ -215,8 +215,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test3)
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name = "Test";
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
-    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = 1;
-    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = 1;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterInNodeNum = 1;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutNodeNum = 1;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = 50000;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = 52;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = 35;
@@ -305,8 +305,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test5)
 
     thisFluidCooler.Name = "Test";
     thisFluidCooler.FluidCoolerMassFlowRateMultiplier = 2.5;
-    thisFluidCooler.WaterInletNodeNum = 1;
-    thisFluidCooler.WaterOutletNodeNum = 1;
+    thisFluidCooler.WaterInNodeNum = 1;
+    thisFluidCooler.WaterOutNodeNum = 1;
     thisFluidCooler.DesignEnteringWaterTemp = 52;
     thisFluidCooler.DesignEnteringAirTemp = 35;
     thisFluidCooler.DesignEnteringAirWetBulbTemp = 25;
@@ -324,7 +324,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test5)
     // test input error check, if the nominal capacity specified and UA value is not zero, then it does not fatal out
     bool testResult = thisFluidCooler.validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
-    EXPECT_TRUE(compare_enums(thisFluidCooler.PerformanceInputMethod_Num, PerfInputMethod::NOMINAL_CAPACITY));
+    EXPECT_ENUM_EQ(thisFluidCooler.PerformanceInputMethod_Num, PerfInputMethod::NOMINAL_CAPACITY);
     // UA value is reset to zero if nominal capacity is specified and input method is "NOMINAL_CAPACITY"
     EXPECT_EQ(thisFluidCooler.HighSpeedFluidCoolerUA, 0.0);
 }
@@ -407,15 +407,18 @@ TEST_F(EnergyPlusFixture, ExerciseSingleSpeedFluidCooler)
     state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 3;
     state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 3;
 
-    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMaxAvail = 5;
-    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMax = 5;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).Temp = 20;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMaxAvail = 5;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMax = 5;
+    auto &dln = state->dataLoopNodes;
+    auto *waterOutNode = dln->nodes(ptr->WaterOutNodeNum);
+    auto *waterInNode = dln->nodes(ptr->WaterInNodeNum);
+    waterOutNode->MassFlowRateMaxAvail = 5;
+    waterOutNode->MassFlowRateMax = 5;
+    waterInNode->Temp = 20;
+    waterInNode->MassFlowRateMaxAvail = 5;
+    waterInNode->MassFlowRateMax = 5;
 
-    // We don't set ptr->OutdoorAirInletNodeNum to a node, so the fluid cooler uses the dataEnvrn values
+    // We don't set ptr->OutdoorAirInNodeNum to a node, so the fluid cooler uses the dataEnvrn values
     // We don't want them as 0 to avoid a divide by zero error, when PsyRhoAirFnPbTdbW will be called with these value in CalcFluidCoolerOutlet
-    EXPECT_EQ(0, ptr->OutdoorAirInletNodeNum);
+    EXPECT_EQ(0, ptr->OutdoorAirInNodeNum);
     state->dataEnvrn->OutBaroPress = 101325;
     state->dataEnvrn->OutHumRat = 0.0001;
 
@@ -478,15 +481,18 @@ TEST_F(EnergyPlusFixture, ExerciseTwoSpeedFluidCooler)
     state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 3;
     state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 3;
 
-    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMaxAvail = 5;
-    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMax = 5;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).Temp = 20;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMaxAvail = 5;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMax = 5;
+    auto &dln = state->dataLoopNodes;
+    auto *waterOutNode = dln->nodes(ptr->WaterOutNodeNum);
+    auto *waterInNode = dln->nodes(ptr->WaterInNodeNum);
+    waterOutNode->MassFlowRateMaxAvail = 5;
+    waterOutNode->MassFlowRateMax = 5;
+    waterInNode->Temp = 20;
+    waterInNode->MassFlowRateMaxAvail = 5;
+    waterInNode->MassFlowRateMax = 5;
 
-    // We don't set ptr->OutdoorAirInletNodeNum to a node, so the fluid cooler uses the dataEnvrn values
+    // We don't set ptr->OutdoorAirInNodeNum to a node, so the fluid cooler uses the dataEnvrn values
     // We don't want them as 0 to avoid a divide by zero error, when PsyRhoAirFnPbTdbW will be called with these value in CalcFluidCoolerOutlet
-    EXPECT_EQ(0, ptr->OutdoorAirInletNodeNum);
+    EXPECT_EQ(0, ptr->OutdoorAirInNodeNum);
     state->dataEnvrn->OutBaroPress = 101325;
     state->dataEnvrn->OutHumRat = 0.0001;
 

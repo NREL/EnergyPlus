@@ -61,7 +61,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::PlantChillers;
 
 TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
@@ -129,10 +128,10 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
         state->dataPlantChillers->ElectricChiller(1).Name;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::Chiller_Electric;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataPlantChillers->ElectricChiller(1).EvapInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut =
-        state->dataPlantChillers->ElectricChiller(1).EvapOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataPlantChillers->ElectricChiller(1).EvapInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum =
+        state->dataPlantChillers->ElectricChiller(1).EvapOutNodeNum;
 
     state->dataPlnt->PlantLoop(2).Name = "CondenserWaterLoop";
     state->dataPlnt->PlantLoop(2).FluidName = "CondenserWater";
@@ -143,10 +142,10 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
         state->dataPlantChillers->ElectricChiller(1).Name;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::Chiller_Electric;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut =
-        state->dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataPlantChillers->ElectricChiller(1).CondInNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum =
+        state->dataPlantChillers->ElectricChiller(1).CondOutNodeNum;
 
     state->dataSize->PlantSizData.allocate(2);
     state->dataSize->PlantSizData(1).DesVolFlowRate = 0.001;
@@ -264,10 +263,10 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
         state->dataPlantChillers->ElectricChiller(1).Name;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::Chiller_Electric;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataPlantChillers->ElectricChiller(1).EvapInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut =
-        state->dataPlantChillers->ElectricChiller(1).EvapOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataPlantChillers->ElectricChiller(1).EvapInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum =
+        state->dataPlantChillers->ElectricChiller(1).EvapOutNodeNum;
 
     state->dataPlnt->PlantLoop(2).Name = "CondenserWaterLoop";
     state->dataPlnt->PlantLoop(2).FluidName = "CondenserWater";
@@ -278,10 +277,10 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
         state->dataPlantChillers->ElectricChiller(1).Name;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::Chiller_Electric;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut =
-        state->dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataPlantChillers->ElectricChiller(1).CondInNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum =
+        state->dataPlantChillers->ElectricChiller(1).CondOutNodeNum;
 
     state->dataSize->PlantSizData.allocate(2);
     state->dataSize->PlantSizData(1).DesVolFlowRate = 0.001;

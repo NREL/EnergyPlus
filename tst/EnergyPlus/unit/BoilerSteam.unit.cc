@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     GetBoilerInput(*state);
     auto &thisBoiler = state->dataBoilerSteam->Boiler((int)state->dataBoilerSteam->Boiler.size());
     EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
-    EXPECT_TRUE(compare_enums(thisBoiler.FuelType, Constant::eFuel::NaturalGas));
+    EXPECT_ENUM_EQ(thisBoiler.FuelType, Constant::eFuel::NaturalGas);
     EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
     EXPECT_EQ(thisBoiler.NomEffic, 0.8);
     EXPECT_EQ(thisBoiler.TempUpLimitBoilerOut, 115);
@@ -152,8 +152,8 @@ TEST_F(EnergyPlusFixture, BoilerSteam_Simulate)
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).TempSetPoint = 2.0;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).MyLoad = 1000;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).ON = true;
-    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = ptr->BoilerInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = ptr->BoilerOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = ptr->BoilerInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = ptr->BoilerOutNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::Boiler_Steam;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = ptr->Name;
@@ -161,11 +161,15 @@ TEST_F(EnergyPlusFixture, BoilerSteam_Simulate)
     state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 3;
     state->dataSize->CurLoopNum = 1;
 
-    state->dataLoopNodes->Node(ptr->BoilerOutletNodeNum).MassFlowRateMaxAvail = 5;
-    state->dataLoopNodes->Node(ptr->BoilerOutletNodeNum).MassFlowRateMax = 5;
-    state->dataLoopNodes->Node(ptr->BoilerInletNodeNum).Temp = 20;
-    state->dataLoopNodes->Node(ptr->BoilerInletNodeNum).MassFlowRateMaxAvail = 5;
-    state->dataLoopNodes->Node(ptr->BoilerInletNodeNum).MassFlowRateMax = 5;
+    auto &dln = state->dataLoopNodes;
+    auto *boilerOutNode = dln->nodes(ptr->BoilerOutNodeNum);
+    auto *boilerInNode = dln->nodes(ptr->BoilerInNodeNum);
+    
+    boilerOutNode->MassFlowRateMaxAvail = 5;
+    boilerOutNode->MassFlowRateMax = 5;
+    boilerInNode->Temp = 20;
+    boilerInNode->MassFlowRateMaxAvail = 5;
+    boilerInNode->MassFlowRateMax = 5;
 
     Real64 curLoad = 1000.0;
     ptr->simulate(*state, pl, true, curLoad, true);
@@ -226,8 +230,8 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     state->dataPlnt->PlantLoop(1).FluidName = "STEAM";
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = thisBoiler.Name;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::Boiler_Steam;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = thisBoiler.BoilerInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = thisBoiler.BoilerOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = thisBoiler.BoilerInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = thisBoiler.BoilerOutNodeNum;
 
     state->dataSize->PlantSizData.allocate(1);
     state->dataSize->PlantSizData(1).DesVolFlowRate = 0.1;

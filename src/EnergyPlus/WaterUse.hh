@@ -154,8 +154,8 @@ namespace WaterUse {
         std::string Name;        // Name of DHW
         bool Init = true;        // Flag for initialization:  TRUE means do the init
         bool StandAlone = false; // Flag for operation with no plant connections
-        int InletNode = 0;       // Hot water demand node
-        int OutletNode = 0;      // Cold water supply node
+        int InNodeNum = 0;       // Hot water demand node
+        int OutNodeNum = 0;      // Cold water supply node
         int SupplyTankNum = 0;
         int RecoveryTankNum = 0;
         int TankDemandID = 0; // array to request flow from supply tank

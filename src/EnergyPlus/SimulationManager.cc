@@ -1709,8 +1709,8 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "numEMSInternalVarsAvailable", state.dataRuntimeLang->numEMSInternalVarsAvailable);
         print(state.files.audit, variable_fmt, "maxEMSInternalVarsAvailable", state.dataRuntimeLang->maxEMSInternalVarsAvailable);
 
-        print(state.files.audit, variable_fmt, "NumOfNodeConnections", state.dataBranchNodeConnections->NumOfNodeConnections);
-        print(state.files.audit, variable_fmt, "MaxNumOfNodeConnections", state.dataBranchNodeConnections->MaxNumOfNodeConnections);
+        print(state.files.audit, variable_fmt, "NumOfNodeConnections", state.dataBranchNodeConnections->NumNodeConnections);
+        print(state.files.audit, variable_fmt, "MaxNumOfNodeConnections", state.dataBranchNodeConnections->MaxNodeConnections);
 #ifdef EP_Count_Calls
         print(state.files.audit, variable_fmt, "NumShadow_Calls", state.dataTimingsData->NumShadow_Calls);
         print(state.files.audit, variable_fmt, "NumShadowAtTS_Calls", state.dataTimingsData->NumShadowAtTS_Calls);
@@ -1945,14 +1945,16 @@ namespace SimulationManager {
         static constexpr std::string_view Format_703(
             "! <{} Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>\n");
 
-        state.dataBranchNodeConnections->NonConnectedNodes.dimension(state.dataLoopNodes->NumOfNodes, true);
+        auto &dln = state.dataLoopNodes;
+        
+        state.dataBranchNodeConnections->NonConnectedNodes.dimension(dln->nodes.size(), true);
 
         int NumNonParents = 0;
-        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumNodeConnections; ++Loop) {
             if (state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
             ++NumNonParents;
         }
-        const int NumParents = state.dataBranchNodeConnections->NumOfNodeConnections - NumNonParents;
+        const int NumParents = state.dataBranchNodeConnections->NumNodeConnections - NumNonParents;
         state.dataBranchNodeConnections->ParentNodeList.allocate(NumParents);
 
         //  Do Parent Objects
@@ -1961,55 +1963,54 @@ namespace SimulationManager {
         print(state.files.bnd, " #Parent Node Connections,{}\n", NumParents);
         print(state.files.bnd, Format_703, "Parent");
 
-        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumNodeConnections; ++Loop) {
             if (!state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
-            state.dataBranchNodeConnections->NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNumber) = false;
+            state.dataBranchNodeConnections->NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNum) = false;
             print(state.files.bnd,
                   " Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
-                      state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
+                  Node::connObjTypeNamesUC[(int)state.dataBranchNodeConnections->NodeConnections(Loop).connObjType],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  Node::ConnTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
+                  Node::connTypeNames[(int)state.dataBranchNodeConnections->NodeConnections(Loop).connType],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
             // Build ParentNodeLists
-            if ((state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == Node::ConnType::Inlet) ||
-                (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == Node::ConnType::Outlet)) {
+            if ((state.dataBranchNodeConnections->NodeConnections(Loop).connType == Node::ConnType::Inlet) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop).connType == Node::ConnType::Outlet)) {
                 bool ParentComponentFound = false;
-                for (int Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop1) {
+                for (int Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumActualParents; ++Loop1) {
                     if (state.dataBranchNodeConnections->ParentNodeList(Loop1).ComponentType !=
-                            state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType ||
+                            state.dataBranchNodeConnections->NodeConnections(Loop).connObjType ||
                         state.dataBranchNodeConnections->ParentNodeList(Loop1).ComponentName !=
                             state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName)
                         continue;
                     ParentComponentFound = true;
 
-                    switch (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType) {
+                    switch (state.dataBranchNodeConnections->NodeConnections(Loop).connType) {
                     case Node::ConnType::Inlet:
-                        state.dataBranchNodeConnections->ParentNodeList(Loop1).InletNodeName =
+                        state.dataBranchNodeConnections->ParentNodeList(Loop1).InNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         break;
                     case Node::ConnType::Outlet:
-                        state.dataBranchNodeConnections->ParentNodeList(Loop1).OutletNodeName =
+                        state.dataBranchNodeConnections->ParentNodeList(Loop1).OutNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                     default:
                         break;
                     }
                 }
                 if (!ParentComponentFound) {
-                    ++state.dataBranchNodeConnections->NumOfActualParents;
-                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).ComponentType =
-                        state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType;
-                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).ComponentName =
+                    ++state.dataBranchNodeConnections->NumActualParents;
+                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumActualParents).ComponentType =
+                        state.dataBranchNodeConnections->NodeConnections(Loop).connObjType;
+                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumActualParents).ComponentName =
                         state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName;
 
-                    switch (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType) {
+                    switch (state.dataBranchNodeConnections->NodeConnections(Loop).connType) {
                     case Node::ConnType::Inlet:
-                        state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).InletNodeName =
+                        state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumActualParents).InNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         break;
                     case Node::ConnType::Outlet:
-                        state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).OutletNodeName =
+                        state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumActualParents).OutNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         break;
                     default:
@@ -2025,21 +2026,20 @@ namespace SimulationManager {
         print(state.files.bnd, " #Non-Parent Node Connections,{}\n", NumNonParents);
         print(state.files.bnd, Format_703, "Non-Parent");
 
-        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumNodeConnections; ++Loop) {
             if (state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
-            state.dataBranchNodeConnections->NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNumber) = false;
+            state.dataBranchNodeConnections->NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNum) = false;
             print(state.files.bnd,
                   " Non-Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
-                      state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
+                  Node::connObjTypeNamesUC[(int)state.dataBranchNodeConnections->NodeConnections(Loop).connObjType],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  Node::ConnTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
+                  Node::connTypeNames[(int)state.dataBranchNodeConnections->NodeConnections(Loop).connType],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
         }
 
         int NumNonConnected = 0;
-        for (int Loop = 1; Loop <= state.dataLoopNodes->NumOfNodes; ++Loop) {
+        for (int Loop = 1; Loop <= dln->nodes.isize(); ++Loop) {
             if (state.dataBranchNodeConnections->NonConnectedNodes(Loop)) ++NumNonConnected;
         }
 
@@ -2049,9 +2049,9 @@ namespace SimulationManager {
             print(state.files.bnd, Format_705, NumNonConnected);
             static constexpr std::string_view Format_706("! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>");
             print(state.files.bnd, "{}\n", Format_706);
-            for (int Loop = 1; Loop <= state.dataLoopNodes->NumOfNodes; ++Loop) {
+            for (int Loop = 1; Loop <= (int)dln->nodes.size(); ++Loop) {
                 if (!state.dataBranchNodeConnections->NonConnectedNodes(Loop)) continue;
-                print(state.files.bnd, " NonConnected Node,{},{}\n", Loop, state.dataLoopNodes->NodeID(Loop));
+                print(state.files.bnd, " NonConnected Node,{},{}\n", Loop, dln->nodes(Loop)->Name);
             }
         }
 
@@ -2071,6 +2071,7 @@ namespace SimulationManager {
         // HVAC system: Component Sets, Air Loop, Plant and Condenser Loop, Supply and
         // return air paths, controlled zones.
         // This information should be useful in diagnosing node connection input errors.
+        auto &dln = state.dataLoopNodes;
 
         static constexpr std::string_view errstring = "**error**";
 
@@ -2096,7 +2097,7 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Outdoor Air Node,{},{}\n",
                   state.dataOutAirNodeMgr->OutsideAirNodeList(Count),
-                  state.dataLoopNodes->NodeID(state.dataOutAirNodeMgr->OutsideAirNodeList(Count)));
+                  dln->nodes(state.dataOutAirNodeMgr->OutsideAirNodeList(Count))->Name);
         }
         // Component Sets
         print(state.files.bnd, "{}\n", "! ===============================================================");
@@ -2108,21 +2109,18 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Component Set,{},{},{},{},{},{},{},{}\n",
                   Count,
-                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
-                      state.dataBranchNodeConnections->CompSets(Count).ParentObjectType)],
+                  Node::connObjTypeNamesUC[(int)state.dataBranchNodeConnections->CompSets(Count).ParentObjectType],
                   state.dataBranchNodeConnections->CompSets(Count).ParentCName,
-                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
-                      state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)],
+                  Node::connObjTypeNamesUC[(int)state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType],
                   state.dataBranchNodeConnections->CompSets(Count).CName,
-                  state.dataBranchNodeConnections->CompSets(Count).InletNodeName,
-                  state.dataBranchNodeConnections->CompSets(Count).OutletNodeName,
+                  state.dataBranchNodeConnections->CompSets(Count).InNodeName,
+                  state.dataBranchNodeConnections->CompSets(Count).OutNodeName,
                   state.dataBranchNodeConnections->CompSets(Count).Description);
 
-            std::string_view const CType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
-                state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)];
+            std::string_view const CType = Node::connObjTypeNamesUC[(int)state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType];
             if (state.dataBranchNodeConnections->CompSets(Count).ParentObjectType == Node::ConnObjType::Undefined ||
-                state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
-                state.dataBranchNodeConnections->CompSets(Count).OutletNodeName == "UNDEFINED") {
+                state.dataBranchNodeConnections->CompSets(Count).InNodeName == "UNDEFINED" ||
+                state.dataBranchNodeConnections->CompSets(Count).OutNodeName == "UNDEFINED") {
                 if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state,
                                      "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
@@ -2133,8 +2131,8 @@ namespace SimulationManager {
                                  format("Node Connection Error for object {}={}", CType, state.dataBranchNodeConnections->CompSets(Count).CName));
                 ShowContinueError(state,
                                   format("  {} not on any Branch or Parent Object", state.dataBranchNodeConnections->CompSets(Count).Description));
-                ShowContinueError(state, format("  Inlet Node : {}", state.dataBranchNodeConnections->CompSets(Count).InletNodeName));
-                ShowContinueError(state, format("  Outlet Node: {}", state.dataBranchNodeConnections->CompSets(Count).OutletNodeName));
+                ShowContinueError(state, format("  Inlet Node : {}", state.dataBranchNodeConnections->CompSets(Count).InNodeName));
+                ShowContinueError(state, format("  Outlet Node: {}", state.dataBranchNodeConnections->CompSets(Count).OutNodeName));
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
                 if (state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType ==
                     Node::ConnObjType::SolarCollectorUnglazedTranspired) {
@@ -2152,8 +2150,8 @@ namespace SimulationManager {
                     state,
                     format("Potential Node Connection Error for object {}, name={}", CType, state.dataBranchNodeConnections->CompSets(Count).CName));
                 ShowContinueError(state, "  Node Types are still UNDEFINED -- See Branch/Node Details file for further information");
-                ShowContinueError(state, format("  Inlet Node : {}", state.dataBranchNodeConnections->CompSets(Count).InletNodeName));
-                ShowContinueError(state, format("  Outlet Node: {}", state.dataBranchNodeConnections->CompSets(Count).OutletNodeName));
+                ShowContinueError(state, format("  Inlet Node : {}", state.dataBranchNodeConnections->CompSets(Count).InNodeName));
+                ShowContinueError(state, format("  Outlet Node: {}", state.dataBranchNodeConnections->CompSets(Count).OutNodeName));
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
             }
         }
@@ -2164,10 +2162,10 @@ namespace SimulationManager {
                     state.dataBranchNodeConnections->CompSets(Count1).ComponentObjectType)
                     continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Count1).CName) continue;
-                if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Count1).InletNodeName)
+                if (state.dataBranchNodeConnections->CompSets(Count).InNodeName != state.dataBranchNodeConnections->CompSets(Count1).InNodeName)
                     continue;
-                if (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName !=
-                    state.dataBranchNodeConnections->CompSets(Count1).OutletNodeName)
+                if (state.dataBranchNodeConnections->CompSets(Count).OutNodeName !=
+                    state.dataBranchNodeConnections->CompSets(Count1).OutNodeName)
                     continue;
                 if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state,
@@ -2175,16 +2173,13 @@ namespace SimulationManager {
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
                 }
-                std::string_view const CType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
-                    state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)];
-                std::string_view const ParentCType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
-                    state.dataBranchNodeConnections->CompSets(Count1).ParentObjectType)];
-                std::string_view const ParentCType1 = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
-                    state.dataBranchNodeConnections->CompSets(Count).ParentObjectType)];
+                std::string_view const CType = Node::connObjTypeNamesUC[(int)state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType];
+                std::string_view const ParentCType = Node::connObjTypeNamesUC[(int)state.dataBranchNodeConnections->CompSets(Count1).ParentObjectType];
+                std::string_view const ParentCType1 = Node::connObjTypeNamesUC[(int)state.dataBranchNodeConnections->CompSets(Count).ParentObjectType];
                 ShowWarningError(state, "Component plus inlet/outlet node pair used more than once:");
                 ShowContinueError(state, format("  Component  : {}={}", CType, state.dataBranchNodeConnections->CompSets(Count).CName));
-                ShowContinueError(state, format("  Inlet Node : {}", state.dataBranchNodeConnections->CompSets(Count).InletNodeName));
-                ShowContinueError(state, format("  Outlet Node: {}", state.dataBranchNodeConnections->CompSets(Count).OutletNodeName));
+                ShowContinueError(state, format("  Inlet Node : {}", state.dataBranchNodeConnections->CompSets(Count).InNodeName));
+                ShowContinueError(state, format("  Outlet Node: {}", state.dataBranchNodeConnections->CompSets(Count).OutNodeName));
                 ShowContinueError(state, format("  Used by    : {}={}", ParentCType, state.dataBranchNodeConnections->CompSets(Count).ParentCName));
                 ShowContinueError(state, format("  and  by    : {}={}", ParentCType1, state.dataBranchNodeConnections->CompSets(Count1).ParentCName));
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
@@ -2223,8 +2218,8 @@ namespace SimulationManager {
                       " Plant Loop,{},{},{},{},{},{}\n",
                       state.dataPlnt->PlantLoop(Count).Name,
                       LoopString,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).InNodeName,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).OutNodeName,
                       state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).BranchList,
                       state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
                 //  Plant Supply Side Splitter
@@ -2234,8 +2229,8 @@ namespace SimulationManager {
                           state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
                           state.dataPlnt->PlantLoop(Count).Name,
                           LoopString,
-                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
-                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NumOutNodes);
+                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NumOutNodes; ++Count1) {
                         print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Splitter,{},",
                               Count1,
@@ -2269,8 +2264,8 @@ namespace SimulationManager {
                               "     Plant Loop Connector Nodes,   {},Splitter,{},{},{},{},{}\n",
                               Count1,
                               state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1),
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.InNodeName,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.OutNodeNames(Count1),
                               state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }
@@ -2283,9 +2278,9 @@ namespace SimulationManager {
                           state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
                           state.dataPlnt->PlantLoop(Count).Name,
                           LoopString,
-                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes); //',Supply,'//  &
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NumInNodes); //',Supply,'//  &
 
-                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
+                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NumInNodes; ++Count1) {
                         print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Mixer,{},",
                               Count1,
@@ -2316,8 +2311,8 @@ namespace SimulationManager {
                               "     Plant Loop Connector Nodes,   {},Mixer,{},{},{},{},{}\n",
                               Count1,
                               state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1),
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.InNodeNames(Count1),
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.OutNodeName,
                               state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }
@@ -2326,13 +2321,13 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).OutNodeName,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).InNodeName);
             print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).OutNodeName,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).InNodeName);
 
         } //  Plant Demand Side Loop
 
@@ -2379,8 +2374,8 @@ namespace SimulationManager {
                       " Plant Loop,{},{},{},{},{},{}\n",
                       state.dataPlnt->PlantLoop(Count).Name,
                       LoopString,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).InNodeName,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).OutNodeName,
                       state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).BranchList,
                       state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
                 //  Plant Supply Side Splitter
@@ -2390,8 +2385,8 @@ namespace SimulationManager {
                           state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
                           state.dataPlnt->PlantLoop(Count).Name,
                           LoopString,
-                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
-                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NumOutNodes);
+                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NumOutNodes; ++Count1) {
                         print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Splitter,{},",
                               Count1,
@@ -2425,8 +2420,8 @@ namespace SimulationManager {
                               "     Plant Loop Connector Nodes,   {},Splitter,{},{},{},{},{}\n",
                               Count1,
                               state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1),
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.InNodeName,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.OutNodeNames(Count1),
                               state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }
@@ -2434,7 +2429,7 @@ namespace SimulationManager {
 
                 //  Plant Supply Side Mixer
                 if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
-                    const int totalInletNodes = state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
+                    const int totalInletNodes = state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NumInNodes;
                     print(state.files.bnd,
                           "   Plant Loop Connector,Mixer,{},{},{},{}\n",
                           state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
@@ -2474,8 +2469,8 @@ namespace SimulationManager {
                               "     Plant Loop Connector Nodes,   {},Mixer,{},{},{},{},{}\n",
                               Count1,
                               state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1),
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.InNodeNames(Count1),
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.OutNodeName,
                               state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }
@@ -2484,13 +2479,13 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).OutNodeName,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).InNodeName);
             print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).OutNodeName,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).InNodeName);
 
         } //  Plant Demand Side Loop
 
@@ -2522,19 +2517,19 @@ namespace SimulationManager {
                       state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
                       state.dataZoneEquip->ZoneEquipConfig(Count).EquipListName,
                       state.dataZoneEquip->ZoneEquipConfig(Count).ControlListName,
-                      state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ZoneNode),
-                      state.dataZoneEquip->ZoneEquipConfig(Count).NumInletNodes,
+                      dln->nodes(state.dataZoneEquip->ZoneEquipConfig(Count).ZoneNodeNum)->Name,
+                      state.dataZoneEquip->ZoneEquipConfig(Count).NumInNodes,
                       state.dataZoneEquip->ZoneEquipConfig(Count).NumExhaustNodes,
                       state.dataZoneEquip->ZoneEquipConfig(Count).NumReturnNodes);
-                for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumInletNodes; ++Count1) {
-                    std::string ChrName = state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
+                for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumInNodes; ++Count1) {
+                    std::string ChrName = dln->nodes(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNodeNum)->Name;
                     if (ChrName == "Undefined") ChrName = "N/A";
                     print(state.files.bnd,
                           "   Controlled Zone Inlet,{},{},{},{},{}\n",
                           Count1,
                           state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
-                          state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).InletNode(Count1)),
-                          state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNode),
+                          dln->nodes(state.dataZoneEquip->ZoneEquipConfig(Count).InNodeNums(Count1))->Name,
+                          dln->nodes(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNodeNum)->Name,
                           ChrName);
                 }
                 for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumExhaustNodes; ++Count1) {
@@ -2542,14 +2537,14 @@ namespace SimulationManager {
                           "   Controlled Zone Exhaust,{},{},{}\n",
                           Count1,
                           state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
-                          state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ExhaustNode(Count1)));
+                          dln->nodes(state.dataZoneEquip->ZoneEquipConfig(Count).ExhaustNodeNums(Count1))->Name);
                 }
                 for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumReturnNodes; ++Count1) {
                     print(state.files.bnd,
                           "   Controlled Zone Return,{},{},{}\n",
                           Count1,
                           state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
-                          state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ReturnNode(Count1)));
+                          dln->nodes(state.dataZoneEquip->ZoneEquipConfig(Count).ReturnNodeNums(Count1))->Name);
                 }
             }
 

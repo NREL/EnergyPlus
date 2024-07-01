@@ -85,7 +85,6 @@ using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HybridModel;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
@@ -169,19 +168,20 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
 
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    state->dataLoopNodes->Node.allocate(5);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 5; ++i) dln->nodes.push_back(new Node::NodeData);
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).Volume = 1000.0;
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -204,17 +204,17 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-    state->dataLoopNodes->Node(1).HumRat = 0.008;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-    state->dataLoopNodes->Node(2).HumRat = 0.008;
+    dln->nodes(1)->MassFlowRate = 0.01; // Zone inlet node 1
+    dln->nodes(1)->HumRat = 0.008;
+    dln->nodes(2)->MassFlowRate = 0.02; // Zone inlet node 2
+    dln->nodes(2)->HumRat = 0.008;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
-    state->dataLoopNodes->Node(3).HumRat = 0.008;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
-    state->dataLoopNodes->Node(4).HumRat = 0.000;
-    state->dataLoopNodes->Node(5).HumRat = 0.000;
+    dln->nodes(3)->MassFlowRate = 0.00; // Zone exhaust node 1
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = dln->nodes(3)->MassFlowRate;
+    dln->nodes(3)->HumRat = 0.008;
+    dln->nodes(4)->MassFlowRate = 0.03; // Zone return node
+    dln->nodes(4)->HumRat = 0.000;
+    dln->nodes(5)->HumRat = 0.000;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MixingMassFlowZone = 0.0;
@@ -234,8 +234,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     EXPECT_NEAR(76.89754831, state->dataContaminantBalance->GCPredictedRate(1), 0.00001);
 
     CorrectZoneContaminants(*state, state->dataHVACGlobal->UseZoneTimeStepHistory);
-    EXPECT_NEAR(489.931000, state->dataLoopNodes->Node(5).CO2, 0.00001);
-    EXPECT_NEAR(0.09093100, state->dataLoopNodes->Node(5).GenContam, 0.00001);
+    EXPECT_NEAR(489.931000, dln->nodes(5)->CO2, 0.00001);
+    EXPECT_NEAR(0.09093100, dln->nodes(5)->GenContam, 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContaminantsTest)
@@ -303,19 +303,20 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
 
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    state->dataLoopNodes->Node.allocate(5);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 5; ++i) dln->nodes.push_back(new Node::NodeData);
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
@@ -323,7 +324,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).Volume = 1000.0;
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -334,24 +335,24 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-    state->dataLoopNodes->Node(1).HumRat = 0.008;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-    state->dataLoopNodes->Node(2).HumRat = 0.008;
+    dln->nodes(1)->MassFlowRate = 0.01; // Zone inlet node 1
+    dln->nodes(1)->HumRat = 0.008;
+    dln->nodes(2)->MassFlowRate = 0.02; // Zone inlet node 2
+    dln->nodes(2)->HumRat = 0.008;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
-    state->dataLoopNodes->Node(3).HumRat = 0.008;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
-    state->dataLoopNodes->Node(4).HumRat = 0.000;
-    state->dataLoopNodes->Node(5).HumRat = 0.000;
+    dln->nodes(3)->MassFlowRate = 0.00; // Zone exhaust node 1
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = dln->nodes(3)->MassFlowRate;
+    dln->nodes(3)->HumRat = 0.008;
+    dln->nodes(4)->MassFlowRate = 0.03; // Zone return node
+    dln->nodes(4)->HumRat = 0.000;
+    dln->nodes(5)->HumRat = 0.000;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MixingMassFlowZone = 0.0;
 
     CorrectZoneContaminants(*state, state->dataHVACGlobal->UseZoneTimeStepHistory);
-    EXPECT_NEAR(490.0, state->dataLoopNodes->Node(5).CO2, 0.00001);
-    EXPECT_NEAR(90.000999, state->dataLoopNodes->Node(5).GenContam, 0.00001);
+    EXPECT_NEAR(490.0, dln->nodes(5)->CO2, 0.00001);
+    EXPECT_NEAR(90.000999, dln->nodes(5)->GenContam, 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlTest)
@@ -433,41 +434,42 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataZoneEquip->ZoneEquipConfig.allocate(3);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
 
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
 
-    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums(1) = 6;
     state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1) = 7;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeNums(1) = 7;
     state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(3).ZoneName = "Zone 3";
 
-    state->dataZoneEquip->ZoneEquipConfig(3).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(3).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(3).InletNode(1) = 8;
+    state->dataZoneEquip->ZoneEquipConfig(3).NumInNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(3).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).InNodeNums(1) = 8;
     state->dataZoneEquip->ZoneEquipConfig(3).NumExhaustNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(3).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNode(1) = 9;
+    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNodeNums(1) = 9;
     state->dataZoneEquip->ZoneEquipConfig(3).FixedReturnFlow.allocate(1);
 
-    state->dataLoopNodes->Node.allocate(10);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 10; ++i) dln->nodes.push_back(new Node::NodeData);
 
     state->dataHeatBal->Zone.allocate(3);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
@@ -475,17 +477,17 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).Volume = 1000.0;
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     state->dataHeatBal->Zone(2).Name = state->dataZoneEquip->ZoneEquipConfig(2).ZoneName;
     state->dataHeatBal->Zone(2).Multiplier = 1.0;
     state->dataHeatBal->Zone(2).Volume = 1000.0;
-    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNum = 5;
     state->dataHeatBal->Zone(2).ZoneVolCapMultpMoist = 1.0;
     state->dataHeatBal->Zone(3).Name = state->dataZoneEquip->ZoneEquipConfig(3).ZoneName;
     state->dataHeatBal->Zone(3).Multiplier = 1.0;
     state->dataHeatBal->Zone(3).Volume = 1000.0;
-    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(3).SystemZoneNodeNum = 5;
     state->dataHeatBal->Zone(3).ZoneVolCapMultpMoist = 1.0;
 
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -503,17 +505,17 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-    state->dataLoopNodes->Node(1).HumRat = 0.008;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-    state->dataLoopNodes->Node(2).HumRat = 0.008;
+    dln->nodes(1)->MassFlowRate = 0.01; // Zone inlet node 1
+    dln->nodes(1)->HumRat = 0.008;
+    dln->nodes(2)->MassFlowRate = 0.02; // Zone inlet node 2
+    dln->nodes(2)->HumRat = 0.008;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
-    state->dataLoopNodes->Node(3).HumRat = 0.008;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
-    state->dataLoopNodes->Node(4).HumRat = 0.000;
-    state->dataLoopNodes->Node(5).HumRat = 0.000;
+    dln->nodes(3)->MassFlowRate = 0.00; // Zone exhaust node 1
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = dln->nodes(3)->MassFlowRate;
+    dln->nodes(3)->HumRat = 0.008;
+    dln->nodes(4)->MassFlowRate = 0.03; // Zone return node
+    dln->nodes(4)->HumRat = 0.000;
+    dln->nodes(5)->HumRat = 0.000;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.008;
@@ -524,10 +526,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MixingMassFlowZone = 0.0;
 
-    state->dataLoopNodes->Node(6).MassFlowRate = 0.01;
-    state->dataLoopNodes->Node(7).MassFlowRate = 0.01;
-    state->dataLoopNodes->Node(8).MassFlowRate = 0.01;
-    state->dataLoopNodes->Node(9).MassFlowRate = 0.01;
+    dln->nodes(6)->MassFlowRate = 0.01;
+    dln->nodes(7)->MassFlowRate = 0.01;
+    dln->nodes(8)->MassFlowRate = 0.01;
+    dln->nodes(9)->MassFlowRate = 0.01;
 
     state->dataContaminantBalance->CO2PredictedRate.allocate(3);
     state->dataContaminantBalance->ZoneSysContDemand.allocate(3);
@@ -619,41 +621,42 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataZoneEquip->ZoneEquipConfig.allocate(3);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
 
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
 
-    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums(1) = 6;
     state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1) = 7;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeNums(1) = 7;
     state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(3).ZoneName = "Zone 3";
 
-    state->dataZoneEquip->ZoneEquipConfig(3).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(3).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(3).InletNode(1) = 8;
+    state->dataZoneEquip->ZoneEquipConfig(3).NumInNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(3).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).InNodeNums(1) = 8;
     state->dataZoneEquip->ZoneEquipConfig(3).NumExhaustNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(3).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNode(1) = 9;
+    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNodeNums(1) = 9;
     state->dataZoneEquip->ZoneEquipConfig(3).FixedReturnFlow.allocate(1);
 
-    state->dataLoopNodes->Node.allocate(10);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 10; ++i) dln->nodes.push_back(new Node::NodeData);
 
     state->dataHeatBal->Zone.allocate(3);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
@@ -661,17 +664,17 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).Volume = 1000.0;
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     state->dataHeatBal->Zone(2).Name = state->dataZoneEquip->ZoneEquipConfig(2).ZoneName;
     state->dataHeatBal->Zone(2).Multiplier = 1.0;
     state->dataHeatBal->Zone(2).Volume = 1000.0;
-    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNum = 5;
     state->dataHeatBal->Zone(2).ZoneVolCapMultpMoist = 1.0;
     state->dataHeatBal->Zone(3).Name = state->dataZoneEquip->ZoneEquipConfig(3).ZoneName;
     state->dataHeatBal->Zone(3).Multiplier = 1.0;
     state->dataHeatBal->Zone(3).Volume = 1000.0;
-    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(3).SystemZoneNodeNum = 5;
     state->dataHeatBal->Zone(3).ZoneVolCapMultpMoist = 1.0;
 
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -689,17 +692,17 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-    state->dataLoopNodes->Node(1).HumRat = 0.008;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-    state->dataLoopNodes->Node(2).HumRat = 0.008;
+    dln->nodes(1)->MassFlowRate = 0.01; // Zone inlet node 1
+    dln->nodes(1)->HumRat = 0.008;
+    dln->nodes(2)->MassFlowRate = 0.02; // Zone inlet node 2
+    dln->nodes(2)->HumRat = 0.008;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
-    state->dataLoopNodes->Node(3).HumRat = 0.008;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
-    state->dataLoopNodes->Node(4).HumRat = 0.000;
-    state->dataLoopNodes->Node(5).HumRat = 0.000;
+    dln->nodes(3)->MassFlowRate = 0.00; // Zone exhaust node 1
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = dln->nodes(3)->MassFlowRate;
+    dln->nodes(3)->HumRat = 0.008;
+    dln->nodes(4)->MassFlowRate = 0.03; // Zone return node
+    dln->nodes(4)->HumRat = 0.000;
+    dln->nodes(5)->HumRat = 0.000;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.008;
@@ -710,11 +713,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MixingMassFlowZone = 0.0;
 
-    state->dataLoopNodes->Node(6).MassFlowRate = 0.01;
-
-    state->dataLoopNodes->Node(7).MassFlowRate = 0.01;
-    state->dataLoopNodes->Node(8).MassFlowRate = 0.01;
-    state->dataLoopNodes->Node(9).MassFlowRate = 0.01;
+    dln->nodes(6)->MassFlowRate = 0.01;
+    dln->nodes(7)->MassFlowRate = 0.01;
+    dln->nodes(8)->MassFlowRate = 0.01;
+    dln->nodes(9)->MassFlowRate = 0.01;
 
     state->dataContaminantBalance->GCPredictedRate.allocate(3);
 

@@ -194,15 +194,15 @@ namespace DesiccantDehumidifiers {
         int ControlNodeNum;                  // node number of control node
         int ExhaustFanCurveIndex;            // exhaust fan curve object index
         int CompIndex;                       // index of HX component to call simheatrecovery
-        int CoolingCoilOutletNodeNum = 0;    // node number of cooling coil outlet node
+        int CoolingCoilOutNodeNum = 0;    // node number of cooling coil outlet node
         int RegenFanOutNodeNum = 0;          // fan outlet node number mined from regen fan object
-        int RegenCoilInletNodeNum = 0;       // regen heating coil inlet node number mined from regen heater object
-        int RegenCoilOutletNodeNum = 0;      // regen heating coil outlet node number mined from regen heater object
+        int RegenCoilInNodeNum = 0;       // regen heating coil inlet node number mined from regen heater object
+        int RegenCoilOutNodeNum = 0;      // regen heating coil outlet node number mined from regen heater object
         int HXProcInNodeNum = 0;             // process inlet node num mined from desiccant heat exchanger object
         int HXProcOutNodeNum = 0;            // process outlet node num mined from desiccant heat exchanger object
         int HXRegenInNodeNum = 0;            // regen inlet node number mined from desiccant heat exchanger object
         int HXRegenOutNodeNum = 0;           // regen outlet node number mined from desiccant heat exchanger object
-        int CondenserInletNodeNum = 0;       // regen outlet node number mined from desiccant heat exchanger object
+        int CondenserInNodeNum = 0;       // regen outlet node number mined from desiccant heat exchanger object
         int DXCoilIndex;                     // DX Coil index mined from coil object
         int ErrCount;                        // error count
         int ErrIndex1;                       // error index
@@ -210,7 +210,7 @@ namespace DesiccantDehumidifiers {
         bool RegenInletIsOutsideAirNode; // regen inlet is connected to an outside air node
         int RegenCoilType_Num;               // type number of regen coil
         int CoilControlNodeNum = 0;          // heating coil hot water or steam inlet node
-        int CoilOutletNodeNum = 0;           // outlet node for water coil
+        int CoilOutNodeNum = 0;           // outlet node for water coil
         PlantLocation plantLoc;              // plant loop component location for water heating coil
         int HotWaterCoilMaxIterIndex;        // Index to recurring warning message
         int HotWaterCoilMaxIterIndex2;       // Index to recurring warning message

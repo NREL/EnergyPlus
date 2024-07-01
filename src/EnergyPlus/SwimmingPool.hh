@@ -72,10 +72,10 @@ namespace SwimmingPool {
         int SurfacePtr;                  // index to surface array
         std::string ZoneName;            // Name of zone the pool is in
         int ZonePtr;                     // Pointer to this zone in the Zone derived type
-        std::string WaterInletNodeName;  // water inlet node name
-        int WaterInletNode;              // water inlet node number
-        std::string WaterOutletNodeName; // water outlet node name
-        int WaterOutletNode;             // water outlet node number
+        std::string WaterInNodeName;  // water inlet node name
+        int WaterInNodeNum = 0;              // water inlet node number
+        std::string WaterOutNodeName; // water outlet node name
+        int WaterOutNodeNum = 0;             // water outlet node number
         PlantLocation HWplantLoc;
         Real64 WaterVolFlowMax;              // maximum water flow rate for pool, m3/s
         Real64 WaterMassFlowRateMax;         // maximum water mass flow rate for pool, kg/s
@@ -141,7 +141,7 @@ namespace SwimmingPool {
 
         // Default Constructor
         SwimmingPoolData()
-            : SurfacePtr(0), ZonePtr(0), WaterInletNode(0), WaterOutletNode(0), HWplantLoc{}, WaterVolFlowMax(0.0), WaterMassFlowRateMax(0.0),
+            : SurfacePtr(0), ZonePtr(0), HWplantLoc{}, WaterVolFlowMax(0.0), WaterMassFlowRateMax(0.0),
               AvgDepth(0.0), ActivityFactor(0.0), ActivityFactorSchedPtr(0), CurActivityFactor(0.0), MakeupWaterSupplySchedPtr(0),
               CurMakeupWaterTemp(0.0), CoverSchedPtr(0), CurCoverSchedVal(0.0), CoverEvapFactor(0.0), CoverConvFactor(0.0), CoverSWRadFactor(0.0),
               CoverLWRadFactor(0.0), CurCoverEvapFac(0.0), CurCoverConvFac(0.0), CurCoverSWRadFac(0.0), CurCoverLWRadFac(0.0),
@@ -176,6 +176,12 @@ namespace SwimmingPool {
         void initSwimmingPoolPlantNodeFlow(EnergyPlusData &state) const;
 
         void calculate(EnergyPlusData &state);
+
+        void calcMassFlowRate(EnergyPlusData &state,
+                              Real64 &massFlowRate, // Mass Flow Rate (to be calculated)
+                              Real64 TH22,          // Pool water temperature from previous time step
+                              Real64 TLoopInletTemp //
+        );
 
         void calcSwimmingPoolEvap(EnergyPlusData &state,
                                   Real64 &EvapRate, // Evaporation rate

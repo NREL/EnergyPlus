@@ -322,9 +322,9 @@ void GetSwimmingPool(EnergyPlusData &state)
             state.dataSwimmingPools->Pool(Item).CoverLWRadFactor = MaxCoverFactor;
         }
 
-        state.dataSwimmingPools->Pool(Item).WaterInletNodeName = Alphas(6);
-        state.dataSwimmingPools->Pool(Item).WaterOutletNodeName = Alphas(7);
-        state.dataSwimmingPools->Pool(Item).WaterInletNode =
+        state.dataSwimmingPools->Pool(Item).WaterInNodeName = Alphas(6);
+        state.dataSwimmingPools->Pool(Item).WaterOutNodeName = Alphas(7);
+        state.dataSwimmingPools->Pool(Item).WaterInNodeNum =
             Node::GetSingleNode(state,
                                                 Alphas(6),
                                                 ErrorsFound,
@@ -334,7 +334,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                 Node::ConnType::Inlet,
                                                 Node::CompFluidStream::Primary,
                                                 Node::ObjectIsNotParent);
-        state.dataSwimmingPools->Pool(Item).WaterOutletNode =
+        state.dataSwimmingPools->Pool(Item).WaterOutNodeNum =
             Node::GetSingleNode(state,
                                                 Alphas(7),
                                                 ErrorsFound,
@@ -480,6 +480,9 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
     Real64 HeatGainPerPerson = ScheduleManager::GetCurrentScheduleValue(state, this->PeopleHeatGainSchedPtr);
     Real64 PeopleModifier = ScheduleManager::GetCurrentScheduleValue(state, this->PeopleSchedPtr);
 
+    auto &dln = state.dataLoopNodes;
+    auto const *waterInNode = dln->nodes(this->WaterInNodeNum);
+    
     if (this->MyOneTimeFlag) {
         this->setupOutputVars(state); // Set up the output variables once here
         this->MyOneTimeFlag = false;
@@ -531,8 +534,8 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
     // initialize the flow rate for the component on the plant side (this follows standard procedure for other components like low temperature
     // radiant systems)
     Real64 mdot = 0.0;
-    PlantUtilities::SetComponentFlowRate(state, mdot, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
-    this->WaterInletTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
+    PlantUtilities::SetComponentFlowRate(state, mdot, this->WaterInNodeNum, this->WaterOutNodeNum, this->HWplantLoc);
+    this->WaterInletTemp = waterInNode->Temp;
 
     // get the schedule values for different scheduled parameters
     if (this->ActivityFactorSchedPtr > 0) {
@@ -813,9 +816,9 @@ void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
 
     if (this->MyPlantScanFlagPool && allocated(state.dataPlnt->PlantLoop)) {
         bool errFlag = false;
-        if (this->WaterInletNode > 0) {
+        if (this->WaterInNodeNum > 0) {
             PlantUtilities::ScanPlantLoopsForObject(
-                state, this->Name, DataPlant::PlantEquipmentType::SwimmingPool_Indoor, this->HWplantLoc, errFlag, _, _, _, this->WaterInletNode, _);
+                state, this->Name, DataPlant::PlantEquipmentType::SwimmingPool_Indoor, this->HWplantLoc, errFlag, _, _, _, this->WaterInNodeNum, _);
             if (errFlag) {
                 ShowFatalError(state, format("{}: Program terminated due to previous condition(s).", RoutineName));
             }
@@ -830,9 +833,9 @@ void SwimmingPoolData::initSwimmingPoolPlantNodeFlow(EnergyPlusData &state) cons
 {
 
     if (!this->MyPlantScanFlagPool) {
-        if (this->WaterInletNode > 0) {
-            PlantUtilities::InitComponentNodes(state, 0.0, this->WaterMassFlowRateMax, this->WaterInletNode, this->WaterOutletNode);
-            PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInletNode, this->WaterVolFlowMax);
+        if (this->WaterInNodeNum > 0) {
+            PlantUtilities::InitComponentNodes(state, 0.0, this->WaterMassFlowRateMax, this->WaterInNodeNum, this->WaterOutNodeNum);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInNodeNum, this->WaterVolFlowMax);
         }
     }
 }
@@ -883,6 +886,9 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcSwimmingPool");
 
+    auto &dln = state.dataLoopNodes;
+    auto const *waterInNode = dln->nodes(this->WaterInNodeNum);
+    
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 EvapRate = 0.0; // evaporation rate for pool in kg/s
 
@@ -920,24 +926,15 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
         FluidProperties::GetSpecificHeatGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName); // specific heat of pool water
 
     Real64 TH22 = state.dataHeatBalSurf->SurfInsideTempHist(2)(
-        SurfNum); // inside surface temperature at the previous time step equals the old pool water temperature
-    Real64 TInSurf =
-        this->CurSetPtTemp; // Setpoint temperature for pool which is also the goal temperature and also the inside surface face temperature
-    Real64 Tmuw = this->CurMakeupWaterTemp;                                       // Inlet makeup water temperature
-    Real64 TLoopInletTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp; // Inlet water temperature from the plant loop
+        SurfNum);                           // inside surface temperature at the previous time step equals the old pool water temperature
+    Real64 Tmuw = this->CurMakeupWaterTemp; // Inlet makeup water temperature
+    Real64 TLoopInletTemp = waterInNode->Temp; // Inlet water temperature from the plant loop
     this->WaterInletTemp = TLoopInletTemp;
 
-    // Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
-    // old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain +
-    // PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
-    Real64 MassFlowRate = (this->WaterMass / (state.dataHVACGlobal->TimeStepSysSec)) *
-                          ((TInSurf - TH22) / (TLoopInletTemp - TInSurf)); // Target mass flow rate to achieve the proper setpoint temperature
-    if (MassFlowRate > this->WaterMassFlowRateMax) {
-        MassFlowRate = this->WaterMassFlowRateMax;
-    } else if (MassFlowRate < 0.0) {
-        MassFlowRate = 0.0;
-    }
-    PlantUtilities::SetComponentFlowRate(state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
+    Real64 MassFlowRate;
+    this->calcMassFlowRate(state, MassFlowRate, TH22, TLoopInletTemp);
+
+    PlantUtilities::SetComponentFlowRate(state, MassFlowRate, this->WaterInNodeNum, this->WaterOutNodeNum, this->HWplantLoc);
     this->WaterMassFlowRate = MassFlowRate;
 
     // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature
@@ -951,6 +948,26 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     // Finally take care of the latent and convective gains resulting from the pool
     state.dataHeatBalFanSys->SumConvPool(ZoneNum) += this->RadConvertToConvect;
     state.dataHeatBalFanSys->SumLatentPool(ZoneNum) += EvapRate * Psychrometrics::PsyHfgAirFnWTdb(thisZoneHB.airHumRat, thisZoneHB.MAT);
+}
+
+void SwimmingPoolData::calcMassFlowRate(EnergyPlusData &state, Real64 &massFlowRate, Real64 TH22, Real64 TLoopInletTemp)
+{
+    // Calculate the mass flow rate to achieve the proper setpoint temperature
+    if (TLoopInletTemp != this->CurSetPtTemp) {
+        massFlowRate = this->WaterMass / state.dataHVACGlobal->TimeStepSysSec * (this->CurSetPtTemp - TH22) / (TLoopInletTemp - this->CurSetPtTemp);
+    } else { // avoid the divide by zero, reset later if necessary
+        massFlowRate = 0.0;
+    }
+    if (massFlowRate > this->WaterMassFlowRateMax) {
+        massFlowRate = this->WaterMassFlowRateMax;
+    } else if (massFlowRate <= 0.0) {
+        // trap case where loop temperature is lower than the setpoint but could still do heating Defect 10317
+        if (TLoopInletTemp > TH22 && TLoopInletTemp <= this->CurSetPtTemp) {
+            massFlowRate = this->WaterMassFlowRateMax;
+        } else {
+            massFlowRate = 0.0;
+        }
+    }
 }
 
 void SwimmingPoolData::calcSwimmingPoolEvap(EnergyPlusData &state,
@@ -989,6 +1006,10 @@ void SwimmingPoolData::update(EnergyPlusData &state)
 
     int SurfNum = this->SurfacePtr; // surface number/pointer
 
+    auto &dln = state.dataLoopNodes;
+    auto *waterOutNode = dln->nodes(this->WaterOutNodeNum);
+    auto *waterInNode = dln->nodes(this->WaterInNodeNum);
+
     if (this->LastSysTimeElapsed == state.dataHVACGlobal->SysTimeElapsed) {
         // Still iterating or reducing system time step, so subtract old values which were
         // not valid
@@ -1006,10 +1027,10 @@ void SwimmingPoolData::update(EnergyPlusData &state)
     this->LastSysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     this->LastTimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
-    PlantUtilities::SafeCopyPlantNode(state, this->WaterInletNode, this->WaterOutletNode);
+    PlantUtilities::SafeCopyPlantNode(state, this->WaterInNodeNum, this->WaterOutNodeNum);
 
-    Real64 WaterMassFlow = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate; // water mass flow rate
-    if (WaterMassFlow > 0.0) state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->PoolWaterTemp;
+    Real64 WaterMassFlow = waterInNode->MassFlowRate; // water mass flow rate
+    if (WaterMassFlow > 0.0) waterOutNode->Temp = this->PoolWaterTemp;
 }
 
 void SwimmingPoolData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)

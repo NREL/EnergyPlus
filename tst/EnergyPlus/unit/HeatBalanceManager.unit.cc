@@ -93,7 +93,6 @@ using namespace EnergyPlus::HeatBalanceAirManager;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataZoneEquipment;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::DataAirSystems;
 
@@ -405,10 +404,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::AdjustMixingOnly));
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::Add));
-    EXPECT_TRUE(
-        compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly));
+    EXPECT_ENUM_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::AdjustMixingOnly);
+    EXPECT_ENUM_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::Add);
+    EXPECT_ENUM_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
@@ -468,9 +466,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing));
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::Adjust));
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::AllZones));
+    EXPECT_ENUM_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing);
+    EXPECT_ENUM_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::Adjust);
+    EXPECT_ENUM_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::AllZones);
 
     // setup mixing and infiltration objects
     state->dataGlobal->NumOfZones = 2;
@@ -487,99 +485,104 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeADUNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeADUNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeADUNum(1) = 0;
-    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool(1).InNode = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeADUNum(1) = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool(1).InNodeNum = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeInletNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeInletNums.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeInletNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeInletNums(1) = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
     state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 5;
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
-    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1) = 7;
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneNodeNum = 5;
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNodeNums(1) = 7;
     state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1) = 8;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeNums(1) = 8;
     state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnFlowSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNodeADUNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeADUNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitCool.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitHeat.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNodeADUNum(1) = 0;
-    state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitCool(1).InNode = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeADUNum(1) = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitCool(1).InNodeNum = 6;
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeInletNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeInletNums.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeInletNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeInletNums(1) = 1;
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).OASysExists = true;
-    state->dataLoopNodes->Node.allocate(8);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 8; ++i) dln->nodes.push_back(new Node::NodeData);
 
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
 
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.0; // Zone 1 zone node
-    state->dataLoopNodes->Node(2).MassFlowRate = 1.0; // Zone 1 inlet node
-    state->dataLoopNodes->Node(3).MassFlowRate = 2.0; // Zone 1 exhaust node
-    state->dataLoopNodes->Node(4).MassFlowRate = 9.0; // Zone 1 return node
+    auto *zone1Node = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum);
+    auto *zone2Node = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNodeNum);
+    zone1Node->Temp = 20.0;
+    zone1Node->HumRat = 0.004;
+    zone2Node->Temp = 20.0;
+    zone2Node->HumRat = 0.004;
+
+    dln->nodes(1)->MassFlowRate = 0.0; // Zone 1 zone node
+    dln->nodes(2)->MassFlowRate = 1.0; // Zone 1 inlet node
+    dln->nodes(3)->MassFlowRate = 2.0; // Zone 1 exhaust node
+    dln->nodes(4)->MassFlowRate = 9.0; // Zone 1 return node
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = 2.0;
 
-    state->dataLoopNodes->Node(5).MassFlowRate = 0.0; // Zone 2 zone node
-    state->dataLoopNodes->Node(6).MassFlowRate = 2.0; // Zone 2 inlet node
-    state->dataLoopNodes->Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
-    state->dataLoopNodes->Node(8).MassFlowRate = 8.0; // Zone 2 return node
+    dln->nodes(5)->MassFlowRate = 0.0; // Zone 2 zone node
+    dln->nodes(6)->MassFlowRate = 2.0; // Zone 2 inlet node
+    dln->nodes(7)->MassFlowRate = 0.0; // Zone 2 exhaust node
+    dln->nodes(8)->MassFlowRate = 8.0; // Zone 2 return node
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneExh = 0.0;
-    state->dataAirLoop->AirLoopFlow(1).OAFlow = state->dataLoopNodes->Node(2).MassFlowRate + state->dataLoopNodes->Node(6).MassFlowRate;
+    state->dataAirLoop->AirLoopFlow(1).OAFlow = dln->nodes(2)->MassFlowRate + dln->nodes(6)->MassFlowRate;
     state->dataAirLoop->AirLoopFlow(1).MaxOutAir = state->dataAirLoop->AirLoopFlow(1).OAFlow;
     state->dataHeatBal->Infiltration(1).MassFlowRate = 0.5;
     state->dataHeatBal->Mixing(1).MixingMassFlowRate = 0.1;
 
     // call zone air mass balance
     CalcZoneMassBalance(*state, false);
-    EXPECT_EQ(state->dataLoopNodes->Node(4).MassFlowRate, 0.0);       // Zone 1 return node (max(0.0, 1-2)
+    EXPECT_EQ(dln->nodes(4)->MassFlowRate, 0.0);       // Zone 1 return node (max(0.0, 1-2)
     EXPECT_EQ(state->dataHeatBal->Infiltration(1).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
     EXPECT_EQ(state->dataHeatBal->Mixing(1).MixingMassFlowRate, 0.1); // Zone 1 to Zone 2 mixing flow rate (unchanged)
-    EXPECT_EQ(state->dataLoopNodes->Node(8).MassFlowRate,
+    EXPECT_EQ(dln->nodes(8)->MassFlowRate,
               2.0); // Zone 2 return node (should be 2 now, because this has zone mass conservation active, so return should equal supply)
 
     state->dataHeatBalFanSys->ZoneReOrder.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    state->dataLoopNodes->Node.deallocate();
+    dln->nodes.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     state->dataHVACGlobal->NumPrimaryAirSys = 0;
@@ -612,9 +615,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing));
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::No));
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::Invalid));
+    EXPECT_ENUM_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing);
+    EXPECT_ENUM_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::No);
+    EXPECT_ENUM_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::Invalid);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVariableTest)
@@ -1236,16 +1239,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
 
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
@@ -1275,13 +1278,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 
     OutAirNodeManager::InitOutAirNodes(*state);
 
+    auto &dln = state->dataLoopNodes;
+    auto *node1 = dln->nodes(1);
+    
     // Test if local nodes data correctly overwritten
-    EXPECT_EQ(25.0, state->dataLoopNodes->Node(1).OutAirDryBulb);
-    EXPECT_EQ(20.0, state->dataLoopNodes->Node(1).OutAirWetBulb);
-    EXPECT_EQ(1.5, state->dataLoopNodes->Node(1).OutAirWindSpeed);
-    EXPECT_EQ(90.0, state->dataLoopNodes->Node(1).OutAirWindDir);
-    EXPECT_DOUBLE_EQ(0.012611481326656135, state->dataLoopNodes->Node(1).HumRat);
-    EXPECT_DOUBLE_EQ(57247.660939392081, state->dataLoopNodes->Node(1).Enthalpy);
+    EXPECT_EQ(25.0, node1->OutAirDryBulb);
+    EXPECT_EQ(20.0, node1->OutAirWetBulb);
+    EXPECT_EQ(1.5, node1->OutAirWindSpeed);
+    EXPECT_EQ(90.0, node1->OutAirWindDir);
+    EXPECT_DOUBLE_EQ(0.012611481326656135, node1->HumRat);
+    EXPECT_DOUBLE_EQ(57247.660939392081, node1->Enthalpy);
 
     InitHeatBalance(*state);
 
@@ -1292,10 +1298,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_EQ(90.0, state->dataHeatBal->Zone(1).WindDir);
 
     // Add a test for #7308 without inputs of schedule names
-    state->dataLoopNodes->Node(1).OutAirDryBulbSchedNum = 0;
-    state->dataLoopNodes->Node(1).OutAirWetBulbSchedNum = 0;
-    state->dataLoopNodes->Node(1).OutAirWindSpeedSchedNum = 0;
-    state->dataLoopNodes->Node(1).OutAirWindDirSchedNum = 0;
+    node1->OutAirDryBulbSchedNum = 0;
+    node1->OutAirWetBulbSchedNum = 0;
+    node1->OutAirWindSpeedSchedNum = 0;
+    node1->OutAirWindDirSchedNum = 0;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->OutWetBulbTemp = 20.0;
     state->dataEnvrn->WindSpeed = 1.5;
@@ -1634,7 +1640,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel::CTF));
+    EXPECT_ENUM_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel::CTF);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
@@ -1661,7 +1667,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel::CTF));
+    EXPECT_ENUM_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel::CTF);
     EXPECT_EQ(state->dataHeatBalSurf->MaxSurfaceTempLimit, 205.2);
     EXPECT_EQ(state->dataHeatBal->LowHConvLimit, 0.004);
     EXPECT_EQ(state->dataHeatBal->HighHConvLimit, 200.6);
@@ -1687,7 +1693,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
     EXPECT_TRUE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel::EMPD));
+    EXPECT_ENUM_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel::EMPD);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
@@ -1710,7 +1716,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_TRUE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel::CondFD));
+    EXPECT_ENUM_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel::CondFD);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
@@ -1733,7 +1739,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_TRUE(state->dataHeatBal->AnyHAMT);
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel::HAMT));
+    EXPECT_ENUM_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel::HAMT);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)

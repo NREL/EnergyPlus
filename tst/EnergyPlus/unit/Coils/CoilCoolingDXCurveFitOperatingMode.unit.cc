@@ -118,7 +118,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
     idf_objects += this->getSpeedObjectString("Coil Cooling DX Curve Fit Speed 1");
     EXPECT_TRUE(process_idf(idf_objects, false));
     CoilCoolingDXCurveFitOperatingMode thisMode(*state, "Coil Cooling DX Curve Fit Operating Mode 1");
-    EXPECT_TRUE(compare_enums(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED, thisMode.condenserType));
+    EXPECT_ENUM_EQ(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED, thisMode.condenserType);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedEvapAirFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedGrossTotalCap);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedCondAirFlowRate);
@@ -273,13 +273,19 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
     HVAC::FanOp fanOp = HVAC::FanOp::Cycling;
     bool singleMode = false;
     state->dataEnvrn->OutDryBulbTemp = 1.0;
-    // thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
-    auto &evapInletNode = state->dataLoopNodes->Node(thisCoil.evapInletNodeIndex);
-    auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
-    auto &condInletNode = state->dataLoopNodes->Node(thisCoil.condInletNodeIndex);
-    auto &condOutletNode = state->dataLoopNodes->Node(thisCoil.condOutletNodeIndex);
+
     Real64 LoadSHR = 0.0;
-    thisCoil.performance.simulate(
-        *state, evapInletNode, evapOutletNode, coilMode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode, LoadSHR);
+
+    auto &dln = state->dataLoopNodes;
+    // thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
+    auto *evapInNode = dln->nodes(thisCoil.evapInNodeNum);
+    auto *evapOutNode = dln->nodes(thisCoil.evapOutNodeNum);
+    auto *condInNode = dln->nodes(thisCoil.condInNodeNum);
+    auto *condOutNode = dln->nodes(thisCoil.condOutNodeNum);
+    
+    thisCoil.performance.simulate(*state,
+                                  *evapInNode, *evapOutNode, coilMode, PLR, speedNum, speedRatio, fanOp, *condInNode, *condOutNode, singleMode, LoadSHR);
     EXPECT_EQ(thisCoil.performance.crankcaseHeaterPower, 120.0);
+
+
 }

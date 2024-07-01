@@ -658,8 +658,8 @@ namespace PlantPipingSystemsManager {
         // ID
         std::string Name;
         // Inlet and outlet information
-        std::string InletNodeName;
-        std::string OutletNodeName;
+        std::string InNodeName;
+        std::string OutNodeName;
         int InNodeNum = 0;
         int OutNodeNum = 0;
         Point3DInteger CircuitInletCell;

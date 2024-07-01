@@ -1427,8 +1427,8 @@ namespace RefrigeratedCase {
         int ChillerSetID = 0; // ID number for this set of chillers (all serving one zone,
         //                       but can be chilled by multi systems)
         int SchedPtr = 0;        // Schedule to take whole set off-line if needed
-        int NodeNumInlet = 0;    // Node ID Number of inlet for chiller set as a whole, not identified for specific coils
-        int NodeNumOutlet = 0;   // Node ID Number of outlet for chiller set as a whole, not identified for specific coils
+        int InNodeNum = 0;    // Node ID Number of inlet for chiller set as a whole, not identified for specific coils
+        int OutNodeNum = 0;   // Node ID Number of outlet for chiller set as a whole, not identified for specific coils
         int NumCoils = 0;        // Number of individual chillers in set
         int ZoneNum = 0;         // ID number of zone where chiller set is located
         int ZoneNodeNum = 0;     // ID number of zone node giving mixed conditions of zone where chiller set is located

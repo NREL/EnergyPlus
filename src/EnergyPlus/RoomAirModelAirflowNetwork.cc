@@ -319,9 +319,9 @@ namespace RoomAir {
                             if (afnHVAC.SupNodeNum > 0 && afnHVAC.ReturnNodeName.empty()) {
                                 // Find matching return node
                                 for (int retNode = 1; retNode <= zoneEquipConfig.NumReturnNodes; ++retNode) {
-                                    if ((zoneEquipConfig.ReturnNodeInNodeNums(retNode) == inletNodeIndex) &&
-                                        (zoneEquipConfig.ReturnNodeInNodeNums(retNode) > 0)) {
-                                        afnHVAC.RetNodeNum = zoneEquipConfig.ReturnNodeInNodeNums(retNode); // Zone return node
+                                    if ((zoneEquipConfig.ReturnNodeInletNums(retNode) == inletNodeIndex) &&
+                                        (zoneEquipConfig.ReturnNodeInletNums(retNode) > 0)) {
+                                        afnHVAC.RetNodeNum = zoneEquipConfig.ReturnNodeInletNums(retNode); // Zone return node // Are these node numbers or not?
                                         break;
                                     }
                                 }

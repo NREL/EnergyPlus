@@ -134,12 +134,12 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
 
     this->name = objName;
 
-    std::string inletNodeName = Util::makeUPPER(j["inlet_node_name"].get<std::string>());
-    std::string outletNodeName = Util::makeUPPER(j["outlet_node_name"].get<std::string>());
+    std::string inNodeName = Util::makeUPPER(j["inlet_node_name"].get<std::string>());
+    std::string outNodeName = Util::makeUPPER(j["outlet_node_name"].get<std::string>());
 
     // get inlet node num
-    this->inletNodeNum = Node::GetSingleNode(state,
-                                                             inletNodeName,
+    this->inNodeNum = Node::GetSingleNode(state,
+                                                             inNodeName,
                                                              errorsFound,
                                                              Node::ConnObjType::GroundHeatExchangerSlinky,
                                                              this->name,
@@ -149,8 +149,8 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
                                                              Node::ObjectIsNotParent);
 
     // get outlet node num
-    this->outletNodeNum = Node::GetSingleNode(state,
-                                                              outletNodeName,
+    this->outNodeNum = Node::GetSingleNode(state,
+                                                              outNodeName,
                                                               errorsFound,
                                                               Node::ConnObjType::GroundHeatExchangerSlinky,
                                                               this->name,
@@ -162,11 +162,11 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     this->available = true;
     this->on = true;
 
-    BranchNodeConnections::TestCompSet(state, this->moduleName, this->name, inletNodeName, outletNodeName, "Condenser Water Nodes");
+    BranchNodeConnections::TestCompSet(state, this->moduleName, this->name, inNodeName, outNodeName, "Condenser Water Nodes");
 
     // load data
     this->designFlow = j["design_flow_rate"].get<Real64>();
-    PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNodeNum, this->designFlow);
+    PlantUtilities::RegisterPlantCompDesignFlow(state, this->inNodeNum, this->designFlow);
 
     this->soil.k = j["soil_thermal_conductivity"].get<Real64>();
     this->soil.rho = j["soil_density"].get<Real64>();
@@ -272,10 +272,10 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     this->name = objName;
 
     // get inlet node num
-    std::string const inletNodeName = Util::makeUPPER(j["inlet_node_name"].get<std::string>());
+    std::string const inNodeName = Util::makeUPPER(j["inlet_node_name"].get<std::string>());
 
-    this->inletNodeNum = Node::GetSingleNode(state,
-                                                             inletNodeName,
+    this->inNodeNum = Node::GetSingleNode(state,
+                                                             inNodeName,
                                                              errorsFound,
                                                              Node::ConnObjType::GroundHeatExchangerSystem,
                                                              objName,
@@ -285,10 +285,10 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                              Node::ObjectIsNotParent);
 
     // get outlet node num
-    std::string const outletNodeName = Util::makeUPPER(j["outlet_node_name"].get<std::string>());
+    std::string const outNodeName = Util::makeUPPER(j["outlet_node_name"].get<std::string>());
 
-    this->outletNodeNum = Node::GetSingleNode(state,
-                                                              outletNodeName,
+    this->outNodeNum = Node::GetSingleNode(state,
+                                                              outNodeName,
                                                               errorsFound,
                                                               Node::ConnObjType::GroundHeatExchangerSystem,
                                                               objName,
@@ -299,10 +299,10 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     this->available = true;
     this->on = true;
 
-    BranchNodeConnections::TestCompSet(state, this->moduleName, objName, inletNodeName, outletNodeName, "Condenser Water Nodes");
+    BranchNodeConnections::TestCompSet(state, this->moduleName, objName, inNodeName, outNodeName, "Condenser Water Nodes");
 
     this->designFlow = j["design_flow_rate"].get<Real64>();
-    PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNodeNum, this->designFlow);
+    PlantUtilities::RegisterPlantCompDesignFlow(state, this->inNodeNum, this->designFlow);
 
     this->soil.k = j["ground_thermal_conductivity"].get<Real64>();
     this->soil.rhoCp = j["ground_thermal_heat_capacity"].get<Real64>();
@@ -2002,7 +2002,7 @@ void GLHEBase::calcGroundHeatExchanger(EnergyPlusData &state)
         this->firstTime = false;
     }
 
-    this->inletTemp = state.dataLoopNodes->nodes(this->inletNodeNum)->Temp;
+    this->inletTemp = state.dataLoopNodes->nodes(this->inNodeNum)->Temp;
 
     Real64 cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -2273,11 +2273,11 @@ void GLHEBase::updateGHX(EnergyPlusData &state)
 
     auto &dln = state.dataLoopNodes;
     
-    PlantUtilities::SafeCopyPlantNode(state, this->inletNodeNum, this->outletNodeNum);
+    PlantUtilities::SafeCopyPlantNode(state, this->inNodeNum, this->outNodeNum);
 
-    auto *outletNode = dln->nodes(this->outletNodeNum);
-    outletNode->Temp = this->outletTemp;
-    outletNode->Enthalpy =
+    auto *outNode = dln->nodes(this->outNodeNum);
+    outNode->Temp = this->outletTemp;
+    outNode->Enthalpy =
         this->outletTemp * FluidProperties::GetSpecificHeatGlycol(state,
                                                                   state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                   this->outletTemp,
@@ -2673,7 +2673,7 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
     auto &dln = state.dataLoopNodes;
     
     // Get fluid props
-    this->inletTemp = dln->nodes(this->inletNodeNum)->Temp;
+    this->inletTemp = dln->nodes(this->inNodeNum)->Temp;
 
     Real64 const cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                                   state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -2942,7 +2942,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
 
     this->massFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->designMassFlow);
 
-    PlantUtilities::SetComponentFlowRate(state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->plantLoc);
+    PlantUtilities::SetComponentFlowRate(state, this->massFlowRate, this->inNodeNum, this->outNodeNum, this->plantLoc);
 
     // Reset local environment init flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
@@ -2963,11 +2963,11 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             RoutineName);
     this->designMassFlow = this->designFlow * fluidDensity;
-    PlantUtilities::InitComponentNodes(state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->designMassFlow, this->inNodeNum, this->outNodeNum);
 
     this->lastQnSubHr = 0.0;
-    dln->nodes(this->inletNodeNum)->Temp = this->tempGround;
-    dln->nodes(this->outletNodeNum)->Temp = this->tempGround;
+    dln->nodes(this->inNodeNum)->Temp = this->tempGround;
+    dln->nodes(this->outNodeNum)->Temp = this->tempGround;
 
     // zero out all history arrays
     this->QnHr = 0.0;
@@ -3018,7 +3018,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 
     this->massFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->designMassFlow);
 
-    PlantUtilities::SetComponentFlowRate(state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->plantLoc);
+    PlantUtilities::SetComponentFlowRate(state, this->massFlowRate, this->inNodeNum, this->outNodeNum, this->plantLoc);
 
     // Reset local environment init flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
@@ -3040,11 +3040,11 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const CurTime)
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             RoutineName);
     this->designMassFlow = this->designFlow * fluidDensity;
-    PlantUtilities::InitComponentNodes(state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->designMassFlow, this->inNodeNum, this->outNodeNum);
 
     this->lastQnSubHr = 0.0;
-    dln->nodes(this->inletNodeNum)->Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
-    dln->nodes(this->outletNodeNum)->Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+    dln->nodes(this->inNodeNum)->Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+    dln->nodes(this->outNodeNum)->Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
 
     // zero out all history arrays
     this->QnHr = 0.0;

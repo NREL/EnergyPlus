@@ -94,7 +94,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataZoneEquipment;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::HeatBalanceManager;
@@ -177,17 +176,18 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     const Real64 Wra = PsyWFnTdbRhPb(*state, Tra, RHra / 100, Press);
     const Real64 Wosa = PsyWFnTdbRhPb(*state, Tosa, RHosa / 100, Press);
 
-    auto &inletNode = state->dataLoopNodes->Node(thisUnitary.InletNode);
-    inletNode.Temp = Tra;
-    inletNode.HumRat = Wra;
-    inletNode.Press = Press;
-    inletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(inletNode.Temp, inletNode.HumRat);
+    auto &dln = state->dataLoopNodes;
+    auto *airInNode = dln->nodes(thisUnitary.AirInNodeNum);
+    airInNode->Temp = Tra;
+    airInNode->HumRat = Wra;
+    airInNode->Press = Press;
+    airInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(airInNode->Temp, airInNode->HumRat);
 
-    auto &secondaryInletNode = state->dataLoopNodes->Node(thisUnitary.SecondaryInletNode);
-    secondaryInletNode.Temp = Tosa;
-    secondaryInletNode.HumRat = Wosa;
-    secondaryInletNode.Press = Press;
-    secondaryInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(secondaryInletNode.Temp, secondaryInletNode.HumRat);
+    auto *secAirInNode = dln->nodes(thisUnitary.SecAirInNodeNum);
+    secAirInNode->Temp = Tosa;
+    secAirInNode->HumRat = Wosa;
+    secAirInNode->Press = Press;
+    secAirInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(secAirInNode->Temp, secAirInNode->HumRat);
 
     InitZoneHybridUnitaryAirConditioners(*state, 1, 1);
     // setup local variables for model inputs
@@ -431,30 +431,29 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     // Check the meters associated with the ZoneHVAC:HybridUnitaryHVAC outputs
     EXPECT_EQ(14, NumFound);
-    EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Cooling
-    EXPECT_TRUE(compare_enums(meteredVars(1).endUseCat, OutputProcessor::EndUseCat::CoolingCoils));
-    EXPECT_TRUE(compare_enums(meteredVars(1).group, OutputProcessor::Group::HVAC));
-    EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Heating
-    EXPECT_TRUE(compare_enums(meteredVars(2).endUseCat, OutputProcessor::EndUseCat::HeatingCoils));
-    EXPECT_TRUE(compare_enums(meteredVars(2).group, OutputProcessor::Group::HVAC));
-    EXPECT_TRUE(compare_enums(meteredVars(3).resource, Constant::eResource::Electricity)); // ELECTRIC - Cooling Energy
-    EXPECT_TRUE(compare_enums(meteredVars(3).endUseCat, OutputProcessor::EndUseCat::Cooling));
-    EXPECT_TRUE(compare_enums(meteredVars(3).group, OutputProcessor::Group::HVAC));
-    EXPECT_TRUE(compare_enums(meteredVars(4).resource, Constant::eResource::Electricity)); // ELECTRIC - Fan Energy
-    EXPECT_TRUE(compare_enums(meteredVars(4).endUseCat, OutputProcessor::EndUseCat::Fans));
-    EXPECT_TRUE(compare_enums(meteredVars(4).group, OutputProcessor::Group::HVAC));
-    EXPECT_TRUE(compare_enums(meteredVars(5).resource,
-                              Constant::eResource::NaturalGas)); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
-    EXPECT_TRUE(compare_enums(meteredVars(5).endUseCat, OutputProcessor::EndUseCat::Cooling));
-    EXPECT_TRUE(compare_enums(meteredVars(5).group, OutputProcessor::Group::HVAC));
-    EXPECT_TRUE(
-        compare_enums(meteredVars(6).resource,
-                      Constant::eResource::DistrictCooling)); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
-    EXPECT_TRUE(compare_enums(meteredVars(6).endUseCat, OutputProcessor::EndUseCat::Cooling));
-    EXPECT_TRUE(compare_enums(meteredVars(6).group, OutputProcessor::Group::HVAC));
-    EXPECT_TRUE(compare_enums(meteredVars(7).resource, Constant::eResource::Water)); // WATER - Cooling Water Use
-    EXPECT_TRUE(compare_enums(meteredVars(7).endUseCat, OutputProcessor::EndUseCat::Cooling));
-    EXPECT_TRUE(compare_enums(meteredVars(7).group, OutputProcessor::Group::HVAC));
+    EXPECT_ENUM_EQ(meteredVars(1).resource, Constant::eResource::EnergyTransfer); // ENERGYTRANSFER - Cooling
+    EXPECT_ENUM_EQ(meteredVars(1).endUseCat, OutputProcessor::EndUseCat::CoolingCoils);
+    EXPECT_ENUM_EQ(meteredVars(1).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(2).resource, Constant::eResource::EnergyTransfer); // ENERGYTRANSFER - Heating
+    EXPECT_ENUM_EQ(meteredVars(2).endUseCat, OutputProcessor::EndUseCat::HeatingCoils);
+    EXPECT_ENUM_EQ(meteredVars(2).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(3).resource, Constant::eResource::Electricity); // ELECTRIC - Cooling Energy
+    EXPECT_ENUM_EQ(meteredVars(3).endUseCat, OutputProcessor::EndUseCat::Cooling);
+    EXPECT_ENUM_EQ(meteredVars(3).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(4).resource, Constant::eResource::Electricity); // ELECTRIC - Fan Energy
+    EXPECT_ENUM_EQ(meteredVars(4).endUseCat, OutputProcessor::EndUseCat::Fans);
+    EXPECT_ENUM_EQ(meteredVars(4).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(5).resource,
+                   Constant::eResource::NaturalGas); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
+    EXPECT_ENUM_EQ(meteredVars(5).endUseCat, OutputProcessor::EndUseCat::Cooling);
+    EXPECT_ENUM_EQ(meteredVars(5).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(6).resource,
+                   Constant::eResource::DistrictCooling); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
+    EXPECT_ENUM_EQ(meteredVars(6).endUseCat, OutputProcessor::EndUseCat::Cooling);
+    EXPECT_ENUM_EQ(meteredVars(6).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(7).resource, Constant::eResource::Water); // WATER - Cooling Water Use
+    EXPECT_ENUM_EQ(meteredVars(7).endUseCat, OutputProcessor::EndUseCat::Cooling);
+    EXPECT_ENUM_EQ(meteredVars(7).group, OutputProcessor::Group::HVAC);
 
     // Check that unit is included in Component Sizing Summary Report
     EXPECT_EQ("ZoneHVAC:HybridUnitaryHVAC", state->dataOutRptPredefined->CompSizeTableEntry(1).typeField);
@@ -643,19 +642,20 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInp
     // Avoid a crash in Psychrometrics function because nodes aren't initialized
     auto &thisUnitary = state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1);
 
-    auto &inletNode = state->dataLoopNodes->Node(thisUnitary.InletNode);
-    inletNode.Temp = 17.57;
-    inletNode.HumRat = 0.007;
-    inletNode.Press = 101325.0;
-    inletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(inletNode.Temp, inletNode.HumRat);
-    inletNode.MassFlowRate = 0.25;
+    auto &dln = state->dataLoopNodes;
+    auto *airInNode = dln->nodes(thisUnitary.AirInNodeNum);
+    airInNode->Temp = 17.57;
+    airInNode->HumRat = 0.007;
+    airInNode->Press = 101325.0;
+    airInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(airInNode->Temp, airInNode->HumRat);
+    airInNode->MassFlowRate = 0.25;
 
-    auto &secondaryInletNode = state->dataLoopNodes->Node(thisUnitary.SecondaryInletNode);
-    secondaryInletNode.Temp = 17.57;
-    secondaryInletNode.HumRat = 0.007;
-    secondaryInletNode.Press = 101325.0;
-    secondaryInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(secondaryInletNode.Temp, secondaryInletNode.HumRat);
-    secondaryInletNode.MassFlowRate = 0.25;
+    auto *secAirInNode = dln->nodes(thisUnitary.SecAirInNodeNum);
+    secAirInNode->Temp = 17.57;
+    secAirInNode->HumRat = 0.007;
+    secAirInNode->Press = 101325.0;
+    secAirInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(secAirInNode->Temp, secAirInNode->HumRat);
+    secAirInNode->MassFlowRate = 0.25;
 
     InitZoneHybridUnitaryAirConditioners(*state, 1, 1);
     // Model *pZoneHybridUnitaryAirConditioner = &state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1);
@@ -864,17 +864,18 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
     constexpr Real64 Wra = 0.01;
     constexpr Real64 Press = 101325.0;
 
-    auto &inletNode = state->dataLoopNodes->Node(thisUnitary.InletNode);
-    inletNode.Temp = Tra;
-    inletNode.HumRat = Wra;
-    inletNode.Press = Press;
-    inletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(inletNode.Temp, inletNode.HumRat);
+    auto &dln = state->dataLoopNodes;
+    auto *airInNode = dln->nodes(thisUnitary.AirInNodeNum);
+    airInNode->Temp = Tra;
+    airInNode->HumRat = Wra;
+    airInNode->Press = Press;
+    airInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(airInNode->Temp, airInNode->HumRat);
 
-    auto &secondaryInletNode = state->dataLoopNodes->Node(thisUnitary.SecondaryInletNode);
-    secondaryInletNode.Temp = Toa;
-    secondaryInletNode.HumRat = Woa;
-    secondaryInletNode.Press = Press;
-    secondaryInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(secondaryInletNode.Temp, secondaryInletNode.HumRat);
+    auto *secAirInNode = dln->nodes(thisUnitary.SecAirInNodeNum);
+    secAirInNode->Temp = Toa;
+    secAirInNode->HumRat = Woa;
+    secAirInNode->Press = Press;
+    secAirInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(secAirInNode->Temp, secAirInNode->HumRat);
 
     InitZoneHybridUnitaryAirConditioners(*state, 1, 1);
     thisUnitary.Initialize(1);
@@ -1288,17 +1289,18 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ModelOperatingSetting
     // thisUnitary.SecInletPressure = 101325;
     // thisUnitary.SecInletRH = RHosa / 1000;
 
-    auto &inletNode = state->dataLoopNodes->Node(thisUnitary.InletNode);
-    inletNode.Temp = Tra;
-    inletNode.HumRat = Wra;
-    inletNode.Press = Press;
-    inletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(inletNode.Temp, inletNode.HumRat);
+    auto &dln = state->dataLoopNodes;
+    auto *airInNode = dln->nodes(thisUnitary.AirInNodeNum);
+    airInNode->Temp = Tra;
+    airInNode->HumRat = Wra;
+    airInNode->Press = Press;
+    airInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(airInNode->Temp, airInNode->HumRat);
 
-    auto &secondaryInletNode = state->dataLoopNodes->Node(thisUnitary.SecondaryInletNode);
-    secondaryInletNode.Temp = Tosa / 1000.0; // Why this division by 1000.0?
-    secondaryInletNode.HumRat = Wosa;
-    secondaryInletNode.Press = Press;
-    secondaryInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(secondaryInletNode.Temp, secondaryInletNode.HumRat);
+    auto *secAirInNode = dln->nodes(thisUnitary.SecAirInNodeNum);
+    secAirInNode->Temp = Tosa / 1000.0; // Why this division by 1000.0?
+    secAirInNode->HumRat = Wosa;
+    secAirInNode->Press = Press;
+    secAirInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(secAirInNode->Temp, secAirInNode->HumRat);
 
     InitZoneHybridUnitaryAirConditioners(*state, 1, 2);
 
@@ -1498,17 +1500,18 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_RuntimeFraction_Initi
     const Real64 Wra = PsyWFnTdbRhPb(*state, Tra, RHra / 100, Press);
     const Real64 Wosa = PsyWFnTdbRhPb(*state, Tosa, RHosa / 100, Press);
 
-    auto &inletNode = state->dataLoopNodes->Node(thisUnitary.InletNode);
-    inletNode.Temp = Tra;
-    inletNode.HumRat = Wra;
-    inletNode.Press = Press;
-    inletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(inletNode.Temp, inletNode.HumRat);
+    auto &dln = state->dataLoopNodes;
+    auto *airInNode = dln->nodes(thisUnitary.AirInNodeNum);
+    airInNode->Temp = Tra;
+    airInNode->HumRat = Wra;
+    airInNode->Press = Press;
+    airInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(airInNode->Temp, airInNode->HumRat);
 
-    auto &secondaryInletNode = state->dataLoopNodes->Node(thisUnitary.SecondaryInletNode);
-    secondaryInletNode.Temp = Tosa;
-    secondaryInletNode.HumRat = Wosa;
-    secondaryInletNode.Press = Press;
-    secondaryInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(secondaryInletNode.Temp, secondaryInletNode.HumRat);
+    auto *secAirInNode = dln->nodes(thisUnitary.SecAirInNodeNum);
+    secAirInNode->Temp = Tosa;
+    secAirInNode->HumRat = Wosa;
+    secAirInNode->Press = Press;
+    secAirInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(secAirInNode->Temp, secAirInNode->HumRat);
 
     InitZoneHybridUnitaryAirConditioners(*state, 1, 1);
     // setup local variables for model inputs

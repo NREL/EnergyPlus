@@ -76,8 +76,8 @@ TEST_F(EnergyPlusFixture, TestPipesInput)
     ASSERT_TRUE(process_idf(idf_objects));
     Pipes::GetPipeInput(*state);
     EXPECT_EQ(2u, state->dataPipes->LocalPipe.size());
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::Pipe, state->dataPipes->LocalPipe(1).Type));
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::PipeSteam, state->dataPipes->LocalPipe(2).Type));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::Pipe, state->dataPipes->LocalPipe(1).Type);
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::PipeSteam, state->dataPipes->LocalPipe(2).Type);
 }
 
 TEST_F(EnergyPlusFixture, CalcPipeHeatTransCoef)
@@ -85,9 +85,12 @@ TEST_F(EnergyPlusFixture, CalcPipeHeatTransCoef)
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
-    state->dataLoopNodes->Node.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut = 2;
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
+
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).InNodeNum = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).OutNodeNum = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
@@ -107,8 +110,8 @@ TEST_F(EnergyPlusFixture, CalcPipeHeatTransCoef)
     pipe.Type = DataPlant::PlantEquipmentType::PipeInterior;
     pipe.Construction = "Pipe construction";
     pipe.ConstructionNum = 1;
-    pipe.InletNodeNum = 1;
-    pipe.OutletNodeNum = 2;
+    pipe.InNodeNum = 1;
+    pipe.OutNodeNum = 2;
     int constexpr NumPipeSections(20);
     pipe.FluidTemp.allocate({0, NumPipeSections});
     pipe.FluidTemp = 7.0;
@@ -118,7 +121,7 @@ TEST_F(EnergyPlusFixture, CalcPipeHeatTransCoef)
     PlantUtilities::ScanPlantLoopsForObject(*state, pipe.Name, pipe.Type, pipe.plantLoc, errFlag);
     ASSERT_FALSE(errFlag);
     EXPECT_EQ(1, pipe.plantLoc.loopNum);
-    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, pipe.plantLoc.loopSideNum));
+    EXPECT_ENUM_EQ(DataPlant::LoopSideLocation::Demand, pipe.plantLoc.loopSideNum);
     EXPECT_EQ(1, pipe.plantLoc.branchNum);
     EXPECT_EQ(1, pipe.plantLoc.compNum);
 

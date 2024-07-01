@@ -360,9 +360,9 @@ namespace FanCoilUnits {
                         ShowContinueError(state, "..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name.");
                         ErrorsFound = true;
                     } else {
-                        fanCoil.OutsideAirNodeNum = OANodeNums(1);
-                        fanCoil.AirReliefNodeNum = OANodeNums(2);
-                        fanCoil.MixedAirNodeNum = OANodeNums(4);
+                        fanCoil.OutsideAirInNodeNum = OANodeNums(1);
+                        fanCoil.ReliefAirOutNodeNum = OANodeNums(2);
+                        fanCoil.MixedAirOutNodeNum = OANodeNums(4);
                     }
                 }
             }
@@ -613,9 +613,9 @@ namespace FanCoilUnits {
                                    ATMixerName,
                                    state.dataFanCoilUnits->ATMixerNum,
                                    state.dataFanCoilUnits->ATMixerType,
-                                   state.dataFanCoilUnits->ATMixerPriNodeNum,
-                                   state.dataFanCoilUnits->ATMixerSecNodeNum,
-                                   state.dataFanCoilUnits->ATMixerOutNodeNum,
+                                   state.dataFanCoilUnits->ATMixerPriAirInNodeNum,
+                                   state.dataFanCoilUnits->ATMixerSecAirInNodeNum,
+                                   state.dataFanCoilUnits->ATMixerAirOutNodeNum,
                                    fanCoil.AirOutNodeNum);
             fanCoil.ControlZoneNum =
                 DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::FourPipeFanCoil, fanCoil.Name);
@@ -628,9 +628,9 @@ namespace FanCoilUnits {
                 fanCoil.ATMixerIndex = state.dataFanCoilUnits->ATMixerNum;
                 fanCoil.ATMixerName = ATMixerName;
                 fanCoil.ATMixerType = HVAC::MixerType::InletSide;
-                fanCoil.ATMixerPriNodeNum = state.dataFanCoilUnits->ATMixerPriNodeNum;
-                fanCoil.ATMixerSecNodeNum = state.dataFanCoilUnits->ATMixerSecNodeNum;
-                fanCoil.ATMixerOutNodeNum = state.dataFanCoilUnits->ATMixerOutNodeNum;
+                fanCoil.ATMixerPriAirInNodeNum = state.dataFanCoilUnits->ATMixerPriAirInNodeNum;
+                fanCoil.ATMixerSecAirInNodeNum = state.dataFanCoilUnits->ATMixerSecAirInNodeNum;
+                fanCoil.ATMixerAirOutNodeNum = state.dataFanCoilUnits->ATMixerAirOutNodeNum;
                 // check that fan coil doesn' have local outside air
                 if (!lAlphaBlanks(8)) {
                     ShowSevereError(
@@ -638,7 +638,7 @@ namespace FanCoilUnits {
                         format("{} = \"{}\". Fan coil unit has local as well as central outdoor air specified", CurrentModuleObject, fanCoil.Name));
                 }
                 // check that the air teminal mixer out node is the fan coil inlet node
-                if (fanCoil.AirInNodeNum != state.dataFanCoilUnits->ATMixerOutNodeNum) {
+                if (fanCoil.AirInNodeNum != state.dataFanCoilUnits->ATMixerAirOutNodeNum) {
                     ShowSevereError(
                         state,
                         format("{} = \"{}\". Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name.",
@@ -655,9 +655,9 @@ namespace FanCoilUnits {
                 fanCoil.ATMixerIndex = state.dataFanCoilUnits->ATMixerNum;
                 fanCoil.ATMixerName = ATMixerName;
                 fanCoil.ATMixerType = HVAC::MixerType::SupplySide;
-                fanCoil.ATMixerPriNodeNum = state.dataFanCoilUnits->ATMixerPriNodeNum;
-                fanCoil.ATMixerSecNodeNum = state.dataFanCoilUnits->ATMixerSecNodeNum;
-                fanCoil.ATMixerOutNodeNum = state.dataFanCoilUnits->ATMixerOutNodeNum;
+                fanCoil.ATMixerPriAirInNodeNum = state.dataFanCoilUnits->ATMixerPriAirInNodeNum;
+                fanCoil.ATMixerSecAirInNodeNum = state.dataFanCoilUnits->ATMixerSecAirInNodeNum;
+                fanCoil.ATMixerAirOutNodeNum = state.dataFanCoilUnits->ATMixerAirOutNodeNum;
                 // check that fan coil doesn' have local outside air
                 if (!lAlphaBlanks(8)) {
                     ShowSevereError(
@@ -665,7 +665,7 @@ namespace FanCoilUnits {
                         format("{} = \"{}\". Fan coil unit has local as well as central outdoor air specified", CurrentModuleObject, fanCoil.Name));
                 }
                 // check that the air teminal mixer secondary air inlet node is the fan coil outlet node
-                if (fanCoil.AirOutNodeNum != state.dataFanCoilUnits->ATMixerSecNodeNum) {
+                if (fanCoil.AirOutNodeNum != state.dataFanCoilUnits->ATMixerSecAirInNodeNum) {
                     ShowSevereError(state,
                                     format("{} = \"{}\". Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air "
                                            "inlet node name.",
@@ -806,13 +806,13 @@ namespace FanCoilUnits {
             }
 
             // Set up component set for supply fan
-            if (fanCoil.OutsideAirNodeNum > 0) {
+            if (fanCoil.OutsideAirInNodeNum > 0) {
                 BranchNodeConnections::SetUpCompSets(state,
                                                      fanCoil.UnitType,
                                                      fanCoil.Name,
                                                      HVAC::fanTypeNames[(int)fanCoil.fanType],
                                                      fanCoil.FanName,
-                                                     dln->nodes(fanCoil.MixedAirNodeNum)->Name,
+                                                     dln->nodes(fanCoil.MixedAirOutNodeNum)->Name,
                                                      "UNDEFINED");
             } else {
                 BranchNodeConnections::SetUpCompSets(state,
@@ -837,14 +837,14 @@ namespace FanCoilUnits {
                                                  dln->nodes(fanCoil.AirOutNodeNum)->Name);
 
             // Set up component set for OA mixer - use OA node and Mixed air node
-            if (fanCoil.OutsideAirNodeNum > 0) {
+            if (fanCoil.OutsideAirInNodeNum > 0) {
                 BranchNodeConnections::SetUpCompSets(state,
                                                      fanCoil.UnitType,
                                                      fanCoil.Name,
                                                      fanCoil.OAMixType,
                                                      fanCoil.OAMixName,
-                                                     dln->nodes(fanCoil.OutsideAirNodeNum)->Name,
-                                                     dln->nodes(fanCoil.MixedAirNodeNum)->Name);
+                                                     dln->nodes(fanCoil.OutsideAirInNodeNum)->Name,
+                                                     dln->nodes(fanCoil.MixedAirOutNodeNum)->Name);
             }
         }
 
@@ -1112,8 +1112,8 @@ namespace FanCoilUnits {
             PlantUtilities::InitComponentNodes(
                 state, fanCoil.MinColdWaterFlow, fanCoil.MaxCoolCoilFluidFlow, fanCoil.CoolCoilFluidInNodeNum, fanCoil.CoolCoilFluidOutNodeNum);
 
-            if (fanCoil.OutsideAirNodeNum > 0) {
-                auto *oaNode = dln->nodes(fanCoil.OutsideAirNodeNum);
+            if (fanCoil.OutsideAirInNodeNum > 0) {
+                auto *oaNode = dln->nodes(fanCoil.OutsideAirInNodeNum);
                 oaNode->MassFlowRateMax = fanCoil.OutAirMassFlow;
                 oaNode->MassFlowRateMin = 0.0;
             }
@@ -1152,13 +1152,13 @@ namespace FanCoilUnits {
             airInNode->MassFlowRateMaxAvail = airInNode->MassFlowRate;
             airInNode->MassFlowRateMinAvail = 0.0;
 
-            if (fanCoil.OutsideAirNodeNum > 0) {
-                auto *oaNode = dln->nodes(fanCoil.OutsideAirNodeNum);
+            if (fanCoil.OutsideAirInNodeNum > 0) {
+                auto *oaNode = dln->nodes(fanCoil.OutsideAirInNodeNum);
                 oaNode->MassFlowRate = fanCoil.OutAirMassFlow;
                 oaNode->MassFlowRateMaxAvail = fanCoil.OutAirMassFlow;
                 oaNode->MassFlowRateMinAvail = fanCoil.OutAirMassFlow;
 
-                auto *reliefNode = dln->nodes(fanCoil.AirReliefNodeNum);
+                auto *reliefNode = dln->nodes(fanCoil.ReliefAirOutNodeNum);
                 reliefNode->MassFlowRate = fanCoil.OutAirMassFlow;
                 reliefNode->MassFlowRateMaxAvail = fanCoil.OutAirMassFlow;
                 reliefNode->MassFlowRateMinAvail = fanCoil.OutAirMassFlow;
@@ -1168,12 +1168,12 @@ namespace FanCoilUnits {
             airInNode->MassFlowRate = 0.0;
             airInNode->MassFlowRateMaxAvail = 0.0;
             airInNode->MassFlowRateMinAvail = 0.0;
-            if (fanCoil.OutsideAirNodeNum > 0) {
-                auto *oaNode = dln->nodes(fanCoil.OutsideAirNodeNum);
+            if (fanCoil.OutsideAirInNodeNum > 0) {
+                auto *oaNode = dln->nodes(fanCoil.OutsideAirInNodeNum);
                 oaNode->MassFlowRate = 0.0;
                 oaNode->MassFlowRateMaxAvail = 0.0;
                 oaNode->MassFlowRateMinAvail = 0.0;
-                auto *reliefNode = dln->nodes(fanCoil.AirReliefNodeNum);
+                auto *reliefNode = dln->nodes(fanCoil.ReliefAirOutNodeNum);
                 reliefNode->MassFlowRate = 0.0;
                 reliefNode->MassFlowRateMaxAvail = 0.0;
                 reliefNode->MassFlowRateMinAvail = 0.0;
@@ -1543,16 +1543,16 @@ namespace FanCoilUnits {
                             state, fanCoil.UnitType, fanCoil.Name, "User-Specified Maximum Hot Water Flow [m3/s]", fanCoil.MaxHotWaterVolFlow);
                     }
                 } else {
-                    state.dataFanCoilUnits->CoilWaterInletNodeNum =
+                    state.dataFanCoilUnits->CoilWaterInNodeNum =
                         WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", fanCoil.HCoilName, ErrorsFound);
-                    state.dataFanCoilUnits->CoilWaterOutletNodeNum =
+                    state.dataFanCoilUnits->CoilWaterOutNodeNum =
                         WaterCoils::GetCoilWaterOutletNode(state, "Coil:Heating:Water", fanCoil.HCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         int PltSizHeatNum = PlantUtilities::MyPlantSizingIndex(state,
                                                                                "Coil:Heating:Water",
                                                                                fanCoil.HCoilName,
-                                                                               state.dataFanCoilUnits->CoilWaterInletNodeNum,
-                                                                               state.dataFanCoilUnits->CoilWaterOutletNodeNum,
+                                                                               state.dataFanCoilUnits->CoilWaterInNodeNum,
+                                                                               state.dataFanCoilUnits->CoilWaterOutNodeNum,
                                                                                ErrorsFound);
                         CoilNum = WaterCoils::GetWaterCoilIndex(state, "COIL:HEATING:WATER", fanCoil.HCoilName, ErrorsFound);
                         bool DoWaterCoilSizing; // if TRUE do water coil sizing calculation
@@ -1729,15 +1729,15 @@ namespace FanCoilUnits {
                     CoolingCoilName = fanCoil.CCoilName;
                     CoolingCoilType = fanCoil.CCoilType;
                 }
-                state.dataFanCoilUnits->CoilWaterInletNodeNum = WaterCoils::GetCoilWaterInletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
-                state.dataFanCoilUnits->CoilWaterOutletNodeNum =
+                state.dataFanCoilUnits->CoilWaterInNodeNum = WaterCoils::GetCoilWaterInletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
+                state.dataFanCoilUnits->CoilWaterOutNodeNum =
                     WaterCoils::GetCoilWaterOutletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                 if (IsAutoSize) {
                     int PltSizCoolNum = PlantUtilities::MyPlantSizingIndex(state,
                                                                            CoolingCoilType,
                                                                            CoolingCoilName,
-                                                                           state.dataFanCoilUnits->CoilWaterInletNodeNum,
-                                                                           state.dataFanCoilUnits->CoilWaterOutletNodeNum,
+                                                                           state.dataFanCoilUnits->CoilWaterInNodeNum,
+                                                                           state.dataFanCoilUnits->CoilWaterOutNodeNum,
                                                                            ErrorsFound);
                     CoilNum = WaterCoils::GetWaterCoilIndex(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                     bool DoWaterCoilSizing; // if TRUE do water coil sizing calculation
@@ -1981,7 +1981,7 @@ namespace FanCoilUnits {
     }
 
     void Sim4PipeFanCoil(EnergyPlusData &state,
-                         int &FanCoilNum,               // number of the current fan coil unit being simulated
+                         int FanCoilNum,               // number of the current fan coil unit being simulated
                          int const ControlledZoneNum,   // index into ZoneEqupConfig
                          bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                          Real64 &PowerMet,              // Sensible power supplied (W)
@@ -2710,9 +2710,9 @@ namespace FanCoilUnits {
             OAMassFlow = 0.0;
 
             // determine minimum outdoor air flow rate
-            if (fanCoil.DSOAPtr > 0 && fanCoil.OutsideAirNodeNum > 0) {
+            if (fanCoil.DSOAPtr > 0 && fanCoil.OutsideAirInNodeNum > 0) {
                 OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, fanCoil.DSOAPtr, ControlledZoneNum, true, true);
-                auto *oaNode = dln->nodes(fanCoil.OutsideAirNodeNum);
+                auto *oaNode = dln->nodes(fanCoil.OutsideAirInNodeNum);
                 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, oaNode->Press, oaNode->Temp, oaNode->HumRat);
                 OAMassFlow = OAVolumeFlowRate * RhoAir;
             }
@@ -3248,9 +3248,9 @@ namespace FanCoilUnits {
         }
 
         if (fanCoil.ATMixerExists) {
-            state.dataFanCoilUnits->ATMixOutNodeNum = fanCoil.ATMixerOutNodeNum;
+            state.dataFanCoilUnits->ATMixOutNodeNum = fanCoil.ATMixerAirOutNodeNum;
             if (fanCoil.ATMixerType == HVAC::MixerType::InletSide) {
-                auto *atMixerPriNode = dln->nodes(fanCoil.ATMixerPriNodeNum);
+                auto *atMixerPriNode = dln->nodes(fanCoil.ATMixerPriAirInNodeNum);
                 // set the primary air inlet mass flow rate
                 atMixerPriNode->MassFlowRate = min(atMixerPriNode->MassFlowRateMaxAvail, inNode->MassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
@@ -3260,8 +3260,8 @@ namespace FanCoilUnits {
             AirMassFlow = inNode->MassFlowRate;
         } else {
             // OutdoorAir:Mixer
-            auto *oaNode = dln->nodes(fanCoil.OutsideAirNodeNum);
-            auto *reliefNode = dln->nodes(fanCoil.AirReliefNodeNum);
+            auto *oaNode = dln->nodes(fanCoil.OutsideAirInNodeNum);
+            auto *reliefNode = dln->nodes(fanCoil.ReliefAirOutNodeNum);
             
             if (fanCoil.CapCtrlMeth_Num == CCM::CycFan) {
                 oaNode->MassFlowRate = min(OASchedValue * oaNode->MassFlowRateMax * PartLoad * fanCoil.SpeedFanRatSel, inNode->MassFlowRate);
@@ -3710,7 +3710,7 @@ namespace FanCoilUnits {
     }
 
     void CalcMultiStage4PipeFanCoil(EnergyPlusData &state,
-                                    int &FanCoilNum,               // number of the current fan coil unit being simulated
+                                    int FanCoilNum,               // number of the current fan coil unit being simulated
                                     int const ZoneNum,             // number of zone being served
                                     bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                     Real64 const QZnReq,           // current zone cooling or heating load
@@ -4134,7 +4134,7 @@ namespace FanCoilUnits {
         }
 
         if (FanCoilNum > 0 && FanCoilNum <= state.dataFanCoilUnits->NumFanCoils) {
-            return state.dataFanCoilUnits->FanCoil(FanCoilNum).OutsideAirNodeNum;
+            return state.dataFanCoilUnits->FanCoil(FanCoilNum).OutsideAirInNodeNum;
         }
 
         return 0;

@@ -429,7 +429,7 @@ PlantCoinicidentAnalysis::PlantCoinicidentAnalysis(
 {
     name = loopName;
     plantLoopIndex = loopIndex;
-    supplySideInletNodeNum = nodeNum;
+    supplySideInNodeNum = nodeNum;
     densityForSizing = density;
     specificHeatForSizing = cp;
     numTimeStepsInAvg = numStepsInAvg;

@@ -214,7 +214,7 @@ namespace HVACDuct {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             state.dataHVACDuct->Duct(DuctNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataHVACDuct->Duct(DuctNum).InletNodeNum = GetSingleNode(state,
+            state.dataHVACDuct->Duct(DuctNum).InNodeNum = GetSingleNode(state,
                                                                                state.dataIPShortCut->cAlphaArgs(2),
                                                                                ErrorsFound,
                                                                                Node::ConnObjType::Duct,
@@ -223,7 +223,7 @@ namespace HVACDuct {
                                                                                Node::ConnType::Inlet,
                                                                                Node::CompFluidStream::Primary,
                                                                            Node::ObjectIsNotParent);
-            state.dataHVACDuct->Duct(DuctNum).OutletNodeNum = GetSingleNode(state,
+            state.dataHVACDuct->Duct(DuctNum).OutNodeNum = GetSingleNode(state,
                                                                                 state.dataIPShortCut->cAlphaArgs(3),
                                                                                 ErrorsFound,
                                                                                 Node::ConnObjType::Duct,
@@ -298,8 +298,8 @@ namespace HVACDuct {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &dln = state.dataLoopNodes;
-        auto const *inNode = dln->nodes(state.dataHVACDuct->Duct(DuctNum).InletNodeNum);
-        auto *outNode = dln->nodes(state.dataHVACDuct->Duct(DuctNum).OutletNodeNum);
+        auto const *inNode = dln->nodes(state.dataHVACDuct->Duct(DuctNum).InNodeNum);
+        auto *outNode = dln->nodes(state.dataHVACDuct->Duct(DuctNum).OutNodeNum);
         // Set the outlet air node conditions of the duct
         outNode->MassFlowRate = inNode->MassFlowRate;
         outNode->Temp = inNode->Temp;

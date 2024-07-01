@@ -223,7 +223,6 @@ namespace UnitVentilator {
         bool errFlag(false);           // interim error flag
         std::string cCoolingCoilType;  // Cooling coil object type
         std::string cHeatingCoilType;  // Heating coil object type
-        int FanIndex;                  // index to fan used for flow checks
         Real64 FanVolFlow;             // volumetric flow rate of fan
         Array1D_string Alphas;         // Alpha items for object
         Array1D<Real64> Numbers;       // Numeric items for object
@@ -233,6 +232,7 @@ namespace UnitVentilator {
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         bool ZoneNodeNotFound;         // used in error checking
 
+        auto &dln = state.dataLoopNodes;
         // Figure out how many unit ventilators there are in the input file
 
         std::string CurrentModuleObject = state.dataUnitVentilators->cMO_UnitVentilator;
@@ -346,7 +346,7 @@ namespace UnitVentilator {
             // non-parent OA mixing box within the unit ventilator.
             // Because there is overlap between the nodes that are parent and non-parent, use a different
             // object type for the non parent nodes
-            unitVent.AirInNode = Node::GetSingleNode(state,
+            unitVent.AirInNodeNum = Node::GetSingleNode(state,
                                                                      Alphas(6),
                                                                      ErrorsFound,
                                                                      Node::ConnObjType::ZoneHVACUnitVentilator,
@@ -355,7 +355,7 @@ namespace UnitVentilator {
                                                                      Node::ConnType::Inlet,
                                                                      Node::CompFluidStream::Primary,
                                                                      Node::ObjectIsParent);
-            unitVent.AirOutNode = Node::GetSingleNode(state,
+            unitVent.AirOutNodeNum = Node::GetSingleNode(state,
                                                                       Alphas(7),
                                                                       ErrorsFound,
                                                                       Node::ConnObjType::ZoneHVACUnitVentilator,
@@ -371,10 +371,10 @@ namespace UnitVentilator {
                                    unitVent.ATMixerName,
                                    unitVent.ATMixerIndex,
                                    unitVent.ATMixerType,
-                                   unitVent.ATMixerPriNode,
-                                   unitVent.ATMixerSecNode,
-                                   unitVent.ATMixerOutNode,
-                                   unitVent.AirOutNode);
+                                   unitVent.ATMixerPriAirInNodeNum,
+                                   unitVent.ATMixerSecAirInNodeNum,
+                                   unitVent.ATMixerMixedAirOutNodeNum,
+                                   unitVent.AirOutNodeNum);
             if (unitVent.ATMixerType == HVAC::MixerType::InletSide || unitVent.ATMixerType == HVAC::MixerType::SupplySide) {
                 unitVent.ATMixerExists = true;
             }
@@ -385,7 +385,7 @@ namespace UnitVentilator {
             }
 
             if (!unitVent.ATMixerExists) {
-                unitVent.AirInNode = Node::GetSingleNode(state,
+                unitVent.AirInNodeNum = Node::GetSingleNode(state,
                                                                          Alphas(6),
                                                                          ErrorsFound,
                                                                          Node::ConnObjType::ZoneHVACUnitVentilator,
@@ -411,7 +411,7 @@ namespace UnitVentilator {
 
             } else {
                 auto *fan = state.dataFans->fans(unitVent.Fan_Index);
-                unitVent.FanOutletNode = fan->outletNodeNum;
+                unitVent.FanOutNodeNum = fan->outNodeNum;
                 unitVent.FanAvailSchedPtr = fan->availSchedNum; // Get the fan's availability schedule
                 FanVolFlow = fan->maxAirFlowRate;
                 if (FanVolFlow != DataSizing::AutoSize && unitVent.MaxAirVolFlow != DataSizing::AutoSize && FanVolFlow < unitVent.MaxAirVolFlow) {
@@ -444,7 +444,7 @@ namespace UnitVentilator {
             // object type for the non parent nodes
             //  Set connection type to 'OutdoorAir', because this is hardwired to OA conditions
             if (!unitVent.ATMixerExists) {
-                unitVent.OutsideAirNode = Node::GetSingleNode(state,
+                unitVent.OAMixerOutsideAirInNodeNum = Node::GetSingleNode(state,
                                                                               Alphas(8),
                                                                               ErrorsFound,
                                                                               Node::ConnObjType::ZoneHVACUnitVentilator,
@@ -454,13 +454,13 @@ namespace UnitVentilator {
                                                                               Node::CompFluidStream::Primary,
                                                                               Node::ObjectIsNotParent);
                 if (!lAlphaBlanks(8)) {
-                    OutAirNodeManager::CheckAndAddAirNodeNumber(state, unitVent.OutsideAirNode, IsValid);
+                    OutAirNodeManager::CheckAndAddAirNodeNumber(state, unitVent.OAMixerOutsideAirInNodeNum, IsValid);
                     if (!IsValid) {
                         ShowWarningError(state, format("{}{} Adding {}={}", RoutineName, CurrentModuleObject, cAlphaFields(8), Alphas(8)));
                     }
                 }
 
-                unitVent.AirReliefNode = Node::GetSingleNode(state,
+                unitVent.OAMixerReliefAirOutNodeNum = Node::GetSingleNode(state,
                                                                              Alphas(9),
                                                                              ErrorsFound,
                                                                              Node::ConnObjType::ZoneHVACUnitVentilator,
@@ -470,7 +470,7 @@ namespace UnitVentilator {
                                                                              Node::CompFluidStream::Primary,
                                                                              Node::ObjectIsNotParent);
 
-                unitVent.OAMixerOutNode = Node::GetSingleNode(state,
+                unitVent.OAMixerMixedAirOutNodeNum = Node::GetSingleNode(state,
                                                                               Alphas(10),
                                                                               ErrorsFound,
                                                                               Node::ConnObjType::ZoneHVACUnitVentilator,
@@ -480,8 +480,8 @@ namespace UnitVentilator {
                                                                               Node::CompFluidStream::Primary,
                                                                               Node::ObjectIsNotParent);
             } else {
-                unitVent.OutsideAirNode = unitVent.ATMixerPriNode;
-                unitVent.OAMixerOutNode = unitVent.ATMixerOutNode;
+                unitVent.OAMixerOutsideAirInNodeNum = unitVent.ATMixerPriAirInNodeNum;
+                unitVent.OAMixerMixedAirOutNodeNum = unitVent.ATMixerMixedAirOutNodeNum;
                 if (!lAlphaBlanks(8) || !lAlphaBlanks(9) || !lAlphaBlanks(10)) {
                     ShowWarningError(state, format("{}{}=\"{}\" is connected to central DOA.", RoutineName, CurrentModuleObject, unitVent.Name));
                     if (!lAlphaBlanks(8)) {
@@ -508,8 +508,8 @@ namespace UnitVentilator {
                                                      unitVent.Name,
                                                      Alphas(11),
                                                      unitVent.FanName,
-                                                     state.dataLoopNodes->NodeID(unitVent.OAMixerOutNode),
-                                                     state.dataLoopNodes->NodeID(unitVent.FanOutletNode));
+                                                     dln->nodes(unitVent.OAMixerMixedAirOutNodeNum)->Name,
+                                                     dln->nodes(unitVent.FanOutNodeNum)->Name);
             } else {
                 if (unitVent.ATMixerType == HVAC::MixerType::InletSide) {
                     // Add fan to component sets array
@@ -518,8 +518,8 @@ namespace UnitVentilator {
                                                          unitVent.Name,
                                                          Alphas(11),
                                                          unitVent.FanName,
-                                                         state.dataLoopNodes->NodeID(unitVent.ATMixerOutNode),
-                                                         state.dataLoopNodes->NodeID(unitVent.FanOutletNode));
+                                                         dln->nodes(unitVent.ATMixerMixedAirOutNodeNum)->Name,
+                                                         dln->nodes(unitVent.FanOutNodeNum)->Name);
                 }
                 if (unitVent.ATMixerType == HVAC::MixerType::SupplySide) {
                     // Add fan to component sets array
@@ -528,8 +528,8 @@ namespace UnitVentilator {
                                                          unitVent.Name,
                                                          Alphas(11),
                                                          unitVent.FanName,
-                                                         state.dataLoopNodes->NodeID(unitVent.AirInNode),
-                                                         state.dataLoopNodes->NodeID(unitVent.FanOutletNode));
+                                                         dln->nodes(unitVent.AirInNodeNum)->Name,
+                                                         dln->nodes(unitVent.FanOutNodeNum)->Name);
                 }
             }
 
@@ -594,13 +594,13 @@ namespace UnitVentilator {
                             // mine the hot water or steam node from the coil object
                             if (unitVent.HCoilType == HeatCoilType::Water) {
                                 unitVent.HCoil_Index = WaterCoils::GetCompIndex(state, WaterCoils::CoilModel::HeatingSimple, unitVent.HCoilName);
-                                unitVent.HotControlNode = state.dataWaterCoils->WaterCoil(unitVent.HCoil_Index).WaterInletNodeNum;
+                                unitVent.HotControlNodeNum = state.dataWaterCoils->WaterCoil(unitVent.HCoil_Index).WaterInNodeNum;
                                 unitVent.MaxVolHotWaterFlow = state.dataWaterCoils->WaterCoil(unitVent.HCoil_Index).MaxWaterVolFlowRate;
                                 // Could probably remove MaxVolHotSteamFlow here
                                 unitVent.MaxVolHotSteamFlow = unitVent.MaxVolHotWaterFlow;
                             } else {
                                 unitVent.HCoil_Index = SteamCoils::GetCompIndex(state, unitVent.HCoilName);
-                                unitVent.HotControlNode = state.dataSteamCoils->SteamCoil(unitVent.HCoil_Index).SteamInletNodeNum;
+                                unitVent.HotControlNodeNum = state.dataSteamCoils->SteamCoil(unitVent.HCoil_Index).SteamInNodeNum;
                                 // Could probably replace MaxVolHotWaterFlow here with MaxVolHotSteamFlow
                                 unitVent.MaxVolHotWaterFlow = state.dataSteamCoils->SteamCoil(unitVent.HCoil_Index).MaxSteamVolFlowRate;
                                 // unitVent.MaxVolHotWaterFlow =
@@ -664,11 +664,11 @@ namespace UnitVentilator {
                                 WaterCoils::CoilModel coilModel = WaterCoils::CoilModel::CoolingSimple;
                                 if (unitVent.CCoilType == CoolCoilType::Detailed) coilModel = WaterCoils::CoilModel::CoolingDetailed;
                                 unitVent.CCoil_Index = WaterCoils::GetCompIndex(state, coilModel, unitVent.CCoilName);
-                                unitVent.ColdControlNode = state.dataWaterCoils->WaterCoil(unitVent.CCoil_Index).WaterInletNodeNum;
+                                unitVent.ColdControlNodeNum = state.dataWaterCoils->WaterCoil(unitVent.CCoil_Index).WaterInNodeNum;
                                 unitVent.MaxVolColdWaterFlow = state.dataWaterCoils->WaterCoil(unitVent.CCoil_Index).MaxWaterVolFlowRate;
                             } else {
                                 // special case, call the parent and return the child water inlet node and water volume flow rate
-                                unitVent.ColdControlNode =
+                                unitVent.ColdControlNodeNum =
                                     HVACHXAssistedCoolingCoil::GetCoilWaterInletNode(state, unitVent.CCoilTypeCh, unitVent.CCoilName, errFlag);
                                 unitVent.MaxVolColdWaterFlow = HVACHXAssistedCoolingCoil::GetCoilMaxWaterFlowRate(
                                     state, "CoilSystem:Cooling:Water:HeatExchangerAssisted", unitVent.CCoilName, errFlag);
@@ -697,7 +697,7 @@ namespace UnitVentilator {
                 // check that unit ventilator air inlet node is the same as a zone exhaust node
                 ZoneNodeNotFound = true;
                 for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumExhaustNodes; ++NodeNum) {
-                    if (unitVent.AirInNode == state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ExhaustNode(NodeNum)) {
+                    if (unitVent.AirInNodeNum == state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ExhaustNodeNums(NodeNum)) {
                         ZoneNodeNotFound = false;
                         break;
                     }
@@ -706,9 +706,9 @@ namespace UnitVentilator {
                     bool InletNodeFound = false;
                     if (unitVent.ZonePtr > 0) {
                         InletNodeFound = ZonePlenum::ValidateInducedNode(state,
-                                                                         unitVent.AirInNode,
+                                                                         unitVent.AirInNodeNum,
                                                                          state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumReturnNodes,
-                                                                         state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ReturnNode);
+                                                                         state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ReturnNodeNums);
                     }
                     if (!InletNodeFound) {
                         ShowSevereError(state,
@@ -719,14 +719,14 @@ namespace UnitVentilator {
                         ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                         ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
                         ShowContinueError(state,
-                                          format("..Unit ventilator unit air inlet node name = {}", state.dataLoopNodes->NodeID(unitVent.AirInNode)));
+                                          format("..Unit ventilator unit air inlet node name = {}", dln->nodes(unitVent.AirInNodeNum)->Name));
                         ErrorsFound = true;
                     }
                 }
                 // check that unit ventilator air outlet node is the same as a zone inlet node.
                 ZoneNodeNotFound = true;
-                for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumInletNodes; ++NodeNum) {
-                    if (unitVent.AirOutNode == state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).InletNode(NodeNum)) {
+                for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumInNodes; ++NodeNum) {
+                    if (unitVent.AirOutNodeNum == state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).InNodeNums(NodeNum)) {
                         ZoneNodeNotFound = false;
                         break;
                     }
@@ -737,15 +737,15 @@ namespace UnitVentilator {
                                            CurrentModuleObject,
                                            unitVent.Name));
                     ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, format("..Unit ventilator air outlet node name = {}", state.dataLoopNodes->NodeID(unitVent.AirOutNode)));
+                    ShowContinueError(state, format("..Unit ventilator air outlet node name = {}", dln->nodes(unitVent.AirOutNodeNum)->Name));
                     ErrorsFound = true;
                 }
             } else {
                 if (unitVent.ATMixerType == HVAC::MixerType::InletSide) {
                     // check that unit ventilator air outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumInletNodes; ++NodeNum) {
-                        if (unitVent.AirOutNode == state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).InletNode(NodeNum)) {
+                    for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumInNodes; ++NodeNum) {
+                        if (unitVent.AirOutNodeNum == state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).InNodeNums(NodeNum)) {
                             ZoneNodeNotFound = false;
                             break;
                         }
@@ -757,25 +757,25 @@ namespace UnitVentilator {
                                                unitVent.Name));
                         ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
                         ShowContinueError(state,
-                                          format("..Unit ventilator air outlet node name = {}", state.dataLoopNodes->NodeID(unitVent.AirOutNode)));
+                                          format("..Unit ventilator air outlet node name = {}", dln->nodes(unitVent.AirOutNodeNum)->Name));
                         ErrorsFound = true;
                     }
 
                     // check that the air mixer out node is the unit ventilator air inlet node
-                    if (unitVent.AirInNode != unitVent.ATMixerOutNode) {
+                    if (unitVent.AirInNodeNum != unitVent.ATMixerMixedAirOutNodeNum) {
                         ShowSevereError(state,
                                         format("{} = \"{}\". unit ventilator air inlet node name must be the same as the mixer outlet node name.",
                                                CurrentModuleObject,
                                                unitVent.Name));
                         ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object.");
                         ShowContinueError(state,
-                                          format("..Unit ventilator air inlet node name = {}", state.dataLoopNodes->NodeID(unitVent.AirInNode)));
+                                          format("..Unit ventilator air inlet node name = {}", dln->nodes(unitVent.AirInNodeNum)->Name));
                         ErrorsFound = true;
                     }
                 }
                 if (unitVent.ATMixerType == HVAC::MixerType::SupplySide) {
                     // check that the mixer secondary air node is the unit ventilator air outlet node
-                    if (unitVent.AirOutNode != unitVent.ATMixerSecNode) {
+                    if (unitVent.AirOutNodeNum != unitVent.ATMixerSecAirInNodeNum) {
                         ShowSevereError(
                             state,
                             format("{} = \"{}\". unit ventilator air outlet node name must be the same as the mixer secondary air inlet node name.",
@@ -783,14 +783,14 @@ namespace UnitVentilator {
                                    unitVent.Name));
                         ShowContinueError(state, "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object.");
                         ShowContinueError(state,
-                                          format("..Unit ventilator air outlet node name = {}", state.dataLoopNodes->NodeID(unitVent.AirOutNode)));
+                                          format("..Unit ventilator air outlet node name = {}", dln->nodes(unitVent.AirOutNodeNum)->Name));
                         ErrorsFound = true;
                     }
 
                     // check that air teminal mixer outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumInletNodes; ++NodeNum) {
-                        if (unitVent.ATMixerOutNode == state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).InletNode(NodeNum)) {
+                    for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumInNodes; ++NodeNum) {
+                        if (unitVent.ATMixerMixedAirOutNodeNum == state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).InNodeNums(NodeNum)) {
                             ZoneNodeNotFound = false;
                             break;
                         }
@@ -802,13 +802,13 @@ namespace UnitVentilator {
                                                unitVent.Name));
                         ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
                         ShowContinueError(state,
-                                          format("..Air terminal mixer outlet node name = {}", state.dataLoopNodes->NodeID(unitVent.ATMixerOutNode)));
+                                          format("..Air terminal mixer outlet node name = {}", dln->nodes(unitVent.ATMixerMixedAirOutNodeNum)->Name));
                         ErrorsFound = true;
                     } else {
                         bool ExhastNodeNotFound = true;
                         // check exhaust node
                         for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumExhaustNodes; ++NodeNum) {
-                            if (unitVent.AirInNode == state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ExhaustNode(NodeNum)) {
+                            if (unitVent.AirInNodeNum == state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ExhaustNodeNums(NodeNum)) {
                                 ExhastNodeNotFound = false;
                                 break;
                             }
@@ -819,9 +819,9 @@ namespace UnitVentilator {
                             if (unitVent.ZonePtr > 0) {
                                 InletNodeFound =
                                     ZonePlenum::ValidateInducedNode(state,
-                                                                    unitVent.AirInNode,
+                                                                    unitVent.AirInNodeNum,
                                                                     state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumReturnNodes,
-                                                                    state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ReturnNode);
+                                                                    state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ReturnNodeNums);
                             }
                             if (!InletNodeFound) {
                                 ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
@@ -832,7 +832,7 @@ namespace UnitVentilator {
                                 ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                                 ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
                                 ShowContinueError(state,
-                                                  format("..UnitVentilator inlet node name = {}", state.dataLoopNodes->NodeID(unitVent.AirInNode)));
+                                                  format("..UnitVentilator inlet node name = {}", dln->nodes(unitVent.AirInNodeNum)->Name));
                                 ErrorsFound = true;
                             }
                         }
@@ -848,7 +848,7 @@ namespace UnitVentilator {
                                                          unitVent.Name,
                                                          cCoolingCoilType,
                                                          unitVent.CCoilName,
-                                                         state.dataLoopNodes->NodeID(unitVent.FanOutletNode),
+                                                         dln->nodes(unitVent.FanOutNodeNum)->Name,
                                                          "UNDEFINED");
 
                     // Add heating coil to component sets array when cooling coil present
@@ -858,7 +858,7 @@ namespace UnitVentilator {
                                                          cHeatingCoilType,
                                                          unitVent.HCoilName,
                                                          "UNDEFINED",
-                                                         state.dataLoopNodes->NodeID(unitVent.AirOutNode));
+                                                         dln->nodes(unitVent.AirOutNodeNum)->Name);
                 } break;
                 case CoilsUsed::Heating: {
                     // Add heating coil to component sets array when no cooling coil present
@@ -867,8 +867,8 @@ namespace UnitVentilator {
                                                          unitVent.Name,
                                                          cHeatingCoilType,
                                                          unitVent.HCoilName,
-                                                         state.dataLoopNodes->NodeID(unitVent.FanOutletNode),
-                                                         state.dataLoopNodes->NodeID(unitVent.AirOutNode));
+                                                         dln->nodes(unitVent.FanOutNodeNum)->Name,
+                                                         dln->nodes(unitVent.AirOutNodeNum)->Name);
                 } break;
                 case CoilsUsed::Cooling: {
                     // Add cooling coil to component sets array when no heating coil present
@@ -877,8 +877,8 @@ namespace UnitVentilator {
                                                          unitVent.Name,
                                                          cCoolingCoilType,
                                                          unitVent.CCoilName,
-                                                         state.dataLoopNodes->NodeID(unitVent.FanOutletNode),
-                                                         state.dataLoopNodes->NodeID(unitVent.AirOutNode));
+                                                         dln->nodes(unitVent.FanOutNodeNum)->Name,
+                                                         dln->nodes(unitVent.AirOutNodeNum)->Name);
                 } break;
                 default: {
                 } break;
@@ -1051,7 +1051,7 @@ namespace UnitVentilator {
                     ShowFatalError(state, "InitUnitVentilator: Program terminated due to previous condition(s).");
                 }
 
-                unitVent.HotCoilOutNodeNum = DataPlant::CompData::getPlantComponent(state, unitVent.HWplantLoc).NodeNumOut;
+                unitVent.HotCoilOutNodeNum = DataPlant::CompData::getPlantComponent(state, unitVent.HWplantLoc).OutNodeNum;
             }
             if ((unitVent.CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
                 (unitVent.CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
@@ -1063,7 +1063,7 @@ namespace UnitVentilator {
                     ShowFatalError(state, "InitUnitVentilator: Program terminated due to previous condition(s).");
                 }
 
-                unitVent.ColdCoilOutNodeNum = DataPlant::CompData::getPlantComponent(state, unitVent.CWPlantLoc).NodeNumOut;
+                unitVent.ColdCoilOutNodeNum = DataPlant::CompData::getPlantComponent(state, unitVent.CWPlantLoc).OutNodeNum;
             } else {
                 if (unitVent.CCoilPresent)
                     ShowFatalError(state, format("InitUnitVentilator: Unit={}, invalid cooling coil type. Program terminated.", unitVent.Name));
@@ -1093,10 +1093,11 @@ namespace UnitVentilator {
             state.dataUnitVentilators->MySizeFlag(UnitVentNum) = false;
         }
 
-        int InNode = unitVent.AirInNode;
-        int OutNode = unitVent.AirOutNode;
-        int OutsideAirNode = unitVent.OutsideAirNode;
-        int AirRelNode = unitVent.AirReliefNode;
+        auto &dln = state.dataLoopNodes;
+        auto *airInNode = dln->nodes(unitVent.AirInNodeNum);
+        auto *airOutNode = dln->nodes(unitVent.AirOutNodeNum);
+        auto *outsideAirInNode = dln->nodes(unitVent.OAMixerOutsideAirInNodeNum);
+        auto *reliefAirOutNode = dln->nodes(unitVent.OAMixerReliefAirOutNodeNum);
 
         // Do the one time initializations
         if (state.dataGlobal->BeginEnvrnFlag && state.dataUnitVentilators->MyEnvrnFlag(UnitVentNum) &&
@@ -1115,14 +1116,14 @@ namespace UnitVentilator {
             }
 
             // set the node max and min mass flow rates
-            state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMax = unitVent.OutAirMassFlow;
-            state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMin = 0.0;
+            outsideAirInNode->MassFlowRateMax = unitVent.OutAirMassFlow;
+            outsideAirInNode->MassFlowRateMin = 0.0;
 
-            state.dataLoopNodes->Node(OutNode).MassFlowRateMax = unitVent.MaxAirMassFlow;
-            state.dataLoopNodes->Node(OutNode).MassFlowRateMin = 0.0;
+            airOutNode->MassFlowRateMax = unitVent.MaxAirMassFlow;
+            airOutNode->MassFlowRateMin = 0.0;
 
-            state.dataLoopNodes->Node(InNode).MassFlowRateMax = unitVent.MaxAirMassFlow;
-            state.dataLoopNodes->Node(InNode).MassFlowRateMin = 0.0;
+            airInNode->MassFlowRateMax = unitVent.MaxAirMassFlow;
+            airInNode->MassFlowRateMin = 0.0;
 
             if (unitVent.HCoilPresent) { // Only initialize these if a heating coil is actually present
 
@@ -1138,7 +1139,7 @@ namespace UnitVentilator {
                     unitVent.MinHotWaterFlow = rho * unitVent.MinVolHotWaterFlow;
 
                     PlantUtilities::InitComponentNodes(
-                        state, unitVent.MinHotWaterFlow, unitVent.MaxHotWaterFlow, unitVent.HotControlNode, unitVent.HotCoilOutNodeNum);
+                        state, unitVent.MinHotWaterFlow, unitVent.MaxHotWaterFlow, unitVent.HotControlNodeNum, unitVent.HotCoilOutNodeNum);
                 }
                 if (unitVent.HCoilType == HeatCoilType::Steam) {
                     Real64 TempSteamIn = 100.00;
@@ -1148,7 +1149,7 @@ namespace UnitVentilator {
                     unitVent.MinHotSteamFlow = SteamDensity * unitVent.MinVolHotSteamFlow;
 
                     PlantUtilities::InitComponentNodes(
-                        state, unitVent.MinHotSteamFlow, unitVent.MaxHotSteamFlow, unitVent.HotControlNode, unitVent.HotCoilOutNodeNum);
+                        state, unitVent.MinHotSteamFlow, unitVent.MaxHotSteamFlow, unitVent.HotControlNodeNum, unitVent.HotCoilOutNodeNum);
                 }
             } //(UnitVent(UnitVentNum)%HCoilPresent)
 
@@ -1162,7 +1163,7 @@ namespace UnitVentilator {
                 unitVent.MaxColdWaterFlow = rho * unitVent.MaxVolColdWaterFlow;
                 unitVent.MinColdWaterFlow = rho * unitVent.MinVolColdWaterFlow;
                 PlantUtilities::InitComponentNodes(
-                    state, unitVent.MinColdWaterFlow, unitVent.MaxColdWaterFlow, unitVent.ColdControlNode, unitVent.ColdCoilOutNodeNum);
+                    state, unitVent.MinColdWaterFlow, unitVent.MaxColdWaterFlow, unitVent.ColdControlNodeNum, unitVent.ColdCoilOutNodeNum);
             }
             state.dataUnitVentilators->MyEnvrnFlag(UnitVentNum) = false;
         } // ...end start of environment inits
@@ -1196,63 +1197,58 @@ namespace UnitVentilator {
             SetMassFlowRateToZero = true;
         }
 
-        auto &inNode(state.dataLoopNodes->Node(InNode));
-        auto &outNode(state.dataLoopNodes->Node(OutNode));
-        auto &oaNode(state.dataLoopNodes->Node(OutsideAirNode));
         if (SetMassFlowRateToZero) {
-            inNode.MassFlowRate = 0.0;
-            inNode.MassFlowRateMaxAvail = 0.0;
-            inNode.MassFlowRateMinAvail = 0.0;
-            outNode.MassFlowRate = 0.0;
-            outNode.MassFlowRateMaxAvail = 0.0;
-            outNode.MassFlowRateMinAvail = 0.0;
-            oaNode.MassFlowRate = 0.0;
-            oaNode.MassFlowRateMaxAvail = 0.0;
-            oaNode.MassFlowRateMinAvail = 0.0;
+            airInNode->MassFlowRate = 0.0;
+            airInNode->MassFlowRateMaxAvail = 0.0;
+            airInNode->MassFlowRateMinAvail = 0.0;
+            airOutNode->MassFlowRate = 0.0;
+            airOutNode->MassFlowRateMaxAvail = 0.0;
+            airOutNode->MassFlowRateMinAvail = 0.0;
+            outsideAirInNode->MassFlowRate = 0.0;
+            outsideAirInNode->MassFlowRateMaxAvail = 0.0;
+            outsideAirInNode->MassFlowRateMinAvail = 0.0;
             if (!unitVent.ATMixerExists) {
-                auto &relNode(state.dataLoopNodes->Node(AirRelNode));
-                relNode.MassFlowRate = 0.0;
-                relNode.MassFlowRateMaxAvail = 0.0;
-                relNode.MassFlowRateMinAvail = 0.0;
+                reliefAirOutNode->MassFlowRate = 0.0;
+                reliefAirOutNode->MassFlowRateMaxAvail = 0.0;
+                reliefAirOutNode->MassFlowRateMinAvail = 0.0;
             }
         } else {
-            inNode.MassFlowRate = unitVent.MaxAirMassFlow;
-            inNode.MassFlowRateMaxAvail = unitVent.MaxAirMassFlow;
-            inNode.MassFlowRateMinAvail = unitVent.MaxAirMassFlow;
-            outNode.MassFlowRate = unitVent.MaxAirMassFlow;
-            outNode.MassFlowRateMaxAvail = unitVent.MaxAirMassFlow;
-            outNode.MassFlowRateMinAvail = unitVent.MaxAirMassFlow;
-            oaNode.MassFlowRate = unitVent.OutAirMassFlow;
-            oaNode.MassFlowRateMaxAvail = unitVent.OutAirMassFlow;
-            oaNode.MassFlowRateMinAvail = unitVent.OutAirMassFlow;
+            airInNode->MassFlowRate = unitVent.MaxAirMassFlow;
+            airInNode->MassFlowRateMaxAvail = unitVent.MaxAirMassFlow;
+            airInNode->MassFlowRateMinAvail = unitVent.MaxAirMassFlow;
+            airOutNode->MassFlowRate = unitVent.MaxAirMassFlow;
+            airOutNode->MassFlowRateMaxAvail = unitVent.MaxAirMassFlow;
+            airOutNode->MassFlowRateMinAvail = unitVent.MaxAirMassFlow;
+            outsideAirInNode->MassFlowRate = unitVent.OutAirMassFlow;
+            outsideAirInNode->MassFlowRateMaxAvail = unitVent.OutAirMassFlow;
+            outsideAirInNode->MassFlowRateMinAvail = unitVent.OutAirMassFlow;
             if (!unitVent.ATMixerExists) {
-                auto &relNode(state.dataLoopNodes->Node(AirRelNode));
-                relNode.MassFlowRate = unitVent.OutAirMassFlow;
-                relNode.MassFlowRateMaxAvail = unitVent.OutAirMassFlow;
-                relNode.MassFlowRateMinAvail = unitVent.OutAirMassFlow;
+                reliefAirOutNode->MassFlowRate = unitVent.OutAirMassFlow;
+                reliefAirOutNode->MassFlowRateMaxAvail = unitVent.OutAirMassFlow;
+                reliefAirOutNode->MassFlowRateMinAvail = unitVent.OutAirMassFlow;
             }
         }
 
         // Initialize the relief air (same as inlet conditions to the unit ventilator...
         // Note that mass flow rates will be taken care of later.
         if (!unitVent.ATMixerExists) {
-            state.dataLoopNodes->Node(AirRelNode) = state.dataLoopNodes->Node(InNode);
+            *reliefAirOutNode = *airInNode;
         }
         state.dataUnitVentilators->OAMassFlowRate = 0.0;
 
         // Just in case the unit is off and conditions do not get sent through
         // the unit for some reason, set the outlet conditions equal to the inlet
         // conditions of the unit ventilator
-        outNode.Temp = inNode.Temp;
-        outNode.Press = inNode.Press;
-        outNode.HumRat = inNode.HumRat;
-        outNode.Enthalpy = inNode.Enthalpy;
+        airOutNode->Temp = airInNode->Temp;
+        airOutNode->Press = airInNode->Press;
+        airOutNode->HumRat = airInNode->HumRat;
+        airOutNode->Enthalpy = airInNode->Enthalpy;
 
         // These initializations only need to be done once at the start of the iterations...
         if (FirstHVACIteration) {
             // Initialize the outside air conditions...
             if (!unitVent.ATMixerExists) {
-                state.dataLoopNodes->Node(OutsideAirNode).Temp = state.dataLoopNodes->Node(OutsideAirNode).OutAirDryBulb;
+                outsideAirInNode->Temp = outsideAirInNode->OutAirDryBulb;
             }
         }
     }
@@ -1805,7 +1801,7 @@ namespace UnitVentilator {
                     CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, "Coil:Heating:Water", unitVent.HCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum = PlantUtilities::MyPlantSizingIndex(
-                            state, "COIL:HEATING:WATER", unitVent.HCoilName, unitVent.HotControlNode, CoilWaterOutletNode, ErrorsFound);
+                            state, "COIL:HEATING:WATER", unitVent.HCoilName, unitVent.HotControlNodeNum, CoilWaterOutletNode, ErrorsFound);
 
                         if (state.dataWaterCoils->WaterCoil(unitVent.HCoil_Index).UseDesignWaterDeltaTemp) {
                             WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(unitVent.HCoil_Index).DesignWaterDeltaTemp;
@@ -1959,7 +1955,7 @@ namespace UnitVentilator {
                     CoilSteamOutletNode = SteamCoils::GetCoilSteamOutletNode(state, "Coil:Heating:Steam", unitVent.HCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum = PlantUtilities::MyPlantSizingIndex(
-                            state, "Coil:Heating:Steam", unitVent.HCoilName, unitVent.HotControlNode, CoilSteamOutletNode, ErrorsFound);
+                            state, "Coil:Heating:Steam", unitVent.HCoilName, unitVent.HotControlNodeNum, CoilSteamOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
                             if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow >= HVAC::SmallAirVolFlow) {
                                 SizingMethod = HVAC::HeatingCapacitySizing;
@@ -2104,7 +2100,7 @@ namespace UnitVentilator {
                     CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizCoolNum = PlantUtilities::MyPlantSizingIndex(
-                            state, CoolingCoilType, CoolingCoilName, unitVent.ColdControlNode, CoilWaterOutletNode, ErrorsFound);
+                            state, CoolingCoilType, CoolingCoilName, unitVent.ColdControlNodeNum, CoilWaterOutletNode, ErrorsFound);
                         if (state.dataWaterCoils->WaterCoil(unitVent.CCoil_Index).UseDesignWaterDeltaTemp) {
                             WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(unitVent.CCoil_Index).DesignWaterDeltaTemp;
                             DoWaterCoilSizing = true;
@@ -2391,9 +2387,10 @@ namespace UnitVentilator {
         HVAC::FanOp fanOp = unitVent.fanOp;
         Real64 PartLoadFrac = 0.0;
 
-        auto &inletNode(state.dataLoopNodes->Node(unitVent.AirInNode));
-        auto &outletNode(state.dataLoopNodes->Node(unitVent.AirOutNode));
-        auto &outsideAirNode(state.dataLoopNodes->Node(unitVent.OutsideAirNode));
+        auto &dln = state.dataLoopNodes;
+        auto *airInNode = dln->nodes(unitVent.AirInNodeNum);
+        auto *airOutNode = dln->nodes(unitVent.AirOutNodeNum);
+        auto *outsideAirInNode = dln->nodes(unitVent.OAMixerOutsideAirInNodeNum);
 
         if ((std::abs(state.dataUnitVentilators->QZnReq) < HVAC::SmallLoad) || (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) ||
             (ScheduleManager::GetCurrentScheduleValue(state, unitVent.SchedPtr) <= 0) ||
@@ -2402,21 +2399,21 @@ namespace UnitVentilator {
 
             // Unit is off or has no load upon it; set the flow rates to zero and then
             // simulate the components with the no flow conditions
-            AirMassFlow = outletNode.MassFlowRate;
+            AirMassFlow = airOutNode->MassFlowRate;
             state.dataUnitVentilators->HCoilOn = false;
-            if (unitVent.HotControlNode > 0) {
+            if (unitVent.HotControlNodeNum > 0) {
                 mdot = 0.0;
-                PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.HotControlNode, unitVent.HotCoilOutNodeNum, unitVent.HWplantLoc);
+                PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.HotControlNodeNum, unitVent.HotCoilOutNodeNum, unitVent.HWplantLoc);
             }
-            if (unitVent.ColdControlNode > 0) {
+            if (unitVent.ColdControlNodeNum > 0) {
                 mdot = 0.0;
-                PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.ColdControlNode, unitVent.ColdCoilOutNodeNum, unitVent.CWPlantLoc);
+                PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.ColdControlNodeNum, unitVent.ColdCoilOutNodeNum, unitVent.CWPlantLoc);
             }
 
             if (fanOp == HVAC::FanOp::Cycling) {
                 CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, fanOp, PartLoadFrac);
-                if (inletNode.MassFlowRateMax > 0.0) {
-                    unitVent.FanPartLoadRatio = inletNode.MassFlowRate / inletNode.MassFlowRateMax;
+                if (airInNode->MassFlowRateMax > 0.0) {
+                    unitVent.FanPartLoadRatio = airInNode->MassFlowRate / airInNode->MassFlowRateMax;
                 }
             } else {
                 CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut);
@@ -2426,22 +2423,22 @@ namespace UnitVentilator {
             unitVent.FanPartLoadRatio = 1.0;
             if (state.dataUnitVentilators->QZnReq > HVAC::SmallLoad) { // HEATING MODE
 
-                ControlNode = unitVent.HotControlNode;
+                auto *controlNode = dln->nodes(unitVent.HotControlNodeNum);
                 ControlOffset = unitVent.HotControlOffset;
                 MaxWaterFlow = unitVent.MaxHotWaterFlow;
                 MinWaterFlow = unitVent.MinHotWaterFlow;
                 // On the first HVAC iteration the system values are given to the controller, but after that
                 // the demand limits are in place and there needs to be feedback to the Zone Equipment
                 if (!FirstHVACIteration && unitVent.HCoilType == HeatCoilType::Water) {
-                    MaxWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
-                    MinWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
+                    MaxWaterFlow = controlNode->MassFlowRateMaxAvail;
+                    MinWaterFlow = controlNode->MassFlowRateMinAvail;
                 }
 
                 state.dataUnitVentilators->HCoilOn = true;
 
-                if (outsideAirNode.MassFlowRate > 0.0) {
+                if (outsideAirInNode->MassFlowRate > 0.0) {
                     MinOAFrac = ScheduleManager::GetCurrentScheduleValue(state, unitVent.MinOASchedPtr) *
-                                (unitVent.MinOutAirMassFlow / outsideAirNode.MassFlowRate);
+                                (unitVent.MinOutAirMassFlow / outsideAirInNode->MassFlowRate);
                 } else {
                     MinOAFrac = 0.0;
                 }
@@ -2460,24 +2457,24 @@ namespace UnitVentilator {
                             // In this control type, the outdoor air flow rate is fixed to the minimum value
                             // which is equal to the maximum value, regardless of all the other conditions.
 
-                            state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                            state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                         } break;
                         case OAControl::VariablePercent: {
                             // This algorithm is probably a bit simplistic in that it just bounces
                             // back and forth between the maximum outside air and the minimum.  In
                             // REAL(r64)ity, a system *might* vary between the two based on the load in
                             // the zone.
-                            Tinlet = inletNode.Temp;
-                            Toutdoor = outsideAirNode.Temp;
+                            Tinlet = airInNode->Temp;
+                            Toutdoor = outsideAirInNode->Temp;
 
                             if (Tinlet >= Toutdoor) {
 
-                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
 
                             } else { // Tinlet < Toutdoor
 
                                 MaxOAFrac = ScheduleManager::GetCurrentScheduleValue(state, unitVent.MaxOASchedPtr);
-                                state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirInNode->MassFlowRate;
                             }
                         } break;
                         case OAControl::FixedTemperature: {
@@ -2489,39 +2486,39 @@ namespace UnitVentilator {
                             // to maximize the amount of air coming from the source that is closer
                             // in temperature to the desired temperature.
                             Tdesired = ScheduleManager::GetCurrentScheduleValue(state, unitVent.TempSchedPtr);
-                            Tinlet = inletNode.Temp;
-                            Toutdoor = outsideAirNode.Temp;
+                            Tinlet = airInNode->Temp;
+                            Toutdoor = outsideAirInNode->Temp;
                             MaxOAFrac = 1.0;
 
                             if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
-                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                             } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
-                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                             } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
                                 // Desired temperature is between the inlet and outdoor temperatures
                                 // so vary the flow rate between no outside air and no recirculation air
                                 // then applying the maximum and minimum limits the user has scheduled
                                 // to make sure too much/little outside air is being introduced
-                                state.dataUnitVentilators->OAMassFlowRate = ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * inletNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * airInNode->MassFlowRate;
                                 state.dataUnitVentilators->OAMassFlowRate =
-                                    max(state.dataUnitVentilators->OAMassFlowRate, (MinOAFrac * outsideAirNode.MassFlowRate));
+                                    max(state.dataUnitVentilators->OAMassFlowRate, (MinOAFrac * outsideAirInNode->MassFlowRate));
                                 state.dataUnitVentilators->OAMassFlowRate =
-                                    min(state.dataUnitVentilators->OAMassFlowRate, (MaxOAFrac * outsideAirNode.MassFlowRate));
+                                    min(state.dataUnitVentilators->OAMassFlowRate, (MaxOAFrac * outsideAirInNode->MassFlowRate));
                             } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
                                 // Desired temperature is below both the inlet and outdoor temperatures
                                 // so use whichever flow rate (max or min) that will get closer
                                 if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                                 } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirInNode->MassFlowRate;
                                 }
                             } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
                                 // Desired temperature is above both the inlet and outdoor temperatures
                                 // so use whichever flow rate (max or min) that will get closer
                                 if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                                 } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirInNode->MassFlowRate;
                                 }
                             } else {
                                 // It should NEVER get to this point, but just in case...
@@ -2537,8 +2534,8 @@ namespace UnitVentilator {
 
                     if (fanOp == HVAC::FanOp::Cycling) {
                         CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, fanOp, PartLoadFrac);
-                        if (inletNode.MassFlowRateMax > 0.0) {
-                            unitVent.FanPartLoadRatio = inletNode.MassFlowRate / inletNode.MassFlowRateMax;
+                        if (airInNode->MassFlowRateMax > 0.0) {
+                            unitVent.FanPartLoadRatio = airInNode->MassFlowRate / airInNode->MassFlowRateMax;
                         }
                     } else {
                         CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut);
@@ -2555,12 +2552,12 @@ namespace UnitVentilator {
                         case OAControl::FixedAmount: {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
-                            state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                            state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                         } break;
                         case OAControl::VariablePercent: {
                             // In heating mode, the outside air for "variable percent" control
                             // is set to the minimum value
-                            state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                            state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                         } break;
                         case OAControl::FixedTemperature: {
                             // In heating mode, the outside air for "fixed temperature" attempts
@@ -2571,39 +2568,39 @@ namespace UnitVentilator {
                             // to maximize the amount of air coming from the source that is closer
                             // in temperature to the desired temperature.
                             Tdesired = ScheduleManager::GetCurrentScheduleValue(state, unitVent.TempSchedPtr);
-                            Tinlet = inletNode.Temp;
-                            Toutdoor = outsideAirNode.Temp;
+                            Tinlet = airInNode->Temp;
+                            Toutdoor = outsideAirInNode->Temp;
                             MaxOAFrac = 1.0;
 
                             if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
-                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                             } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
-                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                             } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
                                 // Desired temperature is between the inlet and outdoor temperatures
                                 // so vary the flow rate between no outside air and no recirculation air
                                 // then applying the maximum and minimum limits the user has scheduled
                                 // to make sure too much/little outside air is being introduced
-                                state.dataUnitVentilators->OAMassFlowRate = ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * inletNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * airInNode->MassFlowRate;
                                 state.dataUnitVentilators->OAMassFlowRate =
-                                    max(state.dataUnitVentilators->OAMassFlowRate, (MinOAFrac * outsideAirNode.MassFlowRate));
+                                    max(state.dataUnitVentilators->OAMassFlowRate, (MinOAFrac * outsideAirInNode->MassFlowRate));
                                 state.dataUnitVentilators->OAMassFlowRate =
-                                    min(state.dataUnitVentilators->OAMassFlowRate, (MaxOAFrac * outsideAirNode.MassFlowRate));
+                                    min(state.dataUnitVentilators->OAMassFlowRate, (MaxOAFrac * outsideAirInNode->MassFlowRate));
                             } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
                                 // Desired temperature is below both the inlet and outdoor temperatures
                                 // so use whichever flow rate (max or min) that will get closer
                                 if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                                 } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirInNode->MassFlowRate;
                                 }
                             } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
                                 // Desired temperature is above both the inlet and outdoor temperatures
                                 // so use whichever flow rate (max or min) that will get closer
                                 if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                                 } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirInNode->MassFlowRate;
                                 }
                             } else {
                                 // It should NEVER get to this point, but just in case...
@@ -2685,24 +2682,24 @@ namespace UnitVentilator {
 
             } else { // COOLING MODE
 
-                ControlNode = unitVent.ColdControlNode;
+                auto const *controlNode = dln->nodes(unitVent.ColdControlNodeNum);
                 ControlOffset = unitVent.ColdControlOffset;
                 MaxWaterFlow = unitVent.MaxColdWaterFlow;
                 MinWaterFlow = unitVent.MinColdWaterFlow;
                 // On the first HVAC iteration the system values are given to the controller, but after that
                 // the demand limits are in place and there needs to be feedback to the Zone Equipment
                 if ((!FirstHVACIteration) && (ControlNode > 0) && (unitVent.CCoilPresent)) {
-                    MaxWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
-                    MinWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
+                    MaxWaterFlow = controlNode->MassFlowRateMaxAvail;
+                    MinWaterFlow = controlNode->MassFlowRateMinAvail;
                 }
                 state.dataUnitVentilators->HCoilOn = false;
 
-                Tinlet = inletNode.Temp;
-                Toutdoor = outsideAirNode.Temp;
+                Tinlet = airInNode->Temp;
+                Toutdoor = outsideAirInNode->Temp;
 
-                if (outsideAirNode.MassFlowRate > 0.0) {
+                if (outsideAirInNode->MassFlowRate > 0.0) {
                     MinOAFrac = ScheduleManager::GetCurrentScheduleValue(state, unitVent.MinOASchedPtr) *
-                                (unitVent.MinOutAirMassFlow / outsideAirNode.MassFlowRate);
+                                (unitVent.MinOutAirMassFlow / outsideAirInNode->MassFlowRate);
                 } else {
                     MinOAFrac = 0.0;
                 }
@@ -2719,14 +2716,14 @@ namespace UnitVentilator {
                         case OAControl::FixedAmount: {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
-                            state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                            state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                         } break;
                         case OAControl::VariablePercent: {
                             state.dataUnitVentilators->OAMassFlowRate =
                                 SetOAMassFlowRateForCoolingVariablePercent(state,
                                                                            UnitVentNum,
                                                                            MinOAFrac,
-                                                                           outsideAirNode.MassFlowRate,
+                                                                           outsideAirInNode->MassFlowRate,
                                                                            ScheduleManager::GetCurrentScheduleValue(state, unitVent.MaxOASchedPtr),
                                                                            Tinlet,
                                                                            Toutdoor);
@@ -2737,34 +2734,34 @@ namespace UnitVentilator {
                             MaxOAFrac = 1.0;
 
                             if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
-                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                             } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
-                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                             } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
                                 // Desired temperature is between the inlet and outdoor temperatures
                                 // so vary the flow rate between no outside air and no recirculation air
                                 // then applying the maximum and minimum limits the user has scheduled
                                 // to make sure too much/little outside air is being introduced
-                                state.dataUnitVentilators->OAMassFlowRate = ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * inletNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * airInNode->MassFlowRate;
                                 state.dataUnitVentilators->OAMassFlowRate =
-                                    max(state.dataUnitVentilators->OAMassFlowRate, (MinOAFrac * outsideAirNode.MassFlowRate));
+                                    max(state.dataUnitVentilators->OAMassFlowRate, (MinOAFrac * outsideAirInNode->MassFlowRate));
                                 state.dataUnitVentilators->OAMassFlowRate =
-                                    min(state.dataUnitVentilators->OAMassFlowRate, (MaxOAFrac * outsideAirNode.MassFlowRate));
+                                    min(state.dataUnitVentilators->OAMassFlowRate, (MaxOAFrac * outsideAirInNode->MassFlowRate));
                             } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
                                 // Desired temperature is below both the inlet and outdoor temperatures
                                 // so use whichever flow rate (max or min) that will get closer
                                 if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                                 } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirInNode->MassFlowRate;
                                 }
                             } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
                                 // Desired temperature is above both the inlet and outdoor temperatures
                                 // so use whichever flow rate (max or min) that will get closer
                                 if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                                 } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirInNode->MassFlowRate;
                                 }
                             } else {
                                 // It should NEVER get to this point, but just in case...
@@ -2780,8 +2777,8 @@ namespace UnitVentilator {
 
                     if (fanOp == HVAC::FanOp::Cycling) {
                         CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, fanOp, PartLoadFrac);
-                        if (inletNode.MassFlowRateMax > 0.0) {
-                            unitVent.FanPartLoadRatio = inletNode.MassFlowRate / inletNode.MassFlowRateMax;
+                        if (airInNode->MassFlowRateMax > 0.0) {
+                            unitVent.FanPartLoadRatio = airInNode->MassFlowRate / airInNode->MassFlowRateMax;
                         }
                     } else {
                         CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut);
@@ -2798,14 +2795,14 @@ namespace UnitVentilator {
                         case OAControl::FixedAmount: {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
-                            state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                            state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                         } break;
                         case OAControl::VariablePercent: {
                             state.dataUnitVentilators->OAMassFlowRate =
                                 SetOAMassFlowRateForCoolingVariablePercent(state,
                                                                            UnitVentNum,
                                                                            MinOAFrac,
-                                                                           outsideAirNode.MassFlowRate,
+                                                                           outsideAirInNode->MassFlowRate,
                                                                            ScheduleManager::GetCurrentScheduleValue(state, unitVent.MaxOASchedPtr),
                                                                            Tinlet,
                                                                            Toutdoor);
@@ -2817,34 +2814,34 @@ namespace UnitVentilator {
                             MaxOAFrac = 1.0;
 
                             if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
-                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                             } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
-                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                             } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
                                 // Desired temperature is between the inlet and outdoor temperatures
                                 // so vary the flow rate between no outside air and no recirculation air
                                 // then applying the maximum and minimum limits the user has scheduled
                                 // to make sure too much/little outside air is being introduced
-                                state.dataUnitVentilators->OAMassFlowRate = ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * inletNode.MassFlowRate;
+                                state.dataUnitVentilators->OAMassFlowRate = ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * airInNode->MassFlowRate;
                                 state.dataUnitVentilators->OAMassFlowRate =
-                                    max(state.dataUnitVentilators->OAMassFlowRate, (MinOAFrac * outsideAirNode.MassFlowRate));
+                                    max(state.dataUnitVentilators->OAMassFlowRate, (MinOAFrac * outsideAirInNode->MassFlowRate));
                                 state.dataUnitVentilators->OAMassFlowRate =
-                                    min(state.dataUnitVentilators->OAMassFlowRate, (MaxOAFrac * outsideAirNode.MassFlowRate));
+                                    min(state.dataUnitVentilators->OAMassFlowRate, (MaxOAFrac * outsideAirInNode->MassFlowRate));
                             } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
                                 // Desired temperature is below both the inlet and outdoor temperatures
                                 // so use whichever flow rate (max or min) that will get closer
                                 if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                                 } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirInNode->MassFlowRate;
                                 }
                             } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
                                 // Desired temperature is above both the inlet and outdoor temperatures
                                 // so use whichever flow rate (max or min) that will get closer
                                 if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * outsideAirInNode->MassFlowRate;
                                 } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirNode.MassFlowRate;
+                                    state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * outsideAirInNode->MassFlowRate;
                                 }
                             } else {
                                 // It should NEVER get to this point, but just in case...
@@ -2915,13 +2912,13 @@ namespace UnitVentilator {
 
             } // ...end of HEATING/COOLING IF-THEN block
 
-            AirMassFlow = outletNode.MassFlowRate;
+            AirMassFlow = airOutNode->MassFlowRate;
             QUnitOut = AirMassFlow *
-                       (Psychrometrics::PsyHFnTdbW(outletNode.Temp, inletNode.HumRat) - Psychrometrics::PsyHFnTdbW(inletNode.Temp, inletNode.HumRat));
+                       (Psychrometrics::PsyHFnTdbW(airOutNode->Temp, airInNode->HumRat) - Psychrometrics::PsyHFnTdbW(airInNode->Temp, airInNode->HumRat));
 
         } // ...end of unit ON/OFF IF-THEN block
 
-        Real64 QTotUnitOut = AirMassFlow * (outletNode.Enthalpy - inletNode.Enthalpy);
+        Real64 QTotUnitOut = AirMassFlow * (airOutNode->Enthalpy - airInNode->Enthalpy);
 
         // Report variables...
         unitVent.HeatPower = max(0.0, QUnitOut);
@@ -2930,7 +2927,7 @@ namespace UnitVentilator {
         unitVent.ElecPower = state.dataFans->fans(unitVent.Fan_Index)->totalPower;
 
         PowerMet = QUnitOut;
-        LatOutputProvided = AirMassFlow * (outletNode.HumRat - inletNode.HumRat); // Latent rate (kg/s), dehumid = negative;
+        LatOutputProvided = AirMassFlow * (airOutNode->HumRat - airInNode->HumRat); // Latent rate (kg/s), dehumid = negative;
     }
 
     void CalcUnitVentilatorComponents(EnergyPlusData &state,
@@ -2963,22 +2960,22 @@ namespace UnitVentilator {
 
         Real64 mdot; // hot water or steam mass flow rate for current time step
 
-        auto &inletNode = state.dataLoopNodes->Node(unitVent.AirInNode);
-        auto &outletNode = state.dataLoopNodes->Node(unitVent.AirOutNode);
-        state.dataUnitVentilators->ZoneNode = state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ZoneNode;
+        auto &dln = state.dataLoopNodes;
+        auto *airInNode = dln->nodes(unitVent.AirInNodeNum);
+        auto *airOutNode = dln->nodes(unitVent.AirOutNodeNum);
+        state.dataUnitVentilators->ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ZoneNodeNum;
         Real64 QCoilReq = state.dataUnitVentilators->QZnReq;
 
         if (fanOp != HVAC::FanOp::Cycling) {
 
             if (unitVent.ATMixerExists) {
-                state.dataUnitVentilators->ATMixOutNode = unitVent.ATMixerOutNode;
-                state.dataUnitVentilators->ATMixerPriNode = unitVent.ATMixerPriNode;
+                state.dataUnitVentilators->ATMixerOutNodeNum = unitVent.ATMixerMixedAirOutNodeNum; // Why are these state variables?
+                state.dataUnitVentilators->ATMixerPriInNodeNum = unitVent.ATMixerPriAirInNodeNum;
                 if (unitVent.ATMixerType == HVAC::MixerType::InletSide) {
+                        auto *atMixerPriInNode = dln->nodes(state.dataUnitVentilators->ATMixerPriInNodeNum);
                     // set the primary air inlet mass flow rate
-                    state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRate =
-                        min(min(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRateMaxAvail,
-                                state.dataUnitVentilators->OAMassFlowRate),
-                            inletNode.MassFlowRate);
+                    atMixerPriInNode->MassFlowRate =
+                        min(min(atMixerPriInNode->MassFlowRateMaxAvail, state.dataUnitVentilators->OAMassFlowRate), airInNode->MassFlowRate);
                     // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
                     SingleDuct::SimATMixer(state, unitVent.ATMixerName, FirstHVACIteration, unitVent.ATMixerIndex);
                 }
@@ -3012,11 +3009,10 @@ namespace UnitVentilator {
                         if (!state.dataUnitVentilators->HCoilOn) {
                             QCoilReq = 0.0;
                         } else {
-                            int HCoilInAirNode = unitVent.FanOutletNode;
-                            Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(unitVent.AirInNode).HumRat);
+                            auto *heatCoilAirInNode = dln->nodes(unitVent.FanOutNodeNum);
+                            Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(airInNode->HumRat);
                             QCoilReq = state.dataUnitVentilators->QZnReq -
-                                       state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
-                                           (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(unitVent.AirInNode).Temp);
+                                       heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - airInNode->Temp);
                         }
 
                         if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
@@ -3028,11 +3024,10 @@ namespace UnitVentilator {
                         if (!state.dataUnitVentilators->HCoilOn) {
                             QCoilReq = 0.0;
                         } else {
-                            int HCoilInAirNode = unitVent.FanOutletNode;
-                            Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(unitVent.AirInNode).HumRat);
+                            auto const *heatCoilAirInNode = dln->nodes(unitVent.FanOutNodeNum);
+                            Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(airInNode->HumRat);
                             QCoilReq = state.dataUnitVentilators->QZnReq -
-                                       state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
-                                           (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(unitVent.AirInNode).Temp);
+                                       heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - airInNode->Temp);
                         }
 
                         if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
@@ -3049,19 +3044,18 @@ namespace UnitVentilator {
 
         } else { // Fan is Fan:OnOff and is cycling
 
-            inletNode.MassFlowRate = inletNode.MassFlowRateMax * PartLoadFrac;
+            airInNode->MassFlowRate = airInNode->MassFlowRateMax * PartLoadFrac;
             // Set the fan inlet node maximum available mass flow rates for cycling fans
-            inletNode.MassFlowRateMaxAvail = inletNode.MassFlowRate;
+            airInNode->MassFlowRateMaxAvail = airInNode->MassFlowRate;
 
             if (unitVent.ATMixerExists) {
-                state.dataUnitVentilators->ATMixOutNode = unitVent.ATMixerOutNode;
-                state.dataUnitVentilators->ATMixerPriNode = unitVent.ATMixerPriNode;
+                state.dataUnitVentilators->ATMixerOutNodeNum = unitVent.ATMixerMixedAirOutNodeNum;
+                state.dataUnitVentilators->ATMixerPriInNodeNum = unitVent.ATMixerPriAirInNodeNum;
                 if (unitVent.ATMixerType == HVAC::MixerType::InletSide) {
                     // set the primary air inlet mass flow rate
-                    state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRate =
-                        min(min(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRateMaxAvail,
-                                state.dataUnitVentilators->OAMassFlowRate),
-                            inletNode.MassFlowRate);
+                    auto *atMixerPriInNode = dln->nodes(state.dataUnitVentilators->ATMixerPriInNodeNum);
+                    atMixerPriInNode->MassFlowRate =
+                        min(min(atMixerPriInNode->MassFlowRateMaxAvail, state.dataUnitVentilators->OAMassFlowRate), airInNode->MassFlowRate);
                     // now calculate the mixer outlet conditions (and the secondary air inlet flow rate)
                     SingleDuct::SimATMixer(state, unitVent.ATMixerName, FirstHVACIteration, unitVent.ATMixerIndex);
                 }
@@ -3075,7 +3069,7 @@ namespace UnitVentilator {
 
                 // where is mdot set ?
                 CalcMdotCCoilCycFan(state, mdot, QCoilReq, state.dataUnitVentilators->QZnReq, UnitVentNum, PartLoadFrac);
-                PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.ColdControlNode, unitVent.ColdCoilOutNodeNum, unitVent.CWPlantLoc);
+                PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.ColdControlNodeNum, unitVent.ColdCoilOutNodeNum, unitVent.CWPlantLoc);
 
                 if (unitVent.CCoilType == CoolCoilType::HXAssisted) {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
@@ -3088,23 +3082,22 @@ namespace UnitVentilator {
 
             if (unitVent.HCoilPresent) {
 
-                {
+                { // Why is this a new scope?
                     switch (unitVent.HCoilType) {
                     case HeatCoilType::Water: {
                         if (!state.dataUnitVentilators->HCoilOn) {
                             QCoilReq = 0.0;
                             mdot = 0.0;
                         } else {
-                            int HCoilInAirNode = unitVent.FanOutletNode;
-                            Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(unitVent.AirInNode).HumRat);
+                            auto *heatCoilAirInNode = dln->nodes(unitVent.FanOutNodeNum);
+                            Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(airInNode->HumRat);
                             QCoilReq = state.dataUnitVentilators->QZnReq -
-                                       state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
-                                           (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(unitVent.AirInNode).Temp);
+                                       heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - airInNode->Temp);
                             mdot = unitVent.MaxHotWaterFlow * PartLoadFrac;
                         }
 
                         if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
-                        PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.HotControlNode, unitVent.HotCoilOutNodeNum, unitVent.HWplantLoc);
+                        PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.HotControlNodeNum, unitVent.HotCoilOutNodeNum, unitVent.HWplantLoc);
                         WaterCoils::SimulateWaterCoilComponents(
                             state, unitVent.HCoilName, FirstHVACIteration, unitVent.HCoil_Index, QCoilReq, fanOp, PartLoadFrac);
                     } break;
@@ -3113,16 +3106,15 @@ namespace UnitVentilator {
                             QCoilReq = 0.0;
                             mdot = 0.0;
                         } else {
-                            int HCoilInAirNode = unitVent.FanOutletNode;
-                            Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(unitVent.AirInNode).HumRat);
+                            auto const *heatCoilAirInNode = dln->nodes(unitVent.FanOutNodeNum);
+                            Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(airInNode->HumRat);
                             QCoilReq = state.dataUnitVentilators->QZnReq -
-                                       state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
-                                           (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(unitVent.AirInNode).Temp);
+                                    heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - airInNode->Temp);
                             mdot = unitVent.MaxHotSteamFlow * PartLoadFrac;
                         }
 
                         if (QCoilReq < 0.0) QCoilReq = 0.0;
-                        PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.HotControlNode, unitVent.HotCoilOutNodeNum, unitVent.HWplantLoc);
+                        PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.HotControlNodeNum, unitVent.HotCoilOutNodeNum, unitVent.HWplantLoc);
                         SteamCoils::SimulateSteamCoilComponents(
                             state, unitVent.HCoilName, FirstHVACIteration, unitVent.HCoil_Index, QCoilReq, _, fanOp, PartLoadFrac);
                     } break;
@@ -3131,11 +3123,10 @@ namespace UnitVentilator {
                         if (!state.dataUnitVentilators->HCoilOn) {
                             QCoilReq = 0.0;
                         } else {
-                            int HCoilInAirNode = unitVent.FanOutletNode;
-                            Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(unitVent.AirInNode).HumRat);
+                            auto const *heatCoilAirInNode = dln->nodes(unitVent.FanOutNodeNum);
+                            Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(airInNode->HumRat);
                             QCoilReq = state.dataUnitVentilators->QZnReq -
-                                       state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
-                                           (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(unitVent.AirInNode).Temp);
+                                heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - airInNode->Temp);
                         }
                         if (QCoilReq < 0.0) QCoilReq = 0.0;
                         HeatingCoils::SimulateHeatingCoilComponents(
@@ -3148,28 +3139,28 @@ namespace UnitVentilator {
                 }
             }
         }
-        Real64 AirMassFlow = outletNode.MassFlowRate;
+        Real64 AirMassFlow = airOutNode->MassFlowRate;
         // calculate delivered load
         if (unitVent.ATMixerExists) {
-            auto &ATMixOutNode(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixOutNode));
-            auto &ATMixerPriNode(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode));
+            auto *atMixerOutNode = dln->nodes(state.dataUnitVentilators->ATMixerOutNodeNum);
+            auto *atMixerPriInNode = dln->nodes(state.dataUnitVentilators->ATMixerPriInNodeNum);
             if (unitVent.ATMixerType == HVAC::MixerType::SupplySide) {
                 // set the primary air inlet mass flow rate
-                ATMixerPriNode.MassFlowRate = min(ATMixerPriNode.MassFlowRateMaxAvail, state.dataUnitVentilators->OAMassFlowRate);
+                atMixerPriInNode->MassFlowRate = min(atMixerPriInNode->MassFlowRateMaxAvail, state.dataUnitVentilators->OAMassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
                 SingleDuct::SimATMixer(state, unitVent.ATMixerName, FirstHVACIteration, unitVent.ATMixerIndex);
-                Real64 SpecHumMin = min(ATMixOutNode.HumRat, inletNode.HumRat); // (kg moisture / kg moist air)
-                LoadMet = ATMixOutNode.MassFlowRate *
-                          (Psychrometrics::PsyHFnTdbW(ATMixOutNode.Temp, SpecHumMin) - Psychrometrics::PsyHFnTdbW(inletNode.Temp, SpecHumMin));
+                Real64 SpecHumMin = min(atMixerOutNode->HumRat, airInNode->HumRat); // (kg moisture / kg moist air)
+                LoadMet = atMixerOutNode->MassFlowRate *
+                          (Psychrometrics::PsyHFnTdbW(atMixerOutNode->Temp, SpecHumMin) - Psychrometrics::PsyHFnTdbW(airInNode->Temp, SpecHumMin));
             } else {
                 // ATM Mixer on inlet side
-                auto &zoneNode(state.dataLoopNodes->Node(state.dataUnitVentilators->ZoneNode));
+                auto *zoneNode = dln->nodes(state.dataUnitVentilators->ZoneNodeNum);
                 LoadMet = AirMassFlow *
-                          (Psychrometrics::PsyHFnTdbW(outletNode.Temp, zoneNode.HumRat) - Psychrometrics::PsyHFnTdbW(zoneNode.Temp, zoneNode.HumRat));
+                          (Psychrometrics::PsyHFnTdbW(airOutNode->Temp, zoneNode->HumRat) - Psychrometrics::PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat));
             }
         } else {
             LoadMet = AirMassFlow *
-                      (Psychrometrics::PsyHFnTdbW(outletNode.Temp, inletNode.HumRat) - Psychrometrics::PsyHFnTdbW(inletNode.Temp, inletNode.HumRat));
+                      (Psychrometrics::PsyHFnTdbW(airOutNode->Temp, airInNode->HumRat) - Psychrometrics::PsyHFnTdbW(airInNode->Temp, airInNode->HumRat));
         }
     }
 
@@ -3201,57 +3192,59 @@ namespace UnitVentilator {
         // outdoor air streams.
 
         auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
-        auto &airRelNode = state.dataLoopNodes->Node(unitVent.AirReliefNode);
-        auto &inletNode = state.dataLoopNodes->Node(unitVent.AirInNode);
-        auto &OAMixOutNode = state.dataLoopNodes->Node(unitVent.OAMixerOutNode);
-        auto &outsideAirNode = state.dataLoopNodes->Node(unitVent.OutsideAirNode);
+
+        auto &dln = state.dataLoopNodes;
+        auto *reliefAirOutNode = dln->nodes(unitVent.OAMixerReliefAirOutNodeNum);
+        auto *airInNode = dln->nodes(unitVent.AirInNodeNum);
+        auto *oaMixerOutNode = dln->nodes(unitVent.OAMixerMixedAirOutNodeNum);
+        auto *outsideAirInNode = dln->nodes(unitVent.OAMixerOutsideAirInNodeNum);
         Real64 OutAirMassFlowRate = state.dataUnitVentilators->OAMassFlowRate;
 
         // Limit the outdoor air mass flow rate if cycling fan
         if (fanOp == HVAC::FanOp::Cycling) {
-            OutAirMassFlowRate = min(state.dataUnitVentilators->OAMassFlowRate, inletNode.MassFlowRate);
+            OutAirMassFlowRate = min(state.dataUnitVentilators->OAMassFlowRate, airInNode->MassFlowRate);
         }
 
         // "Resolve" the air flow rates...
-        outsideAirNode.MassFlowRate = OutAirMassFlowRate;
-        outsideAirNode.MassFlowRateMinAvail = OutAirMassFlowRate;
-        outsideAirNode.MassFlowRateMaxAvail = OutAirMassFlowRate;
+        outsideAirInNode->MassFlowRate = OutAirMassFlowRate;
+        outsideAirInNode->MassFlowRateMinAvail = OutAirMassFlowRate;
+        outsideAirInNode->MassFlowRateMaxAvail = OutAirMassFlowRate;
 
-        airRelNode.MassFlowRate = OutAirMassFlowRate;
-        airRelNode.MassFlowRateMinAvail = OutAirMassFlowRate;
-        airRelNode.MassFlowRateMaxAvail = OutAirMassFlowRate;
+        reliefAirOutNode->MassFlowRate = OutAirMassFlowRate;
+        reliefAirOutNode->MassFlowRateMinAvail = OutAirMassFlowRate;
+        reliefAirOutNode->MassFlowRateMaxAvail = OutAirMassFlowRate;
 
-        OAMixOutNode.MassFlowRate = inletNode.MassFlowRate;
-        OAMixOutNode.MassFlowRateMinAvail = inletNode.MassFlowRate;
-        OAMixOutNode.MassFlowRateMaxAvail = inletNode.MassFlowRate;
+        oaMixerOutNode->MassFlowRate = airInNode->MassFlowRate;
+        oaMixerOutNode->MassFlowRateMinAvail = airInNode->MassFlowRate;
+        oaMixerOutNode->MassFlowRateMaxAvail = airInNode->MassFlowRate;
 
         // "Inlet" conditions for InletNode and OutsideAirNode have already
         // been set elsewhere so we just need to set the "outlet" conditions
-        airRelNode.Temp = inletNode.Temp;
-        airRelNode.Press = inletNode.Press;
-        airRelNode.HumRat = inletNode.HumRat;
-        airRelNode.Enthalpy = inletNode.Enthalpy;
+        reliefAirOutNode->Temp = airInNode->Temp;
+        reliefAirOutNode->Press = airInNode->Press;
+        reliefAirOutNode->HumRat = airInNode->HumRat;
+        reliefAirOutNode->Enthalpy = airInNode->Enthalpy;
 
         Real64 OAFraction = 0.0; // Outside air fraction of inlet air
-        if (inletNode.MassFlowRate > 0.0) {
-            OAFraction = outsideAirNode.MassFlowRate / inletNode.MassFlowRate;
+        if (airInNode->MassFlowRate > 0.0) {
+            OAFraction = outsideAirInNode->MassFlowRate / airInNode->MassFlowRate;
         }
 
         // Perform an energy and moisture mass balance on the mixing portion of the unit ventilator
-        OAMixOutNode.Enthalpy = OAFraction * outsideAirNode.Enthalpy + (1.0 - OAFraction) * inletNode.Enthalpy;
-        OAMixOutNode.HumRat = OAFraction * outsideAirNode.HumRat + (1.0 - OAFraction) * inletNode.HumRat;
+        oaMixerOutNode->Enthalpy = OAFraction * outsideAirInNode->Enthalpy + (1.0 - OAFraction) * airInNode->Enthalpy;
+        oaMixerOutNode->HumRat = OAFraction * outsideAirInNode->HumRat + (1.0 - OAFraction) * airInNode->HumRat;
 
         // Find the other key state points based on calculated conditions
-        OAMixOutNode.Temp = Psychrometrics::PsyTdbFnHW(OAMixOutNode.Enthalpy, OAMixOutNode.HumRat);
-        OAMixOutNode.Press = inletNode.Press;
+        oaMixerOutNode->Temp = Psychrometrics::PsyTdbFnHW(oaMixerOutNode->Enthalpy, oaMixerOutNode->HumRat);
+        oaMixerOutNode->Press = airInNode->Press;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            airRelNode.CO2 = inletNode.CO2;
-            OAMixOutNode.CO2 = OAFraction * outsideAirNode.CO2 + (1.0 - OAFraction) * inletNode.CO2;
+            reliefAirOutNode->CO2 = airInNode->CO2;
+            oaMixerOutNode->CO2 = OAFraction * outsideAirInNode->CO2 + (1.0 - OAFraction) * airInNode->CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            airRelNode.GenContam = inletNode.GenContam;
-            OAMixOutNode.GenContam = OAFraction * outsideAirNode.GenContam + (1.0 - OAFraction) * inletNode.GenContam;
+            reliefAirOutNode->GenContam = airInNode->GenContam;
+            oaMixerOutNode->GenContam = OAFraction * outsideAirInNode->GenContam + (1.0 - OAFraction) * airInNode->GenContam;
         }
     }
 
@@ -3284,20 +3277,16 @@ namespace UnitVentilator {
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
-
-        int GetUnitVentilatorOutAirNode;
-
         if (state.dataUnitVentilators->GetUnitVentilatorInputFlag) {
             GetUnitVentilatorInput(state);
             state.dataUnitVentilators->GetUnitVentilatorInputFlag = false;
         }
 
-        GetUnitVentilatorOutAirNode = 0;
         if (UnitVentNum > 0 && UnitVentNum <= state.dataUnitVentilators->NumOfUnitVents) {
-            GetUnitVentilatorOutAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode;
+            return state.dataUnitVentilators->UnitVent(UnitVentNum).OAMixerOutsideAirInNodeNum;
         }
 
-        return GetUnitVentilatorOutAirNode;
+        return 0;
     }
 
     int GetUnitVentilatorZoneInletAirNode(EnergyPlusData &state, int const UnitVentNum)
@@ -3307,19 +3296,17 @@ namespace UnitVentilator {
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
 
-        int GetUnitVentilatorZoneInletAirNode;
-
         if (state.dataUnitVentilators->GetUnitVentilatorInputFlag) {
             GetUnitVentilatorInput(state);
             state.dataUnitVentilators->GetUnitVentilatorInputFlag = false;
         }
 
-        GetUnitVentilatorZoneInletAirNode = 0;
+
         if (UnitVentNum > 0 && UnitVentNum <= state.dataUnitVentilators->NumOfUnitVents) {
-            GetUnitVentilatorZoneInletAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode;
+           return state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNodeNum;
         }
 
-        return GetUnitVentilatorZoneInletAirNode;
+        return 0;
     }
 
     int GetUnitVentilatorMixedAirNode(EnergyPlusData &state, int const UnitVentNum)
@@ -3329,19 +3316,16 @@ namespace UnitVentilator {
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
 
-        int GetUnitVentilatorMixedAirNode;
-
         if (state.dataUnitVentilators->GetUnitVentilatorInputFlag) {
             GetUnitVentilatorInput(state);
             state.dataUnitVentilators->GetUnitVentilatorInputFlag = false;
         }
 
-        GetUnitVentilatorMixedAirNode = 0;
         if (UnitVentNum > 0 && UnitVentNum <= state.dataUnitVentilators->NumOfUnitVents) {
-            GetUnitVentilatorMixedAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).OAMixerOutNode;
+            return state.dataUnitVentilators->UnitVent(UnitVentNum).OAMixerMixedAirOutNodeNum;
         }
 
-        return GetUnitVentilatorMixedAirNode;
+        return 0;
     }
 
     int GetUnitVentilatorReturnAirNode(EnergyPlusData &state, int const UnitVentNum)
@@ -3351,19 +3335,15 @@ namespace UnitVentilator {
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
 
-        int GetUnitVentilatorReturnAirNode;
-
         if (state.dataUnitVentilators->GetUnitVentilatorInputFlag) {
             GetUnitVentilatorInput(state);
             state.dataUnitVentilators->GetUnitVentilatorInputFlag = false;
         }
 
-        GetUnitVentilatorReturnAirNode = 0;
         if (UnitVentNum > 0 && UnitVentNum <= state.dataUnitVentilators->NumOfUnitVents) {
-            GetUnitVentilatorReturnAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode;
+            return state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNodeNum;
         }
-
-        return GetUnitVentilatorReturnAirNode;
+        return 0;
     }
 
     Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state,
@@ -3390,18 +3370,20 @@ namespace UnitVentilator {
             // Then, limit the OA Mass Flow Rate between the MinOA flow and the MaxOA flow.
 
             auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
+            auto &dln = state.dataLoopNodes;
+
+            auto const *airInNode = dln->nodes(unitVent.AirInNodeNum);
+            auto const *fanOutNode = dln->nodes(unitVent.FanOutNodeNum);
+            auto const *oaMixerOutNode = dln->nodes(unitVent.OAMixerMixedAirOutNodeNum);
+            
             Real64 EnthDiffAcrossFan(0.0); // Temperature difference across the fan
             if (!unitVent.ATMixerExists) {
-                EnthDiffAcrossFan =
-                    state.dataLoopNodes->Node(unitVent.FanOutletNode).Enthalpy - state.dataLoopNodes->Node(unitVent.OAMixerOutNode).Enthalpy;
+                EnthDiffAcrossFan = fanOutNode->Enthalpy - oaMixerOutNode->Enthalpy;
             } else {
                 if (unitVent.ATMixerType == HVAC::MixerType::InletSide) {
-                    EnthDiffAcrossFan =
-                        state.dataLoopNodes->Node(unitVent.FanOutletNode).Enthalpy - state.dataLoopNodes->Node(unitVent.ATMixerOutNode).Enthalpy;
-                }
-                if (unitVent.ATMixerType == HVAC::MixerType::SupplySide) {
-                    EnthDiffAcrossFan =
-                        state.dataLoopNodes->Node(unitVent.FanOutletNode).Enthalpy - state.dataLoopNodes->Node(unitVent.AirInNode).Enthalpy;
+                    EnthDiffAcrossFan = fanOutNode->Enthalpy - oaMixerOutNode->Enthalpy;
+                } else if (unitVent.ATMixerType == HVAC::MixerType::SupplySide) {
+                    EnthDiffAcrossFan = fanOutNode->Enthalpy - airInNode->Enthalpy;
                 }
             }
 
@@ -3423,19 +3405,22 @@ namespace UnitVentilator {
                              Real64 const PartLoadRatio // Part load ratio for unit ventilator
     )
     {
+            auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
+        auto &dln = state.dataLoopNodes;
 
         if (QZnReq >= 0.0) { // Heating requested so no cooling coil needed
             mdot = 0.0;
         } else { // Cooling so set first guess at flow rate
-            mdot = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxColdWaterFlow * PartLoadRatio;
+            mdot = unitVent.MaxColdWaterFlow * PartLoadRatio;
         }
 
         // Check to see what outside air will do, "turn off" cooling coil if OA can handle the load
-        int CCoilInAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).FanOutletNode;
-        int AirInNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode;
-        Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(AirInNode).HumRat);
-        QCoilReq = QZnReq - state.dataLoopNodes->Node(CCoilInAirNode).MassFlowRate * CpAirZn *
-                                (state.dataLoopNodes->Node(CCoilInAirNode).Temp - state.dataLoopNodes->Node(AirInNode).Temp);
+        auto const *coolCoilAirInNode = dln->nodes(unitVent.FanOutNodeNum);
+        auto const *airInNode = dln->nodes(unitVent.AirInNodeNum);
+        
+        Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(airInNode->HumRat);
+        QCoilReq = QZnReq - coolCoilAirInNode->MassFlowRate * CpAirZn * (coolCoilAirInNode->Temp - airInNode->Temp);
+
         if (QCoilReq > -HVAC::SmallLoad) {
             QCoilReq = 0.0;
             mdot = 0.0;

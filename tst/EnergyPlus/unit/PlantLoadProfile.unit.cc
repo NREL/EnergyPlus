@@ -107,12 +107,12 @@ TEST_F(EnergyPlusFixture, LoadProfile_GetInput)
 
     // Tests for LoadProfile on Water loop
     EXPECT_EQ(state->dataPlantLoadProfile->PlantProfile(1).Name, "LOAD PROFILE WATER");
-    EXPECT_TRUE(compare_enums(state->dataPlantLoadProfile->PlantProfile(1).FluidType, PlantLoopFluidType::Water));
+    EXPECT_ENUM_EQ(state->dataPlantLoadProfile->PlantProfile(1).FluidType, PlantLoopFluidType::Water);
     EXPECT_EQ(state->dataPlantLoadProfile->PlantProfile(1).PeakVolFlowRate, 0.002);
 
     // Tests for LoadProfile on Steam loop
     EXPECT_EQ(state->dataPlantLoadProfile->PlantProfile(2).Name, "LOAD PROFILE STEAM");
-    EXPECT_TRUE(compare_enums(state->dataPlantLoadProfile->PlantProfile(2).FluidType, PlantLoopFluidType::Steam));
+    EXPECT_ENUM_EQ(state->dataPlantLoadProfile->PlantProfile(2).FluidType, PlantLoopFluidType::Steam);
     EXPECT_EQ(state->dataPlantLoadProfile->PlantProfile(2).PeakVolFlowRate, 0.008);
     EXPECT_EQ(state->dataPlantLoadProfile->PlantProfile(2).DegOfSubcooling,
               5.0); // check if the default value is assigned in cases where there is no input
@@ -123,7 +123,10 @@ TEST_F(EnergyPlusFixture, LoadProfile_GetInput)
 TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Waterloop)
 {
     state->dataPlnt->PlantLoop.allocate(1);
-    state->dataLoopNodes->Node.allocate(2);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
+
     state->dataPlantLoadProfile->PlantProfile.allocate(1);
 
     // Test setup for a load profile in a water loop
@@ -136,14 +139,14 @@ TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Waterloop)
     thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
     thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::PlantLoadProfile;
     thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "LOAD PROFILE WATER";
-    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 1;
-    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = 2;
+    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = 1;
+    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = 2;
 
-    state->dataLoopNodes->Node(1).Temp = 60.0;
-    state->dataLoopNodes->Node(1).MassFlowRateMax = 10;
-    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 10;
-    state->dataLoopNodes->Node(2).MassFlowRateMax = 10;
-    state->dataLoopNodes->Node(2).MassFlowRateMaxAvail = 10;
+    dln->nodes(1)->Temp = 60.0;
+    dln->nodes(1)->MassFlowRateMax = 10;
+    dln->nodes(1)->MassFlowRateMaxAvail = 10;
+    dln->nodes(2)->MassFlowRateMax = 10;
+    dln->nodes(2)->MassFlowRateMaxAvail = 10;
 
     auto &thisLoadProfileWaterLoop = state->dataPlantLoadProfile->PlantProfile(1);
 
@@ -153,8 +156,8 @@ TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Waterloop)
     thisLoadProfileWaterLoop.PeakVolFlowRate = 0.002;
     thisLoadProfileWaterLoop.LoadSchedule = 1;
     thisLoadProfileWaterLoop.FlowRateFracSchedule = 2;
-    thisLoadProfileWaterLoop.InletNode = 1;
-    thisLoadProfileWaterLoop.OutletNode = 2;
+    thisLoadProfileWaterLoop.InNodeNum = 1;
+    thisLoadProfileWaterLoop.OutNodeNum = 2;
     thisLoadProfileWaterLoop.plantLoc = locWater;
     thisLoadProfileWaterLoop.plantLoc.loopNum = 1;
 
@@ -191,7 +194,10 @@ TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Waterloop)
 TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Steamloop)
 {
     state->dataPlnt->PlantLoop.allocate(1);
-    state->dataLoopNodes->Node.allocate(2);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
+
     state->dataPlantLoadProfile->PlantProfile.allocate(1);
 
     // Test setup for a load profile in a steam loop
@@ -204,19 +210,19 @@ TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Steamloop)
     thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
     thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::PlantLoadProfile;
     thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "LOAD PROFILE STEAM";
-    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 1;
-    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = 2;
+    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = 1;
+    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = 2;
 
     std::string_view RoutineName("PlantLoadProfileTests");
 
     Real64 SatTempAtmPress = FluidProperties::GetSatTemperatureRefrig(
         *state, state->dataPlnt->PlantLoop(1).FluidName, DataEnvironment::StdPressureSeaLevel, state->dataPlnt->PlantLoop(1).FluidIndex, RoutineName);
 
-    state->dataLoopNodes->Node(1).Temp = SatTempAtmPress;
-    state->dataLoopNodes->Node(1).MassFlowRateMax = 1;
-    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 1;
-    state->dataLoopNodes->Node(2).MassFlowRateMax = 1;
-    state->dataLoopNodes->Node(2).MassFlowRateMaxAvail = 1;
+    dln->nodes(1)->Temp = SatTempAtmPress;
+    dln->nodes(1)->MassFlowRateMax = 1;
+    dln->nodes(1)->MassFlowRateMaxAvail = 1;
+    dln->nodes(2)->MassFlowRateMax = 1;
+    dln->nodes(2)->MassFlowRateMaxAvail = 1;
 
     auto &thisLoadProfileSteamLoop = state->dataPlantLoadProfile->PlantProfile(1);
 
@@ -227,8 +233,8 @@ TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Steamloop)
     thisLoadProfileSteamLoop.DegOfSubcooling = 3.0;
     thisLoadProfileSteamLoop.LoadSchedule = 1;
     thisLoadProfileSteamLoop.FlowRateFracSchedule = 2;
-    thisLoadProfileSteamLoop.InletNode = 1;
-    thisLoadProfileSteamLoop.OutletNode = 2;
+    thisLoadProfileSteamLoop.InNodeNum = 1;
+    thisLoadProfileSteamLoop.OutNodeNum = 2;
     thisLoadProfileSteamLoop.plantLoc = locSteam;
     thisLoadProfileSteamLoop.plantLoc.loopNum = 1;
 

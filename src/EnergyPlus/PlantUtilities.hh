@@ -196,8 +196,8 @@ namespace PlantUtilities {
     int MyPlantSizingIndex(EnergyPlusData &state,
                            std::string_view CompType,       // component description
                            std::string_view CompName,       // user name of component
-                           int NodeNumIn,                   // component water inlet node
-                           int NodeNumOut,                  // component water outlet node
+                           int InNodeNum,                   // component water inlet node
+                           int OutNodeNum,                  // component water outlet node
                            bool &ErrorsFound,               // set to true if there's an error
                            bool const PrintErrorFlag = true // used for WSHP's where condenser loop may not be on a plant loop
     );

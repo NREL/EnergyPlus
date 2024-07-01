@@ -424,7 +424,7 @@ namespace WaterUse {
                 waterConnection.Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 if ((!state.dataIPShortCut->lAlphaFieldBlanks(2)) || (!state.dataIPShortCut->lAlphaFieldBlanks(3))) {
-                    waterConnection.InletNode = Node::GetSingleNode(state,
+                    waterConnection.InNodeNum = Node::GetSingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(2),
                                                                                     ErrorsFound,
                                                                                     Node::ConnObjType::WaterUseConnections,
@@ -433,7 +433,7 @@ namespace WaterUse {
                                                                                     Node::ConnType::Inlet,
                                                                                     Node::CompFluidStream::Primary,
                                                                                     Node::ObjectIsNotParent);
-                    waterConnection.OutletNode = Node::GetSingleNode(state,
+                    waterConnection.OutNodeNum = Node::GetSingleNode(state,
                                                                                      state.dataIPShortCut->cAlphaArgs(3),
                                                                                      ErrorsFound,
                                                                                      Node::ConnObjType::WaterUseConnections,
@@ -580,7 +580,7 @@ namespace WaterUse {
                     }
                 }
                 PlantUtilities::RegisterPlantCompDesignFlow(
-                    state, waterConnection.InletNode, waterConnection.PeakMassFlowRate / calcH2ODensity(state));
+                    state, waterConnection.InNodeNum, waterConnection.PeakMassFlowRate / calcH2ODensity(state));
             }
         }
         // need a good place to set a bool to calculate WaterUse hot and cold flow rates in CalcEquipmentFlowRates
@@ -1287,6 +1287,8 @@ namespace WaterUse {
         //       DATE WRITTEN   August 2006
         //       MODIFIED       Brent Griffith 2010, demand side update
 
+        auto &dln = state.dataLoopNodes;
+            
         // Set the cold water temperature
         if (this->SupplyTankNum > 0) {
             this->ColdSupplyTemp = state.dataWaterData->WaterStorage(this->SupplyTankNum).Twater;
@@ -1314,10 +1316,10 @@ namespace WaterUse {
 
             if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
                 // Clear node initial conditions
-                if (this->InletNode > 0 && this->OutletNode > 0) {
-                    PlantUtilities::InitComponentNodes(state, 0.0, this->PeakMassFlowRate, this->InletNode, this->OutletNode);
+                if (this->InNodeNum > 0 && this->OutNodeNum > 0) {
+                    PlantUtilities::InitComponentNodes(state, 0.0, this->PeakMassFlowRate, this->InNodeNum, this->OutNodeNum);
 
-                    this->ReturnTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
+                    this->ReturnTemp = dln->nodes(this->InNodeNum)->Temp;
                 }
 
                 this->Init = false;
@@ -1325,9 +1327,9 @@ namespace WaterUse {
 
             if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
-            if (this->InletNode > 0) {
+            if (this->InNodeNum > 0) {
                 if (!state.dataGlobal->DoingSizing) {
-                    this->HotTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
+                    this->HotTemp = dln->nodes(this->InNodeNum)->Temp;
                 } else {
                     // plant loop will not be running so need a value here.
                     // should change to use tank setpoint but water use connections don't have knowledge of the tank they are fed by
@@ -1362,14 +1364,14 @@ namespace WaterUse {
         this->TotalMassFlowRate = this->ColdMassFlowRate + this->HotMassFlowRate;
 
         if (!this->StandAlone) { // Interact with the plant loop
-            if (this->InletNode > 0) {
+            if (this->InNodeNum > 0) {
                 if (FirstHVACIteration) {
                     // Request the mass flow rate from the demand side manager
-                    PlantUtilities::SetComponentFlowRate(state, this->HotMassFlowRate, this->InletNode, this->OutletNode, this->plantLoc);
+                    PlantUtilities::SetComponentFlowRate(state, this->HotMassFlowRate, this->InNodeNum, this->OutNodeNum, this->plantLoc);
 
                 } else {
                     Real64 DesiredHotWaterMassFlow = this->HotMassFlowRate;
-                    PlantUtilities::SetComponentFlowRate(state, DesiredHotWaterMassFlow, this->InletNode, this->OutletNode, this->plantLoc);
+                    PlantUtilities::SetComponentFlowRate(state, DesiredHotWaterMassFlow, this->InNodeNum, this->OutNodeNum, this->plantLoc);
                     // readjust if more than actual available mass flow rate determined by the demand side manager
                     if ((this->HotMassFlowRate != DesiredHotWaterMassFlow) && (this->HotMassFlowRate > 0.0)) { // plant didn't give what was asked for
 
@@ -1545,13 +1547,14 @@ namespace WaterUse {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Updates the node variables with local variables.
-
-        if (this->InletNode > 0 && this->OutletNode > 0) {
+        auto &dln = state.dataLoopNodes;
+            
+        if (this->InNodeNum > 0 && this->OutNodeNum > 0) {
             // Pass all variables from inlet to outlet node
-            PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode, this->plantLoc.loopNum);
+            PlantUtilities::SafeCopyPlantNode(state, this->InNodeNum, this->OutNodeNum, this->plantLoc.loopNum);
 
             // Set outlet node variables that are possibly changed
-            state.dataLoopNodes->Node(this->OutletNode).Temp = this->ReturnTemp;
+            dln->nodes(this->OutNodeNum)->Temp = this->ReturnTemp;
             // should add enthalpy update to return?
         }
     }

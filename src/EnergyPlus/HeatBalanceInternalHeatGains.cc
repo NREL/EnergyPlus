@@ -192,7 +192,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     } else {
         thisIntGain.device(thisIntGain.numberOfDevices).PtrGenericContamGainRate = &state.dataHeatBal->zeroPointerVal;
     }
-    thisIntGain.device(thisIntGain.numberOfDevices).ReturnAirNodeNum = RetNodeNum;
+    thisIntGain.device(thisIntGain.numberOfDevices).ReturnAirInNodeNum = RetNodeNum;
 }
 
 } // namespace EnergyPlus

@@ -108,7 +108,7 @@ void LocalPipeData::simulate(EnergyPlusData &state,
 
     if (!state.dataGlobal->BeginEnvrnFlag) this->EnvrnFlag = true;
 
-    PlantUtilities::SafeCopyPlantNode(state, this->InletNodeNum, this->OutletNodeNum, this->plantLoc.loopNum);
+    PlantUtilities::SafeCopyPlantNode(state, this->InNodeNum, this->OutNodeNum, this->plantLoc.loopNum);
 }
 
 void LocalPipeData::oneTimeInit_new(EnergyPlusData &state)
@@ -131,7 +131,7 @@ void LocalPipeData::oneTimeInit_new(EnergyPlusData &state)
 void LocalPipeData::initEachEnvironment(EnergyPlusData &state) const
 {
     PlantUtilities::InitComponentNodes(
-        state, 0.0, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxMassFlowRate, this->InletNodeNum, this->OutletNodeNum);
+        state, 0.0, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxMassFlowRate, this->InNodeNum, this->OutNodeNum);
 }
 void LocalPipeData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
@@ -179,7 +179,7 @@ void GetPipeInput(EnergyPlusData &state)
         state.dataPipes->LocalPipe(PipeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPipes->LocalPipe(PipeNum).Type = DataPlant::PlantEquipmentType::Pipe;
 
-        state.dataPipes->LocalPipe(PipeNum).InletNodeNum = GetSingleNode(state,
+        state.dataPipes->LocalPipe(PipeNum).InNodeNum = GetSingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
                                                                              ErrorsFound,
                                                                              Node::ConnObjType::PipeAdiabatic,
@@ -188,7 +188,7 @@ void GetPipeInput(EnergyPlusData &state)
                                                                              Node::ConnType::Inlet,
                                                                              Node::CompFluidStream::Primary,
                                                                              Node::ObjectIsNotParent);
-        state.dataPipes->LocalPipe(PipeNum).OutletNodeNum = GetSingleNode(state,
+        state.dataPipes->LocalPipe(PipeNum).OutNodeNum = GetSingleNode(state,
                                                                               state.dataIPShortCut->cAlphaArgs(3),
                                                                               ErrorsFound,
                                                                               Node::ConnObjType::PipeAdiabatic,
@@ -222,7 +222,7 @@ void GetPipeInput(EnergyPlusData &state)
             state, state.dataPipes->LocalPipeUniqueNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         state.dataPipes->LocalPipe(PipeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPipes->LocalPipe(PipeNum).Type = DataPlant::PlantEquipmentType::PipeSteam;
-        state.dataPipes->LocalPipe(PipeNum).InletNodeNum = GetSingleNode(state,
+        state.dataPipes->LocalPipe(PipeNum).InNodeNum = GetSingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
                                                                              ErrorsFound,
                                                                              Node::ConnObjType::PipeAdiabaticSteam,
@@ -231,7 +231,7 @@ void GetPipeInput(EnergyPlusData &state)
                                                                              Node::ConnType::Inlet,
                                                                              Node::CompFluidStream::Primary,
                                                                              Node::ObjectIsNotParent);
-        state.dataPipes->LocalPipe(PipeNum).OutletNodeNum = GetSingleNode(state,
+        state.dataPipes->LocalPipe(PipeNum).OutNodeNum = GetSingleNode(state,
                                                                               state.dataIPShortCut->cAlphaArgs(3),
                                                                               ErrorsFound,
                                                                               Node::ConnObjType::PipeAdiabaticSteam,

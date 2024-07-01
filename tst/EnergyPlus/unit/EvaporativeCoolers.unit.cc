@@ -723,7 +723,10 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     // one-time setup of evap cooler instance
     int constexpr EvapCoolNum(1);
     EvapCond.allocate(EvapCoolNum);
-    state->dataLoopNodes->Node.allocate(2);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
+
     auto &thisEvapCooler = EvapCond(EvapCoolNum);
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -743,13 +746,13 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     thisEvapCooler.PumpPowerModifierCurveIndex = 1;
     thisEvapCooler.DirectEffectiveness = 0.75;
     thisEvapCooler.DesVolFlowRate = 1.0;
-    thisEvapCooler.InletNode = 1;
+    thisEvapCooler.AirInNodeNum = 1;
     thisEvapCooler.InletTemp = 25.0;
     thisEvapCooler.InletWetBulbTemp = 21.0;
     thisEvapCooler.InletHumRat = PsyWFnTdbTwbPb(*state, thisEvapCooler.InletTemp, thisEvapCooler.InletWetBulbTemp, state->dataEnvrn->OutBaroPress);
 
     // set full flow rate test condition
-    state->dataLoopNodes->Node(thisEvapCooler.InletNode).MassFlowRateMax = 1.0;
+    dln->nodes(thisEvapCooler.AirInNodeNum)->MassFlowRateMax = 1.0;
     thisEvapCooler.InletMassFlowRate = 1.0;
     thisEvapCooler.RecircPumpPower = 200.0;
     thisEvapCooler.PartLoadFract = 1.0;
@@ -800,7 +803,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
     OperatingMode Result_WetFullOperatingMode = EvaporativeCoolers::IndirectResearchSpecialEvapCoolerOperatingMode(
         *state, EvapCoolNum, thisEvapCooler.SecInletTemp, thisEvapCooler.SecInletWetBulbTemp, TdbOutSysWetMin, TdbOutSysDryMin);
     // check operating mode
-    EXPECT_TRUE(compare_enums(Result_WetFullOperatingMode, EvaporativeCoolers::OperatingMode::WetFull));
+    EXPECT_ENUM_EQ(Result_WetFullOperatingMode, EvaporativeCoolers::OperatingMode::WetFull);
     // get outlet temperature in full wet operating mode
     EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(*state,
                                                             EvapCoolNum,
@@ -913,10 +916,12 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
     state->dataAirLoop->AirLoopFlow(1).FanPLR = 0.8;
 
     // Evap cooler conditions
-    state->dataLoopNodes->Node(EvapCond(EvapCoolNum).InletNode).MassFlowRate = 0.5;
-    state->dataLoopNodes->Node(EvapCond(EvapCoolNum).InletNode).Temp = 28.0;
-    state->dataLoopNodes->Node(EvapCond(EvapCoolNum).InletNode).HumRat = 0.001;
-    state->dataLoopNodes->Node(EvapCond(EvapCoolNum).InletNode).Press = state->dataEnvrn->OutBaroPress;
+    auto &dln = state->dataLoopNodes;
+    auto *airInNode = dln->nodes(EvapCond(EvapCoolNum).AirInNodeNum);
+    airInNode->MassFlowRate = 0.5;
+    airInNode->Temp = 28.0;
+    airInNode->HumRat = 0.001;
+    airInNode->Press = state->dataEnvrn->OutBaroPress;
 
     state->dataGlobal->BeginEnvrnFlag = true;
 

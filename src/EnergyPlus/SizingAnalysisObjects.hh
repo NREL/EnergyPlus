@@ -167,15 +167,15 @@ class PlantCoinicidentAnalysis
 public:
     // this object collects data and methods for analyzing coincident sizing for a single plant loop
     int plantLoopIndex = 0;         // index in plant loop data structure.
-    int supplySideInletNodeNum = 0; // node index for supply side inlet node
+    int supplySideInNodeNum = 0; // node index for supply side inlet node
     int plantSizingIndex = 0;
     int numTimeStepsInAvg = 0;
     ZoneTimestepObject newFoundMassFlowRateTimeStamp; // result for max mass flow, as a timestamp object
     Real64 peakMdotCoincidentReturnTemp;
     Real64 peakMdotCoincidentDemand;
     bool anotherIterationDesired = false;
-    int supplyInletNodeFlow_LogIndex; // loop flow rate index for vector of log objects in the logger framework
-    int supplyInletNodeTemp_LogIndex; // loop return temperature index for vector of log objects in the logger framework
+    int supplyInNodeFlow_LogIndex; // loop flow rate index for vector of log objects in the logger framework
+    int supplyInNodeTemp_LogIndex; // loop return temperature index for vector of log objects in the logger framework
     // variables related to loop demand
     int loopDemand_LogIndex; // Loop demand load index for vector of log objects in the logger framework
     bool peakDemandAndFlowMismatch;

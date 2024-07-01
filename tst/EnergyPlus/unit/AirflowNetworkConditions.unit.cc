@@ -75,7 +75,6 @@ using namespace EnergyPlus;
 using namespace AirflowNetwork;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 
 namespace EnergyPlus {
@@ -167,13 +166,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl
     EXPECT_TRUE(state->afn->control_defaulted);
 
     EXPECT_EQ(state->afn->simulation_control.name, "AFNDefaultControl");
-    EXPECT_TRUE(compare_enums(AirflowNetwork::ControlType::MultizoneWithoutDistribution, state->afn->simulation_control.type));
+    EXPECT_ENUM_EQ(AirflowNetwork::ControlType::MultizoneWithoutDistribution, state->afn->simulation_control.type);
     EXPECT_EQ(state->afn->simulation_control.WPCCntr, "SURFACEAVERAGECALCULATION");
     EXPECT_EQ(state->afn->simulation_control.HeightOption, "OPENINGHEIGHT");
     EXPECT_EQ(state->afn->simulation_control.BldgType, "LOWRISE");
     EXPECT_EQ(state->afn->simulation_control.InitType, "ZERONODEPRESSURES");
     EXPECT_FALSE(state->afn->simulation_control.temperature_height_dependence);
-    EXPECT_TRUE(compare_enums(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver));
+    EXPECT_ENUM_EQ(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver);
     //// Use default values for numerical fields
     EXPECT_EQ(state->afn->simulation_control.maximum_iterations, 500);
     EXPECT_NEAR(state->afn->simulation_control.relative_convergence_tolerance, 1.0E-4, 0.00001);
@@ -270,7 +269,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     state->afn->get_input();
 
-    EXPECT_TRUE(compare_enums(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver));
+    EXPECT_ENUM_EQ(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver);
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
@@ -368,7 +367,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     state->afn->get_input();
 
-    EXPECT_TRUE(compare_enums(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver));
+    EXPECT_ENUM_EQ(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver);
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
@@ -5109,11 +5108,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(state->afn->MultizoneExternalNodeData(2).useRelativeAngle);
     EXPECT_EQ(2, state->afn->MultizoneExternalNodeData(2).curve);
 
+    auto &dln = state->dataLoopNodes;
+    auto *node1 = dln->nodes(1);
+    
     // Make sure we can compute the right wind pressure
-    state->dataLoopNodes->Node(1).OutAirWindSpeed = 1.0;
-    state->dataLoopNodes->Node(1).OutAirDryBulb = 15.0;
+    node1->OutAirWindSpeed = 1.0;
+    node1->OutAirDryBulb = 15.0;
     Real64 rho_1 = Psychrometrics::PsyRhoAirFnPbTdbW(
-        *state, state->dataEnvrn->OutBaroPress, state->dataLoopNodes->Node(1).OutAirDryBulb, state->dataLoopNodes->Node(1).HumRat);
+        *state, state->dataEnvrn->OutBaroPress, node1->OutAirDryBulb, node1->HumRat);
     Real64 rho_2 =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.2252059842834473, rho_1);
@@ -5123,10 +5125,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
                                                    false,
                                                    false,
                                                    0.0,
-                                                   state->dataLoopNodes->Node(1).OutAirWindSpeed,
-                                                   state->dataLoopNodes->Node(1).OutAirWindDir,
-                                                   state->dataLoopNodes->Node(1).OutAirDryBulb,
-                                                   state->dataLoopNodes->Node(1).HumRat);
+                                                   node1->OutAirWindSpeed,
+                                                   node1->OutAirWindDir,
+                                                   node1->OutAirDryBulb,
+                                                   node1->HumRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.2252059842834473, p);
 
     // Run the balance routine, for now only to get the pressure set at the external nodes

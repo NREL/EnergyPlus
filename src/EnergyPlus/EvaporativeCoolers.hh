@@ -125,11 +125,11 @@ namespace EvaporativeCoolers {
         Real64 OutletMassFlowRateMaxAvail; // [kg/Sec]
         Real64 OutletMassFlowRateMinAvail; // [kg/Sec]
         bool InitFlag;
-        int InletNodeNum = 0;
-        int OutletNodeNum = 0;
-        int SecondaryInletNodeNum = 0;   // This is usually OA node feeding into the purge/secondary side
-        int SecondaryOutletNodeNum = 0;  // This outlet node of the secondary side and ilet to the secondary fan
-        int TertiaryInletNodeNum = 0;    // This node is used to run building exhaust into purge side.
+        int AirInNodeNum = 0;
+        int AirOutNodeNum = 0;
+        int SecondaryAirInNodeNum = 0;   // This is usually OA node feeding into the purge/secondary side
+        int SecondaryAirOutNodeNum = 0;  // This outlet node of the secondary side and ilet to the secondary fan
+        int TertiaryAirInNodeNum = 0;    // This node is used to run building exhaust into purge side.
         Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
         Real64 InletMassFlowRateMaxAvail;
         Real64 InletMassFlowRateMinAvail;
@@ -179,7 +179,7 @@ namespace EvaporativeCoolers {
         Real64 SatEff;                       // Reporting for Direct Stage and Ind Dry Saturation Efficiency
         Real64 StageEff;                     // Reporting for Indirect Total Stage Efficiency
         Real64 DPBoundFactor;                // in RDDSpecial efficency w.r.t. dewpoint
-        int EvapControlNodeNum;              // need to control to avoid over cooling
+        int EvapControlNodeNum = 0;              // need to control to avoid over cooling
         Real64 DesiredOutletTemp;            // setpoint manager should set this
         Real64 PartLoadFract;                // reduces cooling performance and associated fan power
         int DewPointBoundFlag;               // report when indirect research special cooler is bound by dewpoint
@@ -235,21 +235,21 @@ namespace EvaporativeCoolers {
     struct ZoneEvapCoolerUnitStruct
     {
         std::string Name; // user identifier
-        int ZoneNodeNum;
+        int ZoneNodeNum = 0;
         int AvailSchedIndex;              // pointer to local availability schedule
         std::string AvailManagerListName; // Name of an availability manager list object
         bool UnitIsAvailable;
         Avail::Status FanAvailStatus = Avail::Status::NoAction;
-        int OAInletNodeNum;    // outdoor air inlet node index
-        int UnitOutletNodeNum; // Unit air outlet (to zone) node index
-        int UnitReliefNodeNum; // Unit relief air (from zone) node index (optional)
+        int OutsideAirInNodeNum = 0;    // outdoor air inlet node index
+        int AirOutNodeNum = 0; // Unit air outlet (to zone) node index
+        int ReliefAirInNodeNum = 0; // Unit relief air (from zone) node index (optional)
         HVAC::FanType fanType;
         std::string FanName;
         int FanIndex;
         Real64 ActualFanVolFlowRate;
         int FanAvailSchedPtr;
-        int FanInletNodeNum;
-        int FanOutletNodeNum;
+        int FanInNodeNum = 0;
+        int FanOutNodeNum = 0;
         HVAC::FanOp fanOp = HVAC::FanOp::Invalid;
         Real64 DesignAirVolumeFlowRate;
         Real64 DesignAirMassFlowRate;
@@ -307,8 +307,8 @@ namespace EvaporativeCoolers {
 
         // Default Constructor
         ZoneEvapCoolerUnitStruct()
-            : ZoneNodeNum(0), AvailSchedIndex(0), UnitIsAvailable(false), OAInletNodeNum(0), UnitOutletNodeNum(0), UnitReliefNodeNum(0),
-              fanType(HVAC::FanType::Invalid), FanIndex(0), ActualFanVolFlowRate(0.0), FanAvailSchedPtr(0), FanInletNodeNum(0), FanOutletNodeNum(0),
+            : AvailSchedIndex(0), UnitIsAvailable(false), 
+              fanType(HVAC::FanType::Invalid), FanIndex(0), ActualFanVolFlowRate(0.0), FanAvailSchedPtr(0), 
               DesignAirVolumeFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignFanSpeedRatio(0.0), FanSpeedRatio(0.0),
               fanPlace(HVAC::FanPlace::Invalid), ControlSchemeType(ControlType::Invalid), TimeElapsed(0.0), ThrottlingRange(0.0),
               IsOnThisTimestep(false), WasOnLastTimestep(false), ThresholdCoolingLoad(0.0), EvapCooler_1_Type_Num(EvapCoolerType::Invalid),

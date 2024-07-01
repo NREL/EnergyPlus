@@ -64,30 +64,31 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ChillerElectricEIR;
-using namespace EnergyPlus::DataLoopNode;
 
 TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
 {
     state->dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
     auto &thisEIR = state->dataChillerElectricEIR->ElectricEIRChiller(1);
 
-    thisEIR.EvapInletNodeNum = 1;
-    thisEIR.EvapOutletNodeNum = 2;
-    thisEIR.CondInletNodeNum = 3;
-    thisEIR.CondOutletNodeNum = 4;
-    thisEIR.HeatRecInletNodeNum = 5;
-    thisEIR.HeatRecOutletNodeNum = 6;
+    thisEIR.EvapInNodeNum = 1;
+    thisEIR.EvapOutNodeNum = 2;
+    thisEIR.CondInNodeNum = 3;
+    thisEIR.CondOutNodeNum = 4;
+    thisEIR.HeatRecInNodeNum = 5;
+    thisEIR.HeatRecOutNodeNum = 6;
 
-    state->dataLoopNodes->Node.allocate(6);
-    state->dataLoopNodes->Node(thisEIR.EvapInletNodeNum).Temp = 18.0;
-    state->dataLoopNodes->Node(thisEIR.CondInletNodeNum).Temp = 35.0;
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 6; ++i) dln->nodes.push_back(new Node::NodeData);
+    
+    dln->nodes(thisEIR.EvapInNodeNum)->Temp = 18.0;
+    dln->nodes(thisEIR.CondInNodeNum)->Temp = 35.0;
 
     thisEIR.update(*state, -2000, true);
 
     EXPECT_EQ(18, thisEIR.EvapOutletTemp);
     EXPECT_EQ(35, thisEIR.CondOutletTemp);
 
-    state->dataLoopNodes->Node.deallocate();
+    for (int i = 0; i < 6; ++i) delete dln->nodes(i);
 }
 
 TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
@@ -215,8 +216,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = thisEIR.Name;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::Chiller_ElectricEIR;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = thisEIR.EvapInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = thisEIR.EvapOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = thisEIR.EvapInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = thisEIR.EvapOutNodeNum;
 
     state->dataSize->PlantSizData.allocate(1);
     state->dataSize->PlantSizData(1).DesVolFlowRate = 0.001;
@@ -321,8 +322,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = thisEIRChiller.Name;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::Chiller_ElectricEIR;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = thisEIRChiller.EvapInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = thisEIRChiller.EvapOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = thisEIRChiller.EvapInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = thisEIRChiller.EvapOutNodeNum;
 
     state->dataSize->PlantSizData.allocate(1);
     state->dataSize->PlantSizData(1).DesVolFlowRate = 0.001;
@@ -336,9 +337,11 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     state->dataEnvrn->OutWetBulbTemp = 23.0;
     state->dataEnvrn->OutHumRat =
         Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
-    state->dataLoopNodes->Node(thisEIRChiller.CondInletNodeNum).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(thisEIRChiller.CondInletNodeNum).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
-    state->dataLoopNodes->Node(thisEIRChiller.CondInletNodeNum).HumRat = state->dataEnvrn->OutHumRat;
+
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisEIRChiller.CondInNodeNum)->Temp = state->dataEnvrn->OutDryBulbTemp;
+    dln->nodes(thisEIRChiller.CondInNodeNum)->OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
+    dln->nodes(thisEIRChiller.CondInNodeNum)->HumRat = state->dataEnvrn->OutHumRat;
 
     // set load and run flag
     bool RunFlag(true);
@@ -346,8 +349,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     openOutputFiles(*state);
 
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
-    state->dataLoopNodes->Node(thisEIRChiller.EvapOutletNodeNum).TempSetPoint = 6.67;
-    state->dataLoopNodes->Node(thisEIRChiller.EvapInletNodeNum).Temp = 16.0;
+    dln->nodes(thisEIRChiller.EvapOutNodeNum)->TempSetPoint = 6.67;
+    dln->nodes(thisEIRChiller.EvapInNodeNum)->Temp = 16.0;
     // init and size
     thisEIRChiller.initialize(*state, RunFlag, MyLoad);
     thisEIRChiller.size(*state);

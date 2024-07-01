@@ -87,6 +87,7 @@ extern "C" {
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SystemReports.hh>
+#include <EnergyPlus/Timer.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 // Third Party Headers
 #include <fast_float/fast_float.h>
@@ -451,40 +452,6 @@ namespace Util {
             fsPerfLog.close();
         }
     }
-
-    Real64 epElapsedTime()
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   February 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // An alternative method for timing elapsed times is to call the standard
-        // Date_And_Time routine and set the "time".
-
-        // Return value
-        Real64 calctime; // calculated time based on hrs, minutes, seconds, milliseconds
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Array1D<Int32> clockvalues(8);
-        // value(1)   Current year
-        // value(2)   Current month
-        // value(3)   Current day
-        // value(4)   Time difference with respect to UTC in minutes (0-59)
-        // value(5)   Hour of the day (0-23)
-        // value(6)   Minutes (0-59)
-        // value(7)   Seconds (0-59)
-        // value(8)   Milliseconds (0-999)
-
-        date_and_time(_, _, _, clockvalues);
-        calctime = clockvalues(5) * 3600.0 + clockvalues(6) * 60.0 + clockvalues(7) + clockvalues(8) / 1000.0;
-
-        return calctime;
-    }
-
 } // namespace Util
 
 int AbortEnergyPlus(EnergyPlusData &state)
@@ -530,9 +497,6 @@ int AbortEnergyPlus(EnergyPlusData &state)
     std::string NumSevereDuringWarmup;
     std::string NumWarningsDuringSizing;
     std::string NumSevereDuringSizing;
-    int Hours;      // Elapsed Time Hour Reporting
-    int Minutes;    // Elapsed Time Minute Reporting
-    Real64 Seconds; // Elapsed Time Second Reporting
     bool ErrFound;
     bool TerminalError;
 
@@ -587,17 +551,8 @@ int AbortEnergyPlus(EnergyPlusData &state)
     NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
 
     // catch up with timings if in middle
-    state.dataSysVars->Time_Finish = Util::epElapsedTime();
-    if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
-    state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
-    if (state.dataSysVars->Elapsed_Time < 0.0) state.dataSysVars->Elapsed_Time = 0.0;
-    Hours = state.dataSysVars->Elapsed_Time / 3600.0;
-    state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
-    Minutes = state.dataSysVars->Elapsed_Time / 60.0;
-    state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
-    Seconds = state.dataSysVars->Elapsed_Time;
-    if (Seconds < 0.0) Seconds = 0.0;
-    const std::string Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
+    state.dataSysVars->runtimeTimer.tock();
+    const std::string Elapsed = state.dataSysVars->runtimeTimer.formatAsHourMinSecs();
 
     state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
@@ -702,9 +657,6 @@ int EndEnergyPlus(EnergyPlusData &state)
     std::string NumSevereDuringWarmup;
     std::string NumWarningsDuringSizing;
     std::string NumSevereDuringSizing;
-    int Hours;      // Elapsed Time Hour Reporting
-    int Minutes;    // Elapsed Time Minute Reporting
-    Real64 Seconds; // Elapsed Time Second Reporting
 
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->updateSQLiteSimulationRecord(true, true);
@@ -727,20 +679,11 @@ int EndEnergyPlus(EnergyPlusData &state)
     NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
     strip(NumSevereDuringSizing);
 
-    state.dataSysVars->Time_Finish = Util::epElapsedTime();
-    if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
-    state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
+    state.dataSysVars->runtimeTimer.tock();
     if (state.dataGlobal->createPerfLog) {
-        Util::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
+        Util::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->runtimeTimer.elapsedSeconds()));
     }
-    Hours = state.dataSysVars->Elapsed_Time / 3600.0;
-    state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
-    Minutes = state.dataSysVars->Elapsed_Time / 60.0;
-    state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
-    Seconds = state.dataSysVars->Elapsed_Time;
-    if (Seconds < 0.0) Seconds = 0.0;
-    const std::string Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
-
+    const std::string Elapsed = state.dataSysVars->runtimeTimer.formatAsHourMinSecs();
     state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);

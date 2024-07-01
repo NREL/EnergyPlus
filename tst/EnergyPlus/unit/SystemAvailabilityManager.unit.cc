@@ -270,22 +270,22 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
-    state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneNodeNum = 2;
 
     state->dataZoneEquip->ZoneEquipConfig(3).ZoneName = "Zone 3";
-    state->dataZoneEquip->ZoneEquipConfig(3).ZoneNode = 3;
+    state->dataZoneEquip->ZoneEquipConfig(3).ZoneNodeNum = 3;
 
     state->dataZoneEquip->ZoneEquipConfig(4).ZoneName = "Zone 4";
-    state->dataZoneEquip->ZoneEquipConfig(4).ZoneNode = 4;
+    state->dataZoneEquip->ZoneEquipConfig(4).ZoneNodeNum = 4;
 
     state->dataZoneEquip->ZoneEquipConfig(5).ZoneName = "Zone 5";
-    state->dataZoneEquip->ZoneEquipConfig(5).ZoneNode = 5;
+    state->dataZoneEquip->ZoneEquipConfig(5).ZoneNodeNum = 5;
 
     state->dataZoneEquip->ZoneEquipConfig(6).ZoneName = "Zone 6";
-    state->dataZoneEquip->ZoneEquipConfig(6).ZoneNode = 6;
+    state->dataZoneEquip->ZoneEquipConfig(6).ZoneNodeNum = 6;
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
 
@@ -604,9 +604,9 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleGetInput)
     Avail::GetSysAvailManagerInputs(*state);
     // check the three cycling run time control types
     EXPECT_EQ(3, state->dataAvail->NumNCycSysAvailMgrs);
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::FixedRunTime, state->dataAvail->NightCycleData(1).cyclingRunTimeControl));
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::Thermostat, state->dataAvail->NightCycleData(2).cyclingRunTimeControl));
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, state->dataAvail->NightCycleData(3).cyclingRunTimeControl));
+    EXPECT_ENUM_EQ(Avail::CyclingRunTimeControl::FixedRunTime, state->dataAvail->NightCycleData(1).cyclingRunTimeControl);
+    EXPECT_ENUM_EQ(Avail::CyclingRunTimeControl::Thermostat, state->dataAvail->NightCycleData(2).cyclingRunTimeControl);
+    EXPECT_ENUM_EQ(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, state->dataAvail->NightCycleData(3).cyclingRunTimeControl);
 }
 
 TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
@@ -762,7 +762,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "SPACE1-1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum = 1;
 
     state->dataAvail->NightCycleData(1).Name = "System Avail";
     state->dataAvail->NightCycleData(1).nightCycleControlType = Avail::NightCycleControlType::OnAny;

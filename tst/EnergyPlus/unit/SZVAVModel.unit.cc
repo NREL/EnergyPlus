@@ -174,44 +174,49 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
-    state->dataLoopNodes->Node.allocate(10);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 10; ++i) dln->nodes.push_back(new Node::NodeData);
 
     bool errFlag;
     UnitarySystems::UnitarySys thisUnit;
     int FanIndex = Fans::GetFanIndex(*state, "TEST FAN");
-    thisUnit.AirInNode = state->dataFans->fans(FanIndex)->inletNodeNum;
-    thisUnit.CoolCoilInletNodeNum = DXCoils::GetCoilInletNode(*state, "Coil:Cooling:DX:SingleSpeed", "COOLINGCOIL", errFlag);
-    thisUnit.CoolCoilOutletNodeNum = DXCoils::GetCoilOutletNode(*state, "Coil:Cooling:DX:SingleSpeed", "COOLINGCOIL", errFlag);
-    thisUnit.HeatCoilInletNodeNum = thisUnit.CoolCoilOutletNodeNum;
-    thisUnit.HeatCoilOutletNodeNum = DXCoils::GetCoilOutletNode(*state, "Coil:Heating:DX:SingleSpeed", "HEATINGCOIL", errFlag);
-    thisUnit.AirOutNode = thisUnit.HeatCoilOutletNodeNum;
+    thisUnit.AirInNodeNum = state->dataFans->fans(FanIndex)->inNodeNum;
+    thisUnit.CoolCoilAirInNodeNum = DXCoils::GetCoilInletNode(*state, "Coil:Cooling:DX:SingleSpeed", "COOLINGCOIL", errFlag);
+    thisUnit.CoolCoilAirOutNodeNum = DXCoils::GetCoilOutletNode(*state, "Coil:Cooling:DX:SingleSpeed", "COOLINGCOIL", errFlag);
+    thisUnit.HeatCoilAirInNodeNum = thisUnit.CoolCoilAirOutNodeNum;
+    thisUnit.HeatCoilAirOutNodeNum = DXCoils::GetCoilOutletNode(*state, "Coil:Heating:DX:SingleSpeed", "HEATINGCOIL", errFlag);
+    thisUnit.AirOutNodeNum = thisUnit.HeatCoilAirOutNodeNum;
     // set zone condition
-    int zoneNodeNum = NodeInputManager::GetOnlySingleNode(*state,
+    int zoneNodeNum = Node::GetSingleNode(*state,
                                                           "ZoneNode",
                                                           errFlag,
-                                                          DataLoopNode::ConnectionObjectType::ZoneHVACPackagedTerminalAirConditioner,
+                                                          Node::ConnObjType::ZoneHVACPackagedTerminalAirConditioner,
                                                           "PTUnit",
-                                                          DataLoopNode::NodeFluidType::Air,
-                                                          DataLoopNode::ConnectionType::Inlet,
-                                                          NodeInputManager::CompFluidStream::Primary,
-                                                          DataLoopNode::ObjectIsNotParent);
+                                                          Node::FluidType::Air,
+                                                          Node::ConnType::Inlet,
+                                                          Node::CompFluidStream::Primary,
+                                                          Node::ObjectIsNotParent);
 
-    state->dataLoopNodes->Node(thisUnit.AirInNode).Temp = 21.0;
-    state->dataLoopNodes->Node(thisUnit.AirInNode).HumRat = 0.00773;
-    state->dataLoopNodes->Node(thisUnit.AirInNode).Enthalpy = 40747.4;
-    thisUnit.NodeNumOfControlledZone = 5;
-    state->dataLoopNodes->Node(zoneNodeNum).Temp = 21.0;
-    state->dataLoopNodes->Node(zoneNodeNum).HumRat = 0.08;
+    auto *airInNode = dln->nodes(thisUnit.AirInNodeNum);
+    airInNode->Temp = 21.0;
+    airInNode->HumRat = 0.00773;
+    airInNode->Enthalpy = 40747.4;
+    thisUnit.ControlledZoneNodeNum = 5;
+
+    auto *zoneNode = dln->nodes(zoneNodeNum);
+    zoneNode->Temp = 21.0;
+    zoneNode->HumRat = 0.08;
     thisUnit.ATMixerExists = false;
     thisUnit.MaxCoolCoilFluidFlow = 0.1;
     thisUnit.DesignMinOutletTemp = 10.0;
     thisUnit.MaxNoCoolHeatAirMassFlow = 0.1;
     thisUnit.MaxCoolAirMassFlow = 0.2;
-    state->dataLoopNodes->Node(thisUnit.AirInNode).MassFlowRateMaxAvail = 0.25;
+    airInNode->MassFlowRateMaxAvail = 0.25;
     thisUnit.LowSpeedCoolFanRatio = 0.5;
     thisUnit.LowSpeedHeatFanRatio = 0.5;
-    thisUnit.CoolCoilFluidInletNode = 0;
-    thisUnit.CoolCoilFluidOutletNodeNum = 0;
+    thisUnit.CoolCoilFluidInNodeNum = 0;
+    thisUnit.CoolCoilFluidOutNodeNum = 0;
     thisUnit.CoolCoilPlantLoc.loopNum = 0;
     thisUnit.CoolCoilPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Invalid;
     thisUnit.CoolCoilPlantLoc.branchNum = 0;
@@ -219,8 +224,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     thisUnit.DesignMaxOutletTemp = 30.0;
     thisUnit.MaxHeatAirMassFlow = 0.2;
-    thisUnit.HeatCoilFluidInletNode = 0;
-    thisUnit.HeatCoilFluidOutletNodeNum = 0;
+    thisUnit.HeatCoilFluidInNodeNum = 0;
+    thisUnit.HeatCoilFluidOutNodeNum = 0;
     thisUnit.HeatCoilPlantLoc.loopNum = 0;
     thisUnit.HeatCoilPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Invalid;
     thisUnit.HeatCoilPlantLoc.branchNum = 0;
@@ -229,7 +234,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.ControlZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum = 1;
 
     state->dataScheduleMgr->Schedule.allocate(1);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
@@ -261,13 +266,13 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     state->dataBranchNodeConnections->NumCompSets = 2;
     state->dataBranchNodeConnections->CompSets.allocate(2);
-    state->dataBranchNodeConnections->CompSets(1).ComponentObjectType = DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed;
+    state->dataBranchNodeConnections->CompSets(1).ComponentObjectType = Node::ConnObjType::CoilCoolingDXSingleSpeed;
     state->dataBranchNodeConnections->CompSets(1).CName = "CoolingCoil";
-    state->dataBranchNodeConnections->CompSets(1).ParentObjectType = DataLoopNode::ConnectionObjectType::ZoneHVACPackagedTerminalHeatPump;
+    state->dataBranchNodeConnections->CompSets(1).ParentObjectType = Node::ConnObjType::ZoneHVACPackagedTerminalHeatPump;
     state->dataBranchNodeConnections->CompSets(1).ParentCName = "AirSystem";
-    state->dataBranchNodeConnections->CompSets(2).ComponentObjectType = DataLoopNode::ConnectionObjectType::CoilHeatingDXSingleSpeed;
+    state->dataBranchNodeConnections->CompSets(2).ComponentObjectType = Node::ConnObjType::CoilHeatingDXSingleSpeed;
     state->dataBranchNodeConnections->CompSets(2).CName = "HeatingCoil";
-    state->dataBranchNodeConnections->CompSets(2).ParentObjectType = DataLoopNode::ConnectionObjectType::ZoneHVACPackagedTerminalHeatPump;
+    state->dataBranchNodeConnections->CompSets(2).ParentObjectType = Node::ConnObjType::ZoneHVACPackagedTerminalHeatPump;
     state->dataBranchNodeConnections->CompSets(2).ParentCName = "AirSystem";
 
     state->dataEnvrn->OutDryBulbTemp = 30.0;
@@ -304,22 +309,24 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
                                CompressorOnFlag);
 
     // set unit inlet node conditions for cooling
-    state->dataLoopNodes->Node(thisUnit.AirInNode).Temp = 24.0;
-    state->dataLoopNodes->Node(thisUnit.AirInNode).HumRat = 0.011;
-    state->dataLoopNodes->Node(thisUnit.AirInNode).Enthalpy = 52120.0;
-    state->dataLoopNodes->Node(thisUnit.AirOutNode).Temp = 21.0;
-    state->dataLoopNodes->Node(thisUnit.AirOutNode).HumRat = 0.08;
+    airInNode->Temp = 24.0;
+    airInNode->HumRat = 0.011;
+    airInNode->Enthalpy = 52120.0;
 
-    state->dataLoopNodes->Node(zoneNodeNum).Temp = 24.0;
-    state->dataLoopNodes->Node(zoneNodeNum).HumRat = 0.011;
-    state->dataLoopNodes->Node(zoneNodeNum).Enthalpy = 52120.0;
+    auto *airOutNode = dln->nodes(thisUnit.AirOutNodeNum);
+    airOutNode->Temp = 21.0;
+    airOutNode->HumRat = 0.08;
+
+    zoneNode->Temp = 24.0;
+    zoneNode->HumRat = 0.011;
+    zoneNode->Enthalpy = 52120.0;
 
     // turn the availability schedule on
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataUnitarySystems->CoolingLoad = CoolingLoad;
     state->dataUnitarySystems->HeatingLoad = HeatingLoad;
     // set fan inlet max avail so fan doesn't shut down flow
-    state->dataLoopNodes->Node(thisUnit.AirInNode).MassFlowRateMaxAvail = 0.2;
+    airInNode->MassFlowRateMaxAvail = 0.2;
     state->dataEnvrn->StdRhoAir = 1.2; // fan used this to convert volume to mass flow rate
     state->dataEnvrn->OutBaroPress = 101325.0;
     // second pass through will run model
@@ -338,13 +345,12 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
                                PLR,
                                CompressorOnFlag);
 
-    EXPECT_NEAR(
-        state->dataLoopNodes->Node(thisUnit.AirInNode).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow, 0.00000001);      // low speed air flow rate
-    EXPECT_LT(state->dataLoopNodes->Node(thisUnit.AirOutNode).Temp, state->dataLoopNodes->Node(thisUnit.AirInNode).Temp); // active cooling
-    Real64 AirMassFlow = state->dataLoopNodes->Node(thisUnit.AirOutNode).MassFlowRate;
-    Real64 MinHumRat = min(state->dataLoopNodes->Node(thisUnit.AirOutNode).HumRat, state->dataLoopNodes->Node(thisUnit.AirInNode).HumRat);
-    Real64 OutletTemp = state->dataLoopNodes->Node(thisUnit.AirOutNode).Temp;
-    Real64 InletTemp = state->dataLoopNodes->Node(thisUnit.AirInNode).Temp;
+    EXPECT_NEAR(airInNode->MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow, 0.00000001);      // low speed air flow rate
+    EXPECT_LT(airOutNode->Temp, airInNode->Temp); // active cooling
+    Real64 AirMassFlow = airOutNode->MassFlowRate;
+    Real64 MinHumRat = min(airOutNode->HumRat, airInNode->HumRat);
+    Real64 OutletTemp = airOutNode->Temp;
+    Real64 InletTemp = airInNode->Temp;
     Real64 LoadMet = AirMassFlow * (Psychrometrics::PsyHFnTdbW(OutletTemp, MinHumRat) - Psychrometrics::PsyHFnTdbW(InletTemp, MinHumRat));
     EXPECT_NEAR(LoadMet, QZnReq, 0.2);
     EXPECT_NEAR(LoadMet, -200.0, 0.2);
@@ -364,14 +370,14 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
                                PLR,
                                CompressorOnFlag);
 
-    EXPECT_GT(state->dataLoopNodes->Node(thisUnit.AirInNode).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow); // air flow higher than low speed
-    EXPECT_LT(state->dataLoopNodes->Node(thisUnit.AirInNode).MassFlowRate, thisUnit.MaxCoolAirMassFlow);       // air flow lower than high speed
-    EXPECT_LT(state->dataLoopNodes->Node(thisUnit.AirOutNode).Temp, state->dataLoopNodes->Node(1).Temp);       // active cooling
+    EXPECT_GT(airInNode->MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow); // air flow higher than low speed
+    EXPECT_LT(airInNode->MassFlowRate, thisUnit.MaxCoolAirMassFlow);       // air flow lower than high speed
+    EXPECT_LT(airOutNode->Temp, dln->nodes(1)->Temp);       // active cooling
 
-    AirMassFlow = state->dataLoopNodes->Node(thisUnit.AirOutNode).MassFlowRate;
-    MinHumRat = min(state->dataLoopNodes->Node(thisUnit.AirOutNode).HumRat, state->dataLoopNodes->Node(thisUnit.AirInNode).HumRat);
-    OutletTemp = state->dataLoopNodes->Node(thisUnit.AirOutNode).Temp;
-    InletTemp = state->dataLoopNodes->Node(thisUnit.AirInNode).Temp;
+    AirMassFlow = airOutNode->MassFlowRate;
+    MinHumRat = min(airOutNode->HumRat, airInNode->HumRat);
+    OutletTemp = airOutNode->Temp;
+    InletTemp = airInNode->Temp;
     LoadMet = AirMassFlow * (Psychrometrics::PsyHFnTdbW(OutletTemp, MinHumRat) - Psychrometrics::PsyHFnTdbW(InletTemp, MinHumRat));
     EXPECT_NEAR(LoadMet, QZnReq, 15.0);
     EXPECT_NEAR(LoadMet, -2486.0, 1.0);
@@ -394,12 +400,12 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     // test fails, expected MaxCoolAirMassFlow, only got 87% of that, issue 9090
     // test here should be EXPECT_EQ or EXPECT_NEAR thisUnit.MaxCoolAirMassFlow
-    EXPECT_GT(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow); // high speed air flow rate
-    EXPECT_LT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);        // active cooling
+    EXPECT_GT(dln->nodes(1)->MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow); // high speed air flow rate
+    EXPECT_LT(dln->nodes(4)->Temp, dln->nodes(1)->Temp);        // active cooling
 
-    MinHumRat = min(state->dataLoopNodes->Node(4).HumRat, state->dataLoopNodes->Node(1).HumRat);
-    OutletTemp = state->dataLoopNodes->Node(4).Temp;
-    InletTemp = state->dataLoopNodes->Node(1).Temp;
+    MinHumRat = min(dln->nodes(4)->HumRat, dln->nodes(1)->HumRat);
+    OutletTemp = dln->nodes(4)->Temp;
+    InletTemp = dln->nodes(1)->Temp;
     LoadMet = thisUnit.MaxCoolAirMassFlow * (Psychrometrics::PsyHFnTdbW(OutletTemp, MinHumRat) - Psychrometrics::PsyHFnTdbW(InletTemp, MinHumRat));
     EXPECT_NEAR(LoadMet, QZnReq, 1600.0); // coil could not meet load, not a failure just issue with testing results
     EXPECT_NEAR(LoadMet, -2859.0, 500.0);
@@ -410,12 +416,12 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataUnitarySystems->HeatingLoad = HeatingLoad;
 
     // set unit inlet node conditions for heating
-    state->dataLoopNodes->Node(1).Temp = 21.0;
-    state->dataLoopNodes->Node(1).HumRat = 0.008;
-    state->dataLoopNodes->Node(1).Enthalpy = 41431.0;
-    state->dataLoopNodes->Node(5).Temp = 21.0;
-    state->dataLoopNodes->Node(5).HumRat = 0.008;
-    state->dataLoopNodes->Node(5).Enthalpy = 41431.0;
+    dln->nodes(1)->Temp = 21.0;
+    dln->nodes(1)->HumRat = 0.008;
+    dln->nodes(1)->Enthalpy = 41431.0;
+    dln->nodes(5)->Temp = 21.0;
+    dln->nodes(5)->HumRat = 0.008;
+    dln->nodes(5)->Enthalpy = 41431.0;
 
     // Region 1 of control, low air flow rate, modulate coil capacity
     QZnReq = 200.0;
@@ -432,12 +438,12 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
                                PLR,
                                CompressorOnFlag);
 
-    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow, 0.00000001); // high speed air flow rate
-    EXPECT_GT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                      // active heating
+    EXPECT_NEAR(dln->nodes(1)->MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow, 0.00000001); // high speed air flow rate
+    EXPECT_GT(dln->nodes(4)->Temp, dln->nodes(1)->Temp);                      // active heating
 
-    MinHumRat = min(state->dataLoopNodes->Node(4).HumRat, state->dataLoopNodes->Node(1).HumRat);
-    OutletTemp = state->dataLoopNodes->Node(4).Temp;
-    InletTemp = state->dataLoopNodes->Node(1).Temp;
+    MinHumRat = min(dln->nodes(4)->HumRat, dln->nodes(1)->HumRat);
+    OutletTemp = dln->nodes(4)->Temp;
+    InletTemp = dln->nodes(1)->Temp;
     LoadMet =
         thisUnit.MaxNoCoolHeatAirMassFlow * (Psychrometrics::PsyHFnTdbW(OutletTemp, MinHumRat) - Psychrometrics::PsyHFnTdbW(InletTemp, MinHumRat));
     EXPECT_NEAR(LoadMet, QZnReq, 0.0001);
@@ -458,14 +464,14 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
                                PLR,
                                CompressorOnFlag);
 
-    EXPECT_GT(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow); // air flow higher than low speed
-    EXPECT_LT(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxHeatAirMassFlow);       // air flow lower than high speed
-    EXPECT_GT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);        // active heating
+    EXPECT_GT(dln->nodes(1)->MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow); // air flow higher than low speed
+    EXPECT_LT(dln->nodes(1)->MassFlowRate, thisUnit.MaxHeatAirMassFlow);       // air flow lower than high speed
+    EXPECT_GT(dln->nodes(4)->Temp, dln->nodes(1)->Temp);        // active heating
 
-    AirMassFlow = state->dataLoopNodes->Node(4).MassFlowRate;
-    MinHumRat = min(state->dataLoopNodes->Node(4).HumRat, state->dataLoopNodes->Node(1).HumRat);
-    OutletTemp = state->dataLoopNodes->Node(4).Temp;
-    InletTemp = state->dataLoopNodes->Node(1).Temp;
+    AirMassFlow = dln->nodes(4)->MassFlowRate;
+    MinHumRat = min(dln->nodes(4)->HumRat, dln->nodes(1)->HumRat);
+    OutletTemp = dln->nodes(4)->Temp;
+    InletTemp = dln->nodes(1)->Temp;
     LoadMet = AirMassFlow * (Psychrometrics::PsyHFnTdbW(OutletTemp, MinHumRat) - Psychrometrics::PsyHFnTdbW(InletTemp, MinHumRat));
     EXPECT_NEAR(LoadMet, QZnReq, 0.0001);
     EXPECT_NEAR(LoadMet, 1200.0, 0.0001);
@@ -485,12 +491,12 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
                                PLR,
                                CompressorOnFlag);
 
-    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxHeatAirMassFlow, 0.00000001); // high speed air flow rate
-    EXPECT_GT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                // active heating
+    EXPECT_NEAR(dln->nodes(1)->MassFlowRate, thisUnit.MaxHeatAirMassFlow, 0.00000001); // high speed air flow rate
+    EXPECT_GT(dln->nodes(4)->Temp, dln->nodes(1)->Temp);                // active heating
 
-    MinHumRat = min(state->dataLoopNodes->Node(4).HumRat, state->dataLoopNodes->Node(1).HumRat);
-    OutletTemp = state->dataLoopNodes->Node(4).Temp;
-    InletTemp = state->dataLoopNodes->Node(1).Temp;
+    MinHumRat = min(dln->nodes(4)->HumRat, dln->nodes(1)->HumRat);
+    OutletTemp = dln->nodes(4)->Temp;
+    InletTemp = dln->nodes(1)->Temp;
     LoadMet = thisUnit.MaxHeatAirMassFlow * (Psychrometrics::PsyHFnTdbW(OutletTemp, MinHumRat) - Psychrometrics::PsyHFnTdbW(InletTemp, MinHumRat));
     EXPECT_NEAR(LoadMet, QZnReq, 0.0001);
     EXPECT_NEAR(LoadMet, 2000.0, 0.0001);
@@ -659,7 +665,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_TRUE(compare_enums(CCM::ASHRAE, thisFanCoil.CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::ASHRAE, thisFanCoil.CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ((int)HVAC::FanType::OnOff, (int)thisFanCoil.fanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
@@ -673,38 +679,47 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
     // outside air mixer
     auto &MixerOA(state->dataMixedAir->OAMixer(1));
-    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
-    state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 20.0;
-    state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
-    state->dataLoopNodes->Node(MixerOA.RetNode).HumRat =
-        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
-    state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
-    state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
-    state->dataLoopNodes->Node(MixerOA.InletNode).HumRat =
-        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
+
+    auto &dln = state->dataLoopNodes;
+    auto *oaMixerReturnAirInNode = dln->nodes(MixerOA.ReturnAirInNodeNum);
+    auto *oaMixerOutsideAirInNode = dln->nodes(MixerOA.OutsideAirInNodeNum);
+    
+    oaMixerReturnAirInNode->MassFlowRate = AirMassFlow;
+    oaMixerReturnAirInNode->MassFlowRateMax = MaxAirMassFlow;
+    oaMixerReturnAirInNode->Temp = 20.0;
+    oaMixerReturnAirInNode->Enthalpy = 36000;
+    oaMixerReturnAirInNode->HumRat = PsyWFnTdbH(*state, oaMixerReturnAirInNode->Temp, oaMixerReturnAirInNode->Enthalpy);
+    oaMixerOutsideAirInNode->Temp = 10.0;
+    oaMixerOutsideAirInNode->Enthalpy = 18000;
+    oaMixerOutsideAirInNode->HumRat = PsyWFnTdbH(*state, oaMixerOutsideAirInNode->Temp, oaMixerOutsideAirInNode->Enthalpy);
     // chilled water coil
     auto &CWCoil(state->dataWaterCoils->WaterCoil(1));
     CWCoil.UACoilTotal = 470.0;
     CWCoil.UACoilExternal = 611.0;
     CWCoil.UACoilInternal = 2010.0;
     CWCoil.TotCoilOutsideSurfArea = 50.0;
-    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    auto *cwCoilAirInNode = dln->nodes(CWCoil.AirInNodeNum);
+    auto *cwCoilWaterInNode = dln->nodes(CWCoil.WaterInNodeNum);
+    cwCoilAirInNode->MassFlowRate = AirMassFlow;
+    cwCoilAirInNode->MassFlowRateMax = AirMassFlow;
+    cwCoilAirInNode->MassFlowRateMaxAvail = AirMassFlow;
     CWCoil.InletWaterMassFlowRate = ColdWaterMassFlowRate;
     CWCoil.MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
+    cwCoilWaterInNode->MassFlowRate = ColdWaterMassFlowRate;
+    cwCoilWaterInNode->MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    cwCoilWaterInNode->Temp = 6.0;
     CWCoil.WaterPlantLoc.loopNum = 1;
     CWCoil.WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
     CWCoil.WaterPlantLoc.branchNum = 1;
     CWCoil.WaterPlantLoc.compNum = 1;
     // electric heating coil
     auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
-    state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    auto *ehCoilAirInNode = dln->nodes(eHCoil.AirInNodeNum);
+    
+    ehCoilAirInNode->MassFlowRate = AirMassFlow;
+    ehCoilAirInNode->MassFlowRateMaxAvail = AirMassFlow;
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
 
@@ -723,8 +738,8 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     CWLoop.FluidName = "WATER";
     CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = CWCoil.Name;
     CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
-    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
-    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = CWCoil.WaterInNodeNum;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = CWCoil.WaterOutNodeNum;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;

@@ -432,7 +432,7 @@ namespace WaterToAirHeatPumpSimple {
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = simpleWAHP.Name;
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).SourceType = CurrentModuleObject;
 
-            simpleWAHP.WaterInletNodeNum = GetSingleNode(state,
+            simpleWAHP.WaterInNodeNum = GetSingleNode(state,
                                                              AlphArray(2),
                                                              ErrorsFound,
                                                              Node::ConnObjType::CoilCoolingWaterToAirHeatPumpEquationFit,
@@ -441,7 +441,7 @@ namespace WaterToAirHeatPumpSimple {
                                                              Node::ConnType::Inlet,
                                                              Node::CompFluidStream::Secondary,
                                                              Node::ObjectIsNotParent);
-            simpleWAHP.WaterOutletNodeNum = GetSingleNode(state,
+            simpleWAHP.WaterOutNodeNum = GetSingleNode(state,
                                                               AlphArray(3),
                                                               ErrorsFound,
                                                               Node::ConnObjType::CoilCoolingWaterToAirHeatPumpEquationFit,
@@ -450,7 +450,7 @@ namespace WaterToAirHeatPumpSimple {
                                                               Node::ConnType::Outlet,
                                                               Node::CompFluidStream::Secondary,
                                                               Node::ObjectIsNotParent);
-            simpleWAHP.AirInletNodeNum = GetSingleNode(state,
+            simpleWAHP.AirInNodeNum = GetSingleNode(state,
                                                            AlphArray(4),
                                                            ErrorsFound,
                                                            Node::ConnObjType::CoilCoolingWaterToAirHeatPumpEquationFit,
@@ -459,7 +459,7 @@ namespace WaterToAirHeatPumpSimple {
                                                            Node::ConnType::Inlet,
                                                            Node::CompFluidStream::Primary,
                                                            Node::ObjectIsNotParent);
-            simpleWAHP.AirOutletNodeNum = GetSingleNode(state,
+            simpleWAHP.AirOutNodeNum = GetSingleNode(state,
                                                             AlphArray(5),
                                                             ErrorsFound,
                                                             Node::ConnObjType::CoilCoolingWaterToAirHeatPumpEquationFit,
@@ -662,7 +662,7 @@ namespace WaterToAirHeatPumpSimple {
             }
 
             CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
-            simpleWAHP.WaterInletNodeNum = GetSingleNode(state,
+            simpleWAHP.WaterInNodeNum = GetSingleNode(state,
                                                              AlphArray(2),
                                                              ErrorsFound,
                                                              Node::ConnObjType::CoilHeatingWaterToAirHeatPumpEquationFit,
@@ -671,7 +671,7 @@ namespace WaterToAirHeatPumpSimple {
                                                              Node::ConnType::Inlet,
                                                              Node::CompFluidStream::Secondary,
                                                              Node::ObjectIsNotParent);
-            simpleWAHP.WaterOutletNodeNum = GetSingleNode(state,
+            simpleWAHP.WaterOutNodeNum = GetSingleNode(state,
                                                               AlphArray(3),
                                                               ErrorsFound,
                                                               Node::ConnObjType::CoilHeatingWaterToAirHeatPumpEquationFit,
@@ -680,7 +680,7 @@ namespace WaterToAirHeatPumpSimple {
                                                               Node::ConnType::Outlet,
                                                               Node::CompFluidStream::Secondary,
                                                               Node::ObjectIsNotParent);
-            simpleWAHP.AirInletNodeNum = GetSingleNode(state,
+            simpleWAHP.AirInNodeNum = GetSingleNode(state,
                                                            AlphArray(4),
                                                            ErrorsFound,
                                                            Node::ConnObjType::CoilHeatingWaterToAirHeatPumpEquationFit,
@@ -689,7 +689,7 @@ namespace WaterToAirHeatPumpSimple {
                                                            Node::ConnType::Inlet,
                                                            Node::CompFluidStream::Primary,
                                                            Node::ObjectIsNotParent);
-            simpleWAHP.AirOutletNodeNum = GetSingleNode(state,
+            simpleWAHP.AirOutNodeNum = GetSingleNode(state,
                                                             AlphArray(5),
                                                             ErrorsFound,
                                                             Node::ConnObjType::CoilHeatingWaterToAirHeatPumpEquationFit,
@@ -999,11 +999,11 @@ namespace WaterToAirHeatPumpSimple {
         static constexpr std::string_view RoutineName("InitSimpleWatertoAirHP");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int AirInletNode;            // Node Number of the air inlet
-        int WaterInletNode;          // Node Number of the Water inlet
         Real64 RatedAirMassFlowRate; // coil rated air mass flow rates
         Real64 rho;                  // local fluid density
         bool errFlag;
+
+        auto &dln = state.dataLoopNodes;
 
         if (state.dataWaterToAirHeatPumpSimple->MyOneTimeFlag) {
             // initialize the environment and sizing flags
@@ -1093,11 +1093,6 @@ namespace WaterToAirHeatPumpSimple {
 
             if (state.dataWaterToAirHeatPumpSimple->MyEnvrnFlag(HPNum) && !state.dataWaterToAirHeatPumpSimple->MyPlantScanFlag(HPNum)) {
 
-                // Do the initializations to start simulation
-
-                AirInletNode = simpleWatertoAirHP.AirInletNodeNum;
-                WaterInletNode = simpleWatertoAirHP.WaterInletNodeNum;
-
                 // Initialize all report variables to a known state at beginning of simulation
                 simpleWatertoAirHP.AirVolFlowRate = 0.0;
                 simpleWatertoAirHP.InletAirDBTemp = 0.0;
@@ -1136,8 +1131,8 @@ namespace WaterToAirHeatPumpSimple {
                     PlantUtilities::InitComponentNodes(state,
                                                        0.0,
                                                        simpleWatertoAirHP.DesignWaterMassFlowRate,
-                                                       simpleWatertoAirHP.WaterInletNodeNum,
-                                                       simpleWatertoAirHP.WaterOutletNodeNum);
+                                                       simpleWatertoAirHP.WaterInNodeNum,
+                                                       simpleWatertoAirHP.WaterOutNodeNum);
 
                     if (simpleWatertoAirHP.WAHPType == WatertoAirHP::Heating && simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).DesignWaterMassFlowRate =
@@ -1148,8 +1143,8 @@ namespace WaterToAirHeatPumpSimple {
                             0.0,
                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
                                 .DesignWaterMassFlowRate,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WaterInletNodeNum,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WaterOutletNodeNum);
+                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WaterInNodeNum,
+                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WaterOutNodeNum);
                     }
                 }
 
@@ -1170,19 +1165,19 @@ namespace WaterToAirHeatPumpSimple {
 
         // Set water and air inlet nodes
 
-        AirInletNode = simpleWatertoAirHP.AirInletNodeNum;
-        WaterInletNode = simpleWatertoAirHP.WaterInletNodeNum;
+        auto *airInNode = dln->nodes(simpleWatertoAirHP.AirInNodeNum);
+        auto *waterInNode = dln->nodes(simpleWatertoAirHP.WaterInNodeNum);
 
-        if ((SensLoad != 0.0 || LatentLoad != 0.0) && (state.dataLoopNodes->Node(AirInletNode).MassFlowRate > 0.0)) {
+        if ((SensLoad != 0.0 || LatentLoad != 0.0) && (airInNode->MassFlowRate > 0.0)) {
             simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate;
 
-            simpleWatertoAirHP.AirMassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
+            simpleWatertoAirHP.AirMassFlowRate = airInNode->MassFlowRate;
             // If air flow is less than 25% rated flow. Then throw warning
             RatedAirMassFlowRate =
                 simpleWatertoAirHP.RatedAirVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                                                            state.dataEnvrn->StdBaroPress,
-                                                                                           state.dataLoopNodes->Node(AirInletNode).Temp,
-                                                                                           state.dataLoopNodes->Node(AirInletNode).HumRat,
+                                                                                           airInNode->Temp,
+                                                                                           airInNode->HumRat,
                                                                                            RoutineName);
             if (simpleWatertoAirHP.AirMassFlowRate < 0.25 * RatedAirMassFlowRate) {
                 ShowRecurringWarningErrorAtEnd(state,
@@ -1232,15 +1227,15 @@ namespace WaterToAirHeatPumpSimple {
 
         PlantUtilities::SetComponentFlowRate(state,
                                              simpleWatertoAirHP.WaterMassFlowRate,
-                                             simpleWatertoAirHP.WaterInletNodeNum,
-                                             simpleWatertoAirHP.WaterOutletNodeNum,
+                                             simpleWatertoAirHP.WaterInNodeNum,
+                                             simpleWatertoAirHP.WaterOutNodeNum,
                                              simpleWatertoAirHP.plantLoc);
 
-        simpleWatertoAirHP.InletAirDBTemp = state.dataLoopNodes->Node(AirInletNode).Temp;
-        simpleWatertoAirHP.InletAirHumRat = state.dataLoopNodes->Node(AirInletNode).HumRat;
-        simpleWatertoAirHP.InletAirEnthalpy = state.dataLoopNodes->Node(AirInletNode).Enthalpy;
-        simpleWatertoAirHP.InletWaterTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
-        simpleWatertoAirHP.InletWaterEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;
+        simpleWatertoAirHP.InletAirDBTemp = airInNode->Temp;
+        simpleWatertoAirHP.InletAirHumRat = airInNode->HumRat;
+        simpleWatertoAirHP.InletAirEnthalpy = airInNode->Enthalpy;
+        simpleWatertoAirHP.InletWaterTemp = waterInNode->Temp;
+        simpleWatertoAirHP.InletWaterEnthalpy = waterInNode->Enthalpy;
         simpleWatertoAirHP.OutletWaterTemp = simpleWatertoAirHP.InletWaterTemp;
         simpleWatertoAirHP.OutletWaterEnthalpy = simpleWatertoAirHP.InletWaterEnthalpy;
 
@@ -1593,8 +1588,8 @@ namespace WaterToAirHeatPumpSimple {
                             state,
                             format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)]),
                             simpleWatertoAirHP.Name,
-                            simpleWatertoAirHP.WaterInletNodeNum,
-                            simpleWatertoAirHP.WaterOutletNodeNum,
+                            simpleWatertoAirHP.WaterInNodeNum,
+                            simpleWatertoAirHP.WaterOutNodeNum,
                             ErrorsFound,
                             false);
                         if (PltSizNum > 0) {
@@ -1725,8 +1720,8 @@ namespace WaterToAirHeatPumpSimple {
                             state,
                             format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)]),
                             simpleWatertoAirHP.Name,
-                            simpleWatertoAirHP.WaterInletNodeNum,
-                            simpleWatertoAirHP.WaterOutletNodeNum,
+                            simpleWatertoAirHP.WaterInNodeNum,
+                            simpleWatertoAirHP.WaterOutNodeNum,
                             ErrorsFound,
                             false);
                         if (PltSizNum > 0) {
@@ -1856,8 +1851,8 @@ namespace WaterToAirHeatPumpSimple {
                             state,
                             format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)]),
                             simpleWatertoAirHP.Name,
-                            simpleWatertoAirHP.WaterInletNodeNum,
-                            simpleWatertoAirHP.WaterOutletNodeNum,
+                            simpleWatertoAirHP.WaterInNodeNum,
+                            simpleWatertoAirHP.WaterOutNodeNum,
                             ErrorsFound,
                             false);
                         if (PltSizNum > 0) {
@@ -1966,8 +1961,8 @@ namespace WaterToAirHeatPumpSimple {
                             state,
                             format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)]),
                             simpleWatertoAirHP.Name,
-                            simpleWatertoAirHP.WaterInletNodeNum,
-                            simpleWatertoAirHP.WaterOutletNodeNum,
+                            simpleWatertoAirHP.WaterInNodeNum,
+                            simpleWatertoAirHP.WaterOutNodeNum,
                             ErrorsFound,
                             false);
                         if (PltSizNum > 0) {
@@ -2415,8 +2410,8 @@ namespace WaterToAirHeatPumpSimple {
                             state,
                             format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)]),
                             simpleWatertoAirHP.Name,
-                            simpleWatertoAirHP.WaterInletNodeNum,
-                            simpleWatertoAirHP.WaterOutletNodeNum,
+                            simpleWatertoAirHP.WaterInNodeNum,
+                            simpleWatertoAirHP.WaterOutNodeNum,
                             ErrorsFound,
                             false);
                         if (PltSizNum > 0) {
@@ -2520,8 +2515,8 @@ namespace WaterToAirHeatPumpSimple {
                             state,
                             format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)]),
                             simpleWatertoAirHP.Name,
-                            simpleWatertoAirHP.WaterInletNodeNum,
-                            simpleWatertoAirHP.WaterOutletNodeNum,
+                            simpleWatertoAirHP.WaterInNodeNum,
+                            simpleWatertoAirHP.WaterOutNodeNum,
                             ErrorsFound,
                             false);
                         if (PltSizNum > 0) {
@@ -2859,8 +2854,8 @@ namespace WaterToAirHeatPumpSimple {
                 state,
                 format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)]),
                 simpleWatertoAirHP.Name,
-                simpleWatertoAirHP.WaterInletNodeNum,
-                simpleWatertoAirHP.WaterOutletNodeNum,
+                simpleWatertoAirHP.WaterInNodeNum,
+                simpleWatertoAirHP.WaterOutNodeNum,
                 ErrorsFound,
                 false);
 
@@ -2965,15 +2960,15 @@ namespace WaterToAirHeatPumpSimple {
         if (simpleWatertoAirHP.RatedWaterVolFlowRate > 0.0) {
             if (simpleWatertoAirHP.WAHPType == WatertoAirHP::Heating) {
                 PlantUtilities::RegisterPlantCompDesignFlow(
-                    state, simpleWatertoAirHP.WaterInletNodeNum, 0.5 * simpleWatertoAirHP.RatedWaterVolFlowRate);
+                    state, simpleWatertoAirHP.WaterInNodeNum, 0.5 * simpleWatertoAirHP.RatedWaterVolFlowRate);
                 if (simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
                     auto &companionCoolingCoil(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum));
                     PlantUtilities::RegisterPlantCompDesignFlow(
-                        state, companionCoolingCoil.WaterInletNodeNum, 0.5 * simpleWatertoAirHP.RatedWaterVolFlowRate);
+                        state, companionCoolingCoil.WaterInNodeNum, 0.5 * simpleWatertoAirHP.RatedWaterVolFlowRate);
                 }
             } else if (simpleWatertoAirHP.WAHPType == WatertoAirHP::Cooling) {
                 PlantUtilities::RegisterPlantCompDesignFlow(
-                    state, simpleWatertoAirHP.WaterInletNodeNum, 0.5 * simpleWatertoAirHP.RatedWaterVolFlowRate);
+                    state, simpleWatertoAirHP.WaterInNodeNum, 0.5 * simpleWatertoAirHP.RatedWaterVolFlowRate);
             }
         }
     }
@@ -3284,8 +3279,8 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate * PartLoadRatio;
             PlantUtilities::SetComponentFlowRate(state,
                                                  simpleWatertoAirHP.WaterMassFlowRate,
-                                                 simpleWatertoAirHP.WaterInletNodeNum,
-                                                 simpleWatertoAirHP.WaterOutletNodeNum,
+                                                 simpleWatertoAirHP.WaterInNodeNum,
+                                                 simpleWatertoAirHP.WaterOutNodeNum,
                                                  simpleWatertoAirHP.plantLoc);
             if (simpleWatertoAirHP.WaterMassFlowRate > 0.0) {
                 simpleWatertoAirHP.OutletWaterTemp = state.dataWaterToAirHeatPumpSimple->SourceSideInletTemp +
@@ -3299,8 +3294,8 @@ namespace WaterToAirHeatPumpSimple {
                     simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate;
                     PlantUtilities::SetComponentFlowRate(state,
                                                          simpleWatertoAirHP.WaterMassFlowRate,
-                                                         simpleWatertoAirHP.WaterInletNodeNum,
-                                                         simpleWatertoAirHP.WaterOutletNodeNum,
+                                                         simpleWatertoAirHP.WaterInNodeNum,
+                                                         simpleWatertoAirHP.WaterOutNodeNum,
                                                          simpleWatertoAirHP.plantLoc);
                 } else {
                     simpleWatertoAirHP.WaterMassFlowRate = state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate;
@@ -3501,8 +3496,8 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate * PartLoadRatio;
             PlantUtilities::SetComponentFlowRate(state,
                                                  simpleWatertoAirHP.WaterMassFlowRate,
-                                                 simpleWatertoAirHP.WaterInletNodeNum,
-                                                 simpleWatertoAirHP.WaterOutletNodeNum,
+                                                 simpleWatertoAirHP.WaterInNodeNum,
+                                                 simpleWatertoAirHP.WaterOutNodeNum,
                                                  simpleWatertoAirHP.plantLoc);
             if (simpleWatertoAirHP.WaterMassFlowRate > 0.0) {
                 simpleWatertoAirHP.OutletWaterTemp = state.dataWaterToAirHeatPumpSimple->SourceSideInletTemp -
@@ -3516,8 +3511,8 @@ namespace WaterToAirHeatPumpSimple {
                     simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate;
                     PlantUtilities::SetComponentFlowRate(state,
                                                          simpleWatertoAirHP.WaterMassFlowRate,
-                                                         simpleWatertoAirHP.WaterInletNodeNum,
-                                                         simpleWatertoAirHP.WaterOutletNodeNum,
+                                                         simpleWatertoAirHP.WaterInNodeNum,
+                                                         simpleWatertoAirHP.WaterOutNodeNum,
                                                          simpleWatertoAirHP.plantLoc);
                 } else {
                     simpleWatertoAirHP.WaterMassFlowRate = state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate;
@@ -3548,12 +3543,10 @@ namespace WaterToAirHeatPumpSimple {
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int AirInletNode;
-        int WaterInletNode;
-        int AirOutletNode;
-        int WaterOutletNode;
 
         auto &simpleWatertoAirHP(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum));
+
+        auto &dln = state.dataLoopNodes;
 
         if (!simpleWatertoAirHP.SimFlag) {
             // Heatpump is off; just pass through conditions
@@ -3579,31 +3572,31 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.OutletWaterEnthalpy = simpleWatertoAirHP.InletWaterEnthalpy;
         }
 
-        AirInletNode = simpleWatertoAirHP.AirInletNodeNum;
-        WaterInletNode = simpleWatertoAirHP.WaterInletNodeNum;
-        AirOutletNode = simpleWatertoAirHP.AirOutletNodeNum;
-        WaterOutletNode = simpleWatertoAirHP.WaterOutletNodeNum;
+
+        auto *airInNode = dln->nodes(simpleWatertoAirHP.AirInNodeNum);
+        auto *airOutNode = dln->nodes(simpleWatertoAirHP.AirOutNodeNum);
+        auto *waterOutNode = dln->nodes(simpleWatertoAirHP.WaterOutNodeNum);
 
         // Set the air outlet  nodes of the WatertoAirHPSimple
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
-        state.dataLoopNodes->Node(AirOutletNode).Temp = simpleWatertoAirHP.OutletAirDBTemp;
-        state.dataLoopNodes->Node(AirOutletNode).HumRat = simpleWatertoAirHP.OutletAirHumRat;
-        state.dataLoopNodes->Node(AirOutletNode).Enthalpy = simpleWatertoAirHP.OutletAirEnthalpy;
+        airOutNode->MassFlowRate = airInNode->MassFlowRate;
+        airOutNode->Temp = simpleWatertoAirHP.OutletAirDBTemp;
+        airOutNode->HumRat = simpleWatertoAirHP.OutletAirHumRat;
+        airOutNode->Enthalpy = simpleWatertoAirHP.OutletAirEnthalpy;
 
         // Set the air outlet nodes for properties that just pass through & not used
-        state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
-        state.dataLoopNodes->Node(AirOutletNode).Press = state.dataLoopNodes->Node(AirInletNode).Press;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail;
+        airOutNode->Quality = airInNode->Quality;
+        airOutNode->Press = airInNode->Press;
+        airOutNode->MassFlowRateMin = airInNode->MassFlowRateMin;
+        airOutNode->MassFlowRateMax = airInNode->MassFlowRateMax;
+        airOutNode->MassFlowRateMinAvail = airInNode->MassFlowRateMinAvail;
+        airOutNode->MassFlowRateMaxAvail = airInNode->MassFlowRateMaxAvail;
 
         // Set the water outlet node of the WatertoAirHPSimple
         // Set the water outlet nodes for properties that just pass through & not used
-        PlantUtilities::SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
+        PlantUtilities::SafeCopyPlantNode(state, simpleWatertoAirHP.WaterInNodeNum, simpleWatertoAirHP.WaterOutNodeNum);
 
-        state.dataLoopNodes->Node(WaterOutletNode).Temp = simpleWatertoAirHP.OutletWaterTemp;
-        state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = simpleWatertoAirHP.OutletWaterEnthalpy;
+        waterOutNode->Temp = simpleWatertoAirHP.OutletWaterTemp;
+        waterOutNode->Enthalpy = simpleWatertoAirHP.OutletWaterEnthalpy;
 
         simpleWatertoAirHP.Energy = simpleWatertoAirHP.Power * TimeStepSysSec;
         simpleWatertoAirHP.EnergyLoadTotal = simpleWatertoAirHP.QLoadTotal * TimeStepSysSec;
@@ -3612,10 +3605,10 @@ namespace WaterToAirHeatPumpSimple {
         simpleWatertoAirHP.EnergySource = simpleWatertoAirHP.QSource * TimeStepSysSec;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
+            airOutNode->CO2 = airInNode->CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
+            airOutNode->GenContam = airInNode->GenContam;
         }
 
         if (simpleWatertoAirHP.reportCoilFinalSizes) {
@@ -3959,7 +3952,7 @@ namespace WaterToAirHeatPumpSimple {
 
         WhichCoil = Util::FindItemInList(CoilName, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP);
         if (WhichCoil != 0) {
-            NodeNumber = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).AirInletNodeNum;
+            NodeNumber = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).AirInNodeNum;
         }
 
         if (WhichCoil == 0) {
@@ -4001,7 +3994,7 @@ namespace WaterToAirHeatPumpSimple {
 
         WhichCoil = Util::FindItemInList(CoilName, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP);
         if (WhichCoil != 0) {
-            NodeNumber = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).AirOutletNodeNum;
+            NodeNumber = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).AirOutNodeNum;
         }
 
         if (WhichCoil == 0) {

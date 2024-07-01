@@ -59,11 +59,11 @@ namespace DataPlant {
         std::string TypeOf;      // The 'keyWord' identifying  component type
         std::string Name;        // Component name
         int CompIndex;           // Component Index in whatever is using this component
-        std::string NodeNameIn;  // Component inlet node name
-        std::string NodeNameOut; // Component outlet node name
+        std::string InNodeName;  // Component inlet node name
+        std::string OutNodeName; // Component outlet node name
         bool ON;                 // TRUE = designated component or operation scheme available
-        int NodeNumIn;           // Component inlet node number
-        int NodeNumOut;          // Component outlet node number
+        int InNodeNum = 0;           // Component inlet node number
+        int OutNodeNum = 0;          // Component outlet node number
         bool MeteredVarsFound;
         int NumMeteredVars;
         int EnergyTransComp; // 1=EnergyTransfer, 0=No EnergyTransfer - Reporting flag
@@ -87,7 +87,7 @@ namespace DataPlant {
 
         // Default Constructor
         SubSubcomponentData()
-            : CompIndex(0), ON(true), NodeNumIn(0), NodeNumOut(0), MeteredVarsFound(false), NumMeteredVars(0), EnergyTransComp(0),
+            : CompIndex(0), ON(true), MeteredVarsFound(false), NumMeteredVars(0), EnergyTransComp(0),
               TotPlantSupplyElec(0.0), PlantSupplyElecEff(0.0), PeakPlantSupplyElecEff(0.0), TotPlantSupplyGas(0.0), PlantSupplyGasEff(0.0),
               PeakPlantSupplyGasEff(0.0), TotPlantSupplyPurch(0.0), PlantSupplyPurchEff(0.0), PeakPlantSupplyPurchEff(0.0), TotPlantSupplyOther(0.0),
               PlantSupplyOtherEff(0.0), PeakPlantSupplyOtherEff(0.0), Capacity(0.0), Efficiency(0.0), OpMode(0), AirSysToPlantPtr(0)
@@ -103,10 +103,10 @@ namespace DataPlant {
         int CompIndex;      // Component Index in whatever is using this component
         bool Parent;        // TRUE = designated component is made up of sub-components
         int NumSubSubComps;
-        std::string NodeNameIn;  // Component inlet node name
-        std::string NodeNameOut; // Component outlet node name
-        int NodeNumIn;           // Component inlet node number
-        int NodeNumOut;          // Component outlet node number
+        std::string InNodeName;  // Component inlet node name
+        std::string OutNodeName; // Component outlet node name
+        int InNodeNum = 0;           // Component inlet node number
+        int OutNodeNum = 0;          // Component outlet node number
         bool MeteredVarsFound;
         bool ON; // TRUE = designated component or operation scheme available
         int NumMeteredVars;
@@ -133,7 +133,7 @@ namespace DataPlant {
 
         // Default Constructor
         SubcomponentData()
-            : CompIndex(0), Parent(false), NumSubSubComps(0), NodeNumIn(0), NodeNumOut(0), MeteredVarsFound(false), ON(true), NumMeteredVars(0),
+            : CompIndex(0), Parent(false), NumSubSubComps(0), MeteredVarsFound(false), ON(true), NumMeteredVars(0),
               EnergyTransComp(0), Capacity(0.0), Efficiency(0.0), OpMode(0), TotPlantSupplyElec(0.0), PlantSupplyElecEff(0.0),
               PeakPlantSupplyElecEff(0.0), TotPlantSupplyGas(0.0), PlantSupplyGasEff(0.0), PeakPlantSupplyGasEff(0.0), TotPlantSupplyPurch(0.0),
               PlantSupplyPurchEff(0.0), PeakPlantSupplyPurchEff(0.0), TotPlantSupplyOther(0.0), PlantSupplyOtherEff(0.0),

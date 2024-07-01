@@ -98,7 +98,6 @@ using namespace EnergyPlus::BranchInputManager;
 using namespace EnergyPlus::DataDefineEquip;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -504,10 +503,10 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
         state->dataVariableSpeedCoils->VarSpeedCoil(1).Name;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::CoilVSWAHPCoolingEquationFit;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterInletNodeNum;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut =
-        state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterInNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum =
+        state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterOutNodeNum;
 
     state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
     state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
@@ -517,10 +516,10 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
         state->dataVariableSpeedCoils->VarSpeedCoil(2).Name;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::CoilVSWAHPHeatingEquationFit;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
-        state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut =
-        state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
+        state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum =
+        state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterOutNodeNum;
 
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->FinalZoneSizing.allocate(1);
@@ -872,42 +871,45 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.20;
 
+    auto &dln = state->dataLoopNodes;
+    auto *zoneNode = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum);
     // set zoneNode air condition
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
-                                   state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
+    zoneNode->Temp = 21.1;
+    zoneNode->HumRat = 0.0075;
+    zoneNode->Enthalpy = Psychrometrics::PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat);
 
     state->dataScheduleMgr->Schedule(thisSys.m_FanOpModeSchedPtr).CurrentValue = 1.0; // unit is always on
     state->dataScheduleMgr->Schedule(thisSys.m_SysAvailSchedPtr).CurrentValue = 1.0;  // unit is always available
     state->dataScheduleMgr->Schedule(thisSys.m_FanAvailSchedPtr).CurrentValue = 1.0;  // fan is always available
 
     // initialize mass flow rates
-    state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRate = PrimaryAirMassFlowRate;
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+    dln->nodes(thisSys.AirInNodeNum)->MassFlowRate = HVACInletMassFlowRate;
+
+    auto *oaMixerOutsideAirInNode = dln->nodes(thisSys.m_OAMixerOutsideAirInNodeNum);
+    oaMixerOutsideAirInNode->MassFlowRate = PrimaryAirMassFlowRate;
+    oaMixerOutsideAirInNode->MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
     state->dataFans->fans(1)->maxAirMassFlowRate = HVACInletMassFlowRate;
     state->dataFans->fans(1)->inletAirMassFlowRate = HVACInletMassFlowRate;
     state->dataFans->fans(1)->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataFans->fans(1)->outletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    dln->nodes(state->dataFans->fans(1)->inNodeNum)->MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    dln->nodes(state->dataFans->fans(1)->outNodeNum)->MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
     state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).HumRat = state->dataEnvrn->OutHumRat;
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).Enthalpy = state->dataEnvrn->OutEnthalpy;
+    oaMixerOutsideAirInNode->Temp = state->dataEnvrn->OutDryBulbTemp;
+    oaMixerOutsideAirInNode->HumRat = state->dataEnvrn->OutHumRat;
+    oaMixerOutsideAirInNode->Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
-    state->dataLoopNodes->Node(thisSys.AirInNode).Temp = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
-    state->dataLoopNodes->Node(thisSys.AirInNode).HumRat = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
-    state->dataLoopNodes->Node(thisSys.AirInNode).Enthalpy = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
+    auto *airInNode = dln->nodes(thisSys.AirInNodeNum);
+    airInNode->Temp = zoneNode->Temp;
+    airInNode->HumRat = zoneNode->HumRat;
+    airInNode->Enthalpy = zoneNode->Enthalpy;
 
     state->dataUnitarySystems->unitarySys[0].ControlZoneNum = 1;
     state->dataSize->SysSizingRunDone = false;
@@ -1221,11 +1223,11 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     //		PrimaryAirMassFlowRate = 0.20;
 
     // set zoneNode air condition
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
-                                   state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
+    auto &dln = state->dataLoopNodes;
+    auto *zoneNode = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum);
+    zoneNode->Temp = 21.1;
+    zoneNode->HumRat = 0.0075;
+    zoneNode->Enthalpy = Psychrometrics::PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat);
 
     state->dataUnitarySystems->HeatingLoad = false;
     state->dataUnitarySystems->CoolingLoad = false;
@@ -1240,22 +1242,24 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataFans->fans(1)->maxAirMassFlowRate = HVACInletMassFlowRate;
     state->dataFans->fans(1)->inletAirMassFlowRate = HVACInletMassFlowRate;
     state->dataFans->fans(1)->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataFans->fans(1)->outletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    dln->nodes(state->dataFans->fans(1)->inNodeNum)->MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    dln->nodes(state->dataFans->fans(1)->outNodeNum)->MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
     state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).HumRat = state->dataEnvrn->OutHumRat;
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).Enthalpy = state->dataEnvrn->OutEnthalpy;
+    auto *oaMixerOutsideAirInNode = dln->nodes(thisSys.m_OAMixerOutsideAirInNodeNum);
+    oaMixerOutsideAirInNode->Temp = state->dataEnvrn->OutDryBulbTemp;
+    oaMixerOutsideAirInNode->HumRat = state->dataEnvrn->OutHumRat;
+    oaMixerOutsideAirInNode->Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
-    state->dataLoopNodes->Node(thisSys.AirInNode).Temp = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
-    state->dataLoopNodes->Node(thisSys.AirInNode).HumRat = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
-    state->dataLoopNodes->Node(thisSys.AirInNode).Enthalpy = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
+    auto *airInNode = dln->nodes(thisSys.AirInNodeNum);
+    airInNode->Temp = zoneNode->Temp;
+    airInNode->HumRat = zoneNode->HumRat;
+    airInNode->Enthalpy = zoneNode->Enthalpy;
 
     state->dataSize->SysSizingRunDone = false;
     state->dataSize->ZoneSizingRunDone = false;
@@ -1303,7 +1307,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
     thisSys.simulate(*state, thisSys.Name, FirstHVACIteration, 0, PTUnitNum, HeatActive, CoolActive, 0, 0, true, QUnitOut, latOut);
     EXPECT_NEAR(QUnitOut, 1000.0, 0.01);
-    ASSERT_NEAR(state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow, 0.001);
+    ASSERT_NEAR(airInNode->MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(thisSys.DesignMaxOutletTemp, state->dataHeatingCoils->HeatingCoil(1).OutletAirTemp);
     EXPECT_TRUE(thisSys.m_useNoLoadLowSpeedAirFlow); // because input is blank, doesn't affect no load flow rate because coils are single sped
 
@@ -1311,7 +1315,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0;
     thisSys.simulate(*state, thisSys.Name, FirstHVACIteration, 0, PTUnitNum, HeatActive, CoolActive, 0, 0, true, QUnitOut, latOut);
     EXPECT_NEAR(QUnitOut, 2000.0, 0.01);
-    ASSERT_NEAR(state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow, 0.001);
+    ASSERT_NEAR(airInNode->MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(thisSys.DesignMaxOutletTemp, state->dataHeatingCoils->HeatingCoil(1).OutletAirTemp);
 
     // loads above the lower boundary load should operate above the minimum air flow rate
@@ -1321,7 +1325,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     thisSys.simulate(*state, thisSys.Name, FirstHVACIteration, 0, PTUnitNum, HeatActive, CoolActive, 0, 0, true, QUnitOut, latOut);
     EXPECT_NEAR(QUnitOut, 2010.0, 0.01);
     ASSERT_NEAR(thisSys.DesignMaxOutletTemp, state->dataHeatingCoils->HeatingCoil(1).OutletAirTemp, 0.1);
-    ASSERT_GT(state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow);
+    ASSERT_GT(airInNode->MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow);
 
     // Boundary load for this system in Region 1 at maximum air flow rate is 2995.2 W (upper boundary load of Region 1)
     // system should operate below the maximum air flow rate at loads less than 2995.2 W
@@ -1331,8 +1335,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     thisSys.simulate(*state, thisSys.Name, FirstHVACIteration, 0, PTUnitNum, HeatActive, CoolActive, 0, 0, true, QUnitOut, latOut);
     EXPECT_NEAR(QUnitOut, 2990.0, 0.01);
     ASSERT_NEAR(thisSys.DesignMaxOutletTemp, state->dataHeatingCoils->HeatingCoil(1).OutletAirTemp, 0.1);
-    ASSERT_GT(state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow);
-    ASSERT_LT(state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate, thisSys.MaxHeatAirMassFlow);
+    ASSERT_GT(airInNode->MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow);
+    ASSERT_LT(airInNode->MassFlowRate, thisSys.MaxHeatAirMassFlow);
 
     // Boundary load for this system in Region 1 at maximum air flow rate is 2995.2 W
     // system should operate at maximum air flow rate for loads greater than 2995.2 W
@@ -1342,7 +1346,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     thisSys.simulate(*state, thisSys.Name, FirstHVACIteration, 0, PTUnitNum, HeatActive, CoolActive, 0, 0, true, QUnitOut, latOut);
     EXPECT_NEAR(QUnitOut, 3000.0, 0.01);
     ASSERT_GT(state->dataHeatingCoils->HeatingCoil(1).OutletAirTemp, thisSys.DesignMaxOutletTemp);
-    ASSERT_NEAR(state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate, thisSys.MaxHeatAirMassFlow, 0.0001);
+    ASSERT_NEAR(airInNode->MassFlowRate, thisSys.MaxHeatAirMassFlow, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
@@ -3886,15 +3890,14 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataSimAirServingZones->GetAirLoopInputFlag = false;
     SplitterComponent::GetSplitterInput(*state);
     state->dataUnitarySystems->getInputOnceFlag = false;
+    auto &dln = state->dataLoopNodes;
     for (int i = 1; i <= state->dataGlobal->NumOfZones; ++i) {
         if (!state->dataZoneEquip->ZoneEquipConfig(i).IsControlled) continue;
-        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp =
-            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
-        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat =
-            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).airHumRat;
-        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Enthalpy =
-            Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp,
-                                       state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat);
+        auto *zoneNode = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNodeNum);
+        zoneNode->Temp = state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
+        zoneNode->HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).airHumRat;
+        zoneNode->Enthalpy = Psychrometrics::PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat);
+        
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(i).TotalOutputRequired = -5000.0;
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(i).OutputRequiredToHeatingSP = -1000.0;
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(i).OutputRequiredToCoolingSP = -5000.0;
@@ -3925,12 +3928,12 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataScheduleMgr->Schedule(12).CurrentValue = 21.1; // DOAS SAT
     state->dataScheduleMgr->Schedule(13).CurrentValue = 0.0;  // cyc fan sch, CyclingFanSch
     state->dataScheduleMgr->Schedule(14).CurrentValue = 1.0;  // constant fan sch, ContsFanSch
-    int oaNode = 36;                                          // this node index may change based on component calling order
-    state->dataLoopNodes->Node(oaNode).MassFlowRate = 0.26908 * 1.2;
-    state->dataLoopNodes->Node(oaNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(oaNode).HumRat = state->dataEnvrn->OutHumRat;
-    state->dataLoopNodes->Node(oaNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(oaNode).Temp, state->dataLoopNodes->Node(oaNode).HumRat);
+
+    auto *oaNode = dln->nodes(36);                                          // this node index may change based on component calling order
+    oaNode->MassFlowRate = 0.26908 * 1.2;
+    oaNode->Temp = state->dataEnvrn->OutDryBulbTemp;
+    oaNode->HumRat = state->dataEnvrn->OutHumRat;
+    oaNode->Enthalpy = Psychrometrics::PsyHFnTdbW(oaNode->Temp, oaNode->HumRat);
 
     // local variables
     bool SimZoneEquipment = true;
@@ -3944,25 +3947,23 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     SimAirServingZones::InitAirLoops(*state, FirstHVACIteration);
     SimAirServingZones::SimAirLoopComponents(*state, 1, FirstHVACIteration);
     ZoneEquipmentManager::ManageZoneEquipment(*state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
-    int mixerInletNode = state->dataMixedAir->OAMixer(1).InletNode;
-    int mixerReturnNode = state->dataMixedAir->OAMixer(1).RetNode;
-    int mixerMixedNode = state->dataMixedAir->OAMixer(1).MixNode;
+
+    auto *mixerOutsideAirInNode = dln->nodes(state->dataMixedAir->OAMixer(1).OutsideAirInNodeNum);
+    auto *mixerReturnAirInNode = dln->nodes(state->dataMixedAir->OAMixer(1).ReturnAirInNodeNum);
+    auto *mixerMixedAirOutNode = dln->nodes(state->dataMixedAir->OAMixer(1).MixedAirOutNodeNum);
     // if this EXPECT_EQ fails, node numbers have changed, change OA node number above to match mixerInletNode
-    EXPECT_EQ(36, mixerInletNode);
-    state->dataLoopNodes->Node(mixerInletNode).MassFlowRate = 0.26908 * 1.2;
-    state->dataLoopNodes->Node(mixerInletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(mixerInletNode).HumRat = state->dataEnvrn->OutHumRat;
-    state->dataLoopNodes->Node(mixerReturnNode).MassFlowRate = 0.26908 * 1.2;
-    state->dataLoopNodes->Node(mixerMixedNode).MassFlowRateMaxAvail = 0.26908 * 1.2;
+    EXPECT_EQ(36, state->dataMixedAir->OAMixer(1).OutsideAirInNodeNum);
+    mixerOutsideAirInNode->MassFlowRate = 0.26908 * 1.2;
+    mixerOutsideAirInNode->Temp = state->dataEnvrn->OutDryBulbTemp;
+    mixerOutsideAirInNode->HumRat = state->dataEnvrn->OutHumRat;
+    mixerReturnAirInNode->MassFlowRate = 0.26908 * 1.2;
+    mixerMixedAirOutNode->MassFlowRateMaxAvail = 0.26908 * 1.2;
     for (int i = 1; i <= state->dataGlobal->NumOfZones; ++i) {
         if (!state->dataZoneEquip->ZoneEquipConfig(i).IsControlled) continue;
-        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp =
-            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
-        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat =
-            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).airHumRat;
-        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Enthalpy =
-            Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp,
-                                       state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat);
+        auto *zoneNode = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNodeNum);
+        zoneNode->Temp = state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
+        zoneNode->HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).airHumRat;
+        zoneNode->Enthalpy = Psychrometrics::PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat);
     }
 
     state->dataGlobal->BeginEnvrnFlag = false;
@@ -3971,12 +3972,12 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     ZoneEquipmentManager::SimZoneEquipment(*state, FirstHVACIteration, SimAirLoops);
     Real64 Inletmdot = 0.0;
     Real64 outletmdot = 0.0;
-    for (int NodeNum = 1; NodeNum <= state->dataZonePlenum->ZoneRetPlenCond(1).NumInletNodes; ++NodeNum) {
+    for (int NodeNum = 1; NodeNum <= state->dataZonePlenum->ZoneRetPlenCond(1).NumInNodes; ++NodeNum) {
         // Get node conditions
-        Inletmdot = Inletmdot + state->dataLoopNodes->Node(state->dataZonePlenum->ZoneRetPlenCond(1).InletNode(NodeNum)).MassFlowRate;
+        Inletmdot = Inletmdot + dln->nodes(state->dataZonePlenum->ZoneRetPlenCond(1).InNodeNums(NodeNum))->MassFlowRate;
     }
     for (int NodeNum = 1; NodeNum <= state->dataZonePlenum->ZoneRetPlenCond(1).NumInducedNodes; ++NodeNum) {
-        outletmdot = outletmdot + state->dataLoopNodes->Node(state->dataZonePlenum->ZoneRetPlenCond(1).InducedNode(NodeNum)).MassFlowRate;
+        outletmdot = outletmdot + dln->nodes(state->dataZonePlenum->ZoneRetPlenCond(1).InducedNodeNums(NodeNum))->MassFlowRate;
     }
     outletmdot = outletmdot + state->dataZonePlenum->ZoneRetPlenCond(1).OutletMassFlowRate;
 
@@ -3992,90 +3993,95 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
 
     // System 1 draw air from return node with InletSide of ATMixer
     std::string PTUnit1Name = state->dataUnitarySystems->unitarySys[0].Name;
-    int PTUnit1AirInNode = state->dataUnitarySystems->unitarySys[0].AirInNode;
-    int PTUnit1AirOutNode = state->dataUnitarySystems->unitarySys[0].AirOutNode;
+
+    int ptUnit1AirInNodeNum = state->dataUnitarySystems->unitarySys[0].AirInNodeNum;
+    auto *ptUnit1AirInNode = dln->nodes(ptUnit1AirInNodeNum);
+    auto *ptUnit1AirOutNode = dln->nodes(state->dataUnitarySystems->unitarySys[0].AirOutNodeNum);
     int ATMixer1Index = state->dataUnitarySystems->unitarySys[0].m_ATMixerIndex;
-    int ATMixer1PriInNode = state->dataSingleDuct->SysATMixer(ATMixer1Index).PriInNode;
-    int ATMixer1SecInNode = state->dataSingleDuct->SysATMixer(ATMixer1Index).SecInNode;
-    int ATMixer1AirOutNode = state->dataSingleDuct->SysATMixer(ATMixer1Index).MixedAirOutNode;
-    int zoneRetPlenumInletNode = state->dataZonePlenum->ZoneRetPlenCond(1).InletNode(1);
-    int zone1ReturnNode = state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1);
+    auto *atMixer1PriAirInNode = dln->nodes(state->dataSingleDuct->SysATMixer(ATMixer1Index).PriAirInNodeNum);
+    auto *atMixer1SecAirInNode = dln->nodes(state->dataSingleDuct->SysATMixer(ATMixer1Index).SecAirInNodeNum);
+    int atMixer1MixedAirOutNodeNum = state->dataSingleDuct->SysATMixer(ATMixer1Index).MixedAirOutNodeNum;
+    auto *atMixer1MixedAirOutNode = dln->nodes(atMixer1MixedAirOutNodeNum);
+    int zoneRetPlenumInNodeNum = state->dataZonePlenum->ZoneRetPlenCond(1).InNodeNums(1);
+    auto *zoneRetPlenumInNode = dln->nodes(zoneRetPlenumInNodeNum);
+    int zone1ReturnNodeNum = state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeNums(1);
+    auto *zone1ReturnNode = dln->nodes(zone1ReturnNodeNum);
 
     // *** difference between develop and this branch is that now the air loop is on, this zone ret node Mdot > 0
-    EXPECT_EQ(zone1ReturnNode, zoneRetPlenumInletNode);
-    EXPECT_EQ(PTUnit1AirInNode, ATMixer1AirOutNode);
+    EXPECT_EQ(zone1ReturnNodeNum, zoneRetPlenumInNodeNum);
+    EXPECT_EQ(ptUnit1AirInNodeNum, atMixer1MixedAirOutNodeNum);
 
     // original develop test, fails in this branch
-    // EXPECT_NEAR(23.153277047505515, state->dataLoopNodes->Node(11).Temp, 0.001);
+    // EXPECT_NEAR(23.153277047505515, dln->Node(11).Temp, 0.001);
 
     // ATMixer primary air inlet node, or air loop SAT, T = OAT + fan heat
-    EXPECT_NEAR(31.1803, state->dataLoopNodes->Node(ATMixer1PriInNode).Temp, 0.001);
-    EXPECT_NEAR(0.0015, state->dataLoopNodes->Node(ATMixer1PriInNode).HumRat, 0.001);
-    EXPECT_NEAR(35169.5566, state->dataLoopNodes->Node(ATMixer1PriInNode).Enthalpy, 0.001);
+    EXPECT_NEAR(31.1803, atMixer1PriAirInNode->Temp, 0.001);
+    EXPECT_NEAR(0.0015, atMixer1PriAirInNode->HumRat, 0.001);
+    EXPECT_NEAR(35169.5566, atMixer1PriAirInNode->Enthalpy, 0.001);
 
     // *** this next test is different from develop, air loop is on, this pri/ret flow was 0 before
-    EXPECT_NEAR(0.0356976, state->dataLoopNodes->Node(ATMixer1PriInNode).MassFlowRate, 0.001);
-    EXPECT_NEAR(0.0356976, state->dataLoopNodes->Node(zone1ReturnNode).MassFlowRate, 0.001);
+    EXPECT_NEAR(0.0356976, atMixer1PriAirInNode->MassFlowRate, 0.001);
+    EXPECT_NEAR(0.0356976, zone1ReturnNode->MassFlowRate, 0.001);
 
     // zone exhaust node, which is same as T=23.15327704 above, which means air loop was off, SA Mdot=0 (verified)
-    EXPECT_NEAR(23.153277, state->dataLoopNodes->Node(ATMixer1SecInNode).Temp, 0.001);
+    EXPECT_NEAR(23.153277, atMixer1SecAirInNode->Temp, 0.001);
     // note same as ATMixer primary inlet humrat = 0.0015
-    EXPECT_NEAR(0.0015, state->dataLoopNodes->Node(ATMixer1SecInNode).HumRat, 0.001);
-    EXPECT_NEAR(23903.9785, state->dataLoopNodes->Node(ATMixer1SecInNode).Enthalpy, 0.001);
-    EXPECT_NEAR(0.2883384, state->dataLoopNodes->Node(ATMixer1SecInNode).MassFlowRate, 0.001);
+    EXPECT_NEAR(0.0015, atMixer1SecAirInNode->HumRat, 0.001);
+    EXPECT_NEAR(23903.9785, atMixer1SecAirInNode->Enthalpy, 0.001);
+    EXPECT_NEAR(0.2883384, atMixer1SecAirInNode->MassFlowRate, 0.001);
 
     // same temperature test as above commented out test (23.15327704750551), now shows 21.2 C
     // how do you mix 2 air streams with T1in=31.18 and T2in=23.15 and get Tout=21.23 ??
     // must be a node enthalpy issue with this unit test?
-    EXPECT_NEAR(21.2316, state->dataLoopNodes->Node(ATMixer1AirOutNode).Temp, 0.001);
-    EXPECT_NEAR(0.324036, state->dataLoopNodes->Node(ATMixer1AirOutNode).MassFlowRate, 0.001);
+    EXPECT_NEAR(21.2316, atMixer1MixedAirOutNode->Temp, 0.001);
+    EXPECT_NEAR(0.324036, atMixer1MixedAirOutNode->MassFlowRate, 0.001);
 
     // mass balance zone 1 ATMixer outlet enthalpy based on pri and sec inlet stream enthalpy
-    Real64 ATMixerPriEnthlapy = state->dataLoopNodes->Node(ATMixer1PriInNode).Enthalpy;
-    Real64 ATMixerSecEnthlapy = state->dataLoopNodes->Node(ATMixer1SecInNode).Enthalpy;
-    Real64 ATMixerPriMassFlow = state->dataLoopNodes->Node(ATMixer1PriInNode).MassFlowRate;
-    Real64 ATMixerSecMassFlow = state->dataLoopNodes->Node(ATMixer1SecInNode).MassFlowRate;
+    Real64 ATMixerPriEnthlapy = atMixer1PriAirInNode->Enthalpy;
+    Real64 ATMixerSecEnthlapy = atMixer1SecAirInNode->Enthalpy;
+    Real64 ATMixerPriMassFlow = atMixer1PriAirInNode->MassFlowRate;
+    Real64 ATMixerSecMassFlow = atMixer1SecAirInNode->MassFlowRate;
     Real64 mixedEnthalpy =
         ((ATMixerPriEnthlapy * ATMixerPriMassFlow) + (ATMixerSecEnthlapy * ATMixerSecMassFlow)) / (ATMixerSecMassFlow + ATMixerPriMassFlow);
-    EXPECT_NEAR(mixedEnthalpy, state->dataLoopNodes->Node(ATMixer1AirOutNode).Enthalpy, 0.001);
-    EXPECT_TRUE(state->dataLoopNodes->Node(ATMixer1AirOutNode).Temp < state->dataLoopNodes->Node(10).Temp);
+    EXPECT_NEAR(mixedEnthalpy, atMixer1MixedAirOutNode->Enthalpy, 0.001);
+    EXPECT_TRUE(atMixer1MixedAirOutNode->Temp < dln->nodes(10)->Temp);
 
     // mass balance 1 supply (zone inlet node), 2 outlets (zone exhaust and return)
     // In develop prior to pulling PTUnits into UnitarySystem, this test used nodes 4 compared to 12 + 11
     // 4 was PTUnit outlet node, 12 was zone return node and 11 was ATMixer secondary node
-    EXPECT_NEAR(state->dataLoopNodes->Node(PTUnit1AirOutNode).MassFlowRate,
-                state->dataLoopNodes->Node(zone1ReturnNode).MassFlowRate + state->dataLoopNodes->Node(ATMixer1SecInNode).MassFlowRate,
+    EXPECT_NEAR(ptUnit1AirOutNode->MassFlowRate,
+                zone1ReturnNode->MassFlowRate + atMixer1SecAirInNode->MassFlowRate,
                 0.001);
 
     // System 2 use AirTerminal:SingleDuct:ConstantVolume:NoReheat
     // mass balance 2 inlets (zone inlet nodes), 1 outlet (zone return node)
-    int zone2ReturnNode = state->dataZoneEquip->ZoneEquipConfig(3).ReturnNode(1);
-    int zone2InletNode1 = state->dataZoneEquip->ZoneEquipConfig(3).InletNode(1);
-    int zone2InletNode2 = state->dataZoneEquip->ZoneEquipConfig(3).InletNode(2);
-    EXPECT_NEAR(state->dataLoopNodes->Node(zone2ReturnNode).MassFlowRate,
-                state->dataLoopNodes->Node(zone2InletNode1).MassFlowRate + state->dataLoopNodes->Node(zone2InletNode2).MassFlowRate,
+    auto *zone2ReturnNode = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(3).ReturnNodeNums(1));
+    auto *zone2InletNode1 = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(3).InNodeNums(1));
+    auto *zone2InletNode2 = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(3).InNodeNums(2));
+    EXPECT_NEAR(zone2ReturnNode->MassFlowRate,
+                zone2InletNode1->MassFlowRate + zone2InletNode2->MassFlowRate,
                 0.001);
 
     // System 3 use ATMixer with InletSide. PTAC draw from induce node
     // mass balance 1 inlets (zone inlet), 1 outlet (zone return)
-    int zone3ReturnNode = state->dataZoneEquip->ZoneEquipConfig(4).ReturnNode(1);
-    int zone3InletNode1 = state->dataZoneEquip->ZoneEquipConfig(4).InletNode(1);
-    EXPECT_NEAR(state->dataLoopNodes->Node(zone3InletNode1).MassFlowRate, state->dataLoopNodes->Node(zone3ReturnNode).MassFlowRate, 0.001);
+    auto *zone3ReturnNode = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(4).ReturnNodeNums(1));
+    auto *zone3InletNode1 = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(4).InNodeNums(1));
+    EXPECT_NEAR(zone3InletNode1->MassFlowRate, zone3ReturnNode->MassFlowRate, 0.001);
 
     //// System 4 use ATMixer with supply side, PTAC draw air from exhaust node
     // mass balance 1 inlet (zone inlet), 2 outlets (zone exhaust and return)
-    int zone4ReturnNode = state->dataZoneEquip->ZoneEquipConfig(5).ReturnNode(1);
-    int zone4InletNode1 = state->dataZoneEquip->ZoneEquipConfig(5).InletNode(1);
-    int zone4ExhaustNode1 = state->dataZoneEquip->ZoneEquipConfig(5).ExhaustNode(1);
-    EXPECT_NEAR(state->dataLoopNodes->Node(zone4InletNode1).MassFlowRate,
-                state->dataLoopNodes->Node(zone4ExhaustNode1).MassFlowRate + state->dataLoopNodes->Node(zone4ReturnNode).MassFlowRate,
+    auto *zone4ReturnNode = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(5).ReturnNodeNums(1));
+    auto *zone4InletNode1 = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(5).InNodeNums(1));
+    auto *zone4ExhaustNode1 = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(5).ExhaustNodeNums(1));
+    EXPECT_NEAR(zone4InletNode1->MassFlowRate,
+                zone4ExhaustNode1->MassFlowRate + zone4ReturnNode->MassFlowRate,
                 0.001);
 
     // System 5 use ATMixer with supply side, PTAC draw air from induce node
     // mass balance Return = Supply
-    int zone5ReturnNode = state->dataZoneEquip->ZoneEquipConfig(6).ReturnNode(1);
-    int zone5InletNode1 = state->dataZoneEquip->ZoneEquipConfig(6).InletNode(1);
-    EXPECT_NEAR(state->dataLoopNodes->Node(zone5InletNode1).MassFlowRate, state->dataLoopNodes->Node(zone5ReturnNode).MassFlowRate, 0.001);
+    auto *zone5ReturnNode = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(6).ReturnNodeNums(1));
+    auto *zone5InletNode1 = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(6).InNodeNums(1));
+    EXPECT_NEAR(zone5InletNode1->MassFlowRate, zone5ReturnNode->MassFlowRate, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
@@ -4305,16 +4311,16 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", isZoneEquipment, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
 
-    int zoneSupplyInlet = Util::FindItemInList("SPACE1-1 SUPPLY INLET", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    int zoneExhaustNode = Util::FindItemInList("SPACE1-1 HP INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneSupplyInNodeNum = Node::GetNodeIndex(*state, "SPACE1-1 SUPPLY INLET");
+    int zoneExhaustNodeNum = Node::GetNodeIndex(*state, "SPACE1-1 HP INLET NODE");
     int zoneNum = Util::FindItemInList("SPACE1-1", state->dataHeatBal->Zone);
 
     // Test 1 - PTAC Inlet node is zone exhaust node
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
     EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", thisSys.UnitType); // zoneHVAC equipment type
-    EXPECT_EQ(zoneExhaustNode, thisSys.AirInNode);
-    EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
-    EXPECT_EQ(zoneExhaustNode, thisSys.m_ZoneInletNode);
+    EXPECT_EQ(zoneExhaustNodeNum, thisSys.AirInNodeNum);
+    EXPECT_EQ(zoneSupplyInNodeNum, thisSys.AirOutNodeNum);
+    EXPECT_EQ(zoneExhaustNodeNum, thisSys.m_ZoneInNodeNum);
     EXPECT_EQ(zoneNum, thisSys.ControlZoneNum);
 
     // Test 2 - PTAC Inlet node is plenum induced air node
@@ -4329,10 +4335,11 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     thisSys.processInputSpec(*state, thisSys.input_specs, sysNum, errorsFound, isZoneEquipment, zoneOAUnit);
     ASSERT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(errorsFound);
-    int plenumInducedNode = Util::FindItemInList("PLENUM INDUCED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    EXPECT_EQ(plenumInducedNode, thisSys.AirInNode);
-    EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
-    EXPECT_EQ(zoneSupplyInlet, thisSys.m_ZoneInletNode);
+
+    int plenumInducedNodeNum = Node::GetNodeIndex(*state, "PLENUM INDUCED AIR NODE");
+    EXPECT_EQ(plenumInducedNodeNum, thisSys.AirInNodeNum);
+    EXPECT_EQ(zoneSupplyInNodeNum, thisSys.AirOutNodeNum);
+    EXPECT_EQ(zoneSupplyInNodeNum, thisSys.m_ZoneInNodeNum);
     EXPECT_EQ(zoneNum, thisSys.ControlZoneNum);
 
     // Test 3 - PTAC Inlet node not found
@@ -4359,10 +4366,10 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
 
     ASSERT_TRUE(compare_err_stream(error_string, true));
     ASSERT_TRUE(errorsFound);
-    int someOtherNode = Util::FindItemInList("SOME OTHER NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    EXPECT_EQ(someOtherNode, thisSys.AirInNode);
-    EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
-    EXPECT_EQ(zoneSupplyInlet, thisSys.m_ZoneInletNode);
+    int someOtherNodeNum = Node::GetNodeIndex(*state, "SOME OTHER NODE");
+    EXPECT_EQ(someOtherNodeNum, thisSys.AirInNodeNum);
+    EXPECT_EQ(zoneSupplyInNodeNum, thisSys.AirOutNodeNum);
+    EXPECT_EQ(zoneSupplyInNodeNum, thisSys.m_ZoneInNodeNum);
     EXPECT_EQ(zoneNum, thisSys.ControlZoneNum);
 }
 
@@ -4574,13 +4581,13 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     state->dataUnitarySystems->getInputOnceFlag = false;
     EXPECT_FALSE(errorsFound);
 
-    int zoneSupplyInlet = Util::FindItemInList("THERMAL ZONE ONE INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    int zoneExhaustNode = Util::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneSupplyInNodeNum = Node::GetNodeIndex(*state, "THERMAL ZONE ONE INLET NODE");
+    int zoneExhaustNodeNum = Node::GetNodeIndex(*state, "THERMAL ZONE ONE EXHAUST NODE");
     // test PTHP node connections
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
     EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", thisSys.UnitType);
-    EXPECT_EQ(zoneExhaustNode, thisSys.AirInNode);
-    EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
+    EXPECT_EQ(zoneExhaustNodeNum, thisSys.AirInNodeNum);
+    EXPECT_EQ(zoneSupplyInNodeNum, thisSys.AirOutNodeNum);
 
     thisSys.ControlZoneNum = 1;
     // set outdoor air conditions
@@ -4590,24 +4597,22 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.20;
 
+    auto &dln = state->dataLoopNodes;
     // set zone air conditions
-    auto &zoneAirNode =
-        state->dataLoopNodes->Node(Util::FindItemInList("THERMAL ZONE ONE AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    zoneAirNode.Temp = 20.0;
-    zoneAirNode.HumRat = 0.003;
-    zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
+    auto *zoneAirNode = dln->nodes(Node::GetNodeIndex(*state, "THERMAL ZONE ONE AIR NODE"));
+    zoneAirNode->Temp = 20.0;
+    zoneAirNode->HumRat = 0.003;
+    zoneAirNode->Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode->Temp, zoneAirNode->HumRat);
     // set mixed air conditions
-    auto &mixedAirNode = state->dataLoopNodes->Node(
-        Util::FindItemInList("PTHP THERMAL ZONE ONE MIXED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    mixedAirNode.Temp = 10.0;
-    mixedAirNode.HumRat = 0.003;
-    mixedAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode.Temp, mixedAirNode.HumRat);
+    auto *mixedAirNode = dln->nodes(Node::GetNodeIndex(*state, "PTHP THERMAL ZONE ONE MIXED AIR NODE"));
+    mixedAirNode->Temp = 10.0;
+    mixedAirNode->HumRat = 0.003;
+    mixedAirNode->Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode->Temp, mixedAirNode->HumRat);
     // set zone exhaust node
-    auto &zoneExhNode = state->dataLoopNodes->Node(
-        Util::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    zoneExhNode.Temp = 20.0;
-    zoneExhNode.HumRat = 0.003;
-    zoneExhNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneExhNode.Temp, zoneExhNode.HumRat);
+    auto *zoneExhNode = dln->nodes(Node::GetNodeIndex(*state, "THERMAL ZONE ONE EXHAUST NODE"));
+    zoneExhNode->Temp = 20.0;
+    zoneExhNode->HumRat = 0.003;
+    zoneExhNode->Enthalpy = Psychrometrics::PsyHFnTdbW(zoneExhNode->Temp, zoneExhNode->HumRat);
 
     // set sizing parameters
     state->dataSize->SysSizingRunDone = true;
@@ -4917,34 +4922,38 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     HVACInletMassFlowRate = 0.0;
     PrimaryAirMassFlowRate = 0.0;
     // set zoneNode air condition
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
-    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
-                                   state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
+    auto &dln = state->dataLoopNodes;
+    auto *zoneNode = dln->nodes(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum);
+    zoneNode->Temp = 21.1;
+    zoneNode->HumRat = 0.0075;
+    zoneNode->Enthalpy = Psychrometrics::PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat);
     state->dataScheduleMgr->Schedule(thisSys.m_FanOpModeSchedPtr).CurrentValue = 1.0;
     state->dataScheduleMgr->Schedule(thisSys.m_SysAvailSchedPtr).CurrentValue = 1.0;
     state->dataScheduleMgr->Schedule(thisSys.m_FanAvailSchedPtr).CurrentValue = 1.0;
     // initialize mass flow rates
-    state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRate = PrimaryAirMassFlowRate;
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+    auto *airInNode = dln->nodes(thisSys.AirInNodeNum);
+    auto *oaMixerOutsideAirInNode = dln->nodes(thisSys.m_OAMixerOutsideAirInNodeNum);
+    airInNode->MassFlowRate = HVACInletMassFlowRate;
+    oaMixerOutsideAirInNode->MassFlowRate = PrimaryAirMassFlowRate;
+    oaMixerOutsideAirInNode->MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
     // set fan parameters
-    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->inletNodeNum).MassFlowRateMax = 1.0;
-    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->inletNodeNum).MassFlowRate = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->outletNodeNum).MassFlowRate = HVACInletMassFlowRate;
+    auto *fanInNode = dln->nodes(state->dataFans->fans(thisSys.m_FanIndex)->inNodeNum);
+    auto *fanOutNode = dln->nodes(state->dataFans->fans(thisSys.m_FanIndex)->outNodeNum);
+    fanInNode->MassFlowRateMax = 1.0;
+    fanInNode->MassFlowRate = HVACInletMassFlowRate;
+    fanInNode->MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    fanOutNode->MassFlowRate = HVACInletMassFlowRate;
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
     state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
     // set oa mixer conditions
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).HumRat = state->dataEnvrn->OutHumRat;
-    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).Enthalpy = state->dataEnvrn->OutEnthalpy;
+    oaMixerOutsideAirInNode->Temp = state->dataEnvrn->OutDryBulbTemp;
+    oaMixerOutsideAirInNode->HumRat = state->dataEnvrn->OutHumRat;
+    oaMixerOutsideAirInNode->Enthalpy = state->dataEnvrn->OutEnthalpy;
     // set secondary air conditions
-    state->dataLoopNodes->Node(thisSys.AirInNode).Temp = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
-    state->dataLoopNodes->Node(thisSys.AirInNode).HumRat = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
-    state->dataLoopNodes->Node(thisSys.AirInNode).Enthalpy = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
+    airInNode->Temp = zoneNode->Temp;
+    airInNode->HumRat = zoneNode->HumRat;
+    airInNode->Enthalpy = zoneNode->Enthalpy;
     state->dataUnitarySystems->unitarySys[0].ControlZoneNum = 1;
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
@@ -5021,7 +5030,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     auto &sysAvailMgr = state->dataAvail->NightCycleData(1);
     // check the three cycling run time control types
     EXPECT_EQ(1, state->dataAvail->NumNCycSysAvailMgrs);
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, sysAvailMgr.cyclingRunTimeControl));
+    EXPECT_ENUM_EQ(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, sysAvailMgr.cyclingRunTimeControl);
     // test for initialization and does not crash
     ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
 

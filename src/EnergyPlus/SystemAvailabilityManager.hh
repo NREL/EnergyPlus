@@ -270,13 +270,13 @@ namespace Avail {
     struct SysAvailManagerDiffThermo : SysAvailManager // Derived type for Differential Thermostat Sys Avail Managers
     {
         // Members
-        int HotNode;        // "Hot" sensor node
-        int ColdNode;       // "Cold" sensor node
+        int HotNodeNum = 0;        // "Hot" sensor node
+        int ColdNodeNum = 0;       // "Cold" sensor node
         Real64 TempDiffOn;  // Temperature difference for turn on (delta C)
         Real64 TempDiffOff; // Temperature difference for turn off (delta C)
 
         // Default Constructor
-        SysAvailManagerDiffThermo() : HotNode(0), ColdNode(0), TempDiffOn(0.0), TempDiffOff(0.0)
+        SysAvailManagerDiffThermo() : TempDiffOn(0.0), TempDiffOff(0.0)
         {
         }
     };
@@ -284,11 +284,11 @@ namespace Avail {
     struct SysAvailManagerHiLoTemp : SysAvailManager // Derived type for High/Low Temperature On/Off Sys Avail Managers
     {
         // Members
-        int Node;    // Sensor node
+        int NodeNum = 0;    // Sensor node
         Real64 Temp; // Temperature for on/off (C)
 
         // Default Constructor
-        SysAvailManagerHiLoTemp() : Node(0), Temp(0.0)
+        SysAvailManagerHiLoTemp() : Temp(0.0)
         {
         }
     };
@@ -342,7 +342,7 @@ namespace Avail {
         std::string AirLoopName;                              // Name of HVAC Air Loop
         int AirLoopNum;                                       // HVAC Air Loop number
         std::string ControlZoneName;                          // Controlled zone name
-        int NodeNumOfControlledZone;                          // Controlled zone node number
+        int ControlledZoneNodeNum = 0;                          // Controlled zone node number
         int ControlledZoneNum;                                // Controlled zone number
         int ControlModeSchedPtr;                              // Ventilation control mode schedule pointer
         VentCtrlType ctrlType = VentCtrlType::No;             // hybrid ventilation control mode
@@ -389,7 +389,7 @@ namespace Avail {
 
         // Default Constructor
         SysAvailManagerHybridVent()
-            : AirLoopNum(0), NodeNumOfControlledZone(0), ControlledZoneNum(0), ControlModeSchedPtr(0), MinOutdoorTemp(-100.0), MaxOutdoorTemp(100.0),
+            : AirLoopNum(0), ControlledZoneNum(0), ControlModeSchedPtr(0), MinOutdoorTemp(-100.0), MaxOutdoorTemp(100.0),
               MinOutdoorEnth(0.1), MaxOutdoorEnth(300000.0), MinOutdoorDewPoint(-100.0), MaxOutdoorDewPoint(100.0), MaxWindSpeed(0.0),
               UseRainIndicator(true), MinOASchedPtr(0), DewPointNoRHErrCount(0), DewPointNoRHErrIndex(0), DewPointErrCount(0), DewPointErrIndex(0),
               SingleHCErrCount(0), SingleHCErrIndex(0), OpeningFactorFWS(0), ANControlTypeSchedPtr(0), SimpleControlTypeSchedPtr(0),

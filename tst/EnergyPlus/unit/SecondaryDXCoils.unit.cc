@@ -158,7 +158,10 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate = 0.0;
 
     state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
-    state->dataLoopNodes->Node.allocate(2);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
+
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 10.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.003;
@@ -167,8 +170,9 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilRatedSHR = 1.0;
 
     state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataDXCoils->DXCoil(DXCoilNum).AirInNode = 2;
-    state->dataLoopNodes->Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
+    state->dataDXCoils->DXCoil(DXCoilNum).AirInNodeNum = 2;
+
+    dln->nodes(state->dataDXCoils->DXCoil(DXCoilNum).AirInNodeNum)->Temp = 20.0;
     InitializePsychRoutines(*state);
 
     CalcSecondaryDXCoils(*state, DXCoilNum);
@@ -212,7 +216,6 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
 
     // cleanup
     state->dataDXCoils->DXCoil.deallocate();
-    state->dataLoopNodes->Node.deallocate();
 }
 TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
 {
@@ -239,7 +242,10 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate = 0.0;
 
     state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
-    state->dataLoopNodes->Node.allocate(2);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
+
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 10.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.003;
@@ -258,8 +264,8 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
     state->dataDXCoils->DXCoil(DXCoilNum).MSSpeedNumLS = 1;
 
     state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataDXCoils->DXCoil(DXCoilNum).AirInNode = 2;
-    state->dataLoopNodes->Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
+    state->dataDXCoils->DXCoil(DXCoilNum).AirInNodeNum = 2;
+    dln->nodes(state->dataDXCoils->DXCoil(DXCoilNum).AirInNodeNum)->Temp = 20.0;
     InitializePsychRoutines(*state);
 
     CalcSecondaryDXCoils(*state, DXCoilNum);
@@ -272,5 +278,4 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilSHRFT.deallocate();
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilSHRFF.deallocate();
     state->dataDXCoils->DXCoil.deallocate();
-    state->dataLoopNodes->Node.deallocate();
 }

@@ -86,7 +86,7 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::WaterSource;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Name = "FLUIDSOURCE";
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).InNodeNum = 1;
 
     // define the INOUT variables that are passed back
     Real64 myLoad = 0.0;
@@ -101,9 +101,9 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     // We can check that GetInput happened properly here
     EXPECT_EQ(1u, state->dataPlantCompTempSrc->WaterSource.size());
     auto &waterSource1 = state->dataPlantCompTempSrc->WaterSource(1);
-    EXPECT_TRUE(compare_enums(PlantComponentTemperatureSources::TempSpecType::Constant, waterSource1.tempSpecType));
-    EXPECT_EQ(1, waterSource1.InletNodeNum);
-    EXPECT_EQ(2, waterSource1.OutletNodeNum);
+    EXPECT_ENUM_EQ(PlantComponentTemperatureSources::TempSpecType::Constant, waterSource1.tempSpecType);
+    EXPECT_EQ(1, waterSource1.InNodeNum);
+    EXPECT_EQ(2, waterSource1.OutNodeNum);
 
     // Second call is on firstHVAC, no load at the moment
     firstHVACIteration = true;

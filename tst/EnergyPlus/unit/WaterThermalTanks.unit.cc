@@ -536,8 +536,8 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
     for (int i = 1; i <= state->dataWaterThermalTanks->numHeatPumpWaterHeater; ++i) {
         auto const &HPWH = state->dataWaterThermalTanks->HPWaterHeater(i);
         auto const &Tank = state->dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
-        EXPECT_EQ(HPWH.CondWaterInletNode, Tank.SourceOutletNode);
-        EXPECT_EQ(HPWH.CondWaterOutletNode, Tank.SourceInletNode);
+        EXPECT_EQ(HPWH.CondWaterInNodeNum, Tank.SourceOutNodeNum);
+        EXPECT_EQ(HPWH.CondWaterOutNodeNum, Tank.SourceInNodeNum);
     }
 }
 
@@ -741,11 +741,11 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     Tank.Node(11).SavedTemp = 51.191115456317263;
     Tank.Node(12).SavedTemp = 50.719215567792681;
     Tank.TankTemp = 0.0;
-    for (int i = 1; i <= Tank.Nodes; ++i) {
+    for (int i = 1; i <= Tank.NumNodes; ++i) {
         Tank.Node(i).Temp = Tank.Node(i).SavedTemp;
         Tank.TankTemp += Tank.Node(i).Temp;
     }
-    Tank.TankTemp /= Tank.Nodes;
+    Tank.TankTemp /= Tank.NumNodes;
     Tank.SavedHeaterOn1 = false;
     Tank.HeaterOn1 = Tank.SavedHeaterOn1;
     Tank.SavedHeaterOn2 = false;
@@ -780,7 +780,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     const Real64 HeatFromCoil = Coil.TotalHeatingEnergyRate * state->dataHVACGlobal->TimeStepSysSec; // J
     Real64 TankEnergySum = 0;
-    for (int i = 1; i <= Tank.Nodes; ++i) {
+    for (int i = 1; i <= Tank.NumNodes; ++i) {
         const WaterThermalTanks::StratifiedNodeData &Node = Tank.Node(i);
 
         // I don't want to have to deal with source or use side heat transfer, so verify it's not happening.
@@ -799,9 +799,9 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     // ValidateFuelType tests for WaterHeater:Stratified
     WaterThermalTanks::getWaterHeaterStratifiedInput(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, Constant::eFuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, Constant::eFuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, Constant::eFuel::Electricity));
+    EXPECT_ENUM_EQ(Tank.FuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OffCycParaFuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OnCycParaFuelType, Constant::eFuel::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, HPWHSizing)
@@ -1422,8 +1422,9 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     state->dataHVACGlobal->DXCoilTotalCapacity = 3500.0;
     state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
-    state->dataLoopNodes->Node(3).Temp = 30.0;
-    state->dataLoopNodes->Node(3).HumRat = 0.01;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(3)->Temp = 30.0;
+    dln->nodes(3)->HumRat = 0.01;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool FirstHVACIteration(true);
@@ -1532,9 +1533,9 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     // ValidateFuelType tests for WaterHeater:Mixed
     WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, Constant::eFuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, Constant::eFuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, Constant::eFuel::Electricity));
+    EXPECT_ENUM_EQ(Tank.FuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OffCycParaFuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OnCycParaFuelType, Constant::eFuel::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
@@ -1607,7 +1608,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
 
-    for (int i = 1; i <= Tank.Nodes; ++i) {
+    for (int i = 1; i <= Tank.NumNodes; ++i) {
         auto &node = Tank.Node(i);
         node.SavedTemp = 48.89;
         node.Temp = 48.89;
@@ -1727,7 +1728,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
 
-    for (int i = 1; i <= Tank.Nodes; ++i) {
+    for (int i = 1; i <= Tank.NumNodes; ++i) {
         auto &node = Tank.Node(i);
         node.SavedTemp = 7.5;
         node.Temp = 7.5;
@@ -1958,20 +1959,20 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     Tank.CalcWaterThermalTankStratified(*state);
 
     std::vector<Real64> NodeTemps;
-    NodeTemps.resize(Tank.Nodes);
-    for (int i = 0; i < Tank.Nodes; ++i) {
+    NodeTemps.resize(Tank.NumNodes);
+    for (int i = 0; i < Tank.NumNodes; ++i) {
         NodeTemps[i] = Tank.Node[i].Temp;
     }
 
     // Verify there are no temperature inversions.
-    for (int i = 0; i < Tank.Nodes - 1; ++i) {
+    for (int i = 0; i < Tank.NumNodes - 1; ++i) {
         EXPECT_GE(NodeTemps[i], NodeTemps[i + 1]);
     }
 
-    EXPECT_LT(Tank.Node(Tank.HeaterNode1).Temp, Tank.SetPointTemp);
-    EXPECT_LT(Tank.Node(Tank.HeaterNode2).Temp, Tank.SetPointTemp2);
-    EXPECT_GT(Tank.Node(Tank.HeaterNode1).Temp, Tank.SetPointTemp - Tank.DeadBandDeltaTemp);
-    EXPECT_GT(Tank.Node(Tank.HeaterNode2).Temp, Tank.SetPointTemp2 - Tank.DeadBandDeltaTemp2);
+    EXPECT_LT(Tank.Node(Tank.Heater1NodeNum).Temp, Tank.SetPointTemp);
+    EXPECT_LT(Tank.Node(Tank.Heater2NodeNum).Temp, Tank.SetPointTemp2);
+    EXPECT_GT(Tank.Node(Tank.Heater1NodeNum).Temp, Tank.SetPointTemp - Tank.DeadBandDeltaTemp);
+    EXPECT_GT(Tank.Node(Tank.Heater2NodeNum).Temp, Tank.SetPointTemp2 - Tank.DeadBandDeltaTemp2);
 
     // Run a test where the tank turns on a heater during the timestep.
     for (auto &node : Tank.Node) {
@@ -1981,19 +1982,19 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 
     Tank.CalcWaterThermalTankStratified(*state);
 
-    for (int i = 0; i < Tank.Nodes; ++i) {
+    for (int i = 0; i < Tank.NumNodes; ++i) {
         NodeTemps[i] = Tank.Node[i].Temp;
     }
 
     // Verify there are no temperature inversions.
-    for (int i = 0; i < Tank.Nodes - 1; ++i) {
+    for (int i = 0; i < Tank.NumNodes - 1; ++i) {
         EXPECT_GE(NodeTemps[i], NodeTemps[i + 1]);
     }
 
     // Run a test with a use flow rate
     std::vector<Real64> PrevNodeTemps;
-    PrevNodeTemps.resize(Tank.Nodes);
-    for (int i = 0; i < Tank.Nodes; ++i) {
+    PrevNodeTemps.resize(Tank.NumNodes);
+    for (int i = 0; i < Tank.NumNodes; ++i) {
         auto &node = Tank.Node[i];
         node.Temp = 60.0;
         node.SavedTemp = 60.0;
@@ -2004,18 +2005,18 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 
     Tank.CalcWaterThermalTankStratified(*state);
 
-    for (int i = 0; i < Tank.Nodes; ++i) {
+    for (int i = 0; i < Tank.NumNodes; ++i) {
         NodeTemps[i] = Tank.Node[i].Temp;
     }
 
     // Verify there are no temperature inversions.
-    for (int i = 0; i < Tank.Nodes - 1; ++i) {
+    for (int i = 0; i < Tank.NumNodes - 1; ++i) {
         EXPECT_GE(NodeTemps[i], NodeTemps[i + 1]);
     }
 
     int DummyIndex = 1;
     Real64 TankNodeEnergy = 0;
-    for (int i = 0; i < Tank.Nodes; ++i) {
+    for (int i = 0; i < Tank.NumNodes; ++i) {
         auto &node = Tank.Node[i];
         TankNodeEnergy += node.Mass * (NodeTemps[i] - PrevNodeTemps[i]);
     }
@@ -2029,7 +2030,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     Tank.TankTempLimit = 80.0;
     Tank.UseMassFlowRate = 0.0;
 
-    for (int i = 0; i < Tank.Nodes; ++i) {
+    for (int i = 0; i < Tank.NumNodes; ++i) {
         auto &node = Tank.Node[i];
         if (i <= 4) {
             node.Temp = 81.0;
@@ -2132,8 +2133,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
     constexpr int TankNum = 1;
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
-    Tank.SourceInletNode = 1;
-    Tank.SourceOutletNode = 2;
+    Tank.SourceInNodeNum = 1;
+    Tank.SourceOutNodeNum = 2;
     Tank.SetupStratifiedNodes(*state);
 
     state->dataGlobal->HourOfDay = 0;
@@ -2163,12 +2164,12 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     Tank.CalcWaterThermalTankStratified(*state);
 
     Real64 EnergySum = 0.0;
-    for (int i = 0; i < Tank.Nodes; ++i) {
+    for (int i = 0; i < Tank.NumNodes; ++i) {
         auto &node = Tank.Node[i];
         EnergySum += node.Mass * Cp * (node.Temp - 60.0);
     }
     Real64 Esource = Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp *
-                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * state->dataHVACGlobal->TimeStepSysSec;
+                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutStratNodeNum).TempAvg) * state->dataHVACGlobal->TimeStepSysSec;
     EXPECT_NEAR(Esource, EnergySum, EnergySum * 0.001);
 }
 
@@ -2417,7 +2418,9 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     // FirsttimeThroughFlag attribute supposed to set as false after first run
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
     // Advanced to next time step (0 => 1)
-    EXPECT_EQ(state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp, 50);
+    auto &dln = state->dataLoopNodes;
+    auto *desuperheaterWaterInNode = dln->nodes(Desuperheater.WaterInNodeNum);
+    EXPECT_EQ(desuperheaterWaterInNode->Temp, 50);
     EXPECT_EQ(Tank.SavedTankTemp, 50);
     // No loss no source, Tank temperature supposed to be 50
     EXPECT_EQ(Tank.TankTemp, 50);
@@ -2428,7 +2431,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
     Tank.CalcDesuperheaterWaterHeater(*state, FirstHVAC);
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
-    EXPECT_EQ(state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp, 50);
+    EXPECT_EQ(desuperheaterWaterInNode->Temp, 50);
     // Saved temperature not supposed to change
     EXPECT_EQ(Tank.SavedTankTemp, 50);
     // The source side inlet temperature calculated based on saved temperatures
@@ -2445,7 +2448,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     EXPECT_TRUE(Desuperheater.FirstTimeThroughFlag);
     // Saved temperature not supposed to change
     EXPECT_EQ(Tank.SavedTankTemp, 50);
-    EXPECT_EQ(state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp, 50);
+    EXPECT_EQ(desuperheaterWaterInNode->Temp, 50);
     EXPECT_GT(Tank.SourceInletTemp, 50);
     EXPECT_GT(Tank.TankTemp, 50);
 }
@@ -2671,12 +2674,13 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).Name, "GSHP_COIL1");
     EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).SourceType, "Coil:Cooling:WaterToAirHeatPump:EquationFit");
     // Air node
-    state->dataLoopNodes->Node(5).MassFlowRate = 0.005;
-    state->dataLoopNodes->Node(5).Temp = 28.0;
-    state->dataLoopNodes->Node(5).HumRat = 0.2;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(5)->MassFlowRate = 0.005;
+    dln->nodes(5)->Temp = 28.0;
+    dln->nodes(5)->HumRat = 0.2;
     // Water node
-    state->dataLoopNodes->Node(3).Temp = 15.0;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.05;
+    dln->nodes(3)->Temp = 15.0;
+    dln->nodes(3)->MassFlowRate = 0.05;
     // Plant loop must be initialized
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).plantLoc.loopNum = 1;
     state->dataPlnt->PlantLoop.allocate(LoopNum);
@@ -2704,7 +2708,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = state->dataWaterThermalTanks->WaterHeaterDesuperheater(Tank.DesuperheaterNum);
 
-    for (int i = 1; i <= Tank.Nodes; ++i) {
+    for (int i = 1; i <= Tank.NumNodes; ++i) {
         auto &node = Tank.Node(i);
         node.SavedTemp = 39.0;
         node.Temp = 39.0;
@@ -2719,7 +2723,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Tank.TimeElapsed = 0.0;
     Desuperheater.SetPointTemp = 60.0;
     Desuperheater.Mode = WaterThermalTanks::TankOperatingMode::Heating;
-    state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
+
+    auto *desuperheaterWaterInNode = dln->nodes(Desuperheater.WaterInNodeNum);
+    desuperheaterWaterInNode->Temp = Tank.SourceOutletTemp;
 
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
@@ -2736,7 +2742,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     // If there's no demand in water thermal tank, no heat is reclaimed
     EXPECT_EQ(Desuperheater.HeaterRate, 0);
 
-    for (int i = 1; i <= Tank.Nodes; ++i) {
+    for (int i = 1; i <= Tank.NumNodes; ++i) {
         auto &node = Tank.Node(i);
         node.SavedTemp = 39;
         node.Temp = 39;
@@ -2745,7 +2751,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Tank.SavedTankTemp = 39.0;
     Tank.SavedSourceOutletTemp = 39.0;
     Tank.SourceMassFlowRate = 0.003;
-    state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
+    desuperheaterWaterInNode->Temp = Tank.SavedSourceOutletTemp;
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).PartLoadRatio = 0.8;
     Tank.initialize(*state, false);
@@ -3100,7 +3106,9 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Tank.UseInletTemp = 10.0;
     Tank.UseMassFlowRate = 0.00001;
     Tank.SourceOutletTemp = 45.0;
-    state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
+    auto &dln = state->dataLoopNodes;
+    auto *desuperheaterWaterInNode = dln->nodes(Desuperheater.WaterInNodeNum);
+    desuperheaterWaterInNode->Temp = Tank.SourceOutletTemp;
     Tank.SourceMassFlowRate = 0.003;
     Tank.TimeElapsed = 0.0;
     Desuperheater.SetPointTemp = 50.0;
@@ -3124,7 +3132,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Tank.SavedTankTemp = 61.0;
     Tank.SavedSourceOutletTemp = 61.0;
     Desuperheater.SaveMode = WaterThermalTanks::TankOperatingMode::Floating;
-    state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
+    desuperheaterWaterInNode->Temp = Tank.SavedSourceOutletTemp;
     Tank.SourceMassFlowRate = 0.003;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, HVAC::FanOp::Cycling, HVAC::CompressorOp::On, 1);
     Tank.CalcDesuperheaterWaterHeater(*state, false);
@@ -3227,8 +3235,9 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 
     // Set the available max flow rates for tank and node
     Tank.PlantSourceMassFlowRateMax = Tank.SourceDesignVolFlowRate * rho;
-    state->dataLoopNodes->Node(1).MassFlowRateMax = Tank.PlantSourceMassFlowRateMax;
-    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = Tank.PlantSourceMassFlowRateMax;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(1)->MassFlowRateMax = Tank.PlantSourceMassFlowRateMax;
+    dln->nodes(1)->MassFlowRateMaxAvail = Tank.PlantSourceMassFlowRateMax;
 
     NeedsHeatOrCool = Tank.SourceHeatNeed(*state, 70.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
     EXPECT_FALSE(NeedsHeatOrCool);
@@ -3432,7 +3441,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
     // And the final tank temp too, which is the one triggering the warning
     EXPECT_LT(Tank.TankTemp, 2.0);
     // Might as well check the node temps too
-    for (int i = 0; i < Tank.Nodes; ++i) {
+    for (int i = 0; i < Tank.NumNodes; ++i) {
         EXPECT_LT(Tank.Node[i].Temp, 2.0) << "Node i=" << i;
     }
 
@@ -4218,16 +4227,16 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         auto const &HPWHTank = state->dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
         EXPECT_EQ(HPWH.Name, "HPWHPUMPED");
         EXPECT_EQ(HPWHTank.Name, "HPWHPUMPED MIXED TANK");
-        EXPECT_EQ(HPWH.CondWaterInletNode, HPWHTank.SourceOutletNode);
-        EXPECT_EQ(HPWH.CondWaterOutletNode, HPWHTank.SourceInletNode);
+        EXPECT_EQ(HPWH.CondWaterInNodeNum, HPWHTank.SourceOutNodeNum);
+        EXPECT_EQ(HPWH.CondWaterOutNodeNum, HPWHTank.SourceInNodeNum);
         EXPECT_EQ(HPWH.DXCoilName, "HPWHPUMPED DXCOIL");
         EXPECT_EQ(HPWH.FanName, "HPWHPUMPED FANSYSTEMMODEL");
 
         // ValidateFuelType tests for WaterHeater:Mixed
         WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, Constant::eFuel::DistrictHeatingSteam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, Constant::eFuel::DistrictHeatingSteam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, Constant::eFuel::DistrictHeatingSteam));
+        EXPECT_ENUM_EQ(HPWHTank.FuelType, Constant::eFuel::DistrictHeatingSteam);
+        EXPECT_ENUM_EQ(HPWHTank.OffCycParaFuelType, Constant::eFuel::DistrictHeatingSteam);
+        EXPECT_ENUM_EQ(HPWHTank.OnCycParaFuelType, Constant::eFuel::DistrictHeatingSteam);
     }
 
     ++HPWaterHeaterNum;
@@ -4236,8 +4245,8 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         auto const &HPWHTank = state->dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
         EXPECT_EQ(HPWH.Name, "HPWHWRAPPED");
         EXPECT_EQ(HPWHTank.Name, "HPWHWRAPPED STRATIFIED TANK");
-        EXPECT_EQ(HPWH.CondWaterInletNode, HPWHTank.SourceOutletNode);
-        EXPECT_EQ(HPWH.CondWaterOutletNode, HPWHTank.SourceInletNode);
+        EXPECT_EQ(HPWH.CondWaterInNodeNum, HPWHTank.SourceOutNodeNum);
+        EXPECT_EQ(HPWH.CondWaterOutNodeNum, HPWHTank.SourceInNodeNum);
         EXPECT_EQ(HPWH.DXCoilName, "HPWHWRAPPED DXCOIL");
         EXPECT_EQ(HPWH.FanName, "HPWHWRAPPED FANSYSTEMMODEL");
     }
@@ -4458,8 +4467,9 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         state->dataHVACGlobal->DXCoilTotalCapacity = 3500.0;
         state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
-        state->dataLoopNodes->Node(3).Temp = 30.0;
-        state->dataLoopNodes->Node(3).HumRat = 0.01;
+        auto &dln = state->dataLoopNodes;
+        dln->nodes(3)->Temp = 30.0;
+        dln->nodes(3)->HumRat = 0.01;
         state->dataEnvrn->OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);
@@ -4482,8 +4492,9 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         state->dataHVACGlobal->DXCoilTotalCapacity = 3500.0;
         state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
-        state->dataLoopNodes->Node(3).Temp = 30.0;
-        state->dataLoopNodes->Node(3).HumRat = 0.01;
+        auto &dln = state->dataLoopNodes;
+        dln->nodes(3)->Temp = 30.0;
+        dln->nodes(3)->HumRat = 0.01;
         state->dataEnvrn->OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);
@@ -5098,9 +5109,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_FalsePositiveBlank
 
     EXPECT_EQ(1, state->dataWaterThermalTanks->numWaterHeaterStratified);
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
-    EXPECT_EQ(6, Tank.Nodes);
+    EXPECT_EQ(6, Tank.NumNodes);
     EXPECT_EQ(6u, Tank.AdditionalLossCoeff.size());
-    for (int i = 1; i <= Tank.Nodes; ++i) {
+    for (int i = 1; i <= Tank.NumNodes; ++i) {
         if (i == 2) {
             EXPECT_EQ(0, Tank.AdditionalLossCoeff(i));
         } else {
@@ -5198,9 +5209,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_FalsePositiveZeroe
 
     EXPECT_EQ(1, state->dataWaterThermalTanks->numWaterHeaterStratified);
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
-    EXPECT_EQ(6, Tank.Nodes);
+    EXPECT_EQ(6, Tank.NumNodes);
     EXPECT_EQ(6u, Tank.AdditionalLossCoeff.size());
-    for (int i = 1; i <= Tank.Nodes; ++i) {
+    for (int i = 1; i <= Tank.NumNodes; ++i) {
         if (i == 2) {
             EXPECT_EQ(0, Tank.AdditionalLossCoeff(i));
         } else {
@@ -5297,9 +5308,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_ExpectedWarning)
 
     EXPECT_EQ(1, state->dataWaterThermalTanks->numWaterHeaterStratified);
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
-    EXPECT_EQ(6, Tank.Nodes);
+    EXPECT_EQ(6, Tank.NumNodes);
     EXPECT_EQ(6u, Tank.AdditionalLossCoeff.size());
-    for (int i = 1; i <= Tank.Nodes; ++i) {
+    for (int i = 1; i <= Tank.NumNodes; ++i) {
         if (i == 2) {
             EXPECT_EQ(0, Tank.AdditionalLossCoeff(i));
         } else {
@@ -5321,11 +5332,13 @@ TEST_F(EnergyPlusFixture, PlantMassFlowRatesFuncTest)
     // Test for #8844: Make sure very small values are zeroed out to avoid underflow.
     state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
     state->dataWaterThermalTanks->WaterThermalTank.allocate(1);
-    state->dataLoopNodes->Node.allocate(1);
+
+    auto &dln = state->dataLoopNodes;
+    dln->nodes.push_back(new Node::NodeData);
 
     auto &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
 
-    state->dataLoopNodes->Node(1).MassFlowRate = 1.0e-33;
+    dln->nodes(1)->MassFlowRate = 1.0e-33;
     int inNodeNum = 1;
     DataPlant::LoopSideLocation plantLoopSide = DataPlant::LoopSideLocation::Invalid;
     Real64 outletTemp = 23.0;

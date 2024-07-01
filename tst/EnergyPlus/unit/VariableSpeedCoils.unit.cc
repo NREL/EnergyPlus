@@ -3025,8 +3025,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
         state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(1) * 0.1;
     state->dataVariableSpeedCoils->LoadSideMassFlowRate = state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
-    state->dataLoopNodes->Node(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate =
-        state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
+
+    auto &dln = state->dataLoopNodes;
+    auto *airInNode = dln->nodes(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInNodeNum);
+    airInNode->MassFlowRate = state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
         *state, DXCoilNum, fanOp, SensLoad, LatentLoad, compressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     ;
@@ -3049,8 +3051,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
         state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(1) * PartLoadFrac;
     state->dataVariableSpeedCoils->LoadSideMassFlowRate = state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
-    state->dataLoopNodes->Node(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate =
-        state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
+
+    airInNode->MassFlowRate = state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
     // run the coil
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
         *state, DXCoilNum, fanOp, SensLoad, LatentLoad, compressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
@@ -6922,8 +6924,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     Real64 PartLoadFrac = 0.7;
     Real64 OnOffAirFlowRatio = 1.0;
 
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.2;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.2;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(1)->MassFlowRate = 0.2;
+    dln->nodes(2)->MassFlowRate = 0.2;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate = 0.2;
     state->dataEnvrn->OutDryBulbTemp = -5.0;
 
@@ -7122,8 +7125,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ZeroRatedCoolingCapacity_Test)
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
         state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(1) * 0.1;
     state->dataVariableSpeedCoils->LoadSideMassFlowRate = state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
-    state->dataLoopNodes->Node(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate =
-        state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
+
+    auto &dln = state->dataLoopNodes;
+    auto *airInNode = dln->nodes(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInNodeNum);
+    airInNode->MassFlowRate = state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
         *state, DXCoilNum, fanOp, SensLoad, LatentLoad, compressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     VariableSpeedCoils::UpdateVarSpeedCoil(*state, DXCoilNum);
@@ -7142,9 +7147,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_UpdateVarSpeedCoil_Test)
     Real64 constexpr closeEnough = 0.001;
     state->dataVariableSpeedCoils->VarSpeedCoil.allocate(1);
     auto &thisVarSpeedCoil = state->dataVariableSpeedCoils->VarSpeedCoil(1);
-    state->dataLoopNodes->Node.allocate(2);
-    auto &thisInletNode = state->dataLoopNodes->Node(1);
-    auto &thisOutletNode = state->dataLoopNodes->Node(2);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
+
+    auto *inNode = dln->nodes(1);
+    auto *outNode = dln->nodes(2);
 
     // Set up test data
     state->dataHVACGlobal->TimeStepSysSec = 60.0;
@@ -7154,35 +7162,36 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_UpdateVarSpeedCoil_Test)
     thisVarSpeedCoil.InletAirEnthalpy = 28.743;
     thisVarSpeedCoil.InletWaterTemp = 0.0;
     thisVarSpeedCoil.InletWaterEnthalpy = 0.0;
-    thisVarSpeedCoil.AirInletNodeNum = 1;
-    thisVarSpeedCoil.WaterInletNodeNum = 0;
-    thisVarSpeedCoil.AirOutletNodeNum = 2;
-    thisVarSpeedCoil.WaterOutletNodeNum = 0;
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.123;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
+    thisVarSpeedCoil.AirInNodeNum = 1;
+    thisVarSpeedCoil.WaterInNodeNum = 0;
+    thisVarSpeedCoil.AirOutNodeNum = 2;
+    thisVarSpeedCoil.WaterOutNodeNum = 0;
+
+    dln->nodes(1)->MassFlowRate = 0.123;
+    dln->nodes(2)->MassFlowRate = 0.0;
     thisVarSpeedCoil.OutletAirDBTemp = 0.0;
     thisVarSpeedCoil.OutletAirHumRat = 0.0;
     thisVarSpeedCoil.OutletAirEnthalpy = 0.0;
     thisVarSpeedCoil.OutletWaterTemp = -1.0;
     thisVarSpeedCoil.OutletWaterEnthalpy = -10.0;
-    thisInletNode.Quality = 0.1;
-    thisInletNode.Press = 101234.;
-    thisInletNode.MassFlowRateMin = 0.1;
-    thisInletNode.MassFlowRateMax = 1.0;
-    thisInletNode.MassFlowRateMinAvail = 0.2;
-    thisInletNode.MassFlowRateMaxAvail = 0.9;
-    thisOutletNode.Quality = 0.0;
-    thisOutletNode.Press = 0.0;
-    thisOutletNode.MassFlowRateMin = 0.0;
-    thisOutletNode.MassFlowRateMax = 0.0;
-    thisOutletNode.MassFlowRateMinAvail = 0.0;
-    thisOutletNode.MassFlowRateMaxAvail = 0.0;
+    inNode->Quality = 0.1;
+    inNode->Press = 101234.;
+    inNode->MassFlowRateMin = 0.1;
+    inNode->MassFlowRateMax = 1.0;
+    inNode->MassFlowRateMinAvail = 0.2;
+    inNode->MassFlowRateMaxAvail = 0.9;
+    outNode->Quality = 0.0;
+    outNode->Press = 0.0;
+    outNode->MassFlowRateMin = 0.0;
+    outNode->MassFlowRateMax = 0.0;
+    outNode->MassFlowRateMinAvail = 0.0;
+    outNode->MassFlowRateMaxAvail = 0.0;
     state->dataContaminantBalance->Contaminant.CO2Simulation = true;
-    thisInletNode.CO2 = 55.5;
-    thisOutletNode.CO2 = 0.0;
+    inNode->CO2 = 55.5;
+    outNode->CO2 = 0.0;
     state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
-    thisInletNode.GenContam = 12.345;
-    thisOutletNode.GenContam = 0.0;
+    inNode->GenContam = 12.345;
+    outNode->GenContam = 0.0;
     thisVarSpeedCoil.reportCoilFinalSizes = false;
     thisVarSpeedCoil.VSCoilType == HVAC::Coil_CoolingAirToAirVariableSpeed;
 
@@ -7196,18 +7205,18 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_UpdateVarSpeedCoil_Test)
     EXPECT_NEAR(thisVarSpeedCoil.OutletAirEnthalpy, thisVarSpeedCoil.InletAirEnthalpy, closeEnough);
     EXPECT_NEAR(thisVarSpeedCoil.OutletWaterTemp, thisVarSpeedCoil.InletWaterTemp, closeEnough);
     EXPECT_NEAR(thisVarSpeedCoil.OutletWaterEnthalpy, thisVarSpeedCoil.InletWaterEnthalpy, closeEnough);
-    EXPECT_NEAR(thisOutletNode.MassFlowRate, thisInletNode.MassFlowRate, closeEnough);
-    EXPECT_NEAR(thisOutletNode.Temp, thisVarSpeedCoil.OutletAirDBTemp, closeEnough);
-    EXPECT_NEAR(thisOutletNode.HumRat, thisVarSpeedCoil.OutletAirHumRat, closeEnough);
-    EXPECT_NEAR(thisOutletNode.Enthalpy, thisVarSpeedCoil.OutletAirEnthalpy, closeEnough);
-    EXPECT_NEAR(thisOutletNode.Quality, thisInletNode.Quality, closeEnough);
-    EXPECT_NEAR(thisOutletNode.Press, thisInletNode.Press, closeEnough);
-    EXPECT_NEAR(thisOutletNode.MassFlowRateMin, thisInletNode.MassFlowRateMin, closeEnough);
-    EXPECT_NEAR(thisOutletNode.MassFlowRateMax, thisInletNode.MassFlowRateMax, closeEnough);
-    EXPECT_NEAR(thisOutletNode.MassFlowRateMinAvail, thisInletNode.MassFlowRateMinAvail, closeEnough);
-    EXPECT_NEAR(thisOutletNode.MassFlowRateMaxAvail, thisInletNode.MassFlowRateMaxAvail, closeEnough);
-    EXPECT_NEAR(thisOutletNode.CO2, thisInletNode.CO2, closeEnough);
-    EXPECT_NEAR(thisOutletNode.GenContam, thisInletNode.GenContam, closeEnough);
+    EXPECT_NEAR(outNode->MassFlowRate, inNode->MassFlowRate, closeEnough);
+    EXPECT_NEAR(outNode->Temp, thisVarSpeedCoil.OutletAirDBTemp, closeEnough);
+    EXPECT_NEAR(outNode->HumRat, thisVarSpeedCoil.OutletAirHumRat, closeEnough);
+    EXPECT_NEAR(outNode->Enthalpy, thisVarSpeedCoil.OutletAirEnthalpy, closeEnough);
+    EXPECT_NEAR(outNode->Quality, inNode->Quality, closeEnough);
+    EXPECT_NEAR(outNode->Press, inNode->Press, closeEnough);
+    EXPECT_NEAR(outNode->MassFlowRateMin, inNode->MassFlowRateMin, closeEnough);
+    EXPECT_NEAR(outNode->MassFlowRateMax, inNode->MassFlowRateMax, closeEnough);
+    EXPECT_NEAR(outNode->MassFlowRateMinAvail, inNode->MassFlowRateMinAvail, closeEnough);
+    EXPECT_NEAR(outNode->MassFlowRateMaxAvail, inNode->MassFlowRateMaxAvail, closeEnough);
+    EXPECT_NEAR(outNode->CO2, inNode->CO2, closeEnough);
+    EXPECT_NEAR(outNode->GenContam, inNode->GenContam, closeEnough);
 }
 
 } // namespace EnergyPlus

@@ -1507,7 +1507,7 @@ namespace PlantPipingSystemsManager {
             thisCircuit.DesignVolumeFlowRate = state.dataIPShortCut->rNumericArgs(6);
 
             // Read inlet and outlet node names and validate them
-            thisCircuit.InletNodeName = state.dataIPShortCut->cAlphaArgs(2);
+            thisCircuit.InNodeName = state.dataIPShortCut->cAlphaArgs(2);
             thisCircuit.InNodeNum = Node::GetSingleNode(state,
                                                                            state.dataIPShortCut->cAlphaArgs(2),
                                                                            ErrorsFound,
@@ -1528,7 +1528,7 @@ namespace PlantPipingSystemsManager {
                                            "Bad node name.",
                                            ErrorsFound);
             }
-            thisCircuit.OutletNodeName = state.dataIPShortCut->cAlphaArgs(3);
+            thisCircuit.OutNodeName = state.dataIPShortCut->cAlphaArgs(3);
             thisCircuit.OutNodeNum = Node::GetSingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(3),
                                                                             ErrorsFound,
@@ -1645,9 +1645,9 @@ namespace PlantPipingSystemsManager {
             thisCircuit.DesignVolumeFlowRate = state.dataIPShortCut->rNumericArgs(1);
 
             // Read inlet and outlet node names and validate them
-            thisCircuit.InletNodeName = state.dataIPShortCut->cAlphaArgs(2);
+            thisCircuit.InNodeName = state.dataIPShortCut->cAlphaArgs(2);
             thisCircuit.InNodeNum = Node::GetSingleNode(state,
-                                                                           thisCircuit.InletNodeName,
+                                                                           thisCircuit.InNodeName,
                                                                            ErrorsFound,
                                                                            Node::ConnObjType::GroundHeatExchangerHorizontalTrench,
                                                                            thisTrenchName,
@@ -1658,9 +1658,9 @@ namespace PlantPipingSystemsManager {
             if (thisCircuit.InNodeNum == 0) {
                 CurIndex = 2;
             }
-            thisCircuit.OutletNodeName = state.dataIPShortCut->cAlphaArgs(3);
+            thisCircuit.OutNodeName = state.dataIPShortCut->cAlphaArgs(3);
             thisCircuit.OutNodeNum = Node::GetSingleNode(state,
-                                                                            thisCircuit.OutletNodeName,
+                                                                            thisCircuit.OutNodeName,
                                                                             ErrorsFound,
                                                                             Node::ConnObjType::GroundHeatExchangerHorizontalTrench,
                                                                             thisTrenchName,
@@ -1672,7 +1672,7 @@ namespace PlantPipingSystemsManager {
                 CurIndex = 3;
             }
             BranchNodeConnections::TestCompSet(
-                state, ObjName_HorizTrench, thisTrenchName, thisCircuit.InletNodeName, thisCircuit.OutletNodeName, "Piping System Circuit Nodes");
+                state, ObjName_HorizTrench, thisTrenchName, thisCircuit.InNodeName, thisCircuit.OutNodeName, "Piping System Circuit Nodes");
 
             // Convergence tolerance values, validated by IP
             thisCircuit.Convergence_CurrentToPrevIteration = 0.001;

@@ -73,8 +73,8 @@ namespace SurfaceGroundHeatExchanger {
 
         std::string Name;             // name of surface GHE
         std::string ConstructionName; // name of the associated construction
-        std::string InletNode;        // surface GHE inlet fluid node
-        std::string OutletNode;       // surface GHE outlet fluid node
+        std::string InNodeName;        // surface GHE inlet fluid node
+        std::string OutNodeName;       // surface GHE outlet fluid node
         Real64 DesignMassFlowRate;
         Real64 TubeDiameter;                     // hydronic tube inside diameter
         Real64 TubeSpacing;                      // tube spacing
@@ -86,8 +86,8 @@ namespace SurfaceGroundHeatExchanger {
         int LowerSurfCond;                       // Type of lower surf. boundary condition
         int TubeCircuits;                        // number of circuits in total
         int ConstructionNum;                     // construction index number
-        int InletNodeNum;                        // inlet node number
-        int OutletNodeNum;                       // oulet node number
+        int InNodeNum = 0;                        // inlet node number
+        int OutNodeNum = 0;                       // oulet node number
         Material::SurfaceRoughness TopRoughness; // roughness of top layer
         Material::SurfaceRoughness BtmRoughness; // roughness of bottom layer
         int FrozenErrIndex1;                     // recurring error index
@@ -154,7 +154,7 @@ namespace SurfaceGroundHeatExchanger {
         // Default Constructor
         SurfaceGroundHeatExchangerData()
             : DesignMassFlowRate(0.0), TubeDiameter(0.0), TubeSpacing(0.0), SurfaceLength(0.0), SurfaceWidth(0.0), TopThermAbs(0.0), TopSolarAbs(0.0),
-              BtmThermAbs(0.0), LowerSurfCond(0), TubeCircuits(0), ConstructionNum(0), InletNodeNum(0), OutletNodeNum(0),
+              BtmThermAbs(0.0), LowerSurfCond(0), TubeCircuits(0), ConstructionNum(0), 
               TopRoughness(Material::SurfaceRoughness::Invalid), BtmRoughness(Material::SurfaceRoughness::Invalid), FrozenErrIndex1(0),
               FrozenErrIndex2(0), ConvErrIndex1(0), ConvErrIndex2(0), ConvErrIndex3(0), plantLoc{}, TsrcConstCoef(0.0), TsrcVarCoef(0.0),
               QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0), NumCTFTerms(0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0),

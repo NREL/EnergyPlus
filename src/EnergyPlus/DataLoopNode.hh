@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -476,18 +477,11 @@ namespace Node {
 
         // A struct to defer checking whether a node did correctly get a setpoint via the API / PythonPlugin
         bool needsSetpointChecking = false;
-        bool checkTemperatureSetPoint = false;
-        bool checkTemperatureMinSetPoint = false;
-        bool checkTemperatureMaxSetPoint = false;
-        bool checkHumidityRatioSetPoint = false;
-        bool checkHumidityRatioMinSetPoint = false;
-        bool checkHumidityRatioMaxSetPoint = false;
-        bool checkMassFlowRateSetPoint = false;
-        bool checkMassFlowRateMinSetPoint = false;
-        bool checkMassFlowRateMaxSetPoint = false;
+        std::array<bool, (int)HVAC::CtrlVarType::Num> checkSetPoint = {false, false, false, false, false, false, false, false, false};
 
         // Default Constructor
         NodeData() = default;
+
 
 #ifdef GET_OUT            
         // Member Constructor
@@ -563,8 +557,9 @@ namespace Node {
 
 struct LoopNodeData : BaseGlobalStruct
 {
-    int NumofSplitters = 0;
-    int NumofMixers = 0;
+    int NumSplitters = 0;
+    int NumMixers = 0;
+
     Array1D<Node::NodeData*> nodes; // dim to num nodes in SimHVAC
     std::map<std::string, int> nodeMap;
 
@@ -629,6 +624,7 @@ struct LoopNodeData : BaseGlobalStruct
                 // EMSValueForOutAirWetBulb {C} | CO2 {ppm} | CO2 setpoint {ppm} | Generic contaminant {ppm} | Generic
                 // contaminant setpoint {ppm} | Set to true when node has SPM which follows wetbulb
 #endif // GET_OUT        
+
     void clear_state() override
     {
         new (this) LoopNodeData();

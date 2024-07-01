@@ -101,16 +101,16 @@ TEST_F(EnergyPlusFixture, ExerciseHVACDXHeatPumpSystem)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataLoopNodes->NodeID.allocate(2);
-    state->dataLoopNodes->Node.allocate(2);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
 
     // manually add a dx coil
     state->dataDXCoils->NumDXCoils = 1;
     state->dataDXCoils->GetCoilsInputFlag = false;
     state->dataDXCoils->DXCoil.allocate(1);
     state->dataDXCoils->DXCoil(1).Name = "HEAT PUMP DX HEATING COIL 1";
-    state->dataDXCoils->DXCoil(1).AirInNode = 1;
-    state->dataDXCoils->DXCoil(1).AirOutNode = 2;
+    state->dataDXCoils->DXCoil(1).AirInNodeNum = 1;
+    state->dataDXCoils->DXCoil(1).AirOutNodeNum = 2;
     state->dataDXCoils->DXCoil(1).DXCoilType = "COIL:HEATING:DX:SINGLESPEED";
     state->dataDXCoils->DXCoil(1).RatedTotCap(1) = 1;
     state->dataDXCoils->DXCoil(1).RatedCOP(1) = 1;

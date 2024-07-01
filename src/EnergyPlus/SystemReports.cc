@@ -100,7 +100,6 @@ namespace EnergyPlus::SystemReports {
 // This module embodies the scheme(s) for reporting ventilation loads and energy use.
 
 // Using/Aliasing
-using namespace DataLoopNode;
 using namespace DataAirLoop;
 using namespace DataPlant;
 using namespace DataZoneEquipment;
@@ -137,33 +136,33 @@ void InitEnergyReports(EnergyPlusData &state)
             if (!thisZoneEquipConfig.IsControlled) continue;
             thisZoneEquipConfig.EquipListIndex = Util::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
             auto &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(thisZoneEquipConfig.EquipListIndex);
-            for (int ZoneInletNodeNum = 1; ZoneInletNodeNum <= thisZoneEquipConfig.NumInletNodes; ++ZoneInletNodeNum) {
-                int AirLoopNum = thisZoneEquipConfig.InletNodeAirLoopNum(ZoneInletNodeNum);
+            for (int ZoneInletNodeNum = 1; ZoneInletNodeNum <= thisZoneEquipConfig.NumInNodes; ++ZoneInletNodeNum) {
+                int AirLoopNum = thisZoneEquipConfig.InNodeAirLoopNum(ZoneInletNodeNum);
                 for (int CompNum = 1; CompNum <= thisZoneEquipList.NumOfEquipTypes; ++CompNum) {
                     for (int NodeCount = 1; NodeCount <= thisZoneEquipList.EquipData(CompNum).NumOutlets; ++NodeCount) {
-                        if (thisZoneEquipList.EquipData(CompNum).OutletNodeNums(NodeCount) ==
-                            thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).OutNode) {
+                        if (thisZoneEquipList.EquipData(CompNum).OutNodeNums(NodeCount) ==
+                            thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).OutNodeNum) {
                             thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).AirDistUnitIndex = CompNum;
                             if (thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathExists) {
                                 for (int SAPNum = 1; SAPNum <= state.dataZoneEquip->NumSupplyAirPaths; ++SAPNum) {
-                                    for (int SAPOutNode = 1; SAPOutNode <= state.dataZoneEquip->SupplyAirPath(SAPNum).NumOutletNodes; ++SAPOutNode) {
-                                        if (thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).InNode ==
-                                            state.dataZoneEquip->SupplyAirPath(SAPNum).OutletNode(SAPOutNode)) {
+                                    for (int SAPOutNode = 1; SAPOutNode <= state.dataZoneEquip->SupplyAirPath(SAPNum).NumOutNodes; ++SAPOutNode) {
+                                        if (thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).InNodeNum ==
+                                            state.dataZoneEquip->SupplyAirPath(SAPNum).OutNodeNums(SAPOutNode)) {
                                             thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathIndex = SAPNum;
                                             for (int OutNum = 1; OutNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes;
                                                  ++OutNum) {
-                                                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) ==
-                                                    state.dataZoneEquip->SupplyAirPath(SAPNum).InletNodeNum) {
+                                                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNums(OutNum) ==
+                                                    state.dataZoneEquip->SupplyAirPath(SAPNum).InNodeNum) {
                                                     thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex =
-                                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OutletBranchNum[OutNum - 1];
+                                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OutBranchNums[OutNum - 1];
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
                                                         for (int MainBranchNum = 1;
                                                              MainBranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches;
                                                              ++MainBranchNum) {
                                                             if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum)
                                                                     .Branch(MainBranchNum)
-                                                                    .NodeNumOut ==
-                                                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.NodeNumIn) {
+                                                                    .OutNodeNum ==
+                                                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.InNodeNum) {
                                                                 thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex = MainBranchNum;
                                                             }
                                                         }
@@ -180,12 +179,12 @@ void InitEnergyReports(EnergyPlusData &state)
                                 if (AirLoopNum > 0) {
                                     for (int NodeIndex = 1; NodeIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes;
                                          ++NodeIndex) {
-                                        if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
-                                            thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).InNode) {
+                                        if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNums(NodeIndex) ==
+                                            thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).InNodeNum) {
                                             for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches;
                                                  ++BranchNum) {
-                                                if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNumOut ==
-                                                    state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
+                                                if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).OutNodeNum ==
+                                                    state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNums(NodeIndex)) {
                                                     thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
                                                         for (int MainBranchNum = 1;
@@ -193,8 +192,8 @@ void InitEnergyReports(EnergyPlusData &state)
                                                              ++MainBranchNum) {
                                                             if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum)
                                                                     .Branch(MainBranchNum)
-                                                                    .NodeNumOut ==
-                                                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.NodeNumIn) {
+                                                                    .OutNodeNum ==
+                                                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.InNodeNum) {
                                                                 thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex = MainBranchNum;
                                                             }
                                                         }
@@ -208,19 +207,19 @@ void InitEnergyReports(EnergyPlusData &state)
                                     }
                                 }
                             }
-                        } else if (thisZoneEquipList.EquipData(CompNum).OutletNodeNums(NodeCount) ==
-                                   thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).InNode) {
+                        } else if (thisZoneEquipList.EquipData(CompNum).OutNodeNums(NodeCount) ==
+                                   thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).InNodeNum) {
                             thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).AirDistUnitIndex = CompNum;
                             if (thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathExists) {
                                 for (int SAPNum = 1; SAPNum <= state.dataZoneEquip->NumSupplyAirPaths; ++SAPNum) {
                                     for (int NodeIndex = 1; NodeIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes;
                                          ++NodeIndex) {
-                                        if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
-                                            state.dataZoneEquip->SupplyAirPath(SAPNum).InletNodeNum) {
+                                        if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNums(NodeIndex) ==
+                                            state.dataZoneEquip->SupplyAirPath(SAPNum).InNodeNum) {
                                             for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches;
                                                  ++BranchNum) {
-                                                if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNumOut ==
-                                                    state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
+                                                if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).OutNodeNum ==
+                                                    state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNums(NodeIndex)) {
                                                     thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
                                                         for (int MainBranchNum = 1;
@@ -228,8 +227,8 @@ void InitEnergyReports(EnergyPlusData &state)
                                                              ++MainBranchNum) {
                                                             if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum)
                                                                     .Branch(MainBranchNum)
-                                                                    .NodeNumOut ==
-                                                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.NodeNumIn) {
+                                                                    .OutNodeNum ==
+                                                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.InNodeNum) {
                                                                 thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex = MainBranchNum;
                                                             }
                                                         }
@@ -242,8 +241,8 @@ void InitEnergyReports(EnergyPlusData &state)
                                         }
                                     }
 
-                                    for (int SAPOutNode = 1; SAPOutNode <= state.dataZoneEquip->SupplyAirPath(SAPNum).NumOutletNodes; ++SAPOutNode) {
-                                        if (ZoneInletNodeNum == state.dataZoneEquip->SupplyAirPath(SAPNum).OutletNode(SAPOutNode)) {
+                                    for (int SAPOutNode = 1; SAPOutNode <= state.dataZoneEquip->SupplyAirPath(SAPNum).NumOutNodes; ++SAPOutNode) {
+                                        if (ZoneInletNodeNum == state.dataZoneEquip->SupplyAirPath(SAPNum).OutNodeNums(SAPOutNode)) {
                                             thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathIndex = SAPNum;
                                         }
                                     }
@@ -252,12 +251,12 @@ void InitEnergyReports(EnergyPlusData &state)
                                 if (AirLoopNum > 0) {
                                     for (int NodeIndex = 1; NodeIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes;
                                          ++NodeIndex) {
-                                        if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
-                                            thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).InNode) {
+                                        if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNums(NodeIndex) ==
+                                            thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).InNodeNum) {
                                             for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches;
                                                  ++BranchNum) {
-                                                if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNumOut ==
-                                                    state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
+                                                if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).OutNodeNum ==
+                                                    state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNums(NodeIndex)) {
                                                     thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
                                                         for (int MainBranchNum = 1;
@@ -265,8 +264,8 @@ void InitEnergyReports(EnergyPlusData &state)
                                                              ++MainBranchNum) {
                                                             if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum)
                                                                     .Branch(MainBranchNum)
-                                                                    .NodeNumOut ==
-                                                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.NodeNumIn) {
+                                                                    .OutNodeNum ==
+                                                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.InNodeNum) {
                                                                 thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex = MainBranchNum;
                                                             }
                                                         }
@@ -295,8 +294,8 @@ void InitEnergyReports(EnergyPlusData &state)
             thisZoneEquipConfig.EquipListIndex = Util::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
             int ListNum = thisZoneEquipConfig.EquipListIndex;
             // loop over the zone supply air path inlet nodes
-            for (int ZoneInletNodeNum = 1; ZoneInletNodeNum <= thisZoneEquipConfig.NumInletNodes; ++ZoneInletNodeNum) {
-                int AirLoopNum = thisZoneEquipConfig.InletNodeAirLoopNum(ZoneInletNodeNum);
+            for (int ZoneInletNodeNum = 1; ZoneInletNodeNum <= thisZoneEquipConfig.NumInNodes; ++ZoneInletNodeNum) {
+                int AirLoopNum = thisZoneEquipConfig.InNodeAirLoopNum(ZoneInletNodeNum);
 
                 // 1. Find HVAC component plant loop connections
                 int MainBranchNum = thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex;
@@ -2208,7 +2207,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
         for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
             for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                 Node::ConnObjType TypeOfComp = static_cast<Node::ConnObjType>(
-                    EnergyPlus::getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                    EnergyPlus::getEnumValue(Node::connObjTypeNamesUC,
                                              state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf));
                 std::string &NameOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name;
                 // Get complete list of components for complex branches
@@ -2241,12 +2240,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         {
                             auto &thisSubComponent =
                                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum);
-                            thisSubComponent.TypeOf = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubCompNum))];
+                            thisSubComponent.TypeOf = Node::connObjTypeNamesUC[static_cast<int>(SubCompTypes(SubCompNum))];
                             thisSubComponent.Name = SubCompNames(SubCompNum);
-                            thisSubComponent.NodeNameIn = InletNodeNames(SubCompNum);
-                            thisSubComponent.NodeNameOut = OutletNodeNames(SubCompNum);
-                            thisSubComponent.NodeNumIn = InletNodeNumbers(SubCompNum);
-                            thisSubComponent.NodeNumOut = OutletNodeNumbers(SubCompNum);
+                            thisSubComponent.InNodeName = InletNodeNames(SubCompNum);
+                            thisSubComponent.OutNodeName = OutletNodeNames(SubCompNum);
+                            thisSubComponent.InNodeNum = InletNodeNumbers(SubCompNum);
+                            thisSubComponent.OutNodeNum = OutletNodeNumbers(SubCompNum);
                         }
                     }
 
@@ -2266,7 +2265,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                 // check for 'grandchildren'
                 for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                     Node::ConnObjType TypeOfSubComp = static_cast<Node::ConnObjType>(EnergyPlus::getEnumValue(
-                        BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                        Node::connObjTypeNamesUC,
                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).TypeOf));
                     std::string &NameOfSubComp =
                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).Name;
@@ -2304,12 +2303,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                                                 .SubComp(SubCompNum)
                                                                 .SubSubComp(SubSubCompNum);
                                 thisSubSubComponent.TypeOf = static_cast<std::string>(
-                                    BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubSubCompNum))]);
+                                    Node::connObjTypeNamesUC[static_cast<int>(SubCompTypes(SubSubCompNum))]);
                                 thisSubSubComponent.Name = SubCompNames(SubSubCompNum);
-                                thisSubSubComponent.NodeNameIn = InletNodeNames(SubSubCompNum);
-                                thisSubSubComponent.NodeNameOut = OutletNodeNames(SubSubCompNum);
-                                thisSubSubComponent.NodeNumIn = InletNodeNumbers(SubSubCompNum);
-                                thisSubSubComponent.NodeNumOut = OutletNodeNumbers(SubSubCompNum);
+                                thisSubSubComponent.InNodeName = InletNodeNames(SubSubCompNum);
+                                thisSubSubComponent.OutNodeName = OutletNodeNames(SubSubCompNum);
+                                thisSubSubComponent.InNodeNum = InletNodeNumbers(SubSubCompNum);
+                                thisSubSubComponent.OutNodeNum = OutletNodeNumbers(SubSubCompNum);
                                 NumLeft = BranchNodeConnections::GetNumChildren(state, SubCompTypes(SubSubCompNum), SubCompNames(SubSubCompNum));
                                 if (NumLeft > 0) {
                                     ShowSevereError(
@@ -2462,7 +2461,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
             std::string &TypeOfComp = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipTypeName(CompNum);
             std::string &NameOfComp = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipName(CompNum);
             Node::ConnObjType TypeOfCompNum = static_cast<Node::ConnObjType>(
-                EnergyPlus::getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfComp));
+                EnergyPlus::getEnumValue(Node::connObjTypeNamesUC, TypeOfComp));
             BranchNodeConnections::GetComponentData(state,
                                                     TypeOfCompNum,
                                                     NameOfComp,
@@ -2479,12 +2478,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                 auto &thisEquipData = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipData(CompNum);
                 thisEquipData.TypeOf = TypeOfComp;
                 thisEquipData.Name = NameOfComp;
-                thisEquipData.OutletNodeNums.allocate(NumOutlets);
+                thisEquipData.OutNodeNums.allocate(NumOutlets);
                 thisEquipData.NumOutlets = NumOutlets;
-                thisEquipData.OutletNodeNums = OutletNodeNumbers;
-                thisEquipData.InletNodeNums.allocate(NumInlets);
+                thisEquipData.OutNodeNums = OutletNodeNumbers;
+                thisEquipData.InNodeNums.allocate(NumInlets);
                 thisEquipData.NumInlets = NumInlets;
-                thisEquipData.InletNodeNums = InletNodeNumbers;
+                thisEquipData.InNodeNums = InletNodeNumbers;
                 thisEquipData.Parent = IsParent;
                 NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
                 thisEquipData.NumMeteredVars = NumVariables;
@@ -2551,10 +2550,10 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
 
                     for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                         thisEquipData.SubEquipData(SubCompNum).TypeOf =
-                            BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubCompNum))];
+                            Node::connObjTypeNamesUC[static_cast<int>(SubCompTypes(SubCompNum))];
                         thisEquipData.SubEquipData(SubCompNum).Name = SubCompNames(SubCompNum);
-                        thisEquipData.SubEquipData(SubCompNum).OutletNodeNum = OutletNodeNumbers(SubCompNum);
-                        thisEquipData.SubEquipData(SubCompNum).InletNodeNum = InletNodeNumbers(SubCompNum);
+                        thisEquipData.SubEquipData(SubCompNum).OutNodeNum = OutletNodeNumbers(SubCompNum);
+                        thisEquipData.SubEquipData(SubCompNum).InNodeNum = InletNodeNumbers(SubCompNum);
                     }
 
                     SubCompTypes.deallocate();
@@ -2571,7 +2570,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     std::string &TypeOfSubComp = thisEquipData.SubEquipData(SubCompNum).TypeOf;
                     std::string &NameOfSubComp = thisEquipData.SubEquipData(SubCompNum).Name;
                     Node::ConnObjType TypeOfSubCompNum = static_cast<Node::ConnObjType>(
-                        EnergyPlus::getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfSubComp));
+                        EnergyPlus::getEnumValue(Node::connObjTypeNamesUC, TypeOfSubComp));
                     if (BranchNodeConnections::IsParentObject(state, TypeOfSubCompNum, NameOfSubComp)) {
                         NumGrandChildren = BranchNodeConnections::GetNumChildren(state, TypeOfSubCompNum, NameOfSubComp);
                         thisEquipData.SubEquipData(SubCompNum).NumSubSubEquip = NumGrandChildren;
@@ -2597,10 +2596,10 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
 
                         for (SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum) {
                             thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).TypeOf =
-                                BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubSubCompNum))];
+                                Node::connObjTypeNamesUC[static_cast<int>(SubCompTypes(SubSubCompNum))];
                             thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).Name = SubCompNames(SubSubCompNum);
-                            thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).OutletNodeNum = OutletNodeNumbers(SubSubCompNum);
-                            thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).InletNodeNum = InletNodeNumbers(SubSubCompNum);
+                            thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).OutNodeNum = OutletNodeNumbers(SubSubCompNum);
+                            thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).InNodeNum = InletNodeNumbers(SubSubCompNum);
                         }
                         SubCompTypes.deallocate();
                         SubCompNames.deallocate();
@@ -2726,7 +2725,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         std::string &TypeOfComp = thisComp.TypeOf;
                         std::string &NameOfComp = thisComp.Name;
                         Node::ConnObjType TypeOfCompNum = static_cast<Node::ConnObjType>(
-                            EnergyPlus::getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfComp));
+                            EnergyPlus::getEnumValue(Node::connObjTypeNamesUC, TypeOfComp));
                         // Get complete list of components for complex branches
                         if (BranchNodeConnections::IsParentObject(state, TypeOfCompNum, NameOfComp)) {
 
@@ -2754,12 +2753,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
 
                             for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                                 thisComp.SubComp(SubCompNum).TypeOf =
-                                    BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubCompNum))];
+                                    Node::connObjTypeNamesUC[static_cast<int>(SubCompTypes(SubCompNum))];
                                 thisComp.SubComp(SubCompNum).Name = SubCompNames(SubCompNum);
-                                thisComp.SubComp(SubCompNum).NodeNameIn = InletNodeNames(SubCompNum);
-                                thisComp.SubComp(SubCompNum).NodeNameOut = OutletNodeNames(SubCompNum);
-                                thisComp.SubComp(SubCompNum).NodeNumIn = InletNodeNumbers(SubCompNum);
-                                thisComp.SubComp(SubCompNum).NodeNumOut = OutletNodeNumbers(SubCompNum);
+                                thisComp.SubComp(SubCompNum).InNodeName = InletNodeNames(SubCompNum);
+                                thisComp.SubComp(SubCompNum).OutNodeName = OutletNodeNames(SubCompNum);
+                                thisComp.SubComp(SubCompNum).InNodeNum = InletNodeNumbers(SubCompNum);
+                                thisComp.SubComp(SubCompNum).OutNodeNum = OutletNodeNumbers(SubCompNum);
                             }
 
                             SubCompTypes.deallocate();
@@ -2779,7 +2778,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             std::string &TypeOfSubComp = thisComp.SubComp(SubCompNum).TypeOf;
                             std::string NameOfSubComp = thisComp.SubComp(SubCompNum).Name;
                             Node::ConnObjType TypeOfSubCompNum = static_cast<Node::ConnObjType>(
-                                EnergyPlus::getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfSubComp));
+                                EnergyPlus::getEnumValue(Node::connObjTypeNamesUC, TypeOfSubComp));
                             if (BranchNodeConnections::IsParentObject(state, TypeOfSubCompNum, NameOfSubComp)) {
                                 NumGrandChildren = BranchNodeConnections::GetNumChildren(state, TypeOfSubCompNum, NameOfSubComp);
                                 SubCompTypes.allocate(NumGrandChildren);
@@ -2806,12 +2805,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                     {
                                         auto &thisSubSubComp = thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum);
                                         thisSubSubComp.TypeOf =
-                                            BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubSubCompNum))];
+                                            Node::connObjTypeNamesUC[static_cast<int>(SubCompTypes(SubSubCompNum))];
                                         thisSubSubComp.Name = SubCompNames(SubSubCompNum);
-                                        thisSubSubComp.NodeNameIn = InletNodeNames(SubSubCompNum);
-                                        thisSubSubComp.NodeNameOut = OutletNodeNames(SubSubCompNum);
-                                        thisSubSubComp.NodeNumIn = InletNodeNumbers(SubSubCompNum);
-                                        thisSubSubComp.NodeNumOut = OutletNodeNumbers(SubSubCompNum);
+                                        thisSubSubComp.InNodeName = InletNodeNames(SubSubCompNum);
+                                        thisSubSubComp.OutNodeName = OutletNodeNames(SubSubCompNum);
+                                        thisSubSubComp.InNodeNum = InletNodeNumbers(SubSubCompNum);
+                                        thisSubSubComp.OutNodeNum = OutletNodeNumbers(SubSubCompNum);
                                     }
                                 }
 
@@ -2956,8 +2955,6 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
     int SubCompNum;
     int SubSubCompNum;
     Constant::HeatOrCool CompMode;
-    int InletNodeNum;
-    int OutletNodeNum;
     int ADUNum;
     int ADUCoolNum;
     int ADUHeatNum;
@@ -3020,20 +3017,20 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
         thisSysLoadRepVars.EvapElec = 0.0;
     }
 
-    auto &Node = state.dataLoopNodes->Node;
+    auto &dln = state.dataLoopNodes;
 
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
         auto const &pas = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
         for (BranchNum = 1; BranchNum <= pas.NumBranches; ++BranchNum) {
             auto const &pasBranch = pas.Branch(BranchNum);
-            if (Node(pasBranch.NodeNumOut).MassFlowRate <= 0.0) continue;
+            if (dln->nodes(pasBranch.OutNodeNum)->MassFlowRate <= 0.0) continue;
             for (CompNum = 1; CompNum <= pasBranch.TotalComponents; ++CompNum) {
                 auto const &pasBranchComp = pasBranch.Comp(CompNum);
-                InletNodeNum = pasBranchComp.NodeNumIn;
-                OutletNodeNum = pasBranchComp.NodeNumOut;
-                if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
-                CompLoad = Node(OutletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
-                                                               Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
+                if (pasBranchComp.InNodeNum <= 0 || pasBranchComp.OutNodeNum <= 0) continue;
+                auto const *compInNode = dln->nodes(pasBranchComp.InNodeNum);
+                auto const *compOutNode = dln->nodes(pasBranchComp.OutNodeNum);
+                CompLoad = compOutNode->MassFlowRate * (Psychrometrics::PsyHFnTdbW(compInNode->Temp, compInNode->HumRat) -
+                                                               Psychrometrics::PsyHFnTdbW(compOutNode->Temp, compOutNode->HumRat));
                 CompLoad *= TimeStepSysSec;
                 CompEnergyUse = 0.0;
                 EnergyType = Constant::eResource::Invalid;
@@ -3050,11 +3047,13 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
 
                 for (SubCompNum = 1; SubCompNum <= pasBranchComp.NumSubComps; ++SubCompNum) {
                     auto const &pasBranchSubComp = pasBranchComp.SubComp(SubCompNum);
-                    InletNodeNum = pasBranchSubComp.NodeNumIn;
-                    OutletNodeNum = pasBranchSubComp.NodeNumOut;
-                    if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
-                    CompLoad = Node(OutletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
-                                                                   Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
+                    if (pasBranchSubComp.InNodeNum <= 0 || pasBranchSubComp.OutNodeNum <= 0) continue;
+
+                    auto const *subcompInNode = dln->nodes(pasBranchSubComp.InNodeNum);
+                    auto const *subcompOutNode = dln->nodes(pasBranchSubComp.OutNodeNum);
+
+                    CompLoad = subcompOutNode->MassFlowRate * (Psychrometrics::PsyHFnTdbW(subcompInNode->Temp, subcompInNode->HumRat) -
+                                                                   Psychrometrics::PsyHFnTdbW(subcompOutNode->Temp, subcompOutNode->HumRat));
                     CompLoad *= TimeStepSysSec;
                     CompEnergyUse = 0.0;
                     EnergyType = Constant::eResource::Invalid;
@@ -3071,12 +3070,12 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
 
                     for (SubSubCompNum = 1; SubSubCompNum <= pasBranchSubComp.NumSubSubComps; ++SubSubCompNum) {
                         auto const &pasBranchSubSubComp = pasBranchSubComp.SubSubComp(SubSubCompNum);
-                        InletNodeNum = pasBranchSubSubComp.NodeNumIn;
-                        OutletNodeNum = pasBranchSubSubComp.NodeNumOut;
-                        if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
+                        if (pasBranchSubSubComp.InNodeNum <= 0 || pasBranchSubSubComp.OutNodeNum <= 0) continue;
+                        auto const *subsubcompInNode = dln->nodes(pasBranchSubSubComp.InNodeNum);
+                        auto const *subsubcompOutNode = dln->nodes(pasBranchSubSubComp.OutNodeNum);                        
                         CompLoad =
-                            Node(OutletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
-                                                                Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
+                             subsubcompOutNode->MassFlowRate * (Psychrometrics::PsyHFnTdbW(subsubcompInNode->Temp, subsubcompInNode->HumRat) -
+                                                                Psychrometrics::PsyHFnTdbW(subsubcompOutNode->Temp, subsubcompOutNode->HumRat));
                         CompLoad *= TimeStepSysSec;
                         CompEnergyUse = 0.0;
                         EnergyType = Constant::eResource::Invalid;
@@ -3106,22 +3105,22 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
         if (state.dataZoneEnergyDemand->DeadBandOrSetback(CtrlZoneNum)) ZoneLoad = 0.0;
 
         // loop over the zone supply air path inlet nodes
-        for (int ZoneInNum = 1; ZoneInNum <= zecCtrlZone.NumInletNodes; ++ZoneInNum) {
+        for (int ZoneInNum = 1; ZoneInNum <= zecCtrlZone.NumInNodes; ++ZoneInNum) {
             // retrieve air loop indexes
-            int AirLoopNum = zecCtrlZone.InletNodeAirLoopNum(ZoneInNum);
+            int AirLoopNum = zecCtrlZone.InNodeAirLoopNum(ZoneInNum);
             if (AirLoopNum == 0) continue;
 
             auto const &zecCtrlZoneCool = zecCtrlZone.AirDistUnitCool(ZoneInNum);
             auto const &zecCtrlZoneHeat = zecCtrlZone.AirDistUnitHeat(ZoneInNum);
 
-            AirDistCoolInletNodeNum = max(zecCtrlZoneCool.InNode, 0);
-            AirDistHeatInletNodeNum = max(zecCtrlZoneHeat.InNode, 0);
+            AirDistCoolInletNodeNum = max(zecCtrlZoneCool.InNodeNum, 0);
+            AirDistHeatInletNodeNum = max(zecCtrlZoneHeat.InNodeNum, 0);
 
             // Set for cooling or heating path
             if (AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum == 0) {
-                ADUCoolFlowrate = max(Node(zecCtrlZoneCool.InNode).MassFlowRate, 0.0);
+                ADUCoolFlowrate = max(dln->nodes(zecCtrlZoneCool.InNodeNum)->MassFlowRate, 0.0);
             } else if (AirDistHeatInletNodeNum > 0 && AirDistCoolInletNodeNum == 0) {
-                ADUHeatFlowrate = max(Node(zecCtrlZoneHeat.InNode).MassFlowRate, 0.0);
+                ADUHeatFlowrate = max(dln->nodes(zecCtrlZoneHeat.InNodeNum)->MassFlowRate, 0.0);
             } else {
                 ADUCoolFlowrate = 0.0;
                 ADUHeatFlowrate = 0.0;
@@ -3146,14 +3145,12 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                 CompLoad = 0.0;
                 if (zelEquipData.NumInlets > 0) {
                     for (nodes = 1; nodes <= zelEquipData.NumInlets; ++nodes) {
-                        InletNodeNum = zelEquipData.InletNodeNums(Idx);
-                        CompLoad +=
-                            (Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) * Node(InletNodeNum).MassFlowRate);
+                        auto const *inNode = dln->nodes(zelEquipData.InNodeNums(Idx));
+                        CompLoad += Psychrometrics::PsyHFnTdbW(inNode->Temp, inNode->HumRat) * inNode->MassFlowRate;
                     }
                     for (nodes = 1; nodes <= zelEquipData.NumOutlets; ++nodes) {
-                        OutletNodeNum = zelEquipData.OutletNodeNums(Idx);
-                        CompLoad -=
-                            (Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat) * Node(OutletNodeNum).MassFlowRate);
+                        auto const *outNode = dln->nodes(zelEquipData.OutNodeNums(Idx));
+                        CompLoad -= Psychrometrics::PsyHFnTdbW(outNode->Temp, outNode->HumRat) * outNode->MassFlowRate;
                     }
                 }
                 CompLoad *= TimeStepSysSec;
@@ -3170,11 +3167,11 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
 
                 for (SubCompNum = 1; SubCompNum <= zelEquipData.NumSubEquip; ++SubCompNum) {
                     auto const &zelSubEquipData = zelEquipData.SubEquipData(SubCompNum);
-                    InletNodeNum = zelSubEquipData.InletNodeNum;
-                    OutletNodeNum = zelSubEquipData.OutletNodeNum;
-                    if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
-                    CompLoad = Node(InletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
-                                                                  Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
+                    if (zelSubEquipData.InNodeNum <= 0 || zelSubEquipData.OutNodeNum <= 0) continue;
+                    auto const *inNode = dln->nodes(zelSubEquipData.InNodeNum);
+                    auto const *outNode = dln->nodes(zelSubEquipData.OutNodeNum);
+                    CompLoad = inNode->MassFlowRate * (Psychrometrics::PsyHFnTdbW(inNode->Temp, inNode->HumRat) -
+                                                                  Psychrometrics::PsyHFnTdbW(outNode->Temp, outNode->HumRat));
                     CompLoad *= TimeStepSysSec;
                     CompEnergyUse = 0.0;
                     EnergyType = Constant::eResource::Invalid;
@@ -3189,12 +3186,13 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
 
                     for (SubSubCompNum = 1; SubSubCompNum <= zelSubEquipData.NumSubSubEquip; ++SubSubCompNum) {
                         auto const &zelSubSubEquipData = zelSubEquipData.SubSubEquipData(SubSubCompNum);
-                        InletNodeNum = zelSubSubEquipData.InletNodeNum;
-                        OutletNodeNum = zelSubSubEquipData.OutletNodeNum;
-                        if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
+                        if (zelSubSubEquipData.InNodeNum <= 0 || zelSubSubEquipData.OutNodeNum <= 0) continue;
+
+                        auto const *inNode = dln->nodes(zelSubSubEquipData.InNodeNum);
+                        auto const *outNode = dln->nodes(zelSubSubEquipData.OutNodeNum);
                         CompLoad =
-                            Node(InletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
-                                                               Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
+                            inNode->MassFlowRate * (Psychrometrics::PsyHFnTdbW(inNode->Temp, inNode->HumRat) -
+                                                               Psychrometrics::PsyHFnTdbW(outNode->Temp, outNode->HumRat));
                         CompLoad *= TimeStepSysSec;
                         CompEnergyUse = 0.0;
                         EnergyType = Constant::eResource::Invalid;
@@ -3762,9 +3760,10 @@ void ReportVentilationLoads(EnergyPlusData &state)
 
     Real64 constexpr SmallLoad(0.1); // (W)
 
-    auto &Node = state.dataLoopNodes->Node;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+
+    auto &dln = state.dataLoopNodes;
 
     if (!state.dataSysRpts->VentReportStructureCreated) return;
     if (!state.dataSysRpts->VentLoadsReportEnabled) return;
@@ -3861,16 +3860,18 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 // case statement to cover all possible zone forced air units that could have outside air
 
             case DataZoneEquipment::ZoneEquipType::WindowAirConditioner: { // Window Air Conditioner
-                int OutAirNode = WindowAC::GetWindowACOutAirNode(state, thisEquipIndex);
-                if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
+                int OutAirNodeNum = WindowAC::GetWindowACOutAirNode(state, thisEquipIndex);
+                if (OutAirNodeNum > 0) ZFAUOutAirFlow += dln->nodes(OutAirNodeNum)->MassFlowRate;
 
-                int ZoneInletAirNode = WindowAC::GetWindowACZoneInletAirNode(state, thisEquipIndex);
-                if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                int MixedAirNode = WindowAC::GetWindowACMixedAirNode(state, thisEquipIndex);
-                int ReturnAirNode = WindowAC::GetWindowACReturnAirNode(state, thisEquipIndex);
-                if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                int ZoneAirInNodeNum = WindowAC::GetWindowACZoneInletAirNode(state, thisEquipIndex);
+                if (ZoneAirInNodeNum > 0) ZFAUFlowRate = max(dln->nodes(ZoneAirInNodeNum)->MassFlowRate, 0.0);
+                int MixedAirNodeNum = WindowAC::GetWindowACMixedAirNode(state, thisEquipIndex);
+                int ReturnAirNodeNum = WindowAC::GetWindowACReturnAirNode(state, thisEquipIndex);
+                if ((MixedAirNodeNum > 0) && (ReturnAirNodeNum > 0)) {
+                    auto const *mixedAirNode = dln->nodes(MixedAirNodeNum);
+                    auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(mixedAirNode->Temp, mixedAirNode->HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
@@ -3879,15 +3880,17 @@ void ReportVentilationLoads(EnergyPlusData &state)
             } break;
 
             case DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal: {
-                int OutAirNode = HVACVariableRefrigerantFlow::GetVRFTUOutAirNode(state, thisEquipIndex);
-                if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
-                int ZoneInletAirNode = HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode(state, thisEquipIndex);
-                if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                int MixedAirNode = HVACVariableRefrigerantFlow::GetVRFTUMixedAirNode(state, thisEquipIndex);
-                int ReturnAirNode = HVACVariableRefrigerantFlow::GetVRFTUReturnAirNode(state, thisEquipIndex);
-                if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                int OutAirNodeNum = HVACVariableRefrigerantFlow::GetVRFTUOutAirNode(state, thisEquipIndex);
+                if (OutAirNodeNum > 0) ZFAUOutAirFlow += dln->nodes(OutAirNodeNum)->MassFlowRate;
+                int ZoneAirInNodeNum = HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode(state, thisEquipIndex);
+                if (ZoneAirInNodeNum > 0) ZFAUFlowRate = max(dln->nodes(ZoneAirInNodeNum)->MassFlowRate, 0.0);
+                int MixedAirNodeNum = HVACVariableRefrigerantFlow::GetVRFTUMixedAirNode(state, thisEquipIndex);
+                int ReturnAirNodeNum = HVACVariableRefrigerantFlow::GetVRFTUReturnAirNode(state, thisEquipIndex);
+                if ((MixedAirNodeNum > 0) && (ReturnAirNodeNum > 0)) {
+                    auto const *mixedAirNode = dln->nodes(MixedAirNodeNum);
+                    auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(mixedAirNode->Temp, mixedAirNode->HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
@@ -3900,31 +3903,36 @@ void ReportVentilationLoads(EnergyPlusData &state)
             case DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir: {
                 // loop index accesses correct pointer to equipment on this equipment list, DataZoneEquipment::GetZoneEquipmentData
                 // thisEquipIndex (EquipIndex) is used to access specific equipment for a single class of equipment (e.g., PTAC 1, 2 and 3)
-                int OutAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerOANode();
-                if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
-                int ZoneInletAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getAirOutletNode();
-                if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                int MixedAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerMixNode();
-                int ReturnAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerRetNode();
-                if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                int OutAirNodeNum = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerOANode();
+                if (OutAirNodeNum > 0) ZFAUOutAirFlow += dln->nodes(OutAirNodeNum)->MassFlowRate;
+                int ZoneAirInNodeNum = thisZoneEquipList.compPointer[thisZoneEquipNum]->getAirOutletNode();
+                if (ZoneAirInNodeNum > 0) ZFAUFlowRate = max(dln->nodes(ZoneAirInNodeNum)->MassFlowRate, 0.0);
+                int MixedAirNodeNum = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerMixNode();
+                int ReturnAirNodeNum = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerRetNode();
+                if ((MixedAirNodeNum > 0) && (ReturnAirNodeNum > 0)) {
+                    auto const *mixedAirNode = dln->nodes(MixedAirNodeNum);
+                    auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(mixedAirNode->Temp, mixedAirNode->HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 }
             } break;
 
             case DataZoneEquipment::ZoneEquipType::FourPipeFanCoil: {
-                int OutAirNode = FanCoilUnits::GetFanCoilOutAirNode(state, thisEquipIndex);
-                if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
+                int OutAirNodeNum = FanCoilUnits::GetFanCoilOutAirNode(state, thisEquipIndex);
+                if (OutAirNodeNum > 0) ZFAUOutAirFlow += dln->nodes(OutAirNodeNum)->MassFlowRate;
 
-                int ZoneInletAirNode = FanCoilUnits::GetFanCoilZoneInletAirNode(state, thisEquipIndex);
-                if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                int MixedAirNode = FanCoilUnits::GetFanCoilMixedAirNode(state, thisEquipIndex);
-                int ReturnAirNode = FanCoilUnits::GetFanCoilReturnAirNode(state, thisEquipIndex);
-                if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                int ZoneAirInNodeNum = FanCoilUnits::GetFanCoilZoneInletAirNode(state, thisEquipIndex);
+                if (ZoneAirInNodeNum > 0) ZFAUFlowRate = max(dln->nodes(ZoneAirInNodeNum)->MassFlowRate, 0.0);
+
+                int MixedAirNodeNum = FanCoilUnits::GetFanCoilMixedAirNode(state, thisEquipIndex);
+                int ReturnAirNodeNum = FanCoilUnits::GetFanCoilReturnAirNode(state, thisEquipIndex);
+                if ((MixedAirNodeNum > 0) && (ReturnAirNodeNum > 0)) {
+                    auto const *mixedAirNode = dln->nodes(MixedAirNodeNum);
+                    auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(mixedAirNode->Temp, mixedAirNode->HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
@@ -3933,16 +3941,18 @@ void ReportVentilationLoads(EnergyPlusData &state)
             } break;
 
             case DataZoneEquipment::ZoneEquipType::UnitVentilator: {
-                int OutAirNode = UnitVentilator::GetUnitVentilatorOutAirNode(state, thisEquipIndex);
-                if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
+                int OutAirNodeNum = UnitVentilator::GetUnitVentilatorOutAirNode(state, thisEquipIndex);
+                if (OutAirNodeNum > 0) ZFAUOutAirFlow += dln->nodes(OutAirNodeNum)->MassFlowRate;
 
-                int ZoneInletAirNode = UnitVentilator::GetUnitVentilatorZoneInletAirNode(state, thisEquipIndex);
-                if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                int MixedAirNode = UnitVentilator::GetUnitVentilatorMixedAirNode(state, thisEquipIndex);
-                int ReturnAirNode = UnitVentilator::GetUnitVentilatorReturnAirNode(state, thisEquipIndex);
-                if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                int ZoneAirInNodeNum = UnitVentilator::GetUnitVentilatorZoneInletAirNode(state, thisEquipIndex);
+                if (ZoneAirInNodeNum > 0) ZFAUFlowRate = max(dln->nodes(ZoneAirInNodeNum)->MassFlowRate, 0.0);
+                int MixedAirNodeNum = UnitVentilator::GetUnitVentilatorMixedAirNode(state, thisEquipIndex);
+                int ReturnAirNodeNum = UnitVentilator::GetUnitVentilatorReturnAirNode(state, thisEquipIndex);
+                if ((MixedAirNodeNum > 0) && (ReturnAirNodeNum > 0)) {
+                    auto const *mixedAirNode = dln->nodes(MixedAirNodeNum);
+                    auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(mixedAirNode->Temp, mixedAirNode->HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
@@ -3952,14 +3962,15 @@ void ReportVentilationLoads(EnergyPlusData &state)
 
             case DataZoneEquipment::ZoneEquipType::PurchasedAir: {
                 ZFAUOutAirFlow += PurchasedAirManager::GetPurchasedAirOutAirMassFlow(state, thisEquipIndex);
-                int ZoneInletAirNode = PurchasedAirManager::GetPurchasedAirZoneInletAirNode(state, thisEquipIndex);
-                if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
+                int ZoneAirInNodeNum = PurchasedAirManager::GetPurchasedAirZoneInletAirNode(state, thisEquipIndex);
+                if (ZoneAirInNodeNum > 0) ZFAUFlowRate = max(dln->nodes(ZoneAirInNodeNum)->MassFlowRate, 0.0);
                 ZFAUTempMixedAir = PurchasedAirManager::GetPurchasedAirMixedAirTemp(state, thisEquipIndex);
                 ZFAUHumRatMixedAir = PurchasedAirManager::GetPurchasedAirMixedAirHumRat(state, thisEquipIndex);
-                int ReturnAirNode = PurchasedAirManager::GetPurchasedAirReturnAirNode(state, thisEquipIndex);
-                if ((ZFAUFlowRate > 0) && (ReturnAirNode > 0)) {
+                int ReturnAirNodeNum = PurchasedAirManager::GetPurchasedAirReturnAirNode(state, thisEquipIndex);
+                if ((ZFAUFlowRate > 0) && (ReturnAirNodeNum > 0)) {
+                    auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
                     ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(ZFAUTempMixedAir, ZFAUHumRatMixedAir);
-                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
@@ -3968,16 +3979,18 @@ void ReportVentilationLoads(EnergyPlusData &state)
             } break;
 
             case DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator: {
-                int OutAirNode = HVACStandAloneERV::GetStandAloneERVOutAirNode(state, thisEquipIndex);
-                if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
+                int OutAirNodeNum = HVACStandAloneERV::GetStandAloneERVOutAirNode(state, thisEquipIndex);
+                if (OutAirNodeNum > 0) ZFAUOutAirFlow += dln->nodes(OutAirNodeNum)->MassFlowRate;
 
-                int ZoneInletAirNode = HVACStandAloneERV::GetStandAloneERVZoneInletAirNode(state, thisEquipIndex);
-                if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                int MixedAirNode = ZoneInletAirNode;
-                int ReturnAirNode = HVACStandAloneERV::GetStandAloneERVReturnAirNode(state, thisEquipIndex);
-                if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                int ZoneAirInNodeNum = HVACStandAloneERV::GetStandAloneERVZoneInletAirNode(state, thisEquipIndex);
+                if (ZoneAirInNodeNum > 0) ZFAUFlowRate = max(dln->nodes(ZoneAirInNodeNum)->MassFlowRate, 0.0);
+                int MixedAirNodeNum = ZoneAirInNodeNum;
+                int ReturnAirNodeNum = HVACStandAloneERV::GetStandAloneERVReturnAirNode(state, thisEquipIndex);
+                if ((MixedAirNodeNum > 0) && (ReturnAirNodeNum > 0)) {
+                    auto const *mixedAirNode = dln->nodes(MixedAirNodeNum);
+                    auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(mixedAirNode->Temp, mixedAirNode->HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
@@ -3990,15 +4003,17 @@ void ReportVentilationLoads(EnergyPlusData &state)
             } break;
 
             case DataZoneEquipment::ZoneEquipType::OutdoorAirUnit: {
-                int OutAirNode = OutdoorAirUnit::GetOutdoorAirUnitOutAirNode(state, thisEquipIndex);
-                if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
+                int OutAirNodeNum = OutdoorAirUnit::GetOutdoorAirUnitOutAirNode(state, thisEquipIndex);
+                if (OutAirNodeNum > 0) ZFAUOutAirFlow += dln->nodes(OutAirNodeNum)->MassFlowRate;
 
-                int ZoneInletAirNode = OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(state, thisEquipIndex);
-                if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                int ReturnAirNode = OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode(state, thisEquipIndex);
-                if ((OutAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
-                    ZFAUEnthOutdoorAir = Psychrometrics::PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
+                int ZoneAirInNodeNum = OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(state, thisEquipIndex);
+                if (ZoneAirInNodeNum > 0) ZFAUFlowRate = max(dln->nodes(ZoneAirInNodeNum)->MassFlowRate, 0.0);
+                int ReturnAirNodeNum = OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode(state, thisEquipIndex);
+                if ((OutAirNodeNum > 0) && (ReturnAirNodeNum > 0)) {
+                    auto const *outAirNode = dln->nodes(OutAirNodeNum);
+                    auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
+                    ZFAUEnthOutdoorAir = Psychrometrics::PsyHFnTdbW(outAirNode->Temp, outAirNode->HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
@@ -4007,16 +4022,18 @@ void ReportVentilationLoads(EnergyPlusData &state)
             } break;
 
             case DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler: {
-                int OutAirNode = HybridUnitaryAirConditioners::GetHybridUnitaryACOutAirNode(state, thisEquipIndex);
-                if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
+                int OutAirNodeNum = HybridUnitaryAirConditioners::GetHybridUnitaryACOutAirNode(state, thisEquipIndex);
+                if (OutAirNodeNum > 0) ZFAUOutAirFlow += dln->nodes(OutAirNodeNum)->MassFlowRate;
 
-                int ZoneInletAirNode = HybridUnitaryAirConditioners::GetHybridUnitaryACZoneInletNode(state, thisEquipIndex);
-                if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
+                int ZoneAirInNodeNum = HybridUnitaryAirConditioners::GetHybridUnitaryACZoneInletNode(state, thisEquipIndex);
+                if (ZoneAirInNodeNum > 0) ZFAUFlowRate = max(dln->nodes(ZoneAirInNodeNum)->MassFlowRate, 0.0);
 
-                int ReturnAirNode = HybridUnitaryAirConditioners::GetHybridUnitaryACReturnAirNode(state, thisEquipIndex);
-                if ((OutAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
-                    ZFAUEnthOutdoorAir = Psychrometrics::PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
+                int ReturnAirNodeNum = HybridUnitaryAirConditioners::GetHybridUnitaryACReturnAirNode(state, thisEquipIndex);
+                if ((OutAirNodeNum > 0) && (ReturnAirNodeNum > 0)) {
+                    auto const *outAirNode = dln->nodes(OutAirNodeNum);
+                    auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
+                    ZFAUEnthOutdoorAir = Psychrometrics::PsyHFnTdbW(outAirNode->Temp, outAirNode->HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
 
                     ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
@@ -4060,7 +4077,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
         }
 
         // loop over the zone supply air path inlet nodes
-        for (int ZoneInNum = 1; ZoneInNum <= thisZoneEquipConfig.NumInletNodes; ++ZoneInNum) {
+        for (int ZoneInNum = 1; ZoneInNum <= thisZoneEquipConfig.NumInNodes; ++ZoneInNum) {
             Real64 AirSysEnthReturnAir = 0.0;    // enthalpy of the return air (mixing box inlet node, return side) [kJ/kgK]
             Real64 AirSysEnthMixedAir = 0.0;     // enthalpy of the mixed air (mixing box outlet node, mixed air side) [kJ/kgK]
             Real64 AirSysZoneVentLoad = 0.0;     // ventilation load attributed to a particular zone from primary air system [J]
@@ -4069,40 +4086,28 @@ void ReportVentilationLoads(EnergyPlusData &state)
             Real64 AirSysTotalMixFlowRate = 0.0; // Mixed air mass flow rate [kg/s]
             Real64 AirSysOutAirFlow = 0.0;       // outside air flow rate for zone from primary air system [kg/s]
             // retrieve air loop index
-            int AirLoopNum = thisZoneEquipConfig.InletNodeAirLoopNum(ZoneInNum);
-            int MixedAirNode = 0;
-            int ReturnAirNode = 0;
-            int AirDistCoolInletNodeNum = 0;
-            int AirDistHeatInletNodeNum = 0;
+            int AirLoopNum = thisZoneEquipConfig.InNodeAirLoopNum(ZoneInNum);
             if (AirLoopNum != 0) { // deal with primary air system
-                AirDistCoolInletNodeNum = max(thisZoneEquipConfig.AirDistUnitCool(ZoneInNum).InNode, 0);
-                AirDistHeatInletNodeNum = max(thisZoneEquipConfig.AirDistUnitHeat(ZoneInNum).InNode, 0);
+                auto const &aduCool = thisZoneEquipConfig.AirDistUnitCool(ZoneInNum);
+                auto const &aduHeat = thisZoneEquipConfig.AirDistUnitHeat(ZoneInNum);
                 // Set for cooling or heating path
-                if (AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum == 0) {
-                    ADUCoolFlowrate = max(Node(thisZoneEquipConfig.AirDistUnitCool(ZoneInNum).InNode).MassFlowRate,
-                                          0.0); // CR7244 need to accumulate flow across multiple inlets
-                } else if (AirDistHeatInletNodeNum > 0 && AirDistCoolInletNodeNum == 0) {
-                    ADUHeatFlowrate = max(Node(thisZoneEquipConfig.AirDistUnitHeat(ZoneInNum).InNode).MassFlowRate,
-                                          0.0); // CR7244 need to accumulate flow across multiple inlets
-                } else if (AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum > 0 && AirDistCoolInletNodeNum != AirDistHeatInletNodeNum) {
+                if (aduCool.InNodeNum > 0 && aduHeat.InNodeNum == 0) {
+                    ADUCoolFlowrate = max(dln->nodes(aduCool.InNodeNum)->MassFlowRate, 0.0); // CR7244 need to accumulate flow across multiple inlets
+                } else if (aduHeat.InNodeNum > 0 && aduCool.InNodeNum == 0) {
+                    ADUHeatFlowrate = max(dln->nodes(aduHeat.InNodeNum)->MassFlowRate, 0.0); // CR7244 need to accumulate flow across multiple inlets
+                } else if (aduCool.InNodeNum > 0 && aduHeat.InNodeNum > 0 && aduCool.InNodeNum != aduHeat.InNodeNum) {
                     // dual ducts! CR7244 need to accumulate flow across multiple inlets (don't count same inlet twice)
-                    ADUHeatFlowrate = max(Node(thisZoneEquipConfig.AirDistUnitHeat(ZoneInNum).InNode).MassFlowRate,
-                                          0.0); // CR7244 need to accumulate flow across multiple inlets
-                    ADUCoolFlowrate = max(Node(thisZoneEquipConfig.AirDistUnitCool(ZoneInNum).InNode).MassFlowRate,
-                                          0.0); // CR7244 need to accumulate flow across multiple inlets
-                } else if (AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum > 0) {
+                    ADUHeatFlowrate = max(dln->nodes(aduHeat.InNodeNum)->MassFlowRate, 0.0); // CR7244 need to accumulate flow across multiple inlets
+                    ADUCoolFlowrate = max(dln->nodes(aduCool.InNodeNum)->MassFlowRate, 0.0); // CR7244 need to accumulate flow across multiple inlets
+                } else if (aduCool.InNodeNum > 0 && aduHeat.InNodeNum > 0) {
                     // dual ducts! CR7244 need to accumulate flow across multiple inlets (don't count same inlet twice)
-                    ADUCoolFlowrate = max(Node(thisZoneEquipConfig.AirDistUnitCool(ZoneInNum).InNode).MassFlowRate,
-                                          0.0); // CR7244 need to accumulate flow across multiple inlets
+                    ADUCoolFlowrate = max(dln->nodes(aduCool.InNodeNum)->MassFlowRate, 0.0); // CR7244 need to accumulate flow across multiple inlets
                 } else {
                     // do nothing (already inits)
                 }
-                // Find the mixed air node and return air node of the system that supplies the zone
-                MixedAirNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysOutletNodeNum;
-                ReturnAirNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysInletNodeNum;
 
                 // Collect air loop Voz-dyn and natural ventilation
-                int ADUNum = thisZoneEquipConfig.InletNodeADUNum(ZoneInNum);
+                int ADUNum = thisZoneEquipConfig.InNodeADUNum(ZoneInNum);
                 Real64 termUnitOAFrac = 1.0;
                 if (ADUNum > 0) {
                     int termUnitSizingNum = state.dataDefineEquipment->AirDistUnit(ADUNum).TermUnitSizingNum;
@@ -4121,22 +4126,29 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 }
             }
 
-            if (MixedAirNode == 0 || ReturnAirNode == 0) {
+            
+            // Find the mixed air node and return air node of the system that supplies the zone
+            int MixedAirNodeNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysOutNodeNum;
+            int ReturnAirNodeNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysInNodeNum;
+            if (MixedAirNodeNum == 0 || ReturnAirNodeNum == 0) {
                 AirSysZoneVentLoad = 0.0;
                 AirSysOutAirFlow = 0.0;
             } else {
+                auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
+                auto const *mixedAirNode = dln->nodes(MixedAirNodeNum);
+
                 // Calculate return and mixed air ethalpies
-                AirSysEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
-                AirSysEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
+                AirSysEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
+                AirSysEnthMixedAir = Psychrometrics::PsyHFnTdbW(mixedAirNode->Temp, mixedAirNode->HumRat);
 
                 if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysExists) {
-                    int OutAirNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OAMixOAInNodeNum;
-                    AirSysOutAirFlow = Node(OutAirNode).MassFlowRate;
+                    auto const *outAirNode = dln->nodes(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OAMixOAInNodeNum);
+                    AirSysOutAirFlow = outAirNode->MassFlowRate;
                 } else {
                     AirSysOutAirFlow = 0.0;
                 }
 
-                AirSysTotalMixFlowRate = Node(MixedAirNode).MassFlowRate;
+                AirSysTotalMixFlowRate = mixedAirNode->MassFlowRate;
 
                 if (AirSysTotalMixFlowRate != 0.0) {
                     ZoneFlowFrac = (ADUCoolFlowrate + ADUHeatFlowrate) / AirSysTotalMixFlowRate;
@@ -4559,7 +4571,8 @@ void ReportAirLoopConnections(EnergyPlusData &state)
 
     // PURPOSE OF THIS SUBROUTINE:
     // Report air loop splitter connections to the BND file.
-
+    auto &dln = state.dataLoopNodes;
+        
     static constexpr std::string_view errstring("**error**");
 
     static constexpr std::string_view Format_706("! <#AirLoopHVACs>,<Number of AirLoopHVACs>");
@@ -4580,8 +4593,6 @@ void ReportAirLoopConnections(EnergyPlusData &state)
     static constexpr std::string_view Format_714(
         "! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed "
         "Air Outlet Node Name>,<AirLoopHVAC Name>");
-
-    auto &NodeID = state.dataLoopNodes->NodeID;
 
     print(state.files.bnd, "{}\n", "! ===============================================================");
     print(state.files.bnd, "{}\n", Format_706);
@@ -4620,38 +4631,38 @@ void ReportAirLoopConnections(EnergyPlusData &state)
               oaSysExists);
         for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumReturnNodes; ++Count1) {
             print(state.files.bnd, "   AirLoop Return Connections,{},{},", Count1, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
-            if (state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1) > 0) {
+            if (state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNums(Count1) > 0) {
                 print(state.files.bnd,
                       "{},{},",
-                      state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1),
-                      NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1)));
+                      state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNums(Count1),
+                      dln->nodes(state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNums(Count1))->Name);
             } else {
                 print(state.files.bnd, "{},{},", errstring, errstring);
             }
-            if (state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1) > 0) {
+            if (state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNums(Count1) > 0) {
                 print(state.files.bnd,
                       "{},{}\n",
-                      state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1),
-                      NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1)));
+                      state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNums(Count1),
+                      dln->nodes(state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNums(Count1))->Name);
             } else {
                 print(state.files.bnd, "{},{}\n", errstring, errstring);
             }
         }
         for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumSupplyNodes; ++Count1) {
             print(state.files.bnd, "   AirLoop Supply Connections,{},{},", Count1, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
-            if (state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1) > 0) {
+            if (state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNums(Count1) > 0) {
                 print(state.files.bnd,
                       "{},{},",
-                      state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1),
-                      NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1)));
+                      state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNums(Count1),
+                      dln->nodes(state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNums(Count1))->Name);
             } else {
                 print(state.files.bnd, "{},{},", errstring, errstring);
             }
-            if (state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1) > 0) {
+            if (state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopSupplyNodeNums(Count1) > 0) {
                 print(state.files.bnd,
                       "{},{}\n",
-                      state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1),
-                      NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1)));
+                      state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopSupplyNodeNums(Count1),
+                      dln->nodes(state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopSupplyNodeNums(Count1))->Name);
             } else {
                 print(state.files.bnd, "{},{}\n", errstring, errstring);
             }
@@ -4660,11 +4671,11 @@ void ReportAirLoopConnections(EnergyPlusData &state)
         for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumZonesCooled; ++Count1) {
             const int CtrldZoneNum = state.dataAirLoop->AirToZoneNodeInfo(Count).CoolCtrlZoneNums(Count1);
             print(state.files.bnd, "   Cooled Zone Info,{},{},", Count1, state.dataHeatBal->Zone(CtrldZoneNum).Name);
-            if (state.dataAirLoop->AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1) > 0) {
+            if (state.dataAirLoop->AirToZoneNodeInfo(Count).CoolZoneInNodeNums(Count1) > 0) {
                 print(state.files.bnd,
                       "{},{},{}\n",
-                      state.dataAirLoop->AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1),
-                      NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1)),
+                      state.dataAirLoop->AirToZoneNodeInfo(Count).CoolZoneInNodeNums(Count1),
+                      dln->nodes(state.dataAirLoop->AirToZoneNodeInfo(Count).CoolZoneInNodeNums(Count1))->Name,
                       state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
             } else {
                 print(state.files.bnd, "{},{},{}\n", errstring, errstring, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
@@ -4673,11 +4684,11 @@ void ReportAirLoopConnections(EnergyPlusData &state)
         for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumZonesHeated; ++Count1) {
             const int CtrldZoneNum = state.dataAirLoop->AirToZoneNodeInfo(Count).HeatCtrlZoneNums(Count1);
             print(state.files.bnd, "   Heated Zone Info,{},{},", Count1, state.dataHeatBal->Zone(CtrldZoneNum).Name);
-            if (state.dataAirLoop->AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1) > 0) {
+            if (state.dataAirLoop->AirToZoneNodeInfo(Count).HeatZoneInNodeNums(Count1) > 0) {
                 print(state.files.bnd,
                       "{},{},{}\n",
-                      state.dataAirLoop->AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1),
-                      NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1)),
+                      state.dataAirLoop->AirToZoneNodeInfo(Count).HeatZoneInNodeNums(Count1),
+                      dln->nodes(state.dataAirLoop->AirToZoneNodeInfo(Count).HeatZoneInNodeNums(Count1))->Name,
                       state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
             } else {
                 print(state.files.bnd, "{},{},{}\n", errstring, errstring, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
@@ -4686,20 +4697,20 @@ void ReportAirLoopConnections(EnergyPlusData &state)
         if (state.dataAirLoop->AirToOANodeInfo(Count).OASysExists) {
             std::string ChrOut;
             std::string ChrOut2;
-            if (state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum > 0) {
-                ChrOut = fmt::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum);
+            if (state.dataAirLoop->AirToOANodeInfo(Count).OASysInNodeNum > 0) {
+                ChrOut = fmt::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysInNodeNum);
             } else {
                 ChrOut = errstring;
             }
-            if (state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum > 0) {
-                ChrOut2 = fmt::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum);
+            if (state.dataAirLoop->AirToOANodeInfo(Count).OASysOutNodeNum > 0) {
+                ChrOut2 = fmt::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutNodeNum);
             } else {
                 ChrOut2 = errstring;
             }
 
             print(state.files.bnd, "   Outdoor Air Connections,{},", ChrOut);
             if (ChrOut != errstring) {
-                print(state.files.bnd, "{},", NodeID(state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum));
+                print(state.files.bnd, "{},", dln->nodes(state.dataAirLoop->AirToOANodeInfo(Count).OASysInNodeNum)->Name);
             } else {
                 print(state.files.bnd, "{},", errstring);
             }
@@ -4707,7 +4718,7 @@ void ReportAirLoopConnections(EnergyPlusData &state)
                 print(state.files.bnd,
                       "{},{},{}\n",
                       ChrOut2,
-                      NodeID(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum),
+                      dln->nodes(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutNodeNum)->Name,
                       state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
             } else {
                 print(state.files.bnd, "{},{},{}\n", errstring, errstring, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
@@ -4719,8 +4730,8 @@ void ReportAirLoopConnections(EnergyPlusData &state)
                   "   AirLoopHVAC Connector,Splitter,{},{},Air,{}\n",
                   state.dataAirSystemsData->PrimaryAirSystems(Count).Splitter.Name,
                   state.dataAirSystemsData->PrimaryAirSystems(Count).Name,
-                  state.dataAirSystemsData->PrimaryAirSystems(Count).Splitter.TotalOutletNodes);
-            for (int Count1 = 1; Count1 <= state.dataAirSystemsData->PrimaryAirSystems(Count).Splitter.TotalOutletNodes; ++Count1) {
+                  state.dataAirSystemsData->PrimaryAirSystems(Count).Splitter.NumOutNodes);
+            for (int Count1 = 1; Count1 <= state.dataAirSystemsData->PrimaryAirSystems(Count).Splitter.NumOutNodes; ++Count1) {
                 print(state.files.bnd,
                       "     AirLoopHVAC Connector Branches,{},Splitter,{},",
                       Count1,
@@ -4751,8 +4762,8 @@ void ReportAirLoopConnections(EnergyPlusData &state)
                       "     AirLoopHVAC Connector Nodes,   {},Splitter,{},{},{},{},Air\n",
                       Count1,
                       state.dataAirSystemsData->PrimaryAirSystems(Count).Splitter.Name,
-                      state.dataAirSystemsData->PrimaryAirSystems(Count).Splitter.NodeNameIn,
-                      state.dataAirSystemsData->PrimaryAirSystems(Count).Splitter.NodeNameOut(Count1),
+                      state.dataAirSystemsData->PrimaryAirSystems(Count).Splitter.InNodeName,
+                      state.dataAirSystemsData->PrimaryAirSystems(Count).Splitter.OutNodeNames(Count1),
                       state.dataAirSystemsData->PrimaryAirSystems(Count).Name);
             }
         }

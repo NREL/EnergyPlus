@@ -119,7 +119,6 @@ namespace SurfaceGroundHeatExchanger {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataLoopNode;
 
     // Use statements for access to subroutines in other modules
 
@@ -187,7 +186,6 @@ namespace SurfaceGroundHeatExchanger {
         using FluidProperties::FindGlycol;
 
         using Node::GetSingleNode;
-        using namespace DataLoopNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -248,8 +246,8 @@ namespace SurfaceGroundHeatExchanger {
             }
 
             // get inlet node data
-            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNode = state.dataIPShortCut->cAlphaArgs(3);
-            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNodeNum =
+            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InNodeName = state.dataIPShortCut->cAlphaArgs(3);
+            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InNodeNum =
                 GetSingleNode(state,
                                   state.dataIPShortCut->cAlphaArgs(3),
                                   ErrorsFound,
@@ -258,16 +256,16 @@ namespace SurfaceGroundHeatExchanger {
                                   Node::FluidType::Water,
                                   Node::ConnType::Inlet,
                                   Node::CompFluidStream::Primary,
-                                  ObjectIsNotParent);
-            if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNodeNum == 0) {
+                              Node::ObjectIsNotParent);
+            if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InNodeNum == 0) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                 ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
             // get outlet node data
-            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(4);
-            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNodeNum =
+            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutNodeName = state.dataIPShortCut->cAlphaArgs(4);
+            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutNodeNum =
                 GetSingleNode(state,
                                   state.dataIPShortCut->cAlphaArgs(4),
                                   ErrorsFound,
@@ -276,8 +274,8 @@ namespace SurfaceGroundHeatExchanger {
                                   Node::FluidType::Water,
                                   Node::ConnType::Outlet,
                                   Node::CompFluidStream::Primary,
-                                  ObjectIsNotParent);
-            if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNodeNum == 0) {
+                              Node::ObjectIsNotParent);
+            if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutNodeNum == 0) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
                 ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
@@ -436,10 +434,11 @@ namespace SurfaceGroundHeatExchanger {
         }
 
         if (state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning) {
-            if (!state.dataEnvrn->GroundTemp_SurfaceObjInput) {
+            if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::Shallow]) {
                 ShowWarningError(state, "GetSurfaceGroundHeatExchanger: No \"Site:GroundTemperature:Shallow\" were input.");
                 ShowContinueError(state,
-                                  format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Surface));
+                                  format("Defaults, constant throughout the year of ({:.1R}) will be used.",
+                                         state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Shallow]));
             }
             state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning = false;
         }
@@ -473,6 +472,8 @@ namespace SurfaceGroundHeatExchanger {
         int Cons;          // construction counter
         int LayerNum;      // material layer number for bottom
         Real64 OutDryBulb; // Height Dependent dry bulb.
+
+        auto &dln = state.dataLoopNodes;
 
         // get QTF data - only once
         if (this->InitQTF) {
@@ -538,7 +539,7 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->PastBeamSolarRad = state.dataEnvrn->BeamSolarRad;
             state.dataSurfaceGroundHeatExchangers->PastSolarDirCosVert = state.dataEnvrn->SOLCOS(3);
             state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = state.dataEnvrn->DifSolarRad;
-            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = state.dataEnvrn->GroundTemp_Surface;
+            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Shallow];
             state.dataSurfaceGroundHeatExchangers->PastIsRain = state.dataEnvrn->IsRain;
             state.dataSurfaceGroundHeatExchangers->PastIsSnow = state.dataEnvrn->IsSnow;
             state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(state, SurfaceHXHeight);
@@ -557,10 +558,10 @@ namespace SurfaceGroundHeatExchanger {
         // then shut branch down when equipment is not scheduled to run.
         DesignFlow = RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->DesignMassFlowRate);
 
-        SetComponentFlowRate(state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
+        SetComponentFlowRate(state, DesignFlow, this->InNodeNum, this->OutNodeNum, this->plantLoc);
 
         // get the current flow rate - module variable
-        state.dataSurfaceGroundHeatExchangers->FlowRate = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
+        state.dataSurfaceGroundHeatExchangers->FlowRate = dln->nodes(this->InNodeNum)->MassFlowRate;
     }
 
     void SurfaceGroundHeatExchangerData::CalcSurfaceGroundHeatExchanger(
@@ -731,7 +732,7 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->PastBeamSolarRad = state.dataEnvrn->BeamSolarRad;
             state.dataSurfaceGroundHeatExchangers->PastSolarDirCosVert = state.dataEnvrn->SOLCOS(3);
             state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = state.dataEnvrn->DifSolarRad;
-            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = state.dataEnvrn->GroundTemp_Surface;
+            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Shallow];
             state.dataSurfaceGroundHeatExchangers->PastIsRain = state.dataEnvrn->IsRain;
             state.dataSurfaceGroundHeatExchangers->PastIsSnow = state.dataEnvrn->IsSnow;
             state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(state, SurfaceHXHeight);
@@ -781,7 +782,7 @@ namespace SurfaceGroundHeatExchanger {
                                        TempB,
                                        state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp,
                                        state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp,
-                                       state.dataEnvrn->GroundTemp_Surface);
+                                       state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Shallow]);
                     // under-relax
                     TempBtm = TempBtm * (1.0 - RelaxT) + RelaxT * TempB;
                     // update flux record
@@ -1348,6 +1349,10 @@ namespace SurfaceGroundHeatExchanger {
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
 
+
+        auto &dln = state.dataLoopNodes;
+        auto *outNode = dln->nodes(this->OutNodeNum);
+        
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("SurfaceGroundHeatExchanger:Update");
 
@@ -1388,13 +1393,13 @@ namespace SurfaceGroundHeatExchanger {
                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                         RoutineName);
 
-        SafeCopyPlantNode(state, this->InletNodeNum, this->OutletNodeNum);
+        SafeCopyPlantNode(state, this->InNodeNum, this->OutNodeNum);
         // check for flow
         if ((CpFluid > 0.0) && (state.dataSurfaceGroundHeatExchangers->FlowRate > 0.0)) {
-            state.dataLoopNodes->Node(this->OutletNodeNum).Temp = this->InletTemp - this->SurfaceArea *
-                                                                                        state.dataSurfaceGroundHeatExchangers->SourceFlux /
-                                                                                        (state.dataSurfaceGroundHeatExchangers->FlowRate * CpFluid);
-            state.dataLoopNodes->Node(this->OutletNodeNum).Enthalpy = state.dataLoopNodes->Node(this->OutletNodeNum).Temp * CpFluid;
+            outNode->Temp = this->InletTemp - this->SurfaceArea *
+                    state.dataSurfaceGroundHeatExchangers->SourceFlux /
+                    (state.dataSurfaceGroundHeatExchangers->FlowRate * CpFluid);
+            outNode->Enthalpy = outNode->Temp * CpFluid;
         }
     }
 
@@ -1413,10 +1418,14 @@ namespace SurfaceGroundHeatExchanger {
         // Using/Aliasing
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
+        auto &dln = state.dataLoopNodes;
+        auto *inNode = dln->nodes(this->InNodeNum);
+        auto *outNode = dln->nodes(this->OutNodeNum);
+        
         // update flows and temps from node data
-        this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
-        this->OutletTemp = state.dataLoopNodes->Node(this->OutletNodeNum).Temp;
-        this->MassFlowRate = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
+        this->InletTemp = inNode->Temp;
+        this->OutletTemp = outNode->Temp;
+        this->MassFlowRate = inNode->MassFlowRate;
 
         // update other variables from module variables
         this->HeatTransferRate = state.dataSurfaceGroundHeatExchangers->SourceFlux * this->SurfaceArea;
@@ -1457,8 +1466,8 @@ namespace SurfaceGroundHeatExchanger {
                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                RoutineName);
         this->DesignMassFlowRate = Constant::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
-        InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->InletNodeNum, this->OutletNodeNum);
-        RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
+        InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->InNodeNum, this->OutNodeNum);
+        RegisterPlantCompDesignFlow(state, this->InNodeNum, this->DesignMassFlowRate / rho);
     }
     void SurfaceGroundHeatExchangerData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
     {

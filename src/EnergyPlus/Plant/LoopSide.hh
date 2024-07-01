@@ -97,8 +97,8 @@ namespace DataPlant {
         Array1D<LoopSidePumpInformation> Pumps;
         Real64 TotalPumpHeat; // [W] total heat addition by the pumps to place in "tank"
         bool BypassExists;
-        bool InletNodeSetPt;
-        bool OutletNodeSetPt;
+        bool InNodeSetPt = false;
+        bool OutNodeSetPt = false;
         bool EMSCtrl;
         Real64 EMSValue;
         bool FlowRestrictionFlag; // Max available flow at the outlet of the half loop
@@ -123,8 +123,8 @@ namespace DataPlant {
         Real64 LoopSideInlet_CapExcessStorageTime;
         Real64 LoopSideInlet_CapExcessStorageTimeReport;
         Real64 LoopSideInlet_TotalTime;
-        PlantConvergencePoint InletNode;
-        PlantConvergencePoint OutletNode;
+        PlantConvergencePoint InNode;
+        PlantConvergencePoint OutNode;
         Real64 flowRequestNeedIfOn;
         Real64 flowRequestNeedAndTurnOn;
         Real64 flowRequestFinal;
@@ -147,12 +147,12 @@ namespace DataPlant {
               OncePerTimeStepOperations(true), TimeElapsed(0.0), FlowRequest(0.0), FlowRequestTemperature(0.0),
               TempSetPoint(Node::SensedNodeFlagValue), TempSetPointHi(Node::SensedNodeFlagValue),
               TempSetPointLo(Node::SensedNodeFlagValue), TempInterfaceTankOutlet(0.0), LastTempInterfaceTankOutlet(0.0), TotalBranches(0),
-              TotalPumps(0), BranchPumpsExist(false), TotalPumpHeat(0.0), BypassExists(false), InletNodeSetPt(false),
-              OutletNodeSetPt(false), EMSCtrl(false), EMSValue(0.0), FlowRestrictionFlag(false), FlowLock(DataPlant::FlowLock::Unlocked),
+              TotalPumps(0), BranchPumpsExist(false), TotalPumpHeat(0.0), BypassExists(false), 
+              EMSCtrl(false), EMSValue(0.0), FlowRestrictionFlag(false), FlowLock(DataPlant::FlowLock::Unlocked),
               TotalConnected(0), HasPressureComponents(false), HasParallelPressComps(false), PressureDrop(0.0), PressureEffectiveK(0.0),
               errCount_LoadWasntDist(0), errIndex_LoadWasntDist(0), errCount_LoadRemains(0), errIndex_LoadRemains(0), LoopSideInlet_TankTemp(0.0),
               LoopSideInlet_MdotCpDeltaT(0.0), LoopSideInlet_McpDTdt(0.0), LoopSideInlet_CapExcessStorageTime(0.0),
-              LoopSideInlet_CapExcessStorageTimeReport(0.0), LoopSideInlet_TotalTime(0.0), InletNode(0.0, 0.0), OutletNode(0.0, 0.0),
+              LoopSideInlet_CapExcessStorageTimeReport(0.0), LoopSideInlet_TotalTime(0.0), 
               flowRequestNeedIfOn(0.0), flowRequestNeedAndTurnOn(0.0), flowRequestFinal(0.0), hasConstSpeedBranchPumps(false),
               InitialDemandToLoopSetPoint(0.0), CurrentAlterationsToDemand(0.0), UpdatedDemandToLoopSetPoint(0.0),
               LoadToLoopSetPointThatWasntMet(0.0), InitialDemandToLoopSetPointSAVED(0.0), refrigIndex(0), LoopSetPtDemandAtInlet(0.0),

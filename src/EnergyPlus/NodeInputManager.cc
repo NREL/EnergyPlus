@@ -409,7 +409,7 @@ constexpr std::array<std::string_view, (int)Node::ConnObjType::Num> connObjTypeN
     "SpaceHVAC:ZoneEquipmentSplitter",
     "SpaceHVAC:ZoneEquipmentMixer"};
 
-constexpr std::array<std::string_view, static_cast<int>(Node::ConnObjType::Num)> connObTypeNamesUC = {
+constexpr std::array<std::string_view, static_cast<int>(Node::ConnObjType::Num)> connObjTypeNamesUC = {
     "UNDEFINED",
     "AIRCONDITIONER:VARIABLEREFRIGERANTFLOW",
     "AIRLOOPHVAC",

@@ -130,9 +130,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
     for (unsigned long i = 1; i <= state->dataHeatBal->ZoneOtherEq.size(); ++i) {
         const DataHeatBalance::ZoneEquipData &equip = state->dataHeatBal->ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
-            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, Constant::eFuel::None));
+            ASSERT_ENUM_EQ(equip.OtherEquipFuelType, Constant::eFuel::None);
         } else if (equip.Name == "OTHEREQ2") {
-            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, Constant::eFuel::Propane));
+            ASSERT_ENUM_EQ(equip.OtherEquipFuelType, Constant::eFuel::Propane);
         }
     }
 }
@@ -487,7 +487,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     Real64 InitialPower =
         thisZoneITEq.PowerRpt[(int)PERptVars::CPU] + thisZoneITEq.PowerRpt[(int)PERptVars::Fan] + thisZoneITEq.PowerRpt[(int)PERptVars::UPS];
 
-    state->dataLoopNodes->Node(1).Temp = 45.0;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(1)->Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
     Real64 NewPower =
         thisZoneITEq.PowerRpt[(int)PERptVars::CPU] + thisZoneITEq.PowerRpt[(int)PERptVars::Fan] + thisZoneITEq.PowerRpt[(int)PERptVars::UPS];
@@ -899,11 +900,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    state->dataLoopNodes->Node(1).Temp = 45.0;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(1)->Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
     auto &thisZoneITEq = state->dataHeatBal->ZoneITEq(1);
     ASSERT_DOUBLE_EQ(thisZoneITEq.AirOutletDryBulbT + thisZoneITEq.ReturnApproachTemp, state->dataHeatBal->Zone(1).AdjustedReturnTempByITE);
-    ASSERT_DOUBLE_EQ(state->dataLoopNodes->Node(1).Temp + thisZoneITEq.SupplyApproachTemp, thisZoneITEq.AirInletDryBulbT);
+    ASSERT_DOUBLE_EQ(dln->nodes(1)->Temp + thisZoneITEq.SupplyApproachTemp, thisZoneITEq.AirInletDryBulbT);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)

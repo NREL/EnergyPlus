@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, GasAbsorption_GetInput_Test)
     EXPECT_FALSE(state->dataChillerGasAbsorption->GasAbsorber(1).isWaterCooled);
 
     EXPECT_EQ(2., state->dataChillerGasAbsorption->GasAbsorber(1).CHWLowLimitTemp);
-    EXPECT_TRUE(compare_enums(Constant::eFuel::NaturalGas, state->dataChillerGasAbsorption->GasAbsorber(1).FuelType));
+    EXPECT_ENUM_EQ(Constant::eFuel::NaturalGas, state->dataChillerGasAbsorption->GasAbsorber(1).FuelType);
 }
 
 TEST_F(EnergyPlusFixture, GasAbsorption_getDesignCapacities_Test)
@@ -178,22 +178,22 @@ TEST_F(EnergyPlusFixture, GasAbsorption_getDesignCapacities_Test)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(3);
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 100;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).NodeNumIn = 111;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = 100;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).InNodeNum = 111;
 
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 3;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(3);
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 2;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(2);
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 200;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).NodeNumIn = 222;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = 200;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).InNodeNum = 222;
 
     state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 4;
     state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(4);
     state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 2;
     state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(2);
-    state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 300;
-    state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).NodeNumIn = 333;
+    state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = 300;
+    state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).InNodeNum = 333;
 
     GasAbsorberSpecs thisChillerHeater;
     thisChillerHeater.ChillReturnNodeNum = 111;
@@ -336,9 +336,11 @@ TEST_F(EnergyPlusFixture, GasAbsorption_calculateHeater_Fix_Test)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Locked;
-    state->dataLoopNodes->Node(3).Temp = 60.0;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.5;
-    state->dataLoopNodes->Node(4).TempSetPoint = 70.0;
+
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(3)->Temp = 60.0;
+    dln->nodes(3)->MassFlowRate = 0.5;
+    dln->nodes(4)->TempSetPoint = 70.0;
 
     thisChillerHeater.calculateHeater(*state, loadinput, runflaginput);
 

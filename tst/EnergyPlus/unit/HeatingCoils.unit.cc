@@ -79,7 +79,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInput)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 
-    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType, Constant::eFuel::OtherFuel1));
+    EXPECT_ENUM_EQ(state->dataHeatingCoils->HeatingCoil(1).FuelType, Constant::eFuel::OtherFuel1);
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
@@ -123,7 +123,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeCoal)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 
-    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType, Constant::eFuel::Coal));
+    EXPECT_ENUM_EQ(state->dataHeatingCoils->HeatingCoil(1).FuelType, Constant::eFuel::Coal);
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 
-    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType, Constant::eFuel::Propane));
+    EXPECT_ENUM_EQ(state->dataHeatingCoils->HeatingCoil(1).FuelType, Constant::eFuel::Propane);
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
@@ -165,9 +165,12 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     state->dataHeatingCoils->HeatingCoil(CoilNum).MSNominalCapacity(1) = 10000;
     state->dataHeatingCoils->HeatingCoil(CoilNum).MSEfficiency.allocate(1);
     state->dataHeatingCoils->HeatingCoil(CoilNum).MSEfficiency(1) = 0.9;
-    state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum = 1;
-    state->dataHeatingCoils->HeatingCoil(CoilNum).AirOutletNodeNum = 2;
-    state->dataLoopNodes->Node.allocate(2);
+    state->dataHeatingCoils->HeatingCoil(CoilNum).AirInNodeNum = 1;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).AirOutNodeNum = 2;
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
+
     state->dataHeatingCoils->HeatingCoil(CoilNum).MSParasiticElecLoad.allocate(1);
     state->dataHeatingCoils->HeatingCoil(CoilNum).MSParasiticElecLoad(1) = 0.0;
 

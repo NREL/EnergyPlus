@@ -77,7 +77,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -299,10 +298,10 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
     EXPECT_EQ(PurchAir(1).MinCoolSuppAirTemp, 13.0);
     EXPECT_EQ(PurchAir(1).MaxHeatSuppAirHumRat, 0.015);
     EXPECT_EQ(PurchAir(1).MinCoolSuppAirHumRat, 0.009);
-    EXPECT_TRUE(compare_enums(PurchAir(1).HeatingLimit, LimitType::NoLimit));
-    EXPECT_TRUE(compare_enums(PurchAir(1).CoolingLimit, LimitType::NoLimit));
-    EXPECT_TRUE(compare_enums(PurchAir(1).DehumidCtrlType, HumControl::ConstantSupplyHumidityRatio));
-    EXPECT_TRUE(compare_enums(PurchAir(1).HumidCtrlType, HumControl::ConstantSupplyHumidityRatio));
+    EXPECT_ENUM_EQ(PurchAir(1).HeatingLimit, LimitType::NoLimit);
+    EXPECT_ENUM_EQ(PurchAir(1).CoolingLimit, LimitType::NoLimit);
+    EXPECT_ENUM_EQ(PurchAir(1).DehumidCtrlType, HumControl::ConstantSupplyHumidityRatio);
+    EXPECT_ENUM_EQ(PurchAir(1).HumidCtrlType, HumControl::ConstantSupplyHumidityRatio);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
@@ -415,19 +414,20 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     // Ideal loads air system found the plenum it is attached to
     EXPECT_EQ(PurchAir(1).ReturnPlenumIndex, 1);
     // The ideal loads air system inlet air node is equal to the zone return plenum outlet node
-    EXPECT_EQ(PurchAir(1).PlenumExhaustAirNodeNum, state->dataZonePlenum->ZoneRetPlenCond(1).OutletNode);
+    EXPECT_EQ(PurchAir(1).PlenumExhaustAirNodeNum, state->dataZonePlenum->ZoneRetPlenCond(1).AirOutNodeNum);
     // The ideal loads air system ZoneSupplyAirNodeNum is equal to the zone air inlet node
-    EXPECT_EQ(PurchAir(1).ZoneSupplyAirNodeNum, state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1));
+    EXPECT_EQ(PurchAir(1).ZoneSupplyAirNodeNum, state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1));
     // The ideal loads air system ZoneExhaustAirNodeNum is equal to the zone exhaust air node num
-    EXPECT_EQ(PurchAir(1).ZoneExhaustAirNodeNum, state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1));
+    EXPECT_EQ(PurchAir(1).ZoneExhaustAirNodeNum, state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1));
     // The zone exhaust air node is equal to the zone return plenum inlet air node
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1), state->dataZonePlenum->ZoneRetPlenCond(1).InletNode(1));
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1), state->dataZonePlenum->ZoneRetPlenCond(1).InNodeNums(1));
     // The ideal loads air system has a non-zero mass flow rate
     EXPECT_GT(PurchAir(1).SupplyAirMassFlowRate, 0.0);
     // The ideal loads air system mass flow rate is equal to all nodes attached to this system
-    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, state->dataLoopNodes->Node(PurchAir(1).ZoneSupplyAirNodeNum).MassFlowRate);
-    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, state->dataLoopNodes->Node(PurchAir(1).ZoneExhaustAirNodeNum).MassFlowRate);
-    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, state->dataLoopNodes->Node(PurchAir(1).PlenumExhaustAirNodeNum).MassFlowRate);
+    auto &dln = state->dataLoopNodes;
+    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, dln->nodes(PurchAir(1).ZoneSupplyAirNodeNum)->MassFlowRate);
+    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, dln->nodes(PurchAir(1).ZoneExhaustAirNodeNum)->MassFlowRate);
+    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, dln->nodes(PurchAir(1).PlenumExhaustAirNodeNum)->MassFlowRate);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
@@ -527,8 +527,9 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     auto &PurchAir(state->dataPurchasedAirMgr->PurchAir);
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
     // Ideal loads air system found the plenum it is attached to
-    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, state->dataLoopNodes->Node(PurchAir(1).ZoneSupplyAirNodeNum).MassFlowRate);
-    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, state->dataLoopNodes->Node(PurchAir(1).ZoneExhaustAirNodeNum).MassFlowRate);
+    auto &dln = state->dataLoopNodes;
+    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, dln->nodes(PurchAir(1).ZoneSupplyAirNodeNum)->MassFlowRate);
+    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, dln->nodes(PurchAir(1).ZoneExhaustAirNodeNum)->MassFlowRate);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
@@ -653,18 +654,21 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
 
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
     // Expecting SupplyTemp to be the same as Zone supply temp
-    EXPECT_EQ(PurchAir(1).SupplyTemp, state->dataLoopNodes->Node(PurchAir(1).ZoneSupplyAirNodeNum).Temp);
-    EXPECT_EQ(PurchAir(1).SupplyHumRat, state->dataLoopNodes->Node(PurchAir(1).ZoneSupplyAirNodeNum).HumRat);
+
+    auto &dln = state->dataLoopNodes;
+    auto *zoneSupplyAirNode = dln->nodes(PurchAir(1).ZoneSupplyAirNodeNum);
+    auto *zoneRecircAirNode = dln->nodes(PurchAir(1).ZoneRecircAirNodeNum);
+    auto *outsideAirNode = dln->nodes(PurchAir(1).OutdoorAirNodeNum);
+    EXPECT_EQ(PurchAir(1).SupplyTemp, zoneSupplyAirNode->Temp);
+    EXPECT_EQ(PurchAir(1).SupplyHumRat, zoneSupplyAirNode->HumRat);
 
     // Test for intermediate variables, MixedAirTemp, MixedAirHumRat
-    state->dataLoopNodes->Node(PurchAir(1).ZoneRecircAirNodeNum).Temp = 24;
-    state->dataLoopNodes->Node(PurchAir(1).ZoneRecircAirNodeNum).HumRat = 0.00929;
-    state->dataLoopNodes->Node(PurchAir(1).ZoneRecircAirNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(
-        state->dataLoopNodes->Node(PurchAir(1).ZoneRecircAirNodeNum).Temp, state->dataLoopNodes->Node(PurchAir(1).ZoneRecircAirNodeNum).HumRat);
-    state->dataLoopNodes->Node(PurchAir(1).OutdoorAirNodeNum).Temp = 3;
-    state->dataLoopNodes->Node(PurchAir(1).OutdoorAirNodeNum).HumRat = 0.004586;
-    state->dataLoopNodes->Node(PurchAir(1).OutdoorAirNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(
-        state->dataLoopNodes->Node(PurchAir(1).OutdoorAirNodeNum).Temp, state->dataLoopNodes->Node(PurchAir(1).OutdoorAirNodeNum).HumRat);
+    zoneRecircAirNode->Temp = 24;
+    zoneRecircAirNode->HumRat = 0.00929;
+    zoneRecircAirNode->Enthalpy = Psychrometrics::PsyHFnTdbW(zoneRecircAirNode->Temp, zoneRecircAirNode->HumRat);
+    outsideAirNode->Temp = 3;
+    outsideAirNode->HumRat = 0.004586;
+    outsideAirNode->Enthalpy = Psychrometrics::PsyHFnTdbW(outsideAirNode->Temp, outsideAirNode->HumRat);
     PurchAir(1).MixedAirTemp = 0;
     PurchAir(1).MixedAirHumRat = 0;
     Real64 MixedAirEnthalpy = 0;
@@ -813,13 +817,13 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
 
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 2;
     state->dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(*state); // get EMS input
@@ -833,8 +837,10 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
 
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideMdotOn = true;
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyTempOn = true;
-    state->dataLoopNodes->Node(2).Temp = 25.0;
-    state->dataLoopNodes->Node(2).HumRat = 0.001;
+
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(2)->Temp = 25.0;
+    dln->nodes(2)->HumRat = 0.001;
 
     InitPurchasedAir(*state, 1, 1);
     Real64 SysOutputProvided;
@@ -1071,13 +1077,13 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
 
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 2;
     state->dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(*state); // get EMS input
@@ -1093,8 +1099,9 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyTempOn = true;
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyHumRatOn = true;
 
-    state->dataLoopNodes->Node(2).Temp = 25.0;
-    state->dataLoopNodes->Node(2).HumRat = 0.001;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(2)->Temp = 25.0;
+    dln->nodes(2)->HumRat = 0.001;
 
     InitPurchasedAir(*state, 1, 1);
     Real64 SysOutputProvided;
@@ -1103,7 +1110,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     bool anyEMSRan;
     ManageEMS(*state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const());
 
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum = 1;
     state->dataPurchasedAirMgr->PurchAir(1).OutdoorAirNodeNum = 2;
     state->dataPurchasedAirMgr->PurchAir(1).ZoneRecircAirNodeNum = 1;
 
@@ -1112,9 +1119,9 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyTemp, 18.0);
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyHumRat, 0.01);
 
-    EXPECT_EQ(state->dataLoopNodes->Node(1).Enthalpy, 43431.131);
-    EXPECT_EQ(state->dataLoopNodes->Node(1).HumRat, 0.01);
-    EXPECT_EQ(state->dataLoopNodes->Node(1).Temp, 18.0);
+    EXPECT_EQ(dln->nodes(1)->Enthalpy, 43431.131);
+    EXPECT_EQ(dln->nodes(1)->HumRat, 0.01);
+    EXPECT_EQ(dln->nodes(1)->Temp, 18.0);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
@@ -1242,13 +1249,13 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
 
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 2;
     state->dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(*state); // get EMS input
@@ -1264,8 +1271,9 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyTempOn = true;
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyHumRatOn = true;
 
-    state->dataLoopNodes->Node(2).Temp = 25.0;
-    state->dataLoopNodes->Node(2).HumRat = 0.001;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(2)->Temp = 25.0;
+    dln->nodes(2)->HumRat = 0.001;
     state->dataEnvrn->StdRhoAir = 1.2;
 
     InitPurchasedAir(*state, 1, 1);
@@ -1275,7 +1283,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
     bool anyEMSRan;
     ManageEMS(*state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const());
 
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum = 1;
     state->dataPurchasedAirMgr->PurchAir(1).OutdoorAirNodeNum = 2;
     state->dataPurchasedAirMgr->PurchAir(1).ZoneRecircAirNodeNum = 1;
 
@@ -1287,9 +1295,9 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyTemp, 18.0);
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyHumRat, 0.01);
 
-    EXPECT_EQ(state->dataLoopNodes->Node(1).Enthalpy, 0.0);
-    EXPECT_EQ(state->dataLoopNodes->Node(1).HumRat, 0.0);
-    EXPECT_EQ(state->dataLoopNodes->Node(1).Temp, 0.0);
+    EXPECT_EQ(dln->nodes(1)->Enthalpy, 0.0);
+    EXPECT_EQ(dln->nodes(1)->HumRat, 0.0);
+    EXPECT_EQ(dln->nodes(1)->Temp, 0.0);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
@@ -1414,13 +1422,13 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
 
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 2;
     state->dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(*state); // get EMS input
@@ -1436,8 +1444,9 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyTempOn = false;
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyHumRatOn = false;
 
-    state->dataLoopNodes->Node(2).Temp = 25.0;
-    state->dataLoopNodes->Node(2).HumRat = 0.001;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(2)->Temp = 25.0;
+    dln->nodes(2)->HumRat = 0.001;
 
     InitPurchasedAir(*state, 1, 1);
     Real64 SysOutputProvided;
@@ -1446,7 +1455,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
     bool anyEMSRan;
     ManageEMS(*state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const());
 
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum = 1;
     state->dataPurchasedAirMgr->PurchAir(1).OutdoorAirNodeNum = 2;
     state->dataPurchasedAirMgr->PurchAir(1).ZoneRecircAirNodeNum = 1;
 
@@ -1455,8 +1464,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP = -0.0002;
     state->dataHeatBalFanSys->TempControlType(ControlledZoneNum) = HVAC::ThermostatType::SingleCooling;
 
-    state->dataLoopNodes->Node(1).Temp = 30;
-    state->dataLoopNodes->Node(1).HumRat = 0.012;
+    dln->nodes(1)->Temp = 30;
+    dln->nodes(1)->HumRat = 0.012;
     state->dataEnvrn->StdRhoAir = 1.2;
 
     CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1);
@@ -1476,7 +1485,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).SenOutputToZone, -1000.0000000000002);
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).LatOutputToZone, 5571.2285000000002);
 
-    EXPECT_EQ(state->dataLoopNodes->Node(1).Enthalpy, 45712.285000000003);
-    EXPECT_EQ(state->dataLoopNodes->Node(1).HumRat, 0.01);
-    EXPECT_EQ(state->dataLoopNodes->Node(1).Temp, 20.228931255157292);
+    EXPECT_EQ(dln->nodes(1)->Enthalpy, 45712.285000000003);
+    EXPECT_EQ(dln->nodes(1)->HumRat, 0.01);
+    EXPECT_EQ(dln->nodes(1)->Temp, 20.228931255157292);
 }

@@ -107,9 +107,9 @@ namespace UnitVentilator {
     {
         std::string Name;      // name of unit
         int SchedPtr = 0;      // index to schedule
-        int AirInNode = 0;     // inlet air node number
-        int AirOutNode = 0;    // outlet air node number
-        int FanOutletNode = 0; // outlet node number for fan exit
+        int AirInNodeNum = 0;     // inlet air node number
+        int AirOutNodeNum = 0;    // outlet air node number
+        int FanOutNodeNum = 0; // outlet node number for fan exit
         // (assumes fan is upstream of heating coil)
         HVAC::FanType fanType = HVAC::FanType::Invalid; // Fan type number (see DataHVACGlobals)
         std::string FanName;                            // name of fan
@@ -125,9 +125,9 @@ namespace UnitVentilator {
         int MinOASchedPtr = 0;                          // index to schedule
         int MaxOASchedPtr = 0;                          // index to schedule
         int TempSchedPtr = 0;                           // index to schedule
-        int OutsideAirNode = 0;                         // outside air node number
-        int AirReliefNode = 0;                          // relief air node number
-        int OAMixerOutNode = 0;                         // outlet node after the outside air mixer (inlet to coils if present)
+        int OAMixerOutsideAirInNodeNum = 0;                         // outside air node number
+        int OAMixerReliefAirOutNodeNum = 0;                          // relief air node number
+        int OAMixerMixedAirOutNodeNum = 0;                         // outlet node after the outside air mixer (inlet to coils if present)
         Real64 OutAirVolFlow = 0.0;                     // m3/s
         Real64 OutAirMassFlow = 0.0;                    // kg/s
         Real64 MinOutAirVolFlow = 0.0;                  // m3/s
@@ -150,7 +150,7 @@ namespace UnitVentilator {
         Real64 MinVolHotWaterFlow = 0.0; // m3/s
         Real64 MinVolHotSteamFlow = 0.0; // m3/s
         Real64 MinHotWaterFlow = 0.0;    // kg/s
-        int HotControlNode = 0;          // hot water control node
+        int HotControlNodeNum = 0;          // hot water control node
         int HotCoilOutNodeNum = 0;       // outlet of coil
         Real64 HotControlOffset = 0.0;   // control tolerance
         PlantLocation HWplantLoc;        // index for plant location for hot water coil
@@ -168,7 +168,7 @@ namespace UnitVentilator {
         Real64 MaxColdWaterFlow = 0.0;    // kg/s
         Real64 MinVolColdWaterFlow = 0.0; // m3/s
         Real64 MinColdWaterFlow = 0.0;    // kg/s
-        int ColdControlNode = 0;          // chilled water control node
+        int ColdControlNodeNum = 0;          // chilled water control node
         int ColdCoilOutNodeNum = 0;       // chilled water coil out node
         Real64 ColdControlOffset = 0.0;   // control tolerance
         PlantLocation CWPlantLoc;         // index for plant component for chilled water coil
@@ -191,9 +191,9 @@ namespace UnitVentilator {
         std::string ATMixerName;                                // name of air mixer
         int ATMixerIndex = 0;                                   // index to the air mixer
         HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid; // 1 = inlet side mixer, 2 = supply side mixer
-        int ATMixerPriNode = 0;                                 // primary inlet air node number for the mixer
-        int ATMixerSecNode = 0;                                 // secondary air inlet node number for the mixer
-        int ATMixerOutNode = 0;                                 // outlet air node number for the mixer
+        int ATMixerPriAirInNodeNum = 0;                                 // primary inlet air node number for the mixer
+        int ATMixerSecAirInNodeNum = 0;                                 // secondary air inlet node number for the mixer
+        int ATMixerMixedAirOutNodeNum = 0;                                 // outlet air node number for the mixer
         bool FirstPass = true;                                  // detects first time through for resetting sizing data
 
         UnitVentilatorData() = default;
@@ -308,9 +308,9 @@ struct UnitVentilatorsData : BaseGlobalStruct
     int RefrigIndex = 0;
     int DummyWaterIndex = 1;
 
-    int ATMixOutNode = 0;   // outlet node of ATM Mixer
-    int ATMixerPriNode = 0; // primary air node of ATM Mixer
-    int ZoneNode = 0;       // zone node
+    int ATMixerOutNodeNum = 0;   // outlet node of ATM Mixer
+    int ATMixerPriInNodeNum = 0; // primary air node of ATM Mixer
+    int ZoneNodeNum = 0;       // zone node
 
     void clear_state() override
     {
@@ -330,9 +330,9 @@ struct UnitVentilatorsData : BaseGlobalStruct
         this->MyZoneEqFlag.deallocate();
         this->RefrigIndex = 0;
         this->DummyWaterIndex = 1;
-        this->ATMixOutNode = 0;
-        this->ATMixerPriNode = 0;
-        this->ZoneNode = 0;
+        this->ATMixerOutNodeNum = 0;
+        this->ATMixerPriInNodeNum = 0;
+        this->ZoneNodeNum = 0;
     }
 
     // Default Constructor

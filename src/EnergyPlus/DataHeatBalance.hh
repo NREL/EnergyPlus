@@ -643,7 +643,7 @@ namespace DataHeatBalance {
         bool WindDirEMSOverrideOn = false;           // if true, EMS is calling to override the surface's outside wind direction
         Real64 WindDirEMSOverrideValue = 0.0;        // value to use for EMS override of the surface's outside wind speed
 
-        int OutdoorAirInNodeNum = 0; // Index of the an OutdoorAir:Node,, zero if none
+        int OutsideAirInNodeNum = 0; // Index of the an OutdoorAir:Node,, zero if none
 
         bool isPartOfTotalArea = true;           // Count the zone area when determining the building total floor area
         bool isNominalOccupied = false;          // has occupancy nominally specified
@@ -1014,9 +1014,9 @@ namespace DataHeatBalance {
         int CPUPowerFLTCurve = 0;                  // Index for CPU power function of CPULoadFrac (x) and TAirIn (y) curve
         int FanPowerFFCurve = 0;                   // Index for fan power function of flow fraction curve
         ITEInletConnection AirConnectionType = ITEInletConnection::AdjustedSupply; // Air connection type (AdjustedSupply, ZoneAirNode, RoomAirModel)
-        int InletRoomAirNodeNum = 0;                                               // Room air model node number for air inlet
-        int OutletRoomAirNodeNum = 0;                                              // Room air model node number for air outlet
-        int SupplyAirNodeNum = 0;                                                  // Node number for supply air inlet
+        int RoomAirInNodeNum = 0;                                               // Room air model node number for air inlet
+        int RoomAirOutNodeNum = 0;                                              // Room air model node number for air outlet
+        int SupplyAirInNodeNum = 0;                                                  // Node number for supply air inlet
         Real64 DesignRecircFrac = 0.0;                                             // Design recirculation fraction (0.0-0.5)
         int RecircFLTCurve = 0;             // Index for recirculation function of CPULoadFrac (x) and TSupply (y) curve
         Real64 DesignUPSEfficiency = 0.0;   // Design power supply efficiency (>0.0 - 1.0)
@@ -1203,8 +1203,8 @@ namespace DataHeatBalance {
         Real64 ERVMassFlowRate = 0.0;                // unbalanced mass flow rate from stand-alone ERV
         bool OneTimeFlag = false;                    // One time flag to get nodes of stand alone ERV
         int NumOfERVs = 0;                           // Number of zone stand alone ERVs
-        Array1D_int ERVInletNode;                    // Stand alone ERV supply air inlet nodes
-        Array1D_int ERVExhaustNode;                  // Stand alone ERV air exhaust nodes
+        Array1D_int ERVInNodeNums;                    // Stand alone ERV supply air inlet nodes
+        Array1D_int ERVExhaustOutNodeNums;                  // Stand alone ERV air exhaust nodes
     };
 
     struct MixingData
@@ -1321,7 +1321,7 @@ namespace DataHeatBalance {
         Real64 CarbonDioxideGainRate = 0.0;           // current timestep value of carbon dioxide gain rate for device
         Real64 *PtrGenericContamGainRate = nullptr;   // POINTER to value of generic contaminant gain rate for device
         Real64 GenericContamGainRate = 0.0;           // current timestep value of generic contaminant gain rate for device
-        int ReturnAirNodeNum = 0;                     // return air node number for retrun air convection heat gain
+        int ReturnAirInNodeNum = 0;                     // return air node number for retrun air convection heat gain
     };
 
     struct SpaceZoneSimData // Calculated data by Space or Zone during each time step/hour
@@ -1394,6 +1394,7 @@ namespace DataHeatBalance {
         // Members
         Real64 MeanAirTemp = 0.0;            // Mean Air Temperature {C}
         Real64 OperativeTemp = 0.0;          // Average of Mean Air Temperature {C} and Mean Radiant Temperature {C}
+        Real64 WetbulbGlobeTemp = 0.0;       // Wet-bulb Globe Temperature
         Real64 MeanAirHumRat = 0.0;          // Mean Air Humidity Ratio {kg/kg} (averaged over zone time step)
         Real64 MeanAirDewPointTemp = 0.0;    // Mean Air Dewpoint Temperature {C}
         Real64 ThermOperativeTemp = 0.0;     // Mix of MRT and MAT for Zone Control:Thermostatic:Operative Temperature {C}
@@ -1475,6 +1476,8 @@ namespace DataHeatBalance {
         Real64 OABalanceFanElec = 0.0;       // Fan Electricity {W} due to OA air balance
         Real64 SumEnthalpyM = 0.0;           // Zone sum of EnthalpyM
         Real64 SumEnthalpyH = 0.0;           // Zone sum of EnthalpyH
+        // reporting flags
+        bool ReportWBGT = false; // whether the wetbulb globe temperature is reqeusted as an output variable or used as an EMS sensor
 
         void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string const &name);
     };
@@ -1601,7 +1604,7 @@ namespace DataHeatBalance {
         // Members
         std::string Name;
         int ZonePtr = 0;           // surface pointer
-        int OutdoorAirNodePtr = 0; // schedule pointer
+        int OutsideAirInNodeNum = 0; // schedule pointer
     };
 
     struct ZoneReportVars // Zone and Space report variables

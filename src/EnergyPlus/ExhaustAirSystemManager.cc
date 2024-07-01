@@ -266,8 +266,8 @@ namespace ExhaustAirSystemManager {
         }
 
         Real64 mixerFlow_Prior = 0.0;
-        int outletNode_index = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).OutNodeNum;
-        mixerFlow_Prior = dln->nodes(outletNode_index)->MassFlowRate;
+        int outNodeNum = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).OutNodeNum;
+        mixerFlow_Prior = dln->nodes(outNodeNum)->MassFlowRate;
         if (mixerFlow_Prior == 0.0) {
             // No flow coming out from the exhaust controls;
             // fan should be cut off now;
@@ -399,9 +399,9 @@ namespace ExhaustAirSystemManager {
                 thisExhCtrl.ControlledZoneNum = Util::FindItemInList(zoneName, state.dataHeatBal->Zone);
 
                 // These two nodes are required inputs:
-                std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
-                int inletNodeNum = Node::GetSingleNode(state,
-                                                                       inletNodeName,
+                std::string inNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
+                int inNodeNum = Node::GetSingleNode(state,
+                                                                       inNodeName,
                                                                        ErrorsFound,
                                                                        Node::ConnObjType::ZoneHVACExhaustControl,
                                                                        thisExhCtrl.Name,
@@ -409,12 +409,12 @@ namespace ExhaustAirSystemManager {
                                                                        Node::ConnType::Inlet,
                                                                        Node::CompFluidStream::Primary,
                                                                        Node::ObjectIsParent);
-                thisExhCtrl.InletNodeNum = inletNodeNum;
+                thisExhCtrl.InNodeNum = inNodeNum;
 
-                std::string outletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "outlet_node_name");
+                std::string outNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "outlet_node_name");
 
-                int outletNodeNum = Node::GetSingleNode(state,
-                                                                        outletNodeName,
+                int outNodeNum = Node::GetSingleNode(state,
+                                                                        outNodeName,
                                                                         ErrorsFound,
                                                                         Node::ConnObjType::ZoneHVACExhaustControl,
                                                                         thisExhCtrl.Name,
@@ -422,10 +422,10 @@ namespace ExhaustAirSystemManager {
                                                                         Node::ConnType::Outlet,
                                                                         Node::CompFluidStream::Primary,
                                                                         Node::ObjectIsParent);
-                thisExhCtrl.OutletNodeNum = outletNodeNum;
+                thisExhCtrl.OutNodeNum = outNodeNum;
 
                 if (!state.dataExhAirSystemMrg->mappingDone) {
-                    state.dataExhAirSystemMrg->mixerIndexMap.emplace(outletNodeNum, exhCtrlNum);
+                    state.dataExhAirSystemMrg->mixerIndexMap.emplace(outNodeNum, exhCtrlNum);
                 }
 
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate");
@@ -586,8 +586,8 @@ namespace ExhaustAirSystemManager {
         auto &thisExhCtrl = state.dataZoneEquip->ZoneExhaustControlSystem(ZoneHVACExhaustControlNum);
 
         auto &dln = state.dataLoopNodes;
-        auto *exhInletNode = dln->nodes(thisExhCtrl.InletNodeNum);
-        auto *exhOutletNode = dln->nodes(thisExhCtrl.OutletNodeNum);
+        auto *exhInNode = dln->nodes(thisExhCtrl.InNodeNum);
+        auto *exhOutNode = dln->nodes(thisExhCtrl.OutNodeNum);
 
         Real64 MassFlow;
         Real64 Tin = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisExhCtrl.ZoneNum).ZT;
@@ -597,12 +597,12 @@ namespace ExhaustAirSystemManager {
             thisExhCtrl.BalancedFlow *= FlowRatio;
             thisExhCtrl.UnbalancedFlow *= FlowRatio;
 
-            exhInletNode->MassFlowRate *= FlowRatio;
+            exhInNode->MassFlowRate *= FlowRatio;
         } else {
             // Availability schedule:
             if (thisExhCtrlAvailScheVal <= 0.0) {
                 MassFlow = 0.0;
-                exhInletNode->MassFlowRate = 0.0;
+                exhInNode->MassFlowRate = 0.0;
             } else {
                 //
             }
@@ -671,30 +671,30 @@ namespace ExhaustAirSystemManager {
                 thisExhCtrl.UnbalancedFlow = MassFlow;
             }
 
-            exhInletNode->MassFlowRate = MassFlow;
+            exhInNode->MassFlowRate = MassFlow;
         }
 
-        exhOutletNode->MassFlowRate = exhInletNode->MassFlowRate;
+        exhOutNode->MassFlowRate = exhInNode->MassFlowRate;
 
-        exhOutletNode->Temp = exhInletNode->Temp;
-        exhOutletNode->HumRat = exhInletNode->HumRat;
-        exhOutletNode->Enthalpy = exhInletNode->Enthalpy;
+        exhOutNode->Temp = exhInNode->Temp;
+        exhOutNode->HumRat = exhInNode->HumRat;
+        exhOutNode->Enthalpy = exhInNode->Enthalpy;
         // Set the outlet nodes for properties that just pass through & not used
-        exhOutletNode->Quality = exhInletNode->Quality;
-        exhOutletNode->Press = exhInletNode->Press;
+        exhOutNode->Quality = exhInNode->Quality;
+        exhOutNode->Press = exhInNode->Press;
 
         // Set the Node Flow Control Variables from the Fan Control Variables
-        exhOutletNode->MassFlowRateMax = exhInletNode->MassFlowRateMax;
-        exhOutletNode->MassFlowRateMaxAvail = exhInletNode->MassFlowRateMaxAvail;
-        exhOutletNode->MassFlowRateMinAvail = exhInletNode->MassFlowRateMinAvail;
+        exhOutNode->MassFlowRateMax = exhInNode->MassFlowRateMax;
+        exhOutNode->MassFlowRateMaxAvail = exhInNode->MassFlowRateMaxAvail;
+        exhOutNode->MassFlowRateMinAvail = exhInNode->MassFlowRateMinAvail;
 
         // these might also be useful to pass through
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            exhOutletNode->CO2 = exhInletNode->CO2;
+            exhOutNode->CO2 = exhInNode->CO2;
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            exhOutletNode->GenContam = exhInletNode->GenContam;
+            exhOutNode->GenContam = exhInNode->GenContam;
         }
     }
 
@@ -710,13 +710,13 @@ namespace ExhaustAirSystemManager {
         // mixer outlet sizing:
         Real64 outletFlowMaxAvail = 0.0;
         for (int i = 1; i <= state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).NumInNodes; ++i) {
-            auto const *inletNode = dln->nodes(state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).InNodeNums(i));
-            outletFlowMaxAvail += inletNode->MassFlowRateMaxAvail;
+            auto const *inNode = dln->nodes(state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).InNodeNums(i));
+            outletFlowMaxAvail += inNode->MassFlowRateMaxAvail;
         }
 
         // mixer outlet considered OutletMassFlowRateMaxAvail?
-        auto *outletNode = dln->nodes(state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).OutNodeNum);
-        outletNode->MassFlowRateMaxAvail = outletFlowMaxAvail;
+        auto *outNode = dln->nodes(state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).OutNodeNum);
+        outNode->MassFlowRateMaxAvail = outletFlowMaxAvail;
 
         auto *fan = state.dataFans->fans(thisExhSys.CentralFanIndex);
         // then central exhasut fan sizing here:

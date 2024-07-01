@@ -318,7 +318,7 @@ namespace DataZoneEquipment {
         Array1D_int ReturnNodeNums;           // zone return air nodes (node numbers)
         Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
         Array1D_int
-            ReturnNodeInNodeNums; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
+            ReturnNodeInletNums; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
         Array1D_bool FixedReturnFlow;         // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
         Array1D_int ReturnNodePlenumNum;      // number of the return plenum attached to this return node (zero if none)
         Array1D_int ReturnFlowBasisNodeNums;      // return air flow basis nodes
@@ -326,7 +326,7 @@ namespace DataZoneEquipment {
         // Array1D_int SharedExhaustNode;        // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the
         // exhaust node value
         Array1D<LightReturnExhaustConfig>
-            SharedExhaustNodeNums; // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the exhaust node value
+            SharedExhaustConfigs; // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the exhaust node value
 
         bool ZonalSystemOnly;     // TRUE if served by a zonal system (only)
         bool IsControlled;        // True when this is a controlled zone.
@@ -509,14 +509,14 @@ namespace DataZoneEquipment {
         Array1D_int ComponentIndex;
         Array1D_int SplitterIndex;
         Array1D_int PlenumIndex;
-        int NumOutNodes;
+        int NumOutNodes = 0;
         Array1D_int OutNodeNums;
-        int NumNodes;
+        int NumNodes = 0;
         Array1D_int NodeNums;
         Array1D<DataZoneEquipment::AirNodeType> NodeType;
 
         // Default Constructor
-        SupplyAir() : NumOfComponents(0), NumOutNodes(0), NumNodes(0)
+        SupplyAir() : NumOfComponents(0)
         {
         }
     };

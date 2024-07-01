@@ -68,7 +68,6 @@ using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::ResultsFramework;
 using namespace EnergyPlus::SimulationManager;
 using namespace EnergyPlus::DataOutputs;
-using namespace EnergyPlus::NodeInputManager;
 
 namespace EnergyPlus {
 

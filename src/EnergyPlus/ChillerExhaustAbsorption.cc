@@ -519,7 +519,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
             thisChiller.ExhaustSourceName = state.dataIPShortCut->cAlphaArgs(18);
 
             auto *thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, thisChiller.ExhaustSourceName);
-            thisChiller.ExhaustAirInletNodeNum = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs *>(thisMTG)->CombustionAirOutNodeNum;
+            thisChiller.ExhaustAirInNodeNum = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs *>(thisMTG)->CombustionAirOutNodeNum;
         }
     }
 
@@ -869,7 +869,7 @@ void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         } else {
             // need call to EMS to check node
             errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, EMSManager::SPControlType::TemperatureSetPoint, errFlag);
+            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, HVAC::CtrlVarType::Temp, errFlag);
             dln->nodes(this->ChillSupplyNodeNum)->needsSetpointChecking = false;
             if (errFlag) {
                 if (!this->ChillSetPointErrDone) {
@@ -901,7 +901,7 @@ void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         } else {
             // need call to EMS to check node
             errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::SPControlType::TemperatureSetPoint, errFlag);
+            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, HVAC::CtrlVarType::Temp, errFlag);
             dln->nodes(this->HeatSupplyNodeNum)->needsSetpointChecking = false;
             if (errFlag) {
                 if (!this->HeatSetPointErrDone) {
@@ -1544,11 +1544,11 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
     } break;
     }
 
-    auto *exhaustAirInletNode = dln->nodes(this->ExhaustAirInletNodeNum);
+    auto *exhaustAirInNode = dln->nodes(this->ExhaustAirInNodeNum);
     Real64 ChillDeltaTemp = std::abs(lChillReturnTemp - ChillSupplySetPointTemp);
-    Real64 lExhaustInTemp = exhaustAirInletNode->Temp;
-    Real64 lExhaustInFlow = exhaustAirInletNode->MassFlowRate;
-    Real64 lExhaustAirHumRat = exhaustAirInletNode->HumRat;
+    Real64 lExhaustInTemp = exhaustAirInNode->Temp;
+    Real64 lExhaustInFlow = exhaustAirInNode->MassFlowRate;
+    Real64 lExhaustAirHumRat = exhaustAirInNode->HumRat;
 
     Real64 Cp_CW = FluidProperties::GetSpecificHeatGlycol(state,
                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
@@ -1735,8 +1735,8 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
         // the electricity used
         lTowerLoad = lCoolingLoad + lCoolThermalEnergyUseRate / lThermalEnergyHeatRatio + lCoolElectricPower;
 
-        lExhaustInTemp = exhaustAirInletNode->Temp;
-        lExhaustInFlow = exhaustAirInletNode->MassFlowRate;
+        lExhaustInTemp = exhaustAirInNode->Temp;
+        lExhaustInFlow = exhaustAirInNode->MassFlowRate;
         CpAir = Psychrometrics::PsyCpAirFnW(lExhaustAirHumRat);
         lExhHeatRecPotentialCool = lExhaustInFlow * CpAir * (lExhaustInTemp - AbsLeavingTemp);
         // If Microturbine Exhaust temperature and flow rate is not sufficient to run the chiller, then chiller will not run
@@ -1983,10 +1983,10 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
         // If heating electric is greater, leave cooling electric and subtract if off of heating elec
         // If cooling electric is greater, set heating electric to zero
 
-        auto const *exhaustAirInletNode = dln->nodes(this->ExhaustAirInletNodeNum);
-        lExhaustInTemp = exhaustAirInletNode->Temp;
-        lExhaustInFlow = exhaustAirInletNode->MassFlowRate;
-        Real64 const lExhaustAirHumRat = exhaustAirInletNode->HumRat;
+        auto const *exhaustAirInNode = dln->nodes(this->ExhaustAirInNodeNum);
+        lExhaustInTemp = exhaustAirInNode->Temp;
+        lExhaustInFlow = exhaustAirInNode->MassFlowRate;
+        Real64 const lExhaustAirHumRat = exhaustAirInNode->HumRat;
         Real64 const CpAir = Psychrometrics::PsyCpAirFnW(lExhaustAirHumRat);
         lExhHeatRecPotentialHeat = lExhaustInFlow * CpAir * (lExhaustInTemp - AbsLeavingTemp);
         if (lExhHeatRecPotentialHeat < lHeatThermalEnergyUseRate) {
@@ -2054,21 +2054,21 @@ void ExhaustAbsorberSpecs::updateCoolRecords(EnergyPlusData &state, Real64 MyLoa
     auto *chillReturnNode = dln->nodes(this->ChillReturnNodeNum);
     auto *condSupplyNode = dln->nodes(this->CondSupplyNodeNum);
     auto *condReturnNode = dln->nodes(this->CondReturnNodeNum);
-    auto *exhaustAirInletNode = dln->nodes(this->ExhaustAirInletNodeNum);
+    auto *exhaustAirInNode = dln->nodes(this->ExhaustAirInNodeNum);
     if (MyLoad == 0 || !RunFlag) {
         chillSupplyNode->Temp = chillReturnNode->Temp;
         if (this->isWaterCooled) {
             condSupplyNode->Temp = condReturnNode->Temp;
         }
-        exhaustAirInletNode->Temp = exhaustAirInletNode->Temp;
-        exhaustAirInletNode->MassFlowRate = this->ExhaustInFlow;
+        exhaustAirInNode->Temp = exhaustAirInNode->Temp;
+        exhaustAirInNode->MassFlowRate = this->ExhaustInFlow;
     } else {
         chillSupplyNode->Temp = this->ChillSupplyTemp;
         if (this->isWaterCooled) {
             condSupplyNode->Temp = this->CondSupplyTemp;
         }
-        exhaustAirInletNode->Temp = this->ExhaustInTemp;
-        exhaustAirInletNode->MassFlowRate = this->ExhaustInFlow;
+        exhaustAirInNode->Temp = this->ExhaustInTemp;
+        exhaustAirInNode->MassFlowRate = this->ExhaustInFlow;
     }
 
     // convert power to energy and instantaneous use to use over the time step

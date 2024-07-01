@@ -751,23 +751,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    state->dataLoopNodes->Node.allocate(4);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 4; ++i) dln->nodes.push_back(new Node::NodeData);
 
     state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
     state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
@@ -780,14 +781,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     // allocate surface level adj ratio data member
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
 
-    state->dataLoopNodes->Node(1).Temp = 20.0;
-    state->dataLoopNodes->Node(2).Temp = 20.0;
-    state->dataLoopNodes->Node(3).Temp = 20.0;
-    state->dataLoopNodes->Node(4).Temp = 20.0;
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
+    dln->nodes(1)->Temp = 20.0;
+    dln->nodes(2)->Temp = 20.0;
+    dln->nodes(3)->Temp = 20.0;
+    dln->nodes(4)->Temp = 20.0;
+    dln->nodes(1)->MassFlowRate = 0.1;
+    dln->nodes(2)->MassFlowRate = 0.1;
+    dln->nodes(3)->MassFlowRate = 0.1;
+    dln->nodes(4)->MassFlowRate = 0.1;
 
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
@@ -826,10 +827,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     EXPECT_EQ(20.0, state->dataHeatBal->SurfTempEffBulkAir(3));
 
     // Supply air flow rate = 0
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.0;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.0;
+    dln->nodes(1)->MassFlowRate = 0.0;
+    dln->nodes(2)->MassFlowRate = 0.0;
+    dln->nodes(3)->MassFlowRate = 0.0;
+    dln->nodes(4)->MassFlowRate = 0.0;
     CalcHeatBalanceInsideSurf(*state);
     EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(1));
     EXPECT_EQ(23.0, state->dataHeatBal->SurfTempEffBulkAir(2));
@@ -1296,23 +1297,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    state->dataLoopNodes->Node.allocate(4);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 4; ++i) dln->nodes.push_back(new Node::NodeData);
 
     state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
     state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
@@ -1325,14 +1327,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     // allocate surface level adj ratio data member
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
 
-    state->dataLoopNodes->Node(1).Temp = 20.0;
-    state->dataLoopNodes->Node(2).Temp = 20.0;
-    state->dataLoopNodes->Node(3).Temp = 20.0;
-    state->dataLoopNodes->Node(4).Temp = 20.0;
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
+    dln->nodes(1)->Temp = 20.0;
+    dln->nodes(2)->Temp = 20.0;
+    dln->nodes(3)->Temp = 20.0;
+    dln->nodes(4)->Temp = 20.0;
+    dln->nodes(1)->MassFlowRate = 0.1;
+    dln->nodes(2)->MassFlowRate = 0.1;
+    dln->nodes(3)->MassFlowRate = 0.1;
+    dln->nodes(4)->MassFlowRate = 0.1;
 
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
@@ -1823,20 +1825,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
 
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
@@ -1845,7 +1847,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 24.0;
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRat = 0.001;
 
-    state->dataLoopNodes->Node.allocate(4);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 4; ++i) dln->nodes.push_back(new Node::NodeData);
 
     state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
     state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
@@ -1855,14 +1858,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
     state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
-    state->dataLoopNodes->Node(1).Temp = 20.0;
-    state->dataLoopNodes->Node(2).Temp = 20.0;
-    state->dataLoopNodes->Node(3).Temp = 20.0;
-    state->dataLoopNodes->Node(4).Temp = 20.0;
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
+    dln->nodes(1)->Temp = 20.0;
+    dln->nodes(2)->Temp = 20.0;
+    dln->nodes(3)->Temp = 20.0;
+    dln->nodes(4)->Temp = 20.0;
+    dln->nodes(1)->MassFlowRate = 0.1;
+    dln->nodes(2)->MassFlowRate = 0.1;
+    dln->nodes(3)->MassFlowRate = 0.1;
+    dln->nodes(4)->MassFlowRate = 0.1;
 
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
@@ -1905,12 +1908,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     OutAirNodeManager::InitOutAirNodes(*state);
 
     // Test if local nodes data correctly overwritten
-    EXPECT_EQ(25.0, state->dataLoopNodes->Node(1).OutAirDryBulb);
-    EXPECT_EQ(20.0, state->dataLoopNodes->Node(1).OutAirWetBulb);
-    EXPECT_EQ(1.5, state->dataLoopNodes->Node(1).OutAirWindSpeed);
-    EXPECT_EQ(90.0, state->dataLoopNodes->Node(1).OutAirWindDir);
-    EXPECT_DOUBLE_EQ(0.012611481326656135, state->dataLoopNodes->Node(1).HumRat);
-    EXPECT_DOUBLE_EQ(57247.660939392081, state->dataLoopNodes->Node(1).Enthalpy);
+    EXPECT_EQ(25.0, dln->nodes(1)->OutAirDryBulb);
+    EXPECT_EQ(20.0, dln->nodes(1)->OutAirWetBulb);
+    EXPECT_EQ(1.5, dln->nodes(1)->OutAirWindSpeed);
+    EXPECT_EQ(90.0, dln->nodes(1)->OutAirWindDir);
+    EXPECT_DOUBLE_EQ(0.012611481326656135, dln->nodes(1)->HumRat);
+    EXPECT_DOUBLE_EQ(57247.660939392081, dln->nodes(1)->Enthalpy);
 
     InitSurfaceHeatBalance(*state);
 
@@ -2403,20 +2406,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
 
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
@@ -2425,7 +2428,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 24.0;
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRat = 0.001;
 
-    state->dataLoopNodes->Node.allocate(4);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 4; ++i) dln->nodes.push_back(new Node::NodeData);
 
     state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
     state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
@@ -2435,14 +2439,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
     state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
-    state->dataLoopNodes->Node(1).Temp = 20.0;
-    state->dataLoopNodes->Node(2).Temp = 20.0;
-    state->dataLoopNodes->Node(3).Temp = 20.0;
-    state->dataLoopNodes->Node(4).Temp = 20.0;
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
+    dln->nodes(1)->Temp = 20.0;
+    dln->nodes(2)->Temp = 20.0;
+    dln->nodes(3)->Temp = 20.0;
+    dln->nodes(4)->Temp = 20.0;
+    dln->nodes(1)->MassFlowRate = 0.1;
+    dln->nodes(2)->MassFlowRate = 0.1;
+    dln->nodes(3)->MassFlowRate = 0.1;
+    dln->nodes(4)->MassFlowRate = 0.1;
 
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
@@ -2974,20 +2978,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
@@ -2996,7 +3000,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 24.0;
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRat = 0.001;
 
-    state->dataLoopNodes->Node.allocate(4);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 4; ++i) dln->nodes.push_back(new Node::NodeData);
 
     state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
     state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
@@ -3009,14 +3014,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     // allocate surface level adj ratio data member
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
 
-    state->dataLoopNodes->Node(1).Temp = 20.0;
-    state->dataLoopNodes->Node(2).Temp = 20.0;
-    state->dataLoopNodes->Node(3).Temp = 20.0;
-    state->dataLoopNodes->Node(4).Temp = 20.0;
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
+    dln->nodes(1)->Temp = 20.0;
+    dln->nodes(2)->Temp = 20.0;
+    dln->nodes(3)->Temp = 20.0;
+    dln->nodes(4)->Temp = 20.0;
+    dln->nodes(1)->MassFlowRate = 0.1;
+    dln->nodes(2)->MassFlowRate = 0.1;
+    dln->nodes(3)->MassFlowRate = 0.1;
+    dln->nodes(4)->MassFlowRate = 0.1;
 
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
@@ -5900,34 +5905,34 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     state->dataZoneEquip->ZoneEquipConfig.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Daylit Zone";
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeNums(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Daylit Attic Zone";
     state->dataHeatBal->Zone(2).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(2) = 7;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums(2) = 7;
     state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1) = 8;
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNodeNums(1) = 8;
     state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1) = 9;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeNums(1) = 9;
     state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
 
     state->dataSize->ZoneEqSizing.allocate(2);
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
-    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 10;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNum = 10;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(2);
     for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
@@ -5936,7 +5941,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
         thisZoneHB.airHumRatAvg = 0.001;
     }
 
-    state->dataLoopNodes->Node.allocate(4);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 4; ++i) dln->nodes.push_back(new Node::NodeData);
 
     state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
     state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
@@ -5946,14 +5952,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
     state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
-    state->dataLoopNodes->Node(1).Temp = 20.0;
-    state->dataLoopNodes->Node(2).Temp = 20.0;
-    state->dataLoopNodes->Node(3).Temp = 20.0;
-    state->dataLoopNodes->Node(4).Temp = 20.0;
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
+    dln->nodes(1)->Temp = 20.0;
+    dln->nodes(2)->Temp = 20.0;
+    dln->nodes(3)->Temp = 20.0;
+    dln->nodes(4)->Temp = 20.0;
+    dln->nodes(1)->MassFlowRate = 0.1;
+    dln->nodes(2)->MassFlowRate = 0.1;
+    dln->nodes(3)->MassFlowRate = 0.1;
+    dln->nodes(4)->MassFlowRate = 0.1;
 
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(state->dataSurface->TotSurfaces, 1.0);
     state->dataHeatBalSurf->SurfHConvInt.dimension(state->dataSurface->TotSurfaces, 0.5);
@@ -7031,22 +7037,22 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     auto &zoneEquipConfig = state->dataZoneEquip->ZoneEquipConfig(1);
 
     zoneEquipConfig.ZoneName = "LIVING ZONE";
-    zoneEquipConfig.NumInletNodes = 2;
-    zoneEquipConfig.InletNode.allocate(2);
-    zoneEquipConfig.InletNode(1) = 1;
-    zoneEquipConfig.InletNode(2) = 2;
+    zoneEquipConfig.NumInNodes = 2;
+    zoneEquipConfig.InNodeNums.allocate(2);
+    zoneEquipConfig.InNodeNums(1) = 1;
+    zoneEquipConfig.InNodeNums(2) = 2;
     zoneEquipConfig.NumReturnNodes = 1;
-    zoneEquipConfig.ReturnNode.allocate(1);
-    zoneEquipConfig.ReturnNode(1) = 3;
+    zoneEquipConfig.ReturnNodeNums.allocate(1);
+    zoneEquipConfig.ReturnNodeNums(1) = 3;
     zoneEquipConfig.NumExhaustNodes = 1;
-    zoneEquipConfig.ExhaustNode.allocate(1);
-    zoneEquipConfig.ExhaustNode(1) = 4;
+    zoneEquipConfig.ExhaustNodeNums.allocate(1);
+    zoneEquipConfig.ExhaustNodeNums(1) = 4;
     zoneEquipConfig.FixedReturnFlow.allocate(1);
 
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -7057,20 +7063,22 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 24.0;
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRat = 0.001;
 
-    state->dataLoopNodes->Node.allocate(4);
-    auto &InletNode1 = state->dataLoopNodes->Node(1);
-    auto &InletNode2 = state->dataLoopNodes->Node(2);
-    auto &ExhaustNode = state->dataLoopNodes->Node(3);
-    auto &ReturnNode = state->dataLoopNodes->Node(4);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 4; ++i) dln->nodes.push_back(new Node::NodeData);
 
-    InletNode1.Temp = 20.0;
-    InletNode2.Temp = 20.0;
-    ReturnNode.Temp = 20.0;
-    ExhaustNode.Temp = 20.0;
-    InletNode1.MassFlowRate = 0.1;
-    InletNode2.MassFlowRate = 0.1;
-    ReturnNode.MassFlowRate = 0.1;
-    ExhaustNode.MassFlowRate = 0.1;
+    auto *inNode1 = dln->nodes(1);
+    auto *inNode2 = dln->nodes(2);
+    auto *exhaustNode = dln->nodes(3);
+    auto *returnNode = dln->nodes(4);
+
+    inNode1->Temp = 20.0;
+    inNode2->Temp = 20.0;
+    returnNode->Temp = 20.0;
+    exhaustNode->Temp = 20.0;
+    inNode1->MassFlowRate = 0.1;
+    inNode2->MassFlowRate = 0.1;
+    returnNode->MassFlowRate = 0.1;
+    exhaustNode->MassFlowRate = 0.1;
 
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
@@ -8277,22 +8285,22 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 5;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     auto &zoneEquipConfig = state->dataZoneEquip->ZoneEquipConfig(1);
 
     zoneEquipConfig.ZoneName = "LIVING ZONE";
-    zoneEquipConfig.NumInletNodes = 2;
-    zoneEquipConfig.InletNode.allocate(2);
-    zoneEquipConfig.InletNode(1) = 1;
-    zoneEquipConfig.InletNode(2) = 2;
+    zoneEquipConfig.NumInNodes = 2;
+    zoneEquipConfig.InNodeNums.allocate(2);
+    zoneEquipConfig.InNodeNums(1) = 1;
+    zoneEquipConfig.InNodeNums(2) = 2;
     zoneEquipConfig.NumReturnNodes = 1;
-    zoneEquipConfig.ReturnNode.allocate(1);
-    zoneEquipConfig.ReturnNode(1) = 3;
+    zoneEquipConfig.ReturnNodeNums.allocate(1);
+    zoneEquipConfig.ReturnNodeNums(1) = 3;
     zoneEquipConfig.NumExhaustNodes = 1;
-    zoneEquipConfig.ExhaustNode.allocate(1);
-    zoneEquipConfig.ExhaustNode(1) = 4;
+    zoneEquipConfig.ExhaustNodeNums.allocate(1);
+    zoneEquipConfig.ExhaustNodeNums(1) = 4;
     zoneEquipConfig.FixedReturnFlow.allocate(1);
 
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -8303,20 +8311,22 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 24.0;
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRat = 0.001;
 
-    state->dataLoopNodes->Node.allocate(4);
-    auto &InletNode1 = state->dataLoopNodes->Node(1);
-    auto &InletNode2 = state->dataLoopNodes->Node(2);
-    auto &ExhaustNode = state->dataLoopNodes->Node(3);
-    auto &ReturnNode = state->dataLoopNodes->Node(4);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 4; ++i) dln->nodes.push_back(new Node::NodeData);
 
-    InletNode1.Temp = 20.0;
-    InletNode2.Temp = 20.0;
-    ReturnNode.Temp = 20.0;
-    ExhaustNode.Temp = 20.0;
-    InletNode1.MassFlowRate = 0.1;
-    InletNode2.MassFlowRate = 0.1;
-    ReturnNode.MassFlowRate = 0.1;
-    ExhaustNode.MassFlowRate = 0.1;
+    auto *inNode1 = dln->nodes(1);
+    auto *inNode2 = dln->nodes(2);
+    auto *exhaustNode = dln->nodes(3);
+    auto *returnNode = dln->nodes(4);
+
+    inNode1->Temp = 20.0;
+    inNode2->Temp = 20.0;
+    returnNode->Temp = 20.0;
+    exhaustNode->Temp = 20.0;
+    inNode1->MassFlowRate = 0.1;
+    inNode2->MassFlowRate = 0.1;
+    returnNode->MassFlowRate = 0.1;
+    exhaustNode->MassFlowRate = 0.1;
 
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);

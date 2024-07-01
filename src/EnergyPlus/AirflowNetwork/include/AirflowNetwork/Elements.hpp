@@ -759,14 +759,14 @@ namespace AirflowNetwork {
         Real64 StandardT; // Standard temperature for crack data
         Real64 StandardP; // Standard barometric pressure for crack data
         Real64 StandardW; // Standard humidity ratio for crack data
-        int InletNode;    // Inlet node number
-        int OutletNode;   // Outlet node number
+        int InNodeNum = 0;    // Inlet node number
+        int OutNodeNum = 0;   // Outlet node number
         int EPlusZoneNum; // Zone number
         int PressCtrlNum; // pressure control number
 
         // Default Constructor
         ZoneExhaustFan()
-            : FlowRate(0.0), SchedPtr(0), FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0), InletNode(0), OutletNode(0),
+            : FlowRate(0.0), SchedPtr(0), FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0), 
               EPlusZoneNum(0), PressCtrlNum(0)
         {
         }
@@ -1088,15 +1088,15 @@ namespace AirflowNetwork {
         Real64 Ctrl;               // Control ratio
         HVAC::FanType fanType;     // Fan type: Constant volume or ONOFF
         int FanIndex;              // Fan index
-        int InletNode;             // Inlet node number
-        int OutletNode;            // Outlet node number
+        int InNodeNum = 0;             // Inlet node number
+        int OutNodeNum = 0;            // Outlet node number
         Real64 MaxAirMassFlowRate; // Max Specified MAss Flow Rate of Damper [kg/s]
         int AirLoopNum;            // Air loop number
         bool FanModelFlag;         // True, this fan is FAN:SYSTEMMODEL
 
         // Default Constructor
         ConstantVolumeFan()
-            : FlowRate(0.0), Ctrl(0.0), fanType(HVAC::FanType::Invalid), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0),
+            : FlowRate(0.0), Ctrl(0.0), fanType(HVAC::FanType::Invalid), FanIndex(0), MaxAirMassFlowRate(0.0),
               AirLoopNum(0), FanModelFlag(false)
         {
         }
@@ -1253,12 +1253,12 @@ namespace AirflowNetwork {
         std::string EPlusType;    // EnergyPlus coil type
         Real64 L;                 // Air path length
         Real64 hydraulicDiameter; // Air path hydraulic diameter
-        int DamperInletNode;      // Damper inlet node number
-        int DamperOutletNode;     // Damper outlet node number
+        int DamperInNodeNum = 0;      // Damper inlet node number
+        int DamperOutNodeNum = 0;     // Damper outlet node number
         int AirLoopNum;           // AirLoop number
 
         // Default Constructor
-        DisSysCompTermUnitProp() : L(0.0), hydraulicDiameter(0.0), DamperInletNode(0), DamperOutletNode(0), AirLoopNum(0)
+        DisSysCompTermUnitProp() : L(0.0), hydraulicDiameter(0.0), AirLoopNum(0)
         {
         }
 
@@ -1421,14 +1421,14 @@ namespace AirflowNetwork {
         Real64 StandardT; // Standard temperature for crack data [C]
         Real64 StandardP; // Standard barometric pressure for crack data [Pa]
         Real64 StandardW; // Standard humidity ratio for crack data [kg/kg]
-        int InletNode;    // Inlet node number
-        int OutletNode;   // Outlet node number
+        int InNodeNum = 0;    // Inlet node number
+        int OutNodeNum = 0;   // Outlet node number
         int OAMixerNum;   // OA Mixer number
         int PressCtrlNum; // Pressure control number
 
         // Default Constructor
         OutdoorAirFan()
-            : SchedPtr(0), FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0), InletNode(0), OutletNode(0), OAMixerNum(0),
+            : SchedPtr(0), FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0), OAMixerNum(0),
               PressCtrlNum(0)
         {
         }

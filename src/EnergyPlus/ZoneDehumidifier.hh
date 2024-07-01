@@ -87,8 +87,8 @@ namespace ZoneDehumidifier {
         Real64 OutletAirEnthalpy = 0.0;                                       // Dehumidifier outlet air enthalpy [J/kg]
         Real64 OutletAirHumRat = 0.0;                                         // Dehumidifier outlet air humidity ratio [kg/kg]
         Real64 OffCycleParasiticLoad = 0.0;                                   // Off Cycle Parasitic Load, user input [W]
-        int AirInletNodeNum = 0;                                              // Inlet air node number
-        int AirOutletNodeNum = 0;                                             // Outlet air node number
+        int AirInNodeNum = 0;                                              // Inlet air node number
+        int AirOutNodeNum = 0;                                             // Outlet air node number
         int WaterRemovalCurveIndex = 0;                                       // Index for water removal curve
         int WaterRemovalCurveErrorCount = 0;                                  // Count number of times water removal curve returns a negative value
         int WaterRemovalCurveErrorIndex = 0;                                  // Index for negative value water removal factor recurring messages

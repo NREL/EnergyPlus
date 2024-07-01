@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -520,7 +521,8 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     state->dataCondenserLoopTowers->towers(1).report(*state, true);
 
     // test that tower is really not cooling with no load so temp in and out is the same issue #4927
-    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(9).Temp, state->dataLoopNodes->Node(10).Temp);
+    auto &dln = state->dataLoopNodes;
+    EXPECT_DOUBLE_EQ(dln->nodes(9)->Temp, dln->nodes(10)->Temp);
 }
 
 TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
@@ -912,23 +914,18 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     state->dataCondenserLoopTowers->towers(1).report(*state, true);
 
     // test that tower outlet temperature = set point temperature
-    int inletNodeIndex = 0;
-    int outletNodeIndex = 0;
-    auto inletNode =
-        std::find(state->dataLoopNodes->NodeID.begin(), state->dataLoopNodes->NodeID.end(), "TOWERWATERSYS PUMP-TOWERWATERSYS COOLTOWERNODE");
-    ASSERT_TRUE(inletNode != state->dataLoopNodes->NodeID.end());
-    if (inletNode != state->dataLoopNodes->NodeID.end()) {
-        inletNodeIndex = std::distance(state->dataLoopNodes->NodeID.begin(), inletNode);
-    }
-    auto outletNode =
-        std::find(state->dataLoopNodes->NodeID.begin(), state->dataLoopNodes->NodeID.end(), "TOWERWATERSYS SUPPLY EQUIPMENT OUTLET NODE");
-    ASSERT_TRUE(outletNode != state->dataLoopNodes->NodeID.end());
-    if (outletNode != state->dataLoopNodes->NodeID.end()) {
-        outletNodeIndex = std::distance(state->dataLoopNodes->NodeID.begin(), outletNode);
-    }
+    int inNodeNum = Node::GetNodeIndex(*state, "TOWERWATERSYS PUMP-TOWERWATERSYS COOLTOWERNODE");
+    ASSERT_TRUE(inNodeNum != 0);
+    int outNodeNum = Node::GetNodeIndex(*state, "TOWERWATERSYS SUPPLY EQUIPMENT OUTLET NODE");
+    ASSERT_TRUE(outNodeNum != 0);
+
+    auto &dln = state->dataLoopNodes;
+    auto *inNode = dln->nodes(inNodeNum);
+    auto *outNode = dln->nodes(outNodeNum);
+    
     // TODO: FIXME: This is failing. Actual is -10.409381032746095, expected is 30.
-    EXPECT_GT(state->dataLoopNodes->Node(inletNodeIndex).Temp, 30.0);         // inlet node temperature
-    EXPECT_DOUBLE_EQ(30.0, state->dataLoopNodes->Node(outletNodeIndex).Temp); // outlet node temperature
+    EXPECT_GT(inNode->Temp, 30.0);         // inlet node temperature
+    EXPECT_DOUBLE_EQ(30.0, outNode->Temp); // outlet node temperature
 
     // input not needed for sizing (WasAutoSized = false) using NominalCapacity method but this variable should still size
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUAWasAutoSized);
@@ -3952,7 +3949,8 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutHumRat =
         Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
-    state->dataLoopNodes->Node(VSTower.WaterInletNodeNum).Temp = 35.0;
+
+    state->dataLoopNodes->nodes(VSTower.WaterInNodeNum)->Temp = 35.0;
 
     VSTower.initialize(*state);
     state->dataGlobal->BeginEnvrnFlag = false;
@@ -4297,7 +4295,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CalculateVariableTowerOutletTemp)
     auto &tower = state->dataCondenserLoopTowers->towers(index);
 
     // set node temperature
-    state->dataLoopNodes->Node(tower.WaterInletNodeNum).Temp = 40;
+    state->dataLoopNodes->nodes(tower.WaterInNodeNum)->Temp = 40;
     tower.WaterTemp = 40;
 
     // calculate outlet temperature

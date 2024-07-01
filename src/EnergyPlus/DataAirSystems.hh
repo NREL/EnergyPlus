@@ -100,10 +100,10 @@ namespace DataAirSystems {
         int FlowCtrl = 0;                                                                  // Component flow control (ACTIVE/PASSIVE)
         bool ON = true;          // When true, the designated component or operation scheme is available
         bool Parent = false;     // When true, the designated component is made up of sub-components
-        std::string NodeNameIn;  // Component inlet node name
-        std::string NodeNameOut; // Component outlet node name
-        int NodeNumIn = 0;       // Component inlet node number
-        int NodeNumOut = 0;      // Component outlet node number
+        std::string InNodeName;  // Component inlet node name
+        std::string OutNodeName; // Component outlet node name
+        int InNodeNum = 0;       // Component inlet node number
+        int OutNodeNum = 0;      // Component outlet node number
         bool MeteredVarsFound = false;
         int NumMeteredVars = 0;
         int NumSubComps = 0;
@@ -135,13 +135,13 @@ namespace DataAirSystems {
         int TotalComponents = 0;                                 // Total number of high level components on the branch
         Array1D_int FirstCompIndex;                              // Gives the component index in AllComp that corresponds to Comp
         Array1D_int LastCompIndex;                               // Gives comp index in AllComp that corresponds to last subcomponent
-        int NodeNumIn = 0;                                       // Branch inlet node number
-        int NodeNumOut = 0;                                      // Branch outlet node number
+        int InNodeNum = 0;                                       // Branch inlet node number
+        int OutNodeNum = 0;                                      // Branch outlet node number
         HVAC::AirDuctType DuctType = HVAC::AirDuctType::Invalid; // 1=main, 2=cooling, 3=heating, 4=other
         Array1D<AirLoopCompData> Comp;                           // Component list--high level components
         //  This list would include children, grandchildren, etc.
-        int TotalNodes = 0;  // total number of nodes on branch
-        Array1D_int NodeNum; // node list (numbers)
+        int NumNodes = 0;  // total number of nodes on branch
+        Array1D_int NodeNums; // node list (numbers)
     };
 
     struct AirLoopSplitterData // a splitter joins 1 inlet branch to multiple outlet branches
@@ -149,13 +149,13 @@ namespace DataAirSystems {
         // Members
         bool Exists = false;        // True if there is a splitter (only 1 allowed per loop)
         std::string Name;           // Name of the Splitter
-        int NodeNumIn = 0;          // Node number for the inlet to the splitter
+        int InNodeNum = 0;          // Node number for the inlet to the splitter
         int BranchNumIn = 0;        // Reference number for branch connected to splitter inlet
-        std::string NodeNameIn;     // Node name for the inlet to the splitter
-        int TotalOutletNodes = 0;   // Number of outlet nodes for the splitter
-        Array1D_int NodeNumOut;     // Node numbers for the outlets to the splitter
+        std::string InNodeName;     // Node name for the inlet to the splitter
+        int NumOutNodes = 0;   // Number of outlet nodes for the splitter
+        Array1D_int OutNodeNums;     // Node numbers for the outlets to the splitter
         Array1D_int BranchNumOut;   // Reference numbers for branches connected to splitter outlet
-        Array1D_string NodeNameOut; // Node names for the outlets to the splitter
+        Array1D_string OutNodeNames; // Node names for the outlets to the splitter
     };
 
     struct AirLoopMixerData // a mixer joins multiple inlet branches to a single outlet branch
@@ -163,13 +163,13 @@ namespace DataAirSystems {
         // Members
         bool Exists = false;       // True if there is a Mixer (only 1 allowed per loop)
         std::string Name;          // Name of the Mixer
-        int NodeNumOut = 0;        // Node number for the outlet to the mixer
+        int OutNodeNum = 0;        // Node number for the outlet to the mixer
         int BranchNumOut = 0;      // Reference number for branch connected to mixer outlet
-        std::string NodeNameOut;   // Node name for the outlet to the mixer
-        int TotalInletNodes = 0;   // Number of inlet nodes for the mixer
-        Array1D_int NodeNumIn;     // Node numbers for the inlets to the mixer
+        std::string OutNodeName;   // Node name for the outlet to the mixer
+        int NumInNodes = 0;   // Number of inlet nodes for the mixer
+        Array1D_int InNodeNums;     // Node numbers for the inlets to the mixer
         Array1D_int BranchNumIn;   // Reference numbers for branches connected to mixer inlet
-        Array1D_string NodeNameIn; // Node names for the inlets to the mixer
+        Array1D_string InNodeNames; // Node names for the inlets to the mixer
     };
 
     struct DefinePrimaryAirSystem // There is an array of these for each primary air system
@@ -190,23 +190,23 @@ namespace DataAirSystems {
         AirLoopMixerData Mixer;            // Data for mixer (if any)
         Array1D_bool ControlConverged;     // Convergence Parameter for controllers
         int NumOutletBranches = 0;
-        std::array<int, 3> OutletBranchNum = {0}; // branch numbers of system outlets
+        std::array<int, 3> OutBranchNums = {0}; // branch numbers of system outlets
         int NumInletBranches = 0;
-        std::array<int, 3> InletBranchNum = {0}; // branch number of system inlets
+        std::array<int, 3> InBranchNums = {0}; // branch number of system inlets
         bool CentralHeatCoilExists = true;       // true if there are central heating coils
         bool CentralCoolCoilExists = true;       // true if there are central cooling coils
         bool OASysExists = false;                // true if there is an Outside Air Sys
         bool isAllOA = false;                    // true if there is no return path and the main branch inlet is an outdoor air node
-        int OASysInletNodeNum = 0;               // node number of return air inlet to OA sys
-        int OASysOutletNodeNum = 0;              // node number of mixed air outlet of OA sys
+        int OASysInNodeNum = 0;               // node number of return air inlet to OA sys
+        int OASysOutNodeNum = 0;              // node number of mixed air outlet of OA sys
         int OAMixOAInNodeNum = 0;                // node number of the OA stream inlet to the
         // OA mixer component.
         bool RABExists = false;                            // true if there is a RAB
-        int RABMixInNode = 0;                              // node num of RAB mixer inlet
-        int SupMixInNode = 0;                              // node num of supply air inlet to mixer
-        int MixOutNode = 0;                                // outlet node of mixer
-        int RABSplitOutNode = 0;                           // node num of RAB splitter outlet
-        int OtherSplitOutNode = 0;                         // node num of nonRAB splitter outlet
+        int RABMixInNodeNum = 0;                              // node num of RAB mixer inlet
+        int SupMixInNodeNum = 0;                              // node num of supply air inlet to mixer
+        int MixOutNodeNum = 0;                                // outlet node of mixer
+        int RABSplitOutNodeNum = 0;                           // node num of RAB splitter outlet
+        int OtherSplitOutNodeNum = 0;                         // node num of nonRAB splitter outlet
         int NumOACoolCoils = 0;                            // number of cooling coils in the outside air system
         int NumOAHeatCoils = 0;                            // number of heating coils in the outside air system
         int NumOAHXs = 0;                                  // number of heat exchangers in the outside air system

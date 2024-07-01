@@ -3222,7 +3222,7 @@ namespace InternalHeatGains {
                                 ErrorsFound = true;
                             }
                         } else {
-                            thisZoneITEq.SupplyAirNodeNum = GetSingleNode(state,
+                            thisZoneITEq.SupplyAirInNodeNum = GetSingleNode(state,
                                                                               IHGAlphas(14),
                                                                               ErrorsFound,
                                                                               Node::ConnObjType::ElectricEquipmentITEAirCooled,
@@ -3238,7 +3238,7 @@ namespace InternalHeatGains {
                         if (zoneEqIndex > 0) { // zoneEqIndex could be zero in the case of an uncontrolled zone
                             auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InNodeNums.begin();
                             auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InNodeNums.end();
-                            int key = thisZoneITEq.SupplyAirNodeNum;
+                            int key = thisZoneITEq.SupplyAirInNodeNum;
                             thisZoneITEq.inControlledZone = true;
                             bool supplyNodeFound = false;
                             if (std::find(itStart, itEnd, key) != itEnd) {
@@ -3255,7 +3255,7 @@ namespace InternalHeatGains {
                                 ShowSevereError(state, format("{}: ElectricEquipment:ITE:AirCooled {}", RoutineName, thisZoneITEq.Name));
                                 ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
                                 ErrorsFound = true;
-                            } else if (thisZoneITEq.SupplyAirNodeNum != 0 && !supplyNodeFound) {
+                            } else if (thisZoneITEq.SupplyAirInNodeNum != 0 && !supplyNodeFound) {
                                 // the given supply air node does not match any zone equipment supply air nodes
                                 ShowWarningError(
                                     state,
@@ -3341,10 +3341,13 @@ namespace InternalHeatGains {
                             Real64 TAirInSizing = 0.0;
                             // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite
                             // object
-                            SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
-                            for (int SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZClSetPtMgrs; ++SetPtMgrNum) {
-                                if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == zoneNum) {
-                                    TAirInSizing = state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
+                            SetPointManager::GetSetPointManagerInputs(state);
+                            for (auto *spm : state.dataSetPointManager->spms) {
+                                if (spm->type != SetPointManager::SPMType::SZCooling) continue;
+                                auto *spmSZC = dynamic_cast<SetPointManager::SPMSingleZoneTemp *>(spm);
+                                assert(spmSZC != nullptr);
+                                if (spmSZC->ctrlZoneNum == zoneNum) {
+                                    TAirInSizing = spmSZC->maxSetTemp;
                                 }
                             }
 
@@ -6781,7 +6784,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::TimeStepType::Zone,
                                 OutputProcessor::StoreType::Average,
                                 state.dataHeatBal->ZoneITEq(itEqNum).Name);
-            if (state.dataHeatBal->ZoneITEq(itEqNum).SupplyAirNodeNum != 0) {
+            if (state.dataHeatBal->ZoneITEq(itEqNum).SupplyAirInNodeNum != 0) {
                 SetupOutputVariable(state,
                                     "ITE Supply Heat Index",
                                     Constant::Units::None,
@@ -8060,7 +8063,7 @@ namespace InternalHeatGains {
             // Determine inlet air temperature and humidity
             AirConnection = state.dataHeatBal->ZoneITEq(Loop).AirConnectionType;
             RecircFrac = 0.0;
-            auto const *supplyNode = dln->nodes(state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum);
+            auto const *supplyNode = dln->nodes(state.dataHeatBal->ZoneITEq(Loop).SupplyAirInNodeNum);
             if (state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps) {
                 TSupply = supplyNode->Temp;
                 WSupply = supplyNode->HumRat;
@@ -8171,7 +8174,7 @@ namespace InternalHeatGains {
                 TAirOut = TSupply;
             }
 
-            if ((state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum != 0) && (TAirOut != TSupply)) {
+            if ((state.dataHeatBal->ZoneITEq(Loop).SupplyAirInNodeNum != 0) && (TAirOut != TSupply)) {
                 SupplyHeatIndex = (TAirIn - TSupply) / (TAirOut - TSupply);
             } else {
                 SupplyHeatIndex = 0.0;
@@ -9117,7 +9120,7 @@ namespace InternalHeatGains {
 
         for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
             // If ReturnNodeNum is zero, sum for entire zone, otherwise sum only for specified ReturnNodeNum
-            if ((returnNodeNum == 0) || (returnNodeNum == state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirNodeNum)) {
+            if ((returnNodeNum == 0) || (returnNodeNum == state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirInNodeNum)) {
                 spaceSumReturnAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
             }
         }
@@ -9358,7 +9361,7 @@ namespace InternalHeatGains {
 
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 // If ReturnNodeNum is zero, sum for entire zone, otherwise sum only for specified ReturnNodeNum
-                if ((ReturnNodeNum == 0) || (ReturnNodeNum == state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirNodeNum)) {
+                if ((ReturnNodeNum == 0) || (ReturnNodeNum == state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirInNodeNum)) {
                     SumRetAirLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirLatentGainRate;
                 }
             }

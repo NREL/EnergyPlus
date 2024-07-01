@@ -87,7 +87,6 @@ using namespace RoomAir;
 using namespace DataMoistureBalanceEMPD;
 using namespace DataSurfaces;
 using namespace DataHeatBalSurface;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::Psychrometrics;
 
@@ -103,7 +102,7 @@ protected:
         state->dataSize->CurOASysNum = 0;
         state->dataGlobal->NumOfZones = 1;
         state->dataGlobal->numSpaces = 1;
-        state->dataLoopNodes->NumOfNodes = 5;
+
         state->dataGlobal->BeginEnvrnFlag = true;
         int NumOfSurfaces = 2;
         state->dataRoomAir->AFNZoneInfo.allocate(state->dataGlobal->NumOfZones);
@@ -113,8 +112,10 @@ protected:
         state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
         state->dataHeatBal->spaceIntGainDevices.allocate(state->dataGlobal->numSpaces);
-        state->dataLoopNodes->NodeID.allocate(state->dataLoopNodes->NumOfNodes);
-        state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
+
+        auto &dln = state->dataLoopNodes;
+        for (int i = 0; i < 5; ++i) dln->nodes.push_back(new Node::NodeData);
+        
         state->dataSurface->Surface.allocate(NumOfSurfaces);
         state->dataSurface->SurfTAirRef.allocate(NumOfSurfaces);
         state->dataHeatBalSurf->SurfHConvInt.allocate(NumOfSurfaces);
@@ -152,9 +153,9 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 
     state->dataRoomAir->AFNZoneInfo(ZoneNum).IsUsed = true;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).ActualZoneID = ZoneNum;
-    state->dataRoomAir->AFNZoneInfo(ZoneNum).NumOfAirNodes = NumOfAirNodes;
+    state->dataRoomAir->AFNZoneInfo(ZoneNum).NumAirNodes = NumOfAirNodes;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node.allocate(NumOfAirNodes);
-    state->dataRoomAir->AFNZoneInfo(ZoneNum).ControlAirNodeID = 1;
+    state->dataRoomAir->AFNZoneInfo(ZoneNum).ControlAirNodeNum = 1;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(1).ZoneVolumeFraction = 0.2;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(2).ZoneVolumeFraction = 0.8;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(1).HVAC.allocate(1);
@@ -204,13 +205,13 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(1).Link(1).AFNSimuID = 1;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(1).Link(2).AFNSimuID = 2;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(1).Link(3).AFNSimuID = 3;
-    state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(1).AFNNodeID = 1;
+    state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(1).AFNNodeNum = 1;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(2).NumOfAirflowLinks = 3;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(2).Link.allocate(3);
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(2).Link(1).AFNSimuID = 3;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(2).Link(2).AFNSimuID = 4;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(2).Link(3).AFNSimuID = 5;
-    state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(2).AFNNodeID = 2;
+    state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(2).AFNNodeNum = 2;
 
     state->afn->AirflowNetworkLinkageData(1).NodeNums[0] = 1;
     state->afn->AirflowNetworkLinkageData(2).NodeNums[0] = 1;
@@ -251,14 +252,16 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipType.allocate(1);
     state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipType(1) = DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump;
 
-    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(1) = 1;
-    state->dataLoopNodes->NodeID.allocate(state->dataLoopNodes->NumOfNodes);
-    state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InNodeNums(1) = 1;
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 5; ++i) dln->nodes.push_back(new Node::NodeData);
+
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeNums(1) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataHeatBal->Zone(ZoneNum).Volume = 100;
@@ -289,12 +292,12 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataMstBalEMPD->RVSurface(1) = 0.0011;
     state->dataMstBalEMPD->RVSurface(2) = 0.0012;
 
-    state->dataLoopNodes->NodeID(1) = "Supply";
-    state->dataLoopNodes->NodeID(2) = "Return";
+    dln->nodes(1)->Name = "Supply";
+    dln->nodes(2)->Name = "Return";
 
-    state->dataLoopNodes->Node(1).Temp = 20.0;
-    state->dataLoopNodes->Node(1).HumRat = 0.001;
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.01;
+    dln->nodes(1)->Temp = 20.0;
+    dln->nodes(1)->HumRat = 0.001;
+    dln->nodes(1)->MassFlowRate = 0.01;
 
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
     thisZoneHB.MAT = 20.0;
@@ -368,8 +371,8 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 
     UpdateRoomAirModelAFN(*state, ZoneNum);
 
-    EXPECT_NEAR(24.397538, state->dataLoopNodes->Node(2).Temp, 0.00001);
-    EXPECT_NEAR(0.0024802305, state->dataLoopNodes->Node(2).HumRat, 0.000001);
+    EXPECT_NEAR(24.397538, dln->nodes(2)->Temp, 0.00001);
+    EXPECT_NEAR(0.0024802305, dln->nodes(2)->HumRat, 0.000001);
 
     // #8419
     std::string const idf_objects = delimited_string({

@@ -312,8 +312,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             } else {
                 state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneID = 0;
             }
-            state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeName = AlphArray(4);  //  A4 Cooling Water Inlet Node Name
-            state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantOutletNodeName = AlphArray(5); //  A5 Cooling Water Outlet Node Name
+            state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInNodeName = AlphArray(4);  //  A4 Cooling Water Inlet Node Name
+            state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantOutNodeName = AlphArray(5); //  A5 Cooling Water Outlet Node Name
             // find node ids for water path
             state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInNodeNum =
                 Node::GetSingleNode(state,
@@ -338,7 +338,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             BranchNodeConnections::TestCompSet(
                 state, state.dataIPShortCut->cCurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Heat Recovery Nodes");
 
-            state.dataCHPElectGen->MicroCHP(GeneratorNum).AirInletNodeName = AlphArray(6); //  A6 Air Inlet Node Name
+            state.dataCHPElectGen->MicroCHP(GeneratorNum).AirInNodeName = AlphArray(6); //  A6 Air Inlet Node Name
             // check the node connections
             state.dataCHPElectGen->MicroCHP(GeneratorNum).AirInNodeNum =
                 Node::GetSingleNode(state,
@@ -351,7 +351,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     Node::CompFluidStream::Secondary,
                                                     Node::ObjectIsNotParent);
 
-            state.dataCHPElectGen->MicroCHP(GeneratorNum).AirOutletNodeName = AlphArray(7); //  A7 Air Outlet Node Name
+            state.dataCHPElectGen->MicroCHP(GeneratorNum).AirOutNodeName = AlphArray(7); //  A7 Air Outlet Node Name
             state.dataCHPElectGen->MicroCHP(GeneratorNum).AirOutNodeNum =
                 Node::GetSingleNode(state,
                                                     AlphArray(7),

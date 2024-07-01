@@ -95,9 +95,9 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
     auto &thisDistrictHeatingSteam = state->dataOutsideEnergySrcs->EnergySource(3);
 
     // Tests for GetOutsideEnergySourcesInput()
-    EXPECT_TRUE(compare_enums(thisDistrictHeatingWater.EnergyType, DataPlant::PlantEquipmentType::PurchHotWater));
-    EXPECT_TRUE(compare_enums(thisDistrictCooling.EnergyType, DataPlant::PlantEquipmentType::PurchChilledWater));
-    EXPECT_TRUE(compare_enums(thisDistrictHeatingSteam.EnergyType, DataPlant::PlantEquipmentType::PurchSteam));
+    EXPECT_ENUM_EQ(thisDistrictHeatingWater.EnergyType, DataPlant::PlantEquipmentType::PurchHotWater);
+    EXPECT_ENUM_EQ(thisDistrictCooling.EnergyType, DataPlant::PlantEquipmentType::PurchChilledWater);
+    EXPECT_ENUM_EQ(thisDistrictHeatingSteam.EnergyType, DataPlant::PlantEquipmentType::PurchSteam);
 
     EXPECT_EQ(thisDistrictHeatingWater.NomCap, 1000000.0);
     EXPECT_EQ(thisDistrictCooling.NomCap, 900000.0);
@@ -133,7 +133,8 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
     thisHotWaterLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Name = thisDistrictHeatingWater.Name;
     thisHotWaterLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::PurchHotWater;
 
-    state->dataLoopNodes->Node(thisDistrictHeatingWater.InletNodeNum).Temp = 55.0;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisDistrictHeatingWater.InNodeNum)->Temp = 55.0;
     thisDistrictHeatingWater.plantLoc = locHotWater;
     thisDistrictHeatingWater.plantLoc.loopNum = 1;
     thisDistrictHeatingWater.BeginEnvrnInitFlag = true;
@@ -164,10 +165,10 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
     thisChilledWaterLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
     thisChilledWaterLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Name = thisDistrictCooling.Name;
     thisChilledWaterLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::PurchChilledWater;
-    thisChilledWaterLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumIn = thisDistrictCooling.InletNodeNum;
-    thisChilledWaterLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumOut = thisDistrictCooling.OutletNodeNum;
+    thisChilledWaterLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).InNodeNum = thisDistrictCooling.InNodeNum;
+    thisChilledWaterLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).OutNodeNum = thisDistrictCooling.OutNodeNum;
 
-    state->dataLoopNodes->Node(thisDistrictCooling.InletNodeNum).Temp = 65.0;
+    dln->nodes(thisDistrictCooling.InNodeNum)->Temp = 65.0;
     thisDistrictCooling.plantLoc = locChilledWater;
     thisDistrictCooling.plantLoc.loopNum = 2;
     thisDistrictCooling.BeginEnvrnInitFlag = true;
@@ -188,7 +189,7 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
     thisSteamLoop.FluidIndex = 1;
     thisSteamLoop.MinMassFlowRate = 0.00001;
     thisSteamLoop.MaxMassFlowRate = 20;
-    thisSteamLoop.TempSetPointNodeNum = thisDistrictHeatingSteam.OutletNodeNum;
+    thisSteamLoop.TempSetPointNodeNum = thisDistrictHeatingSteam.OutNodeNum;
     thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
     thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 1;
     thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
@@ -197,8 +198,8 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
     thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Name = thisDistrictHeatingSteam.Name;
     thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::PurchSteam;
 
-    state->dataLoopNodes->Node(thisDistrictHeatingSteam.InletNodeNum).Temp = 95.0; // Temperature of inlet condensate after subcooling
-    state->dataLoopNodes->Node(thisDistrictHeatingSteam.OutletNodeNum).TempSetPoint = 105.0;
+    dln->nodes(thisDistrictHeatingSteam.InNodeNum)->Temp = 95.0; // Temperature of inlet condensate after subcooling
+    dln->nodes(thisDistrictHeatingSteam.OutNodeNum)->TempSetPoint = 105.0;
     thisDistrictHeatingSteam.plantLoc = locSteam;
     thisDistrictHeatingSteam.plantLoc.loopNum = 3;
     thisDistrictHeatingSteam.BeginEnvrnInitFlag = true;

@@ -56,11 +56,13 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
@@ -76,15 +78,18 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     state->dataPlnt->PlantLoop(1).Mass = 50;
     state->dataPlnt->PlantLoop(1).FluidName = "Water";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).OutNodeNum = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).InNodeNum = 1;
     // Note LastTempInterfaceTankOutlet ends up getting reset to zero on the first pass
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).LastTempInterfaceTankOutlet = 80;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).TotalPumpHeat = 500;
-    state->dataLoopNodes->Node.allocate(state->dataPlnt->TotNumLoops);
-    state->dataLoopNodes->Node(1).Temp = 100;
-    state->dataLoopNodes->Node(1).MassFlowRate = 10;
-    state->dataPlnt->PlantLoop(1).OutletNodeFlowrate = 10;
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < state->dataPlnt->TotNumLoops; ++i) dln->nodes.push_back(new Node::NodeData);
+
+    dln->nodes(1)->Temp = 100;
+    dln->nodes(1)->MassFlowRate = 10;
+    state->dataPlnt->PlantLoop(1).OutNodeFlowrate = 10;
 
     // LoopSideInlet_MdotCpDeltaT should be < LoopSideInlet_McpDTdt
     // Therefore CapExcessStorageTime AND TotalTime will increase by 1 timestep
@@ -107,5 +112,93 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     EXPECT_NEAR(-588.264, state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).LoopSideInlet_McpDTdt, .001);
     EXPECT_EQ(1, state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).LoopSideInlet_CapExcessStorageTime);
     EXPECT_EQ(2, state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).LoopSideInlet_TotalTime);
+}
+
+TEST_F(EnergyPlusFixture, UpdateHVACInterface_Test)
+{
+    using namespace DataPlant;
+    using namespace HVACInterfaceManager;
+
+    int AirLoopNum = 1;
+    int InNodeNum = 1;
+    int OutNodeNum = 2;
+    bool OutOfToleranceFlag = false;
+
+    state->dataHVACInterfaceMgr->TmpRealARR.allocate(10);
+    state->dataConvergeParams->AirLoopConvergence.allocate(AirLoopNum);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
+    
+    DataConvergParams::CalledFrom CalledFrom = DataConvergParams::CalledFrom::AirSystemDemandSide;
+
+    auto *inNode = dln->nodes(InNodeNum);
+    auto *outNode = dln->nodes(OutNodeNum);
+    
+    inNode->MassFlowRate = 0.01;
+    outNode->MassFlowRate = 0.01;
+    inNode->HumRat = 0.001;
+    outNode->HumRat = 0.001;
+    inNode->Temp = 23.0;
+    outNode->Temp = 23.0;
+    inNode->Enthalpy = Psychrometrics::PsyHFnTdbW(23.0, 0.001);
+    outNode->Enthalpy = Psychrometrics::PsyHFnTdbW(23.0, 0.001);
+    inNode->Press = 101325.0;
+    outNode->Press = 101325.0;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
+    inNode->CO2 = 400.0;
+    outNode->CO2 = 400.0;
+    inNode->GenContam = 20.0;
+    outNode->GenContam = 20.0;
+
+    UpdateHVACInterface(*state, AirLoopNum, DataConvergParams::CalledFrom::AirSystemDemandSide, OutNodeNum, InNodeNum, OutOfToleranceFlag);
+
+    EXPECT_FALSE(OutOfToleranceFlag);
+    EXPECT_FALSE(state->dataConvergeParams->AirLoopConvergence(1).HVACCO2NotConverged[0]);
+    EXPECT_FALSE(state->dataConvergeParams->AirLoopConvergence(1).HVACGenContamNotConverged[0]);
+
+    UpdateHVACInterface(*state, AirLoopNum, DataConvergParams::CalledFrom::AirSystemSupplySideDeck1, OutNodeNum, InNodeNum, OutOfToleranceFlag);
+
+    EXPECT_FALSE(OutOfToleranceFlag);
+    EXPECT_FALSE(state->dataConvergeParams->AirLoopConvergence(1).HVACCO2NotConverged[1]);
+    EXPECT_FALSE(state->dataConvergeParams->AirLoopConvergence(1).HVACGenContamNotConverged[1]);
+
+    UpdateHVACInterface(*state, AirLoopNum, DataConvergParams::CalledFrom::AirSystemSupplySideDeck2, OutNodeNum, InNodeNum, OutOfToleranceFlag);
+
+    EXPECT_FALSE(OutOfToleranceFlag);
+    EXPECT_FALSE(state->dataConvergeParams->AirLoopConvergence(1).HVACCO2NotConverged[2]);
+    EXPECT_FALSE(state->dataConvergeParams->AirLoopConvergence(1).HVACGenContamNotConverged[2]);
+
+    inNode->CO2 = 400.0;
+    inNode->GenContam = 20.0;
+    outNode->CO2 = 401.0;
+    outNode->GenContam = 20.5;
+
+    UpdateHVACInterface(*state, AirLoopNum, DataConvergParams::CalledFrom::AirSystemDemandSide, OutNodeNum, InNodeNum, OutOfToleranceFlag);
+
+    EXPECT_TRUE(OutOfToleranceFlag);
+    EXPECT_TRUE(state->dataConvergeParams->AirLoopConvergence(1).HVACCO2NotConverged[0]);
+    EXPECT_TRUE(state->dataConvergeParams->AirLoopConvergence(1).HVACGenContamNotConverged[0]);
+
+    inNode->CO2 = 400.0;
+    inNode->GenContam = 20.0;
+    outNode->CO2 = 401.0;
+    outNode->GenContam = 20.5;
+    UpdateHVACInterface(*state, AirLoopNum, DataConvergParams::CalledFrom::AirSystemSupplySideDeck1, OutNodeNum, InNodeNum, OutOfToleranceFlag);
+
+    EXPECT_TRUE(OutOfToleranceFlag);
+    EXPECT_TRUE(state->dataConvergeParams->AirLoopConvergence(1).HVACCO2NotConverged[1]);
+    EXPECT_TRUE(state->dataConvergeParams->AirLoopConvergence(1).HVACGenContamNotConverged[1]);
+
+    inNode->CO2 = 400.0;
+    inNode->GenContam = 20.0;
+    outNode->CO2 = 401.0;
+    outNode->GenContam = 20.5;
+    UpdateHVACInterface(*state, AirLoopNum, DataConvergParams::CalledFrom::AirSystemSupplySideDeck2, OutNodeNum, InNodeNum, OutOfToleranceFlag);
+
+    EXPECT_TRUE(OutOfToleranceFlag);
+    EXPECT_TRUE(state->dataConvergeParams->AirLoopConvergence(1).HVACCO2NotConverged[2]);
+    EXPECT_TRUE(state->dataConvergeParams->AirLoopConvergence(1).HVACGenContamNotConverged[2]);
 }
 } // namespace EnergyPlus

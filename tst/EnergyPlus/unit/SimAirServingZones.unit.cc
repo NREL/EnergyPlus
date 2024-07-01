@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
@@ -797,8 +798,8 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
     // For this test, both ADUs should be connected airloop 1 which is the only one here
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InNodeAirLoopNum(1), 1);
 }
 
 TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
@@ -1029,8 +1030,8 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
     // For this test, each ADUs should be connected to a different airloop
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InNodeAirLoopNum(1), 2);
 }
 
 // this test checks whether an AirLoop with 0 airflow will raise the correct severe error
@@ -1430,9 +1431,9 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
     // For this test, each ADU 1-1 and 2-2 should be connected to airloop 1, and ADU 2-1 to airloop 2
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(2), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InNodeAirLoopNum(1), 2);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InNodeAirLoopNum(2), 1);
 }
 
 TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
@@ -1697,9 +1698,9 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
     // For this test, ADU 1-1 should be connected to airloop 1, and ADU 2-1 and ADU 2-2 to airloop 2
     // This test should fail before the fix for 7518 is added
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(2), 2);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InNodeAirLoopNum(1), 2);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InNodeAirLoopNum(2), 2);
 }
 
 TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2Zones3ADU)
@@ -1893,8 +1894,8 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2Zones3ADU)
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
     // For this test, both ADUs should be connected airloop 1 which is the only one here
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
-    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InNodeAirLoopNum(1), 1);
 }
 
 TEST_F(EnergyPlusFixture, DISABLED_AirLoop_ReturnFan_MinFlow)
@@ -2418,17 +2419,14 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoop_ReturnFan_MinFlow)
 
     SimulationManager::ManageSimulation(*state); // run the design days
 
-    int returnFanNode =
-        Util::FindItemInList("VSD RETURN FAN OUTLET TO MIXING BOX NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    EXPECT_GT(returnFanNode, 0);
-    int supplyOutletNode = Util::FindItemInList("SUPPLY SIDE OUTLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    EXPECT_GT(returnFanNode, 0);
-    EXPECT_GT(supplyOutletNode, 0);
+    auto &dln = state->dataLoopNodes;
+    auto *returnFanNode = dln->nodes(Node::GetNodeIndex(*state, "VSD RETURN FAN OUTLET TO MIXING BOX NODE"));
+    auto *supplyOutletNode = dln->nodes(Node::GetNodeIndex(*state, "SUPPLY SIDE OUTLET NODE"));
 
-    EXPECT_EQ(0, state->dataLoopNodes->Node(returnFanNode).MassFlowRateMin);
-    EXPECT_EQ(0, state->dataLoopNodes->Node(supplyOutletNode).MassFlowRateMin);
-    EXPECT_EQ(0, state->dataLoopNodes->Node(returnFanNode).MassFlowRate);
-    EXPECT_EQ(0, state->dataLoopNodes->Node(supplyOutletNode).MassFlowRate);
+    EXPECT_EQ(0, returnFanNode->MassFlowRateMin);
+    EXPECT_EQ(0, supplyOutletNode->MassFlowRateMin);
+    EXPECT_EQ(0, returnFanNode->MassFlowRate);
+    EXPECT_EQ(0, supplyOutletNode->MassFlowRate);
 }
 
 } // namespace EnergyPlus

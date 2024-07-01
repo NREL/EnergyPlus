@@ -213,7 +213,7 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
         state.dataPondGHE->PondGHE(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
 
         // get inlet node data
-        state.dataPondGHE->PondGHE(Item).InletNode = state.dataIPShortCut->cAlphaArgs(2);
+        state.dataPondGHE->PondGHE(Item).InNodeName = state.dataIPShortCut->cAlphaArgs(2);
         state.dataPondGHE->PondGHE(Item).InNodeNum =
             Node::GetSingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(2),
@@ -231,7 +231,7 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
         }
 
         // get outlet node data
-        state.dataPondGHE->PondGHE(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(3);
+        state.dataPondGHE->PondGHE(Item).OutNodeName = state.dataIPShortCut->cAlphaArgs(3);
         state.dataPondGHE->PondGHE(Item).OutNodeNum =
             Node::GetSingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(3),
@@ -339,9 +339,11 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
         ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
     }
 
-    if (!state.dataEnvrn->GroundTemp_DeepObjInput) {
+    if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::Deep]) {
         ShowWarningError(state, "GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input.");
-        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Deep));
+        ShowContinueError(state,
+                          format("Defaults, constant throughout the year of ({:.1R}) will be used.",
+                                 state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep]));
     }
 }
 
@@ -601,7 +603,7 @@ Real64 PondGroundHeatExchangerData::CalcTotalFLux(EnergyPlusData &state, Real64 
     Real64 UvalueGround = 0.999 * (this->GrndConductivity / this->Depth) + 1.37 * (this->GrndConductivity * Perimeter / this->Area);
 
     // ground heat transfer flux
-    Real64 FluxGround = UvalueGround * (PondBulkTemp - state.dataEnvrn->GroundTemp_Deep);
+    Real64 FluxGround = UvalueGround * (PondBulkTemp - state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep]);
 
     CalcTotalFLux = Qfluid + this->Area * (FluxSolAbsorbed - FluxConvect - FluxLongwave - FluxEvap - FluxGround);
 
@@ -888,7 +890,7 @@ void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
     if (this->OneTimeFlag || state.dataGlobal->WarmupFlag) {
         // initialize pond temps to mean of drybulb and ground temps.
         this->BulkTemperature = this->PastBulkTemperature =
-            0.5 * (DataEnvironment::OutDryBulbTempAt(state, PondHeight) + state.dataEnvrn->GroundTemp_Deep);
+            0.5 * (DataEnvironment::OutDryBulbTempAt(state, PondHeight) + state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep]);
         this->OneTimeFlag = false;
     }
 

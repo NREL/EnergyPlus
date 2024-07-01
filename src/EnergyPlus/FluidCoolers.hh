@@ -106,9 +106,9 @@ namespace FluidCoolers {
         Real64 FluidCoolerLowSpeedNomCap;             // Nominal capacity of the fluid cooler [W] at low speed
         bool FluidCoolerLowSpeedNomCapWasAutoSized;   // true if previous was set to autosize on input
         Real64 FluidCoolerLowSpeedNomCapSizingFactor; // sizing factor for low speed capacity []
-        int WaterInletNodeNum;                        // Node number on the water inlet side of the fluid cooler
-        int WaterOutletNodeNum;                       // Node number on the water outlet side of the fluid cooler
-        int OutdoorAirInletNodeNum;                   // Node number of outdoor air inlet for the fluid cooler
+        int WaterInNodeNum = 0;                        // Node number on the water inlet side of the fluid cooler
+        int WaterOutNodeNum = 0;                       // Node number on the water outlet side of the fluid cooler
+        int OutdoorAirInNodeNum = 0;                   // Node number of outdoor air inlet for the fluid cooler
         int HighMassFlowErrorCount;                   // Counter when mass flow rate is > Design*FluidCoolerMassFlowRateMultiplier
         int HighMassFlowErrorIndex;                   // Index for high mass flow recurring error message
         int OutletWaterTempErrorCount;                // Counter when outlet water temperature is < minimum allowed temperature
@@ -151,8 +151,8 @@ namespace FluidCoolers {
               LowSpeedFluidCoolerUA(0.0), LowSpeedFluidCoolerUAWasAutoSized(false), LowSpeedFluidCoolerUASizingFactor(0.0),
               DesignEnteringWaterTemp(0.0), DesignLeavingWaterTemp(0.0), DesignEnteringAirTemp(0.0), DesignEnteringAirWetBulbTemp(0.0),
               FluidCoolerMassFlowRateMultiplier(0.0), FluidCoolerNominalCapacity(0.0), FluidCoolerLowSpeedNomCap(0.0),
-              FluidCoolerLowSpeedNomCapWasAutoSized(false), FluidCoolerLowSpeedNomCapSizingFactor(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
-              OutdoorAirInletNodeNum(0), HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0),
+              FluidCoolerLowSpeedNomCapWasAutoSized(false), FluidCoolerLowSpeedNomCapSizingFactor(0.0),
+              HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0),
               OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0),
               WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), plantLoc{},
               oneTimeInitFlag(true), beginEnvrnInit(true), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0),

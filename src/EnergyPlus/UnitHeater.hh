@@ -88,8 +88,8 @@ namespace UnitHeater {
         std::string Name;      // name of unit
         std::string SchedName; // availability schedule
         int SchedPtr;          // index to schedule
-        int AirInNode;         // inlet air node number
-        int AirOutNode;        // outlet air node number
+        int AirInNodeNum = 0;         // inlet air node number
+        int AirOutNodeNum = 0;        // outlet air node number
         HVAC::FanType fanType; // Fan type number (see DataHVACGlobals)
         std::string FanName;   // name of fan
         int Fan_Index;
@@ -100,7 +100,7 @@ namespace UnitHeater {
         Real64 MaxAirVolFlow;                   // m3/s
         Real64 MaxAirMassFlow;                  // kg/s
         std::string FanOperatesDuringNoHeating; // Indicates whether fan operates or not during no heating
-        int FanOutletNode;                      // outlet node number for fan exit
+        int FanOutNodeNum = 0;                      // outlet node number for fan exit
         // (assumes fan is upstream of heating coil)
         HVAC::FanOp fanOp = HVAC::FanOp::Invalid; // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
         HCoilType Type;                           // type of heating coil (water, gas, electric, etc.)
@@ -117,9 +117,9 @@ namespace UnitHeater {
         Real64 MinVolHotSteamFlow; // m3/s
         Real64 MinHotWaterFlow;    // kg/s
         Real64 MinHotSteamFlow;    // kg/s
-        int HotControlNode;        // hot water control node, inlet of coil
+        int HotControlNodeNum = 0;        // hot water control node, inlet of coil
         Real64 HotControlOffset;   // control tolerance
-        int HotCoilOutNodeNum;     // outlet of coil
+        int HotCoilOutNodeNum = 0;     // outlet of coil
         PlantLocation HWplantLoc;  // Location of plant component for hot plant coil
         Real64 PartLoadFrac;       // part load fraction for the unit
         // Report data
@@ -137,11 +137,11 @@ namespace UnitHeater {
 
         // Default Constructor
         UnitHeaterData()
-            : SchedPtr(0), AirInNode(0), AirOutNode(0), fanType(HVAC::FanType::Invalid), Fan_Index(0), FanSchedPtr(0), FanAvailSchedPtr(0),
-              ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), FanOutletNode(0), HCoil_Index(0),
+            : SchedPtr(0), fanType(HVAC::FanType::Invalid), Fan_Index(0), FanSchedPtr(0), FanAvailSchedPtr(0),
+              ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), HCoil_Index(0),
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0),
               MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0),
-              MinHotSteamFlow(0.0), HotControlNode(0), HotControlOffset(0.0), HotCoilOutNodeNum(0), HWplantLoc{}, PartLoadFrac(0.0), HeatPower(0.0),
+              MinHotSteamFlow(0.0), HotControlOffset(0.0), HotCoilOutNodeNum(0), HWplantLoc{}, PartLoadFrac(0.0), HeatPower(0.0),
               HeatEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), FanOffNoHeating(false), FanPartLoadRatio(0.0), ZonePtr(0), HVACSizingIndex(0),
               FirstPass(true)
         {

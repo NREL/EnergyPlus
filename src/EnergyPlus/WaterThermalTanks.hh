@@ -318,28 +318,28 @@ namespace WaterThermalTanks {
         Real64 RatedInletWBTemp;                                    // Rated evaporator inlet air wet-bulb temperature (C)
         Real64 RatedInletWaterTemp;                                 // Rated condenser inlet water temperature (C)
         bool FoundTank;                                             // Found storage tank flag associated with HP water heater
-        int HeatPumpAirInletNode;                                   // HP air inlet node (for zone, zone/outdoor or scheduled)
-        int HeatPumpAirOutletNode;                                  // HP air outlet node (for zone, zone/outdoor or scheduled)
-        int OutsideAirNode;                                         // outdoor air node (for outdoor or zone/outdoor air unit only)
-        int ExhaustAirNode;                                         // Exhaust air node (for outdoor or zone/outdoor air unit only)
-        int CondWaterInletNode;                                     // Condenser water inlet node
-        int CondWaterOutletNode;                                    // Condenser water outlet node
-        int WHUseInletNode;                                         // Water heater tank use side inlet node
-        int WHUseOutletNode;                                        // Water heater tank use side outlet node
+        int HeatPumpAirInNodeNum = 0;                                   // HP air inlet node (for zone, zone/outdoor or scheduled)
+        int HeatPumpAirOutNodeNum = 0;                                  // HP air outlet node (for zone, zone/outdoor or scheduled)
+        int OutsideAirInNodeNum = 0;                                         // outdoor air node (for outdoor or zone/outdoor air unit only)
+        int ExhaustAirOutNodeNum = 0;                                         // Exhaust air node (for outdoor or zone/outdoor air unit only)
+        int CondWaterInNodeNum = 0;                                     // Condenser water inlet node
+        int CondWaterOutNodeNum = 0;                                    // Condenser water outlet node
+        int WHUseInNodeNum = 0;                                         // Water heater tank use side inlet node
+        int WHUseOutNodeNum = 0;                                        // Water heater tank use side outlet node
         int WHUseSidePlantLoopNum;                                  // if not zero, then this water heater is on plant loop #
         std::string DXCoilType;                                     // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
         std::string DXCoilName;                                     // Name of DX coil
         int DXCoilNum;                                              // Index of DX coil
         int DXCoilTypeNum;                                          // Type Number of DX coil
-        int DXCoilAirInletNode;                                     // Inlet air node number of DX coil
+        int DXCoilAirInNodeNum = 0;                                     // Inlet air node number of DX coil
         int DXCoilPLFFPLR;                                          // Index to HPWH's DX Coil PLF as a function of PLR curve
         HVAC::FanType fanType;                                      // Integer type of fan (3 = Fan:OnOff)
         std::string FanName;                                        // Name of Fan
-        std::string FanInletNode_str;                               // Fan inlet node name
-        std::string FanOutletNode_str;                              // Fan outlet node name
+        std::string FanInNodeName;                               // Fan inlet node name
+        std::string FanOutNodeName;                              // Fan outlet node name
         int FanNum;                                                 // Index of Fan
         HVAC::FanPlace fanPlace;                                    // Location of Fan
-        int FanOutletNode;                                          // Outlet node of heat pump water heater fan
+        int FanOutNodeNum = 0;                                          // Outlet node of heat pump water heater fan
         int WaterHeaterTankNum;                                     // Index of Water Heater Tank
         int OutletAirSplitterSchPtr;                                // Index to air-side outlet air splitter schedule
         int InletAirMixerSchPtr;                                    // Index to air-side inlet air mixer schedule
@@ -352,8 +352,8 @@ namespace WaterThermalTanks {
         Real64 SetPointTemp;                                        // set point or cut-out temperature [C]
         Real64 MinAirTempForHPOperation;                            // HP does not operate below this ambient temperature
         Real64 MaxAirTempForHPOperation;                            // HP does not operate above this ambient temperature
-        int InletAirMixerNode;                                      // Inlet air mixer node number of HP water heater
-        int OutletAirSplitterNode;                                  // Outlet air splitter node number of HP water heater
+        int MixerAirInNodeNum = 0;                               // Inlet air mixer node number of HP water heater
+        int SplitterAirOutNodeNum = 0;                                  // Outlet air splitter node number of HP water heater
         Real64 SourceMassFlowRate;                                  // Maximum mass flow rate on the source side (kg/s)
         WTTAmbientTemp InletAirConfiguration;                       // Identifies source of HPWH inlet air
         int AmbientTempSchedule;                                    // Schedule index pointer for ambient air temp at HPWH inlet
@@ -388,10 +388,10 @@ namespace WaterThermalTanks {
         Real64 WrappedCondenserBottomLocation;                      // Location of the bottom of the wrapped condenser.
         Real64 WrappedCondenserTopLocation;                         // Location of the top of the wrapped condenser.
         Real64 ControlSensor1Height;                                // location from bottom of tank of control sensor 1
-        int ControlSensor1Node;                                     // Node number of control sensor 1
+        int ControlSensor1NodeNum = 1;                              // Node number of control sensor 1 // Why initialized to 1?
         Real64 ControlSensor1Weight;                                // weight of control sensor 1
         Real64 ControlSensor2Height;                                // location from bottom of tank of control sensor 2
-        int ControlSensor2Node;                                     // Node number of control sensor 2
+        int ControlSensor2NodeNum = 2;                              // Node number of control sensor 2 // Why initialized to 2?
         Real64 ControlSensor2Weight;                                // weight of control sensor 2
         Real64 ControlTempAvg;                              // Measured control temperature for the heat pump, average over timestep, for reporting
         Real64 ControlTempFinal;                            // Measured control temperature at the end of the timestep, for reporting
@@ -408,14 +408,14 @@ namespace WaterThermalTanks {
         bool bIsIHP;                           // whether the HP is a part of Integrated Heat Pump
         bool MyOneTimeFlagHP;                  // first pass log
         bool MyTwoTimeFlagHP;                  // second pass do input check
-        std::string CoilInletNode_str;         // Used to set up comp set
-        std::string CoilOutletNode_str;        // Used to set up comp set
+        std::string CoilInNodeName;         // Used to set up comp set
+        std::string CoilOutNodeName;        // Used to set up comp set
         bool CheckHPWHEquipName;
 
-        std::string InletNodeName1;
-        std::string OutletNodeName1;
-        std::string InletNodeName2;
-        std::string OutletNodeName2;
+        std::string In1NodeName;
+        std::string Out1NodeName;
+        std::string In2NodeName;
+        std::string Out2NodeName;
 
         bool myOneTimeInitFlag;
 
@@ -427,12 +427,11 @@ namespace WaterThermalTanks {
               AvailSchedPtr(0), SetPointTempSchedule(0), DeadBandTempDiff(0.0), Capacity(0.0), BackupElementCapacity(0.0),
               BackupElementEfficiency(0.0), WHOnCycParaLoad(0.0), WHOffCycParaLoad(0.0), WHOnCycParaFracToTank(0.0), WHOffCycParaFracToTank(0.0),
               WHPLFCurve(0), OperatingAirFlowRate(0.0), OperatingAirMassFlowRate(0.0), OperatingWaterFlowRate(0.0), COP(0.0), SHR(0.0),
-              RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), FoundTank(false), HeatPumpAirInletNode(0),
-              HeatPumpAirOutletNode(0), OutsideAirNode(0), ExhaustAirNode(0), CondWaterInletNode(0), CondWaterOutletNode(0), WHUseInletNode(0),
-              WHUseOutletNode(0), WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0),
-              fanType(HVAC::FanType::Invalid), FanNum(0), fanPlace(HVAC::FanPlace::Invalid), FanOutletNode(0), WaterHeaterTankNum(0),
+              RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), FoundTank(false), 
+              WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilPLFFPLR(0),
+              fanType(HVAC::FanType::Invalid), FanNum(0), fanPlace(HVAC::FanPlace::Invalid), WaterHeaterTankNum(0),
               OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0),
-              MinAirTempForHPOperation(5.0), MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0),
+              MinAirTempForHPOperation(5.0), MaxAirTempForHPOperation(48.8888888889),
               SourceMassFlowRate(0.0), InletAirConfiguration(WTTAmbientTemp::OutsideAir), AmbientTempSchedule(0), AmbientRHSchedule(0),
               AmbientTempZone(0), CrankcaseTempIndicator(CrankcaseHeaterControlTemp::Schedule), CrankcaseTempSchedule(0), CrankcaseTempZone(0),
               OffCycParaLoad(0.0), OnCycParaLoad(0.0), ParasiticTempIndicator(WTTAmbientTemp::OutsideAir), OffCycParaFuelRate(0.0),
@@ -440,8 +439,8 @@ namespace WaterThermalTanks {
               HPSetPointError(0), HPSetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0),
               RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0), IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0),
               FirstTimeThroughFlag(true), ShowSetPointWarning(true), HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0),
-              WrappedCondenserBottomLocation(0.0), WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1),
-              ControlSensor1Weight(1.0), ControlSensor2Height(-1.0), ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0),
+              WrappedCondenserBottomLocation(0.0), WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), 
+              ControlSensor1Weight(1.0), ControlSensor2Height(-1.0), ControlSensor2Weight(0.0), ControlTempAvg(0.0),
               ControlTempFinal(0.0), AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0),
               HPWHAirVolFlowRate(HVAC::MaxSpeedLevels, 0.0), HPWHAirMassFlowRate(HVAC::MaxSpeedLevels, 0.0),
               HPWHWaterVolFlowRate(HVAC::MaxSpeedLevels, 0.0), HPWHWaterMassFlowRate(HVAC::MaxSpeedLevels, 0.0),
@@ -484,7 +483,7 @@ namespace WaterThermalTanks {
         WTTAmbientTemp AmbientTempIndicator;                       // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
         int AmbientTempSchedule;                                   // Schedule index pointer
         int AmbientTempZone;                                       // Number of ambient zone around tank
-        int AmbientTempOutsideAirNode;                             // Number of outside air node
+        int AmbientTempOutsideAirNodeNum = 0;                             // Number of outside air node
         Real64 AmbientTemp;                                        // Ambient temperature around tank (C)
         Real64 AmbientZoneGain;                                    // Internal gain to zone from tank losses (W)
         Real64 LossCoeff;                                          // Overall tank heat loss coefficient, UA (W/K)
@@ -514,9 +513,9 @@ namespace WaterThermalTanks {
         Constant::eFuel OnCycParaFuelType;                         // Fuel type for on-cycle parasitic load
         Real64 OnCycParaFracToTank;                                // Fraction of on-cycle parasitic energy ending up in tank (W)
         DataPlant::FlowLock UseCurrentFlowLock;                    // current flow lock setting on use side
-        int UseInletNode;                                          // Inlet node on the use side; colder water returning to a hottank
+        int UseInNodeNum = 0;                                          // Inlet node on the use side; colder water returning to a hottank
         Real64 UseInletTemp;                                       // Use side inlet temperature (C)
-        int UseOutletNode;                                         // Outlet node on the use side; hot tank water
+        int UseOutNodeNum = 0;                                         // Outlet node on the use side; hot tank water
         Real64 UseOutletTemp;                                      // Use side outlet temperature (C)
         Real64 UseMassFlowRate;                                    // Mass flow rate on the use side (kg/s)
         Real64 UseEffectiveness;                                   // Heat transfer effectiveness on use side ()
@@ -530,9 +529,9 @@ namespace WaterThermalTanks {
         int UseSideAvailSchedNum;    // use side availability schedule
         Real64 UseSideLoadRequested; // hold MyLoad request from plant management.
         PlantLocation UseSidePlantLoc;
-        int SourceInletNode;                                         // Inlet node for the source side; hot water from supply
+        int SourceInNodeNum = 0;                                         // Inlet node for the source side; hot water from supply
         Real64 SourceInletTemp;                                      // Source side inlet temperature (C)
-        int SourceOutletNode;                                        // Outlet node for the source side; colder tank water
+        int SourceOutNodeNum = 0;                                        // Outlet node for the source side; colder tank water
         Real64 SourceOutletTemp;                                     // Source side outlet temperature (C)
         Real64 SourceMassFlowRate;                                   // Mass flow rate on the source side (kg/s)
         Real64 SourceEffectiveness;                                  // Heat transfer effectiveness on source side ()
@@ -562,11 +561,11 @@ namespace WaterThermalTanks {
         Real64 Perimeter;        // Perimeter of tank (m), only used for OTHER shape
         TankShape Shape;         // Tank shape:  VERTICAL CYLINDER, HORIZONTAL CYLINDER, or OTHER
         Real64 HeaterHeight1;
-        int HeaterNode1;
+        int Heater1NodeNum = 0;
         bool HeaterOn1;
         bool SavedHeaterOn1;
         Real64 HeaterHeight2;
-        int HeaterNode2;
+        int Heater2NodeNum = 0;
         bool HeaterOn2;
         bool SavedHeaterOn2;
         Real64 AdditionalCond; // Additional destratification conductivity (W/m K)
@@ -586,14 +585,14 @@ namespace WaterThermalTanks {
         Real64 SourceInletHeight;           // Height of source side inlet (m)
         bool SourceInletHeightWasAutoSized; // true if source inlet height was autosize on input
         Real64 SourceOutletHeight;          // Height of source side outlet (m)
-        int UseInletStratNode;              // Use-side inlet node number
-        int UseOutletStratNode;             // Use-side outlet node number
-        int SourceInletStratNode;           // Source-side inlet node number
-        int SourceOutletStratNode;          // Source-side outlet node number
+        int UseInStratNodeNum = 0;              // Use-side inlet node number
+        int UseOutStratNodeNum = 0;             // Use-side outlet node number
+        int SourceInStratNodeNum = 0;           // Source-side inlet node number
+        int SourceOutStratNodeNum = 0;          // Source-side outlet node number
         InletPositionMode InletMode;        // Inlet position mode:  1 = FIXED; 2 = SEEKING
         Real64 InversionMixingRate;
         Array1D<Real64> AdditionalLossCoeff; // Loss coefficient added to the skin loss coefficient (W/m2-K)
-        int Nodes;                           // Number of nodes
+        int NumNodes;                           // Number of nodes
         Array1D<StratifiedNodeData> Node;    // Array of node data
         // Report variables
         Real64 VolFlowRate;            // Scheduled DHW demand (m3/s)
@@ -660,10 +659,10 @@ namespace WaterThermalTanks {
         bool MyHPSizeFlag;
         bool CheckWTTEquipName;
 
-        std::string InletNodeName1;
-        std::string OutletNodeName1;
-        std::string InletNodeName2;
-        std::string OutletNodeName2;
+        std::string In1NodeName;
+        std::string Out1NodeName;
+        std::string In2NodeName;
+        std::string Out2NodeName;
 
         bool myOneTimeInitFlag;
         bool scanPlantLoopsFlag;
@@ -675,28 +674,28 @@ namespace WaterThermalTanks {
         WaterThermalTankData()
             : WaterThermalTankType(DataPlant::PlantEquipmentType::Invalid), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0),
               VolumeWasAutoSized(false), Mass(0.0), TimeElapsed(0.0), AmbientTempIndicator(WTTAmbientTemp::OutsideAir), AmbientTempSchedule(0),
-              AmbientTempZone(0), AmbientTempOutsideAirNode(0), AmbientTemp(0.0), AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0),
+              AmbientTempZone(0), AmbientTemp(0.0), AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0),
               OffCycLossFracToZone(0.0), OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), ControlType(HeaterControlMode::Cycle),
               StratifiedControlMode(PriorityControlMode::Invalid), MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0),
               Efficiency(0.0), PLFCurve(0), SetPointTempSchedule(0), SetPointTemp(0.0), DeadBandDeltaTemp(0.0), TankTempLimit(0.0),
               IgnitionDelay(0.0), OffCycParaLoad(0.0), OffCycParaFracToTank(0.0), OnCycParaLoad(0.0), OnCycParaFracToTank(0.0),
-              UseCurrentFlowLock(DataPlant::FlowLock::Unlocked), UseInletNode(0), UseInletTemp(0.0), UseOutletNode(0), UseOutletTemp(0.0),
+              UseCurrentFlowLock(DataPlant::FlowLock::Unlocked), UseInletTemp(0.0), UseOutletTemp(0.0),
               UseMassFlowRate(0.0), UseEffectiveness(0.0), PlantUseMassFlowRateMax(0.0), SavedUseOutletTemp(0.0), UseDesignVolFlowRate(0.0),
               UseDesignVolFlowRateWasAutoSized(false), UseBranchControlType(DataBranchAirLoopPlant::ControlType::Passive), UseSidePlantSizNum(0),
-              UseSideSeries(true), UseSideAvailSchedNum(0), UseSideLoadRequested(0.0), UseSidePlantLoc{}, SourceInletNode(0), SourceInletTemp(0.0),
-              SourceOutletNode(0), SourceOutletTemp(0.0), SourceMassFlowRate(0.0), SourceEffectiveness(0.0), PlantSourceMassFlowRateMax(0.0),
+              UseSideSeries(true), UseSideAvailSchedNum(0), UseSideLoadRequested(0.0), UseSidePlantLoc{}, SourceInletTemp(0.0),
+              SourceOutletTemp(0.0), SourceMassFlowRate(0.0), SourceEffectiveness(0.0), PlantSourceMassFlowRateMax(0.0),
               SavedSourceOutletTemp(0.0), SourceDesignVolFlowRate(0.0), SourceDesignVolFlowRateWasAutoSized(false),
               SourceBranchControlType(DataBranchAirLoopPlant::ControlType::Passive), SourceSidePlantSizNum(0), SourceSideSeries(true),
               SourceSideAvailSchedNum(0), SrcSidePlantLoc{}, SourceSideControlMode(SourceSideControl::IndirectHeatAltSetpoint),
               SourceSideAltSetpointSchedNum(0), SizingRecoveryTime(0.0), MassFlowRateMax(0.0), VolFlowRateMin(0.0), MassFlowRateMin(0.0),
               FlowRateSchedule(0), UseInletTempSchedule(0), TankTemp(0.0), SavedTankTemp(0.0), TankTempAvg(0.0), Height(0.0),
-              HeightWasAutoSized(false), Perimeter(0.0), Shape(TankShape::VertCylinder), HeaterHeight1(0.0), HeaterNode1(0), HeaterOn1(false),
-              SavedHeaterOn1(false), HeaterHeight2(0.0), HeaterNode2(0), HeaterOn2(false), SavedHeaterOn2(false), AdditionalCond(0.0),
+              HeightWasAutoSized(false), Perimeter(0.0), Shape(TankShape::VertCylinder), HeaterHeight1(0.0), HeaterOn1(false),
+              SavedHeaterOn1(false), HeaterHeight2(0.0), HeaterOn2(false), SavedHeaterOn2(false), AdditionalCond(0.0),
               SetPointTemp2(0.0), SetPointTempSchedule2(0), DeadBandDeltaTemp2(0.0), MaxCapacity2(0.0), OffCycParaHeight(0.0), OnCycParaHeight(0.0),
               SkinLossCoeff(0.0), SkinLossFracToZone(0.0), OffCycFlueLossCoeff(0.0), OffCycFlueLossFracToZone(0.0), UseInletHeight(0.0),
               UseOutletHeight(0.0), UseOutletHeightWasAutoSized(false), SourceInletHeight(0.0), SourceInletHeightWasAutoSized(false),
-              SourceOutletHeight(0.0), UseInletStratNode(0), UseOutletStratNode(0), SourceInletStratNode(0), SourceOutletStratNode(0),
-              InletMode(InletPositionMode::Fixed), InversionMixingRate(0.0), Nodes(0), VolFlowRate(0.0), VolumeConsumed(0.0), UnmetRate(0.0),
+              SourceOutletHeight(0.0), 
+              InletMode(InletPositionMode::Fixed), InversionMixingRate(0.0), NumNodes(0), VolFlowRate(0.0), VolumeConsumed(0.0), UnmetRate(0.0),
               LossRate(0.0), FlueLossRate(0.0), UseRate(0.0), TotalDemandRate(0.0), SourceRate(0.0), HeaterRate(0.0), HeaterRate1(0.0),
               HeaterRate2(0.0), FuelRate(0.0), FuelRate1(0.0), FuelRate2(0.0), VentRate(0.0), OffCycParaFuelRate(0.0), OffCycParaRateToTank(0.0),
               OnCycParaFuelRate(0.0), OnCycParaRateToTank(0.0), NetHeatTransferRate(0.0), CycleOnCount(0), CycleOnCount1(0), CycleOnCount2(0),
@@ -853,8 +852,8 @@ namespace WaterThermalTanks {
                                     Real64 SpeedRatio, // speed ratio between two speed levels
                                     int HPNum,
                                     int SpeedNum,
-                                    int HPWaterInletNode,
-                                    int HPWaterOutletNode,
+                                    int HPWaterInNodeNum,
+                                    int HPWaterOutNodeNum,
                                     Real64 RhoWater,
                                     Real64 desTankTemp,
                                     TankOperatingMode mode,
@@ -885,8 +884,8 @@ namespace WaterThermalTanks {
         int SetPointTempSchedule;                  // Index to Setpoint Temperature Schedule curve
         Real64 DeadBandTempDiff;                   // Dead band temperature difference (cut-in temperature)
         Real64 HeatReclaimRecoveryEff;             // recovery efficiency of desuperheater (0.3 max)
-        int WaterInletNode;                        // Desuperheater water inlet node
-        int WaterOutletNode;                       // Desuperheater water outlet node
+        int WaterInNodeNum = 0;                    // Desuperheater water inlet node
+        int WaterOutNodeNum = 0;                   // Desuperheater water outlet node
         Real64 RatedInletWaterTemp;                // Inlet water temp at rated heat reclaim recovery eff (C)
         Real64 RatedOutdoorAirTemp;                // Outdoor air temp at rated heat reclaim recovery eff (C)
         Real64 MaxInletWaterTemp;                  // Max water temp for heat reclaim recovery (C)
@@ -935,15 +934,15 @@ namespace WaterThermalTanks {
         bool FirstTimeThroughFlag;                                  // Flag for saving water heater status
         bool ValidSourceType;
 
-        std::string InletNodeName1;
-        std::string OutletNodeName1;
-        std::string InletNodeName2;
-        std::string OutletNodeName2;
+        std::string In1NodeName;
+        std::string Out1NodeName;
+        std::string In2NodeName;
+        std::string Out2NodeName;
 
         // Default Constructor
         WaterHeaterDesuperheaterData()
             : InsuffTemperatureWarn(0), AvailSchedPtr(0), SetPointTempSchedule(0), DeadBandTempDiff(0.0), HeatReclaimRecoveryEff(0.0),
-              WaterInletNode(0), WaterOutletNode(0), RatedInletWaterTemp(0.0), RatedOutdoorAirTemp(0.0), MaxInletWaterTemp(0.0),
+              RatedInletWaterTemp(0.0), RatedOutdoorAirTemp(0.0), MaxInletWaterTemp(0.0),
               TankTypeNum(DataPlant::PlantEquipmentType::Invalid), TankNum(0), StandAlone(false), HeaterRate(0.0), HeaterEnergy(0.0), PumpPower(0.0),
               PumpEnergy(0.0), PumpElecPower(0.0), PumpFracToWater(0.0), OperatingWaterFlowRate(0.0), HEffFTemp(0), HEffFTempOutput(0.0),
               SetPointTemp(0.0), WaterHeaterTankNum(0), DesuperheaterPLR(0.0), OnCycParaLoad(0.0), OffCycParaLoad(0.0), OnCycParaFuelEnergy(0.0),

@@ -108,8 +108,8 @@ namespace FuelCellElectricGenerator {
         int WaterSupplyCurveID;            // pointer to curve for water use in reforming
         Real64 NdotDilutionAir;            // user defined constant flow of dilution air (kmol/sec)
         Real64 StackHeatLossToDilution;    // (watts)
-        std::string DilutionInletNodeName; // dilution -> AirHR ?? added air heat recovery path
-        int DilutionInletNodeNum = 0;             // pointer to node for inlet
+        std::string DilutionInNodeName; // dilution -> AirHR ?? added air heat recovery path
+        int DilutionInNodeNum = 0;             // pointer to node for inlet
         std::string DilutionExhaustNodeName;
         int DilutionExhaustNodeNum = 0; // pointer to node getting exhaust
         Real64 PelMin;           // minimum operating point for FCPM electrical power Pel

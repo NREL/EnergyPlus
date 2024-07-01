@@ -75,10 +75,10 @@ namespace TranspiredCollector {
         std::string OSCMName;                     // OtherSideConditionsModel
         int OSCMPtr;                              // OtherSideConditionsModel index
         int SchedPtr;                             // Availablity schedule
-        Array1D_int InletNode;                    // Air system node "pointer", should be set to outdoor air
-        Array1D_int OutletNode;                   // Air system node "pointer", outlet from UTSC
-        Array1D_int ControlNode;                  // Air system node "pointer", should have mixed air setpoint
-        Array1D_int ZoneNode;                     // Air system node "pointer", should have zone node
+        Array1D_int InNodeNums;                    // Air system node "pointer", should be set to outdoor air
+        Array1D_int OutNodeNums;                   // Air system node "pointer", outlet from UTSC
+        Array1D_int ControlNodeNums;                  // Air system node "pointer", should have mixed air setpoint
+        Array1D_int ZoneNodeNums;                     // Air system node "pointer", should have zone node
         int Layout;                               // 'Square' or 'Triangle'
         int Correlation;                          // which heat exchanger effectiveness model
         Real64 HoleDia;                           // Diameter of Perforations in Collector [m]

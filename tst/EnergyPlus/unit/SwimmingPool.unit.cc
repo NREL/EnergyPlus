@@ -132,8 +132,8 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     state->dataSwimmingPools->Pool.allocate(state->dataSwimmingPools->NumSwimmingPools);
     state->dataSwimmingPools->Pool(1).Name = "FirstPool";
     state->dataSwimmingPools->Pool(2).Name = "SecondPool";
-    state->dataSwimmingPools->Pool(1).WaterInletNode = 1;
-    state->dataSwimmingPools->Pool(2).WaterInletNode = 11;
+    state->dataSwimmingPools->Pool(1).WaterInNodeNum = 1;
+    state->dataSwimmingPools->Pool(2).WaterInNodeNum = 11;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
@@ -156,16 +156,16 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::SwimmingPool_Indoor;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "FirstPool";
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::SwimmingPool_Indoor;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Name = "SecondPool";
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumIn = 11;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).InNodeNum = 11;
 
     // Test 1
     state->dataSwimmingPools->Pool(1).initSwimmingPoolPlantLoopIndex(*state);
     EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWplantLoc.loopNum, 1);
-    EXPECT_TRUE(compare_enums(state->dataSwimmingPools->Pool(1).HWplantLoc.loopSideNum, DataPlant::LoopSideLocation::Demand));
+    EXPECT_ENUM_EQ(state->dataSwimmingPools->Pool(1).HWplantLoc.loopSideNum, DataPlant::LoopSideLocation::Demand);
     EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWplantLoc.branchNum, 1);
     EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWplantLoc.compNum, 1);
 
@@ -173,7 +173,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     state->dataSwimmingPools->Pool(1).MyPlantScanFlagPool = true;
     state->dataSwimmingPools->Pool(2).initSwimmingPoolPlantLoopIndex(*state);
     EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWplantLoc.loopNum, 2);
-    EXPECT_TRUE(compare_enums(state->dataSwimmingPools->Pool(2).HWplantLoc.loopSideNum, DataPlant::LoopSideLocation::Supply));
+    EXPECT_ENUM_EQ(state->dataSwimmingPools->Pool(2).HWplantLoc.loopSideNum, DataPlant::LoopSideLocation::Supply);
     EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWplantLoc.branchNum, 1);
     EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWplantLoc.compNum, 1);
 }
@@ -188,8 +188,8 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     state->dataSwimmingPools->Pool.allocate(state->dataSwimmingPools->NumSwimmingPools);
 
     state->dataSwimmingPools->Pool(1).Name = "FirstPool";
-    state->dataSwimmingPools->Pool(1).WaterInletNode = 1;
-    state->dataSwimmingPools->Pool(1).WaterOutletNode = 2;
+    state->dataSwimmingPools->Pool(1).WaterInNodeNum = 1;
+    state->dataSwimmingPools->Pool(1).WaterOutNodeNum = 2;
     state->dataSwimmingPools->Pool(1).HWplantLoc.loopNum = 1;
     state->dataSwimmingPools->Pool(1).HWplantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
     state->dataSwimmingPools->Pool(1).HWplantLoc.branchNum = 1;
@@ -208,9 +208,10 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::SwimmingPool_Indoor;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "FirstPool";
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = 1;
 
-    state->dataLoopNodes->Node.allocate(2);
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
 
     // Test 1
     auto &thisPool = state->dataSwimmingPools->Pool(PoolNum);
@@ -221,8 +222,8 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     state->dataSwimmingPools->Pool(1).MyPlantScanFlagPool = false;
     state->dataSize->SaveNumPlantComps = 0;
     state->dataSize->CompDesWaterFlow.deallocate();
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
-    state->dataLoopNodes->Node(1).MassFlowRateMax = 0.0;
+    dln->nodes(1)->MassFlowRate = 0.0;
+    dln->nodes(1)->MassFlowRateMax = 0.0;
     thisPool.initSwimmingPoolPlantNodeFlow(*state);
     EXPECT_EQ(state->dataSize->CompDesWaterFlow(1).SupNode, 1);
     EXPECT_EQ(state->dataSize->CompDesWaterFlow(1).DesVolFlowRate, 0.00075);
@@ -234,8 +235,8 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     state->dataSwimmingPools->Pool(1).MyPlantScanFlagPool = false;
     state->dataSize->SaveNumPlantComps = 0;
     state->dataSize->CompDesWaterFlow.deallocate();
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
-    state->dataLoopNodes->Node(1).MassFlowRateMax = 0.0;
+    dln->nodes(1)->MassFlowRate = 0.0;
+    dln->nodes(1)->MassFlowRateMax = 0.0;
     thisPool.initSwimmingPoolPlantNodeFlow(*state);
     EXPECT_EQ(state->dataSize->CompDesWaterFlow(1).SupNode, 1);
     EXPECT_EQ(state->dataSize->CompDesWaterFlow(1).DesVolFlowRate, 0.002);
@@ -540,4 +541,82 @@ TEST_F(EnergyPlusFixture, SwimmingPool_reportTest)
     EXPECT_NEAR(expectedEvapEnergyLoss, myPool.EvapEnergyLoss, closeEnough);
     EXPECT_NEAR(expectedMakeUpWaterVolFlowRate, myPool.MakeUpWaterVolFlowRate, closeEnough);
     EXPECT_NEAR(expectedMakeUpWaterVol, myPool.MakeUpWaterVol, closeEnough);
+}
+
+TEST_F(EnergyPlusFixture, SwimmingPool_calcMassFlowRateTest)
+{
+    // Test routine added as a solution to Defect #10317
+    Real64 constexpr closeEnough = 0.00001;
+    Real64 tPoolWater;
+    Real64 tInletWaterLoop;
+    Real64 calculatedFlowRate;
+    Real64 expectedAnswer;
+    SwimmingPoolData testPool;
+
+    state->dataHVACGlobal->TimeStepSysSec = 60.0;
+
+    // Test 1: Normal pass through the routine, no limits violated
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 20.0;
+    tPoolWater = 25.0;
+    tInletWaterLoop = 30.0;
+    expectedAnswer = 11.111111;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
+
+    // Test 2: Flow rate larger than max--limit to max
+    calculatedFlowRate = 0.0; // reset
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 10.0;
+    tPoolWater = 25.0;
+    tInletWaterLoop = 30.0;
+    expectedAnswer = 10.0;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
+
+    // Test 3: Current setpoint is lower than the pool temperature--flow rate set to zero
+    calculatedFlowRate = -9999.9; // reset
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 10.0;
+    tPoolWater = 32.0;
+    tInletWaterLoop = 30.0;
+    expectedAnswer = 0.0;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
+
+    // Test 4: Current setpoint and inlet temperature are equal--flow rate set to max when pool water temperature is lower
+    calculatedFlowRate = -9999.9; // reset
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 20.0;
+    tPoolWater = 25.0;
+    tInletWaterLoop = 27.0;
+    expectedAnswer = 20.0;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
+
+    // Test 5: Current setpoint and inlet temperature are equal--flow rate set to zero when pool water temperature is higher
+    calculatedFlowRate = -9999.9; // reset
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 20.0;
+    tPoolWater = 32.0;
+    tInletWaterLoop = 27.0;
+    expectedAnswer = 0.0;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
+
+    // Test 6: Water temp is below the setpoint but higher than the pool temp--flow rate set to max (this was the cause of the defect)
+    calculatedFlowRate = -9999.9; // reset
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 17.0;
+    tPoolWater = 25.0;
+    tInletWaterLoop = 26.0;
+    expectedAnswer = 17.0;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
 }

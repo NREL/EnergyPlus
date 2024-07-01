@@ -75,8 +75,8 @@ namespace SteamBaseboardRadiator {
         Array1D_int SurfacePtr;
         int ZonePtr;
         int SchedPtr;         // Pointer to the correct schedule
-        int SteamInletNode;   // Inlet steam baseboard node
-        int SteamOutletNode;  // Outlet steam baseboard node
+        int SteamInNodeNum = 0;   // Inlet steam baseboard node
+        int SteamOutNodeNum = 0;  // Outlet steam baseboard node
         int TotSurfToDistrib; // Total numbers of the surfaces that the radiant heat gets distributed
         int FluidIndex;       // Fluid index for FluidProperties (Steam)
         int ControlCompTypeNum;
@@ -124,7 +124,7 @@ namespace SteamBaseboardRadiator {
 
         // Default Constructor
         SteamBaseboardParams()
-            : EquipType(DataPlant::PlantEquipmentType::Invalid), DesignObjectPtr(0), ZonePtr(0), SchedPtr(0), SteamInletNode(0), SteamOutletNode(0),
+            : EquipType(DataPlant::PlantEquipmentType::Invalid), DesignObjectPtr(0), ZonePtr(0), SchedPtr(0), 
               TotSurfToDistrib(0), FluidIndex(0), ControlCompTypeNum(0), CompErrIndex(0), DegOfSubcooling(0.0), SteamMassFlowRate(0.0),
               SteamMassFlowRateMax(0.0), SteamVolFlowRateMax(0.0), SteamOutletTemp(0.0), SteamInletTemp(0.0), SteamInletEnthalpy(0.0),
               SteamOutletEnthalpy(0.0), SteamInletPress(0.0), SteamOutletPress(0.0), SteamInletQuality(0.0), SteamOutletQuality(0.0),

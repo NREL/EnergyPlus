@@ -112,8 +112,8 @@ namespace PipeHeatTransfer {
         std::string EnvrAirNode;            // outside air node providing environmental temp
         Real64 Length;                      // total pipe length [m]
         Real64 PipeID;                      // pipe inside diameter [m]
-        std::string InletNode;              // inlet node name
-        std::string OutletNode;             // outlet node name
+        std::string InNodeName;              // inlet node name
+        std::string OutNodeName;             // outlet node name
         int InNodeNum = 0;                   // inlet node number
         int OutNodeNum = 0;                  // outlet node number
         DataPlant::PlantEquipmentType Type; // Type of pipe

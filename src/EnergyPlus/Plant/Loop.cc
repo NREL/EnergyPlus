@@ -70,10 +70,10 @@ void PlantLoopData::UpdateLoopSideReportVars(EnergyPlusData &state,
     auto const *supInNode = dln->nodes(this->LoopSide(DataPlant::LoopSideLocation::Supply).InNodeNum);
     auto const *supOutNode = dln->nodes(this->LoopSide(DataPlant::LoopSideLocation::Supply).OutNodeNum);
         
-    this->InletNodeFlowrate = supInNode->MassFlowRate;
-    this->InletNodeTemperature = supInNode->Temp;
-    this->OutletNodeFlowrate = supOutNode->MassFlowRate;
-    this->OutletNodeTemperature = supOutNode->Temp;
+    this->InNodeFlowrate = supInNode->MassFlowRate;
+    this->InNodeTemperature = supInNode->Temp;
+    this->OutNodeFlowrate = supOutNode->MassFlowRate;
+    this->OutNodeTemperature = supOutNode->Temp;
 
     // In the baseline code, only reported supply side demand. so putting in "SupplySide" IF block for now but might expand later
     if (OtherSideDemand < 0.0) {

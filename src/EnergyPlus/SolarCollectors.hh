@@ -54,7 +54,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -114,9 +116,9 @@ namespace SolarCollectors {
         bool InitSizing = true;                                                      // Flag for initialization of plant sizing
         int Parameters = 0;                                                          // Parameters object number
         int Surface = 0;                                                             // Surface object number
-        int InletNode = 0;                                                           // Inlet node
+        int InNodeNum = 0;                                                           // Inlet node
         Real64 InletTemp = 0.0;                                                      // Inlet temperature from plant (C)
-        int OutletNode = 0;                                                          // Outlet node
+        int OutNodeNum = 0;                                                          // Outlet node
         Real64 OutletTemp = 0.0;      // Outlet temperature or stagnation temperature in the collector (C)
         Real64 MassFlowRate = 0.0;    // Mass flow rate through the collector (kg/s)
         Real64 MassFlowRateMax = 0.0; // Maximum mass flow rate through the collector (kg/s)

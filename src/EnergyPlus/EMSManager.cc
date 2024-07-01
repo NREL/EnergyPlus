@@ -111,15 +111,15 @@ namespace EMSManager {
                                                                                                   "BEGINZONETIMESTEPAFTERINITHEATBALANCE",
                                                                                                   "BEGINZONETIMESTEPBEFORESETCURRENTWEATHER"};
 
-    constexpr std::array<std::string_view, static_cast<int>(SPControlType::Num)> controlTypeName{"Temperature Setpoint",
-                                                                                                 "Temperature Minimum Setpoint",
-                                                                                                 "Temperature Maximum Setpoint",
-                                                                                                 "Humidity Ratio Setpoint",
-                                                                                                 "Humidity Ratio Minimum Setpoint",
-                                                                                                 "Humidity Ratio Maximum Setpoint",
-                                                                                                 "Mass Flow Rate Setpoint",
-                                                                                                 "Mass Flow Rate Minimum Available Setpoint",
-                                                                                                 "Mass Flow Rate Maximum Available Setpoint"};
+    constexpr std::array<std::string_view, (int)HVAC::CtrlVarType::Num> controlTypeNames = {"Temperature Setpoint",
+                                                                                            "Temperature Minimum Setpoint",
+                                                                                            "Temperature Maximum Setpoint",
+                                                                                            "Humidity Ratio Setpoint",
+                                                                                            "Humidity Ratio Minimum Setpoint",
+                                                                                            "Humidity Ratio Maximum Setpoint",
+                                                                                            "Mass Flow Rate Setpoint",
+                                                                                            "Mass Flow Rate Minimum Available Setpoint",
+                                                                                            "Mass Flow Rate Maximum Available Setpoint"};
 
     void CheckIfAnyEMS(EnergyPlusData &state)
     {
@@ -1505,7 +1505,7 @@ namespace EMSManager {
         }
     }
 
-    bool CheckIfNodeSetPointManaged(EnergyPlusData &state, int const NodeNum, SPControlType const SetPointType, bool byHandle)
+    bool CheckIfNodeSetPointManaged(EnergyPlusData &state, int const NodeNum, HVAC::CtrlVarType const ctrlVar, bool byHandle)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1521,7 +1521,7 @@ namespace EMSManager {
 
         std::string const &cNodeName = state.dataLoopNodes->nodes(NodeNum)->Name;
         std::string cComponentTypeName = "System Node Setpoint";
-        std::string_view cControlTypeName = controlTypeName[static_cast<int>(SetPointType)];
+        std::string_view cControlTypeName = controlTypeNames[(int)ctrlVar];
 
         if (byHandle) {
             for (int Loop = 1; Loop <= state.dataRuntimeLang->numEMSActuatorsAvailable; ++Loop) {
@@ -1534,10 +1534,8 @@ namespace EMSManager {
                 }
             }
             if (!FoundControl) {
-                ShowWarningError(state,
-                                 format("Missing '{}' for node named named '{}'.",
-                                        format(controlTypeName[static_cast<int>(SetPointType)]),
-                                        cNodeName));
+                ShowWarningError(
+                    state, format("Missing '{}' for node named named '{}'.", controlTypeNames[(int)ctrlVar], cNodeName));
             }
         } else {
             for (int Loop = 1; Loop <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed; ++Loop) {
@@ -1555,7 +1553,7 @@ namespace EMSManager {
 
     bool CheckIfNodeSetPointManagedByEMS(EnergyPlusData &state,
                                          int const NodeNum, // index of node being checked.
-                                         SPControlType const SetPointType,
+                                         HVAC::CtrlVarType const ctrlVar,
                                          bool &ErrorFlag)
     {
 
@@ -1568,8 +1566,7 @@ namespace EMSManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &dln = state.dataLoopNodes;
-            
-        bool FoundControl = CheckIfNodeSetPointManaged(state, NodeNum, SetPointType, false);
+        bool FoundControl = CheckIfNodeSetPointManaged(state, NodeNum, ctrlVar, false);
 
         if ((!ErrorFlag) && (!FoundControl)) {
             int numPythonPlugins = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PythonPlugin:Instance");
@@ -1580,38 +1577,7 @@ namespace EMSManager {
                 // We'll defer to checking at the end whether a Plugin / API called getActuatorHandle on it
                 auto *node = dln->nodes(NodeNum);
                 node->needsSetpointChecking = true;
-
-                switch (SetPointType) {
-                case SPControlType::TemperatureSetPoint: {
-                    node->checkTemperatureSetPoint = true;
-                } break;
-                case SPControlType::TemperatureMinSetPoint: {
-                    node->checkTemperatureMinSetPoint = true;
-                } break;
-                case SPControlType::TemperatureMaxSetPoint: {
-                    node->checkTemperatureMaxSetPoint = true;
-                } break;
-                case SPControlType::HumidityRatioSetPoint: {
-                    node->checkHumidityRatioSetPoint = true;
-                } break;
-                case SPControlType::HumidityRatioMinSetPoint: {
-                    node->checkHumidityRatioMinSetPoint = true;
-                } break;
-                case SPControlType::HumidityRatioMaxSetPoint: {
-                    node->checkHumidityRatioMaxSetPoint = true;
-                } break;
-                case SPControlType::MassFlowRateSetPoint: {
-                    node->checkMassFlowRateSetPoint = true;
-                } break;
-                case SPControlType::MassFlowRateMinSetPoint: {
-                    node->checkMassFlowRateMinSetPoint = true;
-                } break;
-                case SPControlType::MassFlowRateMaxSetPoint: {
-                    node->checkMassFlowRateMaxSetPoint = true;
-                } break;
-                default:
-                    break;
-                }
+                node->checkSetPoint[(int)ctrlVar] = true;
             }
         }
 
@@ -1654,39 +1620,11 @@ namespace EMSManager {
                 // Start by setting it to false (assume matched)
                 node->needsSetpointChecking = false;
 
-                if (node->checkTemperatureSetPoint) {
-                    node->needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::TemperatureSetPoint, true);
-                }
-                if (node->checkTemperatureMinSetPoint) {
-                    node->needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::TemperatureMinSetPoint, true);
-                }
-                if (node->checkTemperatureMaxSetPoint) {
-                    node->needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::TemperatureMaxSetPoint, true);
-                }
-                if (node->checkHumidityRatioSetPoint) {
-                    node->needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::HumidityRatioSetPoint, true);
-                }
-                if (node->checkHumidityRatioMinSetPoint) {
-                    node->needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::HumidityRatioMinSetPoint, true);
-                }
-                if (node->checkHumidityRatioMaxSetPoint) {
-                    node->needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::HumidityRatioMaxSetPoint, true);
-                }
-                if (node->checkMassFlowRateSetPoint) {
-                    node->needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::MassFlowRateSetPoint, true);
-                }
-                if (node->checkMassFlowRateMinSetPoint) {
-                    node->needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::MassFlowRateMinSetPoint, true);
-                }
-                if (node->checkMassFlowRateMaxSetPoint) {
-                    node->needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::MassFlowRateMaxSetPoint, true);
+                for (int iCtrlVar = 0; iCtrlVar < (int)HVAC::CtrlVarType::Num; ++iCtrlVar) {
+                    if (node->checkSetPoint[iCtrlVar]) {
+                        node->needsSetpointChecking |=
+                            !CheckIfNodeSetPointManaged(state, NodeNum, static_cast<HVAC::CtrlVarType>(iCtrlVar), true);
+                    }
                 }
 
                 if (node->needsSetpointChecking) {

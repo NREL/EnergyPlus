@@ -225,10 +225,10 @@ namespace PlantCentralGSHP {
         Real64 MaxPartLoadRatClgHtg;      // Maximum Part load ratio in simultaneous heating/cooling mode
         Real64 OptPartLoadRatClgHtg;      // Optimum Part load ratio in simultaneous heating/cooling mode
         Real64 MinPartLoadRatClgHtg;      // minimum Part load ratio in simultaneous heating/cooling mode
-        CGSHPNodeData EvapInletNode;      // Chiller heater evaperator inlet node
-        CGSHPNodeData EvapOutletNode;     // Chiller heater evaperator outlet node
-        CGSHPNodeData CondInletNode;      // Chiller heater condenser inlet node
-        CGSHPNodeData CondOutletNode;     // Chiller heater condenser outlet node
+        CGSHPNodeData EvapInNode;      // Chiller heater evaperator inlet node
+        CGSHPNodeData EvapOutNode;     // Chiller heater evaperator outlet node
+        CGSHPNodeData CondInNode;      // Chiller heater condenser inlet node
+        CGSHPNodeData CondOutNode;     // Chiller heater condenser outlet node
         Real64 EvapVolFlowRate;           // Reference water volumetric flow rate through the evaporator [m3/s]
         bool EvapVolFlowRateWasAutoSized; // true if evaporator flow rate was autosize on input
         Real64 tmpEvapVolFlowRate;        // temporary ref water vol flow rate for intermediate sizing [m3/s]

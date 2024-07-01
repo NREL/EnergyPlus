@@ -104,8 +104,8 @@ namespace ExhaustAirSystemManager {
         int ZoneNum = 0;
         int ControlledZoneNum = 0;
 
-        int InletNodeNum = 0;
-        int OutletNodeNum = 0;
+        int InNodeNum = 0;
+        int OutNodeNum = 0;
 
         Real64 DesignExhaustFlowRate = 0.0;
         FlowControlType FlowControlOption = FlowControlType::Scheduled;

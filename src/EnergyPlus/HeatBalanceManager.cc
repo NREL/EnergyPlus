@@ -2414,7 +2414,7 @@ namespace HeatBalanceManager {
                                              state.dataIPShortCut->cAlphaArgs(3)));
                     ErrorsFound = true;
                 } else {
-                    state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr = NodeNum;
+                    state.dataHeatBal->ZoneLocalEnvironment(Loop).OutsideAirInNodeNum = NodeNum;
                 }
             }
         }
@@ -2422,8 +2422,8 @@ namespace HeatBalanceManager {
         for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
             for (int Loop = 1; Loop <= TotZoneEnv; ++Loop) {
                 if (state.dataHeatBal->ZoneLocalEnvironment(Loop).ZonePtr == ZoneLoop) {
-                    if (state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
-                        state.dataHeatBal->Zone(ZoneLoop).OutdoorAirInNodeNum = state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr;
+                    if (state.dataHeatBal->ZoneLocalEnvironment(Loop).OutsideAirInNodeNum != 0) {
+                        state.dataHeatBal->Zone(ZoneLoop).OutsideAirInNodeNum = state.dataHeatBal->ZoneLocalEnvironment(Loop).OutsideAirInNodeNum;
                     }
                 }
             }
@@ -2883,8 +2883,8 @@ namespace HeatBalanceManager {
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             SetOutAirNodes(state);
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (state.dataHeatBal->Zone(ZoneNum).OutdoorAirInNodeNum > 0) {
-                    auto const *linkedOutAirNode = dln->nodes(state.dataHeatBal->Zone(ZoneNum).OutdoorAirInNodeNum);
+                if (state.dataHeatBal->Zone(ZoneNum).OutsideAirInNodeNum > 0) {
+                    auto const *linkedOutAirNode = dln->nodes(state.dataHeatBal->Zone(ZoneNum).OutsideAirInNodeNum);
                     if (linkedOutAirNode->OutAirDryBulbSchedNum > 0) {
                         state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = ScheduleManager::GetCurrentScheduleValue(
                             state, linkedOutAirNode->OutAirDryBulbSchedNum);

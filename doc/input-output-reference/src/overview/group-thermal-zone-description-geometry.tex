@@ -373,6 +373,13 @@ These two variable outputs are/should be identical. However, note that they can 
 
 From the code definition, the zone mean air temperature is the average temperature of the air temperatures at the system timestep. Remember that the zone heat balance represents a ``well stirred'' model for a zone, therefore there is only one mean air temperature to represent the air temperature for the zone unless a non-mixing RoomAirModel is specified.
 
+\paragraph{Zone Wetbulb Globe Temperature {[}C{]}}\label{zone-wetbulb-globe-temperature-c}
+
+The indoor wet-bulb globe temperature (WBGT) is a measure of indoor heat stress as it affects humans.
+It is calculated as a weighted average of the zone wet-bulb temperature (WBT) and the operative temperature (OT) as follows
+
+WBGT = 0.7*WBT + 0.3*OT
+
 \paragraph{Zone Air Temperature {[}C{]}}\label{zone-air-temperature-c}
 
 This is very similar to the mean air temperature in the last field. The ``well stirred'' model for the zone is the basis, but this temperature is also available at the ``detailed'' system timestep.

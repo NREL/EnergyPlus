@@ -125,9 +125,9 @@ void HVACSizingSimulationManager::SetupSizingAnalyses(EnergyPlusData &state)
         
     for (auto &P : plantCoincAnalyObjs) {
         // call setup log routine for each coincident plant analysis object
-        auto *supplySideInletNode = dln->nodes(P.supplySideInletNodeNum);
-        P.supplyInletNodeFlow_LogIndex = sizingLogger.SetupVariableSizingLog(state, supplySideInletNode->MassFlowRate, P.numTimeStepsInAvg);
-        P.supplyInletNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog(state, supplySideInletNode->Temp, P.numTimeStepsInAvg);
+        auto *supplySideInNode = dln->nodes(P.supplySideInNodeNum);
+        P.supplyInNodeFlow_LogIndex = sizingLogger.SetupVariableSizingLog(state, supplySideInNode->MassFlowRate, P.numTimeStepsInAvg);
+        P.supplyInNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog(state, supplySideInNode->Temp, P.numTimeStepsInAvg);
         if (state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == DataSizing::TypeOfPlantLoop::Heating ||
             state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == DataSizing::TypeOfPlantLoop::Steam) {
             P.loopDemand_LogIndex =
@@ -155,15 +155,15 @@ void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(EnergyPl
     plantCoinAnalyRequestsAnotherIteration = false;
     for (auto &P : plantCoincAnalyObjs) {
         // step 1 find maximum flow rate on concurrent return temp and load
-        P.newFoundMassFlowRateTimeStamp = sizingLogger.logObjs[P.supplyInletNodeFlow_LogIndex].GetLogVariableDataMax(state);
+        P.newFoundMassFlowRateTimeStamp = sizingLogger.logObjs[P.supplyInNodeFlow_LogIndex].GetLogVariableDataMax(state);
         P.peakMdotCoincidentDemand = sizingLogger.logObjs[P.loopDemand_LogIndex].GetLogVariableDataAtTimestamp(P.newFoundMassFlowRateTimeStamp);
         P.peakMdotCoincidentReturnTemp =
-            sizingLogger.logObjs[P.supplyInletNodeTemp_LogIndex].GetLogVariableDataAtTimestamp(P.newFoundMassFlowRateTimeStamp);
+            sizingLogger.logObjs[P.supplyInNodeTemp_LogIndex].GetLogVariableDataAtTimestamp(P.newFoundMassFlowRateTimeStamp);
 
         // step 2 find maximum load and concurrent flow and return temp
         P.NewFoundMaxDemandTimeStamp = sizingLogger.logObjs[P.loopDemand_LogIndex].GetLogVariableDataMax(state);
-        P.peakDemandMassFlow = sizingLogger.logObjs[P.supplyInletNodeFlow_LogIndex].GetLogVariableDataAtTimestamp(P.NewFoundMaxDemandTimeStamp);
-        P.peakDemandReturnTemp = sizingLogger.logObjs[P.supplyInletNodeTemp_LogIndex].GetLogVariableDataAtTimestamp(P.NewFoundMaxDemandTimeStamp);
+        P.peakDemandMassFlow = sizingLogger.logObjs[P.supplyInNodeFlow_LogIndex].GetLogVariableDataAtTimestamp(P.NewFoundMaxDemandTimeStamp);
+        P.peakDemandReturnTemp = sizingLogger.logObjs[P.supplyInNodeTemp_LogIndex].GetLogVariableDataAtTimestamp(P.NewFoundMaxDemandTimeStamp);
 
         P.ResolveDesignFlowRate(state, HVACSizingIterCount);
         if (P.anotherIterationDesired) {

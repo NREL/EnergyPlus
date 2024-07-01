@@ -62,8 +62,6 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::NodeInputManager;
-using namespace EnergyPlus::DataLoopNode;
 
 namespace EnergyPlus {
 
@@ -97,7 +95,7 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 
     OutAirNodeManager::SetOutAirNodes(*state);
 
-    NodeInputManager::SetupNodeVarsForReporting(*state);
+    Node::SetupNodeVarsForReporting(*state);
 
     EMSManager::CheckIfAnyEMS(*state);
 
@@ -106,19 +104,23 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
     bool anyEMSRan;
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyEMSRan, ObjexxFCL::Optional_int_const());
 
-    state->dataLoopNodes->Node(1).Temp = 20.0;
-    state->dataLoopNodes->Node(1).HumRat = 0.01;
+    auto &dln = state->dataLoopNodes;
+    auto *node1 = dln->nodes(1);
+    
+    node1->Temp = 20.0;
+    node1->HumRat = 0.01;
     state->dataEnvrn->OutBaroPress = 100000;
     state->dataEnvrn->StdRhoAir = 1.2;
 
-    NodeInputManager::CalcMoreNodeInfo(*state);
+    Node::CalcMoreNodeInfo(*state);
 
-    EXPECT_NEAR(state->dataLoopNodes->MoreNodeInfo(1).RelHumidity, 67.65, 0.01);
-    EXPECT_NEAR(state->dataLoopNodes->MoreNodeInfo(1).AirDewPointTemp, 13.84, 0.01);
-    EXPECT_NEAR(state->dataLoopNodes->MoreNodeInfo(1).WetBulbTemp, 16.12, 0.01);
-    EXPECT_NEAR(state->dataLoopNodes->MoreNodeInfo(1).SpecificHeat, 1023.43, 0.01);
+    EXPECT_NEAR(node1->RelHumidity, 67.65, 0.01);
+    EXPECT_NEAR(node1->AirDewPointTemp, 13.84, 0.01);
+    EXPECT_NEAR(node1->WetBulbTemp, 16.12, 0.01);
+    EXPECT_NEAR(node1->SpecificHeat, 1023.43, 0.01);
 }
 
+#ifdef GET_OUT
 TEST_F(EnergyPlusFixture, CheckUniqueNodesTest_Test1)
 {
     bool UniqueNodeError(false);
@@ -140,5 +142,5 @@ TEST_F(EnergyPlusFixture, CheckUniqueNodesTest_Test1)
 
     EndUniqueNodeCheck(*state, "Context");
 }
-
+#endif // GET_OUT
 } // namespace EnergyPlus

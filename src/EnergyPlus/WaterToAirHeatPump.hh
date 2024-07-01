@@ -136,10 +136,10 @@ namespace WaterToAirHeatPump {
         Real64 HighPressCutoff;        // High Pressure Cut-off [Pa]
         Real64 LowPressCutoff;         // Low Pressure Cut-off [Pa]
         CompressorType compressorType; // Type of Compressor ie. Reciprocating,Rotary or Scroll
-        int AirInletNodeNum;           // air side coil inlet node number
-        int AirOutletNodeNum;          // air side coil outlet node number
-        int WaterInletNodeNum;         // water side coil inlet node number
-        int WaterOutletNodeNum;        // water side coil outlet node number
+        int AirInNodeNum = 0;           // air side coil inlet node number
+        int AirOutNodeNum = 0;          // air side coil outlet node number
+        int WaterInNodeNum = 0;         // water side coil inlet node number
+        int WaterOutNodeNum = 0;        // water side coil outlet node number
         int LowPressClgError;          // count for low pressure errors (cooling)
         int HighPressClgError;         // count for high pressure errors (cooling)
         int LowPressHtgError;          // count for low pressure errors (heating)
@@ -157,8 +157,8 @@ namespace WaterToAirHeatPump {
               LatentCapacityTimeConstant(0.0), FanDelayTime(0.0), SourceSideUACoeff(0.0), LoadSideTotalUACoeff(0.0), LoadSideOutsideUACoeff(0.0),
               CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0), PowerLosses(0.0), LossFactor(0.0),
               RefVolFlowRate(0.0), VolumeRatio(0.0), LeakRateCoeff(0.0), SourceSideHTR1(0.0), SourceSideHTR2(0.0), HighPressCutoff(0.0),
-              LowPressCutoff(0.0), compressorType(CompressorType::Invalid), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0),
-              WaterOutletNodeNum(0), LowPressClgError(0), HighPressClgError(0), LowPressHtgError(0), HighPressHtgError(0), plantLoc{}
+              LowPressCutoff(0.0), compressorType(CompressorType::Invalid), 
+              LowPressClgError(0), HighPressClgError(0), LowPressHtgError(0), HighPressHtgError(0), plantLoc{}
         {
         }
     };

@@ -215,7 +215,7 @@ namespace SZVAVModel {
             if (SZVAVModel.ATMixerType == HVAC::MixerType::SupplySide) {
                 // Air terminal supply side mixer
                 lowBoundaryLoad =
-                    minAirMassFlow * (Psychrometrics::PsyHFnTdbW(dln->nodes(SZVAVModel.ATMixerOutNodeNum)->Temp, ZoneHumRat) -
+                    minAirMassFlow * (Psychrometrics::PsyHFnTdbW(dln->nodes(SZVAVModel.ATMixerAirOutNodeNum)->Temp, ZoneHumRat) -
                                       Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat));
             } else {
                 // Air terminal inlet side mixer
@@ -685,7 +685,7 @@ namespace SZVAVModel {
             if (SZVAVModel.ATMixerType == HVAC::MixerType::SupplySide) {
                 // Air terminal supply side mixer
                 boundaryLoadMet =
-                    minAirMassFlow * (Psychrometrics::PsyHFnTdbW(dln->nodes(SZVAVModel.ATMixerOutNodeNum)->Temp, ZoneHumRat) -
+                    minAirMassFlow * (Psychrometrics::PsyHFnTdbW(dln->nodes(SZVAVModel.ATMixerMixedAirOutNodeNum)->Temp, ZoneHumRat) -
                                       Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat));
             } else {
                 // Air terminal inlet side mixer

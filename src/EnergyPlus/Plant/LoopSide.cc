@@ -382,23 +382,23 @@ namespace DataPlant {
             return false;
         }
 
-        InletAvgTemp = sum(this->InletNode.TemperatureHistory) / size(this->InletNode.TemperatureHistory);
-        if (any_ne(this->InletNode.TemperatureHistory, InletAvgTemp)) {
+        InletAvgTemp = sum(this->InNode.TemperatureHistory) / size(this->InNode.TemperatureHistory);
+        if (any_ne(this->InNode.TemperatureHistory, InletAvgTemp)) {
             return false;
         }
 
-        InletAvgMdot = sum(this->InletNode.MassFlowRateHistory) / size(this->InletNode.MassFlowRateHistory);
-        if (any_ne(this->InletNode.MassFlowRateHistory, InletAvgMdot)) {
+        InletAvgMdot = sum(this->InNode.MassFlowRateHistory) / size(this->InNode.MassFlowRateHistory);
+        if (any_ne(this->InNode.MassFlowRateHistory, InletAvgMdot)) {
             return false;
         }
 
-        OutletAvgTemp = sum(this->OutletNode.TemperatureHistory) / size(this->OutletNode.TemperatureHistory);
-        if (any_ne(this->OutletNode.TemperatureHistory, OutletAvgTemp)) {
+        OutletAvgTemp = sum(this->OutNode.TemperatureHistory) / size(this->OutNode.TemperatureHistory);
+        if (any_ne(this->OutNode.TemperatureHistory, OutletAvgTemp)) {
             return false;
         }
 
-        OutletAvgMdot = sum(this->OutletNode.MassFlowRateHistory) / size(this->OutletNode.MassFlowRateHistory);
-        if (any_ne(this->OutletNode.MassFlowRateHistory, OutletAvgMdot)) {
+        OutletAvgMdot = sum(this->OutNode.MassFlowRateHistory) / size(this->OutNode.MassFlowRateHistory);
+        if (any_ne(this->OutNode.MassFlowRateHistory, OutletAvgMdot)) {
             return false;
         }
 
@@ -487,9 +487,9 @@ namespace DataPlant {
                 componentOutNode->MassFlowRateMinAvail = MassFlow;
                 componentOutNode->MassFlowRateMaxAvail = MassFlow;
             }
-            // Node(ComponentOutletNode)%MassFlowRateMinAvail = MinAvail
+            // Node(ComponentOutNode)%MassFlowRateMinAvail = MinAvail
             // no this is 2-way valve which messes up flow options
-            //      for demand components Node(ComponentOutletNode)%MassFlowRateMaxAvail = MaxAvail
+            //      for demand components Node(ComponentOutNode)%MassFlowRateMaxAvail = MaxAvail
 
             //~ If this value matches then we are good to move to the next component
             if (std::abs(MassFlow - MassFlowRateFound) < CriteriaDelta_MassFlowRate) continue;
@@ -1207,7 +1207,7 @@ namespace DataPlant {
         return LoopFlow;
     }
 
-    void HalfLoopData::DoFlowAndLoadSolutionPass(EnergyPlusData &state, LoopSideLocation OtherSide, int ThisSideInletNode, bool FirstHVACIteration)
+    void HalfLoopData::DoFlowAndLoadSolutionPass(EnergyPlusData &state, LoopSideLocation OtherSide, int ThisSideInNode, bool FirstHVACIteration)
     {
 
         // This is passed in-out deep down into the depths where the load op manager calls EMS and EMS can shut down pumps
@@ -1218,7 +1218,7 @@ namespace DataPlant {
 
         // Now we know what the loop would "like" to run at, let's see the pump
         // operation range (min/max avail) to see whether it is possible this time around
-        Real64 ThisLoopSideFlow = this->DetermineLoopSideFlowRate(state, ThisSideInletNode, ThisLoopSideFlowRequest);
+        Real64 ThisLoopSideFlow = this->DetermineLoopSideFlowRate(state, ThisSideInNode, ThisLoopSideFlowRequest);
 
         for (auto &branch : this->Branch) {
             branch.lastComponentSimulated = 0;
@@ -2204,14 +2204,14 @@ namespace DataPlant {
         Real64 MixerOutletQuality = 0.0;
 
         // Calculate Mixer outlet mass flow rate
-        for (int InletNodeNum = 1; InletNodeNum <= this->Mixer.NumInNodes; ++InletNodeNum) {
-            auto const *mixerInNode = dln->nodes(this->Mixer.InNodeNums(InletNodeNum));
+        for (int InNodeNum = 1; InNodeNum <= this->Mixer.NumInNodes; ++InNodeNum) {
+            auto const *mixerInNode = dln->nodes(this->Mixer.InNodeNums(InNodeNum));
             MixerOutletMassFlow += mixerInNode->MassFlowRate;
         }
 
         // Calculate Mixer outlet temperature
-        for (int InletNodeNum = 1; InletNodeNum <= this->Mixer.NumInNodes; ++InletNodeNum) {
-            int const mixerInNodeNum = this->Mixer.InNodeNums(InletNodeNum);
+        for (int InNodeNum = 1; InNodeNum <= this->Mixer.NumInNodes; ++InNodeNum) {
+            int const mixerInNodeNum = this->Mixer.InNodeNums(InNodeNum);
             auto *mixerInNode = dln->nodes(mixerInNodeNum);
             if (MixerOutletMassFlow > 0.0) {
                 Real64 const MixerInletMassFlow = mixerInNode->MassFlowRate;

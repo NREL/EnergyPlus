@@ -71,8 +71,8 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
 {
     std::string coil1Name("Coil 1");             // user-defined name of the coil
     std::string coil1Type("Coil:Cooling:Water"); // idf input object class name of coil
-    int chWInletNodeNum = 9;
-    int chWOutletNodeNum = 15;
+    int chWInNodeNum = 9;
+    int chWOutNodeNum = 15;
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
@@ -90,10 +90,10 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
 
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 0;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = 0;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumIn = chWInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumOut = chWOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).InNodeNum = chWInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).OutNodeNum = chWOutNodeNum;
 
     Real64 airVdot(0.052);   // air flow rate in m3/s
     bool isAutoSized(false); // true if autosized
@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     // First with no plant sizing objects defined
     isAutoSized = false; // true if autosized
     state->dataRptCoilSelection->coilSelectionReportObj->setCoilWaterFlowNodeNums(
-        *state, coil1Name, coil1Type, waterVdot, isAutoSized, chWInletNodeNum, chWOutletNodeNum, loopNum);
+        *state, coil1Name, coil1Type, waterVdot, isAutoSized, chWInNodeNum, chWOutNodeNum, loopNum);
     EXPECT_EQ(-999, c1->pltSizNum);
     EXPECT_EQ(loopNum, c1->waterLoopNum);
     EXPECT_EQ(state->dataPlnt->PlantLoop(1).Name, c1->plantLoopName);
@@ -142,7 +142,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     state->dataSize->PlantSizData(1).PlantLoopName = "Chilled Water Loop";
     isAutoSized = true; // true if autosized
     state->dataRptCoilSelection->coilSelectionReportObj->setCoilWaterFlowNodeNums(
-        *state, coil1Name, coil1Type, waterVdot, isAutoSized, chWInletNodeNum, chWOutletNodeNum, loopNum);
+        *state, coil1Name, coil1Type, waterVdot, isAutoSized, chWInNodeNum, chWOutNodeNum, loopNum);
     auto &c1b(state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[0]);
     EXPECT_EQ(1, c1b->pltSizNum);
     EXPECT_EQ(loopNum, c1b->waterLoopNum);
@@ -225,8 +225,8 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
 {
     std::string coil1Name("Coil 1");             // user-defined name of the coil
     std::string coil1Type("Coil:Heating:Steam"); // idf input object class name of coil
-    int wInletNodeNum = 9;
-    int wOutletNodeNum = 15;
+    int wInNodeNum = 9;
+    int wOutNodeNum = 15;
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
@@ -244,10 +244,10 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
 
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 0;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = 0;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumIn = wInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumOut = wOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).InNodeNum = wInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).OutNodeNum = wOutNodeNum;
 
     Real64 airVdot(0.052);   // air flow rate in m3/s
     bool isAutoSized(false); // true if autosized
@@ -263,7 +263,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
     // First with no plant sizing objects defined
     isAutoSized = false; // true if autosized
     state->dataRptCoilSelection->coilSelectionReportObj->setCoilWaterFlowNodeNums(
-        *state, coil1Name, coil1Type, waterVdot, isAutoSized, wInletNodeNum, wOutletNodeNum, loopNum);
+        *state, coil1Name, coil1Type, waterVdot, isAutoSized, wInNodeNum, wOutNodeNum, loopNum);
     EXPECT_EQ(-999, c1->pltSizNum);
     EXPECT_EQ(loopNum, c1->waterLoopNum);
     EXPECT_EQ(state->dataPlnt->PlantLoop(1).Name, c1->plantLoopName);
@@ -279,7 +279,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
     state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Steam;
     isAutoSized = true; // true if autosized
     state->dataRptCoilSelection->coilSelectionReportObj->setCoilWaterFlowNodeNums(
-        *state, coil1Name, coil1Type, waterVdot, isAutoSized, wInletNodeNum, wOutletNodeNum, loopNum);
+        *state, coil1Name, coil1Type, waterVdot, isAutoSized, wInNodeNum, wOutNodeNum, loopNum);
     auto &c1b(state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[0]);
     EXPECT_EQ(1, c1b->pltSizNum);
     EXPECT_EQ(loopNum, c1b->waterLoopNum);

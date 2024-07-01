@@ -191,9 +191,9 @@ namespace CondenserLoopTowers {
         bool TowerFreeConvNomCapWasAutoSized = false;  // true if previous was autosize on Input
         Real64 TowerFreeConvNomCapSizingFactor = 0.0;  // sizing factor for free conv capacity []
         Real64 SizFac = 0.0;                           // sizing factor
-        int WaterInletNodeNum = 0;                     // Node number on the water inlet side of the tower
-        int WaterOutletNodeNum = 0;                    // Node number on the water outlet side of the tower
-        int OutdoorAirInletNodeNum = 0;                // Node number of outdoor air inlet for the tower
+        int WaterInNodeNum = 0;                     // Node number on the water inlet side of the tower
+        int WaterOutNodeNum = 0;                    // Node number on the water outlet side of the tower
+        int OutdoorAirInNodeNum = 0;                // Node number of outdoor air inlet for the tower
         ModelType TowerModelType = ModelType::Invalid; // Type of empirical model (1=CoolTools)
         int VSTower = 0;                               // Index to a variable speed tower (otherwise = 0)
         int FanPowerfAirFlowCurve = 0;                 // Index to fan power correlation curve for VS Towers

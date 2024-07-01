@@ -66,6 +66,21 @@ namespace HVAC {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
+    enum class CtrlVarType
+    {
+        Invalid = -1,
+        Temp,
+        MaxTemp,
+        MinTemp,
+        HumRat,
+        MaxHumRat,
+        MinHumRat,
+        MassFlowRate,
+        MaxMassFlowRate,
+        MinMassFlowRate,
+        Num
+    };
+
     // MODULE PARAMETER DEFINITIONS:
 
     Real64 constexpr SmallHumRatDiff(1.0E-7);
@@ -236,6 +251,7 @@ namespace HVAC {
         DXCurveFitSpeed,
         Num
     };
+        
     static constexpr std::array<std::string_view, static_cast<int>(CoilType::Num)> coilTypeNamesUC = {
         "COIL:COOLING:DX:SINGLESPEED",
         "COIL:HEATING:DX:SINGLESPEED",
@@ -421,8 +437,8 @@ namespace HVAC {
         // Members
         std::string EquipmentType;
         std::string EquipmentName;
-        int NodeNumIn = 0;
-        int NodeNumOut = 0;
+        int InNodeNum = 0;
+        int OutNodeNum = 0;
         Real64 EquipDemand = 0.0;
         Real64 DesignFlowRate = 0.0;
         std::string HeatOrCool;

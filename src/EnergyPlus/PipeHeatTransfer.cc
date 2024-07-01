@@ -280,7 +280,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         }
 
         // get inlet node data
-        state.dataPipeHT->PipeHT(Item).InletNode = state.dataIPShortCut->cAlphaArgs(3);
+        state.dataPipeHT->PipeHT(Item).InNodeName = state.dataIPShortCut->cAlphaArgs(3);
         state.dataPipeHT->PipeHT(Item).InNodeNum = GetSingleNode(state,
                                                                         state.dataIPShortCut->cAlphaArgs(3),
                                                                         ErrorsFound,
@@ -297,7 +297,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         }
 
         // get outlet node data
-        state.dataPipeHT->PipeHT(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(4);
+        state.dataPipeHT->PipeHT(Item).OutNodeName = state.dataIPShortCut->cAlphaArgs(4);
         state.dataPipeHT->PipeHT(Item).OutNodeNum = GetSingleNode(state,
                                                                          state.dataIPShortCut->cAlphaArgs(4),
                                                                          ErrorsFound,
@@ -434,7 +434,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         }
 
         // get inlet node data
-        state.dataPipeHT->PipeHT(Item).InletNode = state.dataIPShortCut->cAlphaArgs(3);
+        state.dataPipeHT->PipeHT(Item).InNodeName = state.dataIPShortCut->cAlphaArgs(3);
         state.dataPipeHT->PipeHT(Item).InNodeNum = GetSingleNode(state,
                                                                         state.dataIPShortCut->cAlphaArgs(3),
                                                                         ErrorsFound,
@@ -451,7 +451,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         }
 
         // get outlet node data
-        state.dataPipeHT->PipeHT(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(4);
+        state.dataPipeHT->PipeHT(Item).OutNodeName = state.dataIPShortCut->cAlphaArgs(4);
         state.dataPipeHT->PipeHT(Item).OutNodeNum = GetSingleNode(state,
                                                                          state.dataIPShortCut->cAlphaArgs(4),
                                                                          ErrorsFound,
@@ -570,7 +570,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         }
 
         // get inlet node data
-        state.dataPipeHT->PipeHT(Item).InletNode = state.dataIPShortCut->cAlphaArgs(3);
+        state.dataPipeHT->PipeHT(Item).InNodeName = state.dataIPShortCut->cAlphaArgs(3);
         state.dataPipeHT->PipeHT(Item).InNodeNum = GetSingleNode(state,
                                                                         state.dataIPShortCut->cAlphaArgs(3),
                                                                         ErrorsFound,
@@ -587,7 +587,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         }
 
         // get outlet node data
-        state.dataPipeHT->PipeHT(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(4);
+        state.dataPipeHT->PipeHT(Item).OutNodeName = state.dataIPShortCut->cAlphaArgs(4);
         state.dataPipeHT->PipeHT(Item).OutNodeNum = GetSingleNode(state,
                                                                          state.dataIPShortCut->cAlphaArgs(4),
                                                                          ErrorsFound,

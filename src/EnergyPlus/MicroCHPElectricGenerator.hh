@@ -165,16 +165,16 @@ namespace MicroCHPElectricGenerator {
         Real64 NomEff;                        // nominal efficiency
         std::string ZoneName;
         int ZoneID;
-        std::string PlantInletNodeName;
+        std::string PlantInNodeName;
         int PlantInNodeNum = 0;
-        std::string PlantOutletNodeName;
+        std::string PlantOutNodeName;
         int PlantOutNodeNum = 0;
         Real64 PlantMassFlowRate;              // only if internal control
         Real64 PlantMassFlowRateMax;           // hardware limit for node%massflowrateMax
         bool PlantMassFlowRateMaxWasAutoSized; // true if mass flow rate was autosized on input
-        std::string AirInletNodeName;
+        std::string AirInNodeName;
         int AirInNodeNum = 0;
-        std::string AirOutletNodeName;
+        std::string AirOutNodeName;
         int AirOutNodeNum = 0;
         int FuelSupplyID;         // index for fuel supply data structure
         int DynamicsControlID;    // index in GeneratorDynamics data where control issues are handled

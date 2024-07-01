@@ -118,7 +118,7 @@ namespace ChillerExhaustAbsorption {
         bool isEnterCondensTemp = false;     // if using entering conderser water temperature is TRUE, exiting is FALSE
         bool isWaterCooled = false;          // if water cooled it is TRUE
         Real64 CHWLowLimitTemp = 0.0;        // Chilled Water Lower Limit Temperature
-        int ExhaustAirInletNodeNum = 0;      // Node number on Exhaust input from generator
+        int ExhaustAirInNodeNum = 0;      // Node number on Exhaust input from generator
         // Calculated design values
         Real64 DesCondMassFlowRate = 0.0; // design nominal mass flow rate of water through the condenser [kg/s]
         Real64 DesHeatMassFlowRate = 0.0; // design nominal mass flow rate of water through the hot water side [kg/s]

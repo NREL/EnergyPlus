@@ -8634,8 +8634,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::StoreType::Sum,
                                         rack.Name);
 
+                    // If CoilFlag is true and Location is Zone, GetRefrigerationInput ensures you must have a Heat Rejection Zone provided already
                     SetupZoneInternalGain(state,
-                                          RefrigCase(rack.CaseNum(1)).ActualZoneNum,
+                                          rack.HeatRejectionZoneNum,
                                           rack.Name,
                                           DataHeatBalance::IntGainType::RefrigerationCompressorRack,
                                           &rack.SensZoneCreditHeatRate,
@@ -8794,8 +8795,18 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::TimeStepType::Zone,
                                         OutputProcessor::StoreType::Sum,
                                         rack.Name);
+
+                    // if Location is Zone, GetRefrigerationInputEither checks that you have at least one load and that either:
+                    // * You have only cases, and they must be all in the same zone
+                    // * Or you must have a Heat Rejection Zone provided
+                    int rackZoneNum = -1;
+                    if (rack.HeatRejectionZoneNum > 0) {
+                        rackZoneNum = rack.HeatRejectionZoneNum;
+                    } else {
+                        rackZoneNum = RefrigCase(rack.CaseNum(1)).ActualZoneNum;
+                    }
                     SetupZoneInternalGain(state,
-                                          RefrigCase(rack.CaseNum(1)).ActualZoneNum,
+                                          rackZoneNum,
                                           rack.Name,
                                           DataHeatBalance::IntGainType::RefrigerationCompressorRack,
                                           &rack.SensZoneCreditHeatRate,
@@ -15221,7 +15232,8 @@ void WalkInData::CalculateWalkIn(EnergyPlusData &state) // Absolute pointer to  
     // Calculate floor load - using 'DataEnvironment::GroundTemp' assigned in weather manager (can be entered by user if desired)
     //    Default value is 18C.
     // Total floor energy rate (W)
-    Real64 FloorLoad = this->FloorArea * this->FloorUValue * (state.dataEnvrn->GroundTemp - TWalkIn);
+    Real64 FloorLoad =
+        this->FloorArea * this->FloorUValue * (state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] - TWalkIn);
 
     Real64 DefrostLoad;
 

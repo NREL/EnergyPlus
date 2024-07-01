@@ -87,7 +87,6 @@ using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
 using namespace EnergyPlus::ZoneContaminantPredictorCorrector;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
@@ -108,7 +107,10 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataRoomAir->ZTMX.allocate(1);
     state->dataRoomAir->ZTMMX.allocate(1);
     state->afn->exchangeData.allocate(1);
-    state->dataLoopNodes->Node.allocate(1);
+
+    auto &dln = state->dataLoopNodes;
+    dln->nodes.push_back(new Node::NodeData);
+    
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
     state->dataHeatBalFanSys->PreviousMeasuredZT1.allocate(1);
@@ -174,7 +176,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataHeatBal->Zone(1).Multiplier = 1;
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 1;
     state->dataHeatBal->space.allocate(1);
     state->dataHeatBal->spaceIntGainDevices.allocate(1);
     state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
@@ -481,7 +483,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataRoomAir->AirModel.allocate(1);
     state->dataRoomAir->ZTOC.allocate(1);
     state->afn->exchangeData.allocate(1);
-    state->dataLoopNodes->Node.allocate(1);
+
+    auto &dln = state->dataLoopNodes;
+    dln->nodes.push_back(new Node::NodeData);
+
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
     state->dataHeatBalFanSys->PreviousMeasuredZT1.allocate(1);
@@ -547,7 +552,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataHeatBal->Zone(1).Multiplier = 1;
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 1;
     state->dataHeatBal->space.allocate(1);
     state->dataHeatBal->spaceIntGainDevices.allocate(1);
     state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);

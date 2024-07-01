@@ -101,7 +101,7 @@ public:
         state->dataHVACGlobal->NumPrimaryAirSys = 1;
         state->dataAirLoop->AirLoopFlow.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
         state->dataAirLoop->AirToZoneNodeInfo.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
-        state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopReturnNodeNum.allocate(1);
+        state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopReturnNodeNums.allocate(1);
         state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 4;
         state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(4);
         state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = state->dataHeatBal->ZoneList(1).Zone(3);
@@ -278,40 +278,42 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     auto &heatComp1 = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
     heatComp1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
     heatComp1.Name = "AWHP_1 Heating Side";
-    heatBranch1.NodeNumIn = 1;
-    heatBranch1.NodeNumOut = 2;
-    heatComp1.NodeNumIn = 1;
-    heatComp1.NodeNumOut = 2;
+    heatBranch1.InNodeNum = 1;
+    heatBranch1.OutNodeNum = 2;
+    heatComp1.InNodeNum = 1;
+    heatComp1.OutNodeNum = 2;
     state->dataPlnt->PlantLoop(2).TempSetPointNodeNum = 2;
     auto &heatBranch2 = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(2);
     auto &heatComp2 = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(2).Comp(1);
     heatComp2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
     heatComp2.Name = "AWHP_2 Heating Side";
-    heatBranch2.NodeNumIn = 3;
-    heatBranch2.NodeNumOut = 4;
-    heatComp2.NodeNumIn = 3;
-    heatComp2.NodeNumOut = 4;
+    heatBranch2.InNodeNum = 3;
+    heatBranch2.OutNodeNum = 4;
+    heatComp2.InNodeNum = 3;
+    heatComp2.OutNodeNum = 4;
 
     auto &coolBranch1 = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1);
     auto &coolComp1 = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
     coolComp1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     coolComp1.Name = "AWHP_1 Cooling Side";
-    coolBranch1.NodeNumIn = 5;
-    coolBranch1.NodeNumOut = 6;
-    coolComp1.NodeNumIn = 5;
-    coolComp1.NodeNumOut = 6;
+    coolBranch1.InNodeNum = 5;
+    coolBranch1.OutNodeNum = 6;
+    coolComp1.InNodeNum = 5;
+    coolComp1.OutNodeNum = 6;
     state->dataPlnt->PlantLoop(1).TempSetPointNodeNum = 6;
     auto &coolBranch2 = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(2);
     auto &coolComp2 = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(2).Comp(1);
     coolComp2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     coolComp2.Name = "AWHP_2 Cooling Side";
-    coolBranch2.NodeNumIn = 7;
-    coolBranch2.NodeNumOut = 8;
-    coolComp2.NodeNumIn = 7;
-    coolComp2.NodeNumOut = 8;
+    coolBranch2.InNodeNum = 7;
+    coolBranch2.OutNodeNum = 8;
+    coolComp2.InNodeNum = 7;
+    coolComp2.OutNodeNum = 8;
 
-    state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopReturnNodeNum(1) = 9;
-    state->dataLoopNodes->Node.allocate(10);
+    state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopReturnNodeNums(1) = 9;
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 10; ++i) dln->nodes.push_back(new Node::NodeData);
 
     bool FirstHVACIteration = false;
     std::string CurrentModuleObject = "PlantEquipmentOperation:ChillerHeaterChangeover";
@@ -356,7 +358,7 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToHeatingSP = 200.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(3)).OutputRequiredToHeatingSP = 300.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(4)).OutputRequiredToHeatingSP = 400.0;
-    state->dataLoopNodes->Node(heatBranch1.NodeNumIn).MassFlowRate = 0.001; // set fake HW plant flow rate
+    dln->nodes(heatBranch1.InNodeNum)->MassFlowRate = 0.001; // set fake HW plant flow rate
 
     // zones have a heating load
     thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);
@@ -370,7 +372,7 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     auto &eqcool = chillerHeaterSupervisor.CoolingOnlyEquipList(1).Comp(1);
     // set cooling demand node temp above cooling set point so equipment is actived if needed
     // heating demand temp = 0 (not initialized) so heating will be active if needed (i.e., temp < heating set point)
-    state->dataLoopNodes->Node(eqcool.DemandNodeNum).Temp = 10.0;
+    dln->nodes(eqcool.DemandNodeNum)->Temp = 10.0;
     auto &eqheat = chillerHeaterSupervisor.HeatingOnlyEquipList(1).Comp(1);
     bool thisCoolEq1 = state->dataPlnt->PlantLoop(1).LoopSide(eqcool.LoopSideNumPtr).Branch(eqcool.BranchNumPtr).Comp(eqcool.CompNumPtr).ON;
     bool thisHeatEq1 = state->dataPlnt->PlantLoop(2).LoopSide(eqheat.LoopSideNumPtr).Branch(eqheat.BranchNumPtr).Comp(eqheat.CompNumPtr).ON;
@@ -385,13 +387,13 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToHeatingSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(3)).OutputRequiredToHeatingSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(4)).OutputRequiredToHeatingSP = 0.0;
-    state->dataLoopNodes->Node(heatBranch1.NodeNumIn).MassFlowRate = 0.0; // set HW plant flow rate
+    dln->nodes(heatBranch1.InNodeNum)->MassFlowRate = 0.0; // set HW plant flow rate
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(1)).OutputRequiredToCoolingSP = 100.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToCoolingSP = 200.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(3)).OutputRequiredToCoolingSP = 300.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(4)).OutputRequiredToCoolingSP = 400.0;
-    state->dataLoopNodes->Node(coolBranch1.NodeNumIn).MassFlowRate = 0.0; // set CW plant flow rate
+    dln->nodes(coolBranch1.InNodeNum)->MassFlowRate = 0.0; // set CW plant flow rate
 
     // zone heating loads are 0 and zone cooling loads are positive (no cooling)
     thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);
@@ -405,7 +407,7 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToCoolingSP = -200.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(3)).OutputRequiredToCoolingSP = -300.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(4)).OutputRequiredToCoolingSP = -400.0;
-    state->dataLoopNodes->Node(coolBranch1.NodeNumIn).MassFlowRate = 0.001; // set fake CW plant flow rate
+    dln->nodes(coolBranch1.InNodeNum)->MassFlowRate = 0.001; // set fake CW plant flow rate
 
     // zone heating loads are 0 and zone cooling loads are negative (cooling)
     thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);
@@ -423,7 +425,7 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToHeatingSP = 200.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(3)).OutputRequiredToHeatingSP = 300.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(4)).OutputRequiredToHeatingSP = 400.0;
-    state->dataLoopNodes->Node(heatBranch1.NodeNumIn).MassFlowRate = 0.001; // set fake HW plant flow rate
+    dln->nodes(heatBranch1.InNodeNum)->MassFlowRate = 0.001; // set fake HW plant flow rate
 
     // zone heating loads are positive (heating) and zone cooling loads are negative (cooling)
     thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);
@@ -507,22 +509,24 @@ TEST_F(DistributeEquipOpTest, SupervisoryControlLogicForAirSourcePlantsTest)
     auto &heatComp1 = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
     heatComp1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
     heatComp1.Name = "AWHP_1 Heating Side";
-    heatBranch1.NodeNumIn = 1;
-    heatBranch1.NodeNumOut = 2;
-    heatComp1.NodeNumIn = 1;
-    heatComp1.NodeNumOut = 2;
+    heatBranch1.InNodeNum = 1;
+    heatBranch1.OutNodeNum = 2;
+    heatComp1.InNodeNum = 1;
+    heatComp1.OutNodeNum = 2;
     state->dataPlnt->PlantLoop(2).TempSetPointNodeNum = 2;
     auto &coolBranch1 = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1);
     auto &coolComp1 = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
     coolComp1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     coolComp1.Name = "AWHP_1 Cooling Side";
-    coolBranch1.NodeNumIn = 5;
-    coolBranch1.NodeNumOut = 6;
-    coolComp1.NodeNumIn = 5;
-    coolComp1.NodeNumOut = 6;
+    coolBranch1.InNodeNum = 5;
+    coolBranch1.OutNodeNum = 6;
+    coolComp1.InNodeNum = 5;
+    coolComp1.OutNodeNum = 6;
     state->dataPlnt->PlantLoop(1).TempSetPointNodeNum = 6;
-    state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopReturnNodeNum(1) = 9;
-    state->dataLoopNodes->Node.allocate(10);
+    state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopReturnNodeNums(1) = 9;
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 10; ++i) dln->nodes.push_back(new Node::NodeData);
 
     bool FirstHVACIteration = false;
     std::string CurrentModuleObject = "PlantEquipmentOperation:ChillerHeaterChangeover";
@@ -566,7 +570,8 @@ TEST_F(DistributeEquipOpTest, SupervisoryControlLogicForAirSourcePlantsTest)
     auto &CoolEq1_status = state->dataPlnt->PlantLoop(1).LoopSide(eqcool.LoopSideNumPtr).Branch(eqcool.BranchNumPtr).Comp(eqcool.CompNumPtr).ON;
     auto &HeatEq1_status = state->dataPlnt->PlantLoop(2).LoopSide(eqheat.LoopSideNumPtr).Branch(eqheat.BranchNumPtr).Comp(eqheat.CompNumPtr).ON;
     // set cooling demand node temp above cooling set point so equipment is actived if needed
-    state->dataLoopNodes->Node(eqcool.DemandNodeNum).Temp = 10.0;
+
+    dln->nodes(eqcool.DemandNodeNum)->Temp = 10.0;
     auto &zone1SysEnergyDemand = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(1));
     auto &zone2SysEnergyDemand = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2));
     auto &zone3SysEnergyDemand = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(3));
@@ -577,7 +582,7 @@ TEST_F(DistributeEquipOpTest, SupervisoryControlLogicForAirSourcePlantsTest)
     zone3SysEnergyDemand.OutputRequiredToHeatingSP = 300.0;
     zone4SysEnergyDemand.OutputRequiredToHeatingSP = 400.0;
     // set fake HW plant flow rate
-    state->dataLoopNodes->Node(heatBranch1.NodeNumIn).MassFlowRate = 0.00189204;
+    dln->nodes(heatBranch1.InNodeNum)->MassFlowRate = 0.00189204;
 
     // zones have a heating load and primary plant has heating load
     thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);
@@ -597,14 +602,14 @@ TEST_F(DistributeEquipOpTest, SupervisoryControlLogicForAirSourcePlantsTest)
     zone3SysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
     zone4SysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
     // reset HW plant flow rate to zero
-    state->dataLoopNodes->Node(heatBranch1.NodeNumIn).MassFlowRate = 0.0;
+    dln->nodes(heatBranch1.InNodeNum)->MassFlowRate = 0.0;
     // set the building cooling load to large negative numbers
     zone1SysEnergyDemand.OutputRequiredToCoolingSP = -100.0;
     zone2SysEnergyDemand.OutputRequiredToCoolingSP = -200.0;
     zone3SysEnergyDemand.OutputRequiredToCoolingSP = -300.0;
     zone4SysEnergyDemand.OutputRequiredToCoolingSP = -400.0;
     // set fake CW plant flow rate to very small value
-    state->dataLoopNodes->Node(coolBranch1.NodeNumIn).MassFlowRate = 0.00002;
+    dln->nodes(coolBranch1.InNodeNum)->MassFlowRate = 0.00002;
 
     // zone heating loads are 0 and zone cooling loads are negative (cooling)
     thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);
@@ -624,7 +629,7 @@ TEST_F(DistributeEquipOpTest, SupervisoryControlLogicForAirSourcePlantsTest)
     zone3SysEnergyDemand.OutputRequiredToHeatingSP = 60.0;
     zone4SysEnergyDemand.OutputRequiredToHeatingSP = 80.0;
     // reset fake HW plant flow rate for a higher primary plant heating load
-    state->dataLoopNodes->Node(heatBranch1.NodeNumIn).MassFlowRate = 0.0189204;
+    dln->nodes(heatBranch1.InNodeNum)->MassFlowRate = 0.0189204;
     // zone heating loads are positive (heating) and zone cooling loads are negative (cooling)
     // primary plant heating load is larger than the primary plant cooling load
     thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);

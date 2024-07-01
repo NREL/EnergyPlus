@@ -117,8 +117,8 @@ namespace SteamCoils {
         Real64 LoopSubcoolReturn;
         int AirInNodeNum = 0;                                   // Inlet node number at air side
         int AirOutNodeNum = 0;                                  // Outlet node number at air side
-        int FluidInNodeNum = 0;                                 // SteamInletNodeNum
-        int FluidOutNodeNum = 0;                                // SteamOutletNodeNum
+        int SteamInNodeNum = 0;                                 
+        int SteamOutNodeNum = 0;                                
         int TempSetPointNodeNum;                               // If applicable : node number that the temp setpoint exists.
         CoilControlType TypeOfCoil = CoilControlType::Invalid; // Control of Coil , temperature or Zone load
         int FluidIndex;                                        // Fluid index for FluidProperties (Steam)

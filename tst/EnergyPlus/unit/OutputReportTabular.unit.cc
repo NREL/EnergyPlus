@@ -112,12 +112,12 @@ using namespace SimulationManager;
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString)
 {
 
-    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::None, SetUnitsStyleFromString("None")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::NotFound, SetUnitsStyleFromString("qqq")));
+    EXPECT_ENUM_EQ(OutputReportTabular::UnitsStyle::None, SetUnitsStyleFromString("None"));
+    EXPECT_ENUM_EQ(OutputReportTabular::UnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH"));
+    EXPECT_ENUM_EQ(OutputReportTabular::UnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ"));
+    EXPECT_ENUM_EQ(OutputReportTabular::UnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ"));
+    EXPECT_ENUM_EQ(OutputReportTabular::UnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND"));
+    EXPECT_ENUM_EQ(OutputReportTabular::UnitsStyle::NotFound, SetUnitsStyleFromString("qqq"));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_Basic)
@@ -6226,7 +6226,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     // zone
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
     state->dataHeatBal->Zone(1).FloorArea = 600.; // 20 x 30
@@ -6388,7 +6388,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->space(1).Name = "PartofTot Conditioned Zone";
     state->dataHeatBal->space(1).spaceTypeNum = 1;
     state->dataHeatBal->space(1).solarEnclosureNum = 1;
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 1; // Conditioned
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
@@ -6405,7 +6405,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->space(2).Name = "PartofTot Unconditioned Zone";
     state->dataHeatBal->space(2).spaceTypeNum = 1;
     state->dataHeatBal->space(2).solarEnclosureNum = 2;
-    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    state->dataHeatBal->Zone(2).SystemZoneNodeNum = 0; // Unconditioned
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).Multiplier = 1.;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.;
@@ -6422,7 +6422,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->space(3).Name = "NOT PartofTot Conditioned Zone";
     state->dataHeatBal->space(3).spaceTypeNum = 1;
     state->dataHeatBal->space(3).solarEnclosureNum = 3;
-    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(3).SystemZoneNodeNum = 1; // Conditioned
     state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
     state->dataHeatBal->Zone(3).Multiplier = 1.;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.;
@@ -7953,7 +7953,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
     state->dataGlobal->NumOfZones = 3;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 1; // Conditioned
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
@@ -7964,7 +7964,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
     state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
-    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    state->dataHeatBal->Zone(2).SystemZoneNodeNum = 0; // Unconditioned
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).Multiplier = 1.;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.;
@@ -7975,7 +7975,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
     state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
 
     state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
-    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(3).SystemZoneNodeNum = 1; // Conditioned
     state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
     state->dataHeatBal->Zone(3).Multiplier = 1.;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.;
@@ -8345,16 +8345,16 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     };
 
     std::string coolingLineGoodDegrees = "    - 2874 annual (standard) cooling degree-days (10°C baseline)";
-    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, getLineType(coolingLineGoodDegrees)));
+    EXPECT_ENUM_EQ(StatLineType::StdCDDLine, getLineType(coolingLineGoodDegrees));
 
     std::string coolingLineBadDegrees = "    - 2874 annual (standard) cooling degree-days (10_BADDEGREESYMBOL_C baseline)";
-    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, getLineType(coolingLineGoodDegrees)));
+    EXPECT_ENUM_EQ(StatLineType::StdCDDLine, getLineType(coolingLineGoodDegrees));
 
     std::string koppenLineWithDots = " - Climate type \"Cfa\" (Köppen classification)**";
-    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, getLineType(koppenLineWithDots)));
+    EXPECT_ENUM_EQ(StatLineType::KoppenLine, getLineType(koppenLineWithDots));
 
     std::string koppenLineNoDots = " - Climate type \"Cfa\" (Koppen classification)**";
-    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, getLineType(koppenLineNoDots)));
+    EXPECT_ENUM_EQ(StatLineType::KoppenLine, getLineType(koppenLineNoDots));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_test)
@@ -8695,7 +8695,7 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Process_Regular_Case_1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
+    EXPECT_ENUM_EQ(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound);
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8708,7 +8708,7 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Process_Regular_Case_2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::InchPound));
+    EXPECT_ENUM_EQ(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::InchPound);
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8721,7 +8721,7 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Process_Regular_Case_3)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::None));
+    EXPECT_ENUM_EQ(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::None);
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8734,7 +8734,7 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
+    EXPECT_ENUM_EQ(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound);
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8748,7 +8748,7 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
+    EXPECT_ENUM_EQ(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound);
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -9026,7 +9026,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     state->dataGlobal->NumOfZones = 3;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 1; // Conditioned
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
@@ -9037,7 +9037,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
-    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    state->dataHeatBal->Zone(2).SystemZoneNodeNum = 0; // Unconditioned
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).Multiplier = 1.;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.;
@@ -9048,7 +9048,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
 
     state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
-    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(3).SystemZoneNodeNum = 1; // Conditioned
     state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
     state->dataHeatBal->Zone(3).Multiplier = 1.;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.;
@@ -9230,7 +9230,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
     // zone
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
     state->dataHeatBal->Zone(1).FloorArea = 600.; // 20 x 30
@@ -9384,7 +9384,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->space.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 1; // Conditioned
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
@@ -9401,7 +9401,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
-    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    state->dataHeatBal->Zone(2).SystemZoneNodeNum = 0; // Unconditioned
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).Multiplier = 1.;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.;
@@ -9418,7 +9418,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
 
     state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
-    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(3).SystemZoneNodeNum = 1; // Conditioned
     state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
     state->dataHeatBal->Zone(3).Multiplier = 1.;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.;
@@ -10745,7 +10745,7 @@ TEST_F(SQLiteFixture, WriteVeriSumSpaceTables_Test)
     // zone
     state->dataGlobal->NumOfZones = 2;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
     state->dataHeatBal->Zone(1).FloorArea = 100.0; // 10 x 10
@@ -10757,7 +10757,7 @@ TEST_F(SQLiteFixture, WriteVeriSumSpaceTables_Test)
     state->dataHeatBal->Zone(1).spaceIndexes.allocate(1);
     state->dataHeatBal->Zone(1).spaceIndexes(1) = 1;
 
-    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 2;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNum = 2;
     state->dataHeatBal->Zone(2).Multiplier = 1.0;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.0;
     state->dataHeatBal->Zone(2).FloorArea = 100.0; // 10 x 10
@@ -11678,7 +11678,7 @@ TEST_F(SQLiteFixture, DOASDirectToZone_ZoneMultiplierRemoved)
 
     ManageSimulation(*state); // run the design days
     auto &finalSysSizing = state->dataSize->FinalSysSizing(1);
-    EXPECT_TRUE(compare_enums(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::SensibleCooling));
+    EXPECT_ENUM_EQ(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::SensibleCooling);
 
     // get the total 'DOAS Direct to Zone' cooling peak load component
     std::string query_total("SELECT Value From TabularDataWithStrings"
@@ -12624,7 +12624,7 @@ TEST_F(SQLiteFixture, UpdateSizing_EndSysSizingCalc)
 
     ManageSimulation(*state); // run the design days
     auto &finalSysSizing = state->dataSize->FinalSysSizing(1);
-    EXPECT_TRUE(compare_enums(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::TotalCooling));
+    EXPECT_ENUM_EQ(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::TotalCooling);
 
     // get the 'Peak Sensible Load with Sizing Factor'
     std::string query("SELECT Value From TabularDataWithStrings"
@@ -13287,7 +13287,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummaryperArea_IPExceptElec)
     state->dataGlobal->NumOfZones = 3;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 1; // Conditioned
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
@@ -13298,7 +13298,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummaryperArea_IPExceptElec)
     state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
-    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    state->dataHeatBal->Zone(2).SystemZoneNodeNum = 0; // Unconditioned
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).Multiplier = 1.;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.;
@@ -13309,7 +13309,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummaryperArea_IPExceptElec)
     state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
 
     state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
-    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(3).SystemZoneNodeNum = 1; // Conditioned
     state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
     state->dataHeatBal->Zone(3).Multiplier = 1.;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.;

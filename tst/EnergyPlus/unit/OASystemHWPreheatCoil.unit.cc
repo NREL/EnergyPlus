@@ -64,7 +64,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataAirLoop;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::HVACControllers;
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::OutputProcessor;
@@ -1068,7 +1067,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
 
     int AirLoopNum(1);
     int OASysNum(1);
-    int AirInletNodeNum(0);
+    int AirInNodeNum(0);
     Real64 CpAir(0.0);
 
     std::string const idf_objects = delimited_string({
@@ -2043,13 +2042,14 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     EXPECT_DOUBLE_EQ(state->dataWaterCoils->WaterCoil(1).InletAirTemp,
                      -17.3); // preheat Hot Water coil air inlet temp is the heating design day outdoor air temp
 
+    auto &dln = state->dataLoopNodes;
     EXPECT_DOUBLE_EQ(11.6,
-                     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirOutletNodeNum)
-                         .TempSetPoint);                                        // check the setpoint at the preheat Hot Water coil air outlet node
+                     dln->nodes(state->dataWaterCoils->WaterCoil(1).AirOutNodeNum)
+                         ->TempSetPoint);                                        // check the setpoint at the preheat Hot Water coil air outlet node
     EXPECT_NEAR(11.6, state->dataWaterCoils->WaterCoil(1).OutletAirTemp, 0.01); // preheat hot water coil is on and is heating the OA air stream
 
-    AirInletNodeNum = state->dataWaterCoils->WaterCoil(1).AirInletNodeNum;
-    CpAir = PsyCpAirFnW(state->dataLoopNodes->Node(AirInletNodeNum).HumRat);
+    AirInNodeNum = state->dataWaterCoils->WaterCoil(1).AirInNodeNum;
+    CpAir = PsyCpAirFnW(dln->nodes(AirInNodeNum)->HumRat);
     EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).TotWaterHeatingCoilRate,
                 state->dataWaterCoils->WaterCoil(1).InletAirMassFlowRate * CpAir *
                     (state->dataWaterCoils->WaterCoil(1).OutletAirTemp - state->dataWaterCoils->WaterCoil(1).InletAirTemp),

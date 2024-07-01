@@ -100,7 +100,6 @@ namespace RoomAir {
     // na
 
     // Using/Aliasing
-    using namespace DataLoopNode;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
@@ -128,7 +127,6 @@ namespace RoomAir {
         // Note that much of the initialization is done in RoomAirManager, SharedDVCVUFDataInit
 
         // Using/Aliasing
-        using namespace DataLoopNode;
         using namespace DataEnvironment;
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
@@ -768,6 +766,8 @@ namespace RoomAir {
         // higher, smaller gamma means interface height will be lower.
         Real64 ZTAveraged;
 
+        
+
         // Exact solution or Euler method
         if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
             if (state.dataHVACGlobal->ShortenTimeStepSysRoomAir && TimeStepSys < state.dataGlobal->TimeStepZone) {
@@ -829,13 +829,16 @@ namespace RoomAir {
         assert((int)(size(IntGainTypesOccupied) + size(IntGainTypesUpSubzone) + size(ExcludedIntGainTypes)) ==
                (int)DataHeatBalance::IntGainType::Num);
 
+        auto &dln = state.dataLoopNodes;
+        
         Real64 ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + thisZoneHB.SysDepZoneLoadsLagged;
         Real64 ZoneEquipConfigNum = zoneU.ZoneEquipPtr;
         if (ZoneEquipConfigNum > 0) {
             auto const &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum);
-            for (int InNodeIndex = 1; InNodeIndex <= zoneEquipConfig.NumInletNodes; ++InNodeIndex) {
-                Real64 NodeTemp = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).Temp;
-                Real64 MassFlowRate = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).MassFlowRate;
+            for (int InNodeIndex = 1; InNodeIndex <= zoneEquipConfig.NumInNodes; ++InNodeIndex) {
+                auto const *inNode = dln->nodes(zoneEquipConfig.InNodeNums(InNodeIndex));
+                Real64 NodeTemp = inNode->Temp;
+                Real64 MassFlowRate = inNode->MassFlowRate;
                 Real64 CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -1138,8 +1141,8 @@ namespace RoomAir {
         }
 
         if (ZoneEquipConfigNum > 0) {
-            int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
-            state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataRoomAir->ZTMX(ZoneNum);
+            auto *zoneNode = dln->nodes(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNum);
+            zoneNode->Temp = state.dataRoomAir->ZTMX(ZoneNum);
         }
 
         if (MIXFLAG) {
@@ -1189,6 +1192,8 @@ namespace RoomAir {
 
         Real64 PowerInPlumesPerMeter; // Power in Plumes per meter of window length [W/m]
         Real64 ZTAveraged;
+
+        auto &dln = state.dataLoopNodes;
 
         // Exact solution or Euler method
         if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
@@ -1255,9 +1260,10 @@ namespace RoomAir {
         int ZoneEquipConfigNum = zoneU.ZoneEquipPtr;
         if (ZoneEquipConfigNum > 0) {
             auto const &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum);
-            for (int InNodeIndex = 1; InNodeIndex <= zoneEquipConfig.NumInletNodes; ++InNodeIndex) {
-                Real64 NodeTemp = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).Temp;
-                Real64 MassFlowRate = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).MassFlowRate;
+            for (int InNodeIndex = 1; InNodeIndex <= zoneEquipConfig.NumInNodes; ++InNodeIndex) {
+                auto const *inNode = dln->nodes(zoneEquipConfig.InNodeNums(InNodeIndex));
+                Real64 NodeTemp = inNode->Temp;
+                Real64 MassFlowRate = inNode->MassFlowRate;
                 Real64 CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -1597,8 +1603,8 @@ namespace RoomAir {
         }
 
         if (ZoneEquipConfigNum > 0) {
-            int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
-            state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataRoomAir->ZTMX(ZoneNum);
+            auto *zoneNode = dln->nodes(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNum);
+            zoneNode->Temp = state.dataRoomAir->ZTMX(ZoneNum);
         }
 
         if (MIXFLAG) {

@@ -80,7 +80,7 @@ namespace ZonePlenum {
         Real64 OutletPressure = 0.0;
         int ZoneNodeNum = 0;
         int ActualZoneNum = 0;
-        int OutNodeNum = 0;
+        int AirOutNodeNum = 0;
         Real64 OutletMassFlowRate = 0.0;         // MassFlow through the ZonePlenum being Simulated [kg/Sec]
         Real64 OutletMassFlowRateMaxAvail = 0.0; // [kg/Sec]
         Real64 OutletMassFlowRateMinAvail = 0.0; // [kg/Sec]

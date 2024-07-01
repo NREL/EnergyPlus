@@ -69,8 +69,8 @@ namespace PondGroundHeatExchanger {
     {
         // Members
         std::string Name;           // name of pond GHE
-        std::string InletNode;      // pond inlet fluid node
-        std::string OutletNode;     // pond outlet fluid node
+        std::string InNodeName;      // pond inlet fluid node
+        std::string OutNodeName;     // pond outlet fluid node
         Real64 DesignMassFlowRate;  // design flow rate of circulating fluid
         Real64 DesignCapacity;      // design cooling capacity of pond at
         Real64 Depth;               // depth of pond

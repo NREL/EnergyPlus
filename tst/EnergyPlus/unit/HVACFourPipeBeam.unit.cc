@@ -216,39 +216,39 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
 
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 3;
     bool ErrorsFound = false;
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode =
-        NodeInputManager::GetOnlySingleNode(*state,
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum =
+        Node::GetSingleNode(*state,
                                             "Zone 1 Node",
                                             ErrorsFound,
-                                            DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
+                                            Node::ConnObjType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
                                             "BeamTest",
-                                            DataLoopNode::NodeFluidType::Air,
-                                            DataLoopNode::ConnectionType::ZoneNode,
-                                            NodeInputManager::CompFluidStream::Primary,
-                                            DataLoopNode::ObjectIsNotParent,
+                                            Node::FluidType::Air,
+                                            Node::ConnType::ZoneNode,
+                                            Node::CompFluidStream::Primary,
+                                            Node::ObjectIsNotParent,
                                             "Test zone node");
 
     state->dataDefineEquipment->AirDistUnit.allocate(1);
     state->dataDefineEquipment->AirDistUnit(1).EquipName(1) =
         "PERIMETER_TOP_ZN_4 4PIPE BEAM"; // needs to be uppercased, or item will not be found at line 2488 in IP
-    state->dataDefineEquipment->AirDistUnit(1).OutletNodeNum = 3;
+    state->dataDefineEquipment->AirDistUnit(1).OutNodeNum = 3;
 
     state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr =
         FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1));
 
     // EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->name, "PERIMETER_TOP_ZN_4 4PIPE BEAM");
 
-    EXPECT_EQ(2, state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat(1).InNode);
+    EXPECT_EQ(2, state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat(1).InNodeNum);
 
-    EXPECT_EQ(3, state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat(1).OutNode);
+    EXPECT_EQ(3, state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat(1).OutNodeNum);
     // EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->aDUNum, 1 );
 }
 
@@ -1760,26 +1760,27 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
 
+    auto &dln = state->dataLoopNodes;
     // indexes values has been changed according to new input_processor output
     // node indexes may be viewed in NodeID array
-    state->dataLoopNodes->Node(14).Temp = 14.0;    // chilled water inlet node
-    state->dataLoopNodes->Node(40).HumRat = 0.008; // zone node
-    state->dataLoopNodes->Node(40).Temp = 24.0;    // zone node
-    state->dataLoopNodes->Node(44).HumRat = 0.008; // primary air inlet node
+    dln->nodes(14)->Temp = 14.0;    // chilled water inlet node
+    dln->nodes(40)->HumRat = 0.008; // zone node
+    dln->nodes(40)->Temp = 24.0;    // zone node
+    dln->nodes(44)->HumRat = 0.008; // primary air inlet node
 
-    state->dataLoopNodes->Node(44).Temp = 12.8; // primary air inlet node
-    state->dataLoopNodes->Node(38).Temp = 45.0; // hot water inlet node
-    // state->dataLoopNodes->Node( 44 ).Temp = 12.8; // primary air inlet node
-    // state->dataLoopNodes->Node( 38 ).Temp = 45.0; // hot water inlet node
+    dln->nodes(44)->Temp = 12.8; // primary air inlet node
+    dln->nodes(38)->Temp = 45.0; // hot water inlet node
+    // dln->nodes( 44 )->Temp = 12.8; // primary air inlet node
+    // dln->nodes( 38 )->Temp = 45.0; // hot water inlet node
 
     Real64 NonAirSysOutput = 0.0;
     state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
-    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, 0.36165246721684446, 0.00001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(15).Temp, 17.835648923740127, 0.00001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(15).MassFlowRate, 0.053404403026239548, 0.00001);
-    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).Temp, 45.0);
-    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).MassFlowRate, 0.0);
+    EXPECT_NEAR(dln->nodes(1)->MassFlowRate, 0.36165246721684446, 0.00001);
+    EXPECT_NEAR(dln->nodes(15)->Temp, 17.835648923740127, 0.00001);
+    EXPECT_NEAR(dln->nodes(15)->MassFlowRate, 0.053404403026239548, 0.00001);
+    EXPECT_DOUBLE_EQ(dln->nodes(39)->Temp, 45.0);
+    EXPECT_DOUBLE_EQ(dln->nodes(39)->MassFlowRate, 0.0);
 
     EXPECT_NEAR(NonAirSysOutput, -857.50347269476481, 0.01);
 
@@ -1788,13 +1789,13 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
 
-    state->dataLoopNodes->Node(40).Temp = 21.0; // zone node
+    dln->nodes(40)->Temp = 21.0; // zone node
     state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
-    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(15).Temp, 14.0);
-    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(15).MassFlowRate, 0.0);
-    EXPECT_NEAR(state->dataLoopNodes->Node(39).Temp, 31.815031821344689, 0.00001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(39).MassFlowRate, 0.14660727634539222, 0.00001);
+    EXPECT_DOUBLE_EQ(dln->nodes(15)->Temp, 14.0);
+    EXPECT_DOUBLE_EQ(dln->nodes(15)->MassFlowRate, 0.0);
+    EXPECT_NEAR(dln->nodes(39)->Temp, 31.815031821344689, 0.00001);
+    EXPECT_NEAR(dln->nodes(39)->MassFlowRate, 0.14660727634539222, 0.00001);
 
     EXPECT_NEAR(NonAirSysOutput, 8079.991302700485, 0.01);
 
@@ -1803,24 +1804,24 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
 
-    state->dataLoopNodes->Node(14).Temp = 14.0;    // chilled water inlet node
-    state->dataLoopNodes->Node(40).HumRat = 0.008; // zone node
-    state->dataLoopNodes->Node(40).Temp = 24.0;    // zone node
-    state->dataLoopNodes->Node(44).HumRat = 0.008; // primary air inlet node
-    state->dataLoopNodes->Node(44).Temp = 22.0;    // primary air inlet node
-    state->dataLoopNodes->Node(38).Temp = 45.0;    // hot water inlet node
+    dln->nodes(14)->Temp = 14.0;    // chilled water inlet node
+    dln->nodes(40)->HumRat = 0.008; // zone node
+    dln->nodes(40)->Temp = 24.0;    // zone node
+    dln->nodes(44)->HumRat = 0.008; // primary air inlet node
+    dln->nodes(44)->Temp = 22.0;    // primary air inlet node
+    dln->nodes(38)->Temp = 45.0;    // hot water inlet node
 
     NonAirSysOutput = 0.0;
     state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
-    EXPECT_NEAR(state->dataLoopNodes->Node(15).Temp, 18.549803918626715, 0.00001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(15).MassFlowRate, 0.22613768427540518, 0.00001);
-    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).Temp, 45.0);
-    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).MassFlowRate, 0.0);
-    // EXPECT_NEAR( state->dataLoopNodes->Node( 15 ).Temp, 18.027306264618733, 0.00001 );
-    // EXPECT_NEAR( state->dataLoopNodes->Node( 15 ).MassFlowRate, 0.25614844309380103, 0.00001 );
-    // EXPECT_DOUBLE_EQ( state->dataLoopNodes->Node( 39 ).Temp, 45.0 );
-    // EXPECT_DOUBLE_EQ( state->dataLoopNodes->Node( 39 ).MassFlowRate, 0.0 );
+    EXPECT_NEAR(dln->nodes(15)->Temp, 18.549803918626715, 0.00001);
+    EXPECT_NEAR(dln->nodes(15)->MassFlowRate, 0.22613768427540518, 0.00001);
+    EXPECT_DOUBLE_EQ(dln->nodes(39)->Temp, 45.0);
+    EXPECT_DOUBLE_EQ(dln->nodes(39)->MassFlowRate, 0.0);
+    // EXPECT_NEAR( dln->nodes( 15 )->Temp, 18.027306264618733, 0.00001 );
+    // EXPECT_NEAR( dln->nodes( 15 ).MassFlowRate, 0.25614844309380103, 0.00001 );
+    // EXPECT_DOUBLE_EQ( dln->nodes( 39 )->Temp, 45.0 );
+    // EXPECT_DOUBLE_EQ( dln->nodes( 39 ).MassFlowRate, 0.0 );
 
     EXPECT_NEAR(NonAirSysOutput, -4307.106339390215, 0.01);
 
@@ -1829,19 +1830,19 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
 
-    state->dataLoopNodes->Node(40).Temp = 21.0; // zone node
+    dln->nodes(40)->Temp = 21.0; // zone node
 
     NonAirSysOutput = 0.0;
     state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
-    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(15).Temp, 14.0);
-    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(15).MassFlowRate, 0.0);
-    EXPECT_NEAR(state->dataLoopNodes->Node(39).Temp, 32.784497823408309, 0.00001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(39).MassFlowRate, 0.091412175315718339, 0.00001);
-    // EXPECT_DOUBLE_EQ( state->dataLoopNodes->Node( 15 ).Temp, 14.0 );
-    // EXPECT_DOUBLE_EQ( state->dataLoopNodes->Node( 15 ).MassFlowRate, 0.0 );
-    // EXPECT_NEAR( state->dataLoopNodes->Node( 39 ).Temp, 33.836239364981424, 0.00001 );
-    // EXPECT_NEAR( state->dataLoopNodes->Node( 39 ).MassFlowRate, 0.10040605035467959, 0.00001 );
+    EXPECT_DOUBLE_EQ(dln->nodes(15)->Temp, 14.0);
+    EXPECT_DOUBLE_EQ(dln->nodes(15)->MassFlowRate, 0.0);
+    EXPECT_NEAR(dln->nodes(39)->Temp, 32.784497823408309, 0.00001);
+    EXPECT_NEAR(dln->nodes(39)->MassFlowRate, 0.091412175315718339, 0.00001);
+    // EXPECT_DOUBLE_EQ( dln->nodes( 15 )->Temp, 14.0 );
+    // EXPECT_DOUBLE_EQ( dln->nodes( 15 ).MassFlowRate, 0.0 );
+    // EXPECT_NEAR( dln->nodes( 39 )->Temp, 33.836239364981424, 0.00001 );
+    // EXPECT_NEAR( dln->nodes( 39 ).MassFlowRate, 0.10040605035467959, 0.00001 );
 
     EXPECT_NEAR(NonAirSysOutput, 4667.5787189210605, 0.01);
 }
@@ -4836,14 +4837,15 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateHighOA)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
 
-    state->dataLoopNodes->Node(40).Temp = 21.0; // zone node
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(40)->Temp = 21.0; // zone node
 
-    state->dataLoopNodes->Node(14).Temp = 14.0;    // chilled water inlet node
-    state->dataLoopNodes->Node(40).HumRat = 0.008; // zone node
-    state->dataLoopNodes->Node(40).Temp = 24.0;    // zone node
-    state->dataLoopNodes->Node(44).HumRat = 0.008; // primary air inlet node
-    state->dataLoopNodes->Node(44).Temp = 22.0;    // primary air inlet node
-    state->dataLoopNodes->Node(38).Temp = 45.0;    // hot water inlet node
+    dln->nodes(14)->Temp = 14.0;    // chilled water inlet node
+    dln->nodes(40)->HumRat = 0.008; // zone node
+    dln->nodes(40)->Temp = 24.0;    // zone node
+    dln->nodes(44)->HumRat = 0.008; // primary air inlet node
+    dln->nodes(44)->Temp = 22.0;    // primary air inlet node
+    dln->nodes(38)->Temp = 45.0;    // hot water inlet node
 
     Real64 NonAirSysOutput = 0.0;
     state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);

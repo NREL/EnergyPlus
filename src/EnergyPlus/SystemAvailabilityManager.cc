@@ -149,7 +149,6 @@ namespace Avail {
         // Manage the simulation of the System Availability Managers
 
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
-        using namespace DataLoopNode;
         using namespace DataAirLoop;
         using namespace DataPlant;
 
@@ -316,7 +315,6 @@ namespace Avail {
         // Using/Aliasing
         using Node::GetSingleNode;
         using Node::MarkNode;
-        using namespace DataLoopNode;
         using DataZoneEquipment::cValidSysAvailManagerCompTypes;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
 
@@ -842,12 +840,11 @@ namespace Avail {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
                 auto &diffThermoMgr = state.dataAvail->DiffThermoData(SysAvailNum);
                 diffThermoMgr.Name = cAlphaArgs(1);
                 diffThermoMgr.type = ManagerType::DiffThermo;
 
-                diffThermoMgr.HotNode = GetSingleNode(state,
+                diffThermoMgr.HotNodeNum = GetSingleNode(state,
                                                           cAlphaArgs(2),
                                                           ErrorsFound,
                                                           Node::ConnObjType::AvailabilityManagerDifferentialThermostat,
@@ -855,13 +852,13 @@ namespace Avail {
                                                           Node::FluidType::Blank,
                                                           Node::ConnType::Sensor,
                                                           Node::CompFluidStream::Primary,
-                                                          ObjectIsNotParent);
+                                                      Node::ObjectIsNotParent);
                 MarkNode(state,
-                         diffThermoMgr.HotNode,
+                         diffThermoMgr.HotNodeNum,
                          Node::ConnObjType::AvailabilityManagerDifferentialThermostat,
                          cAlphaArgs(1),
                          "Hot Node");
-                diffThermoMgr.ColdNode = GetSingleNode(state,
+                diffThermoMgr.ColdNodeNum = GetSingleNode(state,
                                                            cAlphaArgs(3),
                                                            ErrorsFound,
                                                            Node::ConnObjType::AvailabilityManagerDifferentialThermostat,
@@ -869,9 +866,9 @@ namespace Avail {
                                                            Node::FluidType::Blank,
                                                            Node::ConnType::Sensor,
                                                            Node::CompFluidStream::Primary,
-                                                           ObjectIsNotParent);
+                                                       Node::ObjectIsNotParent);
                 MarkNode(state,
-                         diffThermoMgr.ColdNode,
+                         diffThermoMgr.ColdNodeNum,
                          Node::ConnObjType::AvailabilityManagerDifferentialThermostat,
                          cAlphaArgs(1),
                          "Cold Node");
@@ -922,12 +919,11 @@ namespace Avail {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
                 auto &hiTurnOffMgr = state.dataAvail->HiTurnOffData(SysAvailNum);
                 hiTurnOffMgr.Name = cAlphaArgs(1);
                 hiTurnOffMgr.type = ManagerType::HiTempTOff;
 
-                hiTurnOffMgr.Node = GetSingleNode(state,
+                hiTurnOffMgr.NodeNum = GetSingleNode(state,
                                                       cAlphaArgs(2),
                                                       ErrorsFound,
                                                       Node::ConnObjType::AvailabilityManagerHighTemperatureTurnOff,
@@ -935,9 +931,9 @@ namespace Avail {
                                                       Node::FluidType::Blank,
                                                       Node::ConnType::Sensor,
                                                       Node::CompFluidStream::Primary,
-                                                      ObjectIsNotParent);
+                                                  Node::ObjectIsNotParent);
                 MarkNode(state,
-                         hiTurnOffMgr.Node,
+                         hiTurnOffMgr.NodeNum,
                          Node::ConnObjType::AvailabilityManagerHighTemperatureTurnOff,
                          cAlphaArgs(1),
                          "Sensor Node");
@@ -976,12 +972,11 @@ namespace Avail {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
                 auto &hiTurnOnMgr = state.dataAvail->HiTurnOnData(SysAvailNum);
                 hiTurnOnMgr.Name = cAlphaArgs(1);
                 hiTurnOnMgr.type = ManagerType::HiTempTOn;
 
-                hiTurnOnMgr.Node = GetSingleNode(state,
+                hiTurnOnMgr.NodeNum = GetSingleNode(state,
                                                      cAlphaArgs(2),
                                                      ErrorsFound,
                                                      Node::ConnObjType::AvailabilityManagerHighTemperatureTurnOn,
@@ -989,9 +984,9 @@ namespace Avail {
                                                      Node::FluidType::Blank,
                                                      Node::ConnType::Sensor,
                                                      Node::CompFluidStream::Primary,
-                                                     ObjectIsNotParent);
+                                                 Node::ObjectIsNotParent);
                 MarkNode(state,
-                         hiTurnOnMgr.Node,
+                         hiTurnOnMgr.NodeNum,
                          Node::ConnObjType::AvailabilityManagerHighTemperatureTurnOn,
                          cAlphaArgs(1),
                          "Sensor Node");
@@ -1035,7 +1030,7 @@ namespace Avail {
                 loTurnOffMgr.Name = cAlphaArgs(1);
                 loTurnOffMgr.type = ManagerType::LoTempTOff;
 
-                loTurnOffMgr.Node = GetSingleNode(state,
+                loTurnOffMgr.NodeNum = GetSingleNode(state,
                                                       cAlphaArgs(2),
                                                       ErrorsFound,
                                                       Node::ConnObjType::AvailabilityManagerLowTemperatureTurnOff,
@@ -1043,9 +1038,9 @@ namespace Avail {
                                                       Node::FluidType::Blank,
                                                       Node::ConnType::Sensor,
                                                       Node::CompFluidStream::Primary,
-                                                      ObjectIsNotParent);
+                                                  Node::ObjectIsNotParent);
                 MarkNode(state,
-                         loTurnOffMgr.Node,
+                         loTurnOffMgr.NodeNum,
                          Node::ConnObjType::AvailabilityManagerLowTemperatureTurnOff,
                          cAlphaArgs(1),
                          "Sensor Node");
@@ -1095,12 +1090,11 @@ namespace Avail {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
                 auto &loTurnOnMgr = state.dataAvail->LoTurnOnData(SysAvailNum);
                 loTurnOnMgr.Name = cAlphaArgs(1);
                 loTurnOnMgr.type = ManagerType::LoTempTOn;
 
-                loTurnOnMgr.Node = GetSingleNode(state,
+                loTurnOnMgr.NodeNum = GetSingleNode(state,
                                                      cAlphaArgs(2),
                                                      ErrorsFound,
                                                      Node::ConnObjType::AvailabilityManagerLowTemperatureTurnOn,
@@ -1108,9 +1102,9 @@ namespace Avail {
                                                      Node::FluidType::Blank,
                                                      Node::ConnType::Sensor,
                                                      Node::CompFluidStream::Primary,
-                                                     ObjectIsNotParent);
+                                                 Node::ObjectIsNotParent);
                 MarkNode(state,
-                         loTurnOnMgr.Node,
+                         loTurnOnMgr.NodeNum,
                          Node::ConnObjType::AvailabilityManagerLowTemperatureTurnOn,
                          cAlphaArgs(1),
                          "Sensor Node");
@@ -1358,7 +1352,7 @@ namespace Avail {
                                        std::string const &AvailabilityListName, // name that should be an Availability Manager List Name
                                        int const Loop,                          // which loop this is
                                        int const NumAirLoops,                   // Total number of air loops
-                                       bool &ErrorsFound                        // true if certain errors are detected here
+                                       [[maybe_unused]]bool &ErrorsFound                        // true if certain errors are detected here
     )
     {
 
@@ -1426,7 +1420,7 @@ namespace Avail {
     void GetZoneEqAvailabilityManager(EnergyPlusData &state,
                                       int const ZoneEquipType, // Type of ZoneHVAC:* component
                                       int const CompNum,       // Index of a particular ZoneHVAC:* component
-                                      bool &ErrorsFound        // true if certain errors are detected here
+                                      [[maybe_unused]] bool &ErrorsFound        // true if certain errors are detected here
     )
     {
 
@@ -1444,8 +1438,6 @@ namespace Avail {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string AvailabilityListName; // name that should be an Availability Manager List Name
-        int Found;
-        int Num;
         int CompNumAvailManagers; // Number of availability managers associated with a ZoneHVAC:* component
 
         if (state.dataAvail->GetAvailListsInput) {
@@ -1506,7 +1498,6 @@ namespace Avail {
 
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
 
-        int ZoneEquipType;
         int ZoneListNum;
         int ScanZoneListNum;
         int ZoneNum;
@@ -1604,7 +1595,7 @@ namespace Avail {
         // Loop over all the System Availability Managers and invoke the correct
         // System Availability Manager algorithm.
 
-        Status availStatus;
+        Status availStatus = Status::Invalid;
 
         switch (type) {
         case ManagerType::Scheduled: { // 'AvailabilityManager:Scheduled'
@@ -1616,8 +1607,8 @@ namespace Avail {
             } else {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:Scheduled not found: {}", SysAvailName));
             }
-
         } break;
+                
         case ManagerType::ScheduledOn: { // 'AvailabilityManager:ScheduledOn'
             if (SysAvailNum == 0) {
                 SysAvailNum = Util::FindItemInList(SysAvailName, state.dataAvail->SchedOnData);
@@ -1627,8 +1618,8 @@ namespace Avail {
             } else {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:ScheduledOn not found: {}", SysAvailName));
             }
-
         } break;
+                
         case ManagerType::ScheduledOff: { // 'AvailabilityManager:ScheduledOff'
             if (SysAvailNum == 0) {
                 SysAvailNum = Util::FindItemInList(SysAvailName, state.dataAvail->SchedOffData);
@@ -1638,8 +1629,8 @@ namespace Avail {
             } else {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:ScheduledOff not found: {}", SysAvailName));
             }
-
         } break;
+                
         case ManagerType::NightCycle: { // 'AvailabilityManager:NightCycle'
             if (SysAvailNum == 0) {
                 SysAvailNum = Util::FindItemInList(SysAvailName, state.dataAvail->NightCycleData);
@@ -1649,8 +1640,8 @@ namespace Avail {
             } else {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:NightCycle not found: {}", SysAvailName));
             }
-
         } break;
+                
         case ManagerType::OptimumStart: { // 'AvailabilityManager:OptimumStart'
             if (SysAvailNum == 0) {
                 SysAvailNum = Util::FindItemInList(SysAvailName, state.dataAvail->OptimumStartData);
@@ -1660,8 +1651,8 @@ namespace Avail {
             } else {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:OptimumStart not found: {}", SysAvailName));
             }
-
         } break;
+                
         case ManagerType::NightVent: { // 'AvailabilityManager:NightVentilation'
             if (SysAvailNum == 0) {
                 SysAvailNum = Util::FindItemInList(SysAvailName, state.dataAvail->NightVentData);
@@ -1671,8 +1662,8 @@ namespace Avail {
             } else {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:NightVentilation not found: {}", SysAvailName));
             }
-
         } break;
+                
         case ManagerType::DiffThermo: { // 'AvailabilityManager:DifferentialThermostat'
             if (SysAvailNum == 0) {
                 SysAvailNum = Util::FindItemInList(SysAvailName, state.dataAvail->DiffThermoData);
@@ -1683,6 +1674,7 @@ namespace Avail {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:DifferentialThermostat not found: {}", SysAvailName));
             }
         } break;
+                
         case ManagerType::HiTempTOff: { // 'AvailabilityManager:HighTemperatureTurnOff'
             if (SysAvailNum == 0) {
                 SysAvailNum = Util::FindItemInList(SysAvailName, state.dataAvail->HiTurnOffData);
@@ -1693,6 +1685,7 @@ namespace Avail {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOff not found: {}", SysAvailName));
             }
         } break;
+                
         case ManagerType::HiTempTOn: { // 'AvailabilityManager:HighTemperatureTurnOn'
             if (SysAvailNum == 0) {
                 SysAvailNum = Util::FindItemInList(SysAvailName, state.dataAvail->HiTurnOnData);
@@ -1703,6 +1696,7 @@ namespace Avail {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOn not found: {}", SysAvailName));
             }
         } break;
+                
         case ManagerType::LoTempTOff: { // 'AvailabilityManager:LowTemperatureTurnOff'
             if (SysAvailNum == 0) {
                 SysAvailNum = Util::FindItemInList(SysAvailName, state.dataAvail->LoTurnOffData);
@@ -1712,8 +1706,8 @@ namespace Avail {
             } else {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOff not found: {}", SysAvailName));
             }
-
         } break;
+                
         case ManagerType::LoTempTOn: { // 'AvailabilityManager:LowTemperatureTurnOn'
             if (SysAvailNum == 0) {
                 SysAvailNum = Util::FindItemInList(SysAvailName, state.dataAvail->LoTurnOnData);
@@ -1723,14 +1717,15 @@ namespace Avail {
             } else {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOn not found: {}", SysAvailName));
             }
-
         } break;
+                
         default: {
             ShowSevereError(state, format("AvailabilityManager Type not found: {}", type));
             ShowContinueError(state, format("Occurs in Manager={}", SysAvailName));
             ShowFatalError(state, "Preceding condition causes termination.");
-        }
-        }
+        } break;
+                
+        } // switch()
         return availStatus;
     }
 
@@ -3278,6 +3273,7 @@ namespace Avail {
             case ControlAlgorithm::AdaptiveASHRAE: {
                 availStatus = Status::NoAction;
             } break;
+                    
             default:
                 break;
             }
@@ -3437,7 +3433,11 @@ namespace Avail {
         Status availStatus;
 
         auto &diffThermoMgr = state.dataAvail->DiffThermoData(SysAvailNum);
-        Real64 DeltaTemp = state.dataLoopNodes->Node(diffThermoMgr.HotNode).Temp - state.dataLoopNodes->Node(diffThermoMgr.ColdNode).Temp;
+        auto &dln = state.dataLoopNodes;
+        auto const *hotNode = dln->nodes(diffThermoMgr.HotNodeNum);
+        auto const *coldNode = dln->nodes(diffThermoMgr.ColdNodeNum);
+        
+        Real64 DeltaTemp = hotNode->Temp - coldNode->Temp;
 
         if (DeltaTemp >= diffThermoMgr.TempDiffOn) {
             availStatus = Status::CycleOn;
@@ -3467,7 +3467,11 @@ namespace Avail {
         // PURPOSE OF THIS SUBROUTINE:
         // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
         Status availStatus;
-        if (state.dataLoopNodes->Node(state.dataAvail->HiTurnOffData(SysAvailNum).Node).Temp >= state.dataAvail->HiTurnOffData(SysAvailNum).Temp) {
+        auto &dln = state.dataLoopNodes;
+
+        auto const *node = dln->nodes(state.dataAvail->HiTurnOffData(SysAvailNum).NodeNum);
+        
+        if (node->Temp >= state.dataAvail->HiTurnOffData(SysAvailNum).Temp) {
             availStatus = Status::ForceOff;
         } else {
             availStatus = Status::NoAction;
@@ -3492,7 +3496,11 @@ namespace Avail {
         // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
 
         Status availStatus;
-        if (state.dataLoopNodes->Node(state.dataAvail->HiTurnOnData(SysAvailNum).Node).Temp >= state.dataAvail->HiTurnOnData(SysAvailNum).Temp) {
+
+        auto &dln = state.dataLoopNodes;
+        auto const *node = dln->nodes(state.dataAvail->HiTurnOnData(SysAvailNum).NodeNum);
+        
+        if (node->Temp >= state.dataAvail->HiTurnOnData(SysAvailNum).Temp) {
             availStatus = Status::CycleOn;
         } else {
             availStatus = Status::NoAction;
@@ -3519,6 +3527,7 @@ namespace Avail {
         Status availStatus;
         // If applicability schedule is off, then availability manager is inactive, return no action
         auto &loTurnOffMgr = state.dataAvail->LoTurnOffData(SysAvailNum);
+
         if (loTurnOffMgr.SchedPtr > 0) {
             if (GetCurrentScheduleValue(state, loTurnOffMgr.SchedPtr) <= 0.0) {
                 availStatus = Status::NoAction;
@@ -3527,8 +3536,10 @@ namespace Avail {
             }
         }
 
+        auto &dln = state.dataLoopNodes;
+        auto const *node = dln->nodes(loTurnOffMgr.NodeNum);
         // Availability manager is active, check temperature limit
-        if (state.dataLoopNodes->Node(loTurnOffMgr.Node).Temp <= loTurnOffMgr.Temp) {
+        if (node->Temp <= loTurnOffMgr.Temp) {
             availStatus = Status::ForceOff;
         } else {
             availStatus = Status::NoAction;
@@ -3552,7 +3563,10 @@ namespace Avail {
         // PURPOSE OF THIS SUBROUTINE:
         // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
         Status availStatus;
-        if (state.dataLoopNodes->Node(state.dataAvail->LoTurnOnData(SysAvailNum).Node).Temp <= state.dataAvail->LoTurnOnData(SysAvailNum).Temp) {
+
+        auto &dln = state.dataLoopNodes;
+        auto const *node = dln->nodes(state.dataAvail->LoTurnOnData(SysAvailNum).NodeNum);
+        if (node->Temp <= state.dataAvail->LoTurnOnData(SysAvailNum).Temp) {
             availStatus = Status::CycleOn;
         } else {
             availStatus = Status::NoAction;
@@ -3573,7 +3587,6 @@ namespace Avail {
         // PURPOSE OF THIS SUBROUTINE:
         // Manage the simulation of the Hybrid Ventilation Control System Availability Managers
 
-        using namespace DataLoopNode;
         using namespace DataAirLoop;
 
         int PriAirSysNum; // Primary Air System index
@@ -3621,7 +3634,6 @@ namespace Avail {
         // Using/Aliasing
         using Node::GetSingleNode;
         using Node::MarkNode;
-        using namespace DataLoopNode;
 
         using Curve::CurveValue;
         using Curve::GetCurveIndex;
@@ -4228,8 +4240,8 @@ namespace Avail {
                 int ControlledZoneNum = hybridVentMgr.ControlledZoneNum;
                 if (hybridVentMgr.HybridVentMgrConnectedToAirLoop) {
                     if (hybridVentMgr.ControlledZoneNum > 0) {
-                        for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) == hybridVentMgr.AirLoopNum) {
+                        for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInNodes; ++zoneInNode) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InNodeAirLoopNum(zoneInNode) == hybridVentMgr.AirLoopNum) {
                                 zoneFound = true;
                             }
                         }
@@ -4246,8 +4258,8 @@ namespace Avail {
                 if (std::any_of(state.dataAvail->HybridVentData.begin(),
                                 state.dataAvail->HybridVentData.end(),
                                 [](SysAvailManagerHybridVent const &e) { return e.HybridVentMgrConnectedToAirLoop; })) {
-                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) == hybridVentMgr.AirLoopNum &&
+                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInNodes; ++zoneInNode) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InNodeAirLoopNum(zoneInNode) == hybridVentMgr.AirLoopNum &&
                             hybridVentMgr.AirLoopNum > 0) {
                             for (HybridVentNum = 1; HybridVentNum <= state.dataAvail->NumHybridVentSysAvailMgrs; ++HybridVentNum) {
                                 if (!state.dataAvail->HybridVentData(HybridVentNum).HybridVentMgrConnectedToAirLoop &&
@@ -4750,8 +4762,8 @@ namespace Avail {
         if (hybridVentMgr.AirLoopNum > 0 && hybridVentMgr.SimpleControlTypeSchedPtr > 0) {
             SimpleControlType = GetCurrentScheduleValue(state, hybridVentMgr.SimpleControlTypeSchedPtr);
             for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                    if (hybridVentMgr.AirLoopNum == state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode)) {
+                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInNodes; ++zoneInNode) {
+                    if (hybridVentMgr.AirLoopNum == state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InNodeAirLoopNum(zoneInNode)) {
                         // Setup flag for ventilation objects
                         for (i = 1; i <= state.dataHeatBal->TotVentilation; ++i) {
                             if (state.dataHeatBal->Ventilation(i).ZonePtr == ControlledZoneNum) {

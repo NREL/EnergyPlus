@@ -762,12 +762,15 @@ TEST_F(EnergyPlusFixture, HeaderedVariableSpeedPumpEMSPressureTest)
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(thisLoopSideNum).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(thisLoopSideNum).Branch(thisBranchNum).Comp.allocate(1);
-    state->dataLoopNodes->Node(1).MassFlowRate = massflowrate;
-    state->dataLoopNodes->Node(1).MassFlowRateMinAvail = massflowrate;
-    state->dataLoopNodes->Node(1).MassFlowRateMin = massflowrate;
-    state->dataLoopNodes->Node(1).MassFlowRateMax = massflowrate;
-    state->dataLoopNodes->Node(2).MassFlowRateMaxAvail = massflowrate;
-    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = massflowrate;
+
+    auto &dln = state->dataLoopNodes;
+    
+    dln->nodes(1)->MassFlowRate = massflowrate;
+    dln->nodes(1)->MassFlowRateMinAvail = massflowrate;
+    dln->nodes(1)->MassFlowRateMin = massflowrate;
+    dln->nodes(1)->MassFlowRateMax = massflowrate;
+    dln->nodes(2)->MassFlowRateMaxAvail = massflowrate;
+    dln->nodes(1)->MassFlowRateMaxAvail = massflowrate;
 
     state->dataPumps->PumpEquip(1).PumpEffic = 0.8;
     state->dataPumps->PumpEquip(1).EMSPressureOverrideValue = 200.0;

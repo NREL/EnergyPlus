@@ -133,10 +133,10 @@ namespace WaterToAirHeatPumpSimple {
         int SensCoolCapCurveIndex = 0;               // Index of the Sensible Cooling capacity performance curve
         int CoolPowCurveIndex = 0;                   // Index of the Cooling power consumption curve
         int PLFCurveIndex = 0;                       // Index of the Part Load Factor curve
-        int AirInletNodeNum = 0;                     // Node Number of the Air Inlet
-        int AirOutletNodeNum = 0;                    // Node Number of the Air Outlet
-        int WaterInletNodeNum = 0;                   // Node Number of the Water Onlet
-        int WaterOutletNodeNum = 0;                  // Node Number of the Water Outlet
+        int AirInNodeNum = 0;                     // Node Number of the Air Inlet
+        int AirOutNodeNum = 0;                    // Node Number of the Air Outlet
+        int WaterInNodeNum = 0;                   // Node Number of the Water Onlet
+        int WaterOutNodeNum = 0;                  // Node Number of the Water Outlet
         PlantLocation plantLoc;
         HVAC::WaterFlow WaterCyclingMode = HVAC::WaterFlow::Invalid; // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
         // 1=water cycling, 2=water constant, 3=water constant on demand (old mode)

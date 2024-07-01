@@ -1103,18 +1103,18 @@ void processZoneEquipmentInput(EnergyPlusData &state,
 
         thisEquipConfig.ReturnNodeNums.allocate(NumNodes);
         thisEquipConfig.ReturnNodeAirLoopNum.allocate(NumNodes);
-        thisEquipConfig.ReturnNodeInNodeNums.allocate(NumNodes);
+        thisEquipConfig.ReturnNodeInletNums.allocate(NumNodes);
         thisEquipConfig.FixedReturnFlow.allocate(NumNodes);
         thisEquipConfig.ReturnNodePlenumNum.allocate(NumNodes);
         thisEquipConfig.ReturnNodeExhaustNodeNums.allocate(NumNodes);
-        thisEquipConfig.SharedExhaustNodeNums.allocate(NumNodes);
+        thisEquipConfig.SharedExhaustConfigs.allocate(NumNodes);
         thisEquipConfig.ReturnNodeNums = 0;                                         // initialize to zero here
         thisEquipConfig.ReturnNodeAirLoopNum = 0;                               // initialize to zero here
-        thisEquipConfig.ReturnNodeInNodeNums = 0;                                 // initialize to zero here
+        thisEquipConfig.ReturnNodeInletNums = 0;                                 // initialize to zero here
         thisEquipConfig.FixedReturnFlow = false;                                // initialize to false here
         thisEquipConfig.ReturnNodePlenumNum = 0;                                // initialize to zero here
         thisEquipConfig.ReturnNodeExhaustNodeNums = 0;                           // initialize to zero here
-        thisEquipConfig.SharedExhaustNodeNums = LightReturnExhaustConfig::NoExhast; // initialize to zero here
+        thisEquipConfig.SharedExhaustConfigs = LightReturnExhaustConfig::NoExhast; // initialize to zero here
 
         for (int NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
             thisEquipConfig.ReturnNodeNums(NodeNum) = NodeNums(NodeNum);
@@ -1639,14 +1639,14 @@ void CheckSharedExhaust(EnergyPlusData &state)
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes < 2) continue;
         for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount) {
-            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNodeNums(nodeCount) == LightReturnExhaustConfig::Shared) continue;
+            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustConfigs(nodeCount) == LightReturnExhaustConfig::Shared) continue;
             ExhastNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeExhaustNodeNums(nodeCount);
             if (ExhastNodeNum > 0) {
-                state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNodeNums(nodeCount) = LightReturnExhaustConfig::Single;
+                state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustConfigs(nodeCount) = LightReturnExhaustConfig::Single;
                 for (int nodeCount1 = nodeCount + 1; nodeCount1 <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount1) {
                     if (ExhastNodeNum == state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeExhaustNodeNums(nodeCount1)) {
-                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNodeNums(nodeCount) = LightReturnExhaustConfig::Multi;
-                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNodeNums(nodeCount1) = LightReturnExhaustConfig::Shared;
+                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustConfigs(nodeCount) = LightReturnExhaustConfig::Multi;
+                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustConfigs(nodeCount1) = LightReturnExhaustConfig::Shared;
                     }
                 }
             }

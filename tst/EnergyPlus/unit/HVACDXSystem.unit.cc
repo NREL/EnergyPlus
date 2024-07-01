@@ -564,8 +564,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     state->dataGlobal->NumOfZones = 1;
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
@@ -582,8 +582,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
 
     bool FirstHVACIteration = true;
     bool HXUnitOn = false;
-    int InletNode = 1;
-    int ControlNode = 2; // same as outlet node number
+    int InNodeNum = 1;
+    int ControlNodeNum = 2; // same as outlet node number
     int airLoopNum = 1;
 
     bool zoneEquipment = true;
@@ -596,7 +596,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
     EXPECT_EQ(thisSys->m_CoolingCoilType_Num, HVAC::Coil_CoolingAirToAirVariableSpeed);
-    EXPECT_EQ(2, thisSys->CoolCtrlNode);
+    EXPECT_EQ(2, thisSys->CoolCtrlNodeNum);
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;
@@ -608,21 +608,26 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     thisSys->m_DesiredOutletTemp = 18.0;
     thisSys->m_DesiredOutletHumRat = 1.0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataLoopNodes->Node(InletNode).MassFlowRate = 5.66336932 * state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(InletNode).Temp = 24.0;
-    state->dataLoopNodes->Node(InletNode).HumRat = 0.012143698;
-    state->dataLoopNodes->Node(InletNode).Enthalpy = 55029.3778; // conditions at 65 % RH
-    state->dataLoopNodes->Node(ControlNode).TempSetPoint = thisSys->m_DesiredOutletTemp;
+
+    auto &dln = state->dataLoopNodes;
+    auto *inNode = dln->nodes(InNodeNum);
+    auto *controlNode = dln->nodes(ControlNodeNum);
+    
+    inNode->MassFlowRate = 5.66336932 * state->dataEnvrn->StdRhoAir;
+    inNode->Temp = 24.0;
+    inNode->HumRat = 0.012143698;
+    inNode->Enthalpy = 55029.3778; // conditions at 65 % RH
+    controlNode->TempSetPoint = thisSys->m_DesiredOutletTemp;
     Real64 RHControlHumRat = 0.01119276; // humrat at 24C, 60% RH
-    state->dataLoopNodes->Node(ControlNode).HumRatMax = RHControlHumRat;
+    controlNode->HumRatMax = RHControlHumRat;
 
     // test sensible control
     HVAC::CompressorOp CompressorOn = HVAC::CompressorOp::On;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
     // system meets temperature set point
-    EXPECT_NEAR(thisSys->m_DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp, 0.001);
+    EXPECT_NEAR(thisSys->m_DesiredOutletTemp, controlNode->Temp, 0.001);
     // system was not told to meet humidity ratio set point (since DesiredOutletHumRat = 1.0)
-    EXPECT_GT(state->dataLoopNodes->Node(ControlNode).HumRat, state->dataLoopNodes->Node(ControlNode).HumRatMax);
+    EXPECT_GT(controlNode->HumRat, controlNode->HumRatMax);
     // sensible load met by compressor speed 3
     EXPECT_EQ(3, thisSys->m_CoolingSpeedNum);
 
@@ -631,9 +636,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
 
     // system over cools past temperature set point
-    EXPECT_GT(thisSys->m_DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp);
+    EXPECT_GT(thisSys->m_DesiredOutletTemp, controlNode->Temp);
     // system does meet humidity ratio set point
-    EXPECT_NEAR(state->dataLoopNodes->Node(ControlNode).HumRat, state->dataLoopNodes->Node(ControlNode).HumRatMax, 0.0000001);
+    EXPECT_NEAR(controlNode->HumRat, controlNode->HumRatMax, 0.0000001);
     // latent load needed to increase compressor speed to speed 4
     EXPECT_EQ(4, thisSys->m_CoolingSpeedNum);
 }
@@ -763,8 +768,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataGlobal->NumOfZones = 1;
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
@@ -781,8 +786,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
 
     bool FirstHVACIteration = true;
     bool HXUnitOn = false;
-    int InletNode = 1;
-    int ControlNode = 2; // same as outlet node number
+    int InNodeNum = 1;
+    int ControlNodeNum = 2; // same as outlet node number
     int airLoopNum = 1;
 
     bool zoneEquipment = true;
@@ -800,12 +805,16 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     // set up inputs to test coil control
     thisSys->m_DesiredOutletTemp = 22.0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataLoopNodes->Node(InletNode).MassFlowRate = 1.396964 * state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(InletNode).Temp = 24.0;
-    state->dataLoopNodes->Node(InletNode).HumRat = 0.014; // high zone RH, about 75%
-    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
-        state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat); // 55029.3778; // conditions at 65 % RH
-    state->dataLoopNodes->Node(ControlNode).TempSetPoint = thisSys->m_DesiredOutletTemp;
+
+    auto &dln = state->dataLoopNodes;
+    auto *inNode = dln->nodes(InNodeNum);
+    auto *controlNode = dln->nodes(ControlNodeNum);
+    
+    inNode->MassFlowRate = 1.396964 * state->dataEnvrn->StdRhoAir;
+    inNode->Temp = 24.0;
+    inNode->HumRat = 0.014; // high zone RH, about 75%
+    inNode->Enthalpy = Psychrometrics::PsyHFnTdbW(inNode->Temp, inNode->HumRat); // 55029.3778; // conditions at 65 % RH
+    controlNode->TempSetPoint = thisSys->m_DesiredOutletTemp;
 
     // test sensible control
     HVAC::CompressorOp CompressorOn = HVAC::CompressorOp::On;
@@ -825,10 +834,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     EXPECT_NEAR(0.099, state->dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is lower, latent capacity is 0
 
     // test more reasonable zone RH,about 50%
-    state->dataLoopNodes->Node(InletNode).HumRat = 0.0092994;
-    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
-        state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat); // 55029.3778; // conditions at 65 % RH
-    state->dataLoopNodes->Node(ControlNode).TempSetPoint = thisSys->m_DesiredOutletTemp;
+    inNode->HumRat = 0.0092994;
+    inNode->Enthalpy = Psychrometrics::PsyHFnTdbW(inNode->Temp, inNode->HumRat); // 55029.3778; // conditions at 65 % RH
+    controlNode->TempSetPoint = thisSys->m_DesiredOutletTemp;
 
     // remove latent degradation model
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Twet_Rated = 0.0;
@@ -1037,8 +1045,8 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     state->dataGlobal->NumOfZones = 1;
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
@@ -1056,9 +1064,9 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
 
     bool FirstHVACIteration = true;
     bool HXUnitOn = false;
-    int InletNode = 1;
-    int ControlNode = 2; // same as outlet node number
-    int condenserNode = 3;
+    int InNodeNum = 1;
+    int ControlNodeNum = 2; // same as outlet node number
+    int condenserNodeNum = 3;
     int airLoopNum = 1;
 
     bool zoneEquipment = true;
@@ -1071,29 +1079,34 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
     EXPECT_EQ(thisSys->m_CoolingCoilType_Num, HVAC::CoilDX_Cooling);
-    EXPECT_EQ(2, thisSys->CoolCtrlNode);
+    EXPECT_EQ(2, thisSys->CoolCtrlNodeNum);
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0196;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutWetBulbTemp = 27.0932;
-    state->dataLoopNodes->Node(condenserNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(condenserNode).HumRat = state->dataEnvrn->OutHumRat;
+
+    auto &dln = state->dataLoopNodes;
+    auto *inNode = dln->nodes(InNodeNum);
+    auto *controlNode = dln->nodes(ControlNodeNum);
+    auto *condenserNode = dln->nodes(condenserNodeNum);
+    condenserNode->Temp = state->dataEnvrn->OutDryBulbTemp;
+    condenserNode->HumRat = state->dataEnvrn->OutHumRat;
 
     // set up inputs to test coil control
     thisSys->m_DesiredOutletTemp = 20.0;
     thisSys->m_DesiredOutletHumRat = 1.0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataLoopNodes->Node(InletNode).MassFlowRate = 0.8 * state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(InletNode).Press = state->dataEnvrn->OutBaroPress;
-    state->dataLoopNodes->Node(InletNode).HumRat = 0.012143698;
-    state->dataLoopNodes->Node(InletNode).Enthalpy = 55029.3778; // conditions at 65 % RH
-    state->dataLoopNodes->Node(InletNode).Temp =
-        Psychrometrics::PsyTdbFnHW(state->dataLoopNodes->Node(InletNode).Enthalpy, state->dataLoopNodes->Node(InletNode).HumRat);
-    state->dataLoopNodes->Node(ControlNode).TempSetPoint = thisSys->m_DesiredOutletTemp;
+
+    inNode->MassFlowRate = 0.8 * state->dataEnvrn->StdRhoAir;
+    inNode->Press = state->dataEnvrn->OutBaroPress;
+    inNode->HumRat = 0.012143698;
+    inNode->Enthalpy = 55029.3778; // conditions at 65 % RH
+    inNode->Temp = Psychrometrics::PsyTdbFnHW(inNode->Enthalpy, inNode->HumRat);
+    controlNode->TempSetPoint = thisSys->m_DesiredOutletTemp;
     Real64 RHControlHumRat = 0.01; // humrat at 24C, ~60% RH
-    state->dataLoopNodes->Node(ControlNode).HumRatMax = RHControlHumRat;
+    controlNode->HumRatMax = RHControlHumRat;
 
     // test sensible control
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1104,11 +1117,11 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     HVAC::CompressorOp CompOn = HVAC::CompressorOp::On;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
     // system meets temperature set point
-    Real64 outTemp1 = state->dataLoopNodes->Node(ControlNode).Temp;
-    Real64 outHumRat1 = state->dataLoopNodes->Node(ControlNode).HumRat;
-    EXPECT_NEAR(thisSys->m_DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp, 0.001);
+    Real64 outTemp1 = controlNode->Temp;
+    Real64 outHumRat1 = controlNode->HumRat;
+    EXPECT_NEAR(thisSys->m_DesiredOutletTemp, controlNode->Temp, 0.001);
     // system was not told to meet humidity ratio set point (since DesiredOutletHumRat = 1.0)
-    EXPECT_GT(state->dataLoopNodes->Node(ControlNode).HumRat, state->dataLoopNodes->Node(ControlNode).HumRatMax);
+    EXPECT_GT(controlNode->HumRat, controlNode->HumRatMax);
     // sensible load met by compressor speed 1
     EXPECT_EQ(1, thisSys->m_CoolingSpeedNum);
 
@@ -1117,15 +1130,15 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0.0);
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
 
-    Real64 outTemp2 = state->dataLoopNodes->Node(ControlNode).Temp;
-    Real64 outHumRat2 = state->dataLoopNodes->Node(ControlNode).HumRat;
+    Real64 outTemp2 = controlNode->Temp;
+    Real64 outHumRat2 = controlNode->HumRat;
     // system over cools past temperature set point
     EXPECT_LT(outTemp2, thisSys->m_DesiredOutletTemp);
     EXPECT_LT(outTemp2, outTemp1);     // cool reheat overshoots Tsetpoint
     EXPECT_LT(outHumRat2, outHumRat1); // and provides more dehumidification
 
     // system does meet humidity ratio set point
-    EXPECT_NEAR(outHumRat2, state->dataLoopNodes->Node(ControlNode).HumRatMax, 0.001);
+    EXPECT_NEAR(outHumRat2, controlNode->HumRatMax, 0.001);
     EXPECT_NEAR(outHumRat1, 0.01166, 0.0001);      // sensible control yields higher outlet humrat
     EXPECT_NEAR(outHumRat2, 0.01000, 0.0001);      // cool reheat control yields lower outlet humrat at set point
     EXPECT_NEAR(RHControlHumRat, 0.01000, 0.0001); // cool reheat controls to humrat set point
@@ -1138,8 +1151,8 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0.0);
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
 
-    Real64 outTemp3 = state->dataLoopNodes->Node(ControlNode).Temp;
-    Real64 outHumRat3 = state->dataLoopNodes->Node(ControlNode).HumRat;
+    Real64 outTemp3 = controlNode->Temp;
+    Real64 outHumRat3 = controlNode->HumRat;
     // expect same sensible and better dehumidification using multimode since alternate mode coil specs have improved latent
     EXPECT_NEAR(outTemp3, outTemp1, 0.00001); // multimode controls to same Tsetpoint
     EXPECT_LT(outHumRat3, outHumRat1);        // lower outlet humrat with multimode's alternate operating mode

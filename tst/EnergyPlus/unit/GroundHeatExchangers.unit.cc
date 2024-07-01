@@ -65,7 +65,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::GroundHeatExchangers;
@@ -1288,7 +1287,9 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UHF)
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.plantLoc.loopNum = 1;
-    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20;
+
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisGLHE.inNodeNum)->Temp = 20;
     thisGLHE.designFlow = 0.00075708;
 
     Real64 rho = 998.207; // Density at 20 C using CoolProp
@@ -1742,7 +1743,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UBHWT)
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.plantLoc.loopNum = 1;
-    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisGLHE.inNodeNum)->Temp = 20;
     thisGLHE.designFlow = 0.00075708;
 
     Real64 rho = 998.207; // Density at 20 C using CoolProp
@@ -2227,7 +2229,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.plantLoc.loopNum = 1;
-    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 13.0;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisGLHE.inNodeNum)->Temp = 13.0;
     thisGLHE.designFlow = 0.000303 * 4;
 
     Real64 rho = 999.380058; // Density at 13 C using CoolProp
@@ -2532,7 +2535,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.plantLoc.loopNum = 1;
-    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 13.0;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisGLHE.inNodeNum)->Temp = 13.0;
     thisGLHE.designFlow = 0.000303 * 4;
 
     Real64 rho = 999.380058; // Density at 13 C using CoolProp
@@ -2829,7 +2833,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.plantLoc.loopNum = 1;
-    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisGLHE.inNodeNum)->Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 constexpr tolerance = 0.00001;
@@ -3128,7 +3133,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.plantLoc.loopNum = 1;
-    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisGLHE.inNodeNum)->Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 constexpr tolerance = 0.00001;
@@ -3427,7 +3433,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.plantLoc.loopNum = 1;
-    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisGLHE.inNodeNum)->Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 constexpr tolerance = 0.00001;
@@ -3726,7 +3733,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.plantLoc.loopNum = 1;
-    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisGLHE.inNodeNum)->Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 constexpr tolerance = 0.00001;
@@ -4025,7 +4033,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.plantLoc.loopNum = 1;
-    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisGLHE.inNodeNum)->Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 constexpr tolerance = 0.00001;
@@ -4324,7 +4333,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.plantLoc.loopNum = 1;
-    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(thisGLHE.inNodeNum)->Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 constexpr tolerance = 0.00001;

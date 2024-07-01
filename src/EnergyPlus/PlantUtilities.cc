@@ -722,22 +722,22 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
         ShowContinueErrorTimeStamp(state, "");
         ShowContinueError(state, format("PlantLoop Name ({} Side) = {}", DataPlant::DemandSupplyNames[(int)LoopSideNum], loop.Name));
         ShowContinueError(state, format("PlantLoop Setpoint Temperature={:.1R} {{C}}", tempSetPointNode->TempSetPoint));
-        if (loop.LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt) {
+        if (loop.LoopSide(DataPlant::LoopSideLocation::Supply).InNodeSetPt) {
             ShowContinueError(state, "PlantLoop Inlet Node (LoopSideLocation::Supply) has a Setpoint.");
         } else {
             ShowContinueError(state, "PlantLoop Inlet Node (LoopSideLocation::Supply) does not have a Setpoint.");
         }
-        if (loop.LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
+        if (loop.LoopSide(DataPlant::LoopSideLocation::Demand).InNodeSetPt) {
             ShowContinueError(state, "PlantLoop Inlet Node (LoopSideLocation::Demand) has a Setpoint.");
         } else {
             ShowContinueError(state, "PlantLoop Inlet Node (LoopSideLocation::Demand) does not have a Setpoint.");
         }
-        if (loop.LoopSide(DataPlant::LoopSideLocation::Supply).OutletNodeSetPt) {
+        if (loop.LoopSide(DataPlant::LoopSideLocation::Supply).OutNodeSetPt) {
             ShowContinueError(state, "PlantLoop Outlet Node (LoopSideLocation::Supply) has a Setpoint.");
         } else {
             ShowContinueError(state, "PlantLoop Outlet Node (LoopSideLocation::Supply) does not have a Setpoint.");
         }
-        if (loop.LoopSide(DataPlant::LoopSideLocation::Demand).OutletNodeSetPt) {
+        if (loop.LoopSide(DataPlant::LoopSideLocation::Demand).OutNodeSetPt) {
             ShowContinueError(state, "PlantLoop Outlet Node (LoopSideLocation::Demand) has a Setpoint.");
         } else {
             ShowContinueError(state, "PlantLoop Outlet Node (LoopSideLocation::Demand) does not have a Setpoint.");
@@ -1033,7 +1033,7 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
         }
         // see 10133
         // outNode->MassFlowRate =
-        //    dln->Node(InletNodeNum)
+        //    dln->Node(InNodeNum)
         //        .MassFlowRate; // if condenser is on inlet branch, the outlet node needs to be updated or can get splitter/mixer failures
 
         // set sim flag for this loop
@@ -1371,7 +1371,7 @@ void ShiftPlantLoopSideCallingOrder(EnergyPlusData &state, int const OldIndex, i
 }
 
 void RegisterPlantCompDesignFlow(EnergyPlusData &state,
-                                 int const ComponentInletNodeNum, // the component's water inlet node number
+                                 int const ComponentInNodeNum, // the component's water inlet node number
                                  Real64 const DesPlantFlow        // the component's design fluid volume flow rate [m3/s]
 )
 {
@@ -1408,7 +1408,7 @@ void RegisterPlantCompDesignFlow(EnergyPlusData &state,
         NumPlantComps = 1;
         state.dataSize->CompDesWaterFlow.allocate(NumPlantComps);
         // save the new data
-        state.dataSize->CompDesWaterFlow(NumPlantComps).SupNode = ComponentInletNodeNum;
+        state.dataSize->CompDesWaterFlow(NumPlantComps).SupNode = ComponentInNodeNum;
         state.dataSize->CompDesWaterFlow(NumPlantComps).DesVolFlowRate = DesPlantFlow;
         state.dataSize->SaveNumPlantComps = NumPlantComps;
         return;
@@ -1417,7 +1417,7 @@ void RegisterPlantCompDesignFlow(EnergyPlusData &state,
     Found = false;
     // find node num index in structure if any
     for (PlantCompNum = 1; PlantCompNum <= NumPlantComps; ++PlantCompNum) {
-        if (ComponentInletNodeNum == state.dataSize->CompDesWaterFlow(PlantCompNum).SupNode) {
+        if (ComponentInNodeNum == state.dataSize->CompDesWaterFlow(PlantCompNum).SupNode) {
             Found = true;
             thisCallNodeIndex = PlantCompNum;
         }
@@ -1426,10 +1426,10 @@ void RegisterPlantCompDesignFlow(EnergyPlusData &state,
 
     if (!Found) {        // grow structure and add new node at the end
         ++NumPlantComps; // increment the number of components that use water as a source of heat or coolth
-        state.dataSize->CompDesWaterFlow.emplace_back(ComponentInletNodeNum, DesPlantFlow); // Append the new element
+        state.dataSize->CompDesWaterFlow.emplace_back(ComponentInNodeNum, DesPlantFlow); // Append the new element
         state.dataSize->SaveNumPlantComps = NumPlantComps;
     } else {
-        state.dataSize->CompDesWaterFlow(thisCallNodeIndex).SupNode = ComponentInletNodeNum;
+        state.dataSize->CompDesWaterFlow(thisCallNodeIndex).SupNode = ComponentInNodeNum;
         state.dataSize->CompDesWaterFlow(thisCallNodeIndex).DesVolFlowRate = DesPlantFlow;
     }
 }
@@ -1620,24 +1620,24 @@ void LogPlantConvergencePoints(EnergyPlusData &state, bool const FirstHVACIterat
             auto &loop_side = loop.LoopSide(ThisLoopSide);
 
             if (FirstHVACIteration) {
-                loop_side.InletNode.TemperatureHistory = 0.0;
-                loop_side.InletNode.MassFlowRateHistory = 0.0;
-                loop_side.OutletNode.TemperatureHistory = 0.0;
-                loop_side.OutletNode.MassFlowRateHistory = 0.0;
+                loop_side.InNode.TemperatureHistory = 0.0;
+                loop_side.InNode.MassFlowRateHistory = 0.0;
+                loop_side.OutNode.TemperatureHistory = 0.0;
+                loop_side.OutNode.MassFlowRateHistory = 0.0;
             }
 
             auto const *inNode = dln->nodes(loop_side.InNodeNum);
-            Real64 InletNodeTemp = inNode->Temp;
-            Real64 InletNodeMdot = inNode->MassFlowRate;
+            Real64 InNodeTemp = inNode->Temp;
+            Real64 InNodeMdot = inNode->MassFlowRate;
 
             auto const *outNode = dln->nodes(loop_side.OutNodeNum);
-            Real64 OutletNodeTemp = outNode->Temp;
-            Real64 OutletNodeMdot = outNode->MassFlowRate;
+            Real64 OutNodeTemp = outNode->Temp;
+            Real64 OutNodeMdot = outNode->MassFlowRate;
 
-            rshift1(loop_side.InletNode.TemperatureHistory, InletNodeTemp);
-            rshift1(loop_side.InletNode.MassFlowRateHistory, InletNodeMdot);
-            rshift1(loop_side.OutletNode.TemperatureHistory, OutletNodeTemp);
-            rshift1(loop_side.OutletNode.MassFlowRateHistory, OutletNodeMdot);
+            rshift1(loop_side.InNode.TemperatureHistory, InNodeTemp);
+            rshift1(loop_side.InNode.MassFlowRateHistory, InNodeMdot);
+            rshift1(loop_side.OutNode.TemperatureHistory, OutNodeTemp);
+            rshift1(loop_side.OutNode.MassFlowRateHistory, OutNodeMdot);
         }
     }
 }

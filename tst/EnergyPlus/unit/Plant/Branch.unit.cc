@@ -102,25 +102,28 @@ TEST_F(EnergyPlusFixture, TestDetermineBranchFlowRequest)
     DataPlant::BranchData b;
 
     // set up the nodes
-    b.NodeNumIn = 1;
-    b.NodeNumOut = 3;
-    state->dataLoopNodes->Node.allocate(3);
-    auto &nodeIn = state->dataLoopNodes->Node(1);
-    auto &nodeMiddle = state->dataLoopNodes->Node(2);
-    auto &nodeOut = state->dataLoopNodes->Node(3);
+    b.InNodeNum = 1;
+    b.OutNodeNum = 3;
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 3; ++i) dln->nodes.push_back(new Node::NodeData);
+
+    auto *inNode = dln->nodes(1);
+    auto *middleNode = dln->nodes(2);
+    auto *outNode = dln->nodes(3);
 
     // allocate some components
     b.TotalComponents = 2;
     b.Comp.allocate(2);
-    b.Comp(1).NodeNumIn = 1;
-    b.Comp(2).NodeNumIn = 2;
+    b.Comp(1).InNodeNum = 1;
+    b.Comp(2).InNodeNum = 2;
 
-    nodeIn.MassFlowRateRequest = 1.0;
-    nodeIn.MassFlowRateMaxAvail = 5.0;
-    nodeMiddle.MassFlowRateRequest = 2.0;
-    nodeMiddle.MassFlowRateMaxAvail = 5.0;
-    nodeOut.MassFlowRateRequest = 3.0; // only the component inlet nodes are checked, so this shouldn't be used
-    nodeOut.MassFlowRateMaxAvail = 5.0;
+    inNode->MassFlowRateRequest = 1.0;
+    inNode->MassFlowRateMaxAvail = 5.0;
+    middleNode->MassFlowRateRequest = 2.0;
+    middleNode->MassFlowRateMaxAvail = 5.0;
+    outNode->MassFlowRateRequest = 3.0; // only the component inlet nodes are checked, so this shouldn't be used
+    outNode->MassFlowRateMaxAvail = 5.0;
 
     // for non-series-active branch, it just takes the inlet node request
     b.controlType = DataBranchAirLoopPlant::ControlType::Active;

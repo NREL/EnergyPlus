@@ -251,8 +251,8 @@ namespace UnitarySystems {
         int m_FanAvailSchedPtr = 0;
         HVAC::FanOp m_FanOpMode = HVAC::FanOp::Invalid;
         int m_ATMixerIndex = 0;
-        int m_ATMixerPriNodeNum = 0;
-        int m_ATMixerSecNodeNum = 0;
+        int m_ATMixerPriAirInNodeNum = 0;
+        int m_ATMixerSecAirInNodeNum = 0;
         bool m_AirLoopEquipment = true; // ?
         int m_ZoneInNodeNum = 0;
         int m_ZoneSequenceCoolingNum = 0;
@@ -276,7 +276,7 @@ namespace UnitarySystems {
         int m_CoolingCoilAvailSchPtr = 0;
         Real64 m_DesignCoolingCapacity = 0.0;
         Real64 m_MaxCoolAirVolFlow = 0.0;
-        int m_CondenserNodeNum = 0;
+        int m_CondenserAirInNodeNum = 0;
         DataHeatBalance::RefrigCondenserType m_CondenserType = DataHeatBalance::RefrigCondenserType::Invalid;
         int m_CoolingCoilIndex = 0;
         bool m_HeatPump = false;
@@ -294,7 +294,7 @@ namespace UnitarySystems {
         bool m_SuppCoilExists = false;
         Real64 m_DesignSuppHeatingCapacity = 0.0;
         int m_SuppCoilAirInNodeNum = 0;
-        int SuppCoilOutNodeNum = 0;
+        int m_SuppCoilAirOutNodeNum = 0;
         int m_SuppCoilFluidInNodeNum = 0;
         Real64 m_MaxSuppCoilFluidFlow = 0.0;
         int m_SuppHeatCoilIndex = 0;
@@ -461,7 +461,12 @@ namespace UnitarySystems {
         Real64 m_minWaterLoopTempForHR = 0.0;   // water coil heat recovery loops
         bool m_waterSideEconomizerFlag = false; // user input to enable lockout with economizer
         bool m_WaterHRPlantLoopModel = false;   // signifies water heat recovery loop for this CoilSystem
-        std::array<int, 4> m_OAMixerNodeNums{0, 0, 0, 0};
+
+        int m_OAMixerReturnAirInNodeNum = 0; // Wrong spot to use an array
+        int m_OAMixerOutsideAirInNodeNum = 0;
+        int m_OAMixerReliefAirOutNodeNum = 0;
+        int m_OAMixerMixedAirOutNodeNum = 0;
+            
         Real64 m_CoolOutAirVolFlow = 0.0;
         Real64 m_CoolOutAirMassFlow = 0.0;
         Real64 m_HeatOutAirVolFlow = 0.0;
@@ -511,7 +516,7 @@ namespace UnitarySystems {
         int HeatCoilAirOutNodeNum = 0;                          // Heating coil air outlet node number
         bool ATMixerExists = false;                             // true if AT mixer is connected to Unitary System
         HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid; // type of AT mixer, inlet-side or supply-side
-        int ATMixerOutNodeNum = 0;                                 // AT mixer outlet node number
+        int ATMixerMixedAirOutNodeNum = 0;                                 // AT mixer outlet node number
         Real64 ControlZoneMassFlowFrac = 0.0;                   // fraction of air flow to the control zone
         DesignSpecMSHP *m_CompPointerMSHP = nullptr;
         std::string Name;

@@ -319,8 +319,8 @@ namespace FuelCellElectricGenerator {
 
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NdotDilutionAir = NumArray(22);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.StackHeatLossToDilution = NumArray(23);
-                state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.DilutionInletNodeName = AlphArray(7);
-                state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.DilutionInletNodeNum =
+                state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.DilutionInNodeName = AlphArray(7);
+                state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.DilutionInNodeNum =
                     Node::GetSingleNode(state,
                                                         AlphArray(7),
                                                         ErrorsFound,

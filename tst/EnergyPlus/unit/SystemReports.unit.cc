@@ -87,7 +87,9 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
 {
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    state->dataLoopNodes->Node.allocate(2);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
 
     bool CompLoadFlag(false);
     int AirLoopNum(1);
@@ -99,13 +101,13 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 2;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumOut = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).OutNodeNum = 1;
 
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(2);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "Main Gas Humidifier";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "HUMIDIFIER:STEAM:GAS";
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumIn = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumOut = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).InNodeNum = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).OutNodeNum = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NumMeteredVars = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
@@ -114,16 +116,16 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
 
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name = "Main Gas Heating Coil";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf = "COIL:HEATING:DESUPERHEATER";
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).NodeNumIn = 2;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).NodeNumOut = 2;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).InNodeNum = 2;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).OutNodeNum = 2;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).NumMeteredVars = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).curMeterReading = 100.0;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).resource = Constant::eResource::NaturalGas;
 
-    state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
-    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
+    dln->nodes(1)->MassFlowRate = 1.0;
+    dln->nodes(2)->MassFlowRate = 1.0;
 
     state->dataSysRpts->SysLoadRepVars.allocate(1);
 
@@ -202,7 +204,9 @@ TEST_F(EnergyPlusFixture, ReportVentilationLoads_ZoneEquip)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     SystemReports::AllocateAndSetUpVentReports(*state);
     ZoneTempPredictorCorrector::InitZoneAirSetPoints(*state);
-    state->dataLoopNodes->Node.allocate(20);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 20; ++i) dln->nodes.push_back(new Node::NodeData);
 
     // Set up OA requirements for one zone
     state->dataSize->NumOARequirements = 1;
@@ -236,62 +240,63 @@ TEST_F(EnergyPlusFixture, ReportVentilationLoads_ZoneEquip)
 
     // 1: WindowAC
     int equipNum = 1;
-    int nodeNumOA = 1;
+    int oaNodeNum = 1;
+    
     state->dataZoneEquip->ZoneEquipList(1).EquipType(equipNum) = DataZoneEquipment::ZoneEquipType::WindowAirConditioner;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
     state->dataWindowAC->GetWindowACInputFlag = false;
     state->dataWindowAC->WindAC.allocate(1);
-    state->dataWindowAC->WindAC(1).OutsideAirNode = nodeNumOA;
-    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 0.1;
+    state->dataWindowAC->WindAC(1).OutsideAirInNodeNum = oaNodeNum;
+    dln->nodes(oaNodeNum)->MassFlowRate = 0.1;
 
     // 2: VRF
     ++equipNum;
-    ++nodeNumOA;
+    ++oaNodeNum;
     state->dataZoneEquip->ZoneEquipList(1).EquipType(equipNum) = DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
     state->dataHVACVarRefFlow->GetVRFInputFlag = false;
     state->dataHVACVarRefFlow->NumVRFTU = 1;
     state->dataHVACVarRefFlow->VRFTU.allocate(1);
-    state->dataHVACVarRefFlow->VRFTU(1).VRFTUOAMixerOANodeNum = nodeNumOA;
-    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 2.0;
+    state->dataHVACVarRefFlow->VRFTU(1).OAMixerOutsideAirInNodeNum = oaNodeNum;
+    dln->nodes(oaNodeNum)->MassFlowRate = 2.0;
 
     // 3: PTAC
     ++equipNum;
-    ++nodeNumOA;
+    ++oaNodeNum;
     state->dataZoneEquip->ZoneEquipList(1).EquipType(equipNum) = DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
     UnitarySystems::UnitarySys thisSys;
-    thisSys.m_OAMixerNodes[0] = nodeNumOA;
+    thisSys.m_OAMixerOutsideAirInNodeNum = oaNodeNum;
     for (int numSys = 0; numSys <= equipNum; ++numSys) {
         state->dataZoneEquip->ZoneEquipList(1).compPointer.emplace_back(&thisSys);
     }
-    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 30.0;
+    dln->nodes(oaNodeNum)->MassFlowRate = 30.0;
 
     // 4: FanCoil
     ++equipNum;
-    ++nodeNumOA;
+    ++oaNodeNum;
     state->dataZoneEquip->ZoneEquipList(1).EquipType(equipNum) = DataZoneEquipment::ZoneEquipType::FourPipeFanCoil;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
     state->dataFanCoilUnits->GetFanCoilInputFlag = false;
     state->dataFanCoilUnits->NumFanCoils = 1;
     state->dataFanCoilUnits->FanCoil.allocate(1);
-    state->dataFanCoilUnits->FanCoil(1).OutsideAirNode = nodeNumOA;
-    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 400.0;
+    state->dataFanCoilUnits->FanCoil(1).OutsideAirInNodeNum = oaNodeNum;
+    dln->nodes(oaNodeNum)->MassFlowRate = 400.0;
 
     // 5: Unit Ventilator
     ++equipNum;
-    ++nodeNumOA;
+    ++oaNodeNum;
     state->dataZoneEquip->ZoneEquipList(1).EquipType(equipNum) = DataZoneEquipment::ZoneEquipType::UnitVentilator;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
     state->dataUnitVentilators->GetUnitVentilatorInputFlag = false;
     state->dataUnitVentilators->NumOfUnitVents = 1;
     state->dataUnitVentilators->UnitVent.allocate(1);
-    state->dataUnitVentilators->UnitVent(1).OutsideAirNode = nodeNumOA;
-    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 5000.0;
+    state->dataUnitVentilators->UnitVent(1).OAMixerOutsideAirInNodeNum = oaNodeNum;
+    dln->nodes(oaNodeNum)->MassFlowRate = 5000.0;
 
     // 6: Purchased Air (Ideal Loads)
     ++equipNum;
-    ++nodeNumOA;
+    ++oaNodeNum;
     state->dataZoneEquip->ZoneEquipList(1).EquipType(equipNum) = DataZoneEquipment::ZoneEquipType::PurchasedAir;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
     state->dataPurchasedAirMgr->GetPurchAirInputFlag = false;
@@ -301,36 +306,36 @@ TEST_F(EnergyPlusFixture, ReportVentilationLoads_ZoneEquip)
 
     // 7: ERV
     ++equipNum;
-    ++nodeNumOA;
+    ++oaNodeNum;
     state->dataZoneEquip->ZoneEquipList(1).EquipType(equipNum) = DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
     state->dataHVACStandAloneERV->GetERVInputFlag = false;
     state->dataHVACStandAloneERV->NumStandAloneERVs = 1;
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = nodeNumOA;
-    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 700000.0;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInNodeNum = oaNodeNum;
+    dln->nodes(oaNodeNum)->MassFlowRate = 700000.0;
 
     // 8: Outdoor air unit
     ++equipNum;
-    ++nodeNumOA;
+    ++oaNodeNum;
     state->dataZoneEquip->ZoneEquipList(1).EquipType(equipNum) = DataZoneEquipment::ZoneEquipType::OutdoorAirUnit;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
     state->dataOutdoorAirUnit->GetOutdoorAirUnitInputFlag = false;
     state->dataOutdoorAirUnit->NumOfOAUnits = 1;
     state->dataOutdoorAirUnit->OutAirUnit.allocate(1);
-    state->dataOutdoorAirUnit->OutAirUnit(1).OutsideAirNode = nodeNumOA;
-    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 8000000.0;
+    state->dataOutdoorAirUnit->OutAirUnit(1).OutsideAirInNodeNum = oaNodeNum;
+    dln->nodes(oaNodeNum)->MassFlowRate = 8000000.0;
 
     // 9: Zone Hybrid Unitary
     ++equipNum;
-    ++nodeNumOA;
+    ++oaNodeNum;
     state->dataZoneEquip->ZoneEquipList(1).EquipType(equipNum) = DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
     state->dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     state->dataHybridUnitaryAC->NumZoneHybridEvap = 1;
     state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner.allocate(1);
-    state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1).SecondaryInletNode = nodeNumOA;
-    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 90000000.0;
+    state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1).SecAirInNodeNum = oaNodeNum;
+    dln->nodes(oaNodeNum)->MassFlowRate = 90000000.0;
 
     // Call reporting function
     state->dataSysRpts->VentReportStructureCreated = true;

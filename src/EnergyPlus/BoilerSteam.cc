@@ -340,9 +340,10 @@ namespace BoilerSteam {
             } else {
                 // need call to EMS to check node
                 bool FatalError = false; // but not really fatal yet, but should be.
-                EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, this->BoilerOutNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+
+                EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->BoilerOutNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                 dln->nodes(this->BoilerOutNodeNum)->needsSetpointChecking = false;
+
                 if (FatalError) {
                     if (!this->MissingSetPointErrDone) {
                         ShowWarningError(state, format("Missing temperature setpoint for LeavingSetpointModulated mode Boiler named {}", this->Name));

@@ -381,7 +381,7 @@ namespace SolarCollectors {
                     ShowContinueError(state, "Area of surface object will be used in all calculations.");
                 }
 
-                state.dataSolarCollectors->Collector(CollectorNum).InletNode =
+                state.dataSolarCollectors->Collector(CollectorNum).InNodeNum =
                     Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(4),
                                                         ErrorsFound,
@@ -391,7 +391,7 @@ namespace SolarCollectors {
                                                         Node::ConnType::Inlet,
                                                         Node::CompFluidStream::Primary,
                                                         Node::ObjectIsNotParent);
-                state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
+                state.dataSolarCollectors->Collector(CollectorNum).OutNodeNum =
                     Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(5),
                                                         ErrorsFound,
@@ -686,7 +686,7 @@ namespace SolarCollectors {
                     state.dataSolarCollectors->Collector(CollectorNum).VentCavIndex = VentCavIndex;
                 }
 
-                state.dataSolarCollectors->Collector(CollectorNum).InletNode =
+                state.dataSolarCollectors->Collector(CollectorNum).InNodeNum =
                     Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(6),
                                                         ErrorsFound,
@@ -696,7 +696,7 @@ namespace SolarCollectors {
                                                         Node::ConnType::Inlet,
                                                         Node::CompFluidStream::Primary,
                                                         Node::ObjectIsNotParent);
-                state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
+                state.dataSolarCollectors->Collector(CollectorNum).OutNodeNum =
                     Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(7),
                                                         ErrorsFound,
@@ -929,8 +929,10 @@ namespace SolarCollectors {
         static constexpr std::string_view RoutineName("InitSolarCollector");
         Real64 constexpr BigNumber(9999.9); // Component desired mass flow rate
 
+        auto &dln = state.dataLoopNodes;
+
         if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
-            PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNode, this->VolFlowRateMax);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->InNodeNum, this->VolFlowRateMax);
             this->InitSizing = false;
         }
 
@@ -948,7 +950,7 @@ namespace SolarCollectors {
                 this->MassFlowRateMax = BigNumber;
             }
 
-            PlantUtilities::InitComponentNodes(state, 0.0, this->MassFlowRateMax, this->InletNode, this->OutletNode);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->MassFlowRateMax, this->InNodeNum, this->OutNodeNum);
 
             this->Init = false;
 
@@ -1015,12 +1017,12 @@ namespace SolarCollectors {
             this->SetDiffRadFlag = false;
         }
 
-        this->InletTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
+        this->InletTemp = dln->nodes(this->InNodeNum)->Temp;
 
         this->MassFlowRate = this->MassFlowRateMax;
 
         // Request the mass flow rate from the plant component flow utility routine
-        PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNode, this->OutletNode, this->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InNodeNum, this->OutNodeNum, this->plantLoc);
 
         if (this->InitICS) {
 
@@ -1860,7 +1862,8 @@ namespace SolarCollectors {
         tempnom = state.dataSurface->Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * Constant::StefanBoltzmann *
                   ((TempOuterCover + Constant::Kelvin) + state.dataEnvrn->GroundTempKelvin) *
                   (pow_2(TempOuterCover + Constant::Kelvin) + pow_2(state.dataEnvrn->GroundTempKelvin));
-        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->GroundTemp);
+        tempdenom =
+            (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface]);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
             hRadCoefC2Gnd = tempnom;
@@ -1979,7 +1982,7 @@ namespace SolarCollectors {
             CondOfAir = Conductivity[Index];
             PrOfAir = Pr[Index];
             DensOfAir = Density[Index];
-        } else if (Index > NumOfPropDivisions) {
+        } else if (Index >= NumOfPropDivisions) { // 0-index, hence MaxIndex = NumOfPropDivisions - 1
             Index = NumOfPropDivisions - 1;
             VisDOfAir = Mu[Index];
             CondOfAir = Conductivity[Index];
@@ -2112,15 +2115,18 @@ namespace SolarCollectors {
 
         static constexpr std::string_view RoutineName("UpdateSolarCollector");
 
-        PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
+        auto &dln = state.dataLoopNodes;
+        auto *outNode = dln->nodes(this->OutNodeNum);
+        
+        PlantUtilities::SafeCopyPlantNode(state, this->InNodeNum, this->OutNodeNum);
         // Set outlet node variables that are possibly changed
-        state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
+        outNode->Temp = this->OutletTemp;
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                            this->OutletTemp,
                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
-        state.dataLoopNodes->Node(this->OutletNode).Enthalpy = Cp * state.dataLoopNodes->Node(this->OutletNode).Temp;
+        outNode->Enthalpy = Cp * outNode->Temp;
     }
 
     void CollectorData::report(EnergyPlusData &state)

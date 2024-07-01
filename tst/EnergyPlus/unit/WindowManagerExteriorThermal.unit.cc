@@ -228,15 +228,15 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
 
     // outside
     auto typeOfShade = aFactory.getShadeType(*state, simpleCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::NoShade));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::NoShade);
 
     state->dataMaterial->Material(materialOutside)->group = Material::Group::Shade;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::ExtShade));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::ExtShade);
 
     state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowBlind;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::ExtBlind));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::ExtBlind);
 
     // reset the outside to glass
     state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowGlass;
@@ -244,11 +244,11 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
     // inside
     state->dataMaterial->Material(materialInside)->group = Material::Group::Shade;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::IntShade));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::IntShade);
 
     state->dataMaterial->Material(materialInside)->group = Material::Group::WindowBlind;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::IntBlind));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::IntBlind);
 
     // reset the outside to glass
     state->dataMaterial->Material(materialInside)->group = Material::Group::WindowGlass;
@@ -270,11 +270,11 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
 
     state->dataMaterial->Material(materialShade)->group = Material::Group::Shade;
     typeOfShade = aFactory.getShadeType(*state, betweenCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::BGShade));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::BGShade);
 
     state->dataMaterial->Material(materialShade)->group = Material::Group::WindowBlind;
     typeOfShade = aFactory.getShadeType(*state, betweenCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::BGBlind));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::BGBlind);
 }
 
 TEST_F(EnergyPlusFixture, test_getActiveConstructionNumber)

@@ -255,8 +255,7 @@ namespace HVACUnitaryBypassVAV {
             // set outlet node SP for mixed air SP manager
             outNode->TempSetPoint = CalcSetPointTempTarget(state, CBVAVNum);
             if (changeOverByPassVAV.OutNodeSPMIndex > 0) { // update mixed air SPM if exists
-                state.dataSetPointManager->MixedAirSetPtMgr(changeOverByPassVAV.OutNodeSPMIndex)
-                    .calculate(state);                           // update mixed air SP based on new mode
+                state.dataSetPointManager->spms(changeOverByPassVAV.OutNodeSPMIndex)->calculate(state); // update mixed air SP based on new mode
                 SetPointManager::UpdateMixedAirSetPoints(state); // need to know control node to fire off just one of these, do this later
             }
         }
@@ -899,7 +898,7 @@ namespace HVACUnitaryBypassVAV {
                 } else {
                     thisCBVAV.HeatCoilAirInNodeNum = state.dataSteamCoils->SteamCoil(thisCBVAV.HeatCoilIndex).AirInNodeNum;
                     thisCBVAV.HeatCoilAirOutNodeNum = state.dataSteamCoils->SteamCoil(thisCBVAV.HeatCoilIndex).AirOutNodeNum;
-                    thisCBVAV.HeatCoilFluidControlNodeNum = state.dataSteamCoils->SteamCoil(thisCBVAV.HeatCoilIndex).FluidInNodeNum;
+                    thisCBVAV.HeatCoilFluidControlNodeNum = state.dataSteamCoils->SteamCoil(thisCBVAV.HeatCoilIndex).SteamInNodeNum;
                     thisCBVAV.MaxHeatCoilFluidFlow = state.dataSteamCoils->SteamCoil(thisCBVAV.HeatCoilIndex).MaxSteamVolFlowRate;
                     int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                     Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(
@@ -1437,11 +1436,11 @@ namespace HVACUnitaryBypassVAV {
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySys = false;
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).fanOp = cBVAV.fanOp;
             // check for set point manager on outlet node of CBVAV
-            cBVAV.OutNodeSPMIndex = SetPointManager::getSPMBasedOnNode(state,
-                                                                       cBVAV.AirOutNodeNum,
-                                                                       SetPointManager::CtrlVarType::Temp,
-                                                                       SetPointManager::SetPointManagerType::MixedAir,
-                                                                       SetPointManager::CtrlNodeType::Reference);
+            cBVAV.OutNodeSPMIndex = SetPointManager::GetSetPointManagerIndexByNode(state,
+                                                                                   cBVAV.AirOutNodeNum,
+                                                                                   HVAC::CtrlVarType::Temp,
+                                                                                   SetPointManager::SPMType::MixedAir,
+                                                                                   true); // isRefNode
             state.dataHVACUnitaryBypassVAV->MySizeFlag(CBVAVNum) = false;
         }
 
@@ -1728,9 +1727,9 @@ namespace HVACUnitaryBypassVAV {
                     } else {
                         // need call to EMS to check node
                         bool EMSSetPointCheck = false;
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, cBVAV.AirOutNodeNum, EMSManager::SPControlType::HumidityRatioMaxSetPoint, EMSSetPointCheck);
-                        state.dataLoopNodes->nodes(cBVAV.AirOutNodeNum)->needsSetpointChecking = false;
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, cBVAV.AirOutNodeNum, HVAC::CtrlVarType::MaxHumRat, EMSSetPointCheck);
+                        dln->nodes(cBVAV.AirOutNodeNum)->needsSetpointChecking = false;
+
                         if (EMSSetPointCheck) {
                             // There is no plugin anyways, so we now we have a bad condition.
                             ShowWarningError(state, format("Unitary System:VAV:ChangeOverBypass = {}", cBVAV.Name));

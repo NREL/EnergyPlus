@@ -78,9 +78,9 @@ namespace HVACDXHeatPumpSystem {
         int HeatPumpCoilType_Num;
         std::string HeatPumpCoilName;
         int HeatPumpCoilIndex;
-        int DXHeatPumpCoilInletNodeNum;
-        int DXHeatPumpCoilOutletNodeNum;
-        int DXSystemControlNodeNum; // the node number of the node with the set point
+        int DXHeatPumpCoilInNodeNum = 0;
+        int DXHeatPumpCoilOutNodeNum = 0;
+        int DXSystemControlNodeNum = 0; // the node number of the node with the set point
         Real64 DesiredOutletTemp;   // the temperature at the unit outlet node needed
         // to meet the supply air set point.
         Real64 PartLoadFrac;                      // part load fraction for current time step (single speed)
@@ -103,8 +103,8 @@ namespace HVACDXHeatPumpSystem {
 
         // Default Constructor
         DXHeatPumpSystemStruct()
-            : SchedPtr(0), HeatPumpCoilType_Num(0), HeatPumpCoilIndex(0), DXHeatPumpCoilInletNodeNum(0), DXHeatPumpCoilOutletNodeNum(0),
-              DXSystemControlNodeNum(0), DesiredOutletTemp(0.0), PartLoadFrac(0.0), SpeedRatio(0.0), CycRatio(0.0), DXCoilSensPLRIter(0),
+            : SchedPtr(0), HeatPumpCoilType_Num(0), HeatPumpCoilIndex(0), 
+              DesiredOutletTemp(0.0), PartLoadFrac(0.0), SpeedRatio(0.0), CycRatio(0.0), DXCoilSensPLRIter(0),
               DXCoilSensPLRIterIndex(0), DXCoilSensPLRFail(0), DXCoilSensPLRFailIndex(0), OAUnitSetTemp(0.0), SpeedNum(0), FaultyCoilSATFlag(false),
               FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0)
         {

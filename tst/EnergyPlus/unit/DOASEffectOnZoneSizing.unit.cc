@@ -70,7 +70,6 @@
 
 using namespace EnergyPlus;
 using namespace ZoneEquipmentManager;
-using namespace DataLoopNode;
 using namespace DataSizing;
 using namespace DataZoneEquipment;
 using namespace DataEnvironment;
@@ -139,8 +138,9 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
 
 TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
 {
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 10; ++i) dln->nodes.push_back(new Node::NodeData);
 
-    state->dataLoopNodes->Node.allocate(10);
     state->dataSize->ZoneEqSizing.allocate(2);
     state->dataHeatBal->Zone.allocate(2);
     state->dataSize->CalcZoneSizing.allocate(1, 2);
@@ -155,10 +155,10 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(2);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(2);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(2);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNodeNums.allocate(1);
     state->dataHeatBalFanSys->ZoneMassBalanceFlag.allocate(2);
     state->dataGlobal->NumOfZones = 2;
     state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
@@ -196,20 +196,20 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataZoneEnergyDemand->DeadBandOrSetback(2) = false;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(2) = false;
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
-    state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 9;
-    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 4;
-    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 9;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum = 4;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneNodeNum = 9;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNum = 4;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNum = 9;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(2) = 7;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
-    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1) = 8;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InNodeNums(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).InNodeNums(2) = 7;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNodeNums(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNodeNums(1) = 8;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASHighSetpoint = 14.4;
@@ -224,10 +224,11 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASControlStrategy = DataSizing::DOASControl::CoolSup;
     state->dataEnvrn->OutDryBulbTemp = 28.;
     state->dataEnvrn->OutHumRat = 0.017;
-    state->dataLoopNodes->Node(4).Temp = 22;
-    state->dataLoopNodes->Node(4).HumRat = 0.008;
-    state->dataLoopNodes->Node(9).Temp = 22.5;
-    state->dataLoopNodes->Node(9).HumRat = 0.0085;
+
+    dln->nodes(4)->Temp = 22;
+    dln->nodes(4)->HumRat = 0.008;
+    dln->nodes(9)->Temp = 22.5;
+    dln->nodes(9)->HumRat = 0.0085;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).ZnCoolDgnSAMethod = 1;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).ZnCoolDgnSAMethod = 2;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).ZnHeatDgnSAMethod = 1;
@@ -249,30 +250,31 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
     state->dataHeatBalFanSys->ZoneMassBalanceFlag(1) = false;
     state->dataHeatBalFanSys->ZoneMassBalanceFlag(2) = false;
-    state->dataLoopNodes->Node(1).MassFlowRateMin = 0.0;
-    state->dataLoopNodes->Node(1).MassFlowRateMinAvail = 0.0;
-    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 0.0;
-    state->dataLoopNodes->Node(1).MassFlowRateMax = 0.0;
-    state->dataLoopNodes->Node(2).MassFlowRateMin = 0.0;
-    state->dataLoopNodes->Node(2).MassFlowRateMinAvail = 0.0;
-    state->dataLoopNodes->Node(2).MassFlowRateMaxAvail = 0.0;
-    state->dataLoopNodes->Node(2).MassFlowRateMax = 0.0;
-    state->dataLoopNodes->Node(3).MassFlowRateMin = 0.0;
-    state->dataLoopNodes->Node(3).MassFlowRateMinAvail = 0.0;
-    state->dataLoopNodes->Node(3).MassFlowRateMaxAvail = 0.0;
-    state->dataLoopNodes->Node(3).MassFlowRateMax = 0.0;
-    state->dataLoopNodes->Node(6).MassFlowRateMin = 0.0;
-    state->dataLoopNodes->Node(6).MassFlowRateMinAvail = 0.0;
-    state->dataLoopNodes->Node(6).MassFlowRateMaxAvail = 0.0;
-    state->dataLoopNodes->Node(6).MassFlowRateMax = 0.0;
-    state->dataLoopNodes->Node(7).MassFlowRateMin = 0.0;
-    state->dataLoopNodes->Node(7).MassFlowRateMinAvail = 0.0;
-    state->dataLoopNodes->Node(7).MassFlowRateMaxAvail = 0.0;
-    state->dataLoopNodes->Node(7).MassFlowRateMax = 0.0;
-    state->dataLoopNodes->Node(8).MassFlowRateMin = 0.0;
-    state->dataLoopNodes->Node(8).MassFlowRateMinAvail = 0.0;
-    state->dataLoopNodes->Node(8).MassFlowRateMaxAvail = 0.0;
-    state->dataLoopNodes->Node(8).MassFlowRateMax = 0.0;
+
+    dln->nodes(1)->MassFlowRateMin = 0.0;
+    dln->nodes(1)->MassFlowRateMinAvail = 0.0;
+    dln->nodes(1)->MassFlowRateMaxAvail = 0.0;
+    dln->nodes(1)->MassFlowRateMax = 0.0;
+    dln->nodes(2)->MassFlowRateMin = 0.0;
+    dln->nodes(2)->MassFlowRateMinAvail = 0.0;
+    dln->nodes(2)->MassFlowRateMaxAvail = 0.0;
+    dln->nodes(2)->MassFlowRateMax = 0.0;
+    dln->nodes(3)->MassFlowRateMin = 0.0;
+    dln->nodes(3)->MassFlowRateMinAvail = 0.0;
+    dln->nodes(3)->MassFlowRateMaxAvail = 0.0;
+    dln->nodes(3)->MassFlowRateMax = 0.0;
+    dln->nodes(6)->MassFlowRateMin = 0.0;
+    dln->nodes(6)->MassFlowRateMinAvail = 0.0;
+    dln->nodes(6)->MassFlowRateMaxAvail = 0.0;
+    dln->nodes(6)->MassFlowRateMax = 0.0;
+    dln->nodes(7)->MassFlowRateMin = 0.0;
+    dln->nodes(7)->MassFlowRateMinAvail = 0.0;
+    dln->nodes(7)->MassFlowRateMaxAvail = 0.0;
+    dln->nodes(7)->MassFlowRateMax = 0.0;
+    dln->nodes(8)->MassFlowRateMin = 0.0;
+    dln->nodes(8)->MassFlowRateMinAvail = 0.0;
+    dln->nodes(8)->MassFlowRateMaxAvail = 0.0;
+    dln->nodes(8)->MassFlowRateMax = 0.0;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = 0.0;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
     state->dataZoneEquip->ZoneEquipConfig(1).PlenumMassFlow = 0.0;

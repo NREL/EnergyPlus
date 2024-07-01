@@ -1373,7 +1373,8 @@ namespace HeatRecovery {
                             ShowFatalError(state, " Previous condition causes program termination.");
                         } else {
                             // need call to EMS to check node
-                            CheckIfNodeSetPointManagedByEMS(state, this->SupAirOutNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->SupAirOutNodeNum, HVAC::CtrlVarType::Temp, FatalError);
+
                             if (FatalError) {
                                 ShowSevereError(
                                     state, format("Missing temperature setpoint for {} \"{}\" :", HVAC::hxTypeNames[(int)this->type], this->Name));
@@ -1460,9 +1461,9 @@ namespace HeatRecovery {
                             } else {
                                 bool LocalWarningError = false;
                                 // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(
-                                    state, this->SecAirOutNodeNum, EMSManager::SPControlType::HumidityRatioMaxSetPoint, LocalWarningError);
+                                EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->SecAirOutNodeNum, HVAC::CtrlVarType::MaxHumRat, LocalWarningError);
                                 dln->nodes(this->SecAirOutNodeNum)->needsSetpointChecking = false;
+
                                 if (LocalWarningError) {
                                     ShowWarningError(
                                         state,

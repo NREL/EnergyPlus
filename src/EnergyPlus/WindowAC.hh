@@ -77,11 +77,11 @@ namespace WindowAC {
         Real64 MaxAirMassFlow; // kg/s
         Real64 OutAirVolFlow;  // m3/s
         Real64 OutAirMassFlow; // kg/s
-        int AirInNode;         // inlet air node number
-        int AirOutNode;        // outlet air node number
-        int OutsideAirNode;    // outside air node number
-        int AirReliefNode;     // relief air node number
-        int MixedAirNode;      // Mixed Air Node number
+        int AirInNodeNum = 0;         // inlet air node number
+        int AirOutNodeNum = 0;        // outlet air node number
+        int OutsideAirInNodeNum = 0;    // outside air node number
+        int ReliefAirOutNodeNum = 0;     // relief air node number
+        int MixedAirOutNodeNum = 0;      // Mixed Air Node number
         std::string OAMixName; // name of outdoor air mixer
         std::string OAMixType; // type of outdoor air mixer
         int OAMixIndex;
@@ -94,7 +94,7 @@ namespace WindowAC {
         int DXCoilType_Num;                       // Numeric Equivalent for DXCoil Type
         int DXCoilIndex;                          // Index to DX cooling coil
         int DXCoilNumOfSpeeds;                    // number of speed levels for variable speed DX coil
-        int CoilOutletNodeNum;                    // Outlet node number of DX cooling coil
+        int CoilOutNodeNum = 0;                    // Outlet node number of DX cooling coil
         HVAC::FanOp fanOp = HVAC::FanOp::Invalid; // mode of operation; 1=cycling fan, cycling compressor,
         // 2=continuous fan, cycling compresor
         HVAC::FanPlace fanPlace; // fan placement; 1=blow through, 2=draw through
@@ -125,8 +125,8 @@ namespace WindowAC {
         // Default Constructor
         WindACData()
             : UnitType(0), SchedPtr(0), FanSchedPtr(0), FanAvailSchedPtr(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OutAirVolFlow(0.0),
-              OutAirMassFlow(0.0), AirInNode(0), AirOutNode(0), OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0),
-              fanType(HVAC::FanType::Invalid), FanIndex(0), DXCoilType_Num(0), DXCoilIndex(0), DXCoilNumOfSpeeds(0), CoilOutletNodeNum(0),
+              OutAirMassFlow(0.0), OAMixIndex(0),
+              fanType(HVAC::FanType::Invalid), FanIndex(0), DXCoilType_Num(0), DXCoilIndex(0), DXCoilNumOfSpeeds(0), 
               fanPlace(HVAC::FanPlace::Invalid), MaxIterIndex1(0), MaxIterIndex2(0), ConvergenceTol(0.0), PartLoadFrac(0.0),
               EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensCoolEnergyRate(0.0),
               SensCoolEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0),

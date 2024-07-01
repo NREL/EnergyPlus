@@ -86,9 +86,11 @@ TEST_F(EnergyPlusFixture, ExerciseBaseboardElectric)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
-    state->dataLoopNodes->Node.allocate(1);
-    state->dataLoopNodes->Node(1).Temp = 25.0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNodeNum = 1;
+
+    auto &dln = state->dataLoopNodes;
+    dln->nodes.push_back(new Node::NodeData);
+    dln->nodes(1)->Temp = 25.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 100;
 

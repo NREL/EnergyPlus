@@ -4446,7 +4446,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate = 1.23;
     state->afn->AirflowNetworkLinkageData(17).AirLoopNum = 1;
-    state->dataLoopNodes->Node(4).MassFlowRate = 1.23;
+
+    auto &dln = state->dataLoopNodes;
+    
+    dln->nodes(4)->MassFlowRate = 1.23;
 
     state->afn->calculate_balance();
     // Fan:SystemModel

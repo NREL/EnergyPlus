@@ -109,7 +109,7 @@ std::shared_ptr<SiteFCFactorMethodGroundTemps> SiteFCFactorMethodGroundTemps::FC
             thisModel->fcFactorGroundTemps(i) = state.dataIPShortCut->rNumericArgs(i);
         }
 
-        state.dataEnvrn->FCGroundTemps = true;
+        state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::FCFactorMethod] = true;
         found = true;
 
     } else if (numCurrObjects > 1) {
@@ -124,7 +124,7 @@ std::shared_ptr<SiteFCFactorMethodGroundTemps> SiteFCFactorMethodGroundTemps::FC
             thisModel->fcFactorGroundTemps(i) = state.dataWeather->GroundTempsFCFromEPWHeader(i);
         }
 
-        state.dataEnvrn->FCGroundTemps = true;
+        state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::FCFactorMethod] = true;
         found = true;
 
     } else {
@@ -133,7 +133,7 @@ std::shared_ptr<SiteFCFactorMethodGroundTemps> SiteFCFactorMethodGroundTemps::FC
     }
 
     // Write Final Ground Temp Information to the initialization output file
-    if (state.dataEnvrn->FCGroundTemps) {
+    if (state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::FCFactorMethod]) {
         write_ground_temps(state.files.eio, "FCfactorMethod", thisModel->fcFactorGroundTemps);
     }
 

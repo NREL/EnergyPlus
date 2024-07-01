@@ -1327,19 +1327,19 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                     if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp) !=
                         state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName)
                         continue;
-                    if (AirPathNodeName != dln->nodes(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutNodeNum)->Name) {
+                    if (AirPathNodeName != dln->nodes(state.dataZonePlenum->ZoneRetPlenCond(Count2).AirOutNodeNum)->Name) {
                         ShowSevereError(state, format("Error in Return Air Path={}", state.dataZoneEquip->ReturnAirPath(BCount).Name));
                         ShowContinueError(
                             state, format("For AirLoopHVAC:ReturnPlenum={}", state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp)));
                         ShowContinueError(state, format("Expected outlet node (return air path)={}", AirPathNodeName));
                         ShowContinueError(state,
                                           format("Encountered node name (zone return plenum)={}",
-                                                 dln->nodes(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutNodeNum)->Name));
+                                                 dln->nodes(state.dataZonePlenum->ZoneRetPlenCond(Count2).AirOutNodeNum)->Name));
                         ErrFound = true;
                         ++NumErr;
                     } else {
                         ++CountNodes;
-                        AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).OutNodeNum;
+                        AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).AirOutNodeNum;
                         for (int Loop = 1; Loop <= state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInNodes; ++Loop) {
                             ++CountNodes;
                             AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).InNodeNums(Loop);
@@ -1355,7 +1355,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                               state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp),
                               state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp),
                               dln->nodes(state.dataZonePlenum->ZoneRetPlenCond(Count2).InNodeNums(Count1))->Name,
-                              dln->nodes(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutNodeNum)->Name,
+                              dln->nodes(state.dataZonePlenum->ZoneRetPlenCond(Count2).AirOutNodeNum)->Name,
                               PrimaryAirLoopName);
                     }
                 }

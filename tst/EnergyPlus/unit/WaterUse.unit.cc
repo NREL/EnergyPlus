@@ -440,7 +440,8 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     state->dataEnvrn->WaterMainsTemp = 15;
 
     // Set plant loop temperature to 10C, below hot water temperature to trigger warning
-    state->dataLoopNodes->Node(1).Temp = 10;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(1)->Temp = 10;
     Real64 WaterEquipNum = 1;
     auto &thisWaterConnections = state->dataWaterUse->WaterConnections(WaterConnNum);
     auto &thisWaterEquipment = state->dataWaterUse->WaterEquipment(WaterEquipNum);
@@ -467,7 +468,7 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     EXPECT_NEAR(thisWaterEquipment.ColdMassFlowRate + thisWaterEquipment.HotMassFlowRate, thisWaterEquipment.TotalMassFlowRate, 0.00000001);
 
     // Reset hot water temperature to 43.3C
-    state->dataLoopNodes->Node(1).Temp = 43.3;
+    dln->nodes(1)->Temp = 43.3;
     thisWaterConnections.InitConnections(*state);
 
     // Set target temperature to 50C, above hot water temperature to trigger warning
@@ -877,7 +878,8 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test1)
     state->dataEnvrn->WaterMainsTemp = 15;
 
     // Set plant loop temperature to 45C
-    state->dataLoopNodes->Node(1).Temp = 45;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(1)->Temp = 45;
     Real64 WaterEquipNum = 1;
     auto &thisWaterConnections = state->dataWaterUse->WaterConnections(WaterConnNum);
     auto &thisWaterEquipment = state->dataWaterUse->WaterEquipment(WaterEquipNum);

@@ -88,9 +88,9 @@ TEST_F(EnergyPlusFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     thisEFC.OneTimeFlagForEachEvapFluidCooler = false;
     thisEFC.MyEnvrnFlag = false;
     state->dataGlobal->BeginEnvrnFlag = true;
-    thisEFC.WaterInletNodeNum = 1;
-    thisEFC.WaterOutletNodeNum = 2;
-    thisEFC.OutdoorAirInletNodeNum = 0;
+    thisEFC.WaterInNodeNum = 1;
+    thisEFC.WaterOutNodeNum = 2;
+    thisEFC.OutdoorAirInNodeNum = 0;
     thisEFC.plantLoc.loopNum = 1;
     thisEFC.plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
     thisEFC.plantLoc.branchNum = 1;
@@ -100,14 +100,19 @@ TEST_F(EnergyPlusFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     state->dataEnvrn->OutHumRat = 0.02;
     state->dataEnvrn->OutBaroPress = 101325.;
     state->dataEnvrn->OutWetBulbTemp = 8.0;
-    state->dataLoopNodes->Node.allocate(2);
-    state->dataLoopNodes->Node(thisEFC.WaterInletNodeNum).Temp = 20.0;
-    state->dataLoopNodes->Node(1).Temp = 23.0;
-    state->dataLoopNodes->Node(1).MassFlowRateRequest = 0.05;
-    state->dataLoopNodes->Node(1).MassFlowRateMinAvail = 0.0;
-    state->dataLoopNodes->Node(1).MassFlowRateMin = 0.0;
-    state->dataLoopNodes->Node(1).MassFlowRateMax = 0.05;
-    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 0.05;
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
+
+    dln->nodes(thisEFC.WaterInNodeNum)->Temp = 20.0;
+    dln->nodes(1)->Temp = 23.0;
+    dln->nodes(1)->MassFlowRateRequest = 0.05;
+    dln->nodes(1)->MassFlowRateMinAvail = 0.0;
+    dln->nodes(1)->MassFlowRateMin = 0.0;
+    dln->nodes(1)->MassFlowRateMax = 0.05;
+    dln->nodes(1)->MassFlowRateMaxAvail = 0.05;
+
+    
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Locked;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
@@ -190,8 +195,8 @@ TEST_F(EnergyPlusFixture, ExerciseSingleSpeedEvapFluidCooler)
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).TempSetPoint = 2.0;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).MyLoad = 1000;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).ON = true;
-    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = ptr->WaterInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = ptr->WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = ptr->WaterInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = ptr->WaterOutNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = ptr->Name;
@@ -199,11 +204,12 @@ TEST_F(EnergyPlusFixture, ExerciseSingleSpeedEvapFluidCooler)
     state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 3;
     state->dataSize->CurLoopNum = 1;
 
-    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMaxAvail = 5;
-    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMax = 5;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).Temp = 20;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMaxAvail = 5;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMax = 5;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(ptr->WaterOutNodeNum)->MassFlowRateMaxAvail = 5;
+    dln->nodes(ptr->WaterOutNodeNum)->MassFlowRateMax = 5;
+    dln->nodes(ptr->WaterInNodeNum)->Temp = 20;
+    dln->nodes(ptr->WaterInNodeNum)->MassFlowRateMaxAvail = 5;
+    dln->nodes(ptr->WaterInNodeNum)->MassFlowRateMax = 5;
 
     bool firstHVAC = true;
     Real64 curLoad = 0.0;
@@ -274,8 +280,8 @@ TEST_F(EnergyPlusFixture, ExerciseTwoSpeedEvapFluidCooler)
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).TempSetPoint = 2.0;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).MyLoad = 1000;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).ON = true;
-    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = ptr->WaterInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = ptr->WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = ptr->WaterInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = ptr->WaterOutNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
         DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd;
     state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = ptr->Name;
@@ -287,11 +293,12 @@ TEST_F(EnergyPlusFixture, ExerciseTwoSpeedEvapFluidCooler)
     state->dataSize->PlantSizData.allocate(1);
     state->dataSize->PlantSizData(1).ExitTemp = 35;
 
-    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMaxAvail = 5;
-    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMax = 5;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).Temp = 20;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMaxAvail = 5;
-    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMax = 5;
+    auto &dln = state->dataLoopNodes;
+    dln->nodes(ptr->WaterOutNodeNum)->MassFlowRateMaxAvail = 5;
+    dln->nodes(ptr->WaterOutNodeNum)->MassFlowRateMax = 5;
+    dln->nodes(ptr->WaterInNodeNum)->Temp = 20;
+    dln->nodes(ptr->WaterInNodeNum)->MassFlowRateMaxAvail = 5;
+    dln->nodes(ptr->WaterInNodeNum)->MassFlowRateMax = 5;
 
     bool firstHVAC = true;
     Real64 curLoad = 0.0;

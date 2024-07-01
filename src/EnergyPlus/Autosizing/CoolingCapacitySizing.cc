@@ -301,7 +301,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         }
                         this->dataFanType = state.dataFans->fans(thisAirloopDOAS.m_FanIndex)->type;
                         this->dataFanIndex = thisAirloopDOAS.m_FanIndex;
-                        Real64 const CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->nodes(thisAirloopDOAS.m_FanInletNodeNum)->HumRat);
+                        Real64 const CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->nodes(thisAirloopDOAS.m_FanInNodeNum)->HumRat);
                         Real64 const DeltaT = FanCoolLoad / (thisAirloopDOAS.SizingMassFlow * CpAir);
                         if (thisAirloopDOAS.FanBeforeCoolingCoilFlag) {
                             CoilInTemp += DeltaT;

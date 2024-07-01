@@ -68,6 +68,7 @@ namespace DataPlant {
         Num
     };
 
+    // This needs to go, it's not helping
     struct HalfLoopContainer : std::array<HalfLoopData, static_cast<int>(DataPlant::LoopSideLocation::Num)>
     {
         HalfLoopData &operator()(LoopSideLocation ls)
@@ -137,10 +138,10 @@ namespace DataPlant {
         Real64 DemandNotDispatched; // Plant Loop Demand that was not distributed [W]
         Real64 UnmetDemand;         // Plant Loop Unmet Demand [W]
         Real64 BypassFrac;
-        Real64 InletNodeFlowrate;
-        Real64 InletNodeTemperature;
-        Real64 OutletNodeFlowrate;
-        Real64 OutletNodeTemperature;
+        Real64 InNodeFlowrate = 0.0;
+        Real64 InNodeTemperature = 0.0;
+        Real64 OutNodeFlowrate = 0.0;
+        Real64 OutNodeTemperature = 0.0;
         int LastLoopSideSimulated;
 
         // Default Constructor
@@ -154,8 +155,8 @@ namespace DataPlant {
               EconPlacement(0), EconBranch(0), EconComp(0), EconControlTempDiff(0.0),
               LoopHasConnectionComp(false), TypeOfLoop(LoopType::Invalid), PressureSimType(DataPlant::PressSimType::NoPressure),
               HasPressureComponents(false), PressureDrop(0.0), UsePressureForPumpCalcs(false), PressureEffectiveK(0.0), CoolingDemand(0.0),
-              HeatingDemand(0.0), DemandNotDispatched(0.0), UnmetDemand(0.0), BypassFrac(0.0), InletNodeFlowrate(0.0), InletNodeTemperature(0.0),
-              OutletNodeFlowrate(0.0), OutletNodeTemperature(0.0), LastLoopSideSimulated(0)
+              HeatingDemand(0.0), DemandNotDispatched(0.0), UnmetDemand(0.0), BypassFrac(0.0), 
+              LastLoopSideSimulated(0)
         {
         }
 

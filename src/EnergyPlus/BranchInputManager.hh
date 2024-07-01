@@ -95,10 +95,10 @@ namespace BranchInputManager {
         std::string CType;          // Component Type (Cannot be SPLITTER or MIXER)
         std::string Name;           // Component Name
         int CtrlType = 0;           // Active, Passive, Bypass (1,2,3)
-        std::string InletNodeName;  // Inlet Node ID
-        int InletNode = 0;          // Inlet Node Number
-        std::string OutletNodeName; // Outlet Node ID
-        int OutletNode = 0;         // Outlet Node Number
+        std::string InNodeName;  // Inlet Node ID
+        int InNodeNum = 0;          // Inlet Node Number
+        std::string OutNodeName; // Outlet Node ID
+        int OutNodeNum = 0;         // Outlet Node Number
     };
 
     struct BranchData

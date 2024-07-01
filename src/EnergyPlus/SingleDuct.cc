@@ -105,7 +105,6 @@ namespace EnergyPlus::SingleDuct {
 // simulate single duct systems as a single driver or inter-connecting controllers.
 
 // Using/Aliasing
-using namespace DataLoopNode;
 using BranchNodeConnections::SetUpCompSets;
 using BranchNodeConnections::TestCompSet;
 using HVAC::SmallAirVolFlow;
@@ -268,6 +267,8 @@ void GetSysInput(EnergyPlusData &state)
     std::string AirTermSysInletNodeName;  // air terminal single duct system inlet node name
     std::string AirTermSysOutletNodeName; // air terminal single duct system outlet node name
 
+    auto &dln = state.dataLoopNodes;
+    
     state.dataSingleDuct->NumVAVSysGSI = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:Reheat");
     state.dataSingleDuct->NumNoRHVAVSysGSI =
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:NoReheat");
@@ -425,7 +426,7 @@ void GetSysInput(EnergyPlusData &state)
         // For node connections, this object is both a parent and a non-parent, because the
         // VAV damper is not called out as a separate component, its nodes must be connected
         // as ObjectIsNotParent.  But for the reheat coil, the nodes are connected as ObjectIsParent
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum =
             GetSingleNode(state,
                               Alphas(3),
                               ErrorsFound,
@@ -434,9 +435,9 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Outlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsNotParent,
+                          Node::ObjectIsNotParent,
                               cAlphaFields(3));
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum =
             GetSingleNode(state,
                               Alphas(4),
                               ErrorsFound,
@@ -445,7 +446,7 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Inlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsNotParent,
+                          Node::ObjectIsNotParent,
                               cAlphaFields(4));
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRate = Numbers(1);
 
@@ -528,7 +529,7 @@ void GetSysInput(EnergyPlusData &state)
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num != HeatingCoilType::Electric) {
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 IsNotOK = false;
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNodeNum =
                     GetCoilSteamInletNode(state,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -542,7 +543,7 @@ void GetSysInput(EnergyPlusData &state)
                 }
             } else {
                 IsNotOK = false;
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNodeNum =
                     GetCoilWaterInletNode(state,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -556,7 +557,7 @@ void GetSysInput(EnergyPlusData &state)
                 }
             }
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum =
             GetSingleNode(state,
                               Alphas(9),
                               ErrorsFound,
@@ -565,7 +566,7 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Outlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsParent,
+                          Node::ObjectIsParent,
                               cAlphaFields(9));
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxReheatSteamVolFlow = Numbers(4);
@@ -598,15 +599,15 @@ void GetSysInput(EnergyPlusData &state)
         TestCompSet(state,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName,
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum),
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode),
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum)->Name,
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name,
                     "Air Nodes");
 
         for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
-                state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
-                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
+            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum ==
+                state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
+                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum =
+                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum = ADUNum;
                 break;
             }
@@ -621,22 +622,22 @@ void GetSysInput(EnergyPlusData &state)
             ShowContinueError(
                 state,
                 format("...should have outlet node = {}",
-                       state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode)));
+                       dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name));
             ErrorsFound = true;
         } else {
 
             // Fill the Zone Equipment data with the inlet node number of this unit.
             for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
+                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum ==
+                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum > 0) {
                             ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                             ShowContinueError(state,
                                               format("{} already connects to another zone",
-                                                     state.dataLoopNodes->NodeID(
-                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode)));
+                                                     dln->nodes(
+                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name));
                             ShowContinueError(state,
                                               format("Occurs for terminal unit {} = {}",
                                                      state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
@@ -644,10 +645,10 @@ void GetSysInput(EnergyPlusData &state)
                             ShowContinueError(state, "Check terminal unit node names for errors");
                             ErrorsFound = true;
                         } else {
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .TermUnitSizingNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
@@ -655,7 +656,7 @@ void GetSysInput(EnergyPlusData &state)
                         }
 
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
+                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeNum = SupAirIn;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
                             state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
                             state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
@@ -843,7 +844,7 @@ void GetSysInput(EnergyPlusData &state)
         // For node connections, this object is both a parent and a non-parent, because the
         // VAV damper is not called out as a separate component, its nodes must be connected
         // as ObjectIsNotParent.  But for the reheat coil, the nodes are connected as ObjectIsParent
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum =
             GetSingleNode(state,
                               Alphas(3),
                               ErrorsFound,
@@ -852,9 +853,9 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Outlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsNotParent,
+                          Node::ObjectIsNotParent,
                               cAlphaFields(3));
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum =
             GetSingleNode(state,
                               Alphas(4),
                               ErrorsFound,
@@ -863,7 +864,7 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Inlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsNotParent,
+                          Node::ObjectIsNotParent,
                               cAlphaFields(4));
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRate = Numbers(1);
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracDes = Numbers(2);
@@ -891,7 +892,7 @@ void GetSysInput(EnergyPlusData &state)
         } else {
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 IsNotOK = false;
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNodeNum =
                     GetCoilSteamInletNode(state,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -905,7 +906,7 @@ void GetSysInput(EnergyPlusData &state)
                 }
             } else {
                 IsNotOK = false;
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNodeNum =
                     GetCoilWaterInletNode(state,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -920,7 +921,7 @@ void GetSysInput(EnergyPlusData &state)
             }
             //  END IF
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum =
             GetSingleNode(state,
                               Alphas(7),
                               ErrorsFound,
@@ -929,7 +930,7 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Outlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsParent,
+                          Node::ObjectIsParent,
                               cAlphaFields(7));
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxReheatSteamVolFlow = Numbers(3);
@@ -950,15 +951,15 @@ void GetSysInput(EnergyPlusData &state)
         TestCompSet(state,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName,
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum),
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode),
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum)->Name,
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name,
                     "Air Nodes");
 
         for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
-                state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
-                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
+            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum ==
+                state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
+                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum =
+                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum = ADUNum;
                 break;
             }
@@ -973,22 +974,22 @@ void GetSysInput(EnergyPlusData &state)
             ShowContinueError(
                 state,
                 format("...should have outlet node = {}",
-                       state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode)));
+                       dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name));
             ErrorsFound = true;
         } else {
 
             // Fill the Zone Equipment data with the inlet node number of this unit
             for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
+                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum ==
+                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum > 0) {
                             ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                             ShowContinueError(state,
                                               format("{} already connects to another zone",
-                                                     state.dataLoopNodes->NodeID(
-                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode)));
+                                                     dln->nodes(
+                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name));
                             ShowContinueError(state,
                                               format("Occurs for terminal unit {} = {}",
                                                      state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
@@ -996,17 +997,17 @@ void GetSysInput(EnergyPlusData &state)
                             ShowContinueError(state, "Check terminal unit node names for errors");
                             ErrorsFound = true;
                         } else {
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .TermUnitSizingNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .ZoneEqNum = CtrlZone;
                         }
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
+                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeNum = SupAirIn;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
                             state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
                             state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
@@ -1143,7 +1144,7 @@ void GetSysInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum =
             GetSingleNode(state,
                               Alphas(3),
                               ErrorsFound,
@@ -1152,9 +1153,9 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Outlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsParent,
+                          Node::ObjectIsParent,
                               cAlphaFields(3));
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum =
             GetSingleNode(state,
                               Alphas(4),
                               ErrorsFound,
@@ -1163,7 +1164,7 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Inlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsParent,
+                          Node::ObjectIsParent,
                               cAlphaFields(4));
         // The reheat coil control node is necessary for hot water reheat, but not necessary for
         // electric or gas reheat.
@@ -1172,7 +1173,7 @@ void GetSysInput(EnergyPlusData &state)
         } else {
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 IsNotOK = false;
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNodeNum =
                     GetCoilSteamInletNode(state,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -1186,7 +1187,7 @@ void GetSysInput(EnergyPlusData &state)
                 }
             } else {
                 IsNotOK = false;
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNodeNum =
                     GetCoilWaterInletNode(state,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -1200,8 +1201,8 @@ void GetSysInput(EnergyPlusData &state)
                 }
             }
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum =
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRate = Numbers(1);
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracDes = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracMethod = MinFlowFraction::MinFracNotUsed;
@@ -1232,15 +1233,15 @@ void GetSysInput(EnergyPlusData &state)
         TestCompSet(state,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName,
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum),
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum),
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum)->Name,
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum)->Name,
                     "Air Nodes");
 
         for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
-                state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
-                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
+            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum ==
+                state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
+                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum =
+                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum = ADUNum;
                 break;
             }
@@ -1255,22 +1256,22 @@ void GetSysInput(EnergyPlusData &state)
             ShowContinueError(
                 state,
                 format("...should have outlet node = {}",
-                       state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode)));
+                       dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name));
             ErrorsFound = true;
         } else {
 
             // Fill the Zone Equipment data with the inlet node number of this unit.
             for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum ==
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
+                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum ==
+                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum > 0) {
                             ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                             ShowContinueError(state,
                                               format("{} already connects to another zone",
-                                                     state.dataLoopNodes->NodeID(
-                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum)));
+                                                     dln->nodes(
+                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum)->Name));
                             ShowContinueError(state,
                                               format("Occurs for terminal unit {} = {}",
                                                      state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
@@ -1278,17 +1279,17 @@ void GetSysInput(EnergyPlusData &state)
                             ShowContinueError(state, "Check terminal unit node names for errors");
                             ErrorsFound = true;
                         } else {
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .TermUnitSizingNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .ZoneEqNum = CtrlZone;
                         }
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
+                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeNum = SupAirIn;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
                             state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
                             state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
@@ -1363,7 +1364,7 @@ void GetSysInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum =
             GetSingleNode(state,
                               Alphas(3),
                               ErrorsFound,
@@ -1372,9 +1373,9 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Inlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsNotParent,
+                          Node::ObjectIsNotParent,
                               cAlphaFields(3));
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum =
             GetSingleNode(state,
                               Alphas(4),
                               ErrorsFound,
@@ -1383,7 +1384,7 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Outlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsNotParent,
+                          Node::ObjectIsNotParent,
                               cAlphaFields(4));
 
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRate = Numbers(1);
@@ -1391,9 +1392,9 @@ void GetSysInput(EnergyPlusData &state)
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracMethod = MinFlowFraction::MinFracNotUsed;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingNotUsed;
 
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode = 0;
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNodeNum = 0;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum =
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxReheatWaterVolFlow = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxReheatSteamVolFlow = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MinReheatWaterVolFlow = 0.0;
@@ -1404,15 +1405,15 @@ void GetSysInput(EnergyPlusData &state)
         TestCompSet(state,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName,
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum),
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum),
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum)->Name,
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum)->Name,
                     "Air Nodes");
 
         for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum ==
-                state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
-                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
+            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum ==
+                state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
+                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum =
+                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum = ADUNum;
                 break;
             }
@@ -1427,22 +1428,22 @@ void GetSysInput(EnergyPlusData &state)
             ShowContinueError(
                 state,
                 format("...should have outlet node = {}",
-                       state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum)));
+                       dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum)->Name));
             ErrorsFound = true;
         } else {
 
             // Fill the Zone Equipment data with the inlet node number of this unit.
             for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum ==
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
+                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum ==
+                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum > 0) {
                             ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                             ShowContinueError(state,
                                               format("{} already connects to another zone",
-                                                     state.dataLoopNodes->NodeID(
-                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum)));
+                                                     dln->nodes(
+                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum)->Name));
                             ShowContinueError(state,
                                               format("Occurs for terminal unit {} = {}",
                                                      state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
@@ -1450,17 +1451,17 @@ void GetSysInput(EnergyPlusData &state)
                             ShowContinueError(state, "Check terminal unit node names for errors");
                             ErrorsFound = true;
                         } else {
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .TermUnitSizingNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .ZoneEqNum = CtrlZone;
                         }
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
+                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeNum = SupAirIn;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
                             state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
                             state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
@@ -1564,7 +1565,7 @@ void GetSysInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum =
             GetSingleNode(state,
                               Alphas(3),
                               ErrorsFound,
@@ -1573,9 +1574,9 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Outlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsNotParent,
+                          Node::ObjectIsNotParent,
                               cAlphaFields(3));
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum =
             GetSingleNode(state,
                               Alphas(4),
                               ErrorsFound,
@@ -1584,7 +1585,7 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Inlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsNotParent,
+                          Node::ObjectIsNotParent,
                               cAlphaFields(4));
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRate = Numbers(1);
 
@@ -1660,9 +1661,9 @@ void GetSysInput(EnergyPlusData &state)
             }
         }
 
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode = 0;
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNodeNum = 0;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum =
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxReheatWaterVolFlow = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxReheatSteamVolFlow = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MinReheatWaterVolFlow = 0.0;
@@ -1674,15 +1675,15 @@ void GetSysInput(EnergyPlusData &state)
         TestCompSet(state,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName,
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum),
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum),
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum)->Name,
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum)->Name,
                     "Air Nodes");
 
         for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum ==
-                state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
-                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
+            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum ==
+                state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
+                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum =
+                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum = ADUNum;
                 break;
             }
@@ -1697,22 +1698,22 @@ void GetSysInput(EnergyPlusData &state)
             ShowContinueError(
                 state,
                 format("...should have outlet node = {}",
-                       state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode)));
+                       dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name));
             ErrorsFound = true;
         } else {
 
             // Fill the Zone Equipment data with the inlet node number of this unit.
             for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
+                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum ==
+                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum > 0) {
                             ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                             ShowContinueError(state,
                                               format("{} already connects to another zone",
-                                                     state.dataLoopNodes->NodeID(
-                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode)));
+                                                     dln->nodes(
+                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name));
                             ShowContinueError(state,
                                               format("Occurs for terminal unit {} = {}",
                                                      state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
@@ -1720,10 +1721,10 @@ void GetSysInput(EnergyPlusData &state)
                             ShowContinueError(state, "Check terminal unit node names for errors");
                             ErrorsFound = true;
                         } else {
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .TermUnitSizingNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
@@ -1731,7 +1732,7 @@ void GetSysInput(EnergyPlusData &state)
                         }
 
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
+                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeNum = SupAirIn;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
                             state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
                             state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
@@ -1831,7 +1832,7 @@ void GetSysInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum =
             GetSingleNode(state,
                               Alphas(3),
                               ErrorsFound,
@@ -1840,9 +1841,9 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Outlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsNotParent,
+                          Node::ObjectIsNotParent,
                               cAlphaFields(3));
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum =
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum =
             GetSingleNode(state,
                               Alphas(4),
                               ErrorsFound,
@@ -1851,7 +1852,7 @@ void GetSysInput(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Inlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsNotParent,
+                          Node::ObjectIsNotParent,
                               cAlphaFields(4));
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRate = Numbers(1);
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracDes = Numbers(2);
@@ -1873,9 +1874,9 @@ void GetSysInput(EnergyPlusData &state)
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracDes = 1.0;
         }
 
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode = 0;
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNodeNum = 0;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum =
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxReheatWaterVolFlow = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxReheatSteamVolFlow = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MinReheatWaterVolFlow = 0.0;
@@ -1887,15 +1888,15 @@ void GetSysInput(EnergyPlusData &state)
         TestCompSet(state,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName,
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum),
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum),
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum)->Name,
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum)->Name,
                     "Air Nodes");
 
         for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum ==
-                state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
-                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
+            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum ==
+                state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
+                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum =
+                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum = ADUNum;
                 break;
             }
@@ -1910,22 +1911,22 @@ void GetSysInput(EnergyPlusData &state)
             ShowContinueError(
                 state,
                 format("...should have outlet node = {}",
-                       state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode)));
+                       dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name));
             ErrorsFound = true;
         } else {
 
             // Fill the Zone Equipment data with the inlet node number of this unit.
             for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
+                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum ==
+                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum > 0) {
                             ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                             ShowContinueError(state,
                                               format("{} already connects to another zone",
-                                                     state.dataLoopNodes->NodeID(
-                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode)));
+                                                     dln->nodes(
+                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name));
                             ShowContinueError(state,
                                               format("Occurs for terminal unit {} = {}",
                                                      state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
@@ -1933,17 +1934,17 @@ void GetSysInput(EnergyPlusData &state)
                             ShowContinueError(state, "Check terminal unit node names for errors");
                             ErrorsFound = true;
                         } else {
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .TermUnitSizingNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .ZoneEqNum = CtrlZone;
                         }
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
+                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeNum = SupAirIn;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
                             state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
                             state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
@@ -2015,7 +2016,7 @@ void GetSysInput(EnergyPlusData &state)
         IsNotOK = false;
         if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Fuel")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::Gas;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum =
                 GetHeatingCoilOutletNode(state,
                                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -2032,7 +2033,7 @@ void GetSysInput(EnergyPlusData &state)
                                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName));
         } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Electric")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::Electric;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum =
                 GetHeatingCoilOutletNode(state,
                                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -2093,8 +2094,8 @@ void GetSysInput(EnergyPlusData &state)
             ShowSevereItemNotFound(state, eoh, cAlphaFields(6), airTerm.FanName);
             ErrorsFound = true;
         }
-        airTerm.OutletNodeNum = state.dataFans->fans(airTerm.Fan_Index)->outletNodeNum;
-        airTerm.InletNodeNum = state.dataFans->fans(airTerm.Fan_Index)->inletNodeNum;
+        airTerm.OutNodeNum = state.dataFans->fans(airTerm.Fan_Index)->outNodeNum;
+        airTerm.InNodeNum = state.dataFans->fans(airTerm.Fan_Index)->inNodeNum;
 
         if (airTerm.fanType == HVAC::FanType::SystemModel) {
             dynamic_cast<Fans::FanSystem *>(state.dataFans->fans(airTerm.Fan_Index))->isSecondaryDriver = true;
@@ -2115,7 +2116,7 @@ void GetSysInput(EnergyPlusData &state)
             }
         }
 
-        AirTermSysInletNodeName = state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum);
+        AirTermSysInletNodeName = dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum)->Name;
         if (!Util::SameString(Alphas(3), AirTermSysInletNodeName)) {
             ShowWarningError(state,
                              format("{}Invalid air terminal object air inlet node name in {} = {}",
@@ -2147,7 +2148,7 @@ void GetSysInput(EnergyPlusData &state)
             //          END IF
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 IsNotOK = false;
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNodeNum =
                     GetCoilSteamInletNode(state,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -2164,7 +2165,7 @@ void GetSysInput(EnergyPlusData &state)
                     //          \note same as zone inlet node
                     //          \type alpha
                     IsNotOK = false;
-                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
+                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum =
                         GetCoilAirOutletNode(state,
                                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -2181,7 +2182,7 @@ void GetSysInput(EnergyPlusData &state)
                 //                                Node::FluidType::Steam,Node::NodeConnectionType::Actuator,1,ObjectIsParent)
             } else {
                 IsNotOK = false;
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNodeNum =
                     GetCoilWaterInletNode(state,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -2198,7 +2199,7 @@ void GetSysInput(EnergyPlusData &state)
                     //          \note same as zone inlet node
                     //          \type alpha
                     IsNotOK = false;
-                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
+                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum =
                         GetCoilOutletNode(state,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName,
@@ -2223,7 +2224,7 @@ void GetSysInput(EnergyPlusData &state)
         //               GetSingleNode(state, Alphas(4),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
         //                            Node::FluidType::Air,Node::NodeConnectionType::Outlet,1,ObjectIsParent)
         AirTermSysOutletNodeName =
-            state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode);
+            dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name;
         if (!Util::SameString(Alphas(4), AirTermSysOutletNodeName)) {
             ShowWarningError(state,
                              format("{}Invalid air terminal object air outlet node name in {} = {}",
@@ -2253,15 +2254,15 @@ void GetSysInput(EnergyPlusData &state)
         TestCompSet(state,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName,
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum),
-                    state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode),
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum)->Name,
+                    dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name,
                     "Air Nodes");
 
         for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
-                state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
-                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
+            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum ==
+                state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
+                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum =
+                    state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum = ADUNum;
                 break;
             }
@@ -2276,7 +2277,7 @@ void GetSysInput(EnergyPlusData &state)
             ShowContinueError(
                 state,
                 format("...should have outlet node = {}",
-                       state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode)));
+                       dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name));
             ErrorsFound = true;
         } else {
 
@@ -2285,16 +2286,16 @@ void GetSysInput(EnergyPlusData &state)
             IsNotOK = true;
             for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
+                    if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum ==
+                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
                         IsNotOK = false;
-                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum > 0) {
                             ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                             ShowContinueError(state,
                                               format("{} already connects to another zone",
-                                                     state.dataLoopNodes->NodeID(
-                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode)));
+                                                     dln->nodes(
+                                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name));
                             ShowContinueError(state,
                                               format("Occurs for terminal unit {} = {}",
                                                      state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
@@ -2302,17 +2303,17 @@ void GetSysInput(EnergyPlusData &state)
                             ShowContinueError(state, "Check terminal unit node names for errors");
                             ErrorsFound = true;
                         } else {
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum;
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum =
+                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .TermUnitSizingNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum)
                                 .ZoneEqNum = CtrlZone;
                         }
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
+                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeNum = SupAirIn;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
                             state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
                             state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
@@ -2350,16 +2351,16 @@ void GetSysInput(EnergyPlusData &state)
                       state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName,
                       Alphas(7),
                       Alphas(8),
-                      state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum),
-                      state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode));
+                      dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum)->Name,
+                      dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutNodeNum)->Name);
         // Add fan to component sets array
         SetUpCompSets(state,
                       state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                       state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName,
                       Alphas(5),
                       Alphas(6),
-                      state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum),
-                      state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum));
+                      dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InNodeNum)->Name,
+                      dln->nodes(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutNodeNum)->Name);
 
         // Setup the Average damper Position output variable
         SetupOutputVariable(state,
@@ -2455,8 +2456,6 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     static constexpr std::string_view RoutineNameFull("InitHVACSingleDuct");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;
-    int OutletNode;
     int SysIndex;
     // static Array1D_bool MyEnvrnFlag;
     // static Array1D_bool MySizeFlag;
@@ -2466,6 +2465,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     Real64 rho;
     bool errFlag;
 
+    auto &dln = state.dataLoopNodes;
     // static Array1D_bool PlantLoopScanFlag;
 
     // Do the Begin Simulation initializations
@@ -2494,7 +2494,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
                 ShowFatalError(state, "InitSys: Program terminated for previous conditions.");
             }
 
-            this->ReheatCoilOutletNode = DataPlant::CompData::getPlantComponent(state, this->HWplantLoc).NodeNumOut;
+            this->ReheatCoilOutNodeNum = DataPlant::CompData::getPlantComponent(state, this->HWplantLoc).OutNodeNum;
 
             this->PlantLoopScanFlag = false;
         } else {
@@ -2556,12 +2556,12 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
 
         // Set the outlet node max mass flow rate to the Max Air Flow specified for the Sys
-        OutletNode = this->OutletNodeNum;
-        InletNode = this->InletNodeNum;
-        state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
+        auto *outNode = dln->nodes(this->OutNodeNum);
+        auto *inNode = dln->nodes(this->InNodeNum);
+        outNode->MassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
         this->AirMassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
         this->HeatAirMassFlowRateMax = this->MaxHeatAirVolFlowRate * state.dataEnvrn->StdRhoAir;
-        state.dataLoopNodes->Node(InletNode).MassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
+        inNode->MassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
         this->MassFlowDiff = 1.0e-10 * this->AirMassFlowRateMax;
 
         if (this->HWplantLoc.loopNum > 0 && this->ReheatComp_Num != HeatingCoilType::SteamAirHeating) { // protect early calls before plant is setup
@@ -2599,24 +2599,22 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
             if (this->ZoneMinAirFracMethod == MinFlowFraction::Scheduled) {
                 this->ZoneMinAirFracDes = GetScheduleMinValue(state, this->ZoneMinAirFracSchPtr);
             }
-            state.dataLoopNodes->Node(OutletNode).MassFlowRateMin =
-                state.dataLoopNodes->Node(OutletNode).MassFlowRateMax * this->ZoneMinAirFracDes * CurrentEnvZoneTurndownMinAirFrac;
-            state.dataLoopNodes->Node(InletNode).MassFlowRateMin =
-                state.dataLoopNodes->Node(InletNode).MassFlowRateMax * this->ZoneMinAirFracDes * CurrentEnvZoneTurndownMinAirFrac;
+            outNode->MassFlowRateMin = outNode->MassFlowRateMax * this->ZoneMinAirFracDes * CurrentEnvZoneTurndownMinAirFrac;
+            inNode->MassFlowRateMin = inNode->MassFlowRateMax * this->ZoneMinAirFracDes * CurrentEnvZoneTurndownMinAirFrac;
         } else {
-            state.dataLoopNodes->Node(OutletNode).MassFlowRateMin = 0.0;
-            state.dataLoopNodes->Node(InletNode).MassFlowRateMin = 0.0;
+            outNode->MassFlowRateMin = 0.0;
+            inNode->MassFlowRateMin = 0.0;
         }
-        if ((this->ReheatControlNode > 0) && !this->PlantLoopScanFlag) {
+        if ((this->ReheatControlNodeNum > 0) && !this->PlantLoopScanFlag) {
             if (this->ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
-                InitComponentNodes(state, this->MinReheatSteamFlow, this->MaxReheatSteamFlow, this->ReheatControlNode, this->ReheatCoilOutletNode);
+                InitComponentNodes(state, this->MinReheatSteamFlow, this->MaxReheatSteamFlow, this->ReheatControlNodeNum, this->ReheatCoilOutNodeNum);
             } else {
-                InitComponentNodes(state, this->MinReheatWaterFlow, this->MaxReheatWaterFlow, this->ReheatControlNode, this->ReheatCoilOutletNode);
+                InitComponentNodes(state, this->MinReheatWaterFlow, this->MaxReheatWaterFlow, this->ReheatControlNodeNum, this->ReheatCoilOutNodeNum);
             }
         }
         // Find air loop associated with terminal unit
-        if ((this->CtrlZoneNum > 0) && (this->CtrlZoneInNodeIndex > 0)) {
-            this->AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
+        if ((this->CtrlZoneNum > 0) && (this->CtrlZoneInNodeNum > 0)) {
+            this->AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InNodeAirLoopNum(this->CtrlZoneInNodeNum);
             state.dataDefineEquipment->AirDistUnit(this->ADUNum).AirLoopNum = this->AirLoopNum;
         }
 
@@ -2628,8 +2626,8 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     }
 
     // Initialize the Inlet Nodes of the air side of air terminal
-    InletNode = this->InletNodeNum;
-    OutletNode = this->OutletNodeNum;
+    auto *inNode = dln->nodes(this->InNodeNum);
+    auto *outNode = dln->nodes(this->OutNodeNum);
 
     Real64 mDotFromOARequirement(0.0);
 
@@ -2658,47 +2656,47 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     if (this->ZoneMinAirFracMethod == MinFlowFraction::Scheduled) {
         this->ZoneMinAirFracDes = GetCurrentScheduleValue(state, this->ZoneMinAirFracSchPtr);
         // now reset inlet node min avail
-        state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = this->AirMassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
+        inNode->MassFlowRateMinAvail = this->AirMassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
     }
 
     if (FirstHVACIteration) {
         // The first time through set the mass flow rate to the Max
-        if ((state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+        if ((inNode->MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
             if (!(state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated)) {
-                state.dataLoopNodes->Node(InletNode).MassFlowRate = this->AirMassFlowRateMax;
+                inNode->MassFlowRate = this->AirMassFlowRateMax;
             }
         } else {
-            state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+            inNode->MassFlowRate = 0.0;
         }
-        if ((state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+        if ((inNode->MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
             if (!(state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated)) {
                 if (this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
                     if (this->NoOAFlowInputFromUser) {
-                        state.dataLoopNodes->Node(InletNode).MassFlowRate = this->AirMassFlowRateMax;
-                        state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = this->AirMassFlowRateMax;
+                        inNode->MassFlowRate = this->AirMassFlowRateMax;
+                        inNode->MassFlowRateMaxAvail = this->AirMassFlowRateMax;
                     } else {
-                        state.dataLoopNodes->Node(InletNode).MassFlowRate = mDotFromOARequirement;
-                        state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = mDotFromOARequirement;
+                        inNode->MassFlowRate = mDotFromOARequirement;
+                        inNode->MassFlowRateMaxAvail = mDotFromOARequirement;
                     }
                     if (this->EMSOverrideAirFlow) {
-                        state.dataLoopNodes->Node(InletNode).MassFlowRate = this->EMSMassFlowRateValue;
-                        state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = this->EMSMassFlowRateValue;
+                        inNode->MassFlowRate = this->EMSMassFlowRateValue;
+                        inNode->MassFlowRateMaxAvail = this->EMSMassFlowRateValue;
                     }
                 } else {
-                    state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = this->AirMassFlowRateMax;
+                    inNode->MassFlowRateMaxAvail = this->AirMassFlowRateMax;
                 }
             }
         } else {
-            state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = 0.0;
+            inNode->MassFlowRateMaxAvail = 0.0;
         }
 
-        if ((state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+        if ((inNode->MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
             if (!(state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated)) {
-                state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail =
+                inNode->MassFlowRateMinAvail =
                     this->AirMassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
             }
         } else {
-            state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = 0.0;
+            inNode->MassFlowRateMinAvail = 0.0;
         }
         // reset the mass flow rate histories
         this->MassFlow1 = 0.0;
@@ -2709,61 +2707,52 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     } else {
         if (this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
             if (!this->EMSOverrideAirFlow) {
-                if ((state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                if ((inNode->MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                     if (this->NoOAFlowInputFromUser) {
-                        if (state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail < state.dataLoopNodes->Node(InletNode).MassFlowRateMax) {
-                            state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
-                        } else if (state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail > state.dataLoopNodes->Node(InletNode).MassFlowRateMin) {
-                            state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
+                        if (inNode->MassFlowRateMaxAvail < inNode->MassFlowRateMax) {
+                            inNode->MassFlowRate = inNode->MassFlowRateMaxAvail;
+                        } else if (inNode->MassFlowRateMinAvail > inNode->MassFlowRateMin) {
+                            inNode->MassFlowRate = inNode->MassFlowRateMinAvail;
                         } else {
-                            state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
+                            inNode->MassFlowRate = inNode->MassFlowRateMaxAvail;
                         }
                     } else {
-                        state.dataLoopNodes->Node(InletNode).MassFlowRate = mDotFromOARequirement;
+                        inNode->MassFlowRate = mDotFromOARequirement;
                         // but also apply constraints
-                        state.dataLoopNodes->Node(InletNode).MassFlowRate =
-                            min(state.dataLoopNodes->Node(InletNode).MassFlowRate, state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
-                        state.dataLoopNodes->Node(InletNode).MassFlowRate =
-                            min(state.dataLoopNodes->Node(InletNode).MassFlowRate, state.dataLoopNodes->Node(InletNode).MassFlowRateMax);
-                        state.dataLoopNodes->Node(InletNode).MassFlowRate =
-                            max(state.dataLoopNodes->Node(InletNode).MassFlowRate, state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail);
-                        state.dataLoopNodes->Node(InletNode).MassFlowRate =
-                            max(state.dataLoopNodes->Node(InletNode).MassFlowRate, state.dataLoopNodes->Node(InletNode).MassFlowRateMin);
+                        inNode->MassFlowRate = min(inNode->MassFlowRate, inNode->MassFlowRateMaxAvail);
+                        inNode->MassFlowRate = min(inNode->MassFlowRate, inNode->MassFlowRateMax);
+                        inNode->MassFlowRate = max(inNode->MassFlowRate, inNode->MassFlowRateMinAvail);
+                        inNode->MassFlowRate = max(inNode->MassFlowRate, inNode->MassFlowRateMin);
                     }
                 } else {
-                    state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
-                    state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = 0.0;
-                    state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = 0.0;
+                    inNode->MassFlowRate = 0.0;
+                    inNode->MassFlowRateMaxAvail = 0.0;
+                    inNode->MassFlowRateMinAvail = 0.0;
                 }
             } else { // EMS override on
-                state.dataLoopNodes->Node(InletNode).MassFlowRate = this->EMSMassFlowRateValue;
+                inNode->MassFlowRate = this->EMSMassFlowRateValue;
                 // but also apply constraints
-                state.dataLoopNodes->Node(InletNode).MassFlowRate =
-                    min(state.dataLoopNodes->Node(InletNode).MassFlowRate, state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
-                state.dataLoopNodes->Node(InletNode).MassFlowRate =
-                    min(state.dataLoopNodes->Node(InletNode).MassFlowRate, state.dataLoopNodes->Node(InletNode).MassFlowRateMax);
-                state.dataLoopNodes->Node(InletNode).MassFlowRate =
-                    max(state.dataLoopNodes->Node(InletNode).MassFlowRate, state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail);
-                state.dataLoopNodes->Node(InletNode).MassFlowRate =
-                    max(state.dataLoopNodes->Node(InletNode).MassFlowRate, state.dataLoopNodes->Node(InletNode).MassFlowRateMin);
+                inNode->MassFlowRate = min(inNode->MassFlowRate, inNode->MassFlowRateMaxAvail);
+                inNode->MassFlowRate = min(inNode->MassFlowRate, inNode->MassFlowRateMax);
+                inNode->MassFlowRate = max(inNode->MassFlowRate, inNode->MassFlowRateMinAvail);
+                inNode->MassFlowRate = max(inNode->MassFlowRate, inNode->MassFlowRateMin);
             }
         }
     }
 
     // Do a check and make sure that the max and min available(control) flow is
     //  between the physical max and min while operating.
-    this->sd_airterminalInlet.AirMassFlowRateMaxAvail = min(this->AirMassFlowRateMax, state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
+    this->sd_airterminalInlet.AirMassFlowRateMaxAvail = min(this->AirMassFlowRateMax, inNode->MassFlowRateMaxAvail);
     this->sd_airterminalInlet.AirMassFlowRateMinAvail =
-        min(max(state.dataLoopNodes->Node(OutletNode).MassFlowRateMin, state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail),
-            this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
+        min(max(outNode->MassFlowRateMin, inNode->MassFlowRateMinAvail), this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
 
     // Do the following initializations (every time step): This should be the info from
     // the previous components outlets or the node data in this section.
     // Load the node data in this section for the component simulation
-    this->sd_airterminalInlet.AirMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-    this->sd_airterminalInlet.AirTemp = state.dataLoopNodes->Node(InletNode).Temp;
-    this->sd_airterminalInlet.AirHumRat = state.dataLoopNodes->Node(InletNode).HumRat;
-    this->sd_airterminalInlet.AirEnthalpy = state.dataLoopNodes->Node(InletNode).Enthalpy;
+    this->sd_airterminalInlet.AirMassFlowRate = inNode->MassFlowRate;
+    this->sd_airterminalInlet.AirTemp = inNode->Temp;
+    this->sd_airterminalInlet.AirHumRat = inNode->HumRat;
+    this->sd_airterminalInlet.AirEnthalpy = inNode->Enthalpy;
 
     // update to the current minimum air flow fraction
     this->ZoneMinAirFrac = this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
@@ -2976,7 +2965,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     // if a sizing run has been done, check if system sizing has been done for this system
     bool SizingDesRunThisAirSys = false;
     if (state.dataSize->SysSizingRunDone) {
-        AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
+        AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InNodeAirLoopNum(this->CtrlZoneInNodeNum);
         if (AirLoopNum > 0) {
             CheckThisAirSystemForSizing(state, AirLoopNum, SizingDesRunThisAirSys);
         }
@@ -3489,15 +3478,15 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         } else {
             CheckZoneSizing(state, this->sysType, this->SysName);
             if (Util::SameString(this->ReheatComp, "Coil:Heating:Water")) {
-                state.dataSingleDuct->CoilWaterInletNodeSS = GetCoilWaterInletNode(state, "Coil:Heating:Water", this->ReheatName, ErrorsFound);
-                state.dataSingleDuct->CoilWaterOutletNodeSS = GetCoilWaterOutletNode(state, "Coil:Heating:Water", this->ReheatName, ErrorsFound);
+                state.dataSingleDuct->CoilWaterInNodeNumSS = GetCoilWaterInletNode(state, "Coil:Heating:Water", this->ReheatName, ErrorsFound);
+                state.dataSingleDuct->CoilWaterOutNodeNumSS = GetCoilWaterOutletNode(state, "Coil:Heating:Water", this->ReheatName, ErrorsFound);
                 if (IsAutoSize) {
                     PlantSizingErrorsFound = false;
                     PltSizHeatNum = MyPlantSizingIndex(state,
                                                        "Coil:Heating:Water",
                                                        this->ReheatName,
-                                                       state.dataSingleDuct->CoilWaterInletNodeSS,
-                                                       state.dataSingleDuct->CoilWaterOutletNodeSS,
+                                                       state.dataSingleDuct->CoilWaterInNodeNumSS,
+                                                       state.dataSingleDuct->CoilWaterOutNodeNumSS,
                                                        PlantSizingErrorsFound);
                     if (PlantSizingErrorsFound) {
                         ShowContinueError(state, format("...Occurs in {}:{}", this->sysType, this->SysName));
@@ -3608,15 +3597,15 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         } else {
             CheckZoneSizing(state, this->sysType, this->SysName);
             if (Util::SameString(this->ReheatComp, "Coil:Heating:Steam")) {
-                state.dataSingleDuct->CoilSteamInletNodeSS = GetCoilSteamInletNode(state, "Coil:Heating:Steam", this->ReheatName, ErrorsFound);
-                state.dataSingleDuct->CoilSteamOutletNodeSS = GetCoilSteamOutletNode(state, "Coil:Heating:Steam", this->ReheatName, ErrorsFound);
+                state.dataSingleDuct->CoilSteamInNodeNumSS = GetCoilSteamInletNode(state, "Coil:Heating:Steam", this->ReheatName, ErrorsFound);
+                state.dataSingleDuct->CoilSteamOutNodeNumSS = GetCoilSteamOutletNode(state, "Coil:Heating:Steam", this->ReheatName, ErrorsFound);
                 if (IsAutoSize) {
                     PlantSizingErrorsFound = false;
                     PltSizHeatNum = MyPlantSizingIndex(state,
                                                        "Coil:Heating:Steam",
                                                        this->ReheatName,
-                                                       state.dataSingleDuct->CoilSteamInletNodeSS,
-                                                       state.dataSingleDuct->CoilSteamOutletNodeSS,
+                                                       state.dataSingleDuct->CoilSteamInNodeNumSS,
+                                                       state.dataSingleDuct->CoilSteamOutNodeNumSS,
                                                        PlantSizingErrorsFound);
                     if (PlantSizingErrorsFound) {
                         ShowContinueError(state, format("...Occurs in {}:{}", this->sysType, this->SysName));
@@ -3797,8 +3786,6 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     Real64 CpAirAvg;
     Real64 DeltaTemp;
     int SysOutletNode;        // The node number of the terminal unit outlet node
-    int SysInletNode;         // the node number of the terminal unit inlet node
-    int WaterControlNode;     // This is the Actuated Reheat Control Node
     Real64 MaxFlowWater;      // This is the value passed to the Controller depending if FirstHVACIteration or not
     Real64 MinFlowWater;      // This is the value passed to the Controller depending if FirstHVACIteration or not
     Real64 QActualHeating;    // the heating load seen by the reheat coil
@@ -3821,12 +3808,17 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     LeakLoadMult = state.dataDefineEquipment->AirDistUnit(this->ADUNum).LeakLoadMult;
     QTotLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired * LeakLoadMult;
     QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP * LeakLoadMult;
-    SysOutletNode = this->ReheatAirOutletNode;
-    SysInletNode = this->InletNodeNum;
-    CpAirAvg = PsyCpAirFnW(0.5 * (state.dataLoopNodes->Node(ZoneNodeNum).HumRat + this->sd_airterminalInlet.AirHumRat));
+
+    auto &dln = state.dataLoopNodes;
+    auto *sysOutNode = dln->nodes(this->ReheatAirOutNodeNum);
+    auto *zoneNode = dln->nodes(ZoneNodeNum);
+    auto *inNode = dln->nodes(this->InNodeNum);
+    auto *outNode = dln->nodes(this->OutNodeNum);
+    
+    CpAirAvg = PsyCpAirFnW(0.5 * (zoneNode->HumRat + this->sd_airterminalInlet.AirHumRat));
     MinFlowFrac = this->ZoneMinAirFrac;
     MassFlowBasedOnOA = 0.0;
-    state.dataSingleDuct->ZoneTempSDAT = state.dataLoopNodes->Node(ZoneNodeNum).Temp;
+    state.dataSingleDuct->ZoneTempSDAT = zoneNode->Temp;
     state.dataSingleDuct->MinMassAirFlowSDAT = MinFlowFrac * state.dataEnvrn->StdRhoAir * this->MaxAirVolFlowRate;
 
     // Then depending on if the Load is for heating or cooling it is handled differently.  First
@@ -3868,8 +3860,8 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
 
         if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated && state.afn->VAVTerminalRatio > 0.0) {
             MassFlow *= state.afn->VAVTerminalRatio;
-            if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
-                MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
+            if (MassFlow > inNode->MassFlowRate) {
+                MassFlow = inNode->MassFlowRate;
             }
         }
 
@@ -3904,8 +3896,8 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         // the AirflowNetwork model overrids the mass flow rate value
         if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated && state.afn->VAVTerminalRatio > 0.0) {
             MassFlow *= state.afn->VAVTerminalRatio;
-            if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
-                MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
+            if (MassFlow > inNode->MassFlowRate) {
+                MassFlow = inNode->MassFlowRate;
             }
         }
 
@@ -4008,8 +4000,8 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
 
         if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated && state.afn->VAVTerminalRatio > 0.0) {
             MassFlow *= state.afn->VAVTerminalRatio;
-            if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
-                MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
+            if (MassFlow > inNode->MassFlowRate) {
+                MassFlow = inNode->MassFlowRate;
             }
         }
 
@@ -4035,16 +4027,16 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
 
             // Initialize hot water flow rate to zero.
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNodeNum, this->HWplantLoc, true);
             // On the first HVAC iteration the system values are given to the controller, but after that
             // the demand limits are in place and there needs to be feedback to the Zone Equipment
             if (FirstHVACIteration) {
                 MaxFlowWater = this->MaxReheatWaterFlow;
                 MinFlowWater = this->MinReheatWaterFlow;
             } else {
-                WaterControlNode = this->ReheatControlNode;
-                MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
-                MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
+                auto const *waterControlNode = dln->nodes(this->ReheatControlNodeNum);
+                MaxFlowWater = waterControlNode->MassFlowRateMaxAvail;
+                MinFlowWater = waterControlNode->MassFlowRateMinAvail;
             }
 
             // Simulate the reheat coil at constant air flow. Control by varying the
@@ -4056,7 +4048,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                               this->ReheatComp_Index,
                               FirstHVACIteration,
                               QZnReq,
-                              this->ReheatControlNode,
+                              this->ReheatControlNodeNum,
                               MaxFlowWater,
                               MinFlowWater,
                               this->ControllerOffset,
@@ -4073,7 +4065,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
             // hot water coil with fixed (maximum) hot water flow but allow the air flow to
             // vary up to the maximum (air damper opens to try to meet zone load)
             if (this->DamperHeatingAction == Action::Reverse || this->DamperHeatingAction == Action::ReverseWithLimits) {
-                if (state.dataLoopNodes->Node(this->ReheatControlNode).MassFlowRate == MaxFlowWater) {
+                if (dln->nodes(this->ReheatControlNodeNum)->MassFlowRate == MaxFlowWater) {
                     // fill limits for air flow for controller
                     state.dataSingleDuct->MinAirMassFlowRevActSVAV = this->AirMassFlowRateMax * this->ZoneMinAirFrac;
                     state.dataSingleDuct->MinAirMassFlowRevActSVAV =
@@ -4089,7 +4081,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                     state.dataSingleDuct->MaxAirMassFlowRevActSVAV =
                         min(state.dataSingleDuct->MaxAirMassFlowRevActSVAV, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
 
-                    state.dataLoopNodes->Node(this->OutletNodeNum).MassFlowRateMaxAvail =
+                    dln->nodes(this->OutNodeNum)->MassFlowRateMaxAvail =
                         state.dataSingleDuct->MaxAirMassFlowRevActSVAV; // suspect, check how/if used in ControlCompOutput
                     ControlCompOutput(state,
                                       this->ReheatName,
@@ -4097,7 +4089,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                                       this->ReheatComp_Index,
                                       FirstHVACIteration,
                                       state.dataSingleDuct->QZoneMax2SDAT,
-                                      this->OutletNodeNum,
+                                      this->OutNodeNum,
                                       state.dataSingleDuct->MaxAirMassFlowRevActSVAV,
                                       state.dataSingleDuct->MinAirMassFlowRevActSVAV,
                                       this->ControllerOffset,
@@ -4107,8 +4099,8 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                                       SysOutletNode); // why not QZnReq  ?
                     // air flow controller, not on plant, don't pass plant topology info
                     // reset terminal unit inlet air mass flow to new value.
-                    state.dataLoopNodes->Node(this->OutletNodeNum).MassFlowRateMaxAvail = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;
-                    MassFlow = state.dataLoopNodes->Node(SysOutletNode).MassFlowRate;
+                    outNode->MassFlowRateMaxAvail = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;
+                    MassFlow = sysOutNode->MassFlowRate;
 
                     //         ! look for bang-bang condition: flow rate oscillating between 2 values during the air loop / zone
                     //         ! equipment iteration. If detected, set flow rate to previous value and recalc HW flow.
@@ -4128,7 +4120,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                                           this->ReheatComp_Index,
                                           FirstHVACIteration,
                                           QZnReq,
-                                          this->ReheatControlNode,
+                                          this->ReheatControlNodeNum,
                                           MaxFlowWater,
                                           MinFlowWater,
                                           this->ControllerOffset,
@@ -4199,7 +4191,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
             // Simulate reheat coil for the Const Volume system
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNodeNum, this->HWplantLoc, true);
             // call the reheat coil with the NO FLOW condition to make sure that the Node values
             // are passed through to the coil outlet correctly
             SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
@@ -4350,8 +4342,6 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     Real64 MinFlowWater;  // This is the value passed to the Controller depending if FirstHVACIteration or not
     Real64 LeakLoadMult;  // Load multiplier to adjust for downstream leaks
     int SysOutletNode;    // The node number of the terminal unit outlet node
-    int SysInletNode;     // The node number of the terminal unit inlet node
-    int WaterControlNode; // This is the Actuated Reheat Control Node
     Real64 DummyMdot;
     Real64 QActualHeating;
     Real64 MinFlowFrac; // minimum flow fraction (and minimum damper position)
@@ -4364,12 +4354,16 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     LeakLoadMult = state.dataDefineEquipment->AirDistUnit(this->ADUNum).LeakLoadMult;
     QTotLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired * LeakLoadMult;
     QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP * LeakLoadMult;
-    SysOutletNode = this->ReheatAirOutletNode;
-    SysInletNode = this->InletNodeNum;
-    CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
+
+    auto &dln = state.dataLoopNodes;
+    auto *sysOutNode = dln->nodes(this->ReheatAirOutNodeNum);
+    auto *zoneNode = dln->nodes(ZoneNodeNum);
+    auto const *reheatControlNode = dln->nodes(this->ReheatControlNodeNum);
+    
+    CpAirZn = PsyCpAirFnW(zoneNode->HumRat);
     MinFlowFrac = this->ZoneMinAirFrac;
     state.dataSingleDuct->MinMassAirFlowSCBVAV = MinFlowFrac * state.dataEnvrn->StdRhoAir * this->MaxAirVolFlowRate;
-    state.dataSingleDuct->ZoneTempSCBVAV = state.dataLoopNodes->Node(ZoneNodeNum).Temp;
+    state.dataSingleDuct->ZoneTempSCBVAV = zoneNode->Temp;
 
     // Then depending on if the Load is for heating or cooling it is handled differently.  First
     // the massflow rate for cooling is determined to meet the entire load.  Then
@@ -4484,22 +4478,22 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
             // Determine the load required to pass to the Component controller
             // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
             // and is working as-is, temperature setpoints are maintained as expected.
-            QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV + MassFlow * CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp;
+            QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV + MassFlow * CpAirZn * zoneNode->Temp;
             if (QZnReq < SmallLoad) QZnReq = 0.0;
 
             // Initialize hot water flow rate to zero.
             // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNodeNum, this->HWplantLoc, true);
             // On the first HVAC iteration the system values are given to the controller, but after that
             // the demand limits are in place and there needs to be feedback to the Zone Equipment
             if (FirstHVACIteration) {
                 MaxFlowWater = this->MaxReheatWaterFlow;
                 MinFlowWater = this->MinReheatWaterFlow;
             } else {
-                WaterControlNode = this->ReheatControlNode;
-                MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
-                MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
+                auto *waterControlNode = dln->nodes(this->ReheatControlNodeNum);
+                MaxFlowWater = waterControlNode->MassFlowRateMaxAvail;
+                MinFlowWater = waterControlNode->MassFlowRateMinAvail;
             }
 
             // Simulate the reheat coil at constant air flow. Control by varying the
@@ -4510,7 +4504,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
                               this->ReheatComp_Index,
                               FirstHVACIteration,
                               QZnReq,
-                              this->ReheatControlNode,
+                              this->ReheatControlNodeNum,
                               MaxFlowWater,
                               MinFlowWater,
                               this->ControllerOffset,
@@ -4527,14 +4521,14 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
             // hot water coil with fixed (maximum) hot water flow but allow the air flow to
             // vary up to the maximum (air damper opens to try to meet zone load).
             if (this->DamperHeatingAction == Action::Reverse) {
-                if (state.dataLoopNodes->Node(this->ReheatControlNode).MassFlowRate == this->MaxReheatWaterFlow) {
+                if (reheatControlNode->MassFlowRate == this->MaxReheatWaterFlow) {
                     ControlCompOutput(state,
                                       this->ReheatName,
                                       this->ReheatComp,
                                       this->ReheatComp_Index,
                                       FirstHVACIteration,
                                       state.dataSingleDuct->QZoneMax2SCBVAV,
-                                      this->OutletNodeNum,
+                                      this->OutNodeNum,
                                       this->sd_airterminalInlet.AirMassFlowRateMaxAvail,
                                       this->sd_airterminalInlet.AirMassFlowRateMinAvail,
                                       this->ControllerOffset,
@@ -4545,7 +4539,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
                     //                                   ! air flow controller, not on plant, don't pass plant topology info
 
                     // reset terminal unit inlet air mass flow to new value.
-                    MassFlow = state.dataLoopNodes->Node(SysOutletNode).MassFlowRate;
+                    MassFlow = sysOutNode->MassFlowRate;
                     this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
                     this->UpdateSys(state);
                 }
@@ -4562,7 +4556,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
                                       this->ReheatComp_Index,
                                       FirstHVACIteration,
                                       QZnReq,
-                                      this->ReheatControlNode,
+                                      this->ReheatControlNodeNum,
                                       MaxFlowWater,
                                       MinFlowWater,
                                       this->ControllerOffset,
@@ -4627,7 +4621,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
             // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
             // Initialize hot water flow rate to zero.
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNodeNum, this->HWplantLoc, true);
 
             // call the reheat coil with the NO FLOW condition to make sure that the Node values
             // are passed through to the coil outlet correctly
@@ -4693,8 +4687,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     Real64 CpAirZn;
     // unused  REAL(r64) :: CpAirSysIn
     // unused  REAL(r64) :: DeltaTemp
-    int SysOutletNode;    // The node number of the terminal unit outlet node
-    int SysInletNode;     // the node number of the terminal unit inlet node
     int WaterControlNode; // This is the Actuated Reheat Control Node
     int SteamControlNode;
     Real64 MaxFlowWater;    // This is the value passed to the Controller depending if FirstHVACIteration or not
@@ -4725,9 +4717,12 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
 
     // The calculated load from the Heat Balance
     QTotLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
-    SysOutletNode = this->ReheatAirOutletNode;
-    SysInletNode = this->InletNodeNum;
-    CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
+
+    auto &dln = state.dataLoopNodes;
+    auto *sysInNode = dln->nodes(this->InNodeNum);
+    auto *zoneNode = dln->nodes(ZoneNodeNum);
+    
+    CpAirZn = PsyCpAirFnW(zoneNode->HumRat);
     HCType = this->ReheatComp_Num;
     fanType = this->fanType;
     MaxCoolMassFlow = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;
@@ -4744,15 +4739,14 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     }
 
     if (HCType == HeatingCoilType::SimpleHeating) {
-        WaterControlNode = this->ReheatControlNode;
+        auto *waterControlNode = dln->nodes(this->ReheatControlNodeNum);
         HCLoad = 0.0;
         if (FirstHVACIteration) {
             MaxFlowWater = this->MaxReheatWaterFlow;
             MinFlowWater = this->MinReheatWaterFlow;
         } else {
-            WaterControlNode = this->ReheatControlNode;
-            MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
-            MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
+            MaxFlowWater = waterControlNode->MassFlowRateMaxAvail;
+            MinFlowWater = waterControlNode->MassFlowRateMinAvail;
         }
     } else {
         WaterControlNode = 0;
@@ -4762,14 +4756,14 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     }
 
     if (HCType == HeatingCoilType::SteamAirHeating) {
-        SteamControlNode = this->ReheatControlNode;
+        auto *steamControlNode = dln->nodes(this->ReheatControlNodeNum);
         HCLoad = 0.0;
         if (FirstHVACIteration) {
             MaxFlowSteam = this->MaxReheatSteamFlow;
             MinFlowSteam = this->MinReheatSteamFlow;
         } else {
-            MaxFlowSteam = state.dataLoopNodes->Node(SteamControlNode).MassFlowRateMaxAvail;
-            MinFlowSteam = state.dataLoopNodes->Node(SteamControlNode).MassFlowRateMinAvail;
+            MaxFlowSteam = steamControlNode->MassFlowRateMaxAvail;
+            MinFlowSteam = steamControlNode->MassFlowRateMinAvail;
         }
     } else {
         SteamControlNode = 0;
@@ -5023,7 +5017,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                 };
 
                 SolveRoot(state, UnitFlowToler, 50, SolFlag, FracDelivered, f, 0.0, 1.0);
-                MassFlow = state.dataLoopNodes->Node(SysInletNode).MassFlowRate;
+                MassFlow = sysInNode->MassFlowRate;
                 if (SolFlag == -1) {
                     if (this->IterationLimit == 0) {
                         ShowWarningError(state, format("Heating coil control failed in VS VAV terminal unit {}", this->SysName));
@@ -5112,17 +5106,19 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     Real64 QZnReq;       // [Watts]
     Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
     Real64 CpAir;
-    int WaterControlNode;  // This is the Actuated Reheat Control Node
     Real64 MaxFlowWater;   // This is the value passed to the Controller depending if FirstHVACIteration or not
     Real64 MinFlowWater;   // This is the value passed to the Controller depending if FirstHVACIteration or not
     Real64 QActualHeating; // the heating load seen by the reheat coil
     Real64 DummyMdot;      // local fluid mass flow rate
 
+    auto &dln = state.dataLoopNodes;
+    auto *zoneNode = dln->nodes(ZoneNodeNum);
+    
     QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // The calculated load from the Heat Balance
     MassFlow = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;                                       // System massflow is set to the Available
     state.dataSingleDuct->QMax2SCV = QToHeatSetPt;
-    state.dataSingleDuct->ZoneTempSCV = state.dataLoopNodes->Node(ZoneNodeNum).Temp;
-    CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat); // zone air specific heat
+    state.dataSingleDuct->ZoneTempSCV = zoneNode->Temp;
+    CpAir = PsyCpAirFnW(zoneNode->HumRat); // zone air specific heat
     if (this->MaxReheatTempSetByUser) {
         state.dataSingleDuct->TAirMaxSCV = this->MaxReheatTemp;
         state.dataSingleDuct->QMaxSCV = CpAir * MassFlow * (state.dataSingleDuct->TAirMaxSCV - state.dataSingleDuct->ZoneTempSCV);
@@ -5164,7 +5160,7 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
             // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
             // Initialize hot water flow rate to zero.
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNodeNum, this->HWplantLoc, true);
 
             // On the first HVAC iteration the system values are given to the controller, but after that
             // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -5172,9 +5168,9 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
                 MaxFlowWater = this->MaxReheatWaterFlow;
                 MinFlowWater = this->MinReheatWaterFlow;
             } else {
-                WaterControlNode = this->ReheatControlNode;
-                MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
-                MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
+                auto const *waterControlNode = dln->nodes(this->ReheatControlNodeNum);
+                MaxFlowWater = waterControlNode->MassFlowRateMaxAvail;
+                MinFlowWater = waterControlNode->MassFlowRateMinAvail;
             }
 
             // Simulate reheat coil for the Const Volume system
@@ -5185,14 +5181,14 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
                               this->ReheatComp_Index,
                               FirstHVACIteration,
                               QZnReq,
-                              this->ReheatControlNode,
+                              this->ReheatControlNodeNum,
                               MaxFlowWater,
                               MinFlowWater,
                               this->ControllerOffset,
                               this->ControlCompTypeNum,
                               this->CompErrIndex,
                               _,
-                              this->ReheatAirOutletNode,
+                              this->ReheatAirOutNodeNum,
                               MassFlow,
                               _,
                               _,
@@ -5234,7 +5230,7 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
             // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
             // Initialize hot water flow rate to zero.
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNodeNum, this->HWplantLoc, true);
 
             // call the reheat coil with the NO FLOW condition to make sure that the Node values
             // are passed through to the coil outlet correctly
@@ -5273,10 +5269,10 @@ void SingleDuctAirTerminal::SimConstVolNoReheat(EnergyPlusData &state)
 
 void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
                                       bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                                      int const ZoneNode,            // zone node number
+                                      int const ZoneNodeNum,            // zone node number
                                       Real64 const HWFlow,           // hot water flow (kg/s)
                                       Real64 const HCoilReq,         // gas or elec coil demand requested
-                                      HVAC::FanType fanType,         // type of fan
+                                      [[maybe_unused]]HVAC::FanType fanType,         // type of fan
                                       Real64 const AirFlow,          // air flow rate (kg/s)
                                       int const FanOn,               // 1 means fan is on
                                       Real64 &LoadMet                // load met by unit (watts)
@@ -5317,23 +5313,25 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int FanInNode;       // unit air inlet node (fan inlet)
-    int FanOutNode;      // fan outlet node (heating coil inlet node)
-    int HCOutNode;       // unit air outlet node (heating coil air outlet node)
-    int HotControlNode;  // the hot water inlet node
     Real64 AirMassFlow;  // total air mass flow rate [kg/s]
     Real64 CpAirZn;      // zone air specific heat [J/kg-C]
     bool TurnFansOffSav; // save the fan off flag
     Real64 mdot;
 
     TurnFansOffSav = state.dataHVACGlobal->TurnFansOff;
-    FanInNode = this->InletNodeNum;
-    FanOutNode = this->OutletNodeNum;
-    HCOutNode = this->ReheatAirOutletNode;
-    HotControlNode = this->ReheatControlNode;
+
+    auto &dln = state.dataLoopNodes;
+    auto *fanInNode = dln->nodes(this->InNodeNum);
+    auto *fanOutNode = dln->nodes(this->OutNodeNum);
+
+    auto *heatCoilAirOutNode = dln->nodes(this->ReheatAirOutNodeNum);
+
+    auto const *zoneNode = dln->nodes(ZoneNodeNum);
+    
     AirMassFlow = AirFlow;
-    state.dataLoopNodes->Node(FanInNode).MassFlowRate = AirMassFlow;
-    CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
+
+    fanInNode->MassFlowRate = AirMassFlow;
+    CpAirZn = PsyCpAirFnW(zoneNode->HumRat);
     if (FanOn == 1) {
         state.dataFans->fans(this->Fan_Index)->simulate(state, FirstHVACIteration, _, _);
 
@@ -5341,15 +5339,15 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
         state.dataHVACGlobal->TurnFansOff = true;
         state.dataFans->fans(this->Fan_Index)->simulate(state, FirstHVACIteration, _, _);
         state.dataHVACGlobal->TurnFansOff = TurnFansOffSav;
-        state.dataLoopNodes->Node(FanOutNode).MassFlowRate = state.dataLoopNodes->Node(FanInNode).MassFlowRate;
-        state.dataLoopNodes->Node(FanOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(FanInNode).MassFlowRateMaxAvail;
-        state.dataLoopNodes->Node(FanOutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(FanInNode).MassFlowRateMinAvail;
+        fanOutNode->MassFlowRate = fanInNode->MassFlowRate;
+        fanOutNode->MassFlowRateMaxAvail = fanInNode->MassFlowRateMaxAvail;
+        fanOutNode->MassFlowRateMinAvail = fanInNode->MassFlowRateMinAvail;
     }
     switch (this->ReheatComp_Num) {
     case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
         mdot = HWFlow;
         if (this->HWplantLoc.loopNum > 0) {
-            SetComponentFlowRate(state, mdot, this->ReheatControlNode, this->ReheatCoilOutletNode, this->HWplantLoc);
+            SetComponentFlowRate(state, mdot, this->ReheatControlNodeNum, this->ReheatCoilOutNodeNum, this->HWplantLoc);
         }
 
         SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
@@ -5357,7 +5355,7 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     case HeatingCoilType::SteamAirHeating: { // HW Flow is steam mass flow here
         mdot = HWFlow;
         if (this->HWplantLoc.loopNum > 0) {
-            SetComponentFlowRate(state, mdot, this->ReheatControlNode, this->ReheatCoilOutletNode, this->HWplantLoc);
+            SetComponentFlowRate(state, mdot, this->ReheatControlNodeNum, this->ReheatCoilOutNodeNum, this->HWplantLoc);
         }
         SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, HCoilReq);
     } break;
@@ -5372,7 +5370,7 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     } break;
     }
 
-    LoadMet = AirMassFlow * CpAirZn * (state.dataLoopNodes->Node(HCOutNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+    LoadMet = AirMassFlow * CpAirZn * (heatCoilAirOutNode->Temp - zoneNode->Temp);
 }
 
 // End Algorithm Section of the Module
@@ -5394,38 +5392,35 @@ void SingleDuctAirTerminal::UpdateSys(EnergyPlusData &state) const
     // This subroutine updates the Syss.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int OutletNode;
-    int InletNode;
-
-    OutletNode = this->OutletNodeNum;
-    InletNode = this->InletNodeNum;
+    auto &dln = state.dataLoopNodes;
+    auto *outNode = dln->nodes(this->OutNodeNum);
+    auto *inNode = dln->nodes(this->InNodeNum);
 
     if (this->SysType_Num == SysType::SingleDuctVAVReheat || this->SysType_Num == SysType::SingleDuctCBVAVReheat ||
         this->SysType_Num == SysType::SingleDuctCBVAVNoReheat || this->SysType_Num == SysType::SingleDuctVAVNoReheat ||
         this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
         // Set the outlet air nodes of the Sys
-        state.dataLoopNodes->Node(OutletNode).MassFlowRate = this->sd_airterminalOutlet.AirMassFlowRate;
-        state.dataLoopNodes->Node(OutletNode).Temp = this->sd_airterminalOutlet.AirTemp;
-        state.dataLoopNodes->Node(OutletNode).HumRat = this->sd_airterminalOutlet.AirHumRat;
-        state.dataLoopNodes->Node(OutletNode).Enthalpy = this->sd_airterminalOutlet.AirEnthalpy;
+        outNode->MassFlowRate = this->sd_airterminalOutlet.AirMassFlowRate;
+        outNode->Temp = this->sd_airterminalOutlet.AirTemp;
+        outNode->HumRat = this->sd_airterminalOutlet.AirHumRat;
+        outNode->Enthalpy = this->sd_airterminalOutlet.AirEnthalpy;
         // Set the outlet nodes for properties that just pass through & not used
-        state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
-        state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
+        outNode->Quality = inNode->Quality;
+        outNode->Press = inNode->Press;
     }
 
     // After all of the Outlets are updated the mass flow information needs to be
     // passed back to the system inlet.
-    state.dataLoopNodes->Node(InletNode).MassFlowRate = this->sd_airterminalOutlet.AirMassFlowRate;
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail =
-        min(this->sd_airterminalOutlet.AirMassFlowRateMaxAvail, state.dataLoopNodes->Node(OutletNode).MassFlowRateMax);
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = this->sd_airterminalOutlet.AirMassFlowRateMinAvail;
+    inNode->MassFlowRate = this->sd_airterminalOutlet.AirMassFlowRate;
+    outNode->MassFlowRateMaxAvail = min(this->sd_airterminalOutlet.AirMassFlowRateMaxAvail, outNode->MassFlowRateMax);
+    outNode->MassFlowRateMinAvail = this->sd_airterminalOutlet.AirMassFlowRateMinAvail;
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
+        outNode->CO2 = inNode->CO2;
     }
 
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
+        outNode->GenContam = inNode->GenContam;
     }
 }
 
@@ -5521,8 +5516,8 @@ void GetHVACSingleDuctSysIndex(EnergyPlusData &state,
             ErrorsFound = true;
         }
         if (state.dataSingleDuct->sd_airterminal(SDSIndex).SysType_Num == SysType::SingleDuctVAVReheat) {
-            if (present(DamperInletNode)) DamperInletNode = state.dataSingleDuct->sd_airterminal(SDSIndex).InletNodeNum;
-            if (present(DamperOutletNode)) DamperOutletNode = state.dataSingleDuct->sd_airterminal(SDSIndex).OutletNodeNum;
+            if (present(DamperInletNode)) DamperInletNode = state.dataSingleDuct->sd_airterminal(SDSIndex).InNodeNum;
+            if (present(DamperOutletNode)) DamperOutletNode = state.dataSingleDuct->sd_airterminal(SDSIndex).OutNodeNum;
         }
     }
 }
@@ -5581,7 +5576,6 @@ void GetATMixers(EnergyPlusData &state)
     using DataZoneEquipment::EquipmentData;
     using DataZoneEquipment::SubEquipmentData;
     using Node::GetSingleNode;
-    using namespace DataLoopNode;
     using BranchNodeConnections::TestCompSet;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5602,6 +5596,7 @@ void GetATMixers(EnergyPlusData &state)
     state.dataSingleDuct->GetATMixerFlag = false;
 
     auto &ipsc = state.dataIPShortCut;
+    auto &dln = state.dataLoopNodes;
 
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "AirTerminal:SingleDuct:Mixer";
@@ -5656,7 +5651,7 @@ void GetATMixers(EnergyPlusData &state)
         ValidateComponent(
             state, state.dataIPShortCut->cAlphaArgs(2), state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitName, errFlag, cCurrentModuleObject);
 
-        state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode =
+        state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNodeNum =
             GetSingleNode(state,
                               state.dataIPShortCut->cAlphaArgs(4),
                               ErrorsFound,
@@ -5665,10 +5660,10 @@ void GetATMixers(EnergyPlusData &state)
                               Node::FluidType::Air,
                               Node::ConnType::Outlet,
                               Node::CompFluidStream::Primary,
-                              ObjectIsNotParent,
+                          Node::ObjectIsNotParent,
                               state.dataIPShortCut->cAlphaFieldNames(4));
 
-        state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode = GetSingleNode(state,
+        state.dataSingleDuct->SysATMixer(ATMixerNum).PriAirInNodeNum = GetSingleNode(state,
                                                                                    state.dataIPShortCut->cAlphaArgs(5),
                                                                                    ErrorsFound,
                                                                                    Node::ConnObjType::AirTerminalSingleDuctMixer,
@@ -5676,9 +5671,9 @@ void GetATMixers(EnergyPlusData &state)
                                                                                    Node::FluidType::Air,
                                                                                    Node::ConnType::Inlet,
                                                                                    Node::CompFluidStream::Primary,
-                                                                                   ObjectIsNotParent,
+                                                                                     Node::ObjectIsNotParent,
                                                                                    state.dataIPShortCut->cAlphaFieldNames(5));
-        state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode = GetSingleNode(state,
+        state.dataSingleDuct->SysATMixer(ATMixerNum).SecAirInNodeNum = GetSingleNode(state,
                                                                                    state.dataIPShortCut->cAlphaArgs(6),
                                                                                    ErrorsFound,
                                                                                    Node::ConnObjType::AirTerminalSingleDuctMixer,
@@ -5686,7 +5681,7 @@ void GetATMixers(EnergyPlusData &state)
                                                                                    Node::FluidType::Air,
                                                                                    Node::ConnType::Inlet,
                                                                                    Node::CompFluidStream::Primary,
-                                                                                   ObjectIsNotParent,
+                                                                                     Node::ObjectIsNotParent,
                                                                                    state.dataIPShortCut->cAlphaFieldNames(6));
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
@@ -5722,40 +5717,40 @@ void GetATMixers(EnergyPlusData &state)
         }
 
         // Check for dupes in the three nodes.
-        if (state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode == state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode) {
+        if (state.dataSingleDuct->SysATMixer(ATMixerNum).SecAirInNodeNum == state.dataSingleDuct->SysATMixer(ATMixerNum).PriAirInNodeNum) {
             ShowSevereError(state,
                             format("{} = {} {} = {} duplicates the {}.",
                                    cCurrentModuleObject,
                                    state.dataSingleDuct->SysATMixer(ATMixerNum).Name,
                                    state.dataIPShortCut->cAlphaArgs(5),
-                                   state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode),
+                                   dln->nodes(state.dataSingleDuct->SysATMixer(ATMixerNum).PriAirInNodeNum)->Name,
                                    state.dataIPShortCut->cAlphaArgs(4)));
             ErrorsFound = true;
-        } else if (state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode == state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode) {
+        } else if (state.dataSingleDuct->SysATMixer(ATMixerNum).SecAirInNodeNum == state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNodeNum) {
             ShowSevereError(state,
                             format("{} = {} {} = {} duplicates the {}.",
                                    cCurrentModuleObject,
                                    state.dataSingleDuct->SysATMixer(ATMixerNum).Name,
                                    state.dataIPShortCut->cAlphaArgs(6),
-                                   state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode),
+                                   dln->nodes(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNodeNum)->Name,
                                    state.dataIPShortCut->cAlphaArgs(4)));
             ErrorsFound = true;
         }
 
-        if (state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode == state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode) {
+        if (state.dataSingleDuct->SysATMixer(ATMixerNum).PriAirInNodeNum == state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNodeNum) {
             ShowSevereError(state,
                             format("{} = {} {} = {} duplicates the {}.",
                                    cCurrentModuleObject,
                                    state.dataSingleDuct->SysATMixer(ATMixerNum).Name,
                                    state.dataIPShortCut->cAlphaArgs(6),
-                                   state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode),
+                                   dln->nodes(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNodeNum)->Name,
                                    state.dataIPShortCut->cAlphaArgs(5)));
             ErrorsFound = true;
         }
 
         for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode;
+            if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
+                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum = state.dataSingleDuct->SysATMixer(ATMixerNum).PriAirInNodeNum;
                 state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum = ADUNum;
                 break;
             }
@@ -5769,7 +5764,7 @@ void GetATMixers(EnergyPlusData &state)
                                    state.dataSingleDuct->SysATMixer(ATMixerNum).Name));
             ShowContinueError(
                 state,
-                format("...should have outlet node = {}", state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode)));
+                format("...should have outlet node = {}", dln->nodes(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNodeNum)->Name));
             ErrorsFound = true;
         } else {
 
@@ -5779,8 +5774,8 @@ void GetATMixers(EnergyPlusData &state)
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                        if (state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode ==
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                        if (state.dataSingleDuct->SysATMixer(ATMixerNum).SecAirInNodeNum ==
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNodeNums(NodeNum)) {
                             ZoneNodeNotFound = false;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
                             state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = CtrlZone;
@@ -5838,7 +5833,7 @@ void GetATMixers(EnergyPlusData &state)
                         ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
                         ShowContinueError(state,
                                           format("..Inlet Side CONNECTED Air Terminal Mixer inlet node name = {}",
-                                                 state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode)));
+                                                 dln->nodes(state.dataSingleDuct->SysATMixer(ATMixerNum).SecAirInNodeNum)->Name));
                         ErrorsFound = true;
                     }
                 }
@@ -5848,9 +5843,9 @@ void GetATMixers(EnergyPlusData &state)
                 ZoneNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode ==
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++NodeNum) {
+                        if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNodeNum ==
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(NodeNum)) {
                             ZoneNodeNotFound = false;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
                             state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = CtrlZone;
@@ -5880,7 +5875,7 @@ void GetATMixers(EnergyPlusData &state)
                     ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError(state,
                                       format("..Supply Side connected Air Terminal Mixer outlet node name = {}",
-                                             state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode)));
+                                             dln->nodes(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNodeNum)->Name));
                     ErrorsFound = true;
                 }
             }
@@ -5935,27 +5930,28 @@ void GetATMixers(EnergyPlusData &state)
 
 void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHVACIteration)
 {
+    auto &dln = state.dataLoopNodes;
     // Purpose: Initialize the AirTerminalMixers data structure with node data
     if (this->OneTimeInitFlag) {
-        {
+       { // Why is there a new scope here?
             auto &thisADU(state.dataDefineEquipment->AirDistUnit(this->ADUNum));
-            {
-                auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(thisADU.ZoneEqNum));
-                for (int SupAirIn = 1; SupAirIn <= thisZoneEqConfig.NumInletNodes; ++SupAirIn) {
-                    if (this->ZoneInletNode == thisZoneEqConfig.InletNode(SupAirIn)) {
-                        thisZoneEqConfig.AirDistUnitCool(SupAirIn).InNode = this->PriInNode;
-                        thisZoneEqConfig.AirDistUnitCool(SupAirIn).OutNode = this->MixedAirOutNode;
-                        thisZoneEqConfig.AirDistUnitHeat(SupAirIn).InNode = this->PriInNode;
-                        thisZoneEqConfig.AirDistUnitHeat(SupAirIn).OutNode = this->MixedAirOutNode;
+            { // Why is there a new scope here?
+                auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(thisADU.ZoneEqNum)); // Why is there not a new scope here?
+                for (int SupAirIn = 1; SupAirIn <= thisZoneEqConfig.NumInNodes; ++SupAirIn) {
+                    if (this->ZoneInNodeNum == thisZoneEqConfig.InNodeNums(SupAirIn)) {
+                        thisZoneEqConfig.AirDistUnitCool(SupAirIn).InNodeNum = this->PriAirInNodeNum;
+                        thisZoneEqConfig.AirDistUnitCool(SupAirIn).OutNodeNum = this->MixedAirOutNodeNum;
+                        thisZoneEqConfig.AirDistUnitHeat(SupAirIn).InNodeNum = this->PriAirInNodeNum;
+                        thisZoneEqConfig.AirDistUnitHeat(SupAirIn).OutNodeNum = this->MixedAirOutNodeNum;
                         thisADU.TermUnitSizingNum = thisZoneEqConfig.AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                        this->CtrlZoneInNodeIndex = SupAirIn;
-                        {
+                        this->CtrlZoneInNodeNum = SupAirIn;
+                        { // Why is this here?
                             auto &thisTermUnitSizingData(state.dataSize->TermUnitSizing(thisADU.TermUnitSizingNum));
                             thisTermUnitSizingData.ADUName = thisADU.Name;
                             // Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing if there is one attached to this
                             // terminal unit
                             if (thisADU.AirTerminalSizingSpecIndex > 0) {
-                                {
+                               { // Why is this here?
                                     auto const &thisAirTermSizingSpec(state.dataSize->AirTerminalSizingSpec(thisADU.AirTerminalSizingSpecIndex));
                                     thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
                                     thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
@@ -5975,13 +5971,16 @@ void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHV
     // Keep trying until we find it, the airloopnum, that is
     if (this->OneTimeInitFlag2) {
         this->AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(state.dataDefineEquipment->AirDistUnit(this->ADUNum).ZoneEqNum)
-                               .InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
+                               .InNodeAirLoopNum(this->CtrlZoneInNodeNum);
         state.dataDefineEquipment->AirDistUnit(this->ADUNum).AirLoopNum = this->AirLoopNum;
         if (this->AirLoopNum > 0) {
             this->OneTimeInitFlag2 = false;
         }
     }
 
+    auto *priInNode = dln->nodes(this->PriAirInNodeNum);
+    auto *mixedAirOutNode = dln->nodes(this->MixedAirOutNodeNum);
+    
     // Every iteration
     Real64 mDotFromOARequirement(0.0);
     Real64 vDotOAReq(0.0);
@@ -5995,27 +5994,23 @@ void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHV
                 vDotOAReq = DataSizing::calcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true);
                 mDotFromOARequirement = vDotOAReq * state.dataEnvrn->StdRhoAir / airLoopOAFrac;
             } else {
-                mDotFromOARequirement = state.dataLoopNodes->Node(this->PriInNode).MassFlowRate;
+                mDotFromOARequirement = priInNode->MassFlowRate;
             }
         }
         if (FirstHVACIteration) {
-            state.dataLoopNodes->Node(this->PriInNode).MassFlowRate = mDotFromOARequirement;
-            state.dataLoopNodes->Node(this->PriInNode).MassFlowRateMaxAvail = this->MassFlowRateMaxAvail;
-            state.dataLoopNodes->Node(this->PriInNode).MassFlowRateMinAvail = 0.0;
+            priInNode->MassFlowRate = mDotFromOARequirement;
+            priInNode->MassFlowRateMaxAvail = this->MassFlowRateMaxAvail;
+            priInNode->MassFlowRateMinAvail = 0.0;
         } else {
-            state.dataLoopNodes->Node(this->PriInNode).MassFlowRate = mDotFromOARequirement;
+            priInNode->MassFlowRate = mDotFromOARequirement;
 
-            state.dataLoopNodes->Node(this->PriInNode).MassFlowRate =
-                min(state.dataLoopNodes->Node(this->PriInNode).MassFlowRate, state.dataLoopNodes->Node(this->PriInNode).MassFlowRateMaxAvail);
-            state.dataLoopNodes->Node(this->PriInNode).MassFlowRate =
-                max(state.dataLoopNodes->Node(this->PriInNode).MassFlowRate, state.dataLoopNodes->Node(this->PriInNode).MassFlowRateMinAvail);
-            state.dataLoopNodes->Node(this->PriInNode).MassFlowRate =
-                max(state.dataLoopNodes->Node(this->PriInNode).MassFlowRate, state.dataLoopNodes->Node(this->PriInNode).MassFlowRateMin);
+            priInNode->MassFlowRate = min(priInNode->MassFlowRate, priInNode->MassFlowRateMaxAvail);
+            priInNode->MassFlowRate = max(priInNode->MassFlowRate, priInNode->MassFlowRateMinAvail);
+            priInNode->MassFlowRate = max(priInNode->MassFlowRate, priInNode->MassFlowRateMin);
         }
     }
     if (this->type == HVAC::MixerType::InletSide) {
-        state.dataLoopNodes->Node(this->PriInNode).MassFlowRate =
-            min(state.dataLoopNodes->Node(this->PriInNode).MassFlowRate, state.dataLoopNodes->Node(this->MixedAirOutNode).MassFlowRate);
+        priInNode->MassFlowRate = min(priInNode->MassFlowRate, mixedAirOutNode->MassFlowRate);
     }
 }
 
@@ -6051,25 +6046,29 @@ void CalcATMixer(EnergyPlusData &state, int const SysNum)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    state.dataSingleDuct->PriEnthalpyCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).Enthalpy;
-    state.dataSingleDuct->PriHumRatCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).HumRat;
-    state.dataSingleDuct->PriTempCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).Temp;
-    state.dataSingleDuct->PriMassFlowRateCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).MassFlowRate;
+    auto &dln = state.dataLoopNodes;
+    auto const *priInNode = dln->nodes(state.dataSingleDuct->SysATMixer(SysNum).PriAirInNodeNum);
+    auto *secInNode = dln->nodes(state.dataSingleDuct->SysATMixer(SysNum).SecAirInNodeNum);
+    auto const *mixedAirOutNode = dln->nodes(state.dataSingleDuct->SysATMixer(SysNum).MixedAirOutNodeNum);
+    
+    state.dataSingleDuct->PriEnthalpyCATM = priInNode->Enthalpy;
+    state.dataSingleDuct->PriHumRatCATM = priInNode->HumRat;
+    state.dataSingleDuct->PriTempCATM = priInNode->Temp;
+    state.dataSingleDuct->PriMassFlowRateCATM = priInNode->MassFlowRate;
 
-    state.dataSingleDuct->SecAirMassFlowRateCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).MassFlowRate;
-    state.dataSingleDuct->SecAirEnthalpyCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).Enthalpy;
-    state.dataSingleDuct->SecAirHumRatCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).HumRat;
-    state.dataSingleDuct->SecAirTempCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).Temp;
+    state.dataSingleDuct->SecAirMassFlowRateCATM = secInNode->MassFlowRate;
+    state.dataSingleDuct->SecAirEnthalpyCATM = secInNode->Enthalpy;
+    state.dataSingleDuct->SecAirHumRatCATM = secInNode->HumRat;
+    state.dataSingleDuct->SecAirTempCATM = secInNode->Temp;
 
     if (state.dataSingleDuct->SysATMixer(SysNum).type == HVAC::MixerType::SupplySide) {
         state.dataSingleDuct->MixedAirMassFlowRateCATM = state.dataSingleDuct->SecAirMassFlowRateCATM + state.dataSingleDuct->PriMassFlowRateCATM;
     } else {
         // for inlet side mixer, the mixed air flow has been set, but we don't know the secondary flow
-        state.dataSingleDuct->MixedAirMassFlowRateCATM =
-            state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).MixedAirOutNode).MassFlowRate;
+        state.dataSingleDuct->MixedAirMassFlowRateCATM = mixedAirOutNode->MassFlowRate;
         state.dataSingleDuct->SecAirMassFlowRateCATM =
             max(state.dataSingleDuct->MixedAirMassFlowRateCATM - state.dataSingleDuct->PriMassFlowRateCATM, 0.0);
-        state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).MassFlowRate = state.dataSingleDuct->SecAirMassFlowRateCATM;
+        secInNode->MassFlowRate = state.dataSingleDuct->SecAirMassFlowRateCATM;
         if (std::abs(state.dataSingleDuct->PriMassFlowRateCATM + state.dataSingleDuct->SecAirMassFlowRateCATM -
                      state.dataSingleDuct->MixedAirMassFlowRateCATM) > SmallMassFlow) {
             ShowSevereError(
@@ -6117,48 +6116,42 @@ void UpdateATMixer(EnergyPlusData &state, int const SysNum)
 
     // REFERENCES:
 
-    // Using/Aliasing
-    using namespace DataLoopNode;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int PriInNode = state.dataSingleDuct->SysATMixer(SysNum).PriInNode;
-    int SecInNode = state.dataSingleDuct->SysATMixer(SysNum).SecInNode;
-    int MixedAirOutNode = state.dataSingleDuct->SysATMixer(SysNum).MixedAirOutNode;
+    auto &dln = state.dataLoopNodes;
+    
+    auto *priInNode = dln->nodes(state.dataSingleDuct->SysATMixer(SysNum).PriAirInNodeNum);
+    auto *secInNode = dln->nodes(state.dataSingleDuct->SysATMixer(SysNum).SecAirInNodeNum);
+    auto *mixedAirOutNode = dln->nodes(state.dataSingleDuct->SysATMixer(SysNum).MixedAirOutNodeNum);
 
     // mixed air data
-    state.dataLoopNodes->Node(MixedAirOutNode).Temp = state.dataSingleDuct->SysATMixer(SysNum).MixedAirTemp;
-    state.dataLoopNodes->Node(MixedAirOutNode).HumRat = state.dataSingleDuct->SysATMixer(SysNum).MixedAirHumRat;
-    state.dataLoopNodes->Node(MixedAirOutNode).Enthalpy = state.dataSingleDuct->SysATMixer(SysNum).MixedAirEnthalpy;
-    state.dataLoopNodes->Node(MixedAirOutNode).Press = state.dataSingleDuct->SysATMixer(SysNum).MixedAirPressure;
-    state.dataLoopNodes->Node(MixedAirOutNode).MassFlowRate = state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate;
+    mixedAirOutNode->Temp = state.dataSingleDuct->SysATMixer(SysNum).MixedAirTemp;
+    mixedAirOutNode->HumRat = state.dataSingleDuct->SysATMixer(SysNum).MixedAirHumRat;
+    mixedAirOutNode->Enthalpy = state.dataSingleDuct->SysATMixer(SysNum).MixedAirEnthalpy;
+    mixedAirOutNode->Press = state.dataSingleDuct->SysATMixer(SysNum).MixedAirPressure;
+    mixedAirOutNode->MassFlowRate = state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate;
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
         if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= HVAC::VerySmallMassFlow) {
-            state.dataLoopNodes->Node(MixedAirOutNode).CO2 = state.dataLoopNodes->Node(PriInNode).CO2;
+            mixedAirOutNode->CO2 = priInNode->CO2;
         } else {
-            state.dataLoopNodes->Node(MixedAirOutNode).CO2 =
-                (state.dataLoopNodes->Node(SecInNode).MassFlowRate * state.dataLoopNodes->Node(SecInNode).CO2 +
-                 state.dataLoopNodes->Node(PriInNode).MassFlowRate * state.dataLoopNodes->Node(PriInNode).CO2) /
-                state.dataLoopNodes->Node(MixedAirOutNode).MassFlowRate;
+            mixedAirOutNode->CO2 = (secInNode->MassFlowRate * secInNode->CO2 + priInNode->MassFlowRate * priInNode->CO2) / mixedAirOutNode->MassFlowRate;
         }
     }
 
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
         if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= HVAC::VerySmallMassFlow) {
-            state.dataLoopNodes->Node(MixedAirOutNode).GenContam = state.dataLoopNodes->Node(PriInNode).GenContam;
+            mixedAirOutNode->GenContam = priInNode->GenContam;
         } else {
-            state.dataLoopNodes->Node(MixedAirOutNode).GenContam =
-                (state.dataLoopNodes->Node(SecInNode).MassFlowRate * state.dataLoopNodes->Node(SecInNode).GenContam +
-                 state.dataLoopNodes->Node(PriInNode).MassFlowRate * state.dataLoopNodes->Node(PriInNode).GenContam) /
-                state.dataLoopNodes->Node(MixedAirOutNode).MassFlowRate;
+            mixedAirOutNode->GenContam =
+                (secInNode->MassFlowRate * secInNode->GenContam + priInNode->MassFlowRate * priInNode->GenContam) / mixedAirOutNode->MassFlowRate;
         }
     }
 
     // update ADU flow data - because SimATMixer is called from the various zone equipment so the updates in SimZoneAirLoopEquipment won't work
     int aduNum = state.dataSingleDuct->SysATMixer(SysNum).ADUNum;
-    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateTU = state.dataLoopNodes->Node(PriInNode).MassFlowRate;
-    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateZSup = state.dataLoopNodes->Node(PriInNode).MassFlowRate;
-    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateSup = state.dataLoopNodes->Node(PriInNode).MassFlowRate;
+    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateTU = priInNode->MassFlowRate;
+    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateZSup = priInNode->MassFlowRate;
+    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateSup = priInNode->MassFlowRate;
 }
 
 void GetATMixer(EnergyPlusData &state,
@@ -6205,14 +6198,12 @@ void GetATMixer(EnergyPlusData &state,
     if (ATMixerIndex > 0) {
         ATMixerNum = ATMixerIndex;
         ATMixerName = state.dataSingleDuct->SysATMixer(ATMixerIndex).Name;
-        ATMixerPriNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).PriInNode;
-        ATMixerSecNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).SecInNode;
-        ATMixerOutNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).MixedAirOutNode;
+
         ATMixerType = state.dataSingleDuct->SysATMixer(ATMixerIndex).type;
         if (ATMixerType == HVAC::MixerType::InletSide) {
-            state.dataSingleDuct->SysATMixer(ATMixerIndex).ZoneInletNode = ZoneEquipOutletNode;
+            state.dataSingleDuct->SysATMixer(ATMixerIndex).ZoneInNodeNum = ZoneEquipOutletNode;
         } else {
-            state.dataSingleDuct->SysATMixer(ATMixerIndex).ZoneInletNode = ATMixerOutNode;
+            state.dataSingleDuct->SysATMixer(ATMixerIndex).ZoneInNodeNum = ATMixerOutNode;
         }
         state.dataSingleDuct->SysATMixer(ATMixerNum).InitATMixer(state, false);
     } else {
@@ -6247,14 +6238,15 @@ void SetATMixerPriFlow(EnergyPlusData &state,
     // air inlet node.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int PriAirNode; // air terminal mixer primary air inlet node number
 
     if (ATMixerNum <= 0) return;
-    PriAirNode = state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode;
+
+    auto &dln = state.dataLoopNodes;
+    auto *priInNode = dln->nodes(state.dataSingleDuct->SysATMixer(ATMixerNum).PriAirInNodeNum);
     if (present(PriAirMassFlowRate)) {
-        state.dataLoopNodes->Node(PriAirNode).MassFlowRate = PriAirMassFlowRate;
+        priInNode->MassFlowRate = PriAirMassFlowRate;
     } else {
-        state.dataLoopNodes->Node(PriAirNode).MassFlowRate = state.dataLoopNodes->Node(PriAirNode).MassFlowRateMaxAvail;
+        priInNode->MassFlowRate = priInNode->MassFlowRateMaxAvail;
     }
 }
 
@@ -6306,7 +6298,7 @@ void setATMixerSizingProperties(EnergyPlusData &state,
 
     int airLoopIndex = // find air loop associated with ATMixer
         state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum)
-            .InletNodeAirLoopNum(state.dataSingleDuct->SysATMixer(inletATMixerIndex).CtrlZoneInNodeIndex);
+            .InNodeAirLoopNum(state.dataSingleDuct->SysATMixer(inletATMixerIndex).CtrlZoneInNodeNum);
 
     // must be a system sizing run or calculations are not possible
     bool SizingDesRunThisAirSys = false;                                      // Sizing:System object found flag

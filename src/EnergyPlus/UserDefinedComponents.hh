@@ -76,8 +76,8 @@ namespace UserDefinedComponents {
         int simCallbackIndex = -1;  // If API Callbacks are used to simulate this, this defines the index in the user-defined callbacks vector
         int initCallbackIndex = -1; // If API Callbacks are used to init this, this defines the index in the user-defined callbacks vector
         PlantLocation plantLoc;
-        int InletNodeNum;                       // plant loop inlet node index
-        int OutletNodeNum;                      // plant loop outlet node index
+        int InNodeNum = 0;                       // plant loop inlet node index
+        int OutNodeNum = 0;                      // plant loop outlet node index
         DataPlant::LoopFlowStatus FlowPriority; // how component affects overall loop flow determination
         DataPlant::HowMet HowLoadServed;        // nature of component wrt to plant loop's loads
         Real64 LowOutTempLimit;                 // low limit for outlet temp if MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT
@@ -98,8 +98,8 @@ namespace UserDefinedComponents {
 
         // Default Constructor
         PlantConnectionStruct()
-            : ErlInitProgramMngr(0), ErlSimProgramMngr(0), simPluginLocation(-1), initPluginLocation(-1), plantLoc{}, InletNodeNum(0),
-              OutletNodeNum(0), FlowPriority(DataPlant::LoopFlowStatus::Invalid), HowLoadServed(DataPlant::HowMet::Invalid), LowOutTempLimit(0.0),
+            : ErlInitProgramMngr(0), ErlSimProgramMngr(0), simPluginLocation(-1), initPluginLocation(-1), plantLoc{}, 
+              FlowPriority(DataPlant::LoopFlowStatus::Invalid), HowLoadServed(DataPlant::HowMet::Invalid), LowOutTempLimit(0.0),
               HiOutTempLimit(0.0), MassFlowRateRequest(0.0), MassFlowRateMin(0.0), MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0), MyLoad(0.0),
               MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0), InletRho(0.0), InletCp(0.0), InletTemp(0.0), InletMassFlowRate(0.0), OutletTemp(0.0)
         {
@@ -109,8 +109,8 @@ namespace UserDefinedComponents {
     struct AirConnectionStruct
     {
         // Members
-        int InletNodeNum;          // air inlet node index
-        int OutletNodeNum;         // air outlet node index
+        int InNodeNum = 0;          // air inlet node index
+        int OutNodeNum = 0;         // air outlet node index
         Real64 InletRho;           // fills internal variable, current inlet air density [kg/m3]
         Real64 InletCp;            // fills internal variable, current inlet air specific heat [J/kg-c]
         Real64 InletTemp;          // fills internal variable, current inlet air temperature [C]
@@ -122,7 +122,7 @@ namespace UserDefinedComponents {
 
         // Default Constructor
         AirConnectionStruct()
-            : InletNodeNum(0), OutletNodeNum(0), InletRho(0.0), InletCp(0.0), InletTemp(0.0), InletHumRat(0.0), InletMassFlowRate(0.0),
+            : InletRho(0.0), InletCp(0.0), InletTemp(0.0), InletHumRat(0.0), InletMassFlowRate(0.0),
               OutletTemp(0.0), OutletHumRat(0.0), OutletMassFlowRate(0.0)
         {
         }
