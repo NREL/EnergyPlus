@@ -231,7 +231,6 @@ void SimDXCoil(EnergyPlusData &state,
         CalcDXHeatingCoil(state, DXCoilNum, PartLoadRatio, fanOp, AirFlowRatio, MaxCap);
     } break;
     case HVAC::CoilVRF_FluidTCtrl_Cooling: {
-        // fixme: this redefines the MaxCap, how should I go about changing it from optional arg to non-optional?
         CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, HVAC::CompressorOp::On, FirstHVACIteration, PartLoadRatio, fanOp, CompCycRatio, _, _, MaxCap);
     } break;
     case HVAC::CoilVRF_FluidTCtrl_Heating: {
