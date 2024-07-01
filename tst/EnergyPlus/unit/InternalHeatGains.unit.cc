@@ -3296,7 +3296,10 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
     // Test the processing results of the Environmental Class H1 input
     EXPECT_TRUE(thisZoneITEq.Class == DataHeatBalance::ITEClass::H1);
 
+    state->dataEnvrn->StdRhoAir = 0.8;
     InternalHeatGains::CalcZoneITEq(*state);
+    // add a test to verify the standard density air volume flow rate calculation
+    EXPECT_NEAR(state->dataHeatBal->ZoneITEq(1).AirVolFlowStdDensity, 0.2469055, 1e-6);
 
     int NZ = 1;
     int spaceNum = 1;
