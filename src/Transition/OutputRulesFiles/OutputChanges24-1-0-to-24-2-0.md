@@ -43,3 +43,30 @@ These changes will also make corresponding changes in the HTML Intialization Sum
 
 An output variable will be added at both zone and space level: Zone Wetbulb Globe Temperature, and Space Wetbulb Globe
 Temperature
+
+### EnvelopeSummary in Tabular Reports
+
+In the Opaque Exterior table added “Zone” column
+
+Add an entirely new table called Opaque Construction Layers which shows the layers of materials for each construction
+
+
+###	EquipmentSummary in Tabular Reports
+
+In the DX Heating Coils table added "Supplemental Heat High Shutoff Temperature”
+
+In the Fans table added "Motor Loss Zone Name"
+
+Added an entirely new table called Air Terminals
+
+###	SystemSummary in Tabular Reports
+
+In the Demand Controlled Ventilation table added the "type"
+
+Added an entirely new table called Thermostat Schedules
+
+## New HVAC Topology report in Tabular Reports
+
+The HVAC Topology report provides information about the arrangement of HVAC components in the supply and demand side of the airloop, zone equipment, and plant loop. Each row shows the additional component, sub-component, or sub-sub-component being added to the arrangement. 
+
+
