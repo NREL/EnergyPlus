@@ -398,6 +398,10 @@ namespace OutputReportPredefined {
         s->pdchDXHeatCoilLowCap_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Low Temperature Heating (net) Rating Capacity [W]");
         s->pdchDXHeatCoilHSPF2IP_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "HSPF2 [Btu/W-h]");
         s->pdchDXHeatCoilRegionNum_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Region Number");
+        // Std 229 Predef outputs for DX Heating Coils AHRI 2023
+        s->pdchDXHeatCoilMinOADBTforCompOp_2023 =
+            newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation");
+        s->pdchDXHeatCoilAirloopName_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Airloop Name");
 
         s->pdstHeatCoil = newPreDefSubTable(state, s->pdrEquip, "Heating Coils");
 
