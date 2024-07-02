@@ -388,7 +388,7 @@ namespace OutputReportPredefined {
         s->pdchDXHeatCoilRegionNum = newPreDefColumn(state, s->pdstDXHeatCoil, "Region Number");
         // Std 229 Predef outputs for DX Heating Coils
         s->pdchDXHeatCoilMinOADBTforCompOp =
-            newPreDefColumn(state, s->pdstDXHeatCoil, "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation");
+            newPreDefColumn(state, s->pdstDXHeatCoil, "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation [C]");
         s->pdchDXHeatCoilAirloopName = newPreDefColumn(state, s->pdstDXHeatCoil, "Airloop Name");
 
         // for DX Heating Coil AHRI Standard 2023 Ratings | HSPF2
@@ -400,7 +400,7 @@ namespace OutputReportPredefined {
         s->pdchDXHeatCoilRegionNum_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Region Number");
         // Std 229 Predef outputs for DX Heating Coils AHRI 2023
         s->pdchDXHeatCoilMinOADBTforCompOp_2023 =
-            newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation");
+            newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation [C]");
         s->pdchDXHeatCoilAirloopName_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Airloop Name");
 
         s->pdstHeatCoil = newPreDefSubTable(state, s->pdrEquip, "Heating Coils");
