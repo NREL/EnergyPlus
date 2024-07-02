@@ -539,7 +539,6 @@ namespace DataHeatBalance {
         Real64 ZonePierceSET;
         Real64 ZonePierceSETLastStep;
         Real64 ZoneHeatIndex;
-        Real64 ZoneExtendedHeatIndex;
         Real64 ZoneHumidex;
         bool CrossedColdThresh;
         bool CrossedHeatThresh;
@@ -569,7 +568,7 @@ namespace DataHeatBalance {
         // Default Constructor
         ZoneResilience()
             : ZoneNumOcc(0.0), ColdStressTempThresh(15.56), HeatStressTempThresh(30.0), PierceSET(-999.0), PMV(0.0), ZonePierceSET(-1.0),
-              ZonePierceSETLastStep(-1.0), ZoneHeatIndex(0.0), ZoneExtendedHeatIndex(0.0), ZoneHumidex(0.0), CrossedColdThresh(false), CrossedHeatThresh(false)
+              ZonePierceSETLastStep(-1.0), ZoneHeatIndex(0.0), ZoneHumidex(0.0), CrossedColdThresh(false), CrossedHeatThresh(false)
         {
         }
     };
