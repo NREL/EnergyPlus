@@ -64,8 +64,8 @@ using namespace EnergyPlus;
 TEST_F(EnergyPlusFixture, extendedHI_pvstar)
 {
     Real64 tol = 1e-8;
-    std::vector<double> T_values = {200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370};
-    std::vector<double> result = {0.16315953136381425,
+    std::vector<Real64> T_values = {200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370};
+    std::vector<Real64> result = {0.16315953136381425,
                                   0.7045737646159884,
                                   2.6639212639290717,
                                   8.972721335550697,
@@ -91,8 +91,8 @@ TEST_F(EnergyPlusFixture, extendedHI_pvstar)
 TEST_F(EnergyPlusFixture, extendedHI_Le)
 {
     Real64 tol = 1e-8;
-    std::vector<double> T_values = {200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370};
-    std::vector<double> result = {2663805.16,
+    std::vector<Real64> T_values = {200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370};
+    std::vector<Real64> result = {2663805.16,
                                   2641405.16,
                                   2619005.16,
                                   2596605.16,
@@ -118,9 +118,9 @@ TEST_F(EnergyPlusFixture, extendedHI_Le)
 TEST_F(EnergyPlusFixture, extendedHI_Qv)
 {
     Real64 tol = 1e-8;
-    std::vector<double> T_values = {200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370};
-    std::vector<double> P_values = {1, 10, 100, 1000, 10000};
-    std::vector<std::vector<double>> result = {{49.94618970804489, 49.91176798964203, 49.56755080561335, 46.125378965326625, 11.703660562459378},
+    std::vector<Real64> T_values = {200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370};
+    std::vector<Real64> P_values = {1, 10, 100, 1000, 10000};
+    std::vector<std::vector<Real64>> result = {{49.94618970804489, 49.91176798964203, 49.56755080561335, 46.125378965326625, 11.703660562459378},
                                                {47.3566427480449, 47.32222102964202, 46.97800384561336, 43.53583200532663, 9.114113602459378},
                                                {44.76709578804489, 44.73267406964202, 44.38845688561335, 40.94628504532663, 6.5245666424593765},
                                                {42.17754882804489, 42.14312710964202, 41.79890992561335, 38.356738085326626, 3.9350196824593775},
@@ -148,8 +148,8 @@ TEST_F(EnergyPlusFixture, extendedHI_Qv)
 TEST_F(EnergyPlusFixture, extendedHI_Zs)
 {
     Real64 tol = 1e-8;
-    std::vector<double> Rs_values = {0.0387, 0.5, 1, 1.2};
-    std::vector<double> result = {52.1, 18750000.0, 600000000.0, 1492991999.9999998};
+    std::vector<Real64> Rs_values = {0.0387, 0.5, 1, 1.2};
+    std::vector<Real64> result = {52.1, 18750000.0, 600000000.0, 1492991999.9999998};
     for (size_t i = 0; i < Rs_values.size(); ++i) {
         EXPECT_NEAR(extendedHI::Zs(Rs_values[i]), result[i], tol);
     }
@@ -158,9 +158,9 @@ TEST_F(EnergyPlusFixture, extendedHI_Zs)
 TEST_F(EnergyPlusFixture, extendedHI_Ra)
 {
     Real64 tol = 1e-8;
-    std::vector<double> Ts_values = {240, 260, 280, 300, 320, 340, 360};
-    std::vector<double> Ta_values = {240, 260, 280, 300, 320, 340, 360};
-    std::vector<std::vector<double>> result = {{0.05003742549640303,
+    std::vector<Real64> Ts_values = {240, 260, 280, 300, 320, 340, 360};
+    std::vector<Real64> Ta_values = {240, 260, 280, 300, 320, 340, 360};
+    std::vector<std::vector<Real64>> result = {{0.05003742549640303,
                                                 0.04919686900951711,
                                                 0.0482949471609349,
                                                 0.04733482621494337,
@@ -219,9 +219,9 @@ TEST_F(EnergyPlusFixture, extendedHI_Ra)
 TEST_F(EnergyPlusFixture, extendedHI_Ra_bar)
 {
     Real64 tol = 1e-8;
-    std::vector<double> Tf_values = {240, 260, 280, 300, 320, 340, 360};
-    std::vector<double> Ta_values = {240, 260, 280, 300, 320, 340, 360};
-    std::vector<std::vector<double>> result = {{0.07141547425826913,
+    std::vector<Real64> Tf_values = {240, 260, 280, 300, 320, 340, 360};
+    std::vector<Real64> Ta_values = {240, 260, 280, 300, 320, 340, 360};
+    std::vector<std::vector<Real64>> result = {{0.07141547425826913,
                                                 0.0698327896993347,
                                                 0.06815365152671275,
                                                 0.06638750352391155,
@@ -280,9 +280,9 @@ TEST_F(EnergyPlusFixture, extendedHI_Ra_bar)
 TEST_F(EnergyPlusFixture, extendedHI_Ra_un)
 {
     Real64 tol = 1e-8;
-    std::vector<double> Tf_values = {240, 260, 280, 300, 320, 340, 360};
-    std::vector<double> Ta_values = {240, 260, 280, 300, 320, 340, 360};
-    std::vector<std::vector<double>> result = {{0.06787493202819687,
+    std::vector<Real64> Tf_values = {240, 260, 280, 300, 320, 340, 360};
+    std::vector<Real64> Ta_values = {240, 260, 280, 300, 320, 340, 360};
+    std::vector<std::vector<Real64>> result = {{0.06787493202819687,
                                                 0.06642598354057656,
                                                 0.06488609100341329,
                                                 0.06326346252950685,
@@ -341,8 +341,8 @@ TEST_F(EnergyPlusFixture, extendedHI_Ra_un)
 TEST_F(EnergyPlusFixture, extendedHI_find_eqvar)
 {
     Real64 tol = 1e-5;
-    std::vector<double> Ta_values = {240, 260, 280, 300, 320, 340, 360};
-    std::vector<double> RH_values = {0, 0.2, 0.4, 0.6, 0.8, 1.0};
+    std::vector<Real64> Ta_values = {240, 260, 280, 300, 320, 340, 360};
+    std::vector<Real64> RH_values = {0, 0.2, 0.4, 0.6, 0.8, 1.0};
     std::vector<std::vector<std::string>> result_0 = {{"Rf", "Rf", "Rf", "Rf", "Rf", "Rf"},
                                                       {"Rf", "Rf", "Rf", "Rf", "Rf", "Rf"},
                                                       {"Rf", "Rf", "Rf", "Rf", "Rf", "Rf"},
@@ -351,7 +351,7 @@ TEST_F(EnergyPlusFixture, extendedHI_find_eqvar)
                                                       {"Rs", "dTcdt", "dTcdt", "dTcdt", "dTcdt", "dTcdt"},
                                                       {"Rs*", "dTcdt", "dTcdt", "dTcdt", "dTcdt", "dTcdt"}};
     Real64 result_1 = 0.84;
-    std::vector<std::vector<double>> result_2 = {
+    std::vector<std::vector<Real64>> result_2 = {
         {33.04275493601435, 32.695633042229204, 32.355420488419746, 32.02191338684983, 31.694909211003484, 31.374226422935042},
         {1.5604330579759274, 1.546333295029165, 1.5323814066211647, 1.518575393945302, 1.504913229554858, 1.491392978806081},
         {0.4424813164108615, 0.42287513206662247, 0.40403359558586455, 0.3859354349292241, 0.3685598262740109, 0.35188630624297995},
@@ -359,7 +359,7 @@ TEST_F(EnergyPlusFixture, extendedHI_find_eqvar)
         {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
         {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
         {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
-    std::vector<std::vector<double>> result_3 = {
+    std::vector<std::vector<Real64>> result_3 = {
         {0.0387, 0.0387, 0.0387, 0.0387, 0.0387, 0.0387},
         {0.0387, 0.0387, 0.0387, 0.0387, 0.0387, 0.0387},
         {0.0387, 0.0387, 0.0387, 0.0387, 0.0387, 0.0387},
@@ -367,7 +367,7 @@ TEST_F(EnergyPlusFixture, extendedHI_find_eqvar)
         {0.026992716499180645, 0.02259372764887033, 0.0, 0.0, 0.0, 0.0},
         {0.02072684837877413, 0.0, 0.0, 0.0, 0.0, 0.0},
         {0.0014681498999064508, 0.0, 0.0, 0.0, 0.0, 0.0}};
-    std::vector<std::vector<double>> result_4 = {
+    std::vector<std::vector<Real64>> result_4 = {
         {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
         {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
         {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
@@ -392,15 +392,15 @@ TEST_F(EnergyPlusFixture, extendedHI_find_T)
 {
     Real64 tol = 1e-7;
     state->dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Bisection;
-    std::vector<double> Rf_values = {30, 32, 34, 36, 38};
-    std::vector<double> result_0_rf = {240.06754042464308, 239.971123727737, 239.88581076147966, 239.8097881616559, 239.7416166716721};
+    std::vector<Real64> Rf_values = {30, 32, 34, 36, 38};
+    std::vector<Real64> result_0_rf = {240.06754042464308, 239.971123727737, 239.88581076147966, 239.8097881616559, 239.7416166716721};
     for (size_t i = 0; i < Rf_values.size(); ++i) {
         auto const output = extendedHI::find_T(*state, "Rf", Rf_values[i]);
         EXPECT_EQ(std::get<1>(output), "II");
         EXPECT_NEAR(std::get<0>(output), result_0_rf[i], tol);
     }
-    std::vector<double> Rs_values = {0.01, 0.02, 0.03};
-    std::vector<double> result_0_rs = {337.8696502133971, 329.7586998442421, 307.4815719091566};
+    std::vector<Real64> Rs_values = {0.01, 0.02, 0.03};
+    std::vector<Real64> result_0_rs = {337.8696502133971, 329.7586998442421, 307.4815719091566};
     tol = 1e-4;
     for (size_t i = 0; i < Rs_values.size(); ++i) {
         auto const output = extendedHI::find_T(*state, "Rs", Rs_values[i]);
@@ -418,7 +418,7 @@ TEST_F(EnergyPlusFixture, extendedHI_heatindex)
 
     // fixme: not finished
     state->dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Bisection;
-    std::vector<std::vector<double>> HI_values = {{199.9994020652, 199.9997010342, 200.0000000021},
+    std::vector<std::vector<Real64>> HI_values = {{199.9994020652, 199.9997010342, 200.0000000021},
                                                   {209.9975943902, 209.9987971085, 209.9999998068},
                                                   {219.9915822029, 219.9957912306, 219.9999999912},
                                                   {229.9739691979, 229.9869861009, 230.0000001850},
@@ -437,8 +437,8 @@ TEST_F(EnergyPlusFixture, extendedHI_heatindex)
                                                   {343.6312984164, 559.6640227151, 677.2462089759},
                                                   {354.1825692377, 623.1960299857, 755.0832658147}};
 
-    std::vector<double> T_values = {200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370};
-    std::vector<double> RH_values = {0, 0.5, 1};
+    std::vector<Real64> T_values = {200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370};
+    std::vector<Real64> RH_values = {0, 0.5, 1};
 
     Real64 tol = 1e-4;
 
@@ -446,7 +446,6 @@ TEST_F(EnergyPlusFixture, extendedHI_heatindex)
     for (size_t i = 0; i < T_values.size(); ++i) {
         for (size_t j = 0; j < RH_values.size(); ++j) {
             Real64 HI = HI_values[i][j];
-            fmt::print("T={}, RH={}, HI={}\n", T_values[i], RH_values[j], extendedHI::heatindex(*state, T_values[i], RH_values[j], true));
             EXPECT_NEAR(extendedHI::heatindex(*state, T_values[i], RH_values[j], false), HI, tol);
         }
     }
