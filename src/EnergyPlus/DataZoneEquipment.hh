@@ -614,7 +614,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     int NumOfZoneEquipLists = 0;
     Array1D<Avail::Status> ZoneEquipAvail;
     Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
-    EPVector<DataZoneEquipment::EquipConfiguration> spaceEquipConfig;
+    Array1D<DataZoneEquipment::EquipConfiguration> spaceEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;
     Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
     Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;

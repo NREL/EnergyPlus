@@ -1985,6 +1985,239 @@ std::string sizingPeakTimeStamp(EnergyPlusData &state, int timeStepIndex)
     return format(PeakHrMinFmt, hour, minute);
 }
 
+void writeZszSpsz(EnergyPlusData &state,
+                  EnergyPlus::InputOutputFile &outputFile,
+                  int const numSpacesOrZones,
+                  Array1D<DataZoneEquipment::EquipConfiguration> const zsEquipConfig,
+                  EPVector<DataSizing::ZoneSizingData> const &zsCalcFinalSizing,
+                  Array2D<DataSizing::ZoneSizingData> const &zsCalcSizing)
+{
+    char const colSep = state.dataSize->SizingFileColSep;
+    print(outputFile, "Time");
+    for (int i = 1; i <= numSpacesOrZones; ++i) {
+        if (!zsEquipConfig(i).IsControlled) continue;
+        auto &thisCalcFS = zsCalcFinalSizing(i);
+
+        static constexpr std::string_view ZSizeFmt11("{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{"
+                                                     "}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}");
+        print(outputFile,
+              ZSizeFmt11,
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.HeatDesDay,
+              ":Des Heat Load [W]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.CoolDesDay,
+              ":Des Sens Cool Load [W]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.HeatDesDay,
+              ":Des Heat Mass Flow [kg/s]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.CoolDesDay,
+              ":Des Cool Mass Flow [kg/s]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.LatHeatDesDay,
+              ":Des Latent Heat Load [W]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.LatCoolDesDay,
+              ":Des Latent Cool Load [W]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.LatHeatDesDay,
+              ":Des Latent Heat Mass Flow [kg/s]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.LatCoolDesDay,
+              ":Des Latent Cool Mass Flow [kg/s]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.HeatNoDOASDesDay,
+              ":Des Heat Load No DOAS [W]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.CoolNoDOASDesDay,
+              ":Des Sens Cool Load No DOAS [W]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.LatHeatNoDOASDesDay,
+              ":Des Latent Heat Load No DOAS [W]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.LatCoolNoDOASDesDay,
+              ":Des Latent Cool Load No DOAS [W]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.HeatDesDay,
+              ":Heating Zone Temperature [C]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.HeatDesDay,
+              ":Heating Zone Relative Humidity [%]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.CoolDesDay,
+              ":Cooling Zone Temperature [C]",
+              colSep,
+              thisCalcFS.ZoneName,
+              thisCalcFS.CoolDesDay,
+              ":Cooling Zone Relative Humidity [%]");
+    }
+    print(outputFile, "\n");
+    //      HourFrac = 0.0
+    int Minutes = 0;
+    int TimeStepIndex = 0;
+    for (int HourCounter = 1; HourCounter <= 24; ++HourCounter) {
+        for (int TimeStepCounter = 1; TimeStepCounter <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStepCounter) {
+            ++TimeStepIndex;
+            Minutes += state.dataGlobal->MinutesPerTimeStep;
+            int HourPrint = HourCounter - 1;
+            if (Minutes == 60) {
+                Minutes = 0;
+                HourPrint = HourCounter;
+            }
+            static constexpr std::string_view ZSizeFmt20("{:02}:{:02}:00");
+            print(outputFile, ZSizeFmt20, HourPrint, Minutes);
+            for (int i = 1; i <= numSpacesOrZones; ++i) {
+                if (!zsEquipConfig(i).IsControlled) continue;
+                auto &thisCalcFS = zsCalcFinalSizing(i);
+                static constexpr std::string_view ZSizeFmt21("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12."
+                                                             "6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
+                Real64 ZoneRHHeat = 0.0;
+                Real64 ZoneRHCool = 0.0;
+                Real64 ZoneTHeat = 0.0;
+                Real64 ZoneTCool = 0.0;
+                if (thisCalcFS.HeatDDNum > 0) {
+                    ZoneTHeat = zsCalcSizing(thisCalcFS.HeatDDNum, i).HeatZoneTempSeq(TimeStepIndex);
+                    ZoneRHHeat = Psychrometrics::PsyRhFnTdbWPb(state,
+                                                               zsCalcSizing(thisCalcFS.HeatDDNum, i).HeatZoneTempSeq(TimeStepIndex),
+                                                               zsCalcSizing(thisCalcFS.HeatDDNum, i).HeatZoneHumRatSeq(TimeStepIndex),
+                                                               state.dataEnvrn->OutBaroPress) *
+                                 100.0;
+                }
+                if (thisCalcFS.CoolDDNum > 0) {
+                    ZoneTCool = zsCalcSizing(thisCalcFS.CoolDDNum, i).CoolZoneTempSeq(TimeStepIndex);
+                    ZoneRHCool = Psychrometrics::PsyRhFnTdbWPb(state,
+                                                               zsCalcSizing(thisCalcFS.CoolDDNum, i).CoolZoneTempSeq(TimeStepIndex),
+                                                               zsCalcSizing(thisCalcFS.CoolDDNum, i).CoolZoneHumRatSeq(TimeStepIndex),
+                                                               state.dataEnvrn->OutBaroPress) *
+                                 100.0;
+                }
+                print(outputFile,
+                      ZSizeFmt21,
+                      colSep,
+                      thisCalcFS.HeatLoadSeq(TimeStepIndex),
+                      colSep,
+                      thisCalcFS.CoolLoadSeq(TimeStepIndex),
+                      colSep,
+                      thisCalcFS.HeatFlowSeq(TimeStepIndex),
+                      colSep,
+                      thisCalcFS.CoolFlowSeq(TimeStepIndex),
+                      colSep,
+                      thisCalcFS.LatentHeatLoadSeq(TimeStepIndex),
+                      colSep,
+                      thisCalcFS.LatentCoolLoadSeq(TimeStepIndex),
+                      colSep,
+                      thisCalcFS.LatentHeatFlowSeq(TimeStepIndex),
+                      colSep,
+                      thisCalcFS.LatentCoolFlowSeq(TimeStepIndex),
+                      colSep,
+                      thisCalcFS.HeatLoadNoDOASSeq(TimeStepIndex),
+                      colSep,
+                      thisCalcFS.CoolLoadNoDOASSeq(TimeStepIndex),
+                      colSep,
+                      thisCalcFS.HeatLatentLoadNoDOASSeq(TimeStepIndex),
+                      colSep,
+                      thisCalcFS.CoolLatentLoadNoDOASSeq(TimeStepIndex),
+                      colSep,
+                      ZoneTHeat,
+                      colSep,
+                      ZoneRHHeat,
+                      colSep,
+                      ZoneTCool,
+                      colSep,
+                      ZoneRHCool);
+            }
+            print(outputFile, "\n");
+        }
+    }
+    print(outputFile, "Peak");
+
+    for (int i = 1; i <= numSpacesOrZones; ++i) {
+        if (!zsEquipConfig(i).IsControlled) continue;
+        auto &thisCalcFS = zsCalcFinalSizing(i);
+
+        static constexpr std::string_view ZSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12."
+                                                     "6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{}{}{}");
+        print(outputFile,
+              ZSizeFmt31,
+              colSep,
+              thisCalcFS.DesHeatLoad,
+              colSep,
+              thisCalcFS.DesCoolLoad,
+              colSep,
+              thisCalcFS.DesHeatMassFlow,
+              colSep,
+              thisCalcFS.DesCoolMassFlow,
+              colSep,
+              thisCalcFS.DesLatentHeatLoad,
+              colSep,
+              thisCalcFS.DesLatentCoolLoad,
+              colSep,
+              thisCalcFS.DesLatentHeatMassFlow,
+              colSep,
+              thisCalcFS.DesLatentCoolMassFlow,
+              colSep,
+              thisCalcFS.DesHeatLoadNoDOAS,
+              colSep,
+              thisCalcFS.DesCoolLoadNoDOAS,
+              colSep,
+              thisCalcFS.DesLatentHeatLoadNoDOAS,
+              colSep,
+              thisCalcFS.DesLatentCoolLoadNoDOAS,
+              colSep,
+              colSep,
+              colSep,
+              colSep);
+    }
+    print(outputFile, "\n");
+
+    print(outputFile, "\nPeak Vol Flow (m3/s)");
+    for (int i = 1; i <= numSpacesOrZones; ++i) {
+        if (!zsEquipConfig(i).IsControlled) continue;
+        auto &thisCalcFS = zsCalcFinalSizing(i);
+        static constexpr std::string_view ZSizeFmt41("{}{}{}{:12.6E}{}{:12.6E}{}{}{}{:12.6E}{}{:12.6E}{}{}{}{}{}{}{}{}");
+        print(outputFile,
+              ZSizeFmt41,
+              colSep,
+              colSep,
+              colSep,
+              thisCalcFS.DesHeatVolFlow,
+              colSep,
+              thisCalcFS.DesCoolVolFlow,
+              colSep,
+              colSep,
+              colSep,
+              thisCalcFS.DesLatentHeatVolFlow,
+              colSep,
+              thisCalcFS.DesLatentCoolVolFlow,
+              colSep,
+              colSep,
+              colSep,
+              colSep,
+              colSep,
+              colSep,
+              colSep,
+              colSep);
+    }
+    print(outputFile, "\n");
+    outputFile.close();
+}
+
 void updateZoneSizingEndZoneSizingCalc3(DataSizing::ZoneSizingData &zsCalcFinalSizing,
                                         Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
                                         bool &anyLatentLoad,
@@ -2701,82 +2934,6 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                 }
             }
 
-            // SpaceSizing TODO: For now only write zone-level zsz
-            print(state.files.zsz, "Time");
-            for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
-                auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(I);
-
-                static constexpr std::string_view ZSizeFmt11("{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{"
-                                                             "}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}");
-                print(state.files.zsz,
-                      ZSizeFmt11,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->CalcFinalZoneSizing(I).ZoneName,
-                      state.dataSize->CalcFinalZoneSizing(I).HeatDesDay,
-                      ":Des Heat Load [W]",
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->CalcFinalZoneSizing(I).ZoneName,
-                      state.dataSize->CalcFinalZoneSizing(I).CoolDesDay,
-                      ":Des Sens Cool Load [W]",
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->CalcFinalZoneSizing(I).ZoneName,
-                      state.dataSize->CalcFinalZoneSizing(I).HeatDesDay,
-                      ":Des Heat Mass Flow [kg/s]",
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->CalcFinalZoneSizing(I).ZoneName,
-                      state.dataSize->CalcFinalZoneSizing(I).CoolDesDay,
-                      ":Des Cool Mass Flow [kg/s]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.LatHeatDesDay,
-                      ":Des Latent Heat Load [W]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.LatCoolDesDay,
-                      ":Des Latent Cool Load [W]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.LatHeatDesDay,
-                      ":Des Latent Heat Mass Flow [kg/s]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.LatCoolDesDay,
-                      ":Des Latent Cool Mass Flow [kg/s]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.HeatNoDOASDesDay,
-                      ":Des Heat Load No DOAS [W]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.CoolNoDOASDesDay,
-                      ":Des Sens Cool Load No DOAS [W]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.LatHeatNoDOASDesDay,
-                      ":Des Latent Heat Load No DOAS [W]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.LatCoolNoDOASDesDay,
-                      ":Des Latent Cool Load No DOAS [W]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.HeatDesDay,
-                      ":Heating Zone Temperature [C]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.HeatDesDay,
-                      ":Heating Zone Relative Humidity [%]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.CoolDesDay,
-                      ":Cooling Zone Temperature [C]",
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.ZoneName,
-                      calcFinalZoneSizing.CoolDesDay,
-                      ":Cooling Zone Relative Humidity [%]");
-            }
-
             for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                 updateZoneSizingEndZoneSizingCalc2(state, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum));
@@ -2787,158 +2944,20 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                 }
             }
 
-            print(state.files.zsz, "\n");
-            //      HourFrac = 0.0
-            int Minutes = 0;
-            int TimeStepIndex = 0;
-            for (int HourCounter = 1; HourCounter <= 24; ++HourCounter) {
-                for (int TimeStepCounter = 1; TimeStepCounter <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStepCounter) {
-                    ++TimeStepIndex;
-                    Minutes += state.dataGlobal->MinutesPerTimeStep;
-                    int HourPrint = HourCounter - 1;
-                    if (Minutes == 60) {
-                        Minutes = 0;
-                        HourPrint = HourCounter;
-                    }
-                    static constexpr std::string_view ZSizeFmt20("{:02}:{:02}:00");
-                    print(state.files.zsz, ZSizeFmt20, HourPrint, Minutes);
-                    for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
-                        if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
-                        auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(I);
-                        static constexpr std::string_view ZSizeFmt21(
-                            "{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12."
-                            "6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
-                        Real64 ZoneRHHeat = 0.0;
-                        Real64 ZoneRHCool = 0.0;
-                        Real64 ZoneTHeat = 0.0;
-                        Real64 ZoneTCool = 0.0;
-                        if (calcFinalZoneSizing.HeatDDNum > 0) {
-                            ZoneTHeat = state.dataSize->CalcZoneSizing(calcFinalZoneSizing.HeatDDNum, I).HeatZoneTempSeq(TimeStepIndex);
-                            ZoneRHHeat = Psychrometrics::PsyRhFnTdbWPb(
-                                             state,
-                                             state.dataSize->CalcZoneSizing(calcFinalZoneSizing.HeatDDNum, I).HeatZoneTempSeq(TimeStepIndex),
-                                             state.dataSize->CalcZoneSizing(calcFinalZoneSizing.HeatDDNum, I).HeatZoneHumRatSeq(TimeStepIndex),
-                                             state.dataEnvrn->OutBaroPress) *
-                                         100.0;
-                        }
-                        if (calcFinalZoneSizing.CoolDDNum > 0) {
-                            ZoneTCool = state.dataSize->CalcZoneSizing(calcFinalZoneSizing.CoolDDNum, I).CoolZoneTempSeq(TimeStepIndex);
-                            ZoneRHCool = Psychrometrics::PsyRhFnTdbWPb(
-                                             state,
-                                             state.dataSize->CalcZoneSizing(calcFinalZoneSizing.CoolDDNum, I).CoolZoneTempSeq(TimeStepIndex),
-                                             state.dataSize->CalcZoneSizing(calcFinalZoneSizing.CoolDDNum, I).CoolZoneHumRatSeq(TimeStepIndex),
-                                             state.dataEnvrn->OutBaroPress) *
-                                         100.0;
-                        }
-                        print(state.files.zsz,
-                              ZSizeFmt21,
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.HeatLoadSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.CoolLoadSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.HeatFlowSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.CoolFlowSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.LatentHeatLoadSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.LatentCoolLoadSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.LatentHeatFlowSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.LatentCoolFlowSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.HeatLoadNoDOASSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.CoolLoadNoDOASSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.HeatLatentLoadNoDOASSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              calcFinalZoneSizing.CoolLatentLoadNoDOASSeq(TimeStepIndex),
-                              state.dataSize->SizingFileColSep,
-                              ZoneTHeat,
-                              state.dataSize->SizingFileColSep,
-                              ZoneRHHeat,
-                              state.dataSize->SizingFileColSep,
-                              ZoneTCool,
-                              state.dataSize->SizingFileColSep,
-                              ZoneRHCool);
-                    }
-                    print(state.files.zsz, "\n");
-                }
+            writeZszSpsz(state,
+                         state.files.zsz,
+                         state.dataGlobal->NumOfZones,
+                         state.dataZoneEquip->ZoneEquipConfig,
+                         state.dataSize->CalcFinalZoneSizing,
+                         state.dataSize->CalcZoneSizing);
+            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                writeZszSpsz(state,
+                             state.files.spsz,
+                             state.dataGlobal->numSpaces,
+                             state.dataZoneEquip->spaceEquipConfig,
+                             state.dataSize->CalcFinalSpaceSizing,
+                             state.dataSize->CalcSpaceSizing);
             }
-            print(state.files.zsz, "Peak");
-
-            for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
-                auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(I);
-
-                static constexpr std::string_view ZSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12."
-                                                             "6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{}{}{}");
-                print(state.files.zsz,
-                      ZSizeFmt31,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesHeatLoad,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesCoolLoad,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesHeatMassFlow,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesCoolMassFlow,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesLatentHeatLoad,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesLatentCoolLoad,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesLatentHeatMassFlow,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesLatentCoolMassFlow,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesHeatLoadNoDOAS,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesCoolLoadNoDOAS,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesLatentHeatLoadNoDOAS,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesLatentCoolLoadNoDOAS,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep);
-            }
-            print(state.files.zsz, "\n");
-
-            print(state.files.zsz, "\nPeak Vol Flow (m3/s)");
-            for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
-                auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(I);
-                static constexpr std::string_view ZSizeFmt41("{}{}{}{:12.6E}{}{:12.6E}{}{}{}{:12.6E}{}{:12.6E}{}{}{}{}{}{}{}{}");
-                print(state.files.zsz,
-                      ZSizeFmt41,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesHeatVolFlow,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesCoolVolFlow,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesLatentHeatVolFlow,
-                      state.dataSize->SizingFileColSep,
-                      calcFinalZoneSizing.DesLatentCoolVolFlow,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep,
-                      state.dataSize->SizingFileColSep);
-            }
-            print(state.files.zsz, "\n");
-            state.files.zsz.close();
         }
 
         if (!state.dataGlobal->isPulseZoneSizing) {

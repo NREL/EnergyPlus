@@ -566,6 +566,7 @@ void EnergyPlusData::clear_state()
     this->files.shade.close();
     this->files.ssz.close();
     this->files.zsz.close();
+    this->files.spsz.close();
 }
 
 void EnergyPlusData::init_state(EnergyPlusData &state)
