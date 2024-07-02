@@ -392,7 +392,7 @@ namespace OutputReportPredefined {
         s->pdchDXHeatCoilAirloopName = newPreDefColumn(state, s->pdstDXHeatCoil, "Airloop Name");
 
         // for DX Heating Coil AHRI Standard 2023 Ratings | HSPF2
-        s->pdstDXHeatCoil_2023 = newPreDefSubTable(state, s->pdrEquip, "DX Heating Coils [ HSPF2 ]");
+        s->pdstDXHeatCoil_2023 = newPreDefSubTable(state, s->pdrEquip, "DX Heating Coils AHRI 2023");
         s->pdchDXHeatCoilType_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "DX Heating Coil Type");
         s->pdchDXHeatCoilHighCap_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "High Temperature Heating (net) Rating Capacity [W]");
         s->pdchDXHeatCoilLowCap_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Low Temperature Heating (net) Rating Capacity [W]");
