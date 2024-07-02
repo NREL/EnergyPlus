@@ -7382,7 +7382,7 @@ namespace WindowManager {
                         state.dataConstruction->Construct(ThisNum).VisTransNorm = TransVisNorm;
                         state.dataConstruction->Construct(ThisNum).SolTransNorm = TransSolNorm;
 
-                        static constexpr std::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                        static constexpr std::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                         print(state.files.eio,
                               Format_700,
                               state.dataConstruction->Construct(ThisNum).Name,
