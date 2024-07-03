@@ -4,7 +4,7 @@ This group of objects describes the ambient conditions for the simulation.
 
 \subsection{Site:Location}\label{sitelocation}
 
-The location class describes the parameters for the building's location. Only one location is allowed. Weather data file location, if it exists, will override any location data in the IDF. Thus, for an annual simulation, a Location does not need to be entered.
+The location class describes the parameters for the building's location. Only one location is allowed in an IDF. The Site:Location information input fields are described below.  This object is not required for an annual simulation since by default it will read this information from the weather file specified for the run.  See the Keep Site Location Information field below for more information.
 
 \subsubsection{Inputs}\label{inputs-201709281625}
 
@@ -28,20 +28,29 @@ This field represents the time zone of the facility (relative to Greenwich Mean 
 
 This field represents the elevation of the facility in meters (relative to sea level).
 
-Units with their abbreviations are shown in Appendix A. And, as shown in an IDF:
+\paragraph{Field: Keep Site Location Information}\label{keep-site-location-information}
+
+This field controls whether or not the above inforation is kept or overwritten when an annual run is performed using an attached, existing weather file.  There are two choices for this optional field: Yes or No.  When set to Yes, the site information in the above fields is kept and the values obtained from the weather file are ignored.  This option can be useful when the nearest weather station might have a significant difference in one of the parameters such as being at a much higher altitude or being across a time zone boundary.  The default value for this parameter is No which means that the values for latitude, longitude, time zone, and elevation will be overwritten by what is contained in the weather file.
+
+\begin{callout}
+Note that throughout this document units are provided for various input fields.  Units with their abbreviations are shown in Appendix A.
+\end{callout}
+
+An example of what this object would look like in an IDF is:
 
 \begin{lstlisting}
 Site:Location, DENVER COLORADO, ! Name
    39.75000,                    ! Latitude {N+ S-}
   -104.8700,                    ! Longitude {W- E+}
   -7.000000,                    ! TimeZoneNumber {GMT+/-}
-  1610.26;                      ! Elevation {m}
+  1610.26,                      ! Elevation {m}
+  No;                           ! Keep Site Location Information
 \end{lstlisting}
 
-Most examples in this document include the comment lines that illustrate each data field's value. However, this is not necessary (though it makes the IDF more readable). The previous example could also be:
+Most examples in this document include the comment lines that illustrate each data field's value. However, this is not necessary (though it makes the IDF more readable). The previous example could also be written in an IDF as:
 
 \begin{lstlisting}
-Site:Location, DENVER COLORADO,39.75,-104.87,-7,1610.26;
+Site:Location, DENVER COLORADO,39.75,-104.87,-7,1610.26,No;
 \end{lstlisting}
 
 
