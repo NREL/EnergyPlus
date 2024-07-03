@@ -5630,10 +5630,11 @@ void CalcThermalResilience(EnergyPlusData &state)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 const ZoneT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTAV;
             Real64 const ZoneW = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRatAvg;
-            Real64 const ZoneRH = Psychrometrics::PsyRhFnTdbWPb(state, ZoneT, ZoneW, state.dataEnvrn->OutBaroPress) * 100.0;
+            Real64 const ZoneRH = Psychrometrics::PsyRhFnTdbWPb(state, ZoneT, ZoneW, state.dataEnvrn->OutBaroPress);
             Real64 const ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
             // calculate extended heat index
-            state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex = extendedHI::heatindex(state, ZoneTF, ZoneRH, false) - Constant::Kelvin;
+            state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex =
+                extendedHI::heatindex(state, ZoneT + Constant::Kelvin, ZoneRH, false) - Constant::Kelvin;
         }
     }
     if (state.dataHeatBalSurfMgr->reportVarHumidex || state.dataOutRptTab->displayThermalResilienceSummary) {

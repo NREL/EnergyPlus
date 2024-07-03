@@ -303,6 +303,11 @@ namespace extendedHI {
     Real64 heatindex(EnergyPlusData &state, Real64 Ta, Real64 RH, bool show_info = false)
     {
 
+        // Ta: temperature in Kelvin
+        // RH: relative humidity in range of 0.0 to 1.0
+        // show_info: whether to print some messages. Might be useful in debugging
+        // The function computes the extended heat index, in Kelvinn
+
         auto const HVACSystemRootSolverBackup = state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver;
         state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Bisection;
         // Dictionary to map eqvar_name to tuple index
