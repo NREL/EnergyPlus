@@ -107,22 +107,22 @@ namespace extendedHI {
     }
 
     // Thermoregulatory parameters
-    constexpr Real64 sigma = 5.67e-8;                           // W/m^2/K^4 , Stefan-Boltzmann constant
-    constexpr Real64 epsilon = 0.97;                            //           , emissivity of surface, steadman1979
-    constexpr Real64 M = 83.6;                                  // kg        , mass of average US adults, fryar2018
-    constexpr Real64 H = 1.69;                                  // m         , height of average US adults, fryar2018
+    constexpr Real64 sigma = 5.67e-8;                 // W/m^2/K^4 , Stefan-Boltzmann constant
+    constexpr Real64 epsilon = 0.97;                  //           , emissivity of surface, steadman1979
+    constexpr Real64 M = 83.6;                        // kg        , mass of average US adults, fryar2018
+    constexpr Real64 H = 1.69;                        // m         , height of average US adults, fryar2018
     Real64 A = 0.202 * pow(M, 0.425) * pow(H, 0.725); // m^2       , DuBois formula, parson2014
-    constexpr Real64 cpc = 3492.;                               // J/kg/K    , specific heat capacity of core, gagge1972
+    constexpr Real64 cpc = 3492.;                     // J/kg/K    , specific heat capacity of core, gagge1972
     Real64 C = M * cpc / A;                           //           , heat capacity of core
-    constexpr Real64 r = 124.;                                  // Pa/K      , Zf/Rf, steadman1979
-    constexpr Real64 Q = 180.;                                  // W/m^2     , metabolic rate per skin area, steadman1979
-    constexpr Real64 phi_salt = 0.9;                            //           , vapor saturation pressure level of saline solution, steadman1979
-    constexpr Real64 Tc = 310.;                                 // K         , core temperature, steadman1979
+    constexpr Real64 r = 124.;                        // Pa/K      , Zf/Rf, steadman1979
+    constexpr Real64 Q = 180.;                        // W/m^2     , metabolic rate per skin area, steadman1979
+    constexpr Real64 phi_salt = 0.9;                  //           , vapor saturation pressure level of saline solution, steadman1979
+    constexpr Real64 Tc = 310.;                       // K         , core temperature, steadman1979
     Real64 Pc = phi_salt * pvstar(Tc);                //           , core vapor pressure
     Real64 L = Le(310.);                              //           , latent heat of vaporization at 310 K
-    constexpr Real64 p = 1.013e5;                               // Pa        , atmospheric pressure
-    constexpr Real64 eta = 1.43e-6;                             // kg/J      , "inhaled mass" / "metabolic rate", steadman1979
-    constexpr Real64 Pa0 = 1.6e3;                               // Pa        , reference air vapor pressure in regions III, IV, V, VI, steadman1979
+    constexpr Real64 p = 1.013e5;                     // Pa        , atmospheric pressure
+    constexpr Real64 eta = 1.43e-6;                   // kg/J      , "inhaled mass" / "metabolic rate", steadman1979
+    constexpr Real64 Pa0 = 1.6e3;                     // Pa        , reference air vapor pressure in regions III, IV, V, VI, steadman1979
 
     // Function to calculate respiratory heat loss, W/m^2
     Real64 Qv(Real64 Ta, Real64 Pa)
