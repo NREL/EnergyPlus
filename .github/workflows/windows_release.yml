@@ -54,11 +54,6 @@ jobs:
         python-version: ${{ env.Python_REQUIRED_VERSION }}
         architecture: ${{ matrix.arch }}
 
-    - name: Setup QtIFW 4.x
-      uses: jmarrec/setup-qtifw@v1
-      with:
-        qtifw-version: '4.x'
-
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
@@ -137,15 +132,6 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.zip
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: true
-
-    - name: Upload IFW to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.exe
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
