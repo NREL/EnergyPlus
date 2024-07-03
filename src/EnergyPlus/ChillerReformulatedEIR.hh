@@ -215,7 +215,7 @@ namespace ChillerReformulatedEIR {
         int ChillerCondLoopFlowFLoopPLRIndex = 0; // Condenser loop flow rate fraction function of loop PLR
         int CondDT = 0;                           // Temperature difference across condenser
         int CondDTScheduleNum = 0;                // Temperature difference across condenser schedule index
-        Real64 MinCondFlowRatio = 0.0;            // Minimum condenser flow fraction
+        Real64 MinCondFlowRatio = 0.2;            // Minimum condenser flow fraction
         DataBranchAirLoopPlant::ControlType EquipFlowCtrl = DataBranchAirLoopPlant::ControlType::Invalid;
         Real64 VSBranchPumpMinLimitMassFlowCond = 0.0;
         bool VSBranchPumpFoundCond = false;

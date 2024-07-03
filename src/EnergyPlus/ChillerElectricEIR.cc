@@ -673,8 +673,6 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
 
         if (NumAlphas > 17) {
             thisChiller.ChillerCondLoopFlowFLoopPLRIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(18));
-        } else {
-            thisChiller.ChillerCondLoopFlowFLoopPLRIndex = 0;
         }
         if ((thisChiller.ChillerCondLoopFlowFLoopPLRIndex == 0) &&
             (thisChiller.CondenserFlowControl == DataPlant::CondenserFlowControl::ModulatedLoopPLR)) {
@@ -687,11 +685,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
         if (NumAlphas > 18) {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                 thisChiller.CondDTScheduleNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(19));
-            } else {
-                thisChiller.CondDTScheduleNum = 0;
             }
-        } else {
-            thisChiller.CondDTScheduleNum = 0;
         }
         if (thisChiller.CondDTScheduleNum == 0 && thisChiller.CondenserFlowControl == DataPlant::CondenserFlowControl::ModulatedDeltaTemperature) {
             ShowSevereError(state,
@@ -702,8 +696,6 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
 
         if (NumNums > 18) {
             thisChiller.MinCondFlowRatio = state.dataIPShortCut->rNumericArgs(19);
-        } else {
-            thisChiller.MinCondFlowRatio = 0.2;
         }
 
         //   Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
@@ -2406,9 +2398,10 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
             this->CondMassFlowRate = this->CondMassFlowRateMax;
         } break;
         }
-        this->CondMassFlowRate = max(min(this->CondMassFlowRate, this->CondMassFlowRateMax),
-                                     this->MinCondFlowRatio * this->CondMassFlowRateMax,
-                                     this->VSBranchPumpMinLimitMassFlowCond);
+        Real64 minCondMassFlowRate = this->MinCondFlowRatio * this->CondMassFlowRateMax;
+        Real64 minPumpMassFlowRate = this->VSBranchPumpMinLimitMassFlowCond;
+        Real64 maxCondMassFlowRate = min(this->CondMassFlowRate, this->CondMassFlowRateMax);
+        this->CondMassFlowRate = max(maxCondMassFlowRate, minCondMassFlowRate, minPumpMassFlowRate);
         PlantUtilities::SetComponentFlowRate(state, this->CondMassFlowRate, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(
             state, this->CWPlantLoc, this->CondMassFlowIndex, this->CDPlantLoc, DataPlant::CriteriaType::MassFlowRate, this->CondMassFlowRate);

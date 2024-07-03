@@ -2007,7 +2007,7 @@ where:
 
 \emph{ChillerIsOFF} is the logical variable denoting that the chiller is not operating for the current simulation time step (e.g.,~ there is no cooling load to be met by the chiller, or if there is no water flow through the chiller due to a chiller or pump availability schedule, etc.). 
 
-\subsection{Variable Flow Condenser}\label{hot-water-heat-recovery-from-chillers}
+\subsection{Variable Flow Condenser}\label{variable-flow-condenser}
 
 The \hyperref[electric-chiller-model-based-on-condenser-entering-temperature](Chiller:Electric:EIR) and \hyperref[electric-chiller-model-based-on-condenser-leaving-temperature](Chiller:Electric:ReformulatedEIR) have the capability to simulate variable condenser flow requests. The flow request can be capped to a minimum via a user-defined fraction. The minimum condenser plant loop flow rate will be limited by the minimum flow rates of the operating pumps. The flow request can be calculated using one of the following approaches:
 
@@ -2040,7 +2040,7 @@ where:
 \({CAP_{CHWL}}\) is the design chilled water loop capacity determined using inputs from the Sizing:Plant object for the loop
 
 
-The condenser plant loop water flow fraction (\({CWFR}\)) corresponding to the \({PLR_{CWHL}}\) is obtained by feeding it through a user-specified curve. A linear curve is expected: \(CWFR = C * {PLR_{CHWL}} + D\)  where C and D are coefficients. A reference for these coefficients is provided in ``Optimizing Design & Control Of Chilled Water Plants, Part 5'', S. Taylor, ASHRAE Journal June 2012.
+The condenser plant loop water flow fraction (\({CWFR}\)) corresponding to the \({PLR_{CWHL}}\) is obtained by feeding it through a user-specified curve. A linear curve is expected: \(CWFR = C * {PLR_{CHWL}} + D\)  where C and D are coefficients. A reference for these coefficients is provided in ``Optimizing Design \& Control Of Chilled Water Plants, Part 5'', S. Taylor, ASHRAE Journal June 2012.
 
 The actual condenser mass flow request for the chiller is then calculated as follows:
 
