@@ -124,7 +124,7 @@ jobs:
     - name: Build Package
       working-directory: ./build
       shell: bash
-      run: cmake --build . --target package -j 2 --config $BUILD_TYPE
+      run: cmake --build . --target energyplus -j 2 --config $BUILD_TYPE
 
     - name: Upload Zip to release
       uses: svenstaro/upload-release-action@v2
