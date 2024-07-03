@@ -74,18 +74,18 @@ namespace EnergyPlus {
 
 namespace extendedHI {
     // Thermodynamic parameters
-    Real64 Ttrip = 273.16; // K
-    Real64 ptrip = 611.65; // Pa
-    Real64 E0v = 2.3740e6; // J/kg
-    Real64 E0s = 0.3337e6; // J/kg
-    Real64 rgasa = 287.04; // J/kg/K
-    Real64 rgasv = 461.;   // J/kg/K
-    Real64 cva = 719.;     // J/kg/K
-    Real64 cvv = 1418.;    // J/kg/K
-    Real64 cvl = 4119.;    // J/kg/K
-    Real64 cvs = 1861.;    // J/kg/K
-    Real64 cpa = cva + rgasa;
-    Real64 cpv = cvv + rgasv;
+    constexpr Real64 Ttrip = 273.16; // K
+    constexpr Real64 ptrip = 611.65; // Pa
+    constexpr Real64 E0v = 2.3740e6; // J/kg
+    constexpr Real64 E0s = 0.3337e6; // J/kg
+    constexpr Real64 rgasa = 287.04; // J/kg/K
+    constexpr Real64 rgasv = 461.;   // J/kg/K
+    constexpr Real64 cva = 719.;     // J/kg/K
+    constexpr Real64 cvv = 1418.;    // J/kg/K
+    constexpr Real64 cvl = 4119.;    // J/kg/K
+    constexpr Real64 cvs = 1861.;    // J/kg/K
+    constexpr Real64 cpa = cva + rgasa;
+    constexpr Real64 cpv = cvv + rgasv;
 
     // The saturation vapor pressure
     Real64 pvstar(Real64 T)
@@ -107,22 +107,22 @@ namespace extendedHI {
     }
 
     // Thermoregulatory parameters
-    Real64 sigma = 5.67e-8;                           // W/m^2/K^4 , Stefan-Boltzmann constant
-    Real64 epsilon = 0.97;                            //           , emissivity of surface, steadman1979
-    Real64 M = 83.6;                                  // kg        , mass of average US adults, fryar2018
-    Real64 H = 1.69;                                  // m         , height of average US adults, fryar2018
+    constexpr Real64 sigma = 5.67e-8;                           // W/m^2/K^4 , Stefan-Boltzmann constant
+    constexpr Real64 epsilon = 0.97;                            //           , emissivity of surface, steadman1979
+    constexpr Real64 M = 83.6;                                  // kg        , mass of average US adults, fryar2018
+    constexpr Real64 H = 1.69;                                  // m         , height of average US adults, fryar2018
     Real64 A = 0.202 * pow(M, 0.425) * pow(H, 0.725); // m^2       , DuBois formula, parson2014
-    Real64 cpc = 3492.;                               // J/kg/K    , specific heat capacity of core, gagge1972
+    constexpr Real64 cpc = 3492.;                               // J/kg/K    , specific heat capacity of core, gagge1972
     Real64 C = M * cpc / A;                           //           , heat capacity of core
-    Real64 r = 124.;                                  // Pa/K      , Zf/Rf, steadman1979
-    Real64 Q = 180.;                                  // W/m^2     , metabolic rate per skin area, steadman1979
-    Real64 phi_salt = 0.9;                            //           , vapor saturation pressure level of saline solution, steadman1979
-    Real64 Tc = 310.;                                 // K         , core temperature, steadman1979
+    constexpr Real64 r = 124.;                                  // Pa/K      , Zf/Rf, steadman1979
+    constexpr Real64 Q = 180.;                                  // W/m^2     , metabolic rate per skin area, steadman1979
+    constexpr Real64 phi_salt = 0.9;                            //           , vapor saturation pressure level of saline solution, steadman1979
+    constexpr Real64 Tc = 310.;                                 // K         , core temperature, steadman1979
     Real64 Pc = phi_salt * pvstar(Tc);                //           , core vapor pressure
     Real64 L = Le(310.);                              //           , latent heat of vaporization at 310 K
-    Real64 p = 1.013e5;                               // Pa        , atmospheric pressure
-    Real64 eta = 1.43e-6;                             // kg/J      , "inhaled mass" / "metabolic rate", steadman1979
-    Real64 Pa0 = 1.6e3;                               // Pa        , reference air vapor pressure in regions III, IV, V, VI, steadman1979
+    constexpr Real64 p = 1.013e5;                               // Pa        , atmospheric pressure
+    constexpr Real64 eta = 1.43e-6;                             // kg/J      , "inhaled mass" / "metabolic rate", steadman1979
+    constexpr Real64 Pa0 = 1.6e3;                               // Pa        , reference air vapor pressure in regions III, IV, V, VI, steadman1979
 
     // Function to calculate respiratory heat loss, W/m^2
     Real64 Qv(Real64 Ta, Real64 Pa)
@@ -139,8 +139,8 @@ namespace extendedHI {
     // Function to calculate heat transfer resistance through air, exposed part of skin, K m^2/W
     Real64 Ra(Real64 Ts, Real64 Ta)
     {
-        Real64 hc = 17.4;
-        Real64 phi_rad = 0.85;
+        constexpr Real64 hc = 17.4;
+        constexpr Real64 phi_rad = 0.85;
         Real64 hr = epsilon * phi_rad * sigma * (std::pow(Ts, 2) + std::pow(Ta, 2)) * (Ts + Ta);
         return 1.0 / (hc + hr);
     }
@@ -148,8 +148,8 @@ namespace extendedHI {
     // Function to calculate heat transfer resistance through air, clothed part of skin, K m^2/W
     Real64 Ra_bar(Real64 Tf, Real64 Ta)
     {
-        Real64 hc = 11.6;
-        Real64 phi_rad = 0.79;
+        constexpr Real64 hc = 11.6;
+        constexpr Real64 phi_rad = 0.79;
         Real64 hr = epsilon * phi_rad * sigma * (std::pow(Tf, 2) + std::pow(Ta, 2)) * (Tf + Ta);
         return 1.0 / (hc + hr);
     }
@@ -157,19 +157,19 @@ namespace extendedHI {
     // Function to calculate heat transfer resistance through air, when being naked, K m^2/W
     Real64 Ra_un(Real64 Ts, Real64 Ta)
     {
-        Real64 hc = 12.3;
-        Real64 phi_rad = 0.80;
+        constexpr Real64 hc = 12.3;
+        constexpr Real64 phi_rad = 0.80;
         Real64 hr = epsilon * phi_rad * sigma * (std::pow(Ts, 2) + std::pow(Ta, 2)) * (Ts + Ta);
         return 1.0 / (hc + hr);
     }
 
-    Real64 Za = 60.6 / 17.4;     // Pa m^2/W, mass transfer resistance through air, exposed part of skin
-    Real64 Za_bar = 60.6 / 11.6; // Pa m^2/W, mass transfer resistance through air, clothed part of skin
-    Real64 Za_un = 60.6 / 12.3;  // Pa m^2/W, mass transfer resistance through air, when being naked
+    constexpr Real64 Za = 60.6 / 17.4;     // Pa m^2/W, mass transfer resistance through air, exposed part of skin
+    constexpr Real64 Za_bar = 60.6 / 11.6; // Pa m^2/W, mass transfer resistance through air, clothed part of skin
+    constexpr Real64 Za_un = 60.6 / 12.3;  // Pa m^2/W, mass transfer resistance through air, when being naked
 
-    Real64 tol = 1e-8;
-    Real64 tolT = 1e-8;
-    Real64 maxIter = 100;
+    constexpr Real64 tol = 1e-8;
+    constexpr Real64 tolT = 1e-8;
+    constexpr Real64 maxIter = 100;
 
     std::tuple<std::string, Real64, Real64, Real64, Real64> find_eqvar(EnergyPlusData &state, Real64 Ta, Real64 RH)
     {
