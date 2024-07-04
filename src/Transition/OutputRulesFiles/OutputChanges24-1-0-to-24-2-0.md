@@ -43,3 +43,31 @@ These changes will also make corresponding changes in the HTML Intialization Sum
 
 An output variable will be added at both zone and space level: Zone Wetbulb Globe Temperature, and Space Wetbulb Globe
 Temperature
+
+### EIO DX Heating Coil Standard Rating Information 
+
+The EIO and html tabular output files now have a seprate heading and data stream for DX Heating Coils with the AHRI 2023 and prior versions.
+
+! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number
+! <DX Heating Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF2 {Btu/W-h}, Region Number
+
+
+### Euipment Summary Report 
+
+Renamed a table name in the Equipment Summary report:
+
+- from "DX Heating Coils [ HSPF2 ]" 
+- to   "DX Heating Coils AHRI 2023"
+
+Added two new columnuns to the named `DX Heating Coils AHRI 2023` table to make it equivalent to an exiting `DX Heating Coils` table. 
+
+New columns header added:
+
+- "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation [C]"
+- "AirLoop Name"
+
+Renamed a column header by adding units to the `DX Heating Coils` table:
+
+- from "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation"
+- to   "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation [C]"
+
