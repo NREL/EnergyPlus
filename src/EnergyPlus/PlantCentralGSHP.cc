@@ -2442,34 +2442,8 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
             // Mode 4 uses all data from the chilled water loop due to no heating demand
             if (this->SimulClgDominant || CurrentMode == 3) {
                 CurrentMode = 3;
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
-                                                                   CondInletTemp,
-                                                                   state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
-                                                                   RoutineName);
-
                 QCondenser = this->ChillerHeater(ChillerHeaterNum).Report.QCondSimul;
-
-                if (this->VariableFlowCH) { // Variable flow
-                    Real64 CondMassFlowRateCalc = QCondenser / CondDeltaTemp / Cp;
-                    if (CondMassFlowRateCalc > CondMassFlowRate) {
-                        CondMassFlowRateCalc = CondMassFlowRate;
-                        Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
-                        if (CondDeltaTempCalc > CondDeltaTemp) { // Load to meet should be adjusted
-                            QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
-                        }
-                    }
-                    CondMassFlowRate = CondMassFlowRateCalc;
-                } else { // Constant flow control
-                    Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
-                    Real64 CondOutletTempCalc = CondDeltaTempCalc + CondInletTemp;
-                    if (CondOutletTempCalc > CondOutletTemp) {
-                        CondOutletTempCalc = CondOutletTemp;
-                        QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
-                    }
-                    CondOutletTemp = CondOutletTempCalc;
-                }
-
+                this->adjustChillerHeaterFlowTemp(state, QCondenser, CondMassFlowRate, CondOutletTemp, CondInletTemp, CondDeltaTemp);
             } else { // Either Mode 2 or 3 or 5
                 if (this->SimulHtgDominant) {
                     CurrentMode = 5;
@@ -2646,37 +2620,13 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 // Set load this chiller heater should meet and temperatures given
                 QCondenser = min(HeatingLoadToMeet, QCondenser);
 
-                Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
-                                                            CondInletTemp,
-                                                            state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
-                                                            RoutineNameElecEIRChiller);
-
-                // Calculate temperatures for constant flow and mass flow rate for variable flow
-                // Limit mass for this chiller heater to the available mass at given temperature conditions
-                // when mass calculated to meet the load is greater than the maximum available
+                // Calculate outlet temperature for constant flow and mass flow rate for variable flow
+                // Limit mass flow rate for this chiller heater to the available mass at given temperature conditions
+                // when mass flow rate calculated to meet the load is greater than the maximum available
                 // then recalculate heating load this chiller heater can meet
                 if (CurrentMode == 2 || this->SimulHtgDominant) {
                     if (CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance && CondDeltaTemp > 0.0) {
-                        if (this->VariableFlowCH) { // Variable flow
-                            Real64 CondMassFlowRateCalc = QCondenser / CondDeltaTemp / Cp;
-                            if (CondMassFlowRateCalc > CondMassFlowRate) {
-                                CondMassFlowRateCalc = CondMassFlowRate;
-                                Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
-                                if (CondDeltaTempCalc > CondDeltaTemp) { // Load to meet should be adjusted
-                                    QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
-                                }
-                            }
-                            CondMassFlowRate = CondMassFlowRateCalc;
-                        } else { // Constant Flow at a fixed flow rate and capacity
-                            Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
-                            Real64 CondOutletTempCalc = CondDeltaTempCalc + CondInletTemp;
-                            if (CondOutletTempCalc > CondOutletTemp) { // Load to meet should be adjusted
-                                CondOutletTempCalc = CondOutletTemp;
-                                QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
-                            }
-                            CondOutletTemp = CondOutletTempCalc;
-                        }
+                        this->adjustChillerHeaterFlowTemp(state, QCondenser, CondMassFlowRate, CondOutletTemp, CondInletTemp, CondDeltaTemp);
                     } else {
                         QCondenser = 0.0;
                         CondOutletTemp = CondInletTemp;
@@ -2754,6 +2704,39 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
             this->ChillerHeater(ChillerHeaterNum).Report.Condmdot = CondMassFlowRate;
             this->ChillerHeater(ChillerHeaterNum).Report.ActualCOP = ActualCOP;
         }
+    }
+}
+
+void WrapperSpecs::adjustChillerHeaterFlowTemp(EnergyPlusData &state, Real64 &QCondenser,
+                                               Real64 &CondMassFlowRate, Real64 &CondOutletTemp,
+                                               Real64 const CondInletTemp, Real64 const CondDeltaTemp)
+{
+    // Based on whether this is variable or constant flow, adjust either flow or outlet temperature and also the load
+    static constexpr std::string_view RoutineName("adjustChillerHeaterFlow");
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                       state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
+                                                       CondInletTemp,
+                                                       state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
+                                                       RoutineName);
+    
+    if (this->VariableFlowCH) { // Variable Flow (adjust flow and condenser load as needed)
+        Real64 CondMassFlowRateCalc = QCondenser / CondDeltaTemp / Cp;
+        if (CondMassFlowRateCalc > CondMassFlowRate) {
+            CondMassFlowRateCalc = CondMassFlowRate;
+            Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
+            if (CondDeltaTempCalc > CondDeltaTemp) { // Load to meet should be adjusted
+                QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
+            }
+        }
+        CondMassFlowRate = CondMassFlowRateCalc;
+    } else { // Constant Flow (adjust outlet temperature and condenser load as needed)
+        Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
+        Real64 CondOutletTempCalc = CondDeltaTempCalc + CondInletTemp;
+        if (CondOutletTempCalc > CondOutletTemp) { // Load to meet should be adjusted
+            CondOutletTempCalc = CondOutletTemp;
+            QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
+        }
+        CondOutletTemp = CondOutletTempCalc;
     }
 }
 
