@@ -2647,6 +2647,15 @@ CAPFT = f(T_{setpoint}, T_{source,\; inlet})
 \dot{Q}_{avail} = \dot{Q}_{ref} \times CAPFT
 \end{equation}
 
+If heat recovery is active, the capacity of the heat pump is a function of the load-side outlet temperature and the heat recovery-side inlet temperature. Again the heat pump is assumed to meet the load-side temperature set point and therefore the load-side outlet temperature is assumed to be the set point temperature.
+
+\begin{equation}
+CAPFT = f(T_{setpoint}, T_{heatrecovery,\; inlet})
+\end{equation}
+\begin{equation}
+\dot{Q}_{avail} = \dot{Q}_{ref} \times CAPFT
+\end{equation}
+
 \subsubsection{Dry Outdoor Coil Calculations (Heating mode only)}\label{eir-air-to-water-heat-pumps-dry-coil-calculations}
 For air-cooled heat pumps a dry coil correction factor, if used, is applied for heating operation. As the moisture content of the ambient air changes the heating capacity also changes. This change in performance is limited to an ambient relative humidity range of 60 - 90\% where below 60\% the outdoor coil is dry and reduces heating capacity and above 90\% the coil is fully wet and yields full heating capacity. In the following equations, below 60\% relative humidity the $Factor_{correction} = Factor_{correction,\;dry}$ and above 90\% relative humidity the $Factor_{correction} = 1$. These calculations apply only to heating operation.
 \begin{equation}
@@ -2901,6 +2910,77 @@ T{out,\;source} = T_{in,\;source} \pm \frac{\dot{Q}_{source}}{\dot{m}_{source} \
 \begin{equation}
 {Q}_{source} = \dot{Q}_{source} \times TimeStepInSeconds
 \end{equation}
+
+\subsection{Air to Water Heat Pumps with Heat Recovery}\label{air-to-water-heat-pumps-with-heat-recovery}
+
+This section describes an air-to-water heat pump with a heat recovery option. The heat pump object is based on \textit{HeatPump:PlantLoop:EIR:Cooling} and \textit{HeatPump:PlantLoop:EIR:Heating}. The heat recovery options are supported using heat recovery refrigerant-to-water heat exchangers (condenser or evaporator coils) that connect to hot water or chilled water heat recovery plant loops. These objects have fluid inlet and outlet nodes connecting them to a heat recovery plant loop. When these objects are connected to the heat recovery plant loop and the entering fluid temperature is favorable for heat recovery, then the heat recovery operation is enabled
+
+\subsubsection{Heat Recovery Equipment Capacity}
+The heat recovery capacity is derived from the load side capacity of the heat pump by applying energy balance around the heat pump. The hot water and chilled water recovery capacities are calculated as follows:
+
+\begin{equation}
+\dot{Q}_\mathrm{Cap,\; HW} = \dot{Q}_\mathrm{RefCap,\; cool} \times \mathrm{(1 + COP_\mathrm{cool})}
+\end{equation}
+
+\begin{equation}
+\dot{Q}_\mathrm{Cap,\; CHW} = \dot{Q}_\mathrm{RefCap,\; heat} \times \mathrm{(1 - COP_\mathrm{heat})}
+\end{equation}
+
+\subsubsection{Heat Recovery Reference Fluid Flow Rate}
+The heat recovery fluid reference volume flow rates are determined from the heat recovery capacity, design temperature difference of the heat recovery loop, specific heat capacity of the heat recovery fluid and density of the heat recovery fluid as follows:
+
+\begin{equation}
+\dot{V}_\mathrm{heatrecovery,\; HW} = \frac{\dot{Q}_\mathrm{Cap,\; HW}}{\mathrm{Cp}_\mathrm{HW} \times \mathrm{Den}_\mathrm{HW} \times \mathrm{deltaT}_\mathrm{HW}}
+\end{equation}
+
+\begin{equation}
+\dot{V}_\mathrm{heatrecovery,\; CHW} = \frac{\dot{Q}_\mathrm{Cap,\; CHW}}{\mathrm{Cp}_\mathrm{CHW} \times \mathrm{Den}_\mathrm{CHW} \times \mathrm{deltaT}_\mathrm{CHW}}
+\end{equation}
+
+\subsubsection{Heat Recovery Rate}
+The hot water or chilled water heat recovery rate is determined from the load side heat transfer rate and the electric power usage rate based on energy conservation as follows: 
+
+\begin{equation}
+\mathrm{Q}_\mathrm{HW} = \dot{Q}_\mathrm{load,\; cool} + \mathrm{Power}
+\end{equation}
+
+\begin{equation}
+\mathrm{Q}_\mathrm{CHW}  = \dot{Q}_\mathrm{load,\; heat} - \mathrm{Power}
+\end{equation}
+
+The heat recovery does not occur when the heat recovery hot water outlet temperature exceed the user specified maximum temperature limit or when the heat reovery chilled water outlet temperature drops below the minimum temperature limit. Therefore, the heat recovery operation is disabled when heat recovery loop temeprature reaches at these temperature limits.
+
+\subsubsection{Heat Recovery Outlet Temperature}
+The heat recovery fluid outlet temperature is determiend from the heat recovery rate, specific heat of the fluid, and the heat recovery inlet temperature.
+ 
+\begin{equation}
+\mathrm{T}_\mathrm{HW,\; Out} = \mathrm{T}_\mathrm{HW,\; In} + \frac{\mathrm{Q}_\mathrm{HW}}{\mathrm{Cp}_\mathrm{HW} \times \dot{m}_\mathrm{heatrecovery,\; HW}}
+\end{equation}
+
+\begin{equation}
+\mathrm{T}_\mathrm{CHW,\; Out} = \mathrm{T}_\mathrm{CHW,\; In} - \frac{\mathrm{Q}_\mathrm{CHW}}{\mathrm{Cp}_\mathrm{CHW} \times \dot{m}_\mathrm{heatrecovery,\; CHW}}
+\end{equation}
+
+When the heat recovery outlet temperature exceeds the user-specified maximum or minimum temperature limits, the outlet temperatures are capped at this temperature, and the delivered heat recovery rate is recalculated based on these user specified temperature limits.
+
+\begin{equation}
+\dot{Q}_\mathrm{HW,\; limit} = \dot{m}_\mathrm{HW} \times \mathrm{Cp}_\mathrm{HW} \times {(\mathrm{T}_\mathrm{HW,\; limit} - \mathrm{T}_\mathrm{HW,\; In})}
+\end{equation}
+
+\begin{equation}
+\dot{Q}_\mathrm{CHW,\; limit} = \dot{m}_\mathrm{CHW} \times \mathrm{Cp}_\mathrm{CHW} \times {(\mathrm{T}_\mathrm{CHW,\; In} - \mathrm{T}_\mathrm{CHW,\; limit})}
+\end{equation}
+
+The net difference between the potential heat recovery rate and delivered heat recovery rate is reported as source side heat transfer rate and is calculated as follows: 
+
+\begin{equation}
+\dot{Q}_\mathrm{source,\; cool} = \dot{Q}_\mathrm{HW} - \dot{Q}_\mathrm{HW,\; limit}
+\end{equation}
+
+\begin{equation}
+\dot{Q}_\mathrm{source,\; heat} = \dot{Q}_\mathrm{CHW} - \dot{Q}_\mathrm{CHW,\; limit}
+\end{equation}
+
 
 \subsection{Fuel-Fired Air to Water Heat Pumps}\label{fuel-fired-air-to-water-heat-pumps}
 
