@@ -406,9 +406,13 @@ namespace PlantCentralGSHP {
         void CalcChillerModel(EnergyPlusData &state);
 
         void CalcChillerHeaterModel(EnergyPlusData &state);
-        
-        void adjustChillerHeaterFlowTemp(EnergyPlusData &state, Real64 &QCondenser, Real64 &CondMassFlowRate,
-                                         Real64 &CondOutletTemp, Real64 const CondInletTemp, Real64 const CondDeltaTemp);
+
+        void adjustChillerHeaterFlowTemp(EnergyPlusData &state,
+                                         Real64 &QCondenser,
+                                         Real64 &CondMassFlowRate,
+                                         Real64 &CondOutletTemp,
+                                         Real64 const CondInletTemp,
+                                         Real64 const CondDeltaTemp);
 
         void UpdateChillerHeaterRecords(EnergyPlusData &state);
 

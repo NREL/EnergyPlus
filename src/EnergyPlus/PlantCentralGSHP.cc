@@ -2707,9 +2707,12 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
     }
 }
 
-void WrapperSpecs::adjustChillerHeaterFlowTemp(EnergyPlusData &state, Real64 &QCondenser,
-                                               Real64 &CondMassFlowRate, Real64 &CondOutletTemp,
-                                               Real64 const CondInletTemp, Real64 const CondDeltaTemp)
+void WrapperSpecs::adjustChillerHeaterFlowTemp(EnergyPlusData &state,
+                                               Real64 &QCondenser,
+                                               Real64 &CondMassFlowRate,
+                                               Real64 &CondOutletTemp,
+                                               Real64 const CondInletTemp,
+                                               Real64 const CondDeltaTemp)
 {
     // Based on whether this is variable or constant flow, adjust either flow or outlet temperature and also the load
     static constexpr std::string_view RoutineName("adjustChillerHeaterFlow");
@@ -2718,7 +2721,7 @@ void WrapperSpecs::adjustChillerHeaterFlowTemp(EnergyPlusData &state, Real64 &QC
                                                        CondInletTemp,
                                                        state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
-    
+
     if (this->VariableFlowCH) { // Variable Flow (adjust flow and condenser load as needed)
         Real64 CondMassFlowRateCalc = QCondenser / CondDeltaTemp / Cp;
         if (CondMassFlowRateCalc > CondMassFlowRate) {
