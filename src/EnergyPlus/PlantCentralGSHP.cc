@@ -1206,7 +1206,11 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, CHErrorsFound);
 
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeCooling = state.dataIPShortCut->cAlphaArgs(4);
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(4), "LEAVINGCONDENSER")) {
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeCooling = CondenserModeTemperature::LeavingCondenser;
+        } else { // only other option and default value is EnteringCondenser
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeCooling = CondenserModeTemperature::EnteringCondenser;
+        }
 
         // Performance curves
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX =
@@ -1233,7 +1237,11 @@ void GetChillerHeaterInput(EnergyPlusData &state)
             CHErrorsFound = true;
         }
 
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeHeating = state.dataIPShortCut->cAlphaArgs(8);
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "LEAVINGCONDENSER")) {
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeHeating = CondenserModeTemperature::LeavingCondenser;
+        } else { // only other option and default value is EnteringCondenser
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeHeating = CondenserModeTemperature::EnteringCondenser;
+        }
 
         // Performance curves
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX =
@@ -1975,18 +1983,7 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
 
             // Only used to read curve values
             CondOutletTemp = this->ChillerHeater(ChillerHeaterNum).TempRefCondOutCooling;
-            Real64 CondTempforCurve;
-            if (this->ChillerHeater(ChillerHeaterNum).CondMode == "ENTERINGCONDENSER") {
-                CondTempforCurve = CondInletTemp;
-            } else if (this->ChillerHeater(ChillerHeaterNum).CondMode == "LEAVINGCONDENSER") {
-                CondTempforCurve = CondOutletTemp;
-            } else {
-                ShowWarningError(state, format("ChillerHeaterPerformance:Electric:EIR \"{}\":", this->ChillerHeater(ChillerHeaterNum).Name));
-                ShowContinueError(state,
-                                  format("Chiller condenser temperature for curve fit are not decided, defalt value= cond_leaving ({:.3R}).",
-                                         state.dataPlantCentralGSHP->ChillerCapFT));
-                CondTempforCurve = CondOutletTemp;
-            }
+            Real64 CondTempforCurve = this->setChillerHeaterCondTemp(state, ChillerHeaterNum, CondInletTemp, CondOutletTemp);
 
             // Bind local variables from the curve
             Real64 MinPartLoadRat; // Min allowed operating fraction of full load
@@ -2466,25 +2463,11 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX = this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX;
                 this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX = this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX;
 
-                Real64 CondTempforCurve; // Reference condenser temperature for the performance curve reading
+                // Reference condenser temperature for the performance curve reading: set to entering or leaving condenser temperature based on user
+                // input
+                Real64 CondTempforCurve = this->setChillerHeaterCondTemp(
+                    state, ChillerHeaterNum, CondInletTemp, this->ChillerHeater(ChillerHeaterNum).TempRefCondOutClgHtg);
 
-                if (this->ChillerHeater(ChillerHeaterNum).CondMode == "ENTERINGCONDENSER") {
-                    CondTempforCurve = CondInletTemp;
-                } else if (this->ChillerHeater(ChillerHeaterNum).CondMode == "LEAVINGCONDENSER") {
-                    CondTempforCurve = this->ChillerHeater(ChillerHeaterNum).TempRefCondOutClgHtg; //! CondOutletTemp
-                } else {
-                    ShowWarningError(state, format("ChillerHeaterPerformance:Electric:EIR \"{}\":", this->ChillerHeater(ChillerHeaterNum).Name));
-                    ShowContinueError(state,
-                                      format("Chiller condenser temperature for curve fit are not decided, default value= cond_leaving ({:.3R}).",
-                                             state.dataPlantCentralGSHP->ChillerCapFT));
-                    CondTempforCurve =
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
-                }
-
-                Real64 MinPartLoadRat; // Min allowed operating fraction of full load
-                Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
-
-                Curve::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
                 Real64 ChillerRefCap = this->ChillerHeater(ChillerHeaterNum).RefCap;
                 Real64 ReferenceCOP = this->ChillerHeater(ChillerHeaterNum).RefCOP;
                 EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg;
@@ -2522,7 +2505,10 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 // Available chiller capacity as a function of temperature
                 Real64 AvailChillerCap = ChillerRefCap * state.dataPlantCentralGSHP->ChillerCapFT;
 
-                Real64 PartLoadRat; // Operating part load ratio
+                Real64 PartLoadRat;    // Operating part load ratio
+                Real64 MinPartLoadRat; // Min allowed operating fraction of full load
+                Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
+                Curve::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
 
                 // Part load ratio based on reference capacity and available chiller capacity
                 if (AvailChillerCap > 0) {
@@ -2741,6 +2727,18 @@ void WrapperSpecs::adjustChillerHeaterFlowTemp(EnergyPlusData &state,
         }
         CondOutletTemp = CondOutletTempCalc;
     }
+}
+
+Real64
+WrapperSpecs::setChillerHeaterCondTemp(EnergyPlusData &state, int const numChillerHeater, Real64 const condEnteringTemp, Real64 const condLeavingTemp)
+{
+    Real64 setChillerHeaterCondTemp;
+    if (this->ChillerHeater(numChillerHeater).CondMode == CondenserModeTemperature::EnteringCondenser) {
+        setChillerHeaterCondTemp = condEnteringTemp;
+    } else { // by default, if not EnteringCondenser, then this can only be LeavingCondenser
+        setChillerHeaterCondTemp = condLeavingTemp;
+    }
+    return setChillerHeaterCondTemp;
 }
 
 void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int const LoopNum)
