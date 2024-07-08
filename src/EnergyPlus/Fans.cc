@@ -1559,7 +1559,7 @@ void FanComponent::set_size(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, Name, _volFlow);
     Real64 _ratedPower = _volFlow * deltaPress / totalEff; // total fan power
     if (type != HVAC::FanType::ComponentModel) {
-        designPointFEI = FanSystem::report_fei(state, _volFlow, _ratedPower, deltaPress, state.dataEnvrn->StdRhoAir);
+        designPointFEI = FanSystem::report_fei(state, _volFlow, _ratedPower, deltaPress);
     }
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwr, Name, _ratedPower);
     if (_volFlow != 0.0) {
@@ -2653,8 +2653,7 @@ void FanSystem::set_size(EnergyPlusData &state)
             }
         }
     }
-    Real64 _rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataLoopNodes->Node(inletNodeNum).Press, inletAirTemp, inletAirHumRat);
-    designPointFEI = report_fei(state, maxAirFlowRate, designElecPower, deltaPress, _rhoAir);
+    designPointFEI = report_fei(state, maxAirFlowRate, designElecPower, deltaPress);
 
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, Name, HVAC::fanTypeNames[(int)type]);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, Name, totalEff);
@@ -2683,8 +2682,7 @@ void FanSystem::set_size(EnergyPlusData &state)
                                              airLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Name : "N/A");
 }
 
-Real64 FanSystem::report_fei(
-    EnergyPlusData &state, Real64 const _designFlowRate, Real64 const _designElecPower, Real64 const _designDeltaPress, Real64 _inletRhoAir)
+Real64 FanSystem::report_fei(EnergyPlusData &state, Real64 const _designFlowRate, Real64 const _designElecPower, Real64 const _designDeltaPress)
 {
     // PURPOSE OF THIS SUBROUTINE:
     // Calculate the Fan Energy Index
@@ -2693,9 +2691,14 @@ Real64 FanSystem::report_fei(
     // ANSI/AMCA Standard 207-17: Fan System Efficiency and Fan System Input Power Calculation, 2017.
     // AANSI / AMCA Standard 208 - 18: Calculation of the Fan Energy Index, 2018.
 
-    assert(state.dataEnvrn->StdRhoAir > 0.0);
+    Real64 constexpr rhoAirStd = 1.2;   // Value from the above referenced standard
+    Real64 constexpr tempAirFan = 21.0; // Standard fan inlet temperature in Celsius
+    Real64 constexpr hrAirFan = 0.5;    // Standard fan inlet humidity ratio (50%)
+    Real64 _wAirFan = Psychrometrics::PsyWFnTdbRhPb(state, tempAirFan, hrAirFan, state.dataEnvrn->StdBaroPress);
+    Real64 _rhoAirFan = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, tempAirFan, _wAirFan);
+
     // Calculate reference fan shaft power
-    Real64 _refFanShaftPower = (_designFlowRate + 0.118) * (_designDeltaPress + 100 * _inletRhoAir / state.dataEnvrn->StdRhoAir) / (1000 * 0.66);
+    Real64 _refFanShaftPower = (_designFlowRate + 0.118) * (_designDeltaPress + 100 * _rhoAirFan / rhoAirStd) / (1000 * 0.66);
 
     // Calculate reference reference fan transmission efficiency
     Real64 _refFanTransEff = 0.96 * pow((_refFanShaftPower / (_refFanShaftPower + 1.64)), 0.05);

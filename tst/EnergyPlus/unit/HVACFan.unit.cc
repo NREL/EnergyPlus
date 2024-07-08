@@ -484,9 +484,79 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4)
 TEST_F(EnergyPlusFixture, SystemFanObj_FanEnergyIndex)
 {
     // this unit test checks the functions calculating FEI
-    state->dataEnvrn->StdRhoAir = 1.2;
-    Real64 testFEI = Fans::FanSystem::report_fei(*state, 1.0, 1000.0, 100.0, 1.2);
-    EXPECT_NEAR(testFEI, 0.4917, 0.001);
+    // expanded for test of correction to defect #10509
+    Real64 designFlow;
+    Real64 designPower;
+    Real64 designDeltaP;
+    Real64 testFEI;
+    Real64 expectedAnswer;
+    Real64 constexpr allowedTolerance = 0.001;
+
+    // Test 1: (already existing) normal operation of function
+    designFlow = 1.0;
+    designPower = 1000.0;
+    designDeltaP = 100.0;
+    expectedAnswer = 0.4892;
+    testFEI = Fans::FanSystem::report_fei(*state, designFlow, designPower, designDeltaP);
+    EXPECT_NEAR(testFEI, expectedAnswer, allowedTolerance);
+
+    // Test 2a: Zero power-->should result in zero result
+    designFlow = 1.0;
+    designPower = 0.0;
+    designDeltaP = 100.0;
+    expectedAnswer = 0.0;
+    testFEI = Fans::FanSystem::report_fei(*state, designFlow, designPower, designDeltaP);
+    EXPECT_NEAR(testFEI, expectedAnswer, allowedTolerance);
+
+    // Test 2b: Negative power-->should also result in zero result
+    designFlow = 1.0;
+    designPower = -1000.0;
+    designDeltaP = 100.0;
+    expectedAnswer = 0.0;
+    testFEI = Fans::FanSystem::report_fei(*state, designFlow, designPower, designDeltaP);
+    EXPECT_NEAR(testFEI, expectedAnswer, allowedTolerance);
+
+    // Test 3: Lower design power-->higher FEI
+    designFlow = 1.0;
+    designPower = 500.0;
+    designDeltaP = 100.0;
+    expectedAnswer = 0.9784;
+    testFEI = Fans::FanSystem::report_fei(*state, designFlow, designPower, designDeltaP);
+    EXPECT_NEAR(testFEI, expectedAnswer, allowedTolerance);
+
+    // Test 4: Lower flow rate-->lower FEI
+    designFlow = 0.5;
+    designPower = 1000.0;
+    designDeltaP = 100.0;
+    expectedAnswer = 0.2990;
+    testFEI = Fans::FanSystem::report_fei(*state, designFlow, designPower, designDeltaP);
+    EXPECT_NEAR(testFEI, expectedAnswer, allowedTolerance);
+
+    // Test 5: Lower pressure differential-->lower FEI
+    designFlow = 1.0;
+    designPower = 1000.0;
+    designDeltaP = 50.0;
+    expectedAnswer = 0.3833;
+    testFEI = Fans::FanSystem::report_fei(*state, designFlow, designPower, designDeltaP);
+    EXPECT_NEAR(testFEI, expectedAnswer, allowedTolerance);
+
+    // Test 6: Test at altitude (roughly Denver at a pressure of 82 kPa)-->slightly lower FEI if power stays the same
+    state->dataEnvrn->StdBaroPress = 82000.0;
+    designFlow = 1.0;
+    designPower = 1000.0;
+    designDeltaP = 100.0;
+    expectedAnswer = 0.4491;
+    testFEI = Fans::FanSystem::report_fei(*state, designFlow, designPower, designDeltaP);
+    EXPECT_NEAR(testFEI, expectedAnswer, allowedTolerance);
+
+    // Test 7: High values to trigger high motor efficiency limit
+    state->dataEnvrn->StdBaroPress = 82000.0;
+    designFlow = 100.0;
+    designPower = 5000000.0;
+    designDeltaP = 10000.0;
+    expectedAnswer = 0.3311;
+    testFEI = Fans::FanSystem::report_fei(*state, designFlow, designPower, designDeltaP);
+    EXPECT_NEAR(testFEI, expectedAnswer, allowedTolerance);
 }
 
 TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_noPowerFFlowCurve)

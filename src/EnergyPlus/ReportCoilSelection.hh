@@ -404,6 +404,13 @@ public: // methods
                               HVAC::FanType fanType,
                               int fanIndex);
 
+    void setCoilEqNum(EnergyPlusData &state,
+                      std::string const &coilName,
+                      std::string const &coilType,
+                      int const curSysNum,
+                      int const curOASysNum,
+                      int const curZoneEqNum);
+
     static std::string getTimeText(EnergyPlusData &state, int const timeStepAtPeak);
 
     bool isCompTypeFan(std::string const &compType // string component type, input object class name
@@ -432,6 +439,8 @@ private: // methods
                                                std::string const &coilType  // idf input object class name of coil
     );
 
+    void associateZoneCoilWithParent(EnergyPlusData &state, std::unique_ptr<CoilSelectionData> &c);
+
 public: // data
     int numCoilsReported_;
     std::vector<std::unique_ptr<CoilSelectionData>> coilSelectionDataObjs;
@@ -444,6 +453,10 @@ struct ReportCoilSelectionData : BaseGlobalStruct
 {
 
     std::unique_ptr<ReportCoilSelection> coilSelectionReportObj;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {
