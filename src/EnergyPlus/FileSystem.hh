@@ -320,6 +320,10 @@ namespace FileSystem {
         }
     }
 
+    std::string toString(fs::path const &p);
+
+    std::string toGenericString(fs::path const &p);
+
 } // namespace FileSystem
 } // namespace EnergyPlus
 #endif
