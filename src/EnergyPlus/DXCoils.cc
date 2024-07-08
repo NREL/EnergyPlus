@@ -14871,7 +14871,6 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
           SupAirMdot_TestPoint(4));
 
     if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
-
         static constexpr std::string_view Format_994(
             "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
             "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, "
