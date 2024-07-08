@@ -53,6 +53,7 @@
 #include <iostream>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <type_traits>
 
 #ifdef _WIN32
 #include <Shlwapi.h>
@@ -404,12 +405,11 @@ namespace FileSystem {
 
     std::string toString(fs::path const &p)
     {
-        return CLI::detail::maybe_narrow(p.c_str());
-        // if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
-        //     return CLI::narrow(p.wstring());
-        // } else {
-        //     return p.string();
-        // }
+        if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
+            return CLI::narrow(p.wstring());
+        } else {
+            return p.string();
+        }
     }
 
     std::string toGenericString(fs::path const &p)
