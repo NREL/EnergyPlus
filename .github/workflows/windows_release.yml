@@ -54,6 +54,11 @@ jobs:
         python-version: ${{ env.Python_REQUIRED_VERSION }}
         architecture: ${{ matrix.arch }}
 
+    - name: Setup QtIFW 4.x
+      uses: jmarrec/setup-qtifw@v1
+      with:
+        qtifw-version: '4.6.1'
+
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
@@ -117,6 +122,7 @@ jobs:
         cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
               -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
               -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.arch }}/ \
+              -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
               -DENABLE_HARDENED_RUNTIME:BOOL=${{ matrix.enable_hardened_runtime }} \
               -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" \
               ../
@@ -124,7 +130,7 @@ jobs:
     - name: Build Package
       working-directory: ./build
       shell: bash
-      run: cmake --build . --target energyplus -j 2 --config $BUILD_TYPE
+      run: cmake --build . --target package -j 2 --config $BUILD_TYPE
 
     - name: Upload Zip to release
       uses: svenstaro/upload-release-action@v2
