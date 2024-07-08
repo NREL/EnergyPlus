@@ -412,7 +412,11 @@ state.dataStrGlobals->inputFilePath='{}',
 
         // Helper to construct output file path
         auto composePath = [&outputFilePrefixFullPath](const std::string &suffix) -> fs::path {
+            #ifdef _WIN32
+            return fs::path(outputFilePrefixFullPath.native() + CLI::widen(suffix));
+            #else
             return fs::path(outputFilePrefixFullPath.string() + suffix);
+            #endif
         };
 
         // EnergyPlus files

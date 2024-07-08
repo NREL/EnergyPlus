@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ headers
+#include <ios>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
@@ -58,6 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
@@ -65,6 +67,8 @@
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+
+#include <CLI/CLI11.hpp>
 
 namespace EnergyPlus {
 
@@ -2605,17 +2609,38 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
                                    fs::path const &errorFilePath)
     : m_writeOutputToSQLite(writeOutputToSQLite), m_errorStream(errorStream)
 {
+    constexpr bool debug = true;
+
     sqlite3 *m_connection = nullptr;
     if (m_writeOutputToSQLite) {
         int rc = -1;
         bool ok = true;
 
+        if constexpr (debug) {
+            // std::cout << "errorStream=" << errorStream << ", dbName=" << dbName << std::endl;
+            // std::cout << "dbName.string()=" << dbName.string() << std::endl;
+            // std::cout << "dbName.generic_string()=" << dbName.generic_string() << std::endl;
+            std::wcout << "dbName.generic_wstring()=" << dbName.generic_wstring() << std::endl;
+            std::cout << "narrow(dbName.generic_wstring())=" << CLI::narrow(dbName.generic_wstring()) << std::endl;
+        }
+
+        std::string const dbName_utf8 = [&dbName]() {
+            if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
+                return CLI::narrow(dbName.generic_wstring());
+            } else {
+                return dbName.generic_string();
+            }
+        }();
+
         // Test if we can write to the sqlite error file
-        //  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
+        //  Does there need to be a separate sqlite.err file at all?  Consider using eplusout.err
         if (m_errorStream) {
-            *m_errorStream << "SQLite3 message, " << errorFilePath.string() << " open for processing!" << std::endl;
+            *m_errorStream << "SQLite3 message, " << CLI::narrow(errorFilePath.generic_wstring()) << " open for processing!" << std::endl;
         } else {
             ok = false;
+        }
+        if constexpr (debug) {
+            std::cout << "m_errorStream: " << std::boolalpha << ok << std::endl;
         }
 
         // Test if we can create a new file named dbName
@@ -2627,17 +2652,27 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
                 ok = false;
             }
         }
+        if constexpr (debug) {
+            std::cout << "ofstream dbName: " << std::boolalpha << ok << std::endl;
+        }
 
         // Test if we can write to the database
         // If we can't then there are probably locks on the database
         if (ok) {
             // sqlite3_open_v2 could return SQLITE_BUSY at this point. If so, do not proceed to sqlite3_exec.
-            rc = sqlite3_open_v2(dbName.string().c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
+            rc = sqlite3_open_v2(dbName_utf8.c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
             if (rc) {
                 *m_errorStream << "SQLite3 message, can't get exclusive lock to open database: " << sqlite3_errmsg(m_connection) << std::endl;
                 ok = false;
+                if constexpr (debug) {
+                    std::cout << "sqlite3_open_v2: " << std::boolalpha << ok << ' ' << sqlite3_errmsg(m_connection) << std::endl;
+                }
             }
         }
+        if constexpr (debug) {
+            std::cout << "sqlite3_open_v2: " << std::boolalpha << ok << std::endl;
+        }
+
         if (ok) {
             char *zErrMsg = nullptr;
             // Set journal_mode OFF to avoid creating the file dbName + "-journal" (when dbName is a regular file)
@@ -2652,11 +2687,15 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
             } else {
                 if (dbName != ":memory:") {
                     // Remove test db
-                    rc = remove(dbName.string().c_str());
-                    if (rc) {
-                        // File operation failed. SQLite connection is not in an error state.
-                        *m_errorStream << "SQLite3 message, can't remove old database." << std::endl;
-                        ok = false;
+                    // rc = remove(dbName_utf8.c_str());
+                    if (fs::is_regular_file(dbName)) {
+                        std::error_code ec;
+                        if (!fs::remove(dbName, ec)) {
+                            // File operation failed. SQLite connection is not in an error state.
+                            *m_errorStream << "SQLite3 message, can't remove old database. code=" << ec.value() << ", error: " << ec.message()
+                                           << std::endl;
+                            ok = false;
+                        }
                     }
                 }
             }
@@ -2665,7 +2704,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
 
         if (ok) {
             // Now open the output db for the duration of the simulation
-            rc = sqlite3_open_v2(dbName.string().c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
+            rc = sqlite3_open_v2(dbName_utf8.c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
             m_db = std::shared_ptr<sqlite3>(m_connection, sqlite3_close);
             if (rc) {
                 *m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_connection) << std::endl;

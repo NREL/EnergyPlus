@@ -98,9 +98,13 @@ namespace FileSystem {
         // filename. Do we really need that though?
         // path.make_preferred();
         fs::path result = path;
+    #ifdef _WIN32
+        result.make_preferred();
+    #else
         std::string tempPathAsStr = result.make_preferred().string();
         std::replace(tempPathAsStr.begin(), tempPathAsStr.end(), DataStringGlobals::altpathChar, DataStringGlobals::pathChar);
         result = fs::path(tempPathAsStr);
+    #endif
         return result;
     }
 
@@ -113,13 +117,21 @@ namespace FileSystem {
     fs::path getParentDirectoryPath(fs::path const &path)
     {
         // Note: this is needed because "/a/b/c".parent_path() = "/a/b/c/"
+#ifdef _WIN32
+        auto pathStr = path.native();
+        if (!pathStr.empty()) {
+            while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
+                pathStr.erase(pathStr.size() - 1);
+            }
+        }
+#else
         std::string pathStr = path.string();
         if (!pathStr.empty()) {
             while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
                 pathStr.erase(pathStr.size() - 1);
             }
         }
-
+#endif
         // If empty, return "./" instead
         fs::path parent_path = fs::path(pathStr).parent_path();
         if (parent_path.empty()) {
@@ -339,11 +351,45 @@ namespace FileSystem {
     std::string readFile(fs::path const &filePath, std::ios_base::openmode mode)
     {
 #ifdef _WIN32
-        std::string filePathStr = filePath.string();
-        const char *path = filePathStr.c_str();
+        if (!fileExists(filePath)) {
+            throw FatalError("File does not exists");
+        }
+
+        auto filePathStr = filePath.native();
+        const wchar_t *path = filePathStr.c_str();
+        std::wstring_view fopen_mode;
+        if (mode == std::ios_base::in) {
+            fopen_mode = L"r";
+        } else if (mode == std::ios_base::binary) {
+            fopen_mode = L"b";
+        } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
+            fopen_mode = L"rb";
+        } else {
+            throw FatalError("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary");
+        }
+        auto close_file = [](FILE *f) { fclose(f); };
+        auto holder = std::unique_ptr<FILE, decltype(close_file)>(_wfopen(path, fopen_mode.data()), close_file); // (THIS_AUTO_OK)
+        if (!holder) {
+            throw FatalError("Could not open file");
+        }
+
+        auto f = holder.get(); // (THIS_AUTO_OK)
+        const std::uintmax_t size = fs::file_size(filePath);
+        std::string result;
+        result.resize(size);
+
+        size_t bytes_read = fread(result.data(), 1, size, f);
+        bool is_eof = feof(f);
+        bool has_error = ferror(f);
+        if (is_eof != 0) {
+            return result;
+        }
+        if (has_error != 0 || bytes_read != size) {
+            throw FatalError("Error reading file");
+        }
 #else
         const char *path = filePath.c_str();
-#endif
+
 
         if (!fileExists(filePath)) {
             throw FatalError(fmt::format("File does not exists: {}", path));
@@ -380,6 +426,7 @@ namespace FileSystem {
         if (has_error != 0 || bytes_read != size) {
             throw FatalError(fmt::format("Error reading file: {}", path));
         }
+#endif
         return result;
     }
 
