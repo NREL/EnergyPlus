@@ -2309,12 +2309,12 @@ namespace Curve {
                             fs::path filePath(tmp);
                             if (!indVarInstance.count("external_file_column_number")) {
                                 ShowSevereError(state,
-                                                format("{}: No column number defined for external file \"{}\"", contextString, filePath.string()));
+                                                format("{}: No column number defined for external file \"{}\"", contextString, filePath));
                                 ErrorsFound = true;
                             }
                             if (!indVarInstance.count("external_file_starting_row_number")) {
                                 ShowSevereError(
-                                    state, format("{}: No starting row number defined for external file \"{}\"", contextString, filePath.string()));
+                                    state, format("{}: No starting row number defined for external file \"{}\"", contextString, filePath));
                                 ErrorsFound = true;
                             }
 
@@ -2507,12 +2507,12 @@ namespace Curve {
                     fs::path filePath(tmp);
 
                     if (!fields.count("external_file_column_number")) {
-                        ShowSevereError(state, format("{}: No column number defined for external file \"{}\"", contextString, filePath.string()));
+                        ShowSevereError(state, format("{}: No column number defined for external file \"{}\"", contextString, filePath));
                         ErrorsFound = true;
                     }
                     if (!fields.count("external_file_starting_row_number")) {
                         ShowSevereError(state,
-                                        format("{}: No starting row number defined for external file \"{}\"", contextString, filePath.string()));
+                                        format("{}: No starting row number defined for external file \"{}\"", contextString, filePath));
                         ErrorsFound = true;
                     }
 
@@ -2682,11 +2682,11 @@ namespace Curve {
             auto &content = contents[col];
             if (col >= numColumns) {
                 ShowFatalError(
-                    state, format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath.string(), col + 1, numColumns));
+                    state, format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath, col + 1, numColumns));
             }
             if (row >= numRows) {
                 ShowFatalError(
-                    state, format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath.string(), row + 1, numRows));
+                    state, format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath, row + 1, numRows));
             }
             std::vector<double> array(numRows - row);
             std::transform(content.begin() + row, content.end(), array.begin(), [](std::string_view str) {

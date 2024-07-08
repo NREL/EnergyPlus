@@ -68,8 +68,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-#include <CLI/CLI11.hpp>
-
 namespace EnergyPlus {
 
 constexpr std::array<int, (int)OutputProcessor::ReportFreq::Num> reportFreqInts = {
@@ -2621,21 +2619,15 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
             // std::cout << "dbName.string()=" << dbName.string() << std::endl;
             // std::cout << "dbName.generic_string()=" << dbName.generic_string() << std::endl;
             std::wcout << "dbName.generic_wstring()=" << dbName.generic_wstring() << std::endl;
-            std::cout << "narrow(dbName.generic_wstring())=" << CLI::narrow(dbName.generic_wstring()) << std::endl;
+            std::cout << "narrow(dbName.generic_wstring())=" << FileSystem::toGenericString(dbName) << std::endl;
         }
 
-        std::string const dbName_utf8 = [&dbName]() {
-            if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
-                return CLI::narrow(dbName.generic_wstring());
-            } else {
-                return dbName.generic_string();
-            }
-        }();
+        std::string const dbName_utf8 = FileSystem::toGenericString(dbName);
 
         // Test if we can write to the sqlite error file
         //  Does there need to be a separate sqlite.err file at all?  Consider using eplusout.err
         if (m_errorStream) {
-            *m_errorStream << "SQLite3 message, " << CLI::narrow(errorFilePath.generic_wstring()) << " open for processing!" << std::endl;
+            *m_errorStream << "SQLite3 message, " << FileSystem::toGenericString(errorFilePath) << " open for processing!" << std::endl;
         } else {
             ok = false;
         }
