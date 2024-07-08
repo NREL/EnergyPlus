@@ -421,5 +421,14 @@ namespace FileSystem {
         }
     }
 
+    fs::path appendSuffixToPath(fs::path const &outputFilePrefixFullPath, const std::string &suffix)
+    {
+        if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
+            return {outputFilePrefixFullPath.wstring() + CLI::widen(suffix)};
+        } else {
+            return {outputFilePrefixFullPath.string() + suffix};
+        }
+    }
+
 } // namespace FileSystem
 } // namespace EnergyPlus
