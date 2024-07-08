@@ -1985,12 +1985,6 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
             CondOutletTemp = this->ChillerHeater(ChillerHeaterNum).TempRefCondOutCooling;
             Real64 CondTempforCurve = this->setChillerHeaterCondTemp(state, ChillerHeaterNum, CondInletTemp, CondOutletTemp);
 
-            // Bind local variables from the curve
-            Real64 MinPartLoadRat; // Min allowed operating fraction of full load
-            Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
-
-            Curve::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
-
             // Chiller reference capacity
             Real64 ChillerRefCap = this->ChillerHeater(ChillerHeaterNum).RefCap;
             Real64 ReferenceCOP = this->ChillerHeater(ChillerHeaterNum).RefCOP;
@@ -2021,12 +2015,16 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
             // Chiller available capacity at current operating conditions [W]
             Real64 AvailChillerCap = ChillerRefCap * state.dataPlantCentralGSHP->ChillerCapFT;
 
+            Real64 PartLoadRat;    // Operating part load ratio
+            Real64 MinPartLoadRat; // Min allowed operating fraction of full load
+            Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
+
+            Curve::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
+
             // Set load this chiller heater should meet
             QEvaporator = min(CoolingLoadToMeet, (AvailChillerCap * MaxPartLoadRat));
             EvapOutletTemp = EvapOutletTempSetPoint;
             Real64 EvapDeltaTemp = EvapInletTemp - EvapOutletTemp;
-
-            Real64 PartLoadRat; // Operating part load ratio
 
             // Calculate temperatures for constant flow and mass flow rates for variable flow
             if (EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -2061,30 +2059,9 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
                 EvapOutletTemp = EvapInletTemp;
             }
 
-            // Check evaporator temperature low limit and adjust capacity if needed
-            if (EvapOutletTemp < TempLowLimitEout) {
-                if ((EvapInletTemp - TempLowLimitEout) > DataPlant::DeltaTempTol) {
-                    EvapOutletTemp = TempLowLimitEout;
-                    EvapDeltaTemp = EvapInletTemp - EvapOutletTemp;
-                    QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                } else {
-                    QEvaporator = 0.0;
-                    EvapOutletTemp = EvapInletTemp;
-                }
-            }
-
-            // Check if the outlet temperature exceeds the node minimum temperature and adjust capacity if needed
-            if (EvapOutletTemp < this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin) {
-                if ((this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp - this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin) >
-                    DataPlant::DeltaTempTol) {
-                    EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin;
-                    EvapDeltaTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin - EvapOutletTemp;
-                    QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                } else {
-                    QEvaporator = 0.0;
-                    EvapOutletTemp = EvapInletTemp;
-                }
-            }
+            // Run evaporator checks and adjust outlet temp and QEvaporator if necessary
+            WrapperSpecs::checkEvapOutletTemp(
+                state, ChillerHeaterNum, EvapOutletTemp, TempLowLimitEout, EvapInletTemp, QEvaporator, EvapMassFlowRate, Cp);
 
             // Calculate part load once more since evaporator capacity might be modified
             if (AvailChillerCap > 0.0) {
@@ -2481,31 +2458,15 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                     EvapOutletTemp = EvapInletTemp - EvapDeltaTemp;
                 }
 
-                // Check that the evaporator outlet temp honors both plant loop temp low limit and also the chiller low limit
-                if (EvapOutletTemp < TempLowLimitEout) {
-                    if ((this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp - TempLowLimitEout) > DataPlant::DeltaTempTol) {
-                        EvapOutletTemp = TempLowLimitEout;
-                        Real64 EvapDeltaTemp = this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp - EvapOutletTemp;
-                        QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                    } else {
-                        EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp;
-                        Real64 EvapDeltaTemp = this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp - EvapOutletTemp;
-                        QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                    }
-                }
-
-                if (EvapOutletTemp < this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin) {
-                    if ((this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp - this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin) >
-                        DataPlant::DeltaTempTol) {
-                        EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin;
-                        Real64 EvapDeltaTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin - EvapOutletTemp;
-                        QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                    } else {
-                        EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin;
-                        Real64 EvapDeltaTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin - EvapOutletTemp;
-                        QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                    }
-                }
+                // Run evaporator checks and adjust outlet temp and QEvaporator if necessary
+                WrapperSpecs::checkEvapOutletTemp(state,
+                                                  ChillerHeaterNum,
+                                                  EvapOutletTemp,
+                                                  TempLowLimitEout,
+                                                  this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp,
+                                                  QEvaporator,
+                                                  EvapMassFlowRate,
+                                                  Cp);
 
                 // Evaporator operates at full load
                 if (AvailChillerCap > 0.0) {
@@ -2721,6 +2682,41 @@ Real64 WrapperSpecs::calcChillerCapFT(EnergyPlusData &state, int const numChille
         chillCapFT = 0.0;
     }
     return chillCapFT;
+}
+
+void WrapperSpecs::checkEvapOutletTemp(EnergyPlusData &state,
+                                       int const numChillerHeater,
+                                       Real64 &evapOutletTemp,
+                                       Real64 const lowTempLimitEout,
+                                       Real64 const evapInletTemp,
+                                       Real64 &qEvaporator,
+                                       Real64 &evapMassFlowRate,
+                                       Real64 const Cp)
+{
+    // Check evaporator temperature low limit and adjust capacity if needed
+    if (evapOutletTemp < lowTempLimitEout) {
+        if ((evapInletTemp - lowTempLimitEout) > DataPlant::DeltaTempTol) {
+            evapOutletTemp = lowTempLimitEout;
+            Real64 evapDeltaTemp = evapInletTemp - evapOutletTemp;
+            qEvaporator = evapMassFlowRate * Cp * evapDeltaTemp;
+        } else {
+            qEvaporator = 0.0;
+            evapOutletTemp = evapInletTemp;
+        }
+    }
+
+    // Check if the outlet temperature exceeds the node minimum temperature and adjust capacity if needed
+    if (evapOutletTemp < this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin) {
+        if ((this->ChillerHeater(numChillerHeater).EvapInletNode.Temp - this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin) >
+            DataPlant::DeltaTempTol) {
+            evapOutletTemp = this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin;
+            Real64 evapDeltaTemp = this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin - evapOutletTemp;
+            qEvaporator = evapMassFlowRate * Cp * evapDeltaTemp;
+        } else {
+            qEvaporator = 0.0;
+            evapOutletTemp = evapInletTemp;
+        }
+    }
 }
 
 void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int const LoopNum)
