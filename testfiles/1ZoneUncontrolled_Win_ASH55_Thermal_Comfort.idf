@@ -668,7 +668,6 @@
   Output:Variable,*,Zone Air Relative Humidity,hourly;
 
   Output:Variable,*,Zone Heat Index,hourly;
-  Output:Variable,*,Zone Extended Heat Index,hourly;
 
   Output:Variable,*,Zone Humidity Index,hourly;
 
