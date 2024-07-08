@@ -1996,33 +1996,9 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
             Real64 ReferenceCOP = this->ChillerHeater(ChillerHeaterNum).RefCOP;
             Real64 TempLowLimitEout = this->ChillerHeater(ChillerHeaterNum).TempLowLimitEvapOut;
             Real64 EvapOutletTempSetPoint = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling;
-            state.dataPlantCentralGSHP->ChillerCapFT =
-                Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
-            if (state.dataPlantCentralGSHP->ChillerCapFT < 0) {
-                if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
-                    ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                    ShowWarningError(state, format("ChillerHeaterPerformance:Electric:EIR \"{}\":", this->ChillerHeater(ChillerHeaterNum).Name));
-                    ShowContinueError(state,
-                                      format(" ChillerHeater Capacity as a Function of Temperature curve output is negative ({:.3R}).",
-                                             state.dataPlantCentralGSHP->ChillerCapFT));
-                    ShowContinueError(state,
-                                      format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
-                                             EvapOutletTempSetPoint,
-                                             CondInletTemp));
-                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-                } else if (!state.dataGlobal->WarmupFlag) {
-                    ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                    ShowRecurringWarningErrorAtEnd(
-                        state,
-                        "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name +
-                            "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...",
-                        this->ChillerHeater(ChillerHeaterNum).ChillerCapFTErrorIndex,
-                        state.dataPlantCentralGSHP->ChillerCapFT,
-                        state.dataPlantCentralGSHP->ChillerCapFT);
-                }
-                state.dataPlantCentralGSHP->ChillerCapFT = 0.0;
-            }
+            // Calculate Chiller Capacity as a function of temperature and error check
+            state.dataPlantCentralGSHP->ChillerCapFT = this->calcChillerCapFT(state, ChillerHeaterNum, EvapOutletTempSetPoint, CondTempforCurve);
 
             // Calculate the specific heat of chilled water
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -2473,34 +2449,9 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg;
                 Real64 TempLowLimitEout = this->ChillerHeater(ChillerHeaterNum).TempLowLimitEvapOut;
                 Real64 EvapOutletTempSetPoint = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg;
-                state.dataPlantCentralGSHP->ChillerCapFT =
-                    Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
-                if (state.dataPlantCentralGSHP->ChillerCapFT < 0) {
-                    if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
-                        ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                        ShowWarningError(state, format("ChillerHeaterPerformance:Electric:EIR \"{}\":", this->ChillerHeater(ChillerHeaterNum).Name));
-                        ShowContinueError(state,
-                                          format(" ChillerHeater Capacity as a Function of Temperature curve output is negative ({:.3R}).",
-                                                 state.dataPlantCentralGSHP->ChillerCapFT));
-                        ShowContinueError(
-                            state,
-                            format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
-                                   EvapOutletTempSetPoint,
-                                   CondInletTemp));
-                        ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-                    } else if (!state.dataGlobal->WarmupFlag) {
-                        ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                        ShowRecurringWarningErrorAtEnd(
-                            state,
-                            "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name +
-                                "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...",
-                            this->ChillerHeater(ChillerHeaterNum).ChillerCapFTErrorIndex,
-                            state.dataPlantCentralGSHP->ChillerCapFT,
-                            state.dataPlantCentralGSHP->ChillerCapFT);
-                    }
-                    state.dataPlantCentralGSHP->ChillerCapFT = 0.0;
-                }
+                // Calculate Chiller Capacity as a function of temperature and error check
+                state.dataPlantCentralGSHP->ChillerCapFT = this->calcChillerCapFT(state, ChillerHeaterNum, EvapOutletTempSetPoint, CondTempforCurve);
 
                 // Available chiller capacity as a function of temperature
                 Real64 AvailChillerCap = ChillerRefCap * state.dataPlantCentralGSHP->ChillerCapFT;
@@ -2739,6 +2690,37 @@ WrapperSpecs::setChillerHeaterCondTemp(EnergyPlusData &state, int const numChill
         setChillerHeaterCondTemp = condLeavingTemp;
     }
     return setChillerHeaterCondTemp;
+}
+
+Real64 WrapperSpecs::calcChillerCapFT(EnergyPlusData &state, int const numChillerHeater, Real64 const evapOutletTemp, Real64 const condTemp)
+{
+    // Calculate the chiller capacity as a function of temperature
+    Real64 chillCapFT = Curve::CurveValue(state, this->ChillerHeater(numChillerHeater).ChillerCapFTIDX, evapOutletTemp, condTemp);
+
+    // Tracks errors for when the capacity is calculated as less than zero
+    if (chillCapFT < 0) {
+        if (this->ChillerHeater(numChillerHeater).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
+            ++this->ChillerHeater(numChillerHeater).ChillerCapFTError;
+            ShowWarningError(state, format("ChillerHeaterPerformance:Electric:EIR \"{}\":", this->ChillerHeater(numChillerHeater).Name));
+            ShowContinueError(state, format(" ChillerHeater Capacity as a Function of Temperature curve output is negative ({:.3R}).", chillCapFT));
+            ShowContinueError(state,
+                              format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
+                                     evapOutletTemp,
+                                     condTemp));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        } else if (!state.dataGlobal->WarmupFlag) {
+            ++this->ChillerHeater(numChillerHeater).ChillerCapFTError;
+            ShowRecurringWarningErrorAtEnd(
+                state,
+                "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(numChillerHeater).Name +
+                    "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...",
+                this->ChillerHeater(numChillerHeater).ChillerCapFTErrorIndex,
+                chillCapFT,
+                chillCapFT);
+        }
+        chillCapFT = 0.0;
+    }
+    return chillCapFT;
 }
 
 void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int const LoopNum)

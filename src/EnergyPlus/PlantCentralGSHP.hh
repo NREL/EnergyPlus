@@ -425,6 +425,8 @@ namespace PlantCentralGSHP {
         Real64
         setChillerHeaterCondTemp(EnergyPlusData &state, int const numChillerHeater, Real64 const condEnteringTemp, Real64 const condLeavingTemp);
 
+        Real64 calcChillerCapFT(EnergyPlusData &state, int const numChillerHeater, Real64 const evapOutletTemp, Real64 const condTemp);
+
         void UpdateChillerHeaterRecords(EnergyPlusData &state);
 
         void UpdateChillerRecords(EnergyPlusData &state);
