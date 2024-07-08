@@ -208,7 +208,26 @@ Built on Platform: {}
             ->required(false)
             ->check(CLI::ExistingFile);
 
-        bool debugCLI = false;
+        // Catching it myself, so I can print the arguments vector before it's mutated
+        bool debugCLI = std::any_of(args.begin(), args.end(), [](const auto &arg) { return arg == "--debug-cli"; });
+        if (debugCLI) {
+            {
+                fmt::print("ProcessArgs: received args\n");
+                int na = 0;
+                for (const auto &a : args) {
+                    fmt::print("* {}: '{}'\n", na++, a);
+                }
+            }
+            {
+                fmt::print("\nAfter massaging/expanding of args\n");
+                int na = 0;
+                for (const auto &a : arguments) {
+                    fmt::print("* {}: '{}'\n", na++, a);
+                }
+            }
+            fmt::print("\n");
+        }
+        // bool debugCLI = false;
         app.add_flag("--debug-cli", debugCLI, "Print the result of the CLI assignments to the console and exit")->group(""); // Empty group to hide it
 
         app.footer("Example: energyplus -w weather.epw -r input.idf");
@@ -272,6 +291,9 @@ state.dataStrGlobals->inputFilePath='{}',
                        state.dataGlobal->numThread,
                        state.files.inputWeatherFilePath.filePath.generic_string(),
                        state.dataStrGlobals->inputFilePath.generic_string());
+
+            fmt::print(stderr, "--debug-cli passed: exiting early\n");
+
             exit(0);
         }
 
