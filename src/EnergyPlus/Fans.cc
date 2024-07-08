@@ -103,7 +103,9 @@ void FanBase::simulate(EnergyPlusData &state,
                        // the legacy speed ratio that was used with SimulateFanComponents.
                        ObjexxFCL::Optional<Real64 const> _pressureRise, // Pressure difference to use for DeltaPress, for rating DX coils at a
                        ObjexxFCL::Optional<Real64 const> _flowFraction, // when used, this directs the fan to set the flow at this flow fraction
-                       ObjexxFCL::Optional<Real64 const> _onOffFanPartLoadFraction, // to control for cycling in VAV fan in VRFFluidTCtrl
+                       ObjexxFCL::Optional<Real64 const>
+                           _fanRunTimeFraction, // This argument is only used in the variable volume fan in
+                                                // VRFFluidTCtrl model to control for fan cycling. Please do not use it in normal VAV model.
                        // different pressure without entire duct system
                        ObjexxFCL::Optional<Real64 const> _massFlowRate1,    // Mass flow rate in operating mode 1 [kg/s]
                        ObjexxFCL::Optional<Real64 const> _runTimeFraction1, // Run time fraction in operating mode 1
@@ -139,7 +141,7 @@ void FanBase::simulate(EnergyPlusData &state,
             _thisFan->simulateConstant(state);
         } break;
         case HVAC::FanType::VAV: {
-            _thisFan->simulateVAV(state, _pressureRise, _onOffFanPartLoadFraction);
+            _thisFan->simulateVAV(state, _pressureRise, _fanRunTimeFraction);
         } break;
         case HVAC::FanType::OnOff: {
             _thisFan->simulateOnOff(state, _speedRatio);
@@ -1703,7 +1705,9 @@ void FanComponent::simulateConstant(EnergyPlusData &state)
 
 void FanComponent::simulateVAV(EnergyPlusData &state,
                                ObjexxFCL::Optional<Real64 const> _pressureRise,
-                               ObjexxFCL::Optional<Real64 const> _onOffFanPartLoadFraction)
+                               // This argument is only used in the variable volume fan in
+                               // VRFFluidTCtrl model to control for fan cycling. Please do not use it in normal VAV model.
+                               ObjexxFCL::Optional<Real64 const> _fanRunTimeFraction)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1869,8 +1873,8 @@ void FanComponent::simulateVAV(EnergyPlusData &state,
         massFlowRateMaxAvail = 0.0;
         massFlowRateMinAvail = 0.0;
     }
-    if (present(_onOffFanPartLoadFraction)) {
-        totalPower *= _onOffFanPartLoadFraction;
+    if (present(_fanRunTimeFraction)) {
+        totalPower *= _fanRunTimeFraction;
     }
 } // FanComponent::SimVAV()
 
