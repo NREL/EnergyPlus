@@ -111,7 +111,7 @@ std::shared_ptr<SiteBuildingSurfaceGroundTemps> SiteBuildingSurfaceGroundTemps::
             if (thisModel->buildingSurfaceGroundTemps(i) < 15.0 || thisModel->buildingSurfaceGroundTemps(i) > 25.0) genErrorMessage = true;
         }
 
-        state.dataEnvrn->GroundTempObjInput = true;
+        state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::BuildingSurface] = true;
 
         if (genErrorMessage) {
             ShowWarningError(state,

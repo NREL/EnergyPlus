@@ -3342,10 +3342,13 @@ namespace InternalHeatGains {
                             Real64 TAirInSizing = 0.0;
                             // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite
                             // object
-                            SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
-                            for (int SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZClSetPtMgrs; ++SetPtMgrNum) {
-                                if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == zoneNum) {
-                                    TAirInSizing = state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
+                            SetPointManager::GetSetPointManagerInputs(state);
+                            for (auto *spm : state.dataSetPointManager->spms) {
+                                if (spm->type != SetPointManager::SPMType::SZCooling) continue;
+                                auto *spmSZC = dynamic_cast<SetPointManager::SPMSingleZoneTemp *>(spm);
+                                assert(spmSZC != nullptr);
+                                if (spmSZC->ctrlZoneNum == zoneNum) {
+                                    TAirInSizing = spmSZC->maxSetTemp;
                                 }
                             }
 
@@ -3723,8 +3726,12 @@ namespace InternalHeatGains {
                       Format_723,
                       "People",
                       "Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction "
-                      "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum "
-                      "Number of People,Nominal Maximum Number of People");
+                      "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,"
+                      "Minimum Number of People for All Day Types,Maximum Number of People for All Day Types,"
+                      "Minimum Number of People for Weekdays, Maximum Number of People for Weekdays, "
+                      "Minimum Number of People for Weekends/Holidays, Maximum Number of People for Weekends /Holidays,"
+                      "Minimum Number of People for Summer Design Days, Maximum Number of People for Summer Design Days,"
+                      "Minimum Number of People for Winter Design Days, Maximum Number of People for Winter Design Days");
                 if (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU ||
                     state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55) {
                     print(state.files.eio,
@@ -3777,11 +3784,32 @@ namespace InternalHeatGains {
                 print(state.files.eio, "No,");
             }
             print(state.files.eio, "{:.4R},", state.dataHeatBal->People(Loop).CO2RateFactor);
-            print(state.files.eio, "{:.0R},", state.dataHeatBal->People(Loop).NomMinNumberPeople);
+            print(state.files.eio, "{:.1R},", state.dataHeatBal->People(Loop).NomMinNumberPeople);
+            print(state.files.eio, "{:.1R},", state.dataHeatBal->People(Loop).NomMaxNumberPeople);
+
+            auto &thisPeople = state.dataHeatBal->People(Loop);
+            // weekdays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, thisPeople.NumberOfPeoplePtr, DayTypeGroup::Weekday);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMin);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMax);
+
+            // weekends/holidays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, thisPeople.NumberOfPeoplePtr, DayTypeGroup::WeekEndHoliday);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMin);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMax);
+
+            // summer design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, thisPeople.NumberOfPeoplePtr, DayTypeGroup::SummerDesignDay);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMin);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMax);
+
+            // winter design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, thisPeople.NumberOfPeoplePtr, DayTypeGroup::WinterDesignDay);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMin);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMax);
 
             if (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU ||
                 state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55) {
-                print(state.files.eio, "{:.0R},", state.dataHeatBal->People(Loop).NomMaxNumberPeople);
 
                 if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::EnclosureAveraged) {
                     print(state.files.eio, "Zone Averaged,");
@@ -3831,7 +3859,7 @@ namespace InternalHeatGains {
                     print(state.files.eio, "No\n");
                 }
             } else {
-                print(state.files.eio, "{:.0R}\n", state.dataHeatBal->People(Loop).NomMaxNumberPeople);
+                print(state.files.eio, "\n");
             }
         }
         for (int Loop = 1; Loop <= state.dataHeatBal->TotLights; ++Loop) {
@@ -3840,8 +3868,12 @@ namespace InternalHeatGains {
                       Format_723,
                       "Lights",
                       "Lighting Level {W},Lights/Floor Area {W/m2},Lights per person {W/person},Fraction Return "
-                      "Air,Fraction Radiant,Fraction Short Wave,Fraction Convected,Fraction Replaceable,End-Use "
-                      "Category,Nominal Minimum Lighting Level {W},Nominal Maximum Lighting Level {W}\n");
+                      "Air,Fraction Radiant,Fraction Short Wave,Fraction Convected,Fraction Replaceable,End-Use, "
+                      "Minimum Lighting Level for All Day Types {W},Maximum Lighting Level for All Day Types {W},"
+                      "Minimum Lighting Level for Weekdays {W}, Maximum Lighting Level for Weekdays {W},"
+                      "Minimum Lighting Level for Weekends/Holidays {W}, Maximum Lighting Level for Weekends /Holidays {W},"
+                      "Minimum Lighting Level for Summer Design Days {W}, Maximum Lighting Level for Summer Design Days {W},"
+                      "Minimum Lighting Level for Winter Design Days {W}, Maximum Lighting Level for Winter Design Days {W}\n");
             }
 
             int ZoneNum = state.dataHeatBal->Lights(Loop).ZonePtr;
@@ -3871,7 +3903,28 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R},", state.dataHeatBal->Lights(Loop).FractionReplaceable);
             print(state.files.eio, "{},", state.dataHeatBal->Lights(Loop).EndUseSubcategory);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->Lights(Loop).NomMinDesignLevel);
-            print(state.files.eio, "{:.3R}\n", state.dataHeatBal->Lights(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", state.dataHeatBal->Lights(Loop).NomMaxDesignLevel);
+
+            auto &light = state.dataHeatBal->Lights(Loop);
+            // weekdays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, light.SchedPtr, DayTypeGroup::Weekday);
+            print(state.files.eio, "{:.3R},", light.DesignLevel * SchMin);
+            print(state.files.eio, "{:.1R},", light.DesignLevel * SchMax);
+
+            // weekends/holidays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, light.SchedPtr, DayTypeGroup::WeekEndHoliday);
+            print(state.files.eio, "{:.3R},", light.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", light.DesignLevel * SchMax);
+
+            // summer design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, light.SchedPtr, DayTypeGroup::SummerDesignDay);
+            print(state.files.eio, "{:.3R},", light.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", light.DesignLevel * SchMax);
+
+            // winter design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, light.SchedPtr, DayTypeGroup::WinterDesignDay);
+            print(state.files.eio, "{:.3R},", light.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R}\n", light.DesignLevel * SchMax);
         }
         for (int Loop = 1; Loop <= state.dataHeatBal->TotElecEquip; ++Loop) {
             if (Loop == 1) {
@@ -3879,7 +3932,12 @@ namespace InternalHeatGains {
                       Format_723,
                       "ElectricEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
+                      "Lost,Fraction Convected,End-Use SubCategory,"
+                      "Minimum Equipment Level for All Day Types {W},Maximum Equipment Level for All Day Types {W},"
+                      "Minimum Equipment Level for Weekdays {W}, Maximum Equipment Level for Weekdays {W},"
+                      "Minimum Equipment Level for Weekends/Holidays {W}, Maximum Equipment Level for Weekends /Holidays {W},"
+                      "Minimum Equipment Level for Summer Design Days {W}, Maximum Equipment Level for Summer Design Days {W},"
+                      "Minimum Equipment Level for Winter Design Days {W}, Maximum Equipment Level for Winter Design Days {W}\n");
             }
 
             int ZoneNum = state.dataHeatBal->ZoneElectric(Loop).ZonePtr;
@@ -3908,7 +3966,28 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneElectric(Loop).FractionConvected);
             print(state.files.eio, "{},", state.dataHeatBal->ZoneElectric(Loop).EndUseSubcategory);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneElectric(Loop).NomMinDesignLevel);
-            print(state.files.eio, "{:.3R}\n", state.dataHeatBal->ZoneElectric(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneElectric(Loop).NomMaxDesignLevel);
+
+            auto &electric = state.dataHeatBal->ZoneElectric(Loop);
+            // weekdays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, electric.SchedPtr, DayTypeGroup::Weekday);
+            print(state.files.eio, "{:.3R},", electric.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", electric.DesignLevel * SchMax);
+
+            // weekends/holidays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, electric.SchedPtr, DayTypeGroup::WeekEndHoliday);
+            print(state.files.eio, "{:.3R},", electric.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", electric.DesignLevel * SchMax);
+
+            // summer design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, electric.SchedPtr, DayTypeGroup::SummerDesignDay);
+            print(state.files.eio, "{:.3R},", electric.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", electric.DesignLevel * SchMax);
+
+            // winter design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, electric.SchedPtr, DayTypeGroup::WinterDesignDay);
+            print(state.files.eio, "{:.3R},", electric.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R}\n", electric.DesignLevel * SchMax);
         }
         for (int Loop = 1; Loop <= state.dataHeatBal->TotGasEquip; ++Loop) {
             if (Loop == 1) {
@@ -3916,7 +3995,12 @@ namespace InternalHeatGains {
                       Format_723,
                       "GasEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
+                      "Lost,Fraction Convected,End-Use SubCategory,"
+                      "Minimum Equipment Level for All Day Types {W},Maximum Equipment Level for All Day Types {W},"
+                      "Minimum Equipment Level for Weekdays {W}, Maximum Equipment Level for Weekdays {W},"
+                      "Minimum Equipment Level for Weekends/Holidays {W}, Maximum Equipment Level for Weekends /Holidays {W},"
+                      "Minimum Equipment Level for Summer Design Days {W}, Maximum Equipment Level for Summer Design Days {W},"
+                      "Minimum Equipment Level for Winter Design Days {W}, Maximum Equipment Level for Winter Design Days {W}\n");
             }
 
             int ZoneNum = state.dataHeatBal->ZoneGas(Loop).ZonePtr;
@@ -3946,7 +4030,28 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneGas(Loop).FractionConvected);
             print(state.files.eio, "{},", state.dataHeatBal->ZoneGas(Loop).EndUseSubcategory);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneGas(Loop).NomMinDesignLevel);
-            print(state.files.eio, "{:.3R}\n", state.dataHeatBal->ZoneGas(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneGas(Loop).NomMaxDesignLevel);
+
+            auto &gas = state.dataHeatBal->ZoneGas(Loop);
+            // weekdays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, gas.SchedPtr, DayTypeGroup::Weekday);
+            print(state.files.eio, "{:.3R},", gas.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", gas.DesignLevel * SchMax);
+
+            // weekends/holidays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, gas.SchedPtr, DayTypeGroup::WeekEndHoliday);
+            print(state.files.eio, "{:.3R},", gas.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", gas.DesignLevel * SchMax);
+
+            // summer design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, gas.SchedPtr, DayTypeGroup::SummerDesignDay);
+            print(state.files.eio, "{:.3R},", gas.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", gas.DesignLevel * SchMax);
+
+            // winter design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, gas.SchedPtr, DayTypeGroup::WinterDesignDay);
+            print(state.files.eio, "{:.3R},", gas.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R}\n", gas.DesignLevel * SchMax);
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotHWEquip; ++Loop) {
@@ -3955,7 +4060,12 @@ namespace InternalHeatGains {
                       Format_723,
                       "HotWaterEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
+                      "Lost,Fraction Convected,End-Use SubCategory,"
+                      "Minimum Equipment Level for All Day Types {W},Maximum Equipment Level for All Day Types {W},"
+                      "Minimum Equipment Level for Weekdays {W}, Maximum Equipment Level for Weekdays {W},"
+                      "Minimum Equipment Level for Weekends/Holidays {W}, Maximum Equipment Level for Weekends /Holidays {W},"
+                      "Minimum Equipment Level for Summer Design Days {W}, Maximum Equipment Level for Summer Design Days {W},"
+                      "Minimum Equipment Level for Winter Design Days {W}, Maximum Equipment Level for Winter Design Days {W}\n");
             }
 
             int ZoneNum = state.dataHeatBal->ZoneHWEq(Loop).ZonePtr;
@@ -3985,7 +4095,28 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneHWEq(Loop).FractionConvected);
             print(state.files.eio, "{},", state.dataHeatBal->ZoneHWEq(Loop).EndUseSubcategory);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneHWEq(Loop).NomMinDesignLevel);
-            print(state.files.eio, "{:.3R}\n", state.dataHeatBal->ZoneHWEq(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneHWEq(Loop).NomMaxDesignLevel);
+
+            auto &hweq = state.dataHeatBal->ZoneHWEq(Loop);
+            // weekdays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, hweq.SchedPtr, DayTypeGroup::Weekday);
+            print(state.files.eio, "{:.3R},", hweq.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", hweq.DesignLevel * SchMax);
+
+            // weekends/holidays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, hweq.SchedPtr, DayTypeGroup::WeekEndHoliday);
+            print(state.files.eio, "{:.3R},", hweq.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", hweq.DesignLevel * SchMax);
+
+            // summer design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, hweq.SchedPtr, DayTypeGroup::SummerDesignDay);
+            print(state.files.eio, "{:.3R},", hweq.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", hweq.DesignLevel * SchMax);
+
+            // winter design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, hweq.SchedPtr, DayTypeGroup::WinterDesignDay);
+            print(state.files.eio, "{:.3R},", hweq.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R}\n", hweq.DesignLevel * SchMax);
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotStmEquip; ++Loop) {
@@ -3994,7 +4125,12 @@ namespace InternalHeatGains {
                       Format_723,
                       "SteamEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
+                      "Lost,Fraction Convected,End-Use SubCategory,"
+                      "Minimum Equipment Level for All Day Types {W},Maximum Equipment Level for All Day Types {W},"
+                      "Minimum Equipment Level for Weekdays {W}, Maximum Equipment Level for Weekdays {W},"
+                      "Minimum Equipment Level for Weekends/Holidays {W}, Maximum Equipment Level for Weekends /Holidays {W},"
+                      "Minimum Equipment Level for Summer Design Days {W}, Maximum Equipment Level for Summer Design Days {W},"
+                      "Minimum Equipment Level for Winter Design Days {W}, Maximum Equipment Level for Winter Design Days {W}\n");
             }
 
             int ZoneNum = state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr;
@@ -4024,7 +4160,28 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneSteamEq(Loop).FractionConvected);
             print(state.files.eio, "{},", state.dataHeatBal->ZoneSteamEq(Loop).EndUseSubcategory);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneSteamEq(Loop).NomMinDesignLevel);
-            print(state.files.eio, "{:.3R}\n", state.dataHeatBal->ZoneSteamEq(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneSteamEq(Loop).NomMaxDesignLevel);
+
+            auto &stmeq = state.dataHeatBal->ZoneSteamEq(Loop);
+            // weekdays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, stmeq.SchedPtr, DayTypeGroup::Weekday);
+            print(state.files.eio, "{:.3R},", stmeq.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", stmeq.DesignLevel * SchMax);
+
+            // weekends/holidays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, stmeq.SchedPtr, DayTypeGroup::WeekEndHoliday);
+            print(state.files.eio, "{:.3R},", stmeq.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", stmeq.DesignLevel * SchMax);
+
+            // summer design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, stmeq.SchedPtr, DayTypeGroup::SummerDesignDay);
+            print(state.files.eio, "{:.3R},", stmeq.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", stmeq.DesignLevel * SchMax);
+
+            // winter design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, stmeq.SchedPtr, DayTypeGroup::WinterDesignDay);
+            print(state.files.eio, "{:.3R},", stmeq.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R}\n", stmeq.DesignLevel * SchMax);
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotOthEquip; ++Loop) {
@@ -4033,7 +4190,12 @@ namespace InternalHeatGains {
                       Format_723,
                       "OtherEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                      "Lost,Fraction Convected,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
+                      "Lost,Fraction Convected,"
+                      "Minimum Equipment Level for All Day Types {W},Maximum Equipment Level for All Day Types {W},"
+                      "Minimum Equipment Level for Weekdays {W}, Maximum Equipment Level for Weekdays {W},"
+                      "Minimum Equipment Level for Weekends/Holidays {W}, Maximum Equipment Level for Weekends /Holidays {W},"
+                      "Minimum Equipment Level for Summer Design Days {W}, Maximum Equipment Level for Summer Design Days {W},"
+                      "Minimum Equipment Level for Winter Design Days {W}, Maximum Equipment Level for Winter Design Days {W}\n");
             }
 
             int ZoneNum = state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr;
@@ -4062,7 +4224,28 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneOtherEq(Loop).FractionLost);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneOtherEq(Loop).FractionConvected);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneOtherEq(Loop).NomMinDesignLevel);
-            print(state.files.eio, "{:.3R}\n", state.dataHeatBal->ZoneOtherEq(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneOtherEq(Loop).NomMaxDesignLevel);
+
+            auto &other = state.dataHeatBal->ZoneOtherEq(Loop);
+            // weekdays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, other.SchedPtr, DayTypeGroup::Weekday);
+            print(state.files.eio, "{:.3R},", other.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", other.DesignLevel * SchMax);
+
+            // weekends/holidays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, other.SchedPtr, DayTypeGroup::WeekEndHoliday);
+            print(state.files.eio, "{:.3R},", other.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", other.DesignLevel * SchMax);
+
+            // summer design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, other.SchedPtr, DayTypeGroup::SummerDesignDay);
+            print(state.files.eio, "{:.3R},", other.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R},", other.DesignLevel * SchMax);
+
+            // winter design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, other.SchedPtr, DayTypeGroup::WinterDesignDay);
+            print(state.files.eio, "{:.3R},", other.DesignLevel * SchMin);
+            print(state.files.eio, "{:.3R}\n", other.DesignLevel * SchMax);
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
@@ -4073,7 +4256,12 @@ namespace InternalHeatGains {
                       "Equipment Level {W},"
                       "Equipment/Floor Area {W/m2},Equipment per person {W/person},"
                       "Fraction Convected,CPU End-Use SubCategory,Fan End-Use SubCategory,UPS End-Use SubCategory,"
-                      "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}, Design Air Volume Flow Rate {m3/s}\n");
+                      "Minimum Equipment Level for All Day Types {W},Maximum Equipment Level for All Day Types {W},"
+                      "Minimum Equipment Level for Weekdays {W}, Maximum Equipment Level for Weekdays {W},"
+                      "Minimum Equipment Level for Weekends/Holidays {W}, Maximum Equipment Level for Weekends /Holidays {W},"
+                      "Minimum Equipment Level for Summer Design Days {W}, Maximum Equipment Level for Summer Design Days {W},"
+                      "Minimum Equipment Level for Winter Design Days {W}, Maximum Equipment Level for Winter Design Days {W},"
+                      "Design Air Volume Flow Rate {m3/s}\n");
             }
 
             int ZoneNum = state.dataHeatBal->ZoneITEq(Loop).ZonePtr;
@@ -4094,6 +4282,7 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower);
 
             print_and_divide_if_greater_than_zero(state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower, state.dataHeatBal->Zone(ZoneNum).FloorArea);
+            print_and_divide_if_greater_than_zero(state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower, state.dataHeatBal->Zone(ZoneNum).TotOccupants);
 
             // ElectricEquipment:ITE:AirCooled is 100% convective
             print(state.files.eio, "1.0,");
@@ -4103,6 +4292,28 @@ namespace InternalHeatGains {
             print(state.files.eio, "{},", state.dataHeatBal->ZoneITEq(Loop).EndUseSubcategoryUPS);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneITEq(Loop).NomMinDesignLevel);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneITEq(Loop).NomMaxDesignLevel);
+
+            auto &iteq = state.dataHeatBal->ZoneITEq(Loop);
+            // weekdays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, iteq.OperSchedPtr, DayTypeGroup::Weekday);
+            print(state.files.eio, "{:.3R},", iteq.DesignTotalPower * SchMin);
+            print(state.files.eio, "{:.3R},", iteq.DesignTotalPower * SchMax);
+
+            // weekends/holidays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, iteq.OperSchedPtr, DayTypeGroup::WeekEndHoliday);
+            print(state.files.eio, "{:.3R},", iteq.DesignTotalPower * SchMin);
+            print(state.files.eio, "{:.3R},", iteq.DesignTotalPower * SchMax);
+
+            // summer design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, iteq.OperSchedPtr, DayTypeGroup::SummerDesignDay);
+            print(state.files.eio, "{:.3R},", iteq.DesignTotalPower * SchMin);
+            print(state.files.eio, "{:.3R},", iteq.DesignTotalPower * SchMax);
+
+            // winter design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, iteq.OperSchedPtr, DayTypeGroup::WinterDesignDay);
+            print(state.files.eio, "{:.3R},", iteq.DesignTotalPower * SchMin);
+            print(state.files.eio, "{:.3R},", iteq.DesignTotalPower * SchMax);
+
             print(state.files.eio, "{:.10R}\n", state.dataHeatBal->ZoneITEq(Loop).DesignAirVolFlowRate);
         }
 
@@ -6701,7 +6912,7 @@ namespace InternalHeatGains {
 
                 SetupOutputVariable(state,
                                     "Zone ITE Adjusted Return Air Temperature",
-                                    Constant::Units::W,
+                                    Constant::Units::C,
                                     state.dataHeatBal->ZoneRpt(zoneNum).ITEAdjReturnTemp,
                                     OutputProcessor::TimeStepType::Zone,
                                     OutputProcessor::StoreType::Average,
@@ -7710,8 +7921,8 @@ namespace InternalHeatGains {
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace Psychrometrics;
         using Curve::CurveValue;
-        using DataHVACGlobals::SmallAirVolFlow;
-        using DataHVACGlobals::SmallTempDiff;
+        using HVAC::SmallAirVolFlow;
+        using HVAC::SmallTempDiff;
 
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C, H1
         // From ASHRAE 2021 Thermal Guidelines environmental classes for Air-Cooled ITE

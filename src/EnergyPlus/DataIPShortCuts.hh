@@ -66,9 +66,14 @@ struct IPShortCutsData : BaseGlobalStruct
     Array1D_string cAlphaArgs;
     Array1D<Real64> rNumericArgs;
     std::string cCurrentModuleObject;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = IPShortCutsData();
+        new (this) IPShortCutsData();
     }
 };
 

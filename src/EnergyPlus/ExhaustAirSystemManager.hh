@@ -69,7 +69,7 @@ namespace ExhaustAirSystemManager {
         int AvailScheduleNum = ScheduleManager::ScheduleAlwaysOn;
         std::string ZoneMixerName = "";
         int ZoneMixerIndex = 0;
-        DataHVACGlobals::FanType centralFanType = DataHVACGlobals::FanType::Invalid;
+        HVAC::FanType centralFanType = HVAC::FanType::Invalid;
         std::string CentralFanName = "";
         int CentralFanIndex = 0;
 
@@ -149,6 +149,11 @@ struct ExhaustAirSystemMgr : BaseGlobalStruct
     bool GetInputFlag = true;
     std::map<int, int> mixerIndexMap;
     bool mappingDone = false;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) ExhaustAirSystemMgr();
@@ -159,6 +164,10 @@ struct ExhaustControlSystemMgr : BaseGlobalStruct
 {
 
     bool GetInputFlag = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

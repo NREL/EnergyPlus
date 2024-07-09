@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, GasAbsorption_GetInput_Test)
     EXPECT_FALSE(state->dataChillerGasAbsorption->GasAbsorber(1).isWaterCooled);
 
     EXPECT_EQ(2., state->dataChillerGasAbsorption->GasAbsorber(1).CHWLowLimitTemp);
-    EXPECT_TRUE(compare_enums(Constant::eFuel::NaturalGas, state->dataChillerGasAbsorption->GasAbsorber(1).FuelType));
+    EXPECT_ENUM_EQ(Constant::eFuel::NaturalGas, state->dataChillerGasAbsorption->GasAbsorber(1).FuelType);
 }
 
 TEST_F(EnergyPlusFixture, GasAbsorption_getDesignCapacities_Test)

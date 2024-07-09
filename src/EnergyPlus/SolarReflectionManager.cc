@@ -311,7 +311,7 @@ namespace SolarReflectionManager {
                     ObsVec = state.dataSurface->Surface(ObsSurfNum).Vertex(loop);
                     DotProd = dot(state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NormVec, ObsVec - RecVec);
                     // CR8251      IF(DotProd > 0.01d0) THEN  ! This obstructing-surface vertex is not behind receiving surface
-                    if (DotProd > 1.0e-6) { // This obstructing-surface vertex is not behind receiving surface
+                    if (DotProd > Constant::OneMillionth) { // This obstructing-surface vertex is not behind receiving surface
                         ObsBehindRec = false;
                         break;
                     }

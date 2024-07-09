@@ -234,6 +234,10 @@ struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct
     bool GetInput = true;
     EPVector<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->NumberOfPlantFluidHXs = 0;

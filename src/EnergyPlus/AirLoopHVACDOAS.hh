@@ -123,7 +123,7 @@ namespace AirLoopHVACDOAS {
         int NumOfAirLoops = 0;
         int m_InletNodeNum = 0;
         int m_OutletNodeNum = 0;
-        int m_FanIndex = -1;
+        int m_FanIndex = 0;
         int m_FanInletNodeNum = 0;
         int m_FanOutletNodeNum = 0;
         SimAirServingZones::CompType m_FanTypeNum = SimAirServingZones::CompType::Invalid;
@@ -183,9 +183,14 @@ struct AirLoopHVACDOASData : BaseGlobalStruct
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
     std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
     std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = AirLoopHVACDOASData();
+        new (this) AirLoopHVACDOASData();
     }
 };
 
