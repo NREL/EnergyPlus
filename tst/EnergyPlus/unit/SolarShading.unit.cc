@@ -3444,10 +3444,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
     Vector expected_lcsy(0.96592582628906831, 0.25881904510252079, -0.0);
     Vector expected_lcsz(0.0, 0.0, 1.0);
 
-    auto compare_double_vectors = [](Vector const & exp, Vector const& actual) {
+    auto compare_double_vectors = [](Vector const &exp, Vector const &actual) {
         ASSERT_EQ(exp.size(), actual.size());
         for (size_t i = 0; i < exp.size(); ++i) {
-            EXPECT_NEAR(exp[i], actual[i], 0.0000000000000001) << "Failed at index " <<i;
+            EXPECT_NEAR(exp[i], actual[i], 0.0000000000000001) << "Failed at index " << i;
         }
     };
 
