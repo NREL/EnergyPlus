@@ -442,11 +442,11 @@ TEST_F(EnergyPlusFixture, extendedHI_heatindex)
 
     Real64 tol = 1e-4;
 
-    // fixme, this one has issue: extendedHI::heatindex(*state, 310, 0.5, false);
+    // fixme, this one has issue: extendedHI::heatindex(*state, 310, 0.5);
     for (size_t i = 0; i < T_values.size(); ++i) {
         for (size_t j = 0; j < RH_values.size(); ++j) {
             Real64 HI = HI_values[i][j];
-            EXPECT_NEAR(extendedHI::heatindex(*state, T_values[i], RH_values[j], false), HI, tol);
+            EXPECT_NEAR(extendedHI::heatindex(*state, T_values[i], RH_values[j]), HI, tol);
         }
     }
 }
@@ -727,7 +727,7 @@ TEST_F(EnergyPlusFixture, extendedHI_heatindex_compare)
     Real64 extended;
     for (size_t i = 0; i < T_values.size(); ++i) {
         for (size_t j = 0; j < RH_values.size(); ++j) {
-            extended = extendedHI::heatindex(*state, Fahrenheit2Celsius(T_values[i]) + 273.15, RH_values[j] / 100.0, false);
+            extended = extendedHI::heatindex(*state, Fahrenheit2Celsius(T_values[i]) + 273.15, RH_values[j] / 100.0);
             EXPECT_NEAR(HI_values[i][j], extended, 1e-4);
         }
     }

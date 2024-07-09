@@ -300,12 +300,11 @@ namespace extendedHI {
         return std::make_pair(T, region);
     }
 
-    Real64 heatindex(EnergyPlusData &state, Real64 Ta, Real64 RH, bool show_info = false)
+    Real64 heatindex(EnergyPlusData &state, Real64 Ta, Real64 RH)
     {
 
         // Ta: temperature in Kelvin
         // RH: relative humidity in range of 0.0 to 1.0
-        // show_info: whether to print some messages. Might be useful in debugging
         // The function computes the extended heat index, in Kelvinn
 
         auto const HVACSystemRootSolverBackup = state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver;
@@ -330,36 +329,6 @@ namespace extendedHI {
         std::string region = std::get<1>(result);
 
         if (Ta == 0.0) T = 0.0;
-
-        if (show_info) {
-            if (region == "I") {
-                std::cout << "Region I, covering (variable phi)\n";
-                std::cout << "Clothing fraction is " << std::round(std::get<1>(eqvars) * 1000.0) / 1000.0 << "\n";
-            } else if (region == "II") {
-                std::cout << "Region II, clothed (variable Rf, pa = pvstar)\n";
-                std::cout << "Clothing thickness is " << std::round((std::get<2>(eqvars) / 16.7) * 100.0 * 1000.0) / 1000.0 << " cm\n";
-            } else if (region == "III") {
-                std::cout << "Region III, clothed (variable Rf, pa = pref)\n";
-                std::cout << "Clothing thickness is " << std::round((std::get<2>(eqvars) / 16.7) * 100.0 * 1000.0) / 1000.0 << " cm\n";
-            } else if (region == "IV") {
-                Real64 kmin = 5.28; // W/K/m^2, conductance of tissue
-                Real64 rho = 1.0e3; // kg/m^3, density of blood
-                Real64 c = 4184.0;  // J/kg/K, specific heat of blood
-                std::cout << "Region IV, naked (variable Rs, ps < phisalt*pvstar)\n";
-                std::cout << "Blood flow is " << std::round(((1.0 / std::get<3>(eqvars) - kmin) * A / (rho * c)) * 1000.0 * 60.0 * 1000.0) / 1000.0
-                          << " l/min\n";
-            } else if (region == "V") {
-                Real64 kmin = 5.28; // W/K/m^2, conductance of tissue
-                Real64 rho = 1.0e3; // kg/m^3, density of blood
-                Real64 c = 4184.0;  // J/kg/K, specific heat of blood
-                std::cout << "Region V, naked dripping sweat (variable Rs, ps = phisalt*pvstar)\n";
-                std::cout << "Blood flow is " << std::round(((1.0 / std::get<3>(eqvars) - kmin) * A / (rho * c)) * 1000.0 * 60.0 * 1000.0) / 1000.0
-                          << " l/min\n";
-            } else {
-                std::cout << "Region VI, warming up (dTc/dt > 0)\n";
-                std::cout << "dTc/dt = " << std::round(std::get<4>(eqvars) * 3600.0 * 1000000.0) / 1000000.0 << " K/hour\n";
-            }
-        }
 
         state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverBackup;
         return T;
