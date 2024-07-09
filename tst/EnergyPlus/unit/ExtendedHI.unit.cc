@@ -84,7 +84,7 @@ TEST_F(EnergyPlusFixture, extendedHI_pvstar)
                                   62053.2640569111,
                                   90163.72448626769};
     for (size_t i = 0; i < T_values.size(); ++i) {
-        EXPECT_NEAR(extendedHI::pvstar(T_values[i]), result[i], tol);
+        EXPECT_NEAR(ExtendedHI::pvstar(T_values[i]), result[i], tol);
     }
 }
 
@@ -111,7 +111,7 @@ TEST_F(EnergyPlusFixture, extendedHI_Le)
                                   2305405.16,
                                   2283005.16};
     for (size_t i = 0; i < T_values.size(); ++i) {
-        EXPECT_NEAR(extendedHI::Le(T_values[i]), result[i], tol);
+        EXPECT_NEAR(ExtendedHI::Le(T_values[i]), result[i], tol);
     }
 }
 
@@ -140,7 +140,7 @@ TEST_F(EnergyPlusFixture, extendedHI_Qv)
                                                {5.923891388044891, 5.889469669642025, 5.545252485613354, 2.1030806453266275, -32.31863775754062}};
     for (size_t i = 0; i < T_values.size(); ++i) {
         for (size_t j = 0; j < P_values.size(); ++j) {
-            EXPECT_NEAR(extendedHI::Qv(T_values[i], P_values[j]), result[i][j], tol);
+            EXPECT_NEAR(ExtendedHI::Qv(T_values[i], P_values[j]), result[i][j], tol);
         }
     }
 }
@@ -151,7 +151,7 @@ TEST_F(EnergyPlusFixture, extendedHI_Zs)
     std::vector<Real64> Rs_values = {0.0387, 0.5, 1, 1.2};
     std::vector<Real64> result = {52.1, 18750000.0, 600000000.0, 1492991999.9999998};
     for (size_t i = 0; i < Rs_values.size(); ++i) {
-        EXPECT_NEAR(extendedHI::Zs(Rs_values[i]), result[i], tol);
+        EXPECT_NEAR(ExtendedHI::Zs(Rs_values[i]), result[i], tol);
     }
 }
 
@@ -211,7 +211,7 @@ TEST_F(EnergyPlusFixture, extendedHI_Ra)
                                                 0.03827822497025564}};
     for (size_t i = 0; i < Ts_values.size(); ++i) {
         for (size_t j = 0; j < Ta_values.size(); ++j) {
-            EXPECT_NEAR(extendedHI::Ra(Ts_values[i], Ta_values[j]), result[i][j], tol);
+            EXPECT_NEAR(ExtendedHI::Ra(Ts_values[i], Ta_values[j]), result[i][j], tol);
         }
     }
 }
@@ -272,7 +272,7 @@ TEST_F(EnergyPlusFixture, extendedHI_Ra_bar)
                                                 0.0507391028959455}};
     for (size_t i = 0; i < Tf_values.size(); ++i) {
         for (size_t j = 0; j < Ta_values.size(); ++j) {
-            EXPECT_NEAR(extendedHI::Ra_bar(Tf_values[i], Ta_values[j]), result[i][j], tol);
+            EXPECT_NEAR(ExtendedHI::Ra_bar(Tf_values[i], Ta_values[j]), result[i][j], tol);
         }
     }
 }
@@ -333,7 +333,7 @@ TEST_F(EnergyPlusFixture, extendedHI_Ra_un)
                                                 0.04875359793440157}};
     for (size_t i = 0; i < Tf_values.size(); ++i) {
         for (size_t j = 0; j < Ta_values.size(); ++j) {
-            EXPECT_NEAR(extendedHI::Ra_un(Tf_values[i], Ta_values[j]), result[i][j], tol);
+            EXPECT_NEAR(ExtendedHI::Ra_un(Tf_values[i], Ta_values[j]), result[i][j], tol);
         }
     }
 }
@@ -378,7 +378,7 @@ TEST_F(EnergyPlusFixture, extendedHI_find_eqvar)
 
     for (size_t i = 0; i < Ta_values.size(); ++i) {
         for (size_t j = 0; j < RH_values.size(); ++j) {
-            auto const output = extendedHI::find_eqvar(*state, Ta_values[i], RH_values[j]);
+            auto const output = ExtendedHI::find_eqvar(*state, Ta_values[i], RH_values[j]);
             EXPECT_EQ(std::get<0>(output), result_0[i][j]);
             EXPECT_EQ(std::get<1>(output), result_1);
             EXPECT_NEAR(std::get<2>(output), result_2[i][j], tol);
@@ -395,7 +395,7 @@ TEST_F(EnergyPlusFixture, extendedHI_find_T)
     std::vector<Real64> Rf_values = {30, 32, 34, 36, 38};
     std::vector<Real64> result_0_rf = {240.06754042464308, 239.971123727737, 239.88581076147966, 239.8097881616559, 239.7416166716721};
     for (size_t i = 0; i < Rf_values.size(); ++i) {
-        auto const output = extendedHI::find_T(*state, "Rf", Rf_values[i]);
+        auto const output = ExtendedHI::find_T(*state, "Rf", Rf_values[i]);
         EXPECT_EQ(std::get<1>(output), "II");
         EXPECT_NEAR(std::get<0>(output), result_0_rf[i], tol);
     }
@@ -403,13 +403,13 @@ TEST_F(EnergyPlusFixture, extendedHI_find_T)
     std::vector<Real64> result_0_rs = {337.8696502133971, 329.7586998442421, 307.4815719091566};
     tol = 1e-4;
     for (size_t i = 0; i < Rs_values.size(); ++i) {
-        auto const output = extendedHI::find_T(*state, "Rs", Rs_values[i]);
+        auto const output = ExtendedHI::find_T(*state, "Rs", Rs_values[i]);
         EXPECT_EQ(std::get<1>(output), "IV");
         EXPECT_NEAR(std::get<0>(output), result_0_rs[i], tol);
     }
     // fixme: this one has large diff, 347 vs 350, because of the difference in the root solvers between EnergyPlus and the heatindex.py code by Lu
     // and Romps.
-    // auto const output = extendedHI::find_T(*state, "Rs", 349.99999999359716); EXPECT_NEAR(std::get<0>(extendedHI::find_T(*state, "Rs",
+    // auto const output = ExtendedHI::find_T(*state, "Rs", 349.99999999359716); EXPECT_NEAR(std::get<0>(ExtendedHI::find_T(*state, "Rs",
     // 0.0), result_0_rs[i], tol);
 }
 
@@ -442,11 +442,11 @@ TEST_F(EnergyPlusFixture, extendedHI_heatindex)
 
     Real64 tol = 1e-4;
 
-    // fixme, this one has issue: extendedHI::heatindex(*state, 310, 0.5);
+    // fixme, this one has issue: ExtendedHI::heatindex(*state, 310, 0.5);
     for (size_t i = 0; i < T_values.size(); ++i) {
         for (size_t j = 0; j < RH_values.size(); ++j) {
             Real64 HI = HI_values[i][j];
-            EXPECT_NEAR(extendedHI::heatindex(*state, T_values[i], RH_values[j]), HI, tol);
+            EXPECT_NEAR(ExtendedHI::heatindex(*state, T_values[i], RH_values[j]), HI, tol);
         }
     }
 }
@@ -502,7 +502,7 @@ TEST_F(EnergyPlusFixture, extendedHI_heatindex_compare)
     //                       T,
     //                       Fahrenheit2Celsius(T) + 273.15,
     //                       RH_percent,
-    //                       extendedHI::heatindex(*state, Fahrenheit2Celsius(T) + 273.15, RH_percent / 100.0, false));
+    //                       ExtendedHI::heatindex(*state, Fahrenheit2Celsius(T) + 273.15, RH_percent / 100.0, false));
     //        }
     //    }
 
@@ -727,7 +727,7 @@ TEST_F(EnergyPlusFixture, extendedHI_heatindex_compare)
     Real64 extended;
     for (size_t i = 0; i < T_values.size(); ++i) {
         for (size_t j = 0; j < RH_values.size(); ++j) {
-            extended = extendedHI::heatindex(*state, Fahrenheit2Celsius(T_values[i]) + 273.15, RH_values[j] / 100.0);
+            extended = ExtendedHI::heatindex(*state, Fahrenheit2Celsius(T_values[i]) + 273.15, RH_values[j] / 100.0);
             EXPECT_NEAR(HI_values[i][j], extended, 1e-4);
         }
     }

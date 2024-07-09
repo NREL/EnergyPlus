@@ -72,7 +72,7 @@
 
 namespace EnergyPlus {
 
-namespace extendedHI {
+namespace ExtendedHI {
     // Thermodynamic parameters
     constexpr Real64 Ttrip = 273.16; // K
     constexpr Real64 ptrip = 611.65; // Pa
@@ -334,5 +334,5 @@ namespace extendedHI {
         return T;
     }
 
-} // namespace extendedHI
+} // namespace ExtendedHI
 } // namespace EnergyPlus

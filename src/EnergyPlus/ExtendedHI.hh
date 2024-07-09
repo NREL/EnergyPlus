@@ -58,7 +58,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace extendedHI {
+namespace ExtendedHI {
 
     Real64 pvstar(Real64 T);
     Real64 Le(Real64 T);
@@ -71,7 +71,7 @@ namespace extendedHI {
     std::pair<Real64, std::string> find_T(EnergyPlusData &state, std::string eqvar_name, Real64 eqvar);
     Real64 heatindex(EnergyPlusData &state, Real64 Ta, Real64 RH);
 
-} // namespace extendedHI
+} // namespace ExtendedHI
 } // namespace EnergyPlus
 
 #endif

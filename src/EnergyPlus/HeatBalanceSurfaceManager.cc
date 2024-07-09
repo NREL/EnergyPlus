@@ -5624,7 +5624,7 @@ void CalcThermalResilience(EnergyPlusData &state)
             Real64 const ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
             // calculate extended heat index
             state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex =
-                extendedHI::heatindex(state, ZoneT + Constant::Kelvin, ZoneRH) - Constant::Kelvin;
+                ExtendedHI::heatindex(state, ZoneT + Constant::Kelvin, ZoneRH) - Constant::Kelvin;
         }
     }
     if (state.dataHeatBalSurfMgr->reportVarHumidex || state.dataOutRptTab->displayThermalResilienceSummary) {
