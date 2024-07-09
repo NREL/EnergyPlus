@@ -419,8 +419,16 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     state->dataHeatBal->SurfQRadSWOutIncident(thisBIPVT.SurfNum) = 0.0;
     thisBIPVT.calculateBIPVTMaxHeatGain(*state, tempSetPoint, bypassFraction, potentialHeatGain, potentialOutletTemp, eff, tCollector);
 
+#if defined(__APPLE__) && defined __arm64__
+    // BIPVT uses solveLinSysBackSub to solve a system of linear equations using Gaussian elimination and back substitution method
+    // The iteration is slightly different on mac M1, leading to an extra iteration happening to satisfy the error tolerance of 1e-3 and leads to
+    // different results, cf https://github.com/NREL/EnergyPlus/issues/10122#issuecomment-2217405175
+    EXPECT_NEAR(bypassFraction, 0.249, 0.001);
+    EXPECT_NEAR(potentialHeatGain, -3021.77, 0.01);
+#else
     EXPECT_NEAR(bypassFraction, 0.248, 0.001);
     EXPECT_NEAR(potentialHeatGain, -3023.06, 0.01);
+#endif
     EXPECT_NEAR(potentialOutletTemp, 22.0, 0.01);
     EXPECT_NEAR(eff, 0.0, 0.0001);
     EXPECT_NEAR(tCollector, 20.38, 0.01);
