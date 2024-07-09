@@ -577,6 +577,10 @@ struct FurnacesData : BaseGlobalStruct
     int SpeedNum = 1;           // Speed number
     Real64 SupHeaterLoad = 0.0; // supplement heater load
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         GetFurnaceInputFlag = true;

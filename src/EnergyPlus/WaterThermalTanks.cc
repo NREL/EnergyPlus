@@ -114,7 +114,7 @@ namespace EnergyPlus::WaterThermalTanks {
 // WaterHeater:Mixed simulates a well-mixed, single-node tank for hot water applications.  Source (e.g. heat recovery) and
 // use plant connections are allowed.  A scheduled domestic hot water demand can also be specified
 // to directly utilize the hot water without use side connections.
-// WaterHeater:Stratified simulates a stratified, multi-node tank for hot water applicatons.
+// WaterHeater:Stratified simulates a stratified, multi-node tank for hot water applications.
 // The model shares most of the same capabilities as WaterHeater:Mixed
 // but also has up to two heating elements which can be operated in
 // a master-slave mode or simultaneous mode.
@@ -425,7 +425,7 @@ void HeatPumpWaterHeaterData::simulate(
                                                                    state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).DWHCoilName,
                                                                    bDWHCoilReading);
             this->DXCoilAirInletNode = this->HeatPumpAirInletNode;
-        } else // default is to input outdoor fan to the the this
+        } else // default is to input outdoor fan to the HPWH
         {
             this->FanNum = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).IDFanID;
             this->FanName = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).IDFanName;
@@ -12433,7 +12433,6 @@ bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumbe
             }
 
             // Get fan inlet node index
-            bool ErrorsFound{false};
             int FanInletNodeIndex = state.dataFans->fans(HPWH.FanNum)->inletNodeNum;
 
             // Fan inlet node

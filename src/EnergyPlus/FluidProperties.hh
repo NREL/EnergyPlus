@@ -662,6 +662,12 @@ struct FluidPropertiesData : BaseGlobalStruct
     std::array<FluidProperties::cached_tsh, FluidProperties::t_sh_cache_size> cached_t_sh;
 #endif
 
+    void init_state(EnergyPlusData &state) override
+    {
+        FluidProperties::GetFluidPropertiesData(state);
+        this->GetInput = false;
+    }
+
     void clear_state() override
     {
         new (this) FluidPropertiesData();
