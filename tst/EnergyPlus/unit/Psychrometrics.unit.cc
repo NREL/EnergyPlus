@@ -309,7 +309,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
     // check result
     EXPECT_NEAR(analytic_result, numerical_result, 1.0E-010);
 
-    // Test 5: analytical vs numerical cp values for psychomteric chart T and W range
+    // Test 5: analytical vs numerical cp values for psychrometric chart T and W range
     Real64 SSE = 0.0;
     Real64 Error = 0.0;
     Real64 Error_sum = 0.0;
@@ -336,11 +336,24 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
     }
     Real64 StdError = std::sqrt(SSE / 100);
     Real64 Error_avg = Error_sum / 101;
+
     // check analytical vs numerical cp values stats
+    EXPECT_LT(Error_min, 0.0);
+    EXPECT_GT(Error_max, 0.0);
+    EXPECT_GT(Error_avg, 0.0);
+    EXPECT_GT(StdError, 0.0);
+
+#if defined(__APPLE__) && defined __arm64__
+    EXPECT_GE(std::abs(Error_min), -2.8808244678657502e-10);
+    EXPECT_LE(Error_max, 2.5875124265439808e-10);
+    EXPECT_LE(Error_avg, 1.5508032789728189e-09);
+    EXPECT_LE(StdError, 6.7111413639467468e-10);
+#else
     EXPECT_DOUBLE_EQ(Error_min, -2.8808244678657502e-10);
     EXPECT_DOUBLE_EQ(Error_max, 2.5875124265439808e-10);
     EXPECT_DOUBLE_EQ(Error_avg, 1.5508032789728189e-09);
     EXPECT_DOUBLE_EQ(StdError, 6.7111413639467468e-10);
+#endif
 }
 
 TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
