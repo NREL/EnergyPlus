@@ -2064,33 +2064,7 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
                 state, ChillerHeaterNum, EvapOutletTemp, TempLowLimitEout, EvapInletTemp, QEvaporator, EvapMassFlowRate, Cp);
 
             // Calculate part load once more since evaporator capacity might be modified
-            if (AvailChillerCap > 0.0) {
-                PartLoadRat = max(0.0, min((QEvaporator / AvailChillerCap), MaxPartLoadRat));
-            } else {
-                PartLoadRat = 0.0;
-            }
-
-            // Chiller cycles below minimum part load ratio, FRAC = amount of time chiller is ON during this time step
-            if (PartLoadRat < MinPartLoadRat) FRAC = min(1.0, (PartLoadRat / MinPartLoadRat));
-
-            // set the module level variable used for reporting FRAC
-            state.dataPlantCentralGSHP->ChillerCyclingRatio = FRAC;
-
-            // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-            if (AvailChillerCap > 0.0) {
-                PartLoadRat = max(PartLoadRat, MinPartLoadRat);
-            } else {
-                PartLoadRat = 0.0;
-            }
-
-            // set the module level variable used for reporting PLR
-            state.dataPlantCentralGSHP->ChillerPartLoadRatio = PartLoadRat;
-
-            // calculate the load due to false loading on chiller over and above water side load
-            state.dataPlantCentralGSHP->ChillerFalseLoadRate = (AvailChillerCap * PartLoadRat * FRAC) - QEvaporator;
-            if (state.dataPlantCentralGSHP->ChillerFalseLoadRate < HVAC::SmallLoad) {
-                state.dataPlantCentralGSHP->ChillerFalseLoadRate = 0.0;
-            }
+            WrapperSpecs::calcPLRAndCyclingRatio(state, AvailChillerCap, PartLoadRat, MinPartLoadRat, MaxPartLoadRat, QEvaporator, FRAC);
 
             // Determine chiller compressor power and transfer heat calculation
             state.dataPlantCentralGSHP->ChillerEIRFT =
@@ -2468,32 +2442,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                                                   EvapMassFlowRate,
                                                   Cp);
 
-                // Evaporator operates at full load
-                if (AvailChillerCap > 0.0) {
-                    PartLoadRat = max(0.0, min((QEvaporator / AvailChillerCap), MaxPartLoadRat));
-                } else {
-                    PartLoadRat = 0.0;
-                }
-
-                // Chiller cycles below minimum part load ratio, FRAC = amount of time chiller is ON during this time step
-                if (PartLoadRat < MinPartLoadRat) FRAC = min(1.0, (PartLoadRat / MinPartLoadRat));
-                if (FRAC <= 0.0) FRAC = 1.0; // CR 9303 COP reporting issue, it should be greater than zero in this routine
-                state.dataPlantCentralGSHP->ChillerCyclingRatio = FRAC;
-
-                // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-                if (AvailChillerCap > 0.0) {
-                    PartLoadRat = max(PartLoadRat, MinPartLoadRat);
-                } else {
-                    PartLoadRat = 0.0;
-                }
-                // Evaporator part load ratio
-                state.dataPlantCentralGSHP->ChillerPartLoadRatio = PartLoadRat;
-
-                // calculate the load due to false loading on chiller over and above water side load
-                state.dataPlantCentralGSHP->ChillerFalseLoadRate = (AvailChillerCap * PartLoadRat * FRAC) - QEvaporator;
-                if (state.dataPlantCentralGSHP->ChillerFalseLoadRate < HVAC::SmallLoad) {
-                    state.dataPlantCentralGSHP->ChillerFalseLoadRate = 0.0;
-                }
+                WrapperSpecs::calcPLRAndCyclingRatio(state, AvailChillerCap, PartLoadRat, MinPartLoadRat, MaxPartLoadRat, QEvaporator, FRAC);
 
                 state.dataPlantCentralGSHP->ChillerEIRFT =
                     max(0.0, Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
@@ -2716,6 +2665,43 @@ void WrapperSpecs::checkEvapOutletTemp(EnergyPlusData &state,
             qEvaporator = 0.0;
             evapOutletTemp = evapInletTemp;
         }
+    }
+}
+
+void WrapperSpecs::calcPLRAndCyclingRatio(EnergyPlusData &state,
+                                          Real64 const availChillerCap,
+                                          Real64 &actualPartLoadRatio,
+                                          Real64 const minPartLoadRatio,
+                                          Real64 const maxPartLoadRatio,
+                                          Real64 const qEvaporator,
+                                          Real64 &frac)
+{
+    // Calculate PLR (actualPartLoadRatio) based on evaporator load and available capacity, factoring in max PLR
+    if (availChillerCap > 0.0) {
+        actualPartLoadRatio = max(0.0, min((qEvaporator / availChillerCap), maxPartLoadRatio));
+    } else {
+        actualPartLoadRatio = 0.0;
+    }
+
+    // Chiller cycles below minimum part load ratio, frac = amount of time chiller is ON during this time step
+    if (actualPartLoadRatio < minPartLoadRatio) frac = min(1.0, (actualPartLoadRatio / minPartLoadRatio));
+    if (frac <= 0.0) frac = 1.0; // CR 9303 COP reporting issue, it should be greater than zero in this routine
+    state.dataPlantCentralGSHP->ChillerCyclingRatio = frac;
+
+    // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
+    if (availChillerCap > 0.0) {
+        actualPartLoadRatio = max(actualPartLoadRatio, minPartLoadRatio);
+    } else {
+        actualPartLoadRatio = 0.0;
+    }
+
+    // Evaporator part load ratio
+    state.dataPlantCentralGSHP->ChillerPartLoadRatio = actualPartLoadRatio;
+
+    // Calculate the load due to false loading on chiller over and above water side load
+    state.dataPlantCentralGSHP->ChillerFalseLoadRate = (availChillerCap * actualPartLoadRatio * frac) - qEvaporator;
+    if (state.dataPlantCentralGSHP->ChillerFalseLoadRate < HVAC::SmallLoad) {
+        state.dataPlantCentralGSHP->ChillerFalseLoadRate = 0.0;
     }
 }
 

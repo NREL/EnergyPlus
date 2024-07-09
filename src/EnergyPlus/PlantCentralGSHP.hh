@@ -436,6 +436,14 @@ namespace PlantCentralGSHP {
                                  Real64 &evapMassFlowRate,
                                  Real64 const Cp);
 
+        void calcPLRAndCyclingRatio(EnergyPlusData &state,
+                                    Real64 const availChillerCap,
+                                    Real64 &actualPartLoadRatio,
+                                    Real64 const minPartLoadRatio,
+                                    Real64 const maxPartLoadRatio,
+                                    Real64 const qEvaporator,
+                                    Real64 &frac);
+
         void UpdateChillerHeaterRecords(EnergyPlusData &state);
 
         void UpdateChillerRecords(EnergyPlusData &state);
