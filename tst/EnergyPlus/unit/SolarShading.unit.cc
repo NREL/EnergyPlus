@@ -1484,6 +1484,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     compare_err_stream(""); // just for debugging
 
     SolarShading::GetShadowingInput(*state);
+    SolarShading::processShadowingInput(*state);
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
         if (state->dataSurface->Surface(SurfNum).ExtBoundCond == 0 && state->dataSurface->Surface(SurfNum).Zone != 0) {
@@ -3887,6 +3888,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
 
     SolarShading::GetShadowingInput(*state);
+    SolarShading::processShadowingInput(*state);
 
 #ifdef EP_NO_OPENGL
     EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);

@@ -197,6 +197,7 @@ void InitSolarCalculations(EnergyPlusData &state)
         if (state.dataSolarShading->GetInputFlag) {
             checkShadingSurfaceSchedules(state);
             GetShadowingInput(state);
+            processShadowingInput(state);
             state.dataSolarShading->GetInputFlag = false;
             state.dataSolarShading->MaxHCV =
                 (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
@@ -629,30 +630,11 @@ void GetShadowingInput(EnergyPlusData &state)
         state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         state.dataSysVars->ReportExtShadingSunlitFrac = false;
     }
-    if (state.dataSysVars->shadingMethod == ShadingMethod::Imported) {
-        int ExtShadingSchedNum;
-        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataSurface->Surface(SurfNum).Name + "_shading");
-            if (ExtShadingSchedNum != 0) {
-                state.dataSurface->Surface(SurfNum).SurfSchedExternalShadingFrac = true;
-                state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd = ExtShadingSchedNum;
-            } else {
-                ShowWarningError(state,
-                                 format("{}: sunlit fraction schedule not found for {} when using ImportedShading.",
-                                        cCurrentModuleObject,
-                                        state.dataSurface->Surface(SurfNum).Name));
-                ShowContinueError(state, "These values are set to 1.0.");
-            }
-        }
-    }
-
-    bool DisableSelfShadingWithinGroup = false;
-    bool DisableSelfShadingBetweenGroup = false;
 
     aNum++;
     if (NumAlphas >= aNum) {
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
-            DisableSelfShadingWithinGroup = true;
+            state.dataSysVars->DisableSelfShadingWithinGroup = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
         } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
@@ -668,7 +650,7 @@ void GetShadowingInput(EnergyPlusData &state)
     aNum++;
     if (NumAlphas >= aNum) {
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
-            DisableSelfShadingBetweenGroup = true;
+            state.dataSysVars->DisableSelfShadingBetweenGroup = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
         } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
@@ -681,66 +663,17 @@ void GetShadowingInput(EnergyPlusData &state)
         state.dataIPShortCut->cAlphaArgs(aNum) = "No";
     }
 
-    if (DisableSelfShadingBetweenGroup && DisableSelfShadingWithinGroup) {
+    if (state.dataSysVars->DisableSelfShadingBetweenGroup && state.dataSysVars->DisableSelfShadingWithinGroup) {
         state.dataSysVars->DisableAllSelfShading = true;
-    } else if (DisableSelfShadingBetweenGroup || DisableSelfShadingWithinGroup) {
+    } else if (state.dataSysVars->DisableSelfShadingBetweenGroup || state.dataSysVars->DisableSelfShadingWithinGroup) {
         state.dataSysVars->DisableGroupSelfShading = true;
     }
 
     aNum++;
-    int SurfZoneGroup, CurZoneGroup;
-    if (state.dataSysVars->DisableGroupSelfShading) {
-        Array1D_int DisableSelfShadingGroups;
-        int NumOfShadingGroups;
-        if (NumAlphas >= aNum) {
-            // Read all shading groups
-            NumOfShadingGroups = NumAlphas - (aNum - 1);
-            DisableSelfShadingGroups.allocate(NumOfShadingGroups);
-            for (int i = 1; i <= NumOfShadingGroups; i++) {
-                Found = Util::FindItemInList(
-                    state.dataIPShortCut->cAlphaArgs(i + (aNum - 1)), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
-                if (Found != 0) DisableSelfShadingGroups(i) = Found;
-            }
-
-            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
-                if (state.dataSurface->Surface(SurfNum).ExtBoundCond == 0) { // Loop through all exterior surfaces
-                    SurfZoneGroup = 0;
-                    // Check the shading zone group of each exterior surface
-                    for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
-                        CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
-                        for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
-                             ZoneNum++) { // Loop through all zones in the zone list
-                            if (state.dataSurface->Surface(SurfNum).Zone == state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum)) {
-                                SurfZoneGroup = CurZoneGroup;
-                                break;
-                            }
-                        }
-                    }
-                    // if a surface is not in any zone group, no self shading is disabled for this surface
-                    if (SurfZoneGroup != 0) {
-                        // if DisableSelfShadingWithinGroup, add all zones in the same zone group to the surface's disabled zone list
-                        // if DisableSelfShadingBetweenGroups, add all zones in all other zone groups to the surface's disabled zone list
-                        for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
-                            CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
-                            if (SurfZoneGroup == CurZoneGroup && DisableSelfShadingWithinGroup) {
-                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
-                                     ZoneNum++) { // Loop through all zones in the zone list
-                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
-                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
-                                }
-                            } else if (SurfZoneGroup != CurZoneGroup && DisableSelfShadingBetweenGroup) {
-                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones; ZoneNum++) {
-                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
-                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            ShowFatalError(state, "No Shading groups are defined when disabling grouped self shading.");
-        }
+    state.dataSysVars->shadingGroupsNum = NumAlphas - (aNum - 1);
+    state.dataSysVars->zoneName.allocate(state.dataSysVars->shadingGroupsNum);
+    for (int numZone = 1; numZone <= state.dataSysVars->shadingGroupsNum; ++numZone) {
+        state.dataSysVars->zoneName(numZone) = state.dataIPShortCut->cAlphaArgs(aNum - 1 + numZone);
     }
 
     if (!state.dataSysVars->DetailedSolarTimestepIntegration && state.dataSurface->ShadingTransmittanceVaries &&
@@ -795,6 +728,80 @@ void GetShadowingInput(EnergyPlusData &state)
           state.dataIPShortCut->cAlphaArgs(5),
           state.dataIPShortCut->cAlphaArgs(6),
           state.dataIPShortCut->cAlphaArgs(7));
+}
+
+void processShadowingInput(EnergyPlusData &state)
+{
+    // all shadow input processing that needed zones and surfaces to already be read into data (part of fix for Defect #10299)
+
+    if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::Imported) {
+        int ExtShadingSchedNum;
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataSurface->Surface(SurfNum).Name + "_shading");
+            if (ExtShadingSchedNum != 0) {
+                state.dataSurface->Surface(SurfNum).SurfSchedExternalShadingFrac = true;
+                state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd = ExtShadingSchedNum;
+            } else {
+                ShowWarningError(state,
+                                 format("processShadowingInput: sunlit fraction schedule not found for {} when using ImportedShading.",
+                                        state.dataSurface->Surface(SurfNum).Name));
+                ShowContinueError(state, "These values are set to 1.0.");
+            }
+        }
+    }
+
+    int SurfZoneGroup, CurZoneGroup;
+    int Found = 0;
+    if (state.dataSysVars->DisableGroupSelfShading) {
+        Array1D_int DisableSelfShadingGroups;
+        int NumOfShadingGroups = state.dataSysVars->shadingGroupsNum;
+        if (NumOfShadingGroups > 0) {
+            DisableSelfShadingGroups.allocate(NumOfShadingGroups);
+            for (int i = 1; i <= NumOfShadingGroups; i++) {
+                Found = Util::FindItemInList(state.dataSysVars->zoneName(i), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
+                if (Found != 0) DisableSelfShadingGroups(i) = Found;
+            }
+
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+                if (state.dataSurface->Surface(SurfNum).ExtBoundCond == 0) { // Loop through all exterior surfaces
+                    SurfZoneGroup = 0;
+                    // Check the shading zone group of each exterior surface
+                    for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
+                        CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
+                        for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
+                             ZoneNum++) { // Loop through all zones in the zone list
+                            if (state.dataSurface->Surface(SurfNum).Zone == state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum)) {
+                                SurfZoneGroup = CurZoneGroup;
+                                break;
+                            }
+                        }
+                    }
+                    // if a surface is not in any zone group, no self shading is disabled for this surface
+                    if (SurfZoneGroup != 0) {
+                        // if DisableSelfShadingWithinGroup, add all zones in the same zone group to the surface's disabled zone list
+                        // if DisableSelfShadingBetweenGroups, add all zones in all other zone groups to the surface's disabled zone list
+                        for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
+                            CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
+                            if (SurfZoneGroup == CurZoneGroup && state.dataSysVars->DisableSelfShadingWithinGroup) {
+                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
+                                     ZoneNum++) { // Loop through all zones in the zone list
+                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
+                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
+                                }
+                            } else if (SurfZoneGroup != CurZoneGroup && state.dataSysVars->DisableSelfShadingBetweenGroup) {
+                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones; ZoneNum++) {
+                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
+                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            ShowFatalError(state, "No Shading groups are defined when disabling grouped self shading.");
+        }
+    }
 }
 
 void checkScheduledSurfacePresent(EnergyPlusData &state)
