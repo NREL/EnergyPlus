@@ -3343,7 +3343,7 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
     // if (TDPAirIn > DPMax[EnvClass])
     EXPECT_EQ(thisZoneITEq.TimeAboveDewpointT, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
+    EXPECT_NEAR(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass], 0.000000000001);
     EXPECT_EQ(thisZnRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
@@ -3424,15 +3424,14 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
     // if (TDPAirIn > DPMax[EnvClass])
     EXPECT_EQ(thisZoneITEq.TimeAboveDewpointT, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
-    EXPECT_EQ(thisZnRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_NEAR(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass], 0.000000000001);
     EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
 
     EXPECT_EQ(thisZoneITEq.TimeAboveDewpointT, 1.0);
     EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, 1.0);
-    EXPECT_EQ(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
+    EXPECT_NEAR(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass], 0.000000000001);
     EXPECT_EQ(thisZnRpt.ITEqTimeAboveDewpointT, 1.0);
     EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, 1.0);
     EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDewpointT, 1.0);

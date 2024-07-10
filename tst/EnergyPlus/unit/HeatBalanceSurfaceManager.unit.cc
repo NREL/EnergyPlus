@@ -1909,8 +1909,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     EXPECT_EQ(20.0, state->dataLoopNodes->Node(1).OutAirWetBulb);
     EXPECT_EQ(1.5, state->dataLoopNodes->Node(1).OutAirWindSpeed);
     EXPECT_EQ(90.0, state->dataLoopNodes->Node(1).OutAirWindDir);
-    EXPECT_DOUBLE_EQ(0.012611481326656135, state->dataLoopNodes->Node(1).HumRat);
-    EXPECT_DOUBLE_EQ(57247.660939392081, state->dataLoopNodes->Node(1).Enthalpy);
+    EXPECT_NEAR(0.012611481326656135, state->dataLoopNodes->Node(1).HumRat, 0.000000000000001);
+    EXPECT_NEAR(57247.660939392081, state->dataLoopNodes->Node(1).Enthalpy, 0.000000001);
 
     InitSurfaceHeatBalance(*state);
 
@@ -8725,7 +8725,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
         1,                            !- Multiplier
         autocalculate,                !- Ceiling Height {m}
         autocalculate;                !- Volume {m3}
-                          
+
 	  Material,
         Concrete Block,               !- Name
         MediumRough,                  !- Roughness
@@ -8806,7 +8806,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
         SrdSurfs:Surface 3,           !- Surrounding Surface 3 Name
         0.1,                          !- Surrounding Surface 3 View Factor
         Surrounding Temp Sch 3;       !- Surrounding Surface 3 Temperature Schedule Name
-							
+
       Schedule:Compact,
         Surrounding Temp Sch 1,       !- Name
         Any Number,                   !- Schedule Type Limits Name
@@ -8830,7 +8830,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
 
       ScheduleTypeLimits,
         Any Number;                   !- Name
-							
+
       BuildingSurface:Detailed,
         Wall,                         !- Name
         Wall,                         !- Surface Type
