@@ -12465,36 +12465,6 @@ bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumbe
     return HeatPumpWaterHeaterNodeException;
 }
 
-int GetHeatPumpWaterHeaterAirInletNodeNum(EnergyPlusData &state, int HPNum)
-{
-    int HeatPumpWaterHeaterAirInletNodeNum = 0;
-    if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
-        GetWaterThermalTankInput(state);
-        state.dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
-    }
-
-    if (HPNum > 0 && HPNum <= state.dataWaterThermalTanks->numHeatPumpWaterHeater) {
-        HeatPumpWaterHeaterAirInletNodeNum = state.dataWaterThermalTanks->HPWaterHeater(HPNum).HeatPumpAirInletNode;
-    }
-
-    return HeatPumpWaterHeaterAirInletNodeNum;
-}
-
-int GetHeatPumpWaterHeaterAirOutletNodeNum(EnergyPlusData &state, int HPNum)
-{
-    int HeatPumpWaterHeaterAirOutletNodeNum = 0;
-    if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
-        GetWaterThermalTankInput(state);
-        state.dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
-    }
-
-    if (HPNum > 0 && HPNum <= state.dataWaterThermalTanks->numHeatPumpWaterHeater) {
-        HeatPumpWaterHeaterAirOutletNodeNum = state.dataWaterThermalTanks->HPWaterHeater(HPNum).HeatPumpAirOutletNode;
-    }
-
-    return HeatPumpWaterHeaterAirOutletNodeNum;
-}
-
 int getHeatPumpWaterHeaterIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
 {
     if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {

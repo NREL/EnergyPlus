@@ -4119,28 +4119,6 @@ namespace FanCoilUnits {
         return 0;
     }
 
-    int GetFanCoilAirInNode(EnergyPlusData &state, int const FanCoilNum)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         B Griffith
-        //       DATE WRITTEN   Dec  2006
-
-        // PURPOSE OF THIS FUNCTION:
-        // lookup function for OA inlet node for ventilation rate reporting
-
-        if (state.dataFanCoilUnits->GetFanCoilInputFlag) {
-            GetFanCoilUnits(state);
-            state.dataFanCoilUnits->GetFanCoilInputFlag = false;
-        }
-
-        if (FanCoilNum > 0 && FanCoilNum <= state.dataFanCoilUnits->NumFanCoils) {
-            return state.dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode;
-        }
-
-        return 0;
-    }
-
     int GetFanCoilOutAirNode(EnergyPlusData &state, int const FanCoilNum)
     {
 

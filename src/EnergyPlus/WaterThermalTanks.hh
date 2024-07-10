@@ -988,10 +988,6 @@ namespace WaterThermalTanks {
 
     bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int NodeNumber);
 
-    int GetHeatPumpWaterHeaterAirInletNodeNum(EnergyPlusData &state, int HPNum);
-
-    int GetHeatPumpWaterHeaterAirOutletNodeNum(EnergyPlusData &state, int HPNum);
-
     int getHeatPumpWaterHeaterIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag);
 
 } // namespace WaterThermalTanks

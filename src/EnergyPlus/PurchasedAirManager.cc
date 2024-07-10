@@ -3318,21 +3318,6 @@ int GetPurchasedAirReturnAirNode(EnergyPlusData &state, int const PurchAirNum)
     return GetPurchasedAirReturnAirNode;
 }
 
-int GetPurchasedAirZoneExhaustAirNode(EnergyPlusData &state, int PurchAirNum)
-{
-    if (state.dataPurchasedAirMgr->GetPurchAirInputFlag) {
-        GetPurchasedAir(state);
-        state.dataPurchasedAirMgr->GetPurchAirInputFlag = false;
-    }
-
-    int GetPurchasedAirZoneExhaustAirNode = 0;
-    if (PurchAirNum > 0 && PurchAirNum <= state.dataPurchasedAirMgr->NumPurchAir) {
-        GetPurchasedAirZoneExhaustAirNode = state.dataPurchasedAirMgr->PurchAir(PurchAirNum).ZoneExhaustAirNodeNum;
-    }
-
-    return GetPurchasedAirZoneExhaustAirNode;
-}
-
 int getPurchasedAirIndex(EnergyPlusData &state, std::string_view PurchAirName, bool &errFlag)
 {
     if (state.dataPurchasedAirMgr->GetPurchAirInputFlag) {
