@@ -2473,7 +2473,7 @@ bool EIRPlantLoopHeatPump::thermosiphonDisabled(EnergyPlusData &state)
         }
         Real64 thermosiphonCapFrac = Curve::CurveValue(state, this->thermosiphonTempCurveIndex, dT);
         Real64 capFrac = this->partLoadRatio * this->cyclingRatio;
-        if (thermosiphonCapFrac > capFrac && this->loadSideHeatTransfer > 0.0) {
+        if (thermosiphonCapFrac >= capFrac) {
             this->thermosiphonStatus = 1;
             this->powerUsage = 0.0;
             return false;
