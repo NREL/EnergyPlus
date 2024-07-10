@@ -196,7 +196,6 @@ void InitSolarCalculations(EnergyPlusData &state)
 
         if (state.dataSolarShading->GetInputFlag) {
             checkShadingSurfaceSchedules(state);
-            GetShadowingInput(state);
             processShadowingInput(state);
             state.dataSolarShading->GetInputFlag = false;
             state.dataSolarShading->MaxHCV =
@@ -412,6 +411,11 @@ void GetShadowingInput(EnergyPlusData &state)
     using DataSystemVariables::ShadingMethod;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    if (state.dataSolarShading->getShadowingCalculationInput) {
+        state.dataSolarShading->getShadowingCalculationInput = false;
+    } else {
+        return;
+    }
     int NumItems;
     int NumNumbers;
     int NumAlphas;

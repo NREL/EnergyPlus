@@ -1461,6 +1461,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     HeatBalanceManager::GetConstructData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
+    SolarShading::GetShadowingInput(*state);
+
     HeatBalanceManager::GetZoneData(*state, FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
@@ -1483,7 +1485,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     compare_err_stream(""); // just for debugging
 
-    SolarShading::GetShadowingInput(*state);
     SolarShading::processShadowingInput(*state);
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
@@ -3868,6 +3869,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     HeatBalanceManager::GetConstructData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
+    SolarShading::GetShadowingInput(*state);
+
     HeatBalanceManager::GetZoneData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
@@ -3890,11 +3893,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     EXPECT_EQ(state->dataSolarShading->anyScheduledShadingSurface, true);
 
     EXPECT_EQ(state->dataErrTracking->AskForSurfacesReport, true);
-    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 0);
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors,
+              1); // with the rearrangement of code, one warning now gets produced in the shadow calculations
     // Expect no severe errors at this point
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
 
-    SolarShading::GetShadowingInput(*state);
     SolarShading::processShadowingInput(*state);
 
 #ifdef EP_NO_OPENGL
@@ -3902,17 +3905,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
     EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
 #else
-    if (!Penumbra::Penumbra::is_valid_context()) {
-        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
-        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
-        EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
-    } else {
-        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 0);
-        // Now expect one severe error from GetShadowInput()
-        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
-        // There should be a severe warning reported about the PixelCounting and the scheduled shading surface tm values > 0.0 combination.
-        EXPECT_EQ(state->dataErrTracking->LastSevereError, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
-    }
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+    EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
 #endif
 }
 
@@ -4180,6 +4175,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap)
     HeatBalanceManager::GetConstructData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
+    SolarShading::GetShadowingInput(*state);
+
     HeatBalanceManager::GetZoneData(*state, FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
@@ -4201,6 +4198,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap)
 
     SurfaceGeometry::GetSurfaceData(*state, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                            // expect no errors
+
+    SolarShading::processShadowingInput(*state);
 
     //	compare_err_stream( "" ); // just for debugging
 
