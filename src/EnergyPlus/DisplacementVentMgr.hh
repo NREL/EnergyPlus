@@ -158,6 +158,10 @@ struct DisplacementVentMgrData : BaseGlobalStruct
     Real64 TempDepCoef = 0.0; // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
     Real64 TempIndCoef = 0.0; // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->HAT_MX = 0.0;

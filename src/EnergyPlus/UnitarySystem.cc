@@ -1217,8 +1217,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
                     SetPointErrorFlag = true;
                 } else {
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(
-                        state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, SetPointErrorFlag);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, ControlNode, HVAC::CtrlVarType::Temp, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(state, format("{}: Missing temperature setpoint for unitary system = {}", this->UnitType, this->Name));
                         ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
@@ -1236,8 +1235,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
                     SetPointErrorFlag = true;
                 } else if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(
-                        state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, SetPointErrorFlag);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, ControlNode, HVAC::CtrlVarType::MaxHumRat, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(
                             state,
@@ -4451,10 +4449,8 @@ namespace UnitarySystems {
         } // IF (this->m_HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
         // coil outlet node set point has priority, IF not exist, then use system outlet node
-        if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::CtrlVarType::Temp))
-            this->HeatCtrlNode = this->AirOutNode;
-        if (SetPointManager::NodeHasSPMCtrlVarType(state, HeatingCoilOutletNode, SetPointManager::CtrlVarType::Temp))
-            this->HeatCtrlNode = HeatingCoilOutletNode;
+        if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, HVAC::CtrlVarType::Temp)) this->HeatCtrlNode = this->AirOutNode;
+        if (SetPointManager::NodeHasSPMCtrlVarType(state, HeatingCoilOutletNode, HVAC::CtrlVarType::Temp)) this->HeatCtrlNode = HeatingCoilOutletNode;
 
         this->HeatCoilInletNodeNum = HeatingCoilInletNode;
         this->HeatCoilOutletNodeNum = HeatingCoilOutletNode;
@@ -5145,9 +5141,8 @@ namespace UnitarySystems {
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          DataLoopNode::ObjectIsParent);
             } else {
-                if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::CtrlVarType::Temp))
-                    this->CoolCtrlNode = this->AirOutNode;
-                if (SetPointManager::NodeHasSPMCtrlVarType(state, CoolingCoilOutletNode, SetPointManager::CtrlVarType::Temp))
+                if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, HVAC::CtrlVarType::Temp)) this->CoolCtrlNode = this->AirOutNode;
+                if (SetPointManager::NodeHasSPMCtrlVarType(state, CoolingCoilOutletNode, HVAC::CtrlVarType::Temp))
                     this->CoolCtrlNode = CoolingCoilOutletNode;
             }
 
@@ -5425,10 +5420,8 @@ namespace UnitarySystems {
 
         } // IF(.NOT. lAlphaBlanks(iSuppHeatCoilTypeAlphaNum))THEN
 
-        if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::CtrlVarType::Temp))
-            this->SuppCtrlNode = this->AirOutNode;
-        if (SetPointManager::NodeHasSPMCtrlVarType(state, SupHeatCoilOutletNode, SetPointManager::CtrlVarType::Temp))
-            this->SuppCtrlNode = SupHeatCoilOutletNode;
+        if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, HVAC::CtrlVarType::Temp)) this->SuppCtrlNode = this->AirOutNode;
+        if (SetPointManager::NodeHasSPMCtrlVarType(state, SupHeatCoilOutletNode, HVAC::CtrlVarType::Temp)) this->SuppCtrlNode = SupHeatCoilOutletNode;
 
         // Add supplemental heating coil to component sets array
         if (this->m_SuppCoilExists && this->m_SuppCompNotSetYet) {

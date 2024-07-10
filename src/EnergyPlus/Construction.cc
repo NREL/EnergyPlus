@@ -712,7 +712,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
                     // As with the 1-D solution, we are accounting for the thermal mass
                     // of the half-node at the surface by adding it to the first row
-                    // of interior nodes at both sides of the this->  This is not
+                    // of interior nodes at both sides of the construction.  This is not
                     // exact, but it does take all of the thermal mass into account.
                     amatx = rk(1) / (1.5 * rho(1) * cp(1) * dx(1) * dx(1));
                     amaty = rk(1) / (1.5 * rho(1) * cp(1) * dyn * dyn);
@@ -821,7 +821,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
                     // As with the 1-D solution, we are accounting for the thermal mass
                     // of the half-node at the surface by adding it to the first row
-                    // of interior nodes at both sides of the this->  This is not
+                    // of interior nodes at both sides of the construction.  This is not
                     // exact, but it does take all of the thermal mass into account.
                     amatx /= 1.5;
                     amaty /= 1.5;
@@ -943,9 +943,9 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                     ShowContinueError(state, "listed in the severe error above.  The CTF calculate routine is unable to come up");
                     ShowContinueError(state, "with a series of CTF terms that have a reasonable time step and this indicates an");
                     ShowContinueError(state, "error.  Check the definition of this construction and the materials that make up");
-                    ShowContinueError(state, "the this->  Very thin, highly conductive materials may cause problems.");
+                    ShowContinueError(state, "the construction.  Very thin, highly conductive materials may cause problems.");
                     ShowContinueError(state, "This may be avoided by ignoring the presence of those materials since they probably");
-                    ShowContinueError(state, "do not effect the heat transfer characteristics of the this->  Highly");
+                    ShowContinueError(state, "do not effect the heat transfer characteristics of the construction.  Highly");
                     ShowContinueError(state, "conductive or highly resistive layers that are alternated with high mass layers");
                     ShowContinueError(state, "may also result in problems.  After confirming that the input is correct and");
                     ShowContinueError(state, "realistic, the user should contact the EnergyPlus support team.");
@@ -972,7 +972,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
         this->s0(1, 1) = cnd;  // CTFs for current time
         this->s0(2, 1) = -cnd; // step are set to the
         this->s0(1, 2) = cnd;  // overall conductance
-        this->s0(2, 2) = -cnd; // of the this->
+        this->s0(2, 2) = -cnd; // of the construction.
 
         this->e.allocate(1);
         this->e = 0.0;
@@ -1870,7 +1870,7 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
           this->InsideAbsorpThermal,
           this->OutsideAbsorpSolar,
           this->InsideAbsorpSolar,
-          Material::RoughnessNames[static_cast<int>(this->OutsideRoughness)]);
+          Material::surfaceRoughnessNames[(int)this->OutsideRoughness]);
 
     for (int I = 1; I <= this->TotLayers; ++I) {
         int Layer = this->LayerPoint(I);

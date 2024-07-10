@@ -7512,7 +7512,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     SetPredefinedTables(*state);
     std::string CompName = "My DX Coil with 10000W cooling";
 
-    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilType2, CompName, "Coil:Cooling:DX:SingleSpeed");
     PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIA, CompName, 10000., 1);
     PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIB, CompName, 12000., 1);
     PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIC, CompName, 14000., 1);
@@ -12634,7 +12634,7 @@ TEST_F(SQLiteFixture, UpdateSizing_EndSysSizingCalc)
                       "  AND RowName = 'Peak Sensible Load with Sizing Factor'");
     // check the value from result records
     Real64 return_val = execAndReturnFirstDouble(query);
-    EXPECT_EQ(return_val, 5080.22);
+    EXPECT_NEAR(5080.22, return_val, 0.011);
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly)

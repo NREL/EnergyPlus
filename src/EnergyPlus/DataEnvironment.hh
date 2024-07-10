@@ -62,6 +62,16 @@ struct EnergyPlusData;
 
 namespace DataEnvironment {
 
+    enum class GroundTempType
+    {
+        Invalid = -1,
+        BuildingSurface,
+        Shallow,
+        Deep,
+        FCFactorMethod,
+        Num
+    };
+
     Real64 constexpr EarthRadius(6356000.0);          // Radius of the Earth (m)
     Real64 constexpr AtmosphericTempGradient(0.0065); // Standard atmospheric air temperature gradient (K/m)
     Real64 constexpr SunIsUpValue(0.00001);           // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
@@ -100,11 +110,9 @@ struct EnvironmentData : BaseGlobalStruct
     Real64 GndReflectanceForDayltg = 0.0;      // Ground visible reflectance for use in daylighting calc
     Real64 GndReflectance = 0.0;               // Ground visible reflectance from input
     Real64 GndSolarRad = 0.0;                  // Current ground reflected radiation
-    Real64 GroundTemp = 0.0;                   // Current ground temperature {C}
     Real64 GroundTempKelvin = 0.0;             // Current ground temperature {K}
-    Real64 GroundTempFC = 0.0;                 // Current ground temperature defined for F or C factor method {C}
-    Real64 GroundTemp_Surface = 0.0;           // Current surface ground temperature {C}
-    Real64 GroundTemp_Deep = 0.0;              // Current deep ground temperature
+    std::array<Real64, (int)DataEnvironment::GroundTempType::Num> GroundTemp = {0.0, 0.0, 0.0, 0.0};
+
     int HolidayIndex = 0; // Indicates whether current day is a holiday and if so what type - HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
     int HolidayIndexTomorrow = 0;                 // Tomorrow's Holiday Index
     bool IsRain = false;                          // Surfaces are wet for this time interval
@@ -182,10 +190,9 @@ struct EnvironmentData : BaseGlobalStruct
     Real64 SiteWindExp = 0.22;                                  // Exponent for the wind velocity profile at the site
     Real64 SiteWindBLHeight = 370.0;                            // Boundary layer height for the wind velocity profile at the site (m)
     Real64 SiteTempGradient = 0.0065;                           // Air temperature gradient coefficient (K/m)
-    bool GroundTempObjInput = false;                            // Ground temperature object input
-    bool GroundTemp_SurfaceObjInput = false;                    // Surface ground temperature object input
-    bool GroundTemp_DeepObjInput = false;                       // Deep ground temperature object input
-    bool FCGroundTemps = false;
+
+    std::array<bool, (int)DataEnvironment::GroundTempType::Num> GroundTempInputs = {false, false, false, false}; // Ground temperature object input
+
     bool DisplayWeatherMissingDataWarnings = false; // Display missing/out of range weather warnings
     bool IgnoreSolarRadiation = false;              // TRUE if all solar radiation is to be ignored
     bool IgnoreBeamRadiation = false;               // TRUE if beam (aka direct normal) radiation is to be ignored
@@ -203,6 +210,10 @@ struct EnvironmentData : BaseGlobalStruct
     int varyingOrientationSchedIndex = 0;
     bool forceBeginEnvResetSuppress = false; // for PerformancePrecisionTradeoffs
     bool oneTimeCompRptHeaderFlag = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

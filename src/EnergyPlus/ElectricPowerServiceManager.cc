@@ -678,10 +678,9 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
       subpanelFeedInRequest(0.0), subpanelFeedInRate(0.0), subpanelDrawRate(0.0), genElectricProd(0.0), genElectProdRate(0.0), storOpCVDrawRate(0.0),
       storOpCVFeedInRate(0.0), storOpCVChargeRate(0.0), storOpCVDischargeRate(0.0), storOpIsCharging(false), storOpIsDischarging(false),
       genOperationScheme_(GeneratorOpScheme::Invalid), demandMeterPtr_(0), generatorsPresent_(false), myCoGenSetupFlag_(true), demandLimit_(0.0),
-      trackSchedPtr_(0), dCElectricityProd_(0.0), dCElectProdRate_(0.0), dCpowerConditionLosses_(0.0), storagePresent_(false),
-      transformerPresent_(false), totalPowerRequest_(0.0), totalThermalPowerRequest_(0.0), storageScheme_(StorageOpScheme::Invalid),
-      trackStorageOpMeterIndex_(0), converterPresent_(false), maxStorageSOCFraction_(1.0), minStorageSOCFraction_(0.0),
-      designStorageChargePower_(0.0), designStorageChargePowerWasSet_(false), designStorageDischargePower_(0.0),
+      trackSchedPtr_(0), storagePresent_(false), transformerPresent_(false), totalPowerRequest_(0.0), totalThermalPowerRequest_(0.0),
+      storageScheme_(StorageOpScheme::Invalid), trackStorageOpMeterIndex_(0), converterPresent_(false), maxStorageSOCFraction_(1.0),
+      minStorageSOCFraction_(0.0), designStorageChargePower_(0.0), designStorageChargePowerWasSet_(false), designStorageDischargePower_(0.0),
       designStorageDischargePowerWasSet_(false), storageChargeModSchedIndex_(0), storageDischargeModSchedIndex_(0), facilityDemandTarget_(0.0),
       facilityDemandTargetModSchedIndex_(0), eMSOverridePelFromStorage_(false), // if true, EMS calling for override
       eMSValuePelFromStorage_(0.0),                                             // value EMS is directing to use, power from storage [W]
@@ -1959,9 +1958,6 @@ void ElectPowerLoadCenter::setupLoadCenterMeterIndices(EnergyPlusData &state)
 
 void ElectPowerLoadCenter::reinitAtBeginEnvironment()
 {
-    dCElectricityProd_ = 0.0;
-    dCElectProdRate_ = 0.0;
-    dCpowerConditionLosses_ = 0.0;
     genElectricProd = 0.0;
     genElectProdRate = 0.0;
     thermalProd = 0.0;
@@ -2015,11 +2011,6 @@ void ElectPowerLoadCenter::reinitZoneGainsAtBeginEnvironment()
     if (converterObj != nullptr) {
         converterObj->reinitZoneGainsAtBeginEnvironment();
     }
-}
-
-std::string const &ElectPowerLoadCenter::transformerName() const
-{
-    return transformerName_;
 }
 
 std::string const &ElectPowerLoadCenter::generatorListName() const
@@ -2794,19 +2785,9 @@ Real64 DCtoACInverter::pvWattsDCtoACSizeRatio()
     return pvWattsDCtoACSizeRatio_;
 }
 
-Real64 DCtoACInverter::thermLossRate() const
-{
-    return thermLossRate_;
-}
-
 Real64 DCtoACInverter::aCPowerOut() const
 {
     return aCPowerOut_;
-}
-
-Real64 DCtoACInverter::aCEnergyOut() const
-{
-    return aCEnergyOut_;
 }
 
 DCtoACInverter::InverterModelType DCtoACInverter::modelType() const
@@ -3192,21 +3173,6 @@ void ACtoDCConverter::reinitZoneGainsAtBeginEnvironment()
 {
     qdotConvZone_ = 0.0;
     qdotRadZone_ = 0.0;
-}
-
-Real64 ACtoDCConverter::thermLossRate() const
-{
-    return thermLossRate_;
-}
-
-Real64 ACtoDCConverter::dCPowerOut() const
-{
-    return dCPowerOut_;
-}
-
-Real64 ACtoDCConverter::dCEnergyOut() const
-{
-    return dCEnergyOut_;
 }
 
 Real64 ACtoDCConverter::aCPowerIn() const
@@ -3626,6 +3592,7 @@ ElectricStorage::ElectricStorage( // main constructor
                                                 ),
                                   nullptr));
                 ssc_lastBatteryState_ = std::make_unique<battery_state>(ssc_battery_->get_state());
+                ssc_lastBatteryTimeStep_ = ssc_battery_->get_params().dt_hr;
                 ssc_initBatteryState_ = std::make_unique<battery_state>(ssc_battery_->get_state());
             }
 
@@ -3912,7 +3879,8 @@ void ElectricStorage::reinitAtBeginEnvironment()
     } else if (storageModelMode_ == StorageModelType::LiIonNmcBattery) {
         // Copy the initial battery state to the last battery state
         *ssc_lastBatteryState_ = *ssc_initBatteryState_;
-        ssc_battery_->set_state(*ssc_lastBatteryState_);
+        ssc_lastBatteryTimeStep_ = ssc_initBatteryTimeStep_;
+        ssc_battery_->set_state(*ssc_lastBatteryState_, ssc_initBatteryTimeStep_);
     }
     myWarmUpFlag_ = true;
 }
@@ -3953,7 +3921,8 @@ void ElectricStorage::reinitAtEndWarmup()
     } else if (storageModelMode_ == StorageModelType::LiIonNmcBattery) {
         // Copy the initial battery state to the last battery state
         *ssc_lastBatteryState_ = *ssc_initBatteryState_;
-        ssc_battery_->set_state(*ssc_lastBatteryState_);
+        ssc_lastBatteryTimeStep_ = ssc_initBatteryTimeStep_;
+        ssc_battery_->set_state(*ssc_lastBatteryState_, ssc_lastBatteryTimeStep_);
     }
     myWarmUpFlag_ = false;
 }
@@ -4013,6 +3982,7 @@ void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
             }
         } else if (storageModelMode_ == StorageModelType::LiIonNmcBattery) {
             *ssc_lastBatteryState_ = ssc_battery_->get_state();
+            ssc_lastBatteryTimeStep_ = ssc_battery_->get_params().dt_hr;
         }
 
         lastTimeStepStateOfCharge_ = thisTimeStepStateOfCharge_;
@@ -4366,6 +4336,10 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
 
     // Copy the battery state from the end of last timestep
     battery_state battState = *ssc_lastBatteryState_;
+    ssc_battery_->set_state(battState, ssc_lastBatteryTimeStep_);
+    if (std::lround(ssc_battery_->get_params().dt_hr * 60.0) != std::lround(state.dataHVACGlobal->TimeStepSys * 60.0)) {
+        ssc_battery_->ChangeTimestep(state.dataHVACGlobal->TimeStepSys);
+    }
 
     // Set the temperature the battery sees
     if (zoneNum_ > 0) {
@@ -4375,15 +4349,11 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
         // If outside, use outdoor temperature
         battState.thermal->T_room = state.dataEnvrn->OutDryBulbTemp;
     }
-    ssc_battery_->set_state(battState);
 
     // Set the SOC limits
     ssc_battery_->changeSOCLimits(controlSOCMinFracLimit * 100.0, controlSOCMaxFracLimit * 100.0);
 
     // Set the current timestep length
-    if (std::lround(ssc_battery_->get_params().dt_hr * 60.0) != std::lround(state.dataHVACGlobal->TimeStepSys * 60.0)) {
-        ssc_battery_->ChangeTimestep(state.dataHVACGlobal->TimeStepSys);
-    }
 
     // Run the battery
     // SAM uses negative values for charging, positive for discharging
@@ -4672,7 +4642,7 @@ void ElectricStorage::shift(std::vector<Real64> &A, int const m, int const n, st
 // constructor
 ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string const &objectName)
     : myOneTimeFlag_(true), availSchedPtr_(0), usageMode_(TransformerUse::Invalid), heatLossesDestination_(ThermalLossDestination::Invalid),
-      zoneNum_(0), zoneRadFrac_(0.0), ratedCapacity_(0.0), phase_(0), factorTempCoeff_(0.0), tempRise_(0.0), eddyFrac_(0.0),
+      zoneNum_(0), zoneRadFrac_(0.0), ratedCapacity_(0.0), factorTempCoeff_(0.0), tempRise_(0.0), eddyFrac_(0.0),
       performanceInputMode_(TransformerPerformanceInput::Invalid), ratedEfficiency_(0.0), ratedPUL_(0.0), ratedTemp_(0.0), maxPUL_(0.0),
       considerLosses_(true), ratedNL_(0.0), ratedLL_(0.0), overloadErrorIndex_(0), efficiency_(0.0), powerIn_(0.0), energyIn_(0.0), powerOut_(0.0),
       energyOut_(0.0), noLoadLossRate_(0.0), noLoadLossEnergy_(0.0), loadLossRate_(0.0), loadLossEnergy_(0.0), thermalLossRate_(0.0),
@@ -4751,7 +4721,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         }
         zoneRadFrac_ = state.dataIPShortCut->rNumericArgs(1);
         ratedCapacity_ = state.dataIPShortCut->rNumericArgs(2);
-        phase_ = state.dataIPShortCut->rNumericArgs(3);
+        // unused phase_ = state.dataIPShortCut->rNumericArgs(3);
 
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "Copper")) {
             factorTempCoeff_ = 234.5;
@@ -5125,7 +5095,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
 
         // Transformer has two modes.If it works in one mode, the variable for meter output in the other mode
         // is assigned 0
-        totalLossEnergy_ = totalLossRate_ * state.dataHVACGlobal->TimeStepSysSec;
+        // unused totalLossEnergy_ = totalLossRate_ * state.dataHVACGlobal->TimeStepSysSec;
 
         break;
     }

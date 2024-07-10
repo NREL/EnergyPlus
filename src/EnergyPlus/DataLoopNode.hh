@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -519,15 +520,7 @@ namespace DataLoopNode {
     struct NodeSetpointCheckData
     {
         bool needsSetpointChecking = false;
-        bool checkTemperatureSetPoint = false;
-        bool checkTemperatureMinSetPoint = false;
-        bool checkTemperatureMaxSetPoint = false;
-        bool checkHumidityRatioSetPoint = false;
-        bool checkHumidityRatioMinSetPoint = false;
-        bool checkHumidityRatioMaxSetPoint = false;
-        bool checkMassFlowRateSetPoint = false;
-        bool checkMassFlowRateMinSetPoint = false;
-        bool checkMassFlowRateMaxSetPoint = false;
+        std::array<bool, (int)HVAC::CtrlVarType::Num> checkSetPoint = {false, false, false, false, false, false, false, false, false};
     };
 } // namespace DataLoopNode
 
@@ -544,9 +537,13 @@ struct LoopNodeData : BaseGlobalStruct
     Array1D<DataLoopNode::MarkedNodeData> MarkedNode;
     Array1D<DataLoopNode::NodeSetpointCheckData> NodeSetpointCheck;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = LoopNodeData();
+        new (this) LoopNodeData();
     }
 };
 

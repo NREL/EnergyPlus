@@ -331,6 +331,10 @@ struct DataWaterData : BaseGlobalStruct
     bool AnyIrrigationInModel = false;      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
     int PrecipOverwrittenByRainFlag = 0;    // recurring warning index when the rain flag is on but the liquidprecipitation = 0
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         RainFall = {};

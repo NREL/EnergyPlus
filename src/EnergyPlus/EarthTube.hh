@@ -206,9 +206,13 @@ struct EarthTubeData : BaseGlobalStruct
     EPVector<EarthTube::EarthTubeZoneReportVars> ZnRptET;
     EPVector<EarthTube::EarthTubeParameters> EarthTubePars;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = EarthTubeData();
+        new (this) EarthTubeData();
     }
 };
 

@@ -930,8 +930,7 @@ namespace TranspiredCollector {
                                 state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(
-                                    state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, HVAC::CtrlVarType::Temp, state.dataHVACGlobal->SetPointErrorFlag);
                                 if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(
                                         state,

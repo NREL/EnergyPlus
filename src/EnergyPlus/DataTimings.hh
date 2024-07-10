@@ -76,9 +76,13 @@ struct DataTimingsData : BaseGlobalStruct
     int NumCalcScriptF_Calls = 0;
 #endif
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = DataTimingsData();
+        new (this) DataTimingsData();
     }
 };
 

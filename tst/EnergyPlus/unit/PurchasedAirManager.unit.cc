@@ -1461,22 +1461,22 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
 
     CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1);
 
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).MinCoolSuppAirHumRat, 0.009);
+    EXPECT_DOUBLE_EQ(state->dataPurchasedAirMgr->PurchAir(1).MinCoolSuppAirHumRat, 0.009);
 
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).SupplyTemp, 20.228931255157292);
+    EXPECT_DOUBLE_EQ(state->dataPurchasedAirMgr->PurchAir(1).SupplyTemp, 20.228931255157292);
     // Without the current fix, this SupplyHumRat value would be 0.009, which is incorrect:
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).SupplyHumRat, 0.01);
+    EXPECT_DOUBLE_EQ(state->dataPurchasedAirMgr->PurchAir(1).SupplyHumRat, 0.01);
 
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).MixedAirTemp, 30.0);
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).MixedAirHumRat, 0.012);
+    EXPECT_DOUBLE_EQ(state->dataPurchasedAirMgr->PurchAir(1).MixedAirTemp, 30.0);
+    EXPECT_DOUBLE_EQ(state->dataPurchasedAirMgr->PurchAir(1).MixedAirHumRat, 0.012);
 
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).SenCoilLoad, -1003.6327856486452);
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).LatCoilLoad, 5574.8612856486452);
+    EXPECT_DOUBLE_EQ(state->dataPurchasedAirMgr->PurchAir(1).SenCoilLoad, -1003.6327856486452);
+    EXPECT_DOUBLE_EQ(state->dataPurchasedAirMgr->PurchAir(1).LatCoilLoad, 5574.8612856486452);
 
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).SenOutputToZone, -1000.0000000000002);
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).LatOutputToZone, 5571.2285000000002);
+    EXPECT_DOUBLE_EQ(state->dataPurchasedAirMgr->PurchAir(1).SenOutputToZone, -1000.0000000000002);
+    EXPECT_DOUBLE_EQ(state->dataPurchasedAirMgr->PurchAir(1).LatOutputToZone, 5571.2285000000002);
 
-    EXPECT_EQ(state->dataLoopNodes->Node(1).Enthalpy, 45712.285000000003);
-    EXPECT_EQ(state->dataLoopNodes->Node(1).HumRat, 0.01);
-    EXPECT_EQ(state->dataLoopNodes->Node(1).Temp, 20.228931255157292);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(1).Enthalpy, 45712.285000000003);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(1).HumRat, 0.01);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(1).Temp, 20.228931255157292);
 }

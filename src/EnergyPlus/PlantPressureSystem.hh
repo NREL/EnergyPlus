@@ -124,6 +124,10 @@ struct PlantPressureSysData : BaseGlobalStruct
     int ZeroKWarningCounter = 0;
     int MaxIterWarningCounter = 0;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->InitPressureDropOneTimeInit = true;

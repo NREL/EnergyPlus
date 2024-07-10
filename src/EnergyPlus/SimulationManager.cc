@@ -210,6 +210,9 @@ namespace SimulationManager {
         state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state);
+
+        state.init_state(state);
+
         GetProjectData(state);
         Psychrometrics::InitializePsychRoutines(state);
         CheckForMisMatchedEnvironmentSpecifications(state);

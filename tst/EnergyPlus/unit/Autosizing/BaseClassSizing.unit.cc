@@ -738,7 +738,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     Real64 calcCoilInletCond = zoneCond;
     CoolingCapacitySizer sizer;
     Real64 coilInletCond = sizer.setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
-    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+    EXPECT_DOUBLE_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
     zoneEqSizing.ATMixerVolFlow = 1.0;
@@ -747,7 +747,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     Real64 oaCond = zoneEqSizing.ATMixerHeatPriDryBulb;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
     coilInletCond = sizer.setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
-    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+    EXPECT_DOUBLE_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
     zoneEqSizing.ATMixerVolFlow = 0.0;
@@ -756,7 +756,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     oaCond = finalZoneSizing.OutTempAtHeatPeak;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
     coilInletCond = sizer.setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
-    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+    EXPECT_DOUBLE_EQ(coilInletCond, calcCoilInletCond);
 
     // Test heating mode coil inlet humidity ratio
     zoneEqSizing.ATMixerHeatPriDryBulb = 0.0;
@@ -774,7 +774,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneCond = finalZoneSizing.ZoneHumRatAtHeatPeak;
     calcCoilInletCond = zoneCond;
     coilInletCond = sizer.setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
-    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+    EXPECT_DOUBLE_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
     zoneEqSizing.ATMixerVolFlow = 1.0;
@@ -783,7 +783,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     oaCond = zoneEqSizing.ATMixerHeatPriHumRat;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
     coilInletCond = sizer.setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
-    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+    EXPECT_DOUBLE_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
     zoneEqSizing.ATMixerVolFlow = 0.0;
@@ -810,7 +810,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneCond = finalZoneSizing.ZoneTempAtCoolPeak;
     calcCoilInletCond = zoneCond;
     coilInletCond = sizer.setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
-    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+    EXPECT_DOUBLE_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
     zoneEqSizing.ATMixerVolFlow = 1.0;
@@ -819,7 +819,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     oaCond = zoneEqSizing.ATMixerCoolPriDryBulb;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
     coilInletCond = sizer.setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
-    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+    EXPECT_DOUBLE_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
     zoneEqSizing.ATMixerVolFlow = 0.0;
@@ -828,7 +828,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     oaCond = finalZoneSizing.OutTempAtCoolPeak;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
     coilInletCond = sizer.setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
-    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+    EXPECT_DOUBLE_EQ(coilInletCond, calcCoilInletCond);
 
     // Test cooling mode coil inlet humidity ratio
     zoneEqSizing.ATMixerCoolPriDryBulb = 0.0;
@@ -846,7 +846,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneCond = finalZoneSizing.ZoneHumRatAtCoolPeak;
     calcCoilInletCond = zoneCond;
     coilInletCond = sizer.setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
-    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+    EXPECT_DOUBLE_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
     zoneEqSizing.ATMixerVolFlow = 1.0;
@@ -855,7 +855,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     oaCond = zoneEqSizing.ATMixerCoolPriHumRat;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
     coilInletCond = sizer.setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
-    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+    EXPECT_DOUBLE_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
     zoneEqSizing.ATMixerVolFlow = 0.0;
@@ -864,7 +864,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     oaCond = finalZoneSizing.OutHumRatAtCoolPeak;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
     coilInletCond = sizer.setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
-    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+    EXPECT_DOUBLE_EQ(coilInletCond, calcCoilInletCond);
 
     zoneEqSizing.ATMixerCoolPriHumRat = 0.0;
     finalZoneSizing.ZoneHumRatAtCoolPeak = 0.0;

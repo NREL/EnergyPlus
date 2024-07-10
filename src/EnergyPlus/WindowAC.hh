@@ -233,6 +233,10 @@ struct WindowACData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag;  // one time initialization flag
     Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->NumWindAC = 0;
