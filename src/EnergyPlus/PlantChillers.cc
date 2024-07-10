@@ -1601,7 +1601,7 @@ namespace PlantChillers {
             this->PossibleSubcooling =
                 DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc).CurOpSchemeType != DataPlant::OpScheme::CompSetPtBased;
             this->QEvaporator = AvailChillerCap * OperPartLoadRat;
-            Real64 FRAC = 0.0;
+            Real64 FRAC;
             if (OperPartLoadRat < this->MinPartLoadRat) {
                 FRAC = min(1.0, (OperPartLoadRat / this->MinPartLoadRat));
             } else {
@@ -1800,7 +1800,7 @@ namespace PlantChillers {
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
             }
-            Real64 FRAC = 0.0;
+            Real64 FRAC;
             if (OperPartLoadRat < this->MinPartLoadRat) {
                 FRAC = min(1.0, (OperPartLoadRat / this->MinPartLoadRat));
             } else {
