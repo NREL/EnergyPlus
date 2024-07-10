@@ -2234,7 +2234,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::EndUseCat::Cooling,
                                 "Heat Pump");
             SetupOutputVariable(state,
-                                "Heat Pump Thermosiphon Status",
+                                "Thermosiphon Status",
                                 Constant::Units::None,
                                 this->thermosiphonStatus,
                                 OutputProcessor::TimeStepType::System,

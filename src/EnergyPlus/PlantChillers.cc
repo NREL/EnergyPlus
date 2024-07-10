@@ -595,12 +595,13 @@ namespace PlantChillers {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                 thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(10));
                 if (thisChiller.BasinHeaterSchedulePtr == 0) {
-                    ShowWarningError(state,
-                                     format("{}, \"{}\" TRIM(state.dataIPShortCut->cAlphaFieldNames(10)) \"{}\" was not found. Basin heater "
-                                            "operation will not be modeled and the simulation continues",
-                                            state.dataIPShortCut->cCurrentModuleObject,
-                                            thisChiller.Name,
-                                            state.dataIPShortCut->cAlphaArgs(10)));
+                    ShowWarningError(
+                        state,
+                        format("{}, \"{}\" {} \"{}\" was not found. Basin heater operation will not be modeled and the simulation continues",
+                               state.dataIPShortCut->cCurrentModuleObject,
+                               thisChiller.Name,
+                               state.dataIPShortCut->cAlphaFieldNames(10),
+                               state.dataIPShortCut->cAlphaArgs(10)));
                 }
             }
             if (NumAlphas > 12) {
@@ -608,6 +609,10 @@ namespace PlantChillers {
             } else {
                 thisChiller.EndUseSubcategory = "General";
             }
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(14)));
+            }
+            thisChiller.thermosiphonMinTempDiff = state.dataIPShortCut->rNumericArgs(26);
         }
 
         if (ErrorsFound) {
@@ -702,6 +707,13 @@ namespace PlantChillers {
                             "Chiller Condenser Inlet Temperature",
                             Constant::Units::C,
                             this->CondInletTemp,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Thermosiphon Status",
+                            Constant::Units::None,
+                            this->thermosiphonStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             this->Name);
@@ -1385,6 +1397,7 @@ namespace PlantChillers {
         this->EvaporatorEnergy = 0.0;
         this->QHeatRecovered = 0.0;
         this->ActualCOP = 0.0;
+        this->thermosiphonStatus = 0;
 
         //   calculate end time of current time step
         Real64 CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
@@ -1574,6 +1587,7 @@ namespace PlantChillers {
         } else {
             OperPartLoadRat = 0.0;
         }
+        this->CyclingRatio = OperPartLoadRat;
 
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
@@ -1587,13 +1601,15 @@ namespace PlantChillers {
             this->PossibleSubcooling =
                 DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc).CurOpSchemeType != DataPlant::OpScheme::CompSetPtBased;
             this->QEvaporator = AvailChillerCap * OperPartLoadRat;
-            Real64 FRAC;
+            Real64 FRAC = 0.0;
             if (OperPartLoadRat < this->MinPartLoadRat) {
                 FRAC = min(1.0, (OperPartLoadRat / this->MinPartLoadRat));
             } else {
                 FRAC = 1.0;
             }
-            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / this->COP * FRAC;
+            if (this->thermosiphonDisabled(state)) {
+                this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / this->COP * FRAC;
+            }
 
             // Either set the flow to the Constant value or calculate the flow for the variable volume
             if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
@@ -1784,8 +1800,7 @@ namespace PlantChillers {
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
             }
-
-            Real64 FRAC;
+            Real64 FRAC = 0.0;
             if (OperPartLoadRat < this->MinPartLoadRat) {
                 FRAC = min(1.0, (OperPartLoadRat / this->MinPartLoadRat));
             } else {
@@ -1793,7 +1808,9 @@ namespace PlantChillers {
             }
 
             // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / this->COP * FRAC;
+            if (this->thermosiphonDisabled(state)) {
+                this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / this->COP * FRAC;
+            }
 
             if (this->EvapMassFlowRate == 0.0) {
                 this->QEvaporator = 0.0;
@@ -2118,6 +2135,26 @@ namespace PlantChillers {
                 }
             }
             this->MyFlag = false;
+        }
+    }
+    bool ElectricChillerSpecs::thermosiphonDisabled(EnergyPlusData &state)
+    {
+        if (this->thermosiphonTempCurveIndex > 0) {
+            this->thermosiphonStatus = 0;
+            Real64 dT = this->EvapOutletTemp - this->CondInletTemp;
+            if (dT < this->thermosiphonMinTempDiff) {
+                return true;
+            }
+            Real64 thermosiphonCapFrac = Curve::CurveValue(state, this->thermosiphonTempCurveIndex, dT);
+            Real64 capFrac = this->CyclingRatio;
+            if (thermosiphonCapFrac >= capFrac) {
+                this->thermosiphonStatus = 1;
+                this->Power = 0.0;
+                return false;
+            }
+            return true;
+        } else {
+            return true;
         }
     }
 
