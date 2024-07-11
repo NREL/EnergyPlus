@@ -250,6 +250,19 @@ enum class FlowMode
 constexpr std::array<std::string_view, static_cast<int>(FlowMode::Num)> FlowModeNamesUC{
     "CONSTANTFLOW", "NOTMODULATED", "LEAVINGSETPOINTMODULATED", "VARIABLESPEEDPUMPING"};
 
+enum class CondenserFlowControl
+{
+    Invalid = -1,
+    ConstantFlow,
+    ModulatedChillerPLR,
+    ModulatedLoopPLR,
+    ModulatedDeltaTemperature,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(CondenserFlowControl::Num)> CondenserFlowControlNamesUC{
+    "CONSTANTFLOW", "MODULATEDCHILLERPLR", "MODULATEDLOOPPLR", "MODULATEDDELTATEMPERATURE"};
+
 enum class CondenserType
 {
     Invalid = -1,
