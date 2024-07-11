@@ -671,6 +671,10 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
         if (NumNums > 15) {
             thisChiller.MinCondFlowRatio = state.dataIPShortCut->rNumericArgs(16);
         }
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(20)) {
+            thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(20)));
+        }
+        thisChiller.thermosiphonMinTempDiff = state.dataIPShortCut->rNumericArgs(17);
     }
 
     if (ErrorsFound) {
@@ -846,6 +850,14 @@ void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         "Chiller Condenser Mass Flow Rate",
                         Constant::Units::kg_s,
                         this->CondMassFlowRate,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
+                        this->Name);
+
+    SetupOutputVariable(state,
+                        "Thermosiphon Status",
+                        Constant::Units::None,
+                        this->thermosiphonStatus,
                         OutputProcessor::TimeStepType::System,
                         OutputProcessor::StoreType::Average,
                         this->Name);
@@ -2074,6 +2086,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     this->ChillerCapFT = 0.0;
     this->ChillerEIRFT = 0.0;
     this->ChillerEIRFPLR = 0.0;
+    this->thermosiphonStatus = 0;
 
     // Set module-level chiller evap and condenser inlet temperature variables
     Real64 condInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
@@ -2479,7 +2492,9 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     }
 
     if (ReferenceCOP <= 0) ReferenceCOP = 5.5;
-    this->Power = (AvailChillerCap / ReferenceCOP) * this->ChillerEIRFPLR * this->ChillerEIRFT * FRAC;
+    if (this->thermosiphonDisabled(state)) {
+        this->Power = (AvailChillerCap / ReferenceCOP) * this->ChillerEIRFPLR * this->ChillerEIRFT * FRAC;
+    }
 
     this->QCondenser = this->Power * this->CompPowerToCondenserFrac + this->QEvaporator + this->ChillerFalseLoadRate;
 
@@ -2928,6 +2943,27 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
                                            this->ChillerEIRFPLR,
                                            this->ChillerEIRFPLR);
         }
+    }
+}
+
+bool ReformulatedEIRChillerSpecs::thermosiphonDisabled(EnergyPlusData &state)
+{
+    if (this->thermosiphonTempCurveIndex > 0) {
+        this->thermosiphonStatus = 0;
+        Real64 dT = this->EvapOutletTemp - this->CondInletTemp;
+        if (dT < this->thermosiphonMinTempDiff) {
+            return true;
+        }
+        Real64 thermosiphonCapFrac = Curve::CurveValue(state, this->thermosiphonTempCurveIndex, dT);
+        Real64 capFrac = this->ChillerPartLoadRatio * this->ChillerCyclingRatio;
+        if (thermosiphonCapFrac >= capFrac) {
+            this->thermosiphonStatus = 1;
+            this->Power = 0.0;
+            return false;
+        }
+        return true;
+    } else {
+        return true;
     }
 }
 

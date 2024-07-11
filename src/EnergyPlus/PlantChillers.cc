@@ -1800,6 +1800,7 @@ namespace PlantChillers {
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
             }
+
             Real64 FRAC;
             if (OperPartLoadRat < this->MinPartLoadRat) {
                 FRAC = min(1.0, (OperPartLoadRat / this->MinPartLoadRat));
