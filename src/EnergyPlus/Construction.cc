@@ -1924,11 +1924,10 @@ void ConstructionProps::reportLayers(EnergyPlusData &state)
 {
     // Report the layers for each opaque construction in predefined tabular report
     // J. Glazer March 2024
-    auto &opd = state.dataOutRptPredefined;
     if (state.dataOutRptPredefined->pdchOpqConsLayCol.size() > 0) {
         for (int i = 1; i <= this->TotLayers; ++i) {
             int layerIndex = this->LayerPoint(i);
-            auto const *thisMaterial = state.dataMaterial->Material(layerIndex);
+            auto &thisMaterial = state.dataMaterial->Material(layerIndex);
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpqConsLayCol[i - 1], this->Name, thisMaterial->Name);
         }
     }

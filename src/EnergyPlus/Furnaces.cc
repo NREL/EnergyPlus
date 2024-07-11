@@ -689,8 +689,6 @@ namespace Furnaces {
         std::string_view constexpr getAirLoopHVACHeatCoolInput("GetAirLoopHVACHeatCoolInput");
         std::string_view constexpr routineName = "GetFurnaceInput";
 
-        using namespace OutputReportPredefined;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FurnaceNum;                // The Furnace that you are currently loading input into
         int GetObjectNum;              // The index to each specific object name
