@@ -10392,6 +10392,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompConnectionError)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true);
 
     MixedAir::GetOutsideAirSysInputs(*state);
     state->dataMixedAir->GetOASysInputFlag = false;

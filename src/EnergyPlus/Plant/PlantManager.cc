@@ -3046,16 +3046,6 @@ void SizePlantLoop(EnergyPlusData &state,
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).Branch(BranchNum).PumpSizFac = PlantSizFac;
                 }
             }
-
-        } else {
-            // fill PlantSizFac from data structure
-            //                    for (BranchNum = 1;
-            //                         BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).TotalBranches; ++BranchNum) {
-            //                        if (PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).NodeNumIn ==
-            //                            PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).Branch(BranchNum).NodeNumIn) {
-            //                            break;
-            //                        }
-            //                    }
         }
 
         // sum up contributions from CompDesWaterFlow, demand side size request (non-coincident)
@@ -3263,6 +3253,9 @@ void SizePlantLoop(EnergyPlusData &state,
             Real64 DesignPlantCapacity =
                 cp * FluidDensity * state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * state.dataSize->PlantSizData(PlantSizNum).DeltaT;
             state.dataSize->PlantSizData(PlantSizNum).DesCapacity = DesignPlantCapacity; // store it for later use in scaling
+            if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                BaseSizer::reportSizerOutput(state, "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Design Capacity [W]", DesignPlantCapacity);
+            }
         }
     } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {
         FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);

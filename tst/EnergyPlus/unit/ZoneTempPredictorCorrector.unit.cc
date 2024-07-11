@@ -1695,3 +1695,93 @@ TEST_F(EnergyPlusFixture, DownInterpolate4HistoryValues_Test)
     EXPECT_NEAR(oldValue[2], DSHistoryValue3, 0.000001);
     EXPECT_NEAR(oldValue[3], DSHistoryValue4, 0.000001);
 }
+
+TEST_F(EnergyPlusFixture, HybridModel_processInverseModelMultpHMTest)
+{
+    // Test added for fix to GitHub Issue #10508
+    Real64 calcHMmult;
+    Real64 calcHMsum = 0.0;
+    Real64 calcHMcount = 0.0;
+    Real64 calcHMavg = 0.0;
+    Real64 expectedHMmult;
+    Real64 expectedHMsum;
+    Real64 expectedHMcount;
+    Real64 expectedHMavg;
+    int numZones = 1;
+    Real64 constexpr allowableTolerance = 0.001;
+
+    state->dataHeatBal->Zone.allocate(numZones);
+    state->dataHeatBal->Zone(numZones).Name = "Hybrid Zone";
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(numZones);
+
+    // Test 1: Multiplier is less than the minimum.  Reset to the minimum. Nothing added to averages.
+    calcHMmult = 0.5;
+    expectedHMmult = 1.0;
+    expectedHMsum = 0.0;
+    expectedHMcount = 0;
+    expectedHMavg = 0.0;
+    processInverseModelMultpHM(*state, calcHMmult, calcHMsum, calcHMcount, calcHMavg, numZones);
+    EXPECT_NEAR(calcHMmult, expectedHMmult, allowableTolerance);
+    EXPECT_NEAR(calcHMsum, expectedHMsum, allowableTolerance);
+    EXPECT_NEAR(calcHMcount, expectedHMcount, allowableTolerance);
+    EXPECT_NEAR(calcHMavg, expectedHMavg, allowableTolerance);
+    EXPECT_EQ(state->dataZoneTempPredictorCorrector->zoneHeatBalance(numZones).hmThermalMassMultErrIndex, 0);
+
+    // Test 2: Multiplier is equal to minimum.  Reset to the minimum. Nothing added to averages.
+    calcHMmult = 1.0;
+    expectedHMmult = 1.0;
+    expectedHMsum = 0.0;
+    expectedHMcount = 0;
+    expectedHMavg = 0.0;
+    processInverseModelMultpHM(*state, calcHMmult, calcHMsum, calcHMcount, calcHMavg, numZones);
+    EXPECT_NEAR(calcHMmult, expectedHMmult, allowableTolerance);
+    EXPECT_NEAR(calcHMsum, expectedHMsum, allowableTolerance);
+    EXPECT_NEAR(calcHMcount, expectedHMcount, allowableTolerance);
+    EXPECT_NEAR(calcHMavg, expectedHMavg, allowableTolerance);
+    EXPECT_EQ(state->dataZoneTempPredictorCorrector->zoneHeatBalance(numZones).hmThermalMassMultErrIndex, 0);
+
+    // Test 3: Multiplier is greater than minimum but less than maximum.  Set the statistical variables accordingly.
+    calcHMmult = 10.0;
+    expectedHMmult = 10.0;
+    expectedHMsum = 10.0;
+    expectedHMcount = 1;
+    expectedHMavg = 10.0;
+    processInverseModelMultpHM(*state, calcHMmult, calcHMsum, calcHMcount, calcHMavg, numZones);
+    EXPECT_NEAR(calcHMmult, expectedHMmult, allowableTolerance);
+    EXPECT_NEAR(calcHMsum, expectedHMsum, allowableTolerance);
+    EXPECT_NEAR(calcHMcount, expectedHMcount, allowableTolerance);
+    EXPECT_NEAR(calcHMavg, expectedHMavg, allowableTolerance);
+    EXPECT_EQ(state->dataZoneTempPredictorCorrector->zoneHeatBalance(numZones).hmThermalMassMultErrIndex, 0);
+
+    // Test 4: Multiplier is greater than maximum.  Produce an error message but still set the statistical variables accordingly.
+    calcHMmult = 50.0;
+    expectedHMmult = 50.0;
+    expectedHMsum = 60.0;
+    expectedHMcount = 2;
+    expectedHMavg = 30.0;
+    processInverseModelMultpHM(*state, calcHMmult, calcHMsum, calcHMcount, calcHMavg, numZones);
+    EXPECT_NEAR(calcHMmult, expectedHMmult, allowableTolerance);
+    EXPECT_NEAR(calcHMsum, expectedHMsum, allowableTolerance);
+    EXPECT_NEAR(calcHMcount, expectedHMcount, allowableTolerance);
+    EXPECT_NEAR(calcHMavg, expectedHMavg, allowableTolerance);
+    EXPECT_NE(state->dataZoneTempPredictorCorrector->zoneHeatBalance(numZones).hmThermalMassMultErrIndex,
+              0); // This is now set, won't be zero anymore
+    std::string const error_string =
+        delimited_string({"   ** Warning ** Hybrid model thermal mass multiplier higher than the limit for Hybrid Zone",
+                          "   **   ~~~   ** This means that the ratio of the zone air heat capacity for the current time step to the",
+                          "   **   ~~~   ** zone air heat storage is higher than the maximum limit of 30.0."});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // Test 5: Repeat of Test 1--verifying that it won't impact the statistical variables.  No error message.
+    calcHMmult = 0.5;
+    expectedHMmult = 1.0;
+    expectedHMsum = 60.0;
+    expectedHMcount = 2;
+    expectedHMavg = 30.0;
+    processInverseModelMultpHM(*state, calcHMmult, calcHMsum, calcHMcount, calcHMavg, numZones);
+    EXPECT_NEAR(calcHMmult, expectedHMmult, allowableTolerance);
+    EXPECT_NEAR(calcHMsum, expectedHMsum, allowableTolerance);
+    EXPECT_NEAR(calcHMcount, expectedHMcount, allowableTolerance);
+    EXPECT_NEAR(calcHMavg, expectedHMavg, allowableTolerance);
+    EXPECT_NE(state->dataZoneTempPredictorCorrector->zoneHeatBalance(numZones).hmThermalMassMultErrIndex, 0);
+}

@@ -14870,25 +14870,56 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
           SupAirMdot_TestPoint(3),
           SupAirMdot_TestPoint(4));
 
+    if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
+        static constexpr std::string_view Format_994(
+            "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+            "Cooling Capacity {W}, Standard Rating Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, "
+            "IEER "
+            "{Btu/W-h}");
+        print(state.files.eio, "{}\n", Format_994);
+        state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag = false;
+    }
+    static constexpr std::string_view Format_995(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {}, {}, {}\n");
+    print(state.files.eio,
+          Format_995,
+          "Coil:Cooling:DX:TwoSpeed",
+          thisDXCoil.Name,
+          NetCoolingCapRated,
+          EER_TestPoint_SI(1),
+          EER_TestPoint_IP(1),
+          "N/A",
+          "N/A",
+          IEER);
+
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, thisDXCoil.Name, "Coil:Cooling:DX:TwoSpeed");
     // W to tons
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, thisDXCoil.Name, NetCoolingCapRated, 1);
+
+    // TODO: Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
+    // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
+    //
     // These will convert with a factor of 1 which is ok
+    // SEER | Capacity less than 65K Btu/h (19050 W) - calculated as per AHRI Standard 210/240-2023.
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, thisDXCoil.Name, EER_TestPoint_SI(1), 2);
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP, thisDXCoil.Name, EER_TestPoint_IP(1), 2);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, thisDXCoil.Name, IEER, 2);
+    // These will convert with a factor of 1 which is ok
+    // IEER | Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard 340/360-2022.
+    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, thisDXCoil.Name, IEER, 1);
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, thisDXCoil.Name, "N/A");
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, thisDXCoil.Name, "N/A");
-    addFootNoteSubTable(state,
-                        state.dataOutRptPredefined->pdstDXCoolCoil,
-                        "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
-                        "1 - EnergyPlus object type. <br/>"
-                        "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2017. <br/>"
-                        "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2007. <br/>"
-                        "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
-                        "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
-                        "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
-                        "from the appropriate AHRI standard.");
+
+    addFootNoteSubTable(
+        state,
+        state.dataOutRptPredefined->pdstDXCoolCoil,
+        "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
+        "1 - EnergyPlus object type. <br/>"
+        "2 - Capacity less than 65K Btu/h (19050 W) - calculated as per AHRI Standard 210/240-2017. <br/>"
+        "&emsp;&nbsp;Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard 340/360-2007. <br/>"
+        "&emsp;&nbsp;Capacity from 135K (39565 W) to 250K Btu/hr (73268 W) - calculated as per AHRI Standard 365-2009 - Ratings not yet supported in "
+        "EnergyPlus. <br/>"
+        "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
+        "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
+        "from the appropriate AHRI standard.");
 
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilType, thisDXCoil.Name, "Coil:Cooling:DX:TwoSpeed");
     if (thisDXCoil.RateWithInternalStaticAndFanObject) {

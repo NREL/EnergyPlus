@@ -1909,8 +1909,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     EXPECT_EQ(20.0, state->dataLoopNodes->Node(1).OutAirWetBulb);
     EXPECT_EQ(1.5, state->dataLoopNodes->Node(1).OutAirWindSpeed);
     EXPECT_EQ(90.0, state->dataLoopNodes->Node(1).OutAirWindDir);
-    EXPECT_DOUBLE_EQ(0.012611481326656135, state->dataLoopNodes->Node(1).HumRat);
-    EXPECT_DOUBLE_EQ(57247.660939392081, state->dataLoopNodes->Node(1).Enthalpy);
+    EXPECT_NEAR(0.012611481326656135, state->dataLoopNodes->Node(1).HumRat, 0.000000000000001);
+    EXPECT_NEAR(57247.660939392081, state->dataLoopNodes->Node(1).Enthalpy, 0.000000001);
 
     InitSurfaceHeatBalance(*state);
 
@@ -3135,7 +3135,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     state->dataGlobal->NumOfZones = 2;
     state->dataMaterial->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
-    state->dataViewFactor->NumOfSolarEnclosures = 2;
+    state->dataViewFactor->NumOfSolarEnclosures = 3;
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
@@ -3144,6 +3144,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     state->dataConstruction->Construct(1).TransDiff = 0.1;
     state->dataViewFactor->EnclSolInfo(1).solVMULT = 1.0;
     state->dataViewFactor->EnclSolInfo(2).solVMULT = 1.0;
+    state->dataViewFactor->EnclSolInfo(3).solVMULT = 1.0;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).Construction = 1;
@@ -3164,28 +3165,34 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     state->dataSurface->Surface(1).SolarEnclIndex = 1;
     state->dataSurface->Surface(2).SolarEnclIndex = 2;
 
-    ComputeDifSolExcZonesWIZWindows(*state, state->dataGlobal->NumOfZones);
+    ComputeDifSolExcZonesWIZWindows(*state);
 
     EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(1, 1));
     EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(2, 2));
+    EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(3, 3));
     EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(1));
     EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(2));
+    EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(3));
 
     state->dataViewFactor->EnclSolInfo(1).HasInterZoneWindow = true;
     state->dataViewFactor->EnclSolInfo(2).HasInterZoneWindow = true;
+    state->dataViewFactor->EnclSolInfo(3).HasInterZoneWindow = false;
 
-    ComputeDifSolExcZonesWIZWindows(*state, state->dataGlobal->NumOfZones);
+    ComputeDifSolExcZonesWIZWindows(*state);
 
     EXPECT_TRUE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(1));
     EXPECT_TRUE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(2));
+    EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(3));
 
     state->dataGlobal->KickOffSimulation = true;
-    ComputeDifSolExcZonesWIZWindows(*state, state->dataGlobal->NumOfZones);
+    ComputeDifSolExcZonesWIZWindows(*state);
 
     EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(1, 1));
     EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(2, 2));
+    EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(3, 3));
     EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(1));
     EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(2));
+    EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(3));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
@@ -8718,7 +8725,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
         1,                            !- Multiplier
         autocalculate,                !- Ceiling Height {m}
         autocalculate;                !- Volume {m3}
-                          
+
 	  Material,
         Concrete Block,               !- Name
         MediumRough,                  !- Roughness
@@ -8799,7 +8806,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
         SrdSurfs:Surface 3,           !- Surrounding Surface 3 Name
         0.1,                          !- Surrounding Surface 3 View Factor
         Surrounding Temp Sch 3;       !- Surrounding Surface 3 Temperature Schedule Name
-							
+
       Schedule:Compact,
         Surrounding Temp Sch 1,       !- Name
         Any Number,                   !- Schedule Type Limits Name
@@ -8823,7 +8830,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
 
       ScheduleTypeLimits,
         Any Number;                   !- Name
-							
+
       BuildingSurface:Detailed,
         Wall,                         !- Name
         Wall,                         !- Surface Type

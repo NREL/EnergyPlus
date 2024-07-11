@@ -1055,9 +1055,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual3dPt)
 
     EXPECT_TRUE(isAlmostEqual3dPt(a, b));
 
-    b.x = 7.01;
-    b.y = 11.01;
-    b.z = 17.01;
+    b.x = 7.0095;
+    b.y = 11.0095;
+    b.z = 17.0095;
 
     EXPECT_TRUE(isAlmostEqual3dPt(a, b));
 
@@ -1071,9 +1071,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual3dPt)
     a.y = -11.;
     a.z = -17.;
 
-    b.x = -7.01;
-    b.y = -11.01;
-    b.z = -17.01;
+    b.x = -7.0095;
+    b.y = -11.0095;
+    b.z = -17.0095;
 
     EXPECT_TRUE(isAlmostEqual3dPt(a, b));
 }
@@ -1101,8 +1101,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual2dPt)
 
     EXPECT_TRUE(isAlmostEqual2dPt(a, b));
 
-    b.x = 7.01;
-    b.y = 11.01;
+    b.x = 7.0095;
+    b.y = 11.0095;
 
     EXPECT_TRUE(isAlmostEqual2dPt(a, b));
 
@@ -1114,8 +1114,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual2dPt)
     a.x = -7.;
     a.y = -11.;
 
-    b.x = -7.01;
-    b.y = -11.01;
+    b.x = -7.0095;
+    b.y = -11.0095;
 
     EXPECT_TRUE(isAlmostEqual2dPt(a, b));
 }
@@ -3912,6 +3912,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
+        "  Timestep, 20;"
         "  HeatBalanceAlgorithm,",
         "  MoisturePenetrationDepthConductionTransferFunction; !- Algorithm",
         "Material,",
