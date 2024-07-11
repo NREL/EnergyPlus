@@ -1338,7 +1338,7 @@ This numeric field specifies the minimum condensing temperature (C), which is us
 
 \paragraph{Field: Refrigeration System Working Fluid Type}\label{field-refrigeration-system-working-fluid-type}
 
-The type of refrigerant used by the system.~ Valid choices are R11, R123, R134A, R12, R22, R404A, R507A, or R410A. This name will be validated against Fluid Names (ref: Fluid Properties section) in the input file. Note that the corresponding property data, available in FluidPropertiesRefData.idf, must by supplied in the input file.
+The type of refrigerant used by the system.~ Some potential examples of refrigerants that might be used in these systems include R11, R123, R134A, R12, R22, R404A, R507A, or R410A. The name entered in this field will be validated against the occurrences of \hyperref[fluidpropertiesname] {FluidProperties:Name} (ref: Fluid Properties section) in the input file. Note that the corresponding property data for many commonly used refrigerants is available in FluidPropertiesRefData.idf. This data must be included in the input file in which this system is defined.
 
 \paragraph{Field: Suction Temperature Control Type}\label{field-suction-temperature-control-type}
 
