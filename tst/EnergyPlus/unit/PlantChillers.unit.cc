@@ -62,6 +62,7 @@ using namespace PlantChillers;
 
 TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
 {
+    state->init_state(*state);
     // unit test for autosizing heat recovery in Chiller:CombustionTurbine
     state->dataPlantChillers->GTChiller.allocate(1);
 
@@ -99,6 +100,7 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
 
 TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
 {
+    state->init_state(*state);
     // unit test for autosizing heat recovery in Chiller:EngineDriven
     state->dataPlantChillers->EngineDrivenChiller.allocate(1);
 
