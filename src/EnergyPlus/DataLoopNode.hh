@@ -505,6 +505,15 @@ namespace DataLoopNode {
         Real64 Density = 0.0;            // reported density at current temperature [kg/m3]
         Real64 AirDewPointTemp = 0.0;    // reported system node dewpoint temperature [C]
         Real64 SpecificHeat = 0.0;       // reported node specific heat [J/kg-C]
+        bool wetBulbRepReq = false;      // Output variable or EMS sensor requested for this node for wetbulb temp
+        int wetBulbSchedPtr = 0;         // Output variable schedule pointer for this node for wetbulb temp
+        bool relHumidityRepReq = false;  // Output variable or EMS sensor requested for this node for RH
+        int relHumiditySchedPtr = 0;     // Output variable schedule pointer for this node for RH
+        bool dewPointRepReq = false;     // Output variable or EMS sensor requested for this node for dewpoint temp
+        int dewPointSchedPtr = 0;        // Output variable schedule pointer for this node for dewpoint temp
+        bool specificHeatRepReq = false; // Output variable or EMS sensor requested for this node for specific heat
+        int specificHeatSchedPtr = 0;    // Output variable schedule pointer for this node for specific heat
+        std::string reportingString;
     };
 
     struct MarkedNodeData
