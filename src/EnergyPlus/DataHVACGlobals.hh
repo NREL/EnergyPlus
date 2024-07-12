@@ -532,6 +532,7 @@ struct HVACGlobalsData : BaseGlobalStruct
     bool StandardRatingsMyCoolOneTimeFlag2 = true;
     bool StandardRatingsMyCoolOneTimeFlag3 = true;
     bool StandardRatingsMyHeatOneTimeFlag = true;
+    bool StandardRatingsMyHeatOneTimeFlag2 = true;
 
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {

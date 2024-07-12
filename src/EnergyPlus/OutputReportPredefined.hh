@@ -362,6 +362,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXHeatCoilHSPF2SI_2023 = 0;   // HSPF2 value in SI unit at AHRI std. 340/360 conditions [W/W]
     int pdchDXHeatCoilHSPF2IP_2023 = 0;   // HSPF2 value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
     int pdchDXHeatCoilRegionNum_2023 = 0; // Region number for which HSPF is calculated
+    int pdchDXHeatCoilMinOADBTforCompOp_2023 = 0;
+    int pdchDXHeatCoilAirloopName_2023 = 0;
 
     // Heating Coil subtable
     int pdstHeatCoil = 0;

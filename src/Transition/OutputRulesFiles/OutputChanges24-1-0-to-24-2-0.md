@@ -39,11 +39,41 @@ with
 
 These changes will also make corresponding changes in the HTML Intialization Summary report
 
+
 ### Adding an Output:Variable, Zone/Space Wetbulb Globe Temperature
 
 An output variable will be added at both zone and space level: Zone Wetbulb Globe Temperature, and Space Wetbulb Globe
 Temperature
 
+
+### EIO DX Heating Coil Standard Rating Information 
+
+The EIO and html tabular output files now have a seprate heading and data stream for DX Heating Coils with the AHRI 2023 and prior versions.
+
+! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number
+! <DX Heating Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF2 {Btu/W-h}, Region Number
+
+
+### Euipment Summary Report 
+
+Renamed a table name in the Equipment Summary report:
+
+- from "DX Heating Coils [ HSPF2 ]" 
+- to   "DX Heating Coils AHRI 2023"
+
+Added two new columnuns to the named `DX Heating Coils AHRI 2023` table to make it equivalent to an exiting `DX Heating Coils` table. 
+
+New columns header added:
+
+- "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation [C]"
+- "AirLoop Name"
+
+Renamed a column header by adding units to the `DX Heating Coils` table:
+
+- from "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation"
+- to   "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation [C]"
+
+  
 ### Update Headers in EIO and existing tabular reports for Equipment Ratings
 
 EIO updated for the following:
@@ -65,18 +95,19 @@ More information can be found in PR [#10597](https://github.com/NREL/EnergyPlus/
  
 ### EnvelopeSummary in Tabular Reports
 
-In the Opaque Exterior table added “Zone” column
+In the Opaque Exterior table added ï¿½Zoneï¿½ column
 
 Add an entirely new table called Opaque Construction Layers which shows the layers of materials for each construction
 
 
 ###	EquipmentSummary in Tabular Reports
 
-In the DX Heating Coils table added "Supplemental Heat High Shutoff Temperature”
+In the DX Heating Coils table added "Supplemental Heat High Shutoff Temperatureï¿½
 
 In the Fans table added "Motor Loss Zone Name"
 
 Added an entirely new table called Air Terminals
+
 
 ###	SystemSummary in Tabular Reports
 
