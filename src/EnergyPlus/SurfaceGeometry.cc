@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -15680,9 +15681,9 @@ namespace SurfaceGeometry {
 
             if (SignFlag != PrevSignFlag) {
                 if (state.dataGlobal->DisplayExtraWarnings && surfaceTmp.ExtSolar &&
-                    (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) &&
-                    // Warn only once
-                    surfaceTmp.IsConvex) {
+                    (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) && surfaceTmp.IsConvex &&
+                    !state.dataSysVars->SutherlandHodgman &&
+                    (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PolygonClipping)) {
                     ShowWarningError(state,
                                      format("CheckConvexity: Zone=\"{}\", Surface=\"{}\" is non-convex.",
                                             state.dataHeatBal->Zone(surfaceTmp.Zone).Name,

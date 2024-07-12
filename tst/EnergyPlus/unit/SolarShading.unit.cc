@@ -3901,13 +3901,19 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     SolarShading::processShadowingInput(*state);
 
 #ifdef EP_NO_OPENGL
-    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
     EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
 #else
-    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
-    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
-    EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
+    if (!Penumbra::Penumbra::is_valid_context()) {
+        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
+        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+        EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
+    } else {
+        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+        EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
+    }
 #endif
 }
 
