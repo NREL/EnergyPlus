@@ -474,14 +474,15 @@ namespace Constant {
         "customEMS"         // customEMS
     };
 
-    inline std::string unitToString(Units unit) {
+    inline std::string unitToString(Units unit)
+    {
         switch (unit) {
         case Units::Invalid:
             return "invalid";
         default:
-            if (!(0 <= (int)unit 
-                && (int)unit < (int)unitNames.size())) 
-            { return "invalid-out-of-range"; }
+            if (!(0 <= (int)unit && (int)unit < (int)unitNames.size())) {
+                return "invalid-out-of-range";
+            }
             return std::string{unitNames[(unsigned int)unit]};
         }
         return "";
