@@ -209,9 +209,11 @@ Steam Gas Humidifier Outputs
 \item
   HVAC,Sum,Humidifier Water Volume{[}m3{]}
 \item
-  HVAC,Average,Humidifier Gas Use Rate{[}W{]}
+  HVAC,Average,Humidifier NaturalGas Use Rate{[}W{]}
 \item
-  HVAC,Sum,Humidifier Gas Use Energy {[}J{]}
+  HVAC,Sum,Humidifier NaturalGas Use Energy {[}J{]}
+ \item
+  HVAC,Average,Humidifier NaturalGas Use Thermal Efficiency {[}{]}
 \item
   HVAC,Average,Humidifier Auxiliary Electricity Rate {[}W{]}
 \item
@@ -219,7 +221,7 @@ Steam Gas Humidifier Outputs
 \item
   HVAC,Meter,Humidifier:Water {[}m3{]}
 \item
-  HVAC,Meter,Humidifier:Gas {[}J{]}
+  HVAC,Meter,Humidifier:NaturalGas {[}J{]}
 \item
   HVAC,Meter,Humidifier:Electricity {[}J{]}
 \item
@@ -244,13 +246,17 @@ This field reports the water consumption rate of the steam humidifier in cubic m
 
 This output is the cubic meters of water consumed by the steam humidifier over the timestep being reported.
 
-\paragraph{Humidifier Gas Use Rate {[}W{]}}\label{humidifier-gas-use-rate-w}
+\paragraph{Humidifier NaturalGas Use Rate {[}W{]}}\label{humidifier-naturalgas-use-rate-w}
 
-This output is the gas use rate of the gas fired steam humidifier in Watts.
+This output is the natural gas use rate of the natural gas fired steam humidifier in Watts.
 
-\paragraph{Humidifier Gas Use Energy {[}J{]}}\label{humidifier-gas-use-energy-j}
+\paragraph{Humidifier NaturalGas Use Energy {[}J{]}}\label{humidifier-naturalgas-use-energy-j}
 
-This output is the gas consumption of the gas fired steam humidifier in Joules.
+This output is the natural gas consumption of the natural gas fired steam humidifier in Joules.
+
+\paragraph{Humidifier NaturalGas Use Thermal Efficiency {[}{]}}\label{humidifier-naturalgas-use-thermal-efficiency-j}
+
+This output is the thermal efficiency of the natural gas consumed by the natural gas fired steam humidifier.
 
 \paragraph{Humidifier Auxiliary Electricity Rate {[}W{]}}\label{humidifier-auxiliary-electric-power-w}
 
@@ -264,9 +270,9 @@ This is the auxiliary electricity consumption in Joules of the gas fired steam h
 
 This meter output contains the sum of the water consumed (in cubic meters of water during the report timestep) by all the steam humidifiers at the HVAC level in the simulation.
 
-\paragraph{Humidifier:Gas {[}J{]}}\label{humidifiergas-j}
+\paragraph{Humidifier:NaturalGas {[}J{]}}\label{humidifiernaturalgas-j}
 
-This meter output contains the sum of the gas consumed (in Joules during the report timestep) by all the steam humidifiers at the HVAC level in the simulation.
+This meter output contains the sum of the natural gas consumed (in Joules during the report timestep) by all the steam humidifiers at the HVAC level in the simulation.
 
 \paragraph{Humidifier Storage Tank Water Volume Flow Rate {[}m3/s{]}}\label{humidifier-storage-tank-water-volume-flow-rate-m3s-1}
 
