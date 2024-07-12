@@ -52,6 +52,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 
 namespace EnergyPlus {
 
@@ -103,6 +104,7 @@ struct SimulationManagerData : BaseGlobalStruct
     {
         SimulationManager::OpenOutputFiles(state);
         SimulationManager::GetProjectData(state);
+        HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     }
 
     void clear_state() override

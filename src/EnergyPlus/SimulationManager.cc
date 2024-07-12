@@ -102,7 +102,6 @@ extern "C" {
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -211,10 +210,11 @@ namespace SimulationManager {
 
         state.init_state(state);
 
+        // these checks report warnings for SimulationControl setup, no actual inputs are read in
         CheckForMisMatchedEnvironmentSpecifications(state);
         CheckForRequestedReporting(state);
+        // set up pre-defined reports, no actual inputs are read in
         OutputReportPredefined::SetPredefinedTables(state);
-        SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
         OutputProcessor::SetupTimePointers(
             state, OutputProcessor::TimeStepType::Zone, state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
