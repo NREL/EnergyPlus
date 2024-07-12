@@ -132,6 +132,11 @@ bool env_var_on(std::string const &env_var_str);
 
 using OptionalOutputFileRef = std::optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
+void emitErrorMessage(EnergyPlusData &state, int idOne, std::string const &msg, bool shouldFatal);
+void emitErrorMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs, bool shouldFatal);
+void emitWarningMessage(EnergyPlusData &state, int idOne, std::string const &msg);
+void emitWarningMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs);
+
 void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {});
 
 void ShowSevereError(EnergyPlusData &state,
