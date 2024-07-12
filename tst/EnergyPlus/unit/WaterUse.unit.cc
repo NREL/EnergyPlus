@@ -417,6 +417,7 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    state->dataGlobal->CurrentTime = 0.25;
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
@@ -1272,6 +1273,7 @@ TEST_F(EnergyPlusFixture, WaterUse_calcH2ODensity_Test)
     Real64 expectedResult;
     Real64 allowedTolerance = 0.001;
 
+    state->init_state(*state);
     // Test 1: Set the flag to false means don't recalculate.  This means it wasn't set so this should be the default value.
     state->dataWaterUse->calcRhoH2O = false;
     expectedResult = 1000.0;

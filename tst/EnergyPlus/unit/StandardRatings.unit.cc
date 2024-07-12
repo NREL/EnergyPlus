@@ -1202,7 +1202,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
 {
 
     using StandardRatings::CalcChillerIPLV;
-
+    state->init_state(*state);
     // Setup a water-cooled Chiller:Electric:ReformulatedEIR chiller with reference conditions being at non-rated conditions
     state->dataChillerReformulatedEIR->ElecReformEIRChiller.allocate(1);
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes";
