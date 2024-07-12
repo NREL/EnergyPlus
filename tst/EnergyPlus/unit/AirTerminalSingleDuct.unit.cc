@@ -1008,6 +1008,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true); // clear idf errors
     // setup variables for VAV Reheat
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1217,6 +1218,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true); // clear idf errors
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1393,6 +1395,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true); // clear idf errors
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1580,6 +1583,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true); // clear idf errors
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1726,6 +1730,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true); // clear idf errors
     // setup variables for VAV HeatCoolReheat
     int SysNum = 1;
     int ZoneNum = 1;
