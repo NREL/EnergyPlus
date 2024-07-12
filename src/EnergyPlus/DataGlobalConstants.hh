@@ -49,7 +49,8 @@
 #define DataGlobalConstants_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
+#include <fmt/format.h>
+// #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -482,12 +483,13 @@ namespace Constant {
         case Units::Invalid:
             return "invalid";
         default:
-            if (!(0 <= (int)unit && (int)unit < (int)unitNames.size())) {
-                return "invalid-out-of-range";
+            const int iUnit = static_cast<int>(unit);
+            constexpr int numUnitNames = unitNames.size();
+            if (0 <= iUnit && iUnit < numUnitNames) {
+                return fmt::format("[{}]", unitNames[iUnit]);
             }
-            return std::string{unitNames[(unsigned int)unit]};
+            return "invalid-out-of-range";
         }
-        return "";
     }
 
     constexpr std::array<std::string_view, (int)Units::Num> unitNamesUC = {
