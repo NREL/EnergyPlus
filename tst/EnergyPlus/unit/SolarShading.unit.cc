@@ -3893,10 +3893,18 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     EXPECT_EQ(state->dataSolarShading->anyScheduledShadingSurface, true);
 
     EXPECT_EQ(state->dataErrTracking->AskForSurfacesReport, true);
-    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors,
-              1); // with the rearrangement of code, one warning now gets produced in the shadow calculations
     // Expect no severe errors at this point
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+
+#ifdef EP_NO_OPENGL
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
+#else
+    if (!Penumbra::Penumbra::is_valid_context()) {
+        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
+    } else {
+        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+    }
+#endif
 
     SolarShading::processShadowingInput(*state);
 
@@ -5953,4 +5961,206 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution_EQL)
     EXPECT_NEAR(0.0, state->dataHeatBalSurf->SurfWinInitialBeamSolInTrans(windowSurfNum2), 0.01);
     EXPECT_NEAR(0.0, state->dataHeatBalSurf->SurfWinInitialDifSolInTrans(windowSurfNum), 0.01);
     EXPECT_NEAR(1.4736, state->dataHeatBalSurf->SurfWinInitialDifSolInTrans(windowSurfNum2), 0.01);
+}
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest1)
+{
+    // Tests for Defect #10299: Test GetShadowingInput for various combinations of input
+    // with a focus put on the correct setting of variables associated with calculation
+    // method and polygon clipping algorithm
+    std::string const idf_objects = delimited_string({
+        "  ShadowCalculation,",
+        "    PolygonClipping,             !- Shading Calculation Method",
+        "    Timestep,                    !- Shading Calculation Update Frequency Method",
+        "    1,                           !- Shading Calculation Update Frequency",
+        "    200,                         !- Maximum Figures in Shadow Overlap Calculations",
+        "    ConvexWeilerAtherton,        !- Polygon Clipping Algorithm",
+        "    512.0,                       !- Pixel Counting Resolution",
+        "    DetailedSkyDiffuseModeling;  !- Sky Diffuse Modeling Algorithm",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSolarShading->anyScheduledShadingSurface = false;
+
+    // Test 1 of 6: Polygon Clipping and ConvexWeilerAtherton
+    SolarShading::GetShadowingInput(*state);
+    int expectedFrequency = 1;
+    int expectedOverlaps = 200;
+    EXPECT_TRUE(state->dataSysVars->DetailedSkyDiffuseAlgorithm);
+    EXPECT_TRUE(state->dataSysVars->DetailedSolarTimestepIntegration);
+    EXPECT_EQ(expectedFrequency, state->dataSolarShading->ShadowingCalcFrequency);
+    EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
+    EXPECT_FALSE(state->dataSysVars->SutherlandHodgman);
+    EXPECT_FALSE(state->dataSysVars->SlaterBarsky);
+    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
+}
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest2)
+{
+    // Tests for Defect #10299: Test GetShadowingInput for various combinations of input
+    // with a focus put on the correct setting of variables associated with calculation
+    // method and polygon clipping algorithm
+    std::string const idf_objects = delimited_string({
+        "  ShadowCalculation,",
+        "    PolygonClipping,           !- Shading Calculation Method",
+        "    Periodic,                  !- Shading Calculation Update Frequency Method",
+        "    10,                        !- Shading Calculation Update Frequency",
+        "    2000,                      !- Maximum Figures in Shadow Overlap Calculations",
+        "    SutherlandHodgman,         !- Polygon Clipping Algorithm",
+        "    512.0,                     !- Pixel Counting Resolution",
+        "    SimpleSkyDiffuseModeling;  !- Sky Diffuse Modeling Algorithm",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSolarShading->anyScheduledShadingSurface = false;
+
+    // Test 2 of 6: Polygon Clipping and SutherlandHodgman
+    SolarShading::GetShadowingInput(*state);
+    int expectedFrequency = 10;
+    int expectedOverlaps = 2000;
+    EXPECT_FALSE(state->dataSysVars->DetailedSkyDiffuseAlgorithm);
+    EXPECT_FALSE(state->dataSysVars->DetailedSolarTimestepIntegration);
+    EXPECT_EQ(expectedFrequency, state->dataSolarShading->ShadowingCalcFrequency);
+    EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
+    EXPECT_TRUE(state->dataSysVars->SutherlandHodgman);
+    EXPECT_FALSE(state->dataSysVars->SlaterBarsky);
+    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
+}
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest3)
+{
+    // Tests for Defect #10299: Test GetShadowingInput for various combinations of input
+    // with a focus put on the correct setting of variables associated with calculation
+    // method and polygon clipping algorithm
+    std::string const idf_objects = delimited_string({
+        "  ShadowCalculation,",
+        "    PolygonClipping,                   !- Shading Calculation Method",
+        "    Timestep,                          !- Shading Calculation Update Frequency Method",
+        "    30,                                !- Shading Calculation Update Frequency",
+        "    15000,                             !- Maximum Figures in Shadow Overlap Calculations",
+        "    SlaterBarskyandSutherlandHodgman,  !- Polygon Clipping Algorithm",
+        "    512.0,                             !- Pixel Counting Resolution",
+        "    DetailedSkyDiffuseModeling;        !- Sky Diffuse Modeling Algorithm",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSolarShading->anyScheduledShadingSurface = false;
+
+    // Test 3 of 6: Polygon Clipping and SlaterBarskyandSutherlandHodgman
+    SolarShading::GetShadowingInput(*state);
+    int expectedFrequency = 30;
+    int expectedOverlaps = 15000;
+    EXPECT_TRUE(state->dataSysVars->DetailedSkyDiffuseAlgorithm);
+    EXPECT_TRUE(state->dataSysVars->DetailedSolarTimestepIntegration);
+    EXPECT_EQ(expectedFrequency, state->dataSolarShading->ShadowingCalcFrequency);
+    EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
+    EXPECT_TRUE(state->dataSysVars->SutherlandHodgman);
+    EXPECT_TRUE(state->dataSysVars->SlaterBarsky);
+    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
+}
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest4)
+{
+    // Tests for Defect #10299: Test GetShadowingInput for various combinations of input
+    // with a focus put on the correct setting of variables associated with calculation
+    // method and polygon clipping algorithm
+    std::string const idf_objects = delimited_string({
+        "  ShadowCalculation,",
+        "    PixelCounting,               !- Shading Calculation Method",
+        "    Periodic,                    !- Shading Calculation Update Frequency Method",
+        "    1,                           !- Shading Calculation Update Frequency",
+        "    200,                         !- Maximum Figures in Shadow Overlap Calculations",
+        "    ConvexWeilerAtherton,        !- Polygon Clipping Algorithm",
+        "    512.0,                       !- Pixel Counting Resolution",
+        "    DetailedSkyDiffuseModeling;  !- Sky Diffuse Modeling Algorithm",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSolarShading->anyScheduledShadingSurface = false;
+
+    // Test 4 of 6: Pixel Counting and ConvexWeilerAtherton
+    SolarShading::GetShadowingInput(*state);
+    int expectedFrequency = 1;
+    int expectedOverlaps = 200;
+    EXPECT_TRUE(state->dataSysVars->DetailedSkyDiffuseAlgorithm);
+    EXPECT_FALSE(state->dataSysVars->DetailedSolarTimestepIntegration);
+    EXPECT_EQ(expectedFrequency, state->dataSolarShading->ShadowingCalcFrequency);
+    EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
+    EXPECT_FALSE(state->dataSysVars->SutherlandHodgman);
+    EXPECT_FALSE(state->dataSysVars->SlaterBarsky);
+    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
+}
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest5)
+{
+    // Tests for Defect #10299: Test GetShadowingInput for various combinations of input
+    // with a focus put on the correct setting of variables associated with calculation
+    // method and polygon clipping algorithm
+    std::string const idf_objects = delimited_string({
+        "  ShadowCalculation,",
+        "    PixelCounting,               !- Shading Calculation Method",
+        "    Periodic,                    !- Shading Calculation Update Frequency Method",
+        "    10,                          !- Shading Calculation Update Frequency",
+        "    2000,                        !- Maximum Figures in Shadow Overlap Calculations",
+        "    SutherlandHodgman,           !- Polygon Clipping Algorithm",
+        "    512.0,                       !- Pixel Counting Resolution",
+        "    DetailedSkyDiffuseModeling;  !- Sky Diffuse Modeling Algorithm",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSolarShading->anyScheduledShadingSurface = false;
+
+    // Test 5 of 6: Pixel Counting and SutherlandHodgman
+    SolarShading::GetShadowingInput(*state);
+    int expectedFrequency = 10;
+    int expectedOverlaps = 2000;
+    EXPECT_TRUE(state->dataSysVars->DetailedSkyDiffuseAlgorithm);
+    EXPECT_FALSE(state->dataSysVars->DetailedSolarTimestepIntegration);
+    EXPECT_EQ(expectedFrequency, state->dataSolarShading->ShadowingCalcFrequency);
+    EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
+    EXPECT_TRUE(state->dataSysVars->SutherlandHodgman);
+    EXPECT_FALSE(state->dataSysVars->SlaterBarsky);
+    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
+}
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
+{
+    // Tests for Defect #10299: Test GetShadowingInput for various combinations of input
+    // with a focus put on the correct setting of variables associated with calculation
+    // method and polygon clipping algorithm
+    std::string const idf_objects = delimited_string({
+        "  ShadowCalculation,",
+        "    PixelCounting,                     !- Shading Calculation Method",
+        "    Periodic,                          !- Shading Calculation Update Frequency Method",
+        "    56,                                !- Shading Calculation Update Frequency",
+        "    1234,                              !- Maximum Figures in Shadow Overlap Calculations",
+        "    SlaterBarskyandSutherlandHodgman,  !- Polygon Clipping Algorithm",
+        "    512.0,                             !- Pixel Counting Resolution",
+        "    SimpleSkyDiffuseModeling;          !- Sky Diffuse Modeling Algorithm",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSolarShading->anyScheduledShadingSurface = false;
+
+    // Test 36of 6: Pixel Counting and SlaterBarskyandSutherlandHodgman
+    SolarShading::GetShadowingInput(*state);
+
+    int expectedFrequency = 56;
+    int expectedOverlaps = 1234;
+    EXPECT_FALSE(state->dataSysVars->DetailedSkyDiffuseAlgorithm);
+    EXPECT_FALSE(state->dataSysVars->DetailedSolarTimestepIntegration);
+    EXPECT_EQ(expectedFrequency, state->dataSolarShading->ShadowingCalcFrequency);
+    EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
+    EXPECT_TRUE(state->dataSysVars->SutherlandHodgman);
+    EXPECT_TRUE(state->dataSysVars->SlaterBarsky);
+    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
+    std::string const error_string = delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
+                                                       "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate."});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
