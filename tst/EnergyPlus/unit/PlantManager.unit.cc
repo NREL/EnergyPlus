@@ -75,6 +75,7 @@ namespace PlantManager {
 
     TEST_F(EnergyPlusFixture, PlantManager_SizePlantLoopTest)
     {
+        state->init_state(*state);
         state->dataPlnt->PlantLoop.allocate(1);
         state->dataPlnt->PlantLoop(1).VolumeWasAutoSized = true;
         state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 5;
@@ -210,16 +211,15 @@ namespace PlantManager {
         // a SetpointManager:OutdoorAirReset type.
         GetPlantLoopData(*state);
         ASSERT_FALSE(ErrorsFound);
-        // there two setpoint amanegrs in the loop
-        EXPECT_EQ(1, state->dataSetPointManager->NumSchSetPtMgrs);    // SetpointManager:Scheduled
-        EXPECT_EQ(1, state->dataSetPointManager->NumOutAirSetPtMgrs); // SetpointManager:OutdoorAirReset
-        EXPECT_EQ(2, state->dataSetPointManager->NumAllSetPtMgrs);
+        // there two setpoint managers in the loop
+        EXPECT_EQ(2, state->dataSetPointManager->spms.size()); // SetpointManager:Scheduled
+
         // Schedule Setpoint Manager assigned at a plant loop supply outlet node
-        EXPECT_EQ(state->dataSetPointManager->SchSetPtMgr(1).ctrlVarType, "TEMPERATURE");
-        EXPECT_EQ(state->dataSetPointManager->SchSetPtMgr(1).CtrlNodeListName, "CHILLED WATER LOOP SUPPLY OUTLET");
+        EXPECT_EQ((int)state->dataSetPointManager->spms(1)->ctrlVar, (int)HVAC::CtrlVarType::Temp);
+        EXPECT_EQ(state->dataLoopNodes->NodeID(state->dataSetPointManager->spms(1)->ctrlNodeNums[0]), "CHILLED WATER LOOP SUPPLY OUTLET");
         // OAReset Setpoint Manager assigned at a plant loop supply inlet node
-        EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).ctrlVarType, "TEMPERATURE");
-        EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlNodeListName, "CHILLED WATER LOOP SUPPLY INLET");
+        EXPECT_EQ((int)state->dataSetPointManager->spms(2)->ctrlVar, (int)HVAC::CtrlVarType::Temp);
+        EXPECT_EQ(state->dataLoopNodes->NodeID(state->dataSetPointManager->spms(2)->ctrlNodeNums[0]), "CHILLED WATER LOOP SUPPLY INLET");
     }
 } // namespace PlantManager
 
@@ -286,43 +286,38 @@ namespace UserDefinedComponents {
         EXPECT_EQ(5, state->dataBranchNodeConnections->NumOfNodeConnections);
 
         // OA Node
-        EXPECT_TRUE(compare_enums(NodeInputManager::CompFluidStream::Primary, state->dataBranchNodeConnections->NodeConnections(1).FluidStream));
-        EXPECT_TRUE(
-            compare_enums(DataLoopNode::ConnectionObjectType::OutdoorAirNode, state->dataBranchNodeConnections->NodeConnections(1).ObjectType));
+        EXPECT_ENUM_EQ(NodeInputManager::CompFluidStream::Primary, state->dataBranchNodeConnections->NodeConnections(1).FluidStream);
+        EXPECT_ENUM_EQ(DataLoopNode::ConnectionObjectType::OutdoorAirNode, state->dataBranchNodeConnections->NodeConnections(1).ObjectType);
         EXPECT_EQ("OutdoorAir:Node", state->dataBranchNodeConnections->NodeConnections(1).ObjectName);
-        EXPECT_TRUE(compare_enums(DataLoopNode::ConnectionType::OutsideAir, state->dataBranchNodeConnections->NodeConnections(1).ConnectionType));
+        EXPECT_ENUM_EQ(DataLoopNode::ConnectionType::OutsideAir, state->dataBranchNodeConnections->NodeConnections(1).ConnectionType);
         EXPECT_EQ("TEST_OA_NODE", state->dataBranchNodeConnections->NodeConnections(1).NodeName);
 
         // Coil Air Primiary Inlet
-        EXPECT_TRUE(compare_enums(NodeInputManager::CompFluidStream::Primary, state->dataBranchNodeConnections->NodeConnections(2).FluidStream));
-        EXPECT_TRUE(
-            compare_enums(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(2).ObjectType));
+        EXPECT_ENUM_EQ(NodeInputManager::CompFluidStream::Primary, state->dataBranchNodeConnections->NodeConnections(2).FluidStream);
+        EXPECT_ENUM_EQ(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(2).ObjectType);
         EXPECT_EQ("COILUSERDEF_1", state->dataBranchNodeConnections->NodeConnections(2).ObjectName);
-        EXPECT_TRUE(compare_enums(DataLoopNode::ConnectionType::Inlet, state->dataBranchNodeConnections->NodeConnections(2).ConnectionType));
+        EXPECT_ENUM_EQ(DataLoopNode::ConnectionType::Inlet, state->dataBranchNodeConnections->NodeConnections(2).ConnectionType);
         EXPECT_EQ("PRIMARY_INLET_NODE", state->dataBranchNodeConnections->NodeConnections(2).NodeName);
 
         // Coil Air Primiary Outlet
-        EXPECT_TRUE(compare_enums(NodeInputManager::CompFluidStream::Primary, state->dataBranchNodeConnections->NodeConnections(3).FluidStream));
-        EXPECT_TRUE(
-            compare_enums(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(3).ObjectType));
+        EXPECT_ENUM_EQ(NodeInputManager::CompFluidStream::Primary, state->dataBranchNodeConnections->NodeConnections(3).FluidStream);
+        EXPECT_ENUM_EQ(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(3).ObjectType);
         EXPECT_EQ("COILUSERDEF_1", state->dataBranchNodeConnections->NodeConnections(3).ObjectName);
-        EXPECT_TRUE(compare_enums(DataLoopNode::ConnectionType::Outlet, state->dataBranchNodeConnections->NodeConnections(3).ConnectionType));
+        EXPECT_ENUM_EQ(DataLoopNode::ConnectionType::Outlet, state->dataBranchNodeConnections->NodeConnections(3).ConnectionType);
         EXPECT_EQ("PRIMARY_OUTLET_NODE", state->dataBranchNodeConnections->NodeConnections(3).NodeName);
 
         // Coil Air Secondary Inlet
-        EXPECT_TRUE(compare_enums(NodeInputManager::CompFluidStream::Secondary, state->dataBranchNodeConnections->NodeConnections(4).FluidStream));
-        EXPECT_TRUE(
-            compare_enums(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(4).ObjectType));
+        EXPECT_ENUM_EQ(NodeInputManager::CompFluidStream::Secondary, state->dataBranchNodeConnections->NodeConnections(4).FluidStream);
+        EXPECT_ENUM_EQ(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(4).ObjectType);
         EXPECT_EQ("COILUSERDEF_1", state->dataBranchNodeConnections->NodeConnections(4).ObjectName);
-        EXPECT_TRUE(compare_enums(DataLoopNode::ConnectionType::Inlet, state->dataBranchNodeConnections->NodeConnections(4).ConnectionType));
+        EXPECT_ENUM_EQ(DataLoopNode::ConnectionType::Inlet, state->dataBranchNodeConnections->NodeConnections(4).ConnectionType);
         EXPECT_EQ("SECONDARY_INLET_NODE", state->dataBranchNodeConnections->NodeConnections(4).NodeName);
 
         // Coil Air Secondary Outlet
-        EXPECT_TRUE(compare_enums(NodeInputManager::CompFluidStream::Secondary, state->dataBranchNodeConnections->NodeConnections(5).FluidStream));
-        EXPECT_TRUE(
-            compare_enums(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(5).ObjectType));
+        EXPECT_ENUM_EQ(NodeInputManager::CompFluidStream::Secondary, state->dataBranchNodeConnections->NodeConnections(5).FluidStream);
+        EXPECT_ENUM_EQ(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(5).ObjectType);
         EXPECT_EQ("COILUSERDEF_1", state->dataBranchNodeConnections->NodeConnections(5).ObjectName);
-        EXPECT_TRUE(compare_enums(DataLoopNode::ConnectionType::Outlet, state->dataBranchNodeConnections->NodeConnections(5).ConnectionType));
+        EXPECT_ENUM_EQ(DataLoopNode::ConnectionType::Outlet, state->dataBranchNodeConnections->NodeConnections(5).ConnectionType);
         EXPECT_EQ("SECONDARY_OUTLET_NODE", state->dataBranchNodeConnections->NodeConnections(5).NodeName);
     }
 } // namespace UserDefinedComponents

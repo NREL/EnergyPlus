@@ -145,6 +145,10 @@ struct GlobalNamesData : BaseGlobalStruct
     std::unordered_map<std::string, std::string> CoilNames;
     std::unordered_map<std::string, std::string> aDUNames;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->NumChillers = 0;

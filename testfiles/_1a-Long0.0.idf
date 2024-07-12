@@ -10,7 +10,7 @@
 ! Plant:    None.
 ! Modified:
 
-  Version,24.1;
+  Version,24.2;
 
   Site:Location,
     UNKNOWN,                 !- Name
@@ -1408,7 +1408,7 @@
 
   Output:Variable,*,Surface Shading Device Is On Time Fraction,timestep;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,timestep;
+  Output:Variable,*,Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,timestep;
 
   Output:Variable,*,Surface Window Heat Gain Rate,timestep;
 

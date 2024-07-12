@@ -299,6 +299,8 @@ namespace Construction {
 
         void reportTransferFunction(EnergyPlusData &state, int cCounter);
 
+        void reportLayers(EnergyPlusData &state);
+
         bool isGlazingConstruction(EnergyPlusData &state) const;
 
         Real64 setThicknessPerpendicular(EnergyPlusData &state, Real64 userValue);
@@ -316,9 +318,13 @@ struct ConstructionData : BaseGlobalStruct
     Array1D<Construction::ConstructionProps> Construct;
     Array1D_int LayerPoint = Array1D<int>(Construction::MaxLayersInConstruct, 0);
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = ConstructionData();
+        new (this) ConstructionData();
     }
 };
 

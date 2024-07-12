@@ -50,7 +50,7 @@
 
 namespace EnergyPlus {
 
-namespace DataHVACGlobals {
+namespace HVAC {
 
     // MODULE INFORMATION:
     //       MODIFIED       Craig Wray 22Aug2010 Added Fan Component Model
@@ -58,20 +58,37 @@ namespace DataHVACGlobals {
     // PURPOSE OF THIS MODULE:
     // This data-only module is a repository for HVAC variables which are considered
     // to be "global" in nature in EnergyPlus.
+    constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNames = {
+        "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"};
 
-    // fan types
-    Array1D_string const
-        cFanTypes(NumAllFanTypes,
-                  {"Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"});
+    constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNamesUC = {
+        "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
 
-    Array1D_string const cFurnaceTypes(NumUnitarySystemTypes,
-                                       {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
-                                        "AirLoopHVAC:Unitary:Furnace:HeatCool",
-                                        "AirLoopHVAC:UnitaryHeatOnly",
-                                        "AirLoopHVAC:UnitaryHeatCool",
-                                        "AirLoopHVAC:UnitaryHeatPump:AirToAir",
-                                        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
-                                        "AirLoopHVAC:UnitarySystem"});
+    constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNames = {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
+                                                                                            "AirLoopHVAC:Unitary:Furnace:HeatCool",
+                                                                                            "AirLoopHVAC:UnitaryHeatOnly",
+                                                                                            "AirLoopHVAC:UnitaryHeatCool",
+                                                                                            "AirLoopHVAC:UnitaryHeatPump:AirToAir",
+                                                                                            "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
+                                                                                            "AirLoopHVAC:UnitarySystem"};
+
+    constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNamesUC = {"AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY",
+                                                                                              "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL",
+                                                                                              "AIRLOOPHVAC:UNITARYHEATONLY",
+                                                                                              "AIRLOOPHVAC:UNITARYHEATCOOL",
+                                                                                              "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR",
+                                                                                              "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR",
+                                                                                              "AIRLOOPHVAC:UNITARYSYSTEM"};
+
+    constexpr std::array<std::string_view, (int)WaterFlow::Num> waterFlowNames = {"Cycling", "Constant", "ConstantOnDemand"};
+
+    constexpr std::array<std::string_view, (int)WaterFlow::Num> waterFlowNamesUC = {"CYCLING", "CONSTANT", "CONSTANTONDEMAND"};
+
+    constexpr std::array<std::string_view, (int)OATType::Num> oatTypeNames = {"WetBulbTemperature", "DryBulbTemperature"};
+    constexpr std::array<std::string_view, (int)OATType::Num> oatTypeNamesUC = {"WETBULBTEMPERATURE", "DRYBULBTEMPERATURE"};
+
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNames = {"InletSide", "SupplySide"};
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNamesUC = {"INLETSIDE", "SUPPLYSIDE"};
 
     Array1D_string const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",
@@ -190,15 +207,18 @@ namespace DataHVACGlobals {
                                             "",
                                             ""});
 
-    Array1D_string const
-        cHXTypes(NumHXTypes,
-                 {"HeatExchanger:AirToAir:FlatPlate", "HeatExchanger:AirToAir:SensibleAndLatent", "HeatExchanger:Desiccant:BalancedFlow"});
+    constexpr std::array<std::string_view, (int)HXType::Num> hxTypeNames = {
+        "HeatExchanger:AirToAir:FlatPlate", "HeatExchanger:AirToAir:SensibleAndLatent", "HeatExchanger:Desiccant:BalancedFlow"};
 
-    Array1D_string const cATMixerTypes(NumATMixerTypes, {"AirTerminal:SingleDuct:InletSideMixer", "AirTerminal:SingleDuct:SupplySideMixer"});
+    constexpr std::array<std::string_view, (int)HXType::Num> hxTypeNamesUC = {
+        "HEATEXCHANGER:AIRTOAIR:FLATPLATE", "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT", "HEATEXCHANGER:DESICCANT:BALANCEDFLOW"};
 
-    Array1D_string const cVRFTUTypes(NumVRFTUTypes, std::string("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"));
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeNames = {"AirTerminal:SingleDuct:InletSideMixer",
+                                                                                  "AirTerminal:SingleDuct:SupplySideMixer"};
 
-    Array1D_string const cVRFHeatingPerformanceOATTypes(NumVRFHeatingPerformanceOATTypes, {"WetBulbTemperature", "DryBulbTemperature"});
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeNamesUC = {"AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER",
+                                                                                    "AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER"};
+
 #ifdef GET_OUT
     constexpr std::array<std::string_view, (int)ZoneEquipType::Num> zoneEquipTypeNamesUC = {"DUMMY",
                                                                                             "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
@@ -280,6 +300,6 @@ namespace DataHVACGlobals {
                                                                                           "AirTerminal:DualDuct:VAV:OutdoorAir",
                                                                                           "AirLoopHVACReturnAir"};
 #endif //
-} // namespace DataHVACGlobals
+} // namespace HVAC
 
 } // namespace EnergyPlus

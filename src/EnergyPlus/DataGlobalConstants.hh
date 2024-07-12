@@ -393,6 +393,7 @@ namespace Constant {
         V,
         deltaC,
         kmol_s,
+        umol_m2s,
         rev_min,
         Btu_h_W,
         W_m2K,
@@ -448,6 +449,7 @@ namespace Constant {
         "V",                // V
         "deltaC",           // deltaC
         "kmol/s",           // kmol_s
+        "umol/m2-s",        // umol_m2s (micromol_m2s)
         "rev/min",          // rev_min
         "Btu/h-W",          // Btu_h_W
         "W/m2-K",           // W_m2K
@@ -516,6 +518,7 @@ namespace Constant {
         "V",                // V
         "DELTAC",           // deltaC
         "KMOL/S",           // kmol_s
+        "UMOL/M2-S",        // umol_m2s (micromol_m2s)
         "REV/MIN",          // rev_min
         "BTH/H-W",          // Btu_h_W
         "W/M2-K",           // W_m2K
@@ -582,13 +585,19 @@ namespace Constant {
     Real64 constexpr OneFifth = 1.0 / 5.0;   // 1/5 in highest precision
     Real64 constexpr OneSixth = 1.0 / 6.0;   // 1/6 in highest precision
     Real64 constexpr FourFifths = 4.0 / 5.0; // 4/5 in highest precision
+    Real64 constexpr OneThousandth = 1.0e-3; // Used as a tolerance in various places
+    Real64 constexpr OneMillionth = 1.0e-6;  // Used as a tolerance in various places
 
+    Real64 constexpr OneCentimeter = 0.01;     // Geometric tolerance in meters
+    Real64 constexpr TwoCentimeters = 0.02;    // Geometric tolerance in meters
+    Real64 constexpr SmallDistance = 1.0e-4;   // Geometric tolerance in meters
     Real64 constexpr MaxEXPArg = 709.78;       // maximum exponent in EXP() function
     Real64 constexpr Pi = 3.14159265358979324; // Pi 3.1415926535897932384626435
     Real64 constexpr PiOvr2 = Pi / 2.0;        // Pi/2
     Real64 constexpr TwoPi = 2.0 * Pi;         // 2*Pi 6.2831853071795864769252868
     Real64 constexpr GravityConstant = 9.807;
     Real64 constexpr DegToRadians = Pi / 180.0;                           // Conversion for Degrees to Radians
+    Real64 constexpr DegToRad = Pi / 180.0;                               // Why is it DegToRadians and RadToDeg? Why? WHY?
     Real64 constexpr RadToDeg = 180.0 / Pi;                               // Conversion for Radians to Degrees
     Real64 constexpr SecInHour = 3600.0;                                  // Conversion for hours to seconds
     Real64 constexpr HoursInDay = 24.0;                                   // Number of Hours in Day

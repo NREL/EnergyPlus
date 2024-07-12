@@ -88,11 +88,11 @@ struct CoilCoolingDXCurveFitPerformance
     void simulate(EnergyPlusData &state,
                   const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
-                  int useAlternateMode,
+                  HVAC::CoilMode currentCoilMode,
                   Real64 &PLR,
                   int &speedNum,
                   Real64 &speedRatio,
-                  int const fanOpMode,
+                  HVAC::FanOp const fanOp,
                   DataLoopNode::NodeData &condInletNode,
                   DataLoopNode::NodeData &condOutletNode,
                   bool const singleMode,
@@ -105,7 +105,7 @@ struct CoilCoolingDXCurveFitPerformance
                    Real64 &PLR,
                    int &speedNum,
                    Real64 &speedRatio,
-                   int const fanOpMode,
+                   HVAC::FanOp const fanOp,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode,
                    bool const singleMode);
@@ -154,6 +154,7 @@ struct CoilCoolingDXCurveFitPerformance
     // standard rating stuff -- for now just 210/240
     Real64 standardRatingCoolingCapacity = 0.0; // net cooling capacity of single speed DX cooling coil
     Real64 standardRatingSEER = 0.0;            // seasonal energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingSEER_Standard = 0.0;   // seasonal energy efficiency ratio
     Real64 standardRatingEER = 0.0;             // energy efficiency ratio of single speed DX cooling coil
     Real64 standardRatingIEER = 0.0;            // Integrated energy efficiency ratio of single speed DX cooling coil
 
@@ -165,9 +166,9 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 standardRatingIEER2 = 0.0; // Integrated energy efficiency ratio of singgle speed DX cooling coil | AHRI Std.340/360-2022(IP)
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
-    int hasAlternateMode = 0;                          // 0 Normal, 1 Enhanced, 2 SubcoolReheat
-    CoilCoolingDXCurveFitOperatingMode alternateMode;  // enhanced dehumidifcation or Subcool mode
-    CoilCoolingDXCurveFitOperatingMode alternateMode2; // Reheat mode
+    HVAC::CoilMode maxAvailCoilMode = HVAC::CoilMode::Normal; // max available coil mode, 0 Normal, 1 Enhanced, 2 SubcoolReheat
+    CoilCoolingDXCurveFitOperatingMode alternateMode;         // enhanced dehumidifcation or Subcool mode
+    CoilCoolingDXCurveFitOperatingMode alternateMode2;        // Reheat mode
 };
 
 } // namespace EnergyPlus

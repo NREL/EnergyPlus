@@ -450,15 +450,15 @@ namespace HybridModel {
                                             "Zone Infiltration Hybrid Model Air Change Rate",
                                             Constant::Units::ach,
                                             state.dataHeatBal->Zone(ZonePtr).InfilOAAirChangeRateHM,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                         SetupOutputVariable(state,
                                             "Zone Infiltration Hybrid Model Mass Flow Rate",
                                             Constant::Units::kg_s,
                                             state.dataHeatBal->Zone(ZonePtr).MCPIHM,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                     }
                     if (state.dataHybridModel->HybridModelZone(ZonePtr).PeopleCountCalc_T ||
@@ -468,11 +468,19 @@ namespace HybridModel {
                                             "Zone Hybrid Model People Count",
                                             Constant::Units::None,
                                             state.dataHeatBal->Zone(ZonePtr).NumOccHM,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                     }
-
+                    if (state.dataHybridModel->HybridModelZone(ZonePtr).InternalThermalMassCalc_T) {
+                        SetupOutputVariable(state,
+                                            "Zone Hybrid Model Thermal Mass Multiplier",
+                                            Constant::Units::None,
+                                            state.dataHeatBal->Zone(ZonePtr).ZoneVolCapMultpSensHM,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
+                                            state.dataHeatBal->Zone(ZonePtr).Name);
+                    }
                 } else {
                     ShowSevereError(
                         state,

@@ -68,7 +68,7 @@ using namespace FenestrationCommon;
 using namespace SpectralAveraging;
 using namespace MultiLayerOptics;
 
-namespace WindowManager {
+namespace Window {
 
     bool isSurfaceHit(EnergyPlusData &state, const int t_SurfNum, const Vector &t_Ray)
     {
@@ -122,7 +122,7 @@ namespace WindowManager {
         // Handles solar radiation spetrum from defalut location or IDF
         CSeries solarRadiation;
 
-        for (int i = 1; i <= state.dataWindowManager->nume; ++i) {
+        for (int i = 1; i <= nume; ++i) {
             solarRadiation.addProperty(state.dataWindowManager->wle[i - 1], state.dataWindowManager->e[i - 1]);
         }
 
@@ -143,7 +143,7 @@ namespace WindowManager {
         // Handles solar radiation spetrum from defalut location or IDF
         CSeries visibleResponse;
 
-        for (int i = 1; i <= state.dataWindowManager->numt3; ++i) {
+        for (int i = 1; i <= numt3; ++i) {
             visibleResponse.addProperty(state.dataWindowManager->wlt3[i - 1], state.dataWindowManager->y30[i - 1]);
         }
 
@@ -262,6 +262,6 @@ namespace WindowManager {
         return it->second;
     }
 
-} // namespace WindowManager
+} // namespace Window
 
 } // namespace EnergyPlus

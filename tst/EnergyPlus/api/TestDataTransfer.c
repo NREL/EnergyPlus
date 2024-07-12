@@ -76,8 +76,7 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
         //     fprintf(fp, "%s,%s,%s,%s,%s\n", d.what, d.name, d.key, d.type, d.unit);
         // }
         // fclose(fp);
-
-        const char **surfaceNames = getObjectNames(state, "BuildingSurface:Detailed", &arraySize);
+        char **surfaceNames = getObjectNames(state, "BuildingSurface:Detailed", &arraySize);
 
         if (arraySize == 0) {
             printf("Encountered a file with no BuildingSurface:Detailed, can't run this script on that file! Aborting!");

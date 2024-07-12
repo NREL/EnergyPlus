@@ -1163,7 +1163,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: The current zone time step in fractional hours.
         """
-        return self.api.systemTimeStep(state)
+        return self.api.zoneTimeStep(state)
 
     def system_time_step(self, state: c_void_p) -> float:
         """

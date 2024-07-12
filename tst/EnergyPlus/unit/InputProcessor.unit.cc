@@ -223,6 +223,9 @@ TEST_F(InputProcessorFixture, decode_encode_1)
                                        "  Relative,",
                                        "  Relative;",
                                        "",
+                                       "Timestep,",
+                                       "  4;",
+                                       "",
                                        "Version,",
                                        "  " + DataStringGlobals::MatchVersion + ";",
                                        ""});
@@ -267,6 +270,9 @@ TEST_F(InputProcessorFixture, decode_encode_2)
                                           "  Relative,",
                                           "  Relative,",
                                           "  Relative;",
+                                          "",
+                                          "Timestep,",
+                                          "  4;",
                                           "",
                                           "Version,",
                                           "  " + DataStringGlobals::MatchVersion + ";",
@@ -335,6 +341,9 @@ TEST_F(InputProcessorFixture, decode_encode_3)
                                           "  ,",
                                           "  10;",
                                           "",
+                                          "Timestep,",
+                                          "  4;",
+                                          "",
                                           "Version,",
                                           "  " + DataStringGlobals::MatchVersion + ";",
                                           ""}));
@@ -366,6 +375,9 @@ TEST_F(InputProcessorFixture, byte_order_mark)
                                           "  Relative,",
                                           "  Relative,",
                                           "  Relative;",
+                                          "",
+                                          "Timestep,",
+                                          "  4;",
                                           "",
                                           "Version,",
                                           "  " + DataStringGlobals::MatchVersion + ";",
@@ -548,6 +560,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_2)
                                "\"vertex_entry_direction\":\"Counterclockwise\""
                                "}"
                                "},"
+                               "\"Timestep\":{\"\":{\"idf_order\":0,\"number_of_timesteps_per_hour\":4}},"
                                "\"Version\":{"
                                "\"\":{"
                                "\"idf_order\":0,"
@@ -596,6 +609,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
                                "\"vertex_entry_direction\":\"Counterclockwise\""
                                "}"
                                "},"
+                               "\"Timestep\":{\"\":{\"idf_order\":0,\"number_of_timesteps_per_hour\":4}},"
                                "\"Version\":{"
                                "\"\":{"
                                "\"idf_order\":0,"
@@ -927,6 +941,9 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                                               "  Relative,",
                                               "  Relative,",
                                               "  Relative;",
+                                              "",
+                                              "Timestep,",
+                                              "  4;",
                                               "",
                                               "Version,",
                                               "  " + DataStringGlobals::MatchVersion + ";",
@@ -1980,31 +1997,31 @@ TEST_F(InputProcessorFixture, look_ahead)
     size_t index = 0;
     IdfParser::Token token = look_ahead(test_input, index);
     EXPECT_EQ(0ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     index = 2;
     token = look_ahead(test_input, index);
     EXPECT_EQ(2ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::COMMA, token);
     index = 3;
     token = look_ahead(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::EXCLAMATION, token);
     index = 5;
     token = look_ahead(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     index = 7;
     token = look_ahead(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::SEMICOLON, token);
     index = 9;
     token = look_ahead(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     index = test_input.size();
     token = look_ahead(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::END, token);
 }
 
 TEST_F(InputProcessorFixture, next_token)
@@ -2014,26 +2031,26 @@ TEST_F(InputProcessorFixture, next_token)
     std::string const test_input("B , ! t ; `");
     IdfParser::Token token = next_token(test_input, index);
     EXPECT_EQ(1ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     token = next_token(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::COMMA, token);
     token = next_token(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::EXCLAMATION, token);
     token = next_token(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     token = next_token(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::SEMICOLON, token);
     token = next_token(test_input, index);
     EXPECT_EQ(11ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     index = test_input.size();
     token = next_token(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::END, token);
 }
 
 TEST_F(InputProcessorFixture, getObjectItem_json1)
@@ -2076,7 +2093,7 @@ TEST_F(InputProcessorFixture, getObjectItem_json1)
                                                               cAlphaFields,
                                                               cNumericFields);
 
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"SIMPLEANDTABULAR", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"SIMPLEANDTABULAR", "USEOUTPUTCONTROLTABLESTYLE"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"Option Type", "Unit Conversion for Tabular Data"}), cAlphaFields));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({}), cNumericFields));
     EXPECT_TRUE(compare_containers(std::vector<bool>({}), lNumericBlanks));
@@ -2135,9 +2152,14 @@ TEST_F(InputProcessorFixture, getObjectItem_json2)
                                                               cAlphaFields,
                                                               cNumericFields);
 
-    EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", ""}),
-        Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER",
+                                                             "",
+                                                             "THERMALEFFICIENCYFPLR",
+                                                             "MIXED AIR NODE 1",
+                                                             "MAIN HUMIDIFIER OUTLET NODE",
+                                                             "",
+                                                             "FIXEDINLETWATERTEMPERATURE"}),
+                                   Alphas));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"Name",
                                                              "Availability Schedule Name",
                                                              "Thermal Efficiency Modifier Curve Name",
@@ -2520,7 +2542,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon)
                                                               cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"HPACCOOLEIRFT SPEED", "", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"HPACCOOLEIRFT SPEED", "DIMENSIONLESS", "DIMENSIONLESS", "DIMENSIONLESS"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({
                                        "Name",
                                        "Input Unit Type for X",
@@ -2642,8 +2664,8 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, true, true, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(26, NumNumbers);
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8,   16.7, 0.0085, 0.0085, 0, 0, 0, 0,
-                                                        0,      0,   0, 0,      0,    1,      -99999, 0,    0,      -99999, 0, 0, 0}),
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8,   16.7, 0.0085, 0.0085, 0, 0, 0,     0,
+                                                        0,      0,   0, 0,      0,    1,      -99999, 0,    0,      -99999, 0, 0, -99999}),
                                    Numbers));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true, true, true,
                                                       true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true, true, true}),
@@ -2784,7 +2806,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
                                                               cNumericFields);
 
     EXPECT_EQ(2, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "", "", "", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "", "", "", "", "FIXEDINLETWATERTEMPERATURE"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"Name",
                                                              "Availability Schedule Name",
                                                              "Thermal Efficiency Modifier Curve Name",
@@ -2800,7 +2822,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
         std::vector<std::string>({"Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power"}),
         cNumericFields));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true, true, true}), lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0, 0, 0, 0}), Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0, 0.8, 0, 0}), Numbers));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -2846,6 +2868,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
         "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed ",
         "  80;                     !- Maximum Supply Air Temperature{ C }",
     });
 
@@ -2883,7 +2906,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
                                                               cAlphaFields,
                                                               cNumericFields);
 
-    EXPECT_EQ(22, NumAlphas);
+    EXPECT_EQ(23, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"GASHEAT DXAC FURNACE 1",
                                                              "LOAD",
                                                              "EAST ZONE",
@@ -2906,6 +2929,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
                                                              "SUPPLYAIRFLOWRATE",
                                                              "SUPPLYAIRFLOWRATE",
                                                              "SUPPLYAIRFLOWRATE",
+                                                             "YES",
                                                              "",
                                                              "",
                                                              "",
@@ -2914,14 +2938,14 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
                                    Alphas));
     EXPECT_TRUE(
         compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-                                              false, true,  true,  false, false, false, false, false, true,  true,  true,  true,  true}),
+                                              false, true,  true,  false, false, false, false, false, true,  true,  true,  true,  true,  true}),
                            lAlphaBlanks));
 
     EXPECT_EQ(17, NumNumbers);
     EXPECT_TRUE(compare_containers(std::vector<bool>({true, true, false, true, true, true,  false, true, true, true, false,
                                                       true, true, true,  true, true, false, true,  true, true, true, true}),
                                    lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0, 0, 0}), Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 0, 0, 80, 21, 0, 0, 0, 80}), Numbers));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -3032,12 +3056,12 @@ TEST_F(InputProcessorFixture, getObjectItem_test_zone_input)
                                                               cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"EAST ZONE", "", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"EAST ZONE", "", "", "YES"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(8, NumNumbers);
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, true}), lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({0, 0, 0, 0, 1, 1, -99999, -99999, 0}), Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({0, 0, 0, 0, 1, 1, -99999, -99999, -99999}), Numbers));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -3312,7 +3336,7 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
                                                               cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ANY NUMBER", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ANY NUMBER", "", "DIMENSIONLESS"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(0, NumNumbers);
@@ -3415,7 +3439,7 @@ TEST_F(InputProcessorFixture, getObjectItem_fan_on_off)
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"SUPPLY FAN 1", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "DX COOLING COIL AIR INLET NODE", "", "", ""}),
+        std::vector<std::string>({"SUPPLY FAN 1", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "DX COOLING COIL AIR INLET NODE", "", "", "General"}),
         Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true, true}), lAlphaBlanks));
 
@@ -3478,7 +3502,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
         *state, CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLCAPFFF", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLCAPFFF", "DIMENSIONLESS", "DIMENSIONLESS"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(5, NumNumbers);
@@ -3512,7 +3536,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
                                                               cNumericFields2);
 
     EXPECT_EQ(1, NumAlphas2);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLEIRFFF", "", ""}), Alphas2));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLEIRFFF", "DIMENSIONLESS", "DIMENSIONLESS"}), Alphas2));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true}), lAlphaBlanks2));
 
     EXPECT_EQ(5, NumNumbers2);
@@ -3546,7 +3570,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
                                                               cNumericFields3);
 
     EXPECT_EQ(1, NumAlphas3);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"PLFFPLR", "", ""}), Alphas3));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"PLFFPLR", "DIMENSIONLESS", "DIMENSIONLESS"}), Alphas3));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true}), lAlphaBlanks3));
 
     EXPECT_EQ(5, NumNumbers3);
@@ -4196,6 +4220,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
 
         // 1 fields with default, 0 Autosizable, 0 Autocalculatable
         // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Timestep,",
+        "  4;", // Has a default
+
+        // 1 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
         "Version,",
         "  9.4;", // Has a default
 
@@ -4276,11 +4305,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
     state->dataInputProcessing->inputProcessor->reportIDFRecordsStats(*state);
 
     // TOTAL:
-    // 36 fields with defaults, 6 Autosizable, 3 Autocalculatable
+    // 37 fields with defaults, 6 Autosizable, 3 Autocalculatable
     // 11 fields defaulted    , 4 Autosized  , 2 Autocalculated
 
-    EXPECT_EQ(4, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
-    EXPECT_EQ(36, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
+    EXPECT_EQ(5, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
+    EXPECT_EQ(37, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
     EXPECT_EQ(6, state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
     EXPECT_EQ(3, state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
     EXPECT_EQ(11, state->dataOutput->iNumberOfDefaultedFields);    // Number of defaulted fields in IDF
@@ -4292,6 +4321,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
 {
 
     std::string const idf_objects = delimited_string({
+
+        // 1 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Timestep,",
+        "  4;", // Has a default
 
         // 1 fields with default, 0 Autosizable, 0 Autocalculatable
         // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
@@ -4349,11 +4383,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
     state->dataInputProcessing->inputProcessor->reportIDFRecordsStats(*state);
 
     // TOTAL:
-    // 15 fields with defaults, 0 Autosizable, 0 Autocalculatable
+    // 16 fields with defaults, 0 Autosizable, 0 Autocalculatable
     // 2  fields defaulted    , 0 Autosized  , 0 Autocalculated
 
-    EXPECT_EQ(4, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
-    EXPECT_EQ(15, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
+    EXPECT_EQ(5, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
+    EXPECT_EQ(16, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
     EXPECT_EQ(0, state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
     EXPECT_EQ(0, state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
     EXPECT_EQ(2, state->dataOutput->iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
@@ -4454,8 +4488,8 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(3), 0.5, 0.0001);
     // Defaults from schema
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(2), 0.9, 0.0001);
-    // Fields beyond min-fields come back as blank or zero, even if they have a default
-    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(4), 0.0, 0.0001);
+    // Fields beyond min-fields come back as the default value
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(4), 0.7, 0.0001);
 }
 
 TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromJSON)

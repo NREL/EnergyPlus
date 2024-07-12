@@ -167,7 +167,7 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
             error_str += "\tenum keys must begin with upper case letter\n"
 
     if difflib.get_close_matches(name, keys, cutoff=0.7):
-        exceptions = ["DataGlobalConstants.hh:HeatOrCool"]
+        exceptions = ["DataGlobalConstants.hh:HeatOrCool", "DataHVACGlobals.hh:UnitarySysType"]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tenum keys are too similar to enum name\n"
 

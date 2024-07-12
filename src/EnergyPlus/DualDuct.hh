@@ -73,6 +73,9 @@ namespace DualDuct {
         Num
     };
 
+    static constexpr std::array<std::string_view, static_cast<int>(DualDuctDamper::Num)> dualDuctDamperNames = {
+        "ConstantVolume", "VariableVolume", "OutdoorAir"};
+
     enum class PerPersonMode
     {
         Invalid = -1,
@@ -163,6 +166,8 @@ namespace DualDuct {
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
         void UpdateDualDuct(EnergyPlusData &state);
+
+        void reportTerminalUnit(EnergyPlusData &state);
     };
 
     void SimulateDualDuct(EnergyPlusData &state, std::string_view CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
@@ -187,9 +192,13 @@ struct DualDuctData : BaseGlobalStruct
     Array1D_bool RecircIsUsedARR;
     Array1D_string DamperNamesARR;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = DualDuctData();
+        new (this) DualDuctData();
     }
 };
 

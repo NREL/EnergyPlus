@@ -74,7 +74,7 @@ FILE_NAMES_TO_SKIP = [
 # tex files are included here, but the docs folder is ignored,
 # so it has no effect right now
 FILE_PATTERNS = [
-    '.cc', '.hh', '.tex', '.cpp', '.hpp',
+    '.cc', '.hh', '.tex', '.cpp', '.hpp', '.idd'
 ]
 
 current_script_dir = os.path.dirname(os.path.realpath(__file__))

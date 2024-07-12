@@ -66,48 +66,51 @@
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/api/runtime.h>
 
-APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize)
-{
-    struct LocalAPIDataEntry
-    {
+APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize) {
+    struct LocalAPIDataEntry {
         std::string what;
         std::string name;
         std::string type;
         std::string key;
         std::string unit;
-        LocalAPIDataEntry(std::string _what, std::string _name, std::string _key, std::string _type, std::string _unit)
-            : what(std::move(_what)), name(std::move(_name)), type(std::move(_type)), key(std::move(_key)), unit(std::move(_unit))
-        {
+
+        LocalAPIDataEntry(std::string _what, std::string _name, std::string _type, std::string _key, std::string _unit)
+            : what(std::move(_what)), name(std::move(_name)), type(std::move(_type)), key(std::move(_key)),
+              unit(std::move(_unit)) {
         }
     };
     std::vector<LocalAPIDataEntry> localDataEntries;
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    for (auto const &availActuator : thisState->dataRuntimeLang->EMSActuatorAvailable) {
-        if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.ControlTypeName.empty()) {
+    for (auto const &availActuator: thisState->dataRuntimeLang->EMSActuatorAvailable) {
+        if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.
+            ControlTypeName.empty()) {
             break;
         }
         localDataEntries.emplace_back(
-            "Actuator", availActuator.ComponentTypeName, availActuator.ControlTypeName, availActuator.UniqueIDName, availActuator.Units);
+            "Actuator", availActuator.ComponentTypeName, availActuator.ControlTypeName, availActuator.UniqueIDName,
+            availActuator.Units);
     }
-    for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) {
+    for (auto const &availVariable: thisState->dataRuntimeLang->EMSInternalVarsAvailable) {
         if (availVariable.DataTypeName.empty() && availVariable.UniqueIDName.empty()) {
             break;
         }
-        localDataEntries.emplace_back("InternalVariable", availVariable.DataTypeName, "", availVariable.UniqueIDName, availVariable.Units);
+        localDataEntries.emplace_back("InternalVariable", availVariable.DataTypeName, "", availVariable.UniqueIDName,
+                                      availVariable.Units);
     }
-    for (auto const &gVarName : thisState->dataPluginManager->globalVariableNames) {
+    for (auto const &gVarName: thisState->dataPluginManager->globalVariableNames) {
         localDataEntries.emplace_back("PluginGlobalVariable", "", "", gVarName, "");
     }
-    for (auto const &trend : thisState->dataPluginManager->trends) {
+    for (auto const &trend: thisState->dataPluginManager->trends) {
         localDataEntries.emplace_back("PluginTrendVariable,", "", "", trend.name, "");
     }
-    for (auto const *meter : thisState->dataOutputProcessor->meters) {
+    for (auto const *meter: thisState->dataOutputProcessor->meters) {
         if (meter->Name.empty()) {
             break;
         }
-        localDataEntries.emplace_back("OutputMeter", "", "", meter->Name, EnergyPlus::Constant::unitToString(meter->units));
+        localDataEntries.emplace_back("OutputMeter", "", "", meter->Name,
+                                      EnergyPlus::Constant::unitToString(meter->units));
     }
-    for (auto const *variable : thisState->dataOutputProcessor->outVars) {
+    for (auto const *variable: thisState->dataOutputProcessor->outVars) {
         if (variable->varType != EnergyPlus::OutputProcessor::VariableType::Real) continue;
         if (variable->name.empty() && variable->keyUC.empty()) {
             break;
@@ -137,8 +140,7 @@ APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize)
     return data;
 }
 
-void freeAPIData(const APIDataEntry *data, const unsigned int arraySize)
-{
+void freeAPIData(const APIDataEntry *data, const unsigned int arraySize) {
     for (unsigned int i = 0; i < arraySize; i++) {
         delete[] data[i].what;
         delete[] data[i].name;
@@ -149,12 +151,12 @@ void freeAPIData(const APIDataEntry *data, const unsigned int arraySize)
     delete[] data;
 }
 
-char *listAllAPIDataCSV(EnergyPlusState state)
-{
+char *listAllAPIDataCSV(EnergyPlusState state) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     std::string output = "**ACTUATORS**\n";
-    for (auto const &availActuator : thisState->dataRuntimeLang->EMSActuatorAvailable) {
-        if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.ControlTypeName.empty()) {
+    for (auto const &availActuator: thisState->dataRuntimeLang->EMSActuatorAvailable) {
+        if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.
+            ControlTypeName.empty()) {
             break;
         }
         output.append("Actuator,");
@@ -164,7 +166,7 @@ char *listAllAPIDataCSV(EnergyPlusState state)
         output.append(availActuator.Units).append("\n");
     }
     output.append("**INTERNAL_VARIABLES**\n");
-    for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) {
+    for (auto const &availVariable: thisState->dataRuntimeLang->EMSInternalVarsAvailable) {
         if (availVariable.DataTypeName.empty() && availVariable.UniqueIDName.empty()) {
             break;
         }
@@ -174,17 +176,17 @@ char *listAllAPIDataCSV(EnergyPlusState state)
         output.append(availVariable.Units).append("\n");
     }
     output.append("**PLUGIN_GLOBAL_VARIABLES**\n");
-    for (auto const &gVarName : thisState->dataPluginManager->globalVariableNames) {
+    for (auto const &gVarName: thisState->dataPluginManager->globalVariableNames) {
         output.append("PluginGlobalVariable,");
         output.append(gVarName).append("\n");
     }
     output.append("**TRENDS**\n");
-    for (auto const &trend : thisState->dataPluginManager->trends) {
+    for (auto const &trend: thisState->dataPluginManager->trends) {
         output.append("PluginTrendVariable,");
         output.append(trend.name).append("\n");
     }
     output.append("**METERS**\n");
-    for (auto const *meter : thisState->dataOutputProcessor->meters) {
+    for (auto const *meter: thisState->dataOutputProcessor->meters) {
         if (meter->Name.empty()) {
             break;
         }
@@ -193,7 +195,7 @@ char *listAllAPIDataCSV(EnergyPlusState state)
         output.append(EnergyPlus::Constant::unitToString(meter->units)).append("\n");
     }
     output.append("**VARIABLES**\n");
-    for (auto const *variable : thisState->dataOutputProcessor->outVars) {
+    for (auto const *variable: thisState->dataOutputProcessor->outVars) {
         if (variable->varType != EnergyPlus::OutputProcessor::VariableType::Real) continue;
         if (variable->name.empty() && variable->keyUC.empty()) {
             break;
@@ -202,9 +204,10 @@ char *listAllAPIDataCSV(EnergyPlusState state)
         output.append(variable->name).append(",");
         output.append(variable->keyUC).append(",");
         output
-            .append(variable->units == EnergyPlus::Constant::Units::customEMS ? variable->unitNameCustomEMS
-                                                                              : EnergyPlus::Constant::unitToString(variable->units))
-            .append("\n");
+                .append(variable->units == EnergyPlus::Constant::Units::customEMS
+                            ? variable->unitNameCustomEMS
+                            : EnergyPlus::Constant::unitToString(variable->units))
+                .append("\n");
     }
     // note that we cannot just return a c_str to the local string, as the string will be destructed upon leaving
     // this function, and undefined behavior will occur.
@@ -215,8 +218,7 @@ char *listAllAPIDataCSV(EnergyPlusState state)
     return p;
 }
 
-int apiDataFullyReady(EnergyPlusState state)
-{
+int apiDataFullyReady(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (thisState->dataPluginManager->fullyReady) {
         return 1;
@@ -224,8 +226,7 @@ int apiDataFullyReady(EnergyPlusState state)
     return 0;
 }
 
-int apiErrorFlag(EnergyPlusState state)
-{
+int apiErrorFlag(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (thisState->dataPluginManager->apiErrorFlag) {
         return 1;
@@ -233,14 +234,12 @@ int apiErrorFlag(EnergyPlusState state)
     return 0;
 }
 
-void resetErrorFlag(EnergyPlusState state)
-{
+void resetErrorFlag(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     thisState->dataPluginManager->apiErrorFlag = false;
 }
 
-const char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
-{
+char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     auto &epjson = thisState->dataInputProcessing->inputProcessor->epJSON;
     const auto instances = epjson.find(objectType);
@@ -250,32 +249,32 @@ const char **getObjectNames(EnergyPlusState state, const char *objectType, unsig
     }
     auto &instancesValue = instances.value();
     *resultingSize = instancesValue.size();
-    auto *data = new const char *[*resultingSize];
+    char **data = new char *[*resultingSize];
     unsigned int i = -1;
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
         i++;
-        data[i] = instance.key().data();
+        std::string s = std::string(instance.key());
+        data[i] = new char[std::strlen(instance.key().data()) + 1];
+        std::strcpy(data[i], instance.key().data());
     }
     return data;
 }
 
-void freeObjectNames(const char **objectNames, unsigned int arraySize)
-{
+void freeObjectNames(char **objectNames, unsigned int arraySize) {
     // as of right now we don't actually need to free the underlying strings, they exist in the epJSON instance, so just delete our array of pointers
-    (void)arraySize; // no op to avoid compiler warning that this variable is unused, in the future, this may be needed so keeping it in the API now
+    (void) arraySize;
+    // no op to avoid compiler warning that this variable is unused, in the future, this may be needed so keeping it in the API now
     delete[] objectNames;
 }
 
-int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char *surfName, const char *matName)
-{
+int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char *surfName, const char *matName) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     std::string UCsurfName = EnergyPlus::Util::makeUPPER(surfName);
     std::string UCmatName = EnergyPlus::Util::makeUPPER(matName);
     return EnergyPlus::HeatBalFiniteDiffManager::numNodesInMaterialLayer(*thisState, UCsurfName, UCmatName);
 }
 
-void requestVariable(EnergyPlusState state, const char *type, const char *key)
-{
+void requestVariable(EnergyPlusState state, const char *type, const char *key) {
     // allow specifying a request for an output variable, so that E+ does not have to keep all of them in memory
     // should be called before energyplus is run!
     // note that the variable request array is cleared during clear_state, so if you run multiple E+ runs, these must be requested again each time.
@@ -286,8 +285,7 @@ void requestVariable(EnergyPlusState state, const char *type, const char *key)
     thisState->dataOutputProcessor->apiVarRequests.push_back(request);
 }
 
-int getVariableHandle(EnergyPlusState state, const char *type, const char *key)
-{
+int getVariableHandle(EnergyPlusState state, const char *type, const char *key) {
     // Variables are accessed through a single integer ID, but there are multiple internal types: real and integer.
     // I am going to make the integer handle span all both types, by carefully defining the handle.
     // basically, the handles are contiguous, with:
@@ -309,8 +307,7 @@ int getVariableHandle(EnergyPlusState state, const char *type, const char *key)
     return -1; // return -1 if it wasn't found
 }
 
-Real64 getVariableValue(EnergyPlusState state, const int handle)
-{
+Real64 getVariableValue(EnergyPlusState state, const int handle) {
     // this function works in conjunction with the plan set up in getVariableHandle
     // basically, the handles are contiguous, with:
     //  - index 1 being the first real variable handle
@@ -325,7 +322,7 @@ Real64 getVariableValue(EnergyPlusState state, const int handle)
             return *(dynamic_cast<EnergyPlus::OutputProcessor::OutVarReal const *>(thisOutputVar))->Which;
         }
         if (thisOutputVar->varType == EnergyPlus::OutputProcessor::VariableType::Integer) {
-            return (Real64) * (dynamic_cast<EnergyPlus::OutputProcessor::OutVarInt const *>(thisOutputVar))->Which;
+            return (Real64) *(dynamic_cast<EnergyPlus::OutputProcessor::OutVarInt const *>(thisOutputVar))->Which;
         }
         if (thisState->dataGlobal->errorCallback) {
             std::cout
@@ -334,29 +331,33 @@ Real64 getVariableValue(EnergyPlusState state, const int handle)
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return zero
-            EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: Error in getVariableValue; received handle: {}", handle));
+            EnergyPlus::ShowSevereError(
+                *thisState, fmt::format("Data Exchange API: Error in getVariableValue; received handle: {}", handle));
             EnergyPlus::ShowContinueError(
-                *thisState, "The getVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
+                *thisState,
+                "The getVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         }
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
     if (thisState->dataGlobal->errorCallback) {
-        std::cout << "ERROR: Variable handle out of range in getVariableValue, returning zero but caller should take note and likely abort."
+        std::cout <<
+                "ERROR: Variable handle out of range in getVariableValue, returning zero but caller should take note and likely abort."
                 << std::endl;
     } else {
         // must be running from python plugin, need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return zero
-        EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: Index error in getVariableValue; received handle: {}", handle));
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Index error in getVariableValue; received handle: {}", handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
     }
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0;
 }
 
-int getMeterHandle(EnergyPlusState state, const char *meterName)
-{
+int getMeterHandle(EnergyPlusState state, const char *meterName) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     std::string const meterNameUC = EnergyPlus::Util::makeUPPER(meterName);
     const int i = EnergyPlus::GetMeterIndex(*thisState, meterNameUC);
@@ -367,28 +368,30 @@ int getMeterHandle(EnergyPlusState state, const char *meterName)
     return i;
 }
 
-Real64 getMeterValue(EnergyPlusState state, int handle)
-{
+Real64 getMeterValue(EnergyPlusState state, int handle) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 0 && handle < thisState->dataOutputProcessor->meters.size()) {
         return EnergyPlus::GetCurrentMeterValue(*thisState, handle);
     }
     if (thisState->dataGlobal->errorCallback) {
-        std::cout << "ERROR: Meter handle out of range in getMeterValue, returning zero but caller should take note and likely abort."
+        std::cout <<
+                "ERROR: Meter handle out of range in getMeterValue, returning zero but caller should take note and likely abort."
                 << std::endl;
     } else {
         // must be running from python plugin, need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return zero
-        EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: Index error in getMeterValue; received handle: {}", handle));
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Index error in getMeterValue; received handle: {}", handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getMeterValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getMeterValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
     }
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0;
 }
 
-int getActuatorHandle(EnergyPlusState state, const char *componentType, const char *controlType, const char *uniqueKey)
-{
+int getActuatorHandle(EnergyPlusState state, const char *componentType, const char *controlType,
+                      const char *uniqueKey) {
     int handle = 0;
     std::string const typeUC = EnergyPlus::Util::makeUPPER(componentType);
     std::string const keyUC = EnergyPlus::Util::makeUPPER(uniqueKey);
@@ -401,22 +404,25 @@ int getActuatorHandle(EnergyPlusState state, const char *componentType, const ch
         std::string const actuatorIDUC = EnergyPlus::Util::makeUPPER(availActuator.UniqueIDName);
         std::string const actuatorControlUC = EnergyPlus::Util::makeUPPER(availActuator.ControlTypeName);
         if (typeUC == actuatorTypeUC && keyUC == actuatorIDUC && controlUC == actuatorControlUC) {
-
             if (availActuator.handleCount > 0) {
                 // If the handle is already used by an IDF EnergyManagementSystem:Actuator, we should warn the user
                 bool foundActuator = false;
-                for (auto const &usedActuator : thisState->dataRuntimeLang->EMSActuatorUsed) {
+                for (auto const &usedActuator: thisState->dataRuntimeLang->EMSActuatorUsed) {
                     if (usedActuator.ActuatorVariableNum == handle) {
                         EnergyPlus::ShowWarningError(
                             *thisState,
-                            "Data Exchange API: An EnergyManagementSystem:Actuator seems to be already defined in the EnergyPlus File and named '" +
-                                usedActuator.Name + "'.");
+                            "Data Exchange API: An EnergyManagementSystem:Actuator seems to be already defined in the EnergyPlus File and named '"
+                            +
+                            usedActuator.Name + "'.");
                         EnergyPlus::ShowContinueError(
-                            *thisState, fmt::format("Occurred for componentType='{}', controlType='{}', uniqueKey='{}'.", typeUC, controlUC, keyUC));
+                            *thisState, fmt::format(
+                                "Occurred for componentType='{}', controlType='{}', uniqueKey='{}'.", typeUC, controlUC,
+                                keyUC));
                         EnergyPlus::ShowContinueError(*thisState,
-                                                      fmt::format("The getActuatorHandle function will still return the handle (= {}) but caller "
-                                                                  "should take note that there is a risk of overwritting.",
-                                                                  handle));
+                                                      fmt::format(
+                                                          "The getActuatorHandle function will still return the handle (= {}) but caller "
+                                                          "should take note that there is a risk of overwritting.",
+                                                          handle));
                         foundActuator = true;
                         break;
                     }
@@ -425,11 +431,13 @@ int getActuatorHandle(EnergyPlusState state, const char *componentType, const ch
                     EnergyPlus::ShowWarningError(*thisState,
                                                  "Data Exchange API: You seem to already have tried to get an Actuator Handle on this one.");
                     EnergyPlus::ShowContinueError(
-                        *thisState, fmt::format("Occurred for componentType='{}', controlType='{}', uniqueKey='{}'.", typeUC, controlUC, keyUC));
+                        *thisState, fmt::format("Occurred for componentType='{}', controlType='{}', uniqueKey='{}'.",
+                                                typeUC, controlUC, keyUC));
                     EnergyPlus::ShowContinueError(*thisState,
-                                                  fmt::format("The getActuatorHandle function will still return the handle (= {}) but caller should "
-                                                              "take note that there is a risk of overwritting.",
-                                                              handle));
+                                                  fmt::format(
+                                                      "The getActuatorHandle function will still return the handle (= {}) but caller should "
+                                                      "take note that there is a risk of overwritting.",
+                                                      handle));
                 }
             }
             ++availActuator.handleCount;
@@ -440,8 +448,7 @@ int getActuatorHandle(EnergyPlusState state, const char *componentType, const ch
     return -1;
 }
 
-void resetActuator(EnergyPlusState state, int handle)
-{
+void resetActuator(EnergyPlusState state, int handle) {
     // resets the actuator so that E+ will use the internally calculated value again
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
@@ -449,11 +456,15 @@ void resetActuator(EnergyPlusState state, int handle)
         *theActuator.Actuated = false;
     } else {
         if (thisState->dataGlobal->errorCallback) {
-            std::cout << "ERROR: Actuator handle out of range in resetActuator, returning but caller should take note and likely abort." << std::endl;
+            std::cout <<
+                    "ERROR: Actuator handle out of range in resetActuator, returning but caller should take note and likely abort."
+                    << std::endl;
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return
-            EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: index error in resetActuator; received handle: {}", handle));
+            EnergyPlus::ShowSevereError(
+                *thisState, fmt::format("Data Exchange API: index error in resetActuator; received handle: {}",
+                                        handle));
             EnergyPlus::ShowContinueError(*thisState,
                                           "The resetActuator function will return to allow the plugin to finish, then EnergyPlus will abort");
         }
@@ -461,8 +472,7 @@ void resetActuator(EnergyPlusState state, int handle)
     }
 }
 
-void setActuatorValue(EnergyPlusState state, const int handle, const Real64 value)
-{
+void setActuatorValue(EnergyPlusState state, const int handle, const Real64 value) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
         auto &theActuator(thisState->dataRuntimeLang->EMSActuatorAvailable(handle));
@@ -472,17 +482,21 @@ void setActuatorValue(EnergyPlusState state, const int handle, const Real64 valu
             *theActuator.IntValue = static_cast<int>(std::lround(value));
         } else {
             // follow protocol from EMS manager, where 1.0 is true, 0.0 is false, and anything else is also false
-            *theActuator.LogValue = value > 0.99999 && value < 1.00001; // allow small tolerance while passing between languages and types
+            *theActuator.LogValue = value > 0.99999 && value < 1.00001;
+            // allow small tolerance while passing between languages and types
         }
         *theActuator.Actuated = true;
     } else {
         if (thisState->dataGlobal->errorCallback) {
-            std::cout << "ERROR: Actuator handle out of range in setActuatorValue, returning but caller should take note and likely abort."
-                      << std::endl;
+            std::cout <<
+                    "ERROR: Actuator handle out of range in setActuatorValue, returning but caller should take note and likely abort."
+                    << std::endl;
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return
-            EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: index error in setActuatorValue; received handle: {}", handle));
+            EnergyPlus::ShowSevereError(
+                *thisState, fmt::format("Data Exchange API: index error in setActuatorValue; received handle: {}",
+                                        handle));
             EnergyPlus::ShowContinueError(*thisState,
                                           "The setActuatorValue function will return to allow the plugin to finish, then EnergyPlus will abort");
         }
@@ -490,8 +504,7 @@ void setActuatorValue(EnergyPlusState state, const int handle, const Real64 valu
     }
 }
 
-Real64 getActuatorValue(EnergyPlusState state, const int handle)
-{
+Real64 getActuatorValue(EnergyPlusState state, const int handle) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
         const auto &theActuator(thisState->dataRuntimeLang->EMSActuatorAvailable(handle));
@@ -508,26 +521,29 @@ Real64 getActuatorValue(EnergyPlusState state, const int handle)
         return 0;
     }
     if (thisState->dataGlobal->errorCallback) {
-        std::cout << "ERROR: Actuator handle out of range in getActuatorValue, returning zero but caller should take note and likely abort."
+        std::cout <<
+                "ERROR: Actuator handle out of range in getActuatorValue, returning zero but caller should take note and likely abort."
                 << std::endl;
     } else {
         // must be running from python plugin, need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return 0
-        EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: index error in getActuatorValue; received handle: {}", handle));
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: index error in getActuatorValue; received handle: {}", handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getActuatorValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getActuatorValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
     }
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0;
 }
 
-int getInternalVariableHandle(EnergyPlusState state, const char *type, const char *key)
-{
+int getInternalVariableHandle(EnergyPlusState state, const char *type, const char *key) {
     int handle = 0;
     std::string const typeUC = EnergyPlus::Util::makeUPPER(type);
     std::string const keyUC = EnergyPlus::Util::makeUPPER(key);
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) { // TODO: this should stop at numEMSInternalVarsAvailable
+    for (auto const &availVariable: thisState->dataRuntimeLang->EMSInternalVarsAvailable) {
+        // TODO: this should stop at numEMSInternalVarsAvailable
         handle++;
         std::string const variableTypeUC = EnergyPlus::Util::makeUPPER(availVariable.DataTypeName);
         std::string const variableIDUC = EnergyPlus::Util::makeUPPER(availVariable.UniqueIDName);
@@ -538,124 +554,138 @@ int getInternalVariableHandle(EnergyPlusState state, const char *type, const cha
     return -1;
 }
 
-Real64 getInternalVariableValue(EnergyPlusState state, int handle)
-{
+Real64 getInternalVariableValue(EnergyPlusState state, int handle) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    if (handle >= 1 && handle <= (int)thisState->dataRuntimeLang->numEMSInternalVarsAvailable) {
+    if (handle >= 1 && handle <= (int) thisState->dataRuntimeLang->numEMSInternalVarsAvailable) {
         auto const &thisVar = thisState->dataRuntimeLang->EMSInternalVarsAvailable(handle);
         if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PtrDataType::Real) {
             return *thisVar.RealValue;
         }
         if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PtrDataType::Integer) {
-            return (Real64)(*thisVar.IntValue);
+            return (Real64) (*thisVar.IntValue);
         }
         // Doesn't look like this struct actually has a logical member type, so uh, throw here?
-        std::cout << "ERROR: Invalid internal variable type here, developer issue., returning zero but caller should take note and likely abort."
+        std::cout <<
+                "ERROR: Invalid internal variable type here, developer issue., returning zero but caller should take note and likely abort."
                 << std::endl;
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
     if (thisState->dataGlobal->errorCallback) {
-        std::cout << "ERROR: Internal variable handle out of range in getInternalVariableValue, returning zero but caller should take note and "
+        std::cout <<
+                "ERROR: Internal variable handle out of range in getInternalVariableValue, returning zero but caller should take note and "
                 "likely abort."
                 << std::endl;
     } else {
         // must be running from python plugin, need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return 0
         EnergyPlus::ShowSevereError(*thisState,
-                                    fmt::format("Data Exchange API: index error in getInternalVariableValue; received handle: {}", handle));
+                                    fmt::format(
+                                        "Data Exchange API: index error in getInternalVariableValue; received handle: {}",
+                                        handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getInternalVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getInternalVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
     }
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0;
 }
 
-int getPluginGlobalVariableHandle(EnergyPlusState state, const char *name)
-{
+int getPluginGlobalVariableHandle(EnergyPlusState state, const char *name) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataPluginManager->pluginManager->getGlobalVariableHandle(*thisState, name);
 }
 
-Real64 getPluginGlobalVariableValue(EnergyPlusState state, int handle)
-{
+Real64 getPluginGlobalVariableValue(EnergyPlusState state, int handle) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxGlobalVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return 0
         EnergyPlus::ShowSevereError(
-            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginGlobalVariableValue; received handle: {}", handle));
+            *thisState, fmt::format(
+                "Data Exchange API: Problem -- index error in getPluginGlobalVariableValue; received handle: {}",
+                handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginGlobalVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginGlobalVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
     return thisState->dataPluginManager->pluginManager->getGlobalVariableValue(*thisState, handle);
 }
 
-void setPluginGlobalVariableValue(EnergyPlusState state, int handle, Real64 value)
-{
+void setPluginGlobalVariableValue(EnergyPlusState state, int handle, Real64 value) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxGlobalVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
-            *thisState, fmt::format("Data Exchange API: Problem -- index error in setPluginGlobalVariableValue; received handle: {}", handle));
+            *thisState, fmt::format(
+                "Data Exchange API: Problem -- index error in setPluginGlobalVariableValue; received handle: {}",
+                handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginGlobalVariableValue function will return to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginGlobalVariableValue function will return to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
     }
     thisState->dataPluginManager->pluginManager->setGlobalVariableValue(*thisState, handle, value);
 }
 
-int getPluginTrendVariableHandle(EnergyPlusState state, const char *name)
-{
+int getPluginTrendVariableHandle(EnergyPlusState state, const char *name) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return EnergyPlus::PluginManagement::PluginManager::getTrendVariableHandle(*thisState, name);
 }
 
-Real64 getPluginTrendVariableValue(EnergyPlusState state, int handle, int timeIndex)
-{
+Real64 getPluginTrendVariableValue(EnergyPlusState state, int handle, int timeIndex) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
-            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableValue; received handle: {}", handle));
+            *thisState, fmt::format(
+                "Data Exchange API: Problem -- index error in getPluginTrendVariableValue; received handle: {}",
+                handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableValue function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableValue function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
-    if (timeIndex < 1 || timeIndex > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(*thisState, handle)) {
+    if (timeIndex < 1 || timeIndex > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(
+            *thisState, handle)) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
             *thisState,
-            fmt::format("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableValue; received value: {}",
-                        timeIndex));
+            fmt::format(
+                "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableValue; received value: {}",
+                timeIndex));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableValue function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableValue function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
     return EnergyPlus::PluginManagement::PluginManager::getTrendVariableValue(*thisState, handle, timeIndex);
 }
 
-Real64 getPluginTrendVariableAverage(EnergyPlusState state, int handle, int count)
-{
+Real64 getPluginTrendVariableAverage(EnergyPlusState state, int handle, int count) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
-            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableAverage; received handle: {}", handle));
+            *thisState, fmt::format(
+                "Data Exchange API: Problem -- index error in getPluginTrendVariableAverage; received handle: {}",
+                handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableAverage function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableAverage function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
-    if (count < 2 || count > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(*thisState, handle)) {
+    if (count < 2 || count > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(
+            *thisState, handle)) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
@@ -664,111 +694,127 @@ Real64 getPluginTrendVariableAverage(EnergyPlusState state, int handle, int coun
                 "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableAverage; received value: {}",
                 count));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableAverage function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableAverage function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
     return EnergyPlus::PluginManagement::PluginManager::getTrendVariableAverage(*thisState, handle, count);
 }
 
-Real64 getPluginTrendVariableMin(EnergyPlusState state, int handle, int count)
-{
+Real64 getPluginTrendVariableMin(EnergyPlusState state, int handle, int count) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
-            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableMin; received handle: {}", handle));
+            *thisState, fmt::format(
+                "Data Exchange API: Problem -- index error in getPluginTrendVariableMin; received handle: {}", handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableMin function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableMin function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
-    if (count < 2 || count > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(*thisState, handle)) {
+    if (count < 2 || count > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(
+            *thisState, handle)) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
             *thisState,
-            fmt::format("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableMin; received value: {}",
-                        count));
+            fmt::format(
+                "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableMin; received value: {}",
+                count));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableMin function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableMin function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
     return EnergyPlus::PluginManagement::PluginManager::getTrendVariableMin(*thisState, handle, count);
 }
 
-Real64 getPluginTrendVariableMax(EnergyPlusState state, int handle, int count)
-{
+Real64 getPluginTrendVariableMax(EnergyPlusState state, int handle, int count) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
-            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableMax; received handle: {}", handle));
+            *thisState, fmt::format(
+                "Data Exchange API: Problem -- index error in getPluginTrendVariableMax; received handle: {}", handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableMax function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableMax function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
-    if (count < 2 || count > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(*thisState, handle)) {
+    if (count < 2 || count > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(
+            *thisState, handle)) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
             *thisState,
-            fmt::format("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableMax; received value: {}",
-                        count));
+            fmt::format(
+                "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableMax; received value: {}",
+                count));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableMax function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableMax function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
     return EnergyPlus::PluginManagement::PluginManager::getTrendVariableMax(*thisState, handle, count);
 }
 
-Real64 getPluginTrendVariableSum(EnergyPlusState state, int handle, int count)
-{
+Real64 getPluginTrendVariableSum(EnergyPlusState state, int handle, int count) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
-            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableSum; received handle: {}", handle));
+            *thisState, fmt::format(
+                "Data Exchange API: Problem -- index error in getPluginTrendVariableSum; received handle: {}", handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableSum function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableSum function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
-    if (count < 2 || count > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(*thisState, handle)) {
+    if (count < 2 || count > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(
+            *thisState, handle)) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
             *thisState,
-            fmt::format("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableSum; received value: {}",
-                        count));
+            fmt::format(
+                "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableSum; received value: {}",
+                count));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableSum function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableSum function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
     return EnergyPlus::PluginManagement::PluginManager::getTrendVariableSum(*thisState, handle, count);
 }
 
-Real64 getPluginTrendVariableDirection(EnergyPlusState state, int handle, int count)
-{
+Real64 getPluginTrendVariableDirection(EnergyPlusState state, int handle, int count) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
-            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableDirection; received handle: {}", handle));
+            *thisState, fmt::format(
+                "Data Exchange API: Problem -- index error in getPluginTrendVariableDirection; received handle: {}",
+                handle));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableDirection function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableDirection function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
-    if (count < 2 || count > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(*thisState, handle)) {
+    if (count < 2 || count > EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(
+            *thisState, handle)) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
@@ -777,75 +823,68 @@ Real64 getPluginTrendVariableDirection(EnergyPlusState state, int handle, int co
                 "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableDirection; received value: {}",
                 count));
         EnergyPlus::ShowContinueError(
-            *thisState, "The getPluginTrendVariableDirection function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
+            *thisState,
+            "The getPluginTrendVariableDirection function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
     return EnergyPlus::PluginManagement::PluginManager::getTrendVariableDirection(*thisState, handle, count);
 }
 
-int year(EnergyPlusState state)
-{
+int year(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataEnvrn->Year;
 }
 
-int calendarYear(EnergyPlusState state)
-{
+int calendarYear(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataGlobal->CalendarYear;
 }
 
-int month(EnergyPlusState state)
-{
+int month(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataEnvrn->Month;
 }
 
-int dayOfMonth(EnergyPlusState state)
-{
+int dayOfMonth(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataEnvrn->DayOfMonth;
 }
 
-int dayOfWeek(EnergyPlusState state)
-{
+int dayOfWeek(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataEnvrn->DayOfWeek;
 }
 
-int dayOfYear(EnergyPlusState state)
-{
+int dayOfYear(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataEnvrn->DayOfYear;
 }
 
-int daylightSavingsTimeIndicator(EnergyPlusState state)
-{
+int daylightSavingsTimeIndicator(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataEnvrn->DSTIndicator;
 }
 
-int hour(EnergyPlusState state)
-{
+int hour(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    return thisState->dataGlobal->HourOfDay - 1; // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
+    return thisState->dataGlobal->HourOfDay - 1;
+    // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
 }
 
-Real64 currentTime(EnergyPlusState state)
-{
+Real64 currentTime(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     if (thisState->dataHVACGlobal->TimeStepSys < thisState->dataGlobal->TimeStepZone) {
         // CurrentTime is for end of zone timestep, need to move back to beginning of current zone timestep, then add on system time elapsed already
         // plus current system timestep
-        return thisState->dataGlobal->CurrentTime - thisState->dataGlobal->TimeStepZone + thisState->dataHVACGlobal->SysTimeElapsed +
+        return thisState->dataGlobal->CurrentTime - thisState->dataGlobal->TimeStepZone + thisState->dataHVACGlobal->
+               SysTimeElapsed +
                thisState->dataHVACGlobal->TimeStepSys;
     }
     return thisState->dataGlobal->CurrentTime;
 }
 
-int minutes(EnergyPlusState state)
-{
+int minutes(EnergyPlusState state) {
     // the -1 is to push us to the right minute, but this should be handled cautiously because if we are inside the HVAC iteration loop,
     // currentTime() returns a floating point fractional hour, so truncation could put this a few seconds from the expected minute.
     const Real64 currentTimeVal = currentTime(state);
@@ -855,72 +894,62 @@ int minutes(EnergyPlusState state)
     return static_cast<int>(fractionalMinutesIntoTheDay);
 }
 
-int numTimeStepsInHour([[maybe_unused]] EnergyPlusState state)
-{
+int numTimeStepsInHour([[maybe_unused]] EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataGlobal->NumOfTimeStepInHour;
 }
 
-int zoneTimeStepNum([[maybe_unused]] EnergyPlusState state)
-{
+int zoneTimeStepNum([[maybe_unused]] EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataGlobal->TimeStep;
 }
 
-int holidayIndex(EnergyPlusState state)
-{
+int holidayIndex(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataEnvrn->HolidayIndex;
 }
 
-int sunIsUp(EnergyPlusState state)
-{ // maintain response convention from previous (EMS) implementation
+int sunIsUp(EnergyPlusState state) {
+    // maintain response convention from previous (EMS) implementation
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    return (int)thisState->dataEnvrn->SunIsUp;
+    return (int) thisState->dataEnvrn->SunIsUp;
 }
 
-int isRaining(EnergyPlusState state)
-{
+int isRaining(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    return (int)thisState->dataEnvrn->IsRain;
+    return (int) thisState->dataEnvrn->IsRain;
 }
 
-int warmupFlag(EnergyPlusState state)
-{
+int warmupFlag(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    return (int)thisState->dataGlobal->WarmupFlag;
+    return (int) thisState->dataGlobal->WarmupFlag;
 }
 
-Real64 zoneTimeStep(EnergyPlusState state)
-{
+Real64 zoneTimeStep(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataGlobal->TimeStepZone;
 }
 
-Real64 systemTimeStep(EnergyPlusState state)
-{
+Real64 systemTimeStep(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataHVACGlobal->TimeStepSys;
 }
 
-int currentEnvironmentNum(EnergyPlusState state)
-{
+int currentEnvironmentNum(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataEnvrn->CurEnvirNum;
 }
 
-int kindOfSim(EnergyPlusState state)
-{
+int kindOfSim(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return static_cast<int>(thisState->dataGlobal->KindOfSim);
 }
 
-int getConstructionHandle(EnergyPlusState state, const char *constructionName)
-{
+int getConstructionHandle(EnergyPlusState state, const char *constructionName) {
     int handle = 0;
     std::string const nameUC = EnergyPlus::Util::makeUPPER(constructionName);
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    for (auto const &construct : thisState->dataConstruction->Construct) {
+    for (auto const &construct: thisState->dataConstruction->Construct) {
         handle++;
         if (nameUC == EnergyPlus::Util::makeUPPER(construct.Name)) {
             return handle;
@@ -929,51 +958,49 @@ int getConstructionHandle(EnergyPlusState state, const char *constructionName)
     return -1; // return -1 if it wasn't found
 }
 
-int actualTime(EnergyPlusState)
-{
+int actualTime(EnergyPlusState) {
     const std::string datestring;
     Array1D_int datevalues(8);
     ObjexxFCL::date_and_time(datestring, _, _, datevalues);
     return sum(datevalues({5, 8}));
 }
 
-int actualDateTime(EnergyPlusState)
-{
+int actualDateTime(EnergyPlusState) {
     const std::string datestring;
     const Array1D_int datevalues(8);
     ObjexxFCL::date_and_time(datestring, _, _, datevalues);
     return sum(datevalues);
 }
 
-int todayWeatherIsRainAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+int todayWeatherIsRainAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
 
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
-        return (int)thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).IsRain;
+        return (int) thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).IsRain;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0;
 }
-int todayWeatherIsSnowAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+int todayWeatherIsSnowAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
 
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
-        return (int)thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).IsSnow;
+        return (int) thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).IsSnow;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0;
 }
 
-Real64 todayWeatherOutDryBulbAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+Real64 todayWeatherOutDryBulbAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
 
     const int iHour = hour + 1;
@@ -981,314 +1008,338 @@ Real64 todayWeatherOutDryBulbAtTime(EnergyPlusState state, int hour, int timeSte
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).OutDryBulbTemp;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 todayWeatherOutDewPointAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 todayWeatherOutDewPointAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).OutDewPointTemp;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 todayWeatherOutBarometricPressureAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 todayWeatherOutBarometricPressureAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).OutBaroPress;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 todayWeatherOutRelativeHumidityAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 todayWeatherOutRelativeHumidityAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).OutRelHum;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 todayWeatherWindSpeedAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 todayWeatherWindSpeedAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).WindSpeed;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 todayWeatherWindDirectionAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 todayWeatherWindDirectionAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).WindDir;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 todayWeatherSkyTemperatureAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 todayWeatherSkyTemperatureAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).SkyTemp;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 todayWeatherHorizontalIRSkyAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 todayWeatherHorizontalIRSkyAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).HorizIRSky;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 todayWeatherBeamSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 todayWeatherBeamSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).BeamSolarRad;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 todayWeatherDiffuseSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 todayWeatherDiffuseSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).DifSolarRad;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 todayWeatherAlbedoAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 todayWeatherAlbedoAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).Albedo;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 todayWeatherLiquidPrecipitationAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 todayWeatherLiquidPrecipitationAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsToday(timeStepNum, iHour).LiquidPrecip;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
 
-int tomorrowWeatherIsRainAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+int tomorrowWeatherIsRainAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
-        return (int)thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).IsRain;
+        return (int) thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).IsRain;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0;
 }
-int tomorrowWeatherIsSnowAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+int tomorrowWeatherIsSnowAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
-        return (int)thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).IsSnow;
+        return (int) thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).IsSnow;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0;
 }
-Real64 tomorrowWeatherOutDryBulbAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 tomorrowWeatherOutDryBulbAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).OutDryBulbTemp;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 tomorrowWeatherOutDewPointAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 tomorrowWeatherOutDewPointAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).OutDewPointTemp;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 tomorrowWeatherOutBarometricPressureAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 tomorrowWeatherOutBarometricPressureAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).OutBaroPress;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 tomorrowWeatherOutRelativeHumidityAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 tomorrowWeatherOutRelativeHumidityAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).OutRelHum;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 tomorrowWeatherWindSpeedAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 tomorrowWeatherWindSpeedAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).WindSpeed;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 tomorrowWeatherWindDirectionAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 tomorrowWeatherWindDirectionAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).WindDir;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 tomorrowWeatherSkyTemperatureAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 tomorrowWeatherSkyTemperatureAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).SkyTemp;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 tomorrowWeatherHorizontalIRSkyAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 tomorrowWeatherHorizontalIRSkyAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).HorizIRSky;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 tomorrowWeatherBeamSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 tomorrowWeatherBeamSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).BeamSolarRad;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 tomorrowWeatherDiffuseSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 tomorrowWeatherDiffuseSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).DifSolarRad;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 tomorrowWeatherAlbedoAtTime(EnergyPlusState state, int hour, int timeStepNum)
-{
+
+Real64 tomorrowWeatherAlbedoAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).Albedo;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
-Real64 tomorrowWeatherLiquidPrecipitationAtTime(EnergyPlusState state, const int hour, const int timeStepNum)
-{
+
+Real64 tomorrowWeatherLiquidPrecipitationAtTime(EnergyPlusState state, const int hour, const int timeStepNum) {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     const int iHour = hour + 1;
     if ((iHour > 0) && (iHour <= EnergyPlus::Constant::HoursInDay) && (timeStepNum > 0) &&
         (timeStepNum <= thisState->dataGlobal->NumOfTimeStepInHour)) {
         return thisState->dataWeather->wvarsHrTsTomorrow(timeStepNum, iHour).LiquidPrecip;
     }
-    EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
+    EnergyPlus::ShowSevereError(
+        *thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0.0;
 }
 
-Real64 currentSimTime(EnergyPlusState state)
-{
+Real64 currentSimTime(EnergyPlusState state) {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     return (thisState->dataGlobal->DayOfSim - 1) * EnergyPlus::Constant::HoursInDay + currentTime(state);
 }

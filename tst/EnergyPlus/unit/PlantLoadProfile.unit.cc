@@ -107,12 +107,12 @@ TEST_F(EnergyPlusFixture, LoadProfile_GetInput)
 
     // Tests for LoadProfile on Water loop
     EXPECT_EQ(state->dataPlantLoadProfile->PlantProfile(1).Name, "LOAD PROFILE WATER");
-    EXPECT_TRUE(compare_enums(state->dataPlantLoadProfile->PlantProfile(1).FluidType, PlantLoopFluidType::Water));
+    EXPECT_ENUM_EQ(state->dataPlantLoadProfile->PlantProfile(1).FluidType, PlantLoopFluidType::Water);
     EXPECT_EQ(state->dataPlantLoadProfile->PlantProfile(1).PeakVolFlowRate, 0.002);
 
     // Tests for LoadProfile on Steam loop
     EXPECT_EQ(state->dataPlantLoadProfile->PlantProfile(2).Name, "LOAD PROFILE STEAM");
-    EXPECT_TRUE(compare_enums(state->dataPlantLoadProfile->PlantProfile(2).FluidType, PlantLoopFluidType::Steam));
+    EXPECT_ENUM_EQ(state->dataPlantLoadProfile->PlantProfile(2).FluidType, PlantLoopFluidType::Steam);
     EXPECT_EQ(state->dataPlantLoadProfile->PlantProfile(2).PeakVolFlowRate, 0.008);
     EXPECT_EQ(state->dataPlantLoadProfile->PlantProfile(2).DegOfSubcooling,
               5.0); // check if the default value is assigned in cases where there is no input
@@ -122,6 +122,7 @@ TEST_F(EnergyPlusFixture, LoadProfile_GetInput)
 
 TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Waterloop)
 {
+    state->init_state(*state);
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataLoopNodes->Node.allocate(2);
     state->dataPlantLoadProfile->PlantProfile.allocate(1);
@@ -190,6 +191,7 @@ TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Waterloop)
 
 TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Steamloop)
 {
+    state->init_state(*state);
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataLoopNodes->Node.allocate(2);
     state->dataPlantLoadProfile->PlantProfile.allocate(1);

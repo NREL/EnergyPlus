@@ -44,7 +44,7 @@
 ! Chillers:                       HeatPump:PlantLoop:EIR:Cooling, HeatPump:PlantLoop:EIR:Heating
 ! Number of Zones: 19
 
-  Version,24.1;
+  Version,24.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -10065,9 +10065,12 @@ Fan:SystemModel,
     AirSource,             !- Condenser Type
     AWHP_1 Cooling Side Condenser Air Inlet Node,  !- Source Side Inlet Node Name
     AWHP_1 Cooling Side Condenser Air Outlet Node,  !- Source Side Outlet Node Name
+    ,                           !- Heat Recovery Inlet Node Name
+    ,                           !- Heat Recovery Outlet Node Name       
     AWHP_1 Heating Side,            !- Companion Heat Pump Name
     autosize,                   !- Load Side Reference Flow Rate {m3/s}
     autosize,                   !- Source Side Reference Flow Rate {m3/s}
+    ,                           !- Heat Recovery Reference Flow Rate {m3/s}
     autosize,                  !- Reference Capacity {W}
     2.89,                    !- Reference Coefficient of Performance {W/W}
     1.0,                        !- Sizing Factor
@@ -10089,9 +10092,12 @@ Fan:SystemModel,
     AirSource,             !- Condenser Type
     AWHP_2 Condenser Air Inlet Node,  !- Source Side Inlet Node Name
     AWHP_2 Condenser Air Outlet Node,  !- Source Side Outlet Node Name
+    ,                           !- Heat Recovery Inlet Node Name
+    ,                           !- Heat Recovery Outlet Node Name       
     AWHP_2 Heating Side,            !- Companion Heat Pump Name
     autosize,                   !- Load Side Reference Flow Rate {m3/s}
     autosize,                   !- Source Side Reference Flow Rate {m3/s}
+    ,                           !- Heat Recovery Reference Flow Rate {m3/s}
     autosize,                  !- Reference Capacity {W}
     2.89,                    !- Reference Coefficient of Performance {W/W}
     1.0,                        !- Sizing Factor
@@ -10150,9 +10156,12 @@ Curve:Biquadratic,
     AirSource,             !- Condenser Type
     AWHP_1 Heating Side Condenser Air Inlet Node,  !- Source Side Inlet Node Name
     AWHP_1 Heating Side Condenser Air Outlet Node,  !- Source Side Outlet Node Name
+    ,                           !- Heat Recovery Inlet Node Name
+    ,                           !- Heat Recovery Outlet Node Name   
     AWHP_1 Cooling Side,            !- Companion Heat Pump Name
     autosize,                   !- Load Side Reference Flow Rate {m3/s}
     autosize,                   !- Source Side Reference Flow Rate {m3/s}
+    ,                           !- Heat Recovery Reference Flow Rate {m3/s} 
     autosize,                   !- Reference Capacity {W}
     2.89,                    !- Reference Coefficient of Performance {W/W}
     1.0,                        !- Sizing Factor
@@ -10212,9 +10221,12 @@ Curve:Biquadratic,
     AirSource,             !- Condenser Type
     AWHP_2 Heating Side Condenser Air Inlet Node,  !- Source Side Inlet Node Name
     AWHP_2 Heating Side Condenser Air Outlet Node,  !- Source Side Outlet Node Name
+    ,                           !- Heat Recovery Inlet Node Name
+    ,                           !- Heat Recovery Outlet Node Name   
     AWHP_2 Cooling Side,            !- Companion Heat Pump Name
     autosize,                   !- Load Side Reference Flow Rate {m3/s}
     autosize,                   !- Source Side Reference Flow Rate {m3/s}
+    ,                           !- Heat Recovery Reference Flow Rate {m3/s} 
     autosize,                   !- Reference Capacity {W}
     2.89,                    !- Reference Coefficient of Performance {W/W}
     1.0,                        !- Sizing Factor
@@ -10540,9 +10552,12 @@ Curve:Biquadratic,
     WaterSource,                          !- Condenser Type
     Heating Side WSHP Source Side Inlet,  !- Source Side Inlet Node Name
     Heating Side WSHP Source Side Oulet,  !- Source Side Outlet Node Name
+    ,                           !- Heat Recovery Inlet Node Name
+    ,                           !- Heat Recovery Outlet Node Name   
     Dedicated HR Cooling Side WSHP,       !- Companion Heat Pump Name
     autosize,                   !- Load Side Reference Flow Rate {m3/s}
     autosize,                   !- Source Side Reference Flow Rate {m3/s}
+    ,                           !- Heat Recovery Reference Flow Rate {m3/s}
     autosize,                   !- Reference Capacity {W}
     3.5,                        !- Reference Coefficient of Performance {W/W}
     0.2,                        !- Sizing Factor
@@ -10611,9 +10626,12 @@ Curve:Biquadratic,
     WaterSource,                           !- Condenser Type
     Cooling Side WSHP Source Side Inlet,   !- Source Side Inlet Node Name
     Cooling Side WSHP Source Side Outlet,  !- Source Side Outlet Node Name
+    ,                        !- Heat Recovery Inlet Node Name
+    ,                        !- Heat Recovery Outlet Node Name      
     Dedicated HR Heating Side WSHP,        !- Companion Heat Pump Name
     autosize,                !- Load Side Reference Flow Rate {m3/s}
     autosize,                !- Source Side Reference Flow Rate {m3/s}
+    ,                        !- Heat Recovery Reference Flow Rate {m3/s}
     autosize,                !- Reference Capacity {W}
     3.5,                     !- Reference Coefficient of Performance {W/W}
     0.2,                     !- Sizing Factor

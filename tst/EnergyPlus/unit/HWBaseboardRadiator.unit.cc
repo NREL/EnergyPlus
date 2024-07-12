@@ -77,6 +77,7 @@ using namespace DataPlant;
 
 TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 {
+    state->init_state(*state);
     Real64 LoadMet;
     int BBNum;
 

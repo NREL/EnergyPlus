@@ -82,7 +82,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace WindowManager {
+namespace Window {
 
     enum class ShadePosition
     {
@@ -178,7 +178,7 @@ namespace WindowManager {
         static Gases::CGas getAir();
         Material::MaterialBase *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
     };
-} // namespace WindowManager
+} // namespace Window
 
 } // namespace EnergyPlus
 

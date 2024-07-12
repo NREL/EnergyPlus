@@ -62,6 +62,7 @@ using namespace PlantChillers;
 
 TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
 {
+    state->init_state(*state);
     // unit test for autosizing heat recovery in Chiller:CombustionTurbine
     state->dataPlantChillers->GTChiller.allocate(1);
 
@@ -99,6 +100,7 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
 
 TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
 {
+    state->init_state(*state);
     // unit test for autosizing heat recovery in Chiller:EngineDriven
     state->dataPlantChillers->EngineDrivenChiller.allocate(1);
 
@@ -226,7 +228,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
     EngineDrivenChillerSpecs::getInput(*state);
 
     EXPECT_EQ(1, state->dataPlantChillers->NumEngineDrivenChillers);
-    EXPECT_TRUE(compare_enums(state->dataPlantChillers->EngineDrivenChiller(1).FuelType, Constant::eFuel::Diesel));
+    EXPECT_ENUM_EQ(state->dataPlantChillers->EngineDrivenChiller(1).FuelType, Constant::eFuel::Diesel);
 }
 
 TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
@@ -295,5 +297,5 @@ TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
     GTChillerSpecs::getInput(*state);
 
     EXPECT_EQ(1, state->dataPlantChillers->NumGTChillers);
-    EXPECT_TRUE(compare_enums(state->dataPlantChillers->GTChiller(1).FuelType, Constant::eFuel::NaturalGas));
+    EXPECT_ENUM_EQ(state->dataPlantChillers->GTChiller(1).FuelType, Constant::eFuel::NaturalGas);
 }

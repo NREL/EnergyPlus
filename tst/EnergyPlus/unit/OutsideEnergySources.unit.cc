@@ -95,9 +95,9 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
     auto &thisDistrictHeatingSteam = state->dataOutsideEnergySrcs->EnergySource(3);
 
     // Tests for GetOutsideEnergySourcesInput()
-    EXPECT_TRUE(compare_enums(thisDistrictHeatingWater.EnergyType, DataPlant::PlantEquipmentType::PurchHotWater));
-    EXPECT_TRUE(compare_enums(thisDistrictCooling.EnergyType, DataPlant::PlantEquipmentType::PurchChilledWater));
-    EXPECT_TRUE(compare_enums(thisDistrictHeatingSteam.EnergyType, DataPlant::PlantEquipmentType::PurchSteam));
+    EXPECT_ENUM_EQ(thisDistrictHeatingWater.EnergyType, DataPlant::PlantEquipmentType::PurchHotWater);
+    EXPECT_ENUM_EQ(thisDistrictCooling.EnergyType, DataPlant::PlantEquipmentType::PurchChilledWater);
+    EXPECT_ENUM_EQ(thisDistrictHeatingSteam.EnergyType, DataPlant::PlantEquipmentType::PurchSteam);
 
     EXPECT_EQ(thisDistrictHeatingWater.NomCap, 1000000.0);
     EXPECT_EQ(thisDistrictCooling.NomCap, 900000.0);

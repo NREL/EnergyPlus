@@ -62,7 +62,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::HighTempRadiantSystem;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataSizing;
 
@@ -147,9 +146,9 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemSca
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
-    SizingTypesNum = DataHVACGlobals::NumOfSizingTypes;
+    SizingTypesNum = HVAC::NumOfSizingTypes;
     if (SizingTypesNum < 1) SizingTypesNum = 1;
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
 
     SizeHighTempRadiantSystem(*state, RadSysNum);
     EXPECT_FALSE(state->dataSize->DataScalableSizingON);

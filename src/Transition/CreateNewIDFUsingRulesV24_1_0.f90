@@ -134,6 +134,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=20) :: PotentialRunPeriodName
   ! END OF TODO
 
+  ! used in transition code for HeatExchanger:AirToAir:SensibleAndLatent
+  CHARACTER(20), DIMENSION(4) :: HxEffectAt75Airflow
+  CHARACTER(20), DIMENSION(4) :: HxEffectAt100Airflow
+  CHARACTER(MaxNameLength + 2), DIMENSION(4) :: HxTableName
+  LOGICAL :: tableAdded
+  LOGICAL :: tableIndependentVarAdded = .false.
+  CHARACTER(10) :: tableID
+  REAL :: effect75
+  REAL :: effect100
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -382,7 +391,20 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                 CurArgs = CurArgs + 1
 
               ! If your original object starts with A, insert the rules here
-
+              CASE('AIRLOOPHVAC:UNITARYSYSTEM') ! add new input field No Load Supply Air Flow Rate Control Set To Low Speed
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                  ! OutArgs(39) is added. If existing coil is VS DX cooling or heating coil then set YES, otherwise set NO
+                  IF (CurArgs .gt. 38) THEN
+                      IF (SameString(InArgs(12),'Coil:Heating:DX:VariableSpeed') .or. SameString(InArgs(15),'Coil:Cooling:DX:VariableSpeed')) THEN
+                          OutArgs(39)='Yes'
+                      ELSE
+                          OutArgs(39)='No'
+                      ENDIF
+                      OutArgs(40:CurArgs+1)=InArgs(39:CurArgs)
+                      CurArgs = CurArgs + 1
+                  END IF
               ! If your original object starts with C, insert the rules here
               CASE('COMFORTVIEWFACTORANGLES')
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -401,6 +423,96 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with G, insert the rules here
 
               ! If your original object starts with H, insert the rules here
+
+              CASE('HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+
+                ! read in 8 reference value for the effectiveness at 75% and 100%
+                HxEffectAt75Airflow(1) = TRIM(InArgs(6))    ! Sensible Effectiveness at 75% Heating Air Flow
+                HxEffectAt75Airflow(2) = TRIM(InArgs(7))    ! Latent Effectiveness at 75% Heating Air Flow
+                HxEffectAt75Airflow(3) = TRIM(InArgs(10))   ! Sensible Effectiveness at 75% Cooling Air Flow
+                HxEffectAt75Airflow(4) = TRIM(InArgs(11))   ! Latent Effectiveness at 75% Cooling Air Flow
+                HxEffectAt100Airflow(1) = TRIM(InArgs(4))   ! Sensible Effectiveness at 100% Heating Air Flow
+                HxEffectAt100Airflow(2) = TRIM(InArgs(5))   ! Latent Effectiveness at 100% Heating Air Flow
+                HxEffectAt100Airflow(3) = TRIM(InArgs(8))   ! Sensible Effectiveness at 100% Cooling Air Flow
+                HxEffectAt100Airflow(4) = TRIM(InArgs(9))   ! Latent Effectiveness at 100% Cooling Air Flow
+
+                ! Remove the 4 fields for 75% airflow and adjust the index of the fields
+                OutArgs(1:5) = InArgs(1:5)
+                OutArgs(6) = InArgs(8)
+                OutArgs(7) = InArgs(9)
+                OutArgs(8:19) = InArgs(12:23)
+
+                ! Fill in table names
+                DO i = 1, 4
+                  READ(HxEffectAt75Airflow(i), *) effect75
+                  READ(HxEffectAt100Airflow(i), *) effect100
+                  IF (effect75 /= effect100) THEN
+                    WRITE(tableID, '(I0)') i
+                    HxTableName(i) = TRIM(InArgs(1)) // '_' // tableID
+                    OutArgs(19 + i) = HxTableName(i)      ! table name
+                  ELSE
+                    OutArgs(19 + i) = ''                  ! empty table name
+                  ENDIF
+                END DO
+                ! removed 4 fields and added 4 fields, no change to CurArgs
+                CALL WriteOutIDFLines(DifLfn,'HeatExchanger:AirToAir:SensibleAndLatent',CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                ! create table object
+                DO i = 1, 4
+                  READ(HxEffectAt75Airflow(i), *) effect75
+                  READ(HxEffectAt100Airflow(i), *) effect100
+                  IF (effect75 /= effect100) THEN
+                     ! create new object Table:Lookup,
+                     ObjectName='Table:Lookup'
+                     CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                     OutArgs(1) = HxTableName(i)
+                     OutArgs(2) = 'effectiveness_IndependentVariableList'
+                     OutArgs(3) = 'DivisorOnly'             !- Normalization Method
+                     OutArgs(4) = HxEffectAt100Airflow(i)   !- Normalization Divisor
+                     OutArgs(5) = '0.0'                     !- Minimum Output
+                     OutArgs(6) = '10.0'                    !- Maximum Output
+                     OutArgs(7) = 'Dimensionless'           !- Output Unit Type
+                     OutArgs(8) = ''                        !- External File Name
+                     OutArgs(9) = ''                        !- External File Column Number
+                     OutArgs(10) = ''                       !- External File Starting Row Number
+                     OutArgs(11) = HxEffectAt75Airflow(i)   !- Output Value 1
+                     OutArgs(12) = HxEffectAt100Airflow(i)  !- Output Value 2
+                     CurArgs = 12
+                     tableAdded = .true.
+                     CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                  ENDIF
+                END DO
+
+                ! add independent variables used in the tables
+                IF (tableAdded .AND. .NOT. tableIndependentVarAdded) THEN
+                  tableIndependentVarAdded = .true.
+                  ObjectName='Table:IndependentVariableList'
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  OutArgs(1) = 'effectiveness_IndependentVariableList'
+                  OutArgs(2) = 'HxAirFlowRatio'
+                  CurArgs = 2
+                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                  ObjectName='Table:IndependentVariable'
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  OutArgs(1) = 'HxAirFlowRatio'          !  Name
+                  OutArgs(2) = 'Linear'                  !  Interpolation Method
+                  OutArgs(3) = 'Linear'                  !  Extrapolation Method
+                  OutArgs(4) = '0.0'                     !  Minimum Value
+                  OutArgs(5) = '10.0'                    !  Maximum Value
+                  OutArgs(6) = ''                        !  Normalization Reference Value
+                  OutArgs(7) = 'Dimensionless'           !  Unit Type
+                  OutArgs(8) = ''                        !  External File Name
+                  OutArgs(9) = ''                        !  External File Column Number
+                  OutArgs(10) = ''                       !  External File Starting Row Number
+                  OutArgs(11) = '0.75'                   !  Value 1
+                  OutArgs(12) = '1.0'                    !  Value 2
+                  CurArgs = 12
+                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ENDIF
+                Written=.true.
 
               ! If your original object starts with I, insert the rules here
 
@@ -434,6 +546,38 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
+              CASE('ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER') ! add new input field No Load Supply Air Flow Rate Control Set To Low Speed
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:9)=InArgs(1:9)
+                  ! OutArgs(10) is added. If existing coil is VS DX cooling or heating coil then set Yes, otherwise set No
+                  IF (SameString(InArgs(17),'Coil:Cooling:DX:VariableSpeed')) THEN
+                      OutArgs(10)='Yes'
+                  ELSE
+                      OutArgs(10)='No'
+                  ENDIF
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  CurArgs = CurArgs + 1
+              CASE('ZONEHVAC:PACKAGEDTERMINALHEATPUMP') ! add new input field No Load Supply Air Flow Rate Control Set To Low Speed
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:9)=InArgs(1:9)
+                   ! OutArgs(10) is added. If existing coil is VS DX cooling or heating coil then set Yes, otherwise set No
+                  IF (SameString(InArgs(15),'Coil:Heating:DX:VariableSpeed') .or. SameString(InArgs(18),'Coil:Cooling:DX:VariableSpeed')) THEN
+                      OutArgs(10)='Yes'
+                  ELSE
+                      OutArgs(10)='No'
+                  ENDIF
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  CurArgs = CurArgs + 1
+              CASE('ZONEHVAC:WATERTOAIRHEATPUMP') ! add new input field No Load Supply Air Flow Rate Control Set To Low Speed
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:9)=InArgs(1:9)
+                  ! Coil:*:WaterToAirHeatPump:VariableSpeedEquationFit was not previously used to set no load air flow rate
+                  OutArgs(10)='No'
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  CurArgs = CurArgs + 1
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !

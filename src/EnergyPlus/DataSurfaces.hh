@@ -882,7 +882,7 @@ namespace DataSurfaces {
     {
         Real64 solidAng = 0.0;    // Solid angle subtended by window from daylit ref points 1 and 2
         Real64 solidAngWtd = 0.0; // Solid angle subtended by window from ref pts weighted by glare pos factor
-        std::array<std::array<Real64, (int)WinCover::Num>, (int)Lum::Num> lums = {{0.0, 0.0}};
+        std::array<std::array<Real64, (int)WinCover::Num>, (int)Lum::Num> lums = {{{0.0, 0.0}}};
         Real64 illumFromWinRep = 0.0; // Illuminance from window at reference point N [lux]
         Real64 lumWinRep = 0.0;       // Window luminance as viewed from reference point N [cd/m2]
     };
@@ -1411,7 +1411,7 @@ namespace DataSurfaces {
 
     // Clears the global data in DataSurfaces.
     // Needed for unit tests, should not be normally called.
-    void clear_state();
+    // void clear_state() override;
 
     void SetSurfaceOutBulbTempAt(EnergyPlusData &state);
 
@@ -1597,11 +1597,12 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinBmBmSolar;   // Exterior beam-to-beam solar transmitted through window, or window plus blind, into zone (W)
     Array1D<Real64> SurfWinBmDifSolar;  // Exterior beam-to-diffuse solar transmitted through window, or window plus blind, into zone (W)
     Array1D<Real64> SurfWinDifSolar;    // Exterior diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
-    Array1D<Real64> SurfWinHeatGain;    // Total heat gain from window = WinTransSolar + (IR and convection from glazing, or,
+    Array1D<Real64> SurfWinHeatGain;    // Total heat gain from window (W) = WinTransSolar + (IR and convection from glazing, or,
                                         // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
                                         // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
-    Array1D<Real64> SurfWinHeatGainRep; // Equals WinHeatGain when WinHeatGain >= 0.0
-    Array1D<Real64> SurfWinHeatLossRep; // Equals -WinHeatGain when WinHeatGain < 0.0
+                                        // minus SurfWinInitialDifSolInTrans minus SurfWinLossSWZoneToOutWinRep
+    Array1D<Real64> SurfWinHeatGainRep; // Equals WinHeatGain when WinHeatGain >= 0.0 (W)
+    Array1D<Real64> SurfWinHeatLossRep; // Equals -WinHeatGain when WinHeatGain < 0.0 (W)
     Array1D<Real64> SurfWinGainConvGlazToZoneRep;     // component of WinHeatGain convect to zone from glazing (W)
     Array1D<Real64> SurfWinGainIRGlazToZoneRep;       // component of WinHeatGain net IR to zone from glazing (W)
     Array1D<Real64> SurfWinLossSWZoneToOutWinRep;     // component of WinHeatGain shortwave transmit back out (W)
@@ -1806,6 +1807,10 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::GroundSurfacesProperty> GroundSurfsProperty;
 
     int actualMaxSlatAngs = Material::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

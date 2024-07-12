@@ -384,7 +384,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -424,7 +424,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest_Actual)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -465,7 +465,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -519,7 +519,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest_Actual)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -565,7 +565,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest_ActualBroken)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -597,11 +597,11 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-
+    compare_eio_stream_substring("", true);
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these two parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -688,6 +688,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
 
     bool ErrorsFound(false);
     state->dataEnvrn->TotDesDays = 2;
+    state->dataGlobal->NumOfTimeStepInHour = 0;
     // setup environment state
     state->dataWeather->Environment.allocate(state->dataEnvrn->TotDesDays);
     state->dataWeather->DesignDay.allocate(state->dataEnvrn->TotDesDays);
@@ -708,7 +709,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     Real64 TauB = state->dataWeather->DesDayInput(EnvrnNum).TauB;
     Real64 TauD = state->dataWeather->DesDayInput(EnvrnNum).TauD;
     // check tau values
-    EXPECT_TRUE(compare_enums(Weather::DesDaySolarModel::ASHRAE_Tau2017, state->dataWeather->DesDayInput(EnvrnNum).solarModel));
+    EXPECT_ENUM_EQ(Weather::DesDaySolarModel::ASHRAE_Tau2017, state->dataWeather->DesDayInput(EnvrnNum).solarModel);
     EXPECT_EQ(0.325, TauB);
     EXPECT_EQ(2.461, TauD);
     // calc expected values for environment 1
@@ -811,7 +812,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state->dataWeather->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::DesignDay));
+    EXPECT_ENUM_EQ(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::DesignDay);
 }
 
 // Test for https://github.com/NREL/EnergyPlus/issues/7550
@@ -885,7 +886,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     ASSERT_FALSE(ErrorsFound);
 
     Weather::SetUpDesignDay(*state, 1);
-    EXPECT_TRUE(compare_enums(state->dataWeather->DesDayInput(1).HumIndType, Weather::DesDayHumIndType::Enthalpy));
+    EXPECT_ENUM_EQ(state->dataWeather->DesDayInput(1).HumIndType, Weather::DesDayHumIndType::Enthalpy);
     EXPECT_EQ(state->dataWeather->DesDayInput(1).HumIndValue, 90500.0);
 
     unsigned n_RH_not100 = 0;
@@ -1144,6 +1145,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz)
 
     bool ErrorsFound(false);
     state->dataEnvrn->TotDesDays = 2;
+    state->dataGlobal->NumOfTimeStepInHour = 0;
 
     // setup environment state
     state->dataWeather->Environment.allocate(state->dataEnvrn->TotDesDays);
@@ -1850,7 +1852,7 @@ TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_OK)
 
     EXPECT_TRUE(compare_err_stream("", true));
     EXPECT_EQ(1, state->dataWeather->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
+    EXPECT_ENUM_EQ(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather);
 }
 
 TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_Missing)
@@ -1915,7 +1917,7 @@ TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_Missing)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state->dataWeather->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
+    EXPECT_ENUM_EQ(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather);
 }
 
 TEST_F(EnergyPlusFixture, epwHeaderTest)
@@ -2004,11 +2006,11 @@ TEST_F(EnergyPlusFixture, epwHeaderTest)
     EXPECT_FALSE(has_err_output());
     EXPECT_TRUE(state->dataWeather->WFAllowsLeapYears);
     EXPECT_TRUE(state->dataWeather->EPWDaylightSaving);
-    EXPECT_TRUE(compare_enums(state->dataWeather->EPWDST.StDateType, Weather::DateType::NthDayInMonth));
+    EXPECT_ENUM_EQ(state->dataWeather->EPWDST.StDateType, Weather::DateType::NthDayInMonth);
     EXPECT_EQ(state->dataWeather->EPWDST.StMon, 5);
     EXPECT_EQ(state->dataWeather->EPWDST.StDay, 1);
     EXPECT_EQ(state->dataWeather->EPWDST.StWeekDay, 2);
-    EXPECT_TRUE(compare_enums(state->dataWeather->EPWDST.EnDateType, Weather::DateType::MonthDay));
+    EXPECT_ENUM_EQ(state->dataWeather->EPWDST.EnDateType, Weather::DateType::MonthDay);
     EXPECT_EQ(state->dataWeather->EPWDST.EnMon, 7);
     EXPECT_EQ(state->dataWeather->EPWDST.EnDay, 31);
     EXPECT_EQ(state->dataWeather->EPWDST.EnWeekDay, 2);
@@ -2485,8 +2487,87 @@ TEST_F(EnergyPlusFixture, EPW_no_eol_at_end_of_file)
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream("", true));
     EXPECT_EQ(1, state->dataWeather->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
+    EXPECT_ENUM_EQ(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather);
 
     EXPECT_NO_THROW(Weather::ReadWeatherForDay(*state, 1, 1, true));
     EXPECT_TRUE(compare_err_stream("", true));
+}
+
+TEST_F(EnergyPlusFixture, WeatherManager_GetAndResolveLocationInfoTest)
+{
+    // Tests both GetLocationInfo and ResolveLocationInformation subroutines for GitHub Issue #10579 work
+
+    std::string const idf_objects = delimited_string({
+        "Site:Location,",
+        "  SkyHighChicago,  !- Name",
+        "  41.78,                   !- Latitude {deg}",
+        "  -87.75,                  !- Longitude {deg}",
+        "  -6.00,                   !- Time Zone {hr}",
+        "  1190.00,                 !- Elevation {m}",
+        "  Yes;                     !- Keep Site Location Information",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+    Real64 expectedLat = 41.78;
+    Real64 expectedLong = -87.75;
+    Real64 expectedTZ = -6.0;
+    Real64 expectedElevationIDF = 1190.0;
+    Real64 expectedElevationEPW = 190.0;
+
+    bool foundErrors(false);
+    Real64 allowedTolerance = 0.00001;
+
+    // Test 1: GetLocationInfo Test--verify read and the setting of variables
+    Weather::GetLocationInfo(*state, foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_EQ(state->dataWeather->LocationTitle, "SKYHIGHCHICAGO");
+    EXPECT_NEAR(state->dataEnvrn->Latitude, expectedLat, allowedTolerance);
+    EXPECT_NEAR(state->dataEnvrn->Longitude, expectedLong, allowedTolerance);
+    EXPECT_NEAR(state->dataEnvrn->TimeZoneNumber, expectedTZ, allowedTolerance);
+    EXPECT_NEAR(state->dataEnvrn->Elevation, expectedElevationIDF, allowedTolerance);
+    EXPECT_TRUE(state->dataWeather->keepUserSiteLocationDefinition);
+    EXPECT_TRUE(state->dataWeather->LocationGathered);
+
+    // Test 2A: ResolveLocationInformation Test A--location keep IDF info (no changes in data)
+    state->dataWeather->NumOfEnvrn = 1;
+    state->dataWeather->Environment.allocate(state->dataWeather->NumOfEnvrn);
+    state->dataWeather->Environment(state->dataWeather->NumOfEnvrn).KindOfEnvrn = Constant::KindOfSim::RunPeriodWeather;
+    state->dataWeather->WeatherFileExists = true;
+    state->dataWeather->LocationGathered = true;
+    Weather::ResolveLocationInformation(*state, foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_EQ(state->dataWeather->LocationTitle, "SKYHIGHCHICAGO");
+    EXPECT_NEAR(state->dataEnvrn->Latitude, expectedLat, allowedTolerance);
+    EXPECT_NEAR(state->dataEnvrn->Longitude, expectedLong, allowedTolerance);
+    EXPECT_NEAR(state->dataEnvrn->TimeZoneNumber, expectedTZ, allowedTolerance);
+    EXPECT_NEAR(state->dataEnvrn->Elevation, expectedElevationIDF, allowedTolerance);
+    EXPECT_TRUE(state->dataWeather->keepUserSiteLocationDefinition);
+
+    // Test 2B: ResolveLocationInformation Test B--location swap to EPW info (change in data)
+    state->dataWeather->keepUserSiteLocationDefinition = false;
+    state->dataWeather->LocationTitle = "OVERWRITETHIS";
+    state->dataEnvrn->Latitude = 0.0;
+    state->dataEnvrn->Longitude = 0.0;
+    state->dataEnvrn->TimeZoneNumber = 0.0;
+    state->dataEnvrn->Elevation = 0.0;
+    state->dataEnvrn->WeatherFileLocationTitle = "CHICAGOOHARE";
+    state->dataWeather->WeatherFileLatitude = expectedLat;
+    state->dataWeather->WeatherFileLongitude = expectedLong;
+    state->dataWeather->WeatherFileTimeZone = expectedTZ;
+    state->dataWeather->WeatherFileElevation = expectedElevationEPW;
+    std::string const error_text2B = delimited_string({
+        "   ** Warning ** Weather file location will be used rather than entered (IDF) Location object.",
+        "   **   ~~~   ** ..Location object=OVERWRITETHIS",
+        "   **   ~~~   ** ..Weather File Location=CHICAGOOHARE",
+        "   **   ~~~   ** ..due to location differences, Latitude difference=[41.78] degrees, Longitude difference=[87.75] degrees.",
+        "   **   ~~~   ** ..Time Zone difference=[6.0] hour(s), Elevation difference=[19000.00] percent, [190.00] meters.",
+    });
+    Weather::ResolveLocationInformation(*state, foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_EQ(state->dataWeather->LocationTitle, "CHICAGOOHARE");
+    EXPECT_NEAR(state->dataEnvrn->Latitude, expectedLat, allowedTolerance);
+    EXPECT_NEAR(state->dataEnvrn->Longitude, expectedLong, allowedTolerance);
+    EXPECT_NEAR(state->dataEnvrn->TimeZoneNumber, expectedTZ, allowedTolerance);
+    EXPECT_NEAR(state->dataEnvrn->Elevation, expectedElevationEPW, allowedTolerance);
+    EXPECT_FALSE(state->dataWeather->keepUserSiteLocationDefinition);
+    EXPECT_TRUE(compare_err_stream(error_text2B, true));
 }

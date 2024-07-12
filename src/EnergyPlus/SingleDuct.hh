@@ -141,8 +141,7 @@ namespace SingleDuct {
         int ReheatComp_Index;                               // Returned Index number from other routines
         std::string ReheatName;                             // name of reheat coil
         DataPlant::PlantEquipmentType ReheatComp_PlantType; // typeOf_ number for plant type of heating coil
-        std::string FanType;                                // Type of the Fan Object
-        int Fan_Num;                                        // Numeric Equivalent in this module for fan type
+        HVAC::FanType fanType;                              // Numeric Equivalent in this module for fan type
         int Fan_Index;                                      // Returned Index number from other routines
         int ControlCompTypeNum;
         int CompErrIndex;
@@ -224,8 +223,8 @@ namespace SingleDuct {
         // Default Constructor
         SingleDuctAirTerminal()
             : SysNum(-1), SysType_Num(SysType::Invalid), SchedPtr(0), ReheatComp_Num(HeatingCoilType::None), ReheatComp_Index(0),
-              ReheatComp_PlantType(DataPlant::PlantEquipmentType::Invalid), Fan_Num(0), Fan_Index(0), ControlCompTypeNum(0), CompErrIndex(0),
-              MaxAirVolFlowRate(0.0), AirMassFlowRateMax(0.0), MaxHeatAirVolFlowRate(0.0), HeatAirMassFlowRateMax(0.0),
+              ReheatComp_PlantType(DataPlant::PlantEquipmentType::Invalid), fanType(HVAC::FanType::Invalid), Fan_Index(0), ControlCompTypeNum(0),
+              CompErrIndex(0), MaxAirVolFlowRate(0.0), AirMassFlowRateMax(0.0), MaxHeatAirVolFlowRate(0.0), HeatAirMassFlowRateMax(0.0),
               ZoneMinAirFracMethod(MinFlowFraction::Constant), ZoneMinAirFracDes(0.0), ZoneMinAirFrac(0.0), ZoneMinAirFracReport(0.0),
               ZoneFixedMinAir(0.0), ZoneMinAirFracSchPtr(0), ConstantMinAirFracSetByUser(false), FixedMinAirSetByUser(false), DesignMinAirFrac(0.0),
               DesignFixedMinAir(0.0), InletNodeNum(0), OutletNodeNum(0), ReheatControlNode(0), ReheatCoilOutletNode(0), ReheatCoilMaxCapacity(0.0),
@@ -261,7 +260,7 @@ namespace SingleDuct {
                        int ZoneNode,
                        Real64 HWFlow,
                        Real64 HCoilReq,
-                       int FanType,
+                       HVAC::FanType fanType,
                        Real64 AirFlow,
                        int FanOn,
                        Real64 &LoadMet);
@@ -269,6 +268,8 @@ namespace SingleDuct {
         void SimConstVolNoReheat(EnergyPlusData &state);
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+
+        void reportTerminalUnit(EnergyPlusData &state);
 
         void UpdateSys(EnergyPlusData &state) const;
 
@@ -279,25 +280,25 @@ namespace SingleDuct {
     {
         // Members
         // Input data
-        std::string Name;                  // name of unit
-        int MixerType = 0;                 // type of inlet mixer, 1 = inlet side, 2 = supply side
-        int ZoneHVACUnitType = 0;          // type of Zone HVAC unit. ZoneHVAC:WaterToAirHeatPump =1, ZoneHVAC:FourPipeFanCoil = 2
-        std::string ZoneHVACUnitName;      // name of Zone HVAC unit
-        int SecInNode = 0;                 // secondary air inlet node number
-        int PriInNode = 0;                 // primary air inlet node number
-        int MixedAirOutNode = 0;           // mixed air outlet node number
-        int ZoneInletNode = 0;             // zone inlet node that ultimately receives air from this mixer
-        Real64 MixedAirTemp = 0.0;         // mixed air in temp
-        Real64 MixedAirHumRat = 0.0;       // mixed air in hum rat
-        Real64 MixedAirEnthalpy = 0.0;     // mixed air in enthalpy
-        Real64 MixedAirPressure = 0.0;     // mixed air in pressure
-        Real64 MixedAirMassFlowRate = 0.0; // mixed air in mass flow rate
-        Real64 MassFlowRateMaxAvail = 0.0; // maximum air mass flow rate allowed through component
-        int ADUNum = 0;                    // index of Air Distribution Unit
-        int TermUnitSizingIndex = 0;       // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
-        bool OneTimeInitFlag = true;       // true if one-time inits should be done
-        bool OneTimeInitFlag2 = true;      // true if more one-time inits should be done
-        int CtrlZoneInNodeIndex = 0;       // which controlled zone inlet node number corresponds with this unit
+        std::string Name;                                // name of unit
+        HVAC::MixerType type = HVAC::MixerType::Invalid; // type of inlet mixer, 1 = inlet side, 2 = supply side
+        int ZoneHVACUnitType = 0;                        // type of Zone HVAC unit. ZoneHVAC:WaterToAirHeatPump =1, ZoneHVAC:FourPipeFanCoil = 2
+        std::string ZoneHVACUnitName;                    // name of Zone HVAC unit
+        int SecInNode = 0;                               // secondary air inlet node number
+        int PriInNode = 0;                               // primary air inlet node number
+        int MixedAirOutNode = 0;                         // mixed air outlet node number
+        int ZoneInletNode = 0;                           // zone inlet node that ultimately receives air from this mixer
+        Real64 MixedAirTemp = 0.0;                       // mixed air in temp
+        Real64 MixedAirHumRat = 0.0;                     // mixed air in hum rat
+        Real64 MixedAirEnthalpy = 0.0;                   // mixed air in enthalpy
+        Real64 MixedAirPressure = 0.0;                   // mixed air in pressure
+        Real64 MixedAirMassFlowRate = 0.0;               // mixed air in mass flow rate
+        Real64 MassFlowRateMaxAvail = 0.0;               // maximum air mass flow rate allowed through component
+        int ADUNum = 0;                                  // index of Air Distribution Unit
+        int TermUnitSizingIndex = 0;                     // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
+        bool OneTimeInitFlag = true;                     // true if one-time inits should be done
+        bool OneTimeInitFlag2 = true;                    // true if more one-time inits should be done
+        int CtrlZoneInNodeIndex = 0;                     // which controlled zone inlet node number corresponds with this unit
         int ZoneNum = 0;
         bool NoOAFlowInputFromUser = true;    // avoids OA calculation if no input specified by user
         int OARequirementsPtr = 0;            // - Index to DesignSpecification:OutdoorAir object
@@ -335,7 +336,7 @@ namespace SingleDuct {
                     std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
-                    int &ATMixerType,                 // air teminal mixer type
+                    HVAC::MixerType &ATMixerType,     // air teminal mixer type
                     int &ATMixerPriNode,              // air terminal mixer primary air node number
                     int &ATMixerSecNode,              // air terminal mixer secondary air node number
                     int &ATMixerOutNode,              // air terminal mixer outlet air node number
@@ -434,6 +435,10 @@ struct SingleDuctData : BaseGlobalStruct
                                                     // available air mass flow rate [W]
     Real64 MinMassAirFlowSDAT = 0.0;                // the air flow rate during heating for normal acting damper
     Real64 QZoneMax2SDAT = 0.0;                     // temporary variable
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {
