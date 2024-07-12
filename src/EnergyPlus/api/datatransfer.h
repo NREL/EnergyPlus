@@ -135,7 +135,7 @@ ENERGYPLUSLIB_API struct APIDataEntry *getAPIData(EnergyPlusState state, unsigne
 /// \param[in] data An array (pointer) of API data exchange that points as returned from the getAPIData function
 /// \param[in] arraySize The size of the API data exchange array, which is known after the call to getAPIData.
 /// \return Nothing, this simply frees the memory
-ENERGYPLUSLIB_API void freeAPIData(struct APIDataEntry *data, unsigned int arraySize);
+ENERGYPLUSLIB_API void freeAPIData(const struct APIDataEntry *data, unsigned int arraySize);
 /// \brief Gets the names of the object instances in the current input file
 /// \details Although many workflows should be aware of the input file already, there are certain cases where asking EnergyPlus
 ///          to report back the current input file objects has value.  The primary application is when a user is still utilizing an IDF based

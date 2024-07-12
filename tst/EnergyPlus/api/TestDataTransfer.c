@@ -70,6 +70,13 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
 
         unsigned int arraySize;
         struct APIDataEntry *data = getAPIData(state, &arraySize); // inspect this to see what's available to exchange
+        // FILE *fp = fopen("/tmp/data.csv", "w");
+        // for (unsigned int a = 0; a < arraySize; a++) {
+        //     const struct APIDataEntry d = *(data + a);
+        //     fprintf(fp, "%s,%s,%s,%s,%s\n", d.what, d.name, d.key, d.type, d.unit);
+        // }
+        // fclose(fp);
+
         const char **surfaceNames = getObjectNames(state, "BuildingSurface:Detailed", &arraySize);
 
         if (arraySize == 0) {
