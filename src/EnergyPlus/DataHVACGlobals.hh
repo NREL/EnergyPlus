@@ -120,6 +120,9 @@ namespace HVAC {
         Num
     };
 
+    static constexpr std::array<std::string_view, static_cast<int>(ThermostatType::Num)> thermostatTypeNames = {
+        "Uncontrolled", "SingleHeating", "SingleCooling", "SingleHeatCool", "DualSetPointWithDeadBand"};
+
     enum class AirDuctType
     // parameters describing air duct type
     {
@@ -131,6 +134,9 @@ namespace HVAC {
         RAB,
         Num
     };
+
+    static constexpr std::array<std::string_view, static_cast<int>(AirDuctType::Num)> airDuctTypeNames = {
+        "Main", "Cooling", "Heating", "Other", "Return Air Bypass"};
 
     int constexpr Cooling(2);
     int constexpr Heating(3);
@@ -426,7 +432,6 @@ namespace HVAC {
 
     int constexpr MaxSpeedLevels = 10;
 
-    // extern Array1D_string const cFanTypes;
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
     extern Array1D_string const cHeatingCoilTypes;

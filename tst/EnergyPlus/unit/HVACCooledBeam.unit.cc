@@ -45,45 +45,76 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ReturnAirPathManager_hh_INCLUDED
-#define ReturnAirPathManager_hh_INCLUDED
+// EnergyPlus::Construction Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/HVACCooledBeam.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
-namespace EnergyPlus {
+#include "Fixtures/EnergyPlusFixture.hh"
 
-// Forward declarations
-struct EnergyPlusData;
+using namespace EnergyPlus;
+using namespace EnergyPlus::HVACCooledBeam;
+using namespace EnergyPlus::DataPlant;
 
-namespace ReturnAirPathManager {
-
-    void SimReturnAirPath(EnergyPlusData &state);
-
-    void GetReturnAirPathInput(EnergyPlusData &state);
-
-    void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum);
-
-    void ReportReturnAirPath(int &ReturnAirPathNum); // unused1208
-
-} // namespace ReturnAirPathManager
-
-struct ReturnAirPathMgr : BaseGlobalStruct
+TEST_F(EnergyPlusFixture, HVACCooledBeam_reportTerminalUnit)
 {
+    using namespace EnergyPlus::OutputReportPredefined;
+    auto &orp = *state->dataOutRptPredefined;
 
-    bool GetInputFlag = true;
+    SetPredefinedTables(*state);
 
-    void init_state([[maybe_unused]] EnergyPlusData &state) override
-    {
-    }
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    auto &sch = state->dataScheduleMgr->Schedule;
+    sch.allocate(5);
+    sch(1).Name = "schA";
+    sch(2).Name = "schB";
 
-    void clear_state() override
-    {
-        this->GetInputFlag = true;
-    }
-};
+    auto &adu = state->dataDefineEquipment->AirDistUnit;
+    adu.allocate(2);
+    adu(1).Name = "ADU a";
+    adu(1).TermUnitSizingNum = 1;
 
-} // namespace EnergyPlus
+    auto &siz = state->dataSize->TermUnitFinalZoneSizing;
+    siz.allocate(2);
+    siz(1).DesCoolVolFlowMin = 0.15;
+    siz(1).MinOA = 0.05;
+    siz(1).CoolDesTemp = 12.5;
+    siz(1).HeatDesTemp = 40.0;
+    siz(1).DesHeatLoad = 2000.0;
+    siz(1).DesCoolLoad = 3000.0;
 
-#endif
+    auto &cb = state->dataHVACCooledBeam->CoolBeam;
+    cb.allocate(2);
+    cb(1).ADUNum = 1;
+    cb(1).UnitType = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
+    cb(1).MaxAirVolFlow = 0.30;
+    cb(1).CBTypeString = "active";
+
+    cb(1).reportTerminalUnit(*state);
+
+    EXPECT_EQ("0.15", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinFlow, "ADU a"));
+    EXPECT_EQ("0.05", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOutdoorFlow, "ADU a"));
+    EXPECT_EQ("12.50", RetrievePreDefTableEntry(*state, orp.pdchAirTermSupCoolingSP, "ADU a"));
+    EXPECT_EQ("40.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermSupHeatingSP, "ADU a"));
+    EXPECT_EQ("2000.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatingCap, "ADU a"));
+    EXPECT_EQ("3000.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolingCap, "ADU a"));
+    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:CooledBeam", RetrievePreDefTableEntry(*state, orp.pdchAirTermTypeInp, "ADU a"));
+    EXPECT_EQ("0.30", RetrievePreDefTableEntry(*state, orp.pdchAirTermPrimFlow, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermSecdFlow, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinFlowSch, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMaxFlowReh, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOAflowSch, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatCoilType, "ADU a"));
+    EXPECT_EQ("active", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolCoilType, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanType, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanName, "ADU a"));
+}

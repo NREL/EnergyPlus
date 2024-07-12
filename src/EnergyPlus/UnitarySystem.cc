@@ -81,6 +81,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -3437,6 +3438,8 @@ namespace UnitarySystems {
     {
         static constexpr std::string_view routineName = "UnitarySys::processInputSpec";
 
+        using namespace OutputReportPredefined;
+
         static constexpr std::string_view unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
         std::string const &cCurrentModuleObject = input_data.system_type;
@@ -6371,6 +6374,10 @@ namespace UnitarySystems {
         // this may also allow supplemental heater to operate when in heating mode when it should not
         if (this->m_MaxOATSuppHeat == 21.0 && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
             this->m_MaxOATSuppHeat = 999.0;
+        }
+        if (this->m_SuppCoilExists) {
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXHeatCoilSuppHiT, this->m_HeatingCoilName, this->m_MaxOATSuppHeat);
         }
 
         if (this->m_MaxCoolAirVolFlow > 0.0 && this->m_MaxHeatAirVolFlow > 0.0 && this->m_MaxNoCoolHeatAirVolFlow >= 0.0 &&

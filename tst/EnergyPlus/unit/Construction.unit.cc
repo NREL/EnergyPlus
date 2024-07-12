@@ -45,45 +45,79 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ReturnAirPathManager_hh_INCLUDED
-#define ReturnAirPathManager_hh_INCLUDED
+// EnergyPlus::Construction Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 
-namespace EnergyPlus {
+#include "Fixtures/EnergyPlusFixture.hh"
 
-// Forward declarations
-struct EnergyPlusData;
+using namespace EnergyPlus;
+using namespace EnergyPlus::Construction;
 
-namespace ReturnAirPathManager {
-
-    void SimReturnAirPath(EnergyPlusData &state);
-
-    void GetReturnAirPathInput(EnergyPlusData &state);
-
-    void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum);
-
-    void ReportReturnAirPath(int &ReturnAirPathNum); // unused1208
-
-} // namespace ReturnAirPathManager
-
-struct ReturnAirPathMgr : BaseGlobalStruct
+TEST_F(EnergyPlusFixture, Construction_reportLayers)
 {
+    using namespace EnergyPlus::OutputReportPredefined;
 
-    bool GetInputFlag = true;
+    auto &c = state->dataConstruction;
+    auto &m = state->dataMaterial;
+    auto &orp = *state->dataOutRptPredefined;
 
-    void init_state([[maybe_unused]] EnergyPlusData &state) override
-    {
+    SetPredefinedTables(*state);
+
+    m->TotMaterials = 8;
+    for (int i = 1; i <= m->TotMaterials; i++) {
+        Material::MaterialChild *p = new Material::MaterialChild;
+        m->Material.push_back(p);
     }
 
-    void clear_state() override
-    {
-        this->GetInputFlag = true;
-    }
-};
+    m->Material(1)->Name = "mat a";
+    m->Material(2)->Name = "mat b";
+    m->Material(3)->Name = "mat c";
+    m->Material(4)->Name = "mat d";
+    m->Material(5)->Name = "mat e";
+    m->Material(6)->Name = "mat f";
+    m->Material(7)->Name = "mat g";
+    m->Material(8)->Name = "mat h";
 
-} // namespace EnergyPlus
+    c->Construct.allocate(3);
 
-#endif
+    c->Construct(1).Name = "ConsB";
+    c->Construct(1).TotLayers = 1;
+    c->Construct(1).LayerPoint(1) = 2;
+    c->Construct(1).reportLayers(*state);
+
+    c->Construct(2).Name = "ConsCEGAH";
+    c->Construct(2).TotLayers = 5;
+    c->Construct(2).LayerPoint(1) = 3;
+    c->Construct(2).LayerPoint(2) = 5;
+    c->Construct(2).LayerPoint(3) = 7;
+    c->Construct(2).LayerPoint(4) = 1;
+    c->Construct(2).LayerPoint(5) = 8;
+    c->Construct(2).reportLayers(*state);
+
+    c->Construct(3).Name = "ConsDA";
+    c->Construct(3).TotLayers = 2;
+    c->Construct(3).LayerPoint(1) = 4;
+    c->Construct(3).LayerPoint(2) = 1;
+    c->Construct(3).reportLayers(*state);
+
+    EXPECT_EQ("mat b", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[0], "ConsB"));
+    EXPECT_EQ("NOT FOUND", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[1], "ConsB"));
+
+    EXPECT_EQ("mat c", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[0], "ConsCEGAH"));
+    EXPECT_EQ("mat e", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[1], "ConsCEGAH"));
+    EXPECT_EQ("mat g", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[2], "ConsCEGAH"));
+    EXPECT_EQ("mat a", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[3], "ConsCEGAH"));
+    EXPECT_EQ("mat h", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[4], "ConsCEGAH"));
+    EXPECT_EQ("NOT FOUND", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[5], "ConsCEGAH"));
+
+    EXPECT_EQ("mat d", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[0], "ConsDA"));
+    EXPECT_EQ("mat a", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[1], "ConsDA"));
+    EXPECT_EQ("NOT FOUND", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[2], "ConsDA"));
+}
