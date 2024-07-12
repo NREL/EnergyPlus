@@ -101,6 +101,8 @@ public: // Methods
 
     virtual int getTermUnitSizingIndex() = 0;
 
+    virtual void reportTerminalUnit(EnergyPlusData &state) = 0;
+
 protected:                                               // Data
     AirTerminalUnitType terminalType = notYetDetermined; // Type of air distribution unit  //Legacy For use during transition to OO
     std::string name;                                    // name of unit

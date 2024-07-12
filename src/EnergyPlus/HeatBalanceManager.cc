@@ -7118,6 +7118,11 @@ namespace HeatBalanceManager {
             state.dataHeatBal->SimpleCTFOnly = false;
         }
 
+        for (auto &construction : state.dataConstruction->Construct) {
+            if (!construction.IsUsedCTF) continue;
+            construction.reportLayers(state);
+        }
+
         bool InitCTFDoReport;
         General::ScanForReports(state, "Constructions", InitCTFDoReport, "Constructions");
         if (InitCTFDoReport || DoCTFErrorReport) {

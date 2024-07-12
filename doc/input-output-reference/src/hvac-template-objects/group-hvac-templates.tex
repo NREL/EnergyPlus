@@ -326,7 +326,7 @@ This object provides an ideal system to supply conditioned air to the zone that 
 
 This component can be operated with infinite or finite heating and cooling capacity. For either mode -- infinite or limited capacity -- the user can also specify on/off schedules for heating and cooling and outdoor air controls. There are also optional controls for dehumidification, humidification, economizer, and heat recovery. This component may be used in combination with other HVAC equipment serving the same zone.
 
-This component can be thought of as an ideal unit that mixes air at the zone exhaust condition with the specified amount of outdoor air and then adds or removes heat and moisture at 100\% efficiency in order to produce a supply air stream at the specified conditions. The energy required to condition the supply air is metered and reported as \hyperref[districtheating]{DistrictHeating} and \hyperref[districtcooling]{DistrictCooling}.
+This component can be thought of as an ideal unit that mixes air at the zone exhaust condition with the specified amount of outdoor air and then adds or removes heat and moisture at 100\% efficiency in order to produce a supply air stream at the specified conditions. The energy required to condition the supply air is metered and reported as \hyperref[districtheating]{DistrictHeatingWater} and \hyperref[districtcooling]{DistrictCooling}.
 
 \subsubsection{Inputs}\label{inputs-1-022}
 
@@ -910,7 +910,7 @@ Enter the shaft power of the supply fan divided by the electrical power consumed
 
 \paragraph{Field: Cooling Coil Type}\label{field-cooling-coil-type-1}
 
-Enter the type of cooling coil. There is currently only one choices for this field, SingleSpeedDX.
+Enter the type of cooling coil. There is currently only one choice for this field, SingleSpeedDX.
 
 \paragraph{Field: Cooling Coil Availability Schedule Name}\label{field-cooling-coil-availability-schedule-name-1}
 
@@ -1156,7 +1156,7 @@ Enter the shaft power of the supply fan divided by the electrical power consumed
 
 \paragraph{Field: Cooling Coil Type}\label{field-cooling-coil-type-2}
 
-Enter the type of cooling coil. There is currently only one choices for this field, SingleSspeedDX.
+Enter the type of cooling coil. There is currently only one choice for this field, SingleSpeedDX.
 
 \paragraph{Field: Cooling Coil Availability Schedule Name}\label{field-cooling-coil-availability-schedule-name-2}
 
@@ -1176,7 +1176,7 @@ Enter the coefficient of performance defined as the gross cooling coil capacity 
 
 \paragraph{Field: Heat Pump Heating Coil Type}\label{field-heat-pump-heating-coil-type}
 
-Enter the type of heat pump heating coil. There is currently only one choices for this field, SingleSpeedDXHeatPump.
+Enter the type of heat pump heating coil. There is currently only one choice for this field, SingleSpeedDXHeatPump.
 
 \paragraph{Field: Heat Pump Heating Coil Availability Schedule Name}\label{field-heat-pump-heating-coil-availability-schedule-name}
 
@@ -1445,7 +1445,8 @@ Enter the shaft power of the supply fan divided by the electrical power consumed
 
 \paragraph{Field: Cooling Coil Type}\label{field-cooling-coil-type-3}
 
-Enter the type of cooling coil. There is currently only one choices for this field, \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit}.
+Enter the type of cooling coil. At the present time, there is currently only one choice for this field:
+ \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit}
 
 \paragraph{Field: Cooling Coil Gross Rated Total Capacity}\label{field-cooling-coil-gross-rated-total-capacity-2}
 
@@ -1461,7 +1462,8 @@ Enter the coefficient of performance defined as the gross cooling coil capacity 
 
 \paragraph{Field: Heat Pump Heating Coil Type}\label{field-heat-pump-heating-coil-type-1}
 
-Enter the type of heat pump heating coil. There is currently only one choices for this field, \hyperref[coilheatingwatertoairheatpumpequationfit]{Coil:Heating:WaterToAirHeatPump:EquationFit}.
+Enter the type of heat pump heating coil. There is currently only one choice for this field:
+ \hyperref[coilheatingwatertoairheatpumpequationfit]{Coil:Heating:WaterToAirHeatPump:EquationFit}.
 
 \paragraph{Field: Heat Pump Heating Coil Gross Rated Capacity}\label{field-heat-pump-heating-coil-gross-rated-capacity-1}
 
@@ -3654,9 +3656,7 @@ Enter the fraction of the motor heat that is added to the air stream. A value of
 
 \paragraph{Field: Cooling Coil Type}\label{field-cooling-coil-type-6}
 
-Enter the type of cooling coil. There is currently only one choices for this field,
-
-SingleSpeedDX. Future versions may have additional cooling coil types.
+Enter the type of cooling coil. There is currently only one choice for this field, SingleSpeedDX. Future versions may have additional cooling coil types.
 
 \paragraph{Field: Cooling Coil Availability Schedule Name}\label{field-cooling-coil-availability-schedule-name-5}
 
