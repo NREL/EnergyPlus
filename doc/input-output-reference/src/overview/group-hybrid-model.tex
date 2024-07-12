@@ -16,8 +16,9 @@ This field is the name of the thermal zone (ref: Zone) and attaches a particular
 
 \paragraph{Field: Calculate Zone Internal Thermal Mass}\label{field-calculate-zone-internal-thermal-mass-hm}
 
-This field is used to provide an option to calculate the temperature capacity multiplier (Ref: ZoneCapacitanceMultiplier:ResearchSpecial). The temperature capacity multiplier is represented as internal thermal mass multiplier in the hybrid model.
-When YES is selected, the hybrid model calculates the multiplier based on the inverse heat balance algorithm using the measured zone air temperature.
+This field is used to provide an option to calculate the temperature capacity multiplier required by \hyperref[zonecapacitancemultiplierresearchspecial]{ZoneCapacitanceMultiplier:ResearchSpecial}. The temperature capacity multiplier is represented as internal thermal mass multiplier in the hybrid model. When YES is selected, the hybrid model calculates the multiplier based on the inverse heat balance algorithm using the measured zone air temperature.
+
+Output for this parameter can be found via the output variable listed below.  Additionally, an average for the simulation is also provided in the table report \hyperref[input-verification-and-results-summary-or-ivrs]{Input Verification and Results Summary} subtable \textit{Hybrid Model: Internal Thermal Mass}.
 
 \paragraph{Field: Calculate Zone Air Infiltration Rate}\label{field-calculate-zone-air-infiltration-rate-hm}
 

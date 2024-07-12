@@ -3427,7 +3427,7 @@ namespace CondenserLoopTowers {
                 this->Name,
                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName); // Fluid Name more reasonable than FluidType
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignRange);
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignApproach);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCApproach, this->Name, this->DesignApproach);
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchCTFCDesFanPwr, this->Name, this->HighSpeedFanPower); // eqival to Design Fan Power?
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCDesInletAirWBT, this->Name, this->DesInletAirWBTemp);
@@ -5356,10 +5356,9 @@ namespace CondenserLoopTowers {
                     }
                     //           outlet water temperature is calculated as the inlet air wet-bulb temperature plus tower approach temperature
                     this->OutletWaterTemp = Twb + Ta;
-                } // IF(OutletWaterTempMIN .LT. TempSetPoint)THEN
-
-            } // IF(OutletWaterTempOFF .GT. TempSetPoint)THEN
-        }     // IF(OutletWaterTempON .LT. TempSetPoint) ie if tower should not run at full capacity
+                }
+            }
+        }
 
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,

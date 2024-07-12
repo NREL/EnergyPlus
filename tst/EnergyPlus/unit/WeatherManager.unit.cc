@@ -597,7 +597,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-
+    compare_eio_stream_substring("", true);
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
@@ -688,6 +688,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
 
     bool ErrorsFound(false);
     state->dataEnvrn->TotDesDays = 2;
+    state->dataGlobal->NumOfTimeStepInHour = 0;
     // setup environment state
     state->dataWeather->Environment.allocate(state->dataEnvrn->TotDesDays);
     state->dataWeather->DesignDay.allocate(state->dataEnvrn->TotDesDays);
@@ -1144,6 +1145,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz)
 
     bool ErrorsFound(false);
     state->dataEnvrn->TotDesDays = 2;
+    state->dataGlobal->NumOfTimeStepInHour = 0;
 
     // setup environment state
     state->dataWeather->Environment.allocate(state->dataEnvrn->TotDesDays);

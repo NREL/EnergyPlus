@@ -295,6 +295,10 @@ In addition to the canned Surface reports (view the Reports section later in thi
   Zone,Sum,Zone Total Internal Total Heating Energy {[}J{]}
 \item
   Zone,Average,Zone Total Internal Total Heating Rate {[}W{]}
+ \item
+  Zone Phase Change Material Melting Enthalpy{[{J/kg}]}
+ \item
+  Zone Phase Change Material Freezing Enthalpy{[{J/kg}]}
 \item
   HVAC,Average,Zone Exfiltration Heat Transfer Rate {[}W{]}
 \item
@@ -659,6 +663,14 @@ These output variables represent the sum of latent gains from specific internal 
 \paragraph{Space or Zone Total Internal Total Heating Energy {[}J{]}}\label{zone-total-internal-total-heating-energy-j}
 
 These output variables represent the sum of all heat gains throughout the space or zone in Watts (for rate) or joules. This includes all heat gains from Energyplus objects that are listed in Table \ref{table:space-or-zone-total-internal-heat-gain-constituents}.
+
+\paragraph{Zone Phase Change Material Melting Enthalpy {[}J/kg{]}}\label{zone-phase-change-material-melting-enthalpy-jkg}
+
+This output variable tracks the summation of all energy within a zone that is associated with phase change materials melting during the current time period in J/kg.  This report is only produced when the user enters phase change materials (see \hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}), opts to use the Conduction Finite Difference (aka CondFD) solution algorithm (see \hyperref[heatbalancealgorithm]{HeatBalanceAlgorithm}), and requests DisplayAdvancedReportVariables (see \hyperref[outputdiagnostics]{Output:Diagnostics}).
+
+\paragraph{Zone Phase Change Material Freezing Enthalpy {[}J/kg{]}}\label{zone-phase-change-material-freezing-enthalpy-jkg}
+
+This output variable tracks the summation of all energy within a zone that is associated with phase change materials freezing during the current time period in J/kg.  This report is only produced when the user enters phase change materials (\hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}), opts to use the Conduction Finite Difference (aka CondFD) solution algorithm (see \hyperref[heatbalancealgorithm]{HeatBalanceAlgorithm}), and requests DisplayAdvancedReportVariables (see \hyperref[outputdiagnostics]{Output:Diagnostics}).
 
 \paragraph{Zone Exfiltration Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-heat-transfer-rate-w}
 

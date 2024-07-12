@@ -284,9 +284,10 @@ namespace DataZoneEquipment {
         bool SupplyAirPathExists;
         int MainBranchIndex;
         int SupplyBranchIndex;
-        int AirDistUnitIndex;    // equipment number in EquipList
-        int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
-        int SupplyAirPathIndex;
+        int AirDistUnitIndex;          // equipment number in EquipList
+        int TermUnitSizingIndex;       // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
+        int SupplyAirPathIndex;        // Pointer to SupplyAirPath serving this terminal unit
+        int SupplyAirPathOutNodeIndex; // Pointer to SupplyAirPath OutletNode serving this terminal unit
         Array1D<SubSubEquipmentData> Coil;
 
         // Default Constructor
@@ -305,18 +306,20 @@ namespace DataZoneEquipment {
         int EquipListIndex;
         std::string ControlListName;
         int ZoneNode;
-        int NumInletNodes;                // number of inlet nodes
-        int NumExhaustNodes;              // number of exhaust nodes
-        int NumReturnNodes;               // number of return air nodes
-        int NumReturnFlowBasisNodes;      // number of return air flow basis nodes
-        int ReturnFlowSchedPtrNum;        // return air flow fraction schedule pointer
-        bool FlowError;                   // flow error flag
-        Array1D_int InletNode;            // zone supply air inlet nodes
-        Array1D_int InletNodeAirLoopNum;  // air loop number connected to this inlet node (0 if not an airloop node)
-        Array1D_int InletNodeADUNum;      // AirDistUnit connected to this inlet node (0 if not an ADU node, could be zone equip or direct air)
-        Array1D_int ExhaustNode;          // zone air exhaust nodes
-        Array1D_int ReturnNode;           // zone return air nodes (node numbers)
-        Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
+        int NumInletNodes;                    // number of inlet nodes
+        int NumExhaustNodes;                  // number of exhaust nodes
+        int NumReturnNodes;                   // number of return air nodes
+        int NumReturnFlowBasisNodes;          // number of return air flow basis nodes
+        int ReturnFlowSchedPtrNum;            // return air flow fraction schedule pointer
+        bool FlowError;                       // flow error flag
+        Array1D_int InletNode;                // zone supply air inlet nodes
+        Array1D_int InletNodeAirLoopNum;      // air loop number connected to this inlet node (0 if not an airloop node)
+        Array1D_int InletNodeADUNum;          // AirDistUnit connected to this inlet node (0 if not an ADU node, could be zone equip or direct air)
+        Array1D_int ExhaustNode;              // zone air exhaust nodes
+        Array1D_int ReturnNode;               // zone return air nodes (node numbers)
+        Array1D_int ReturnNodeAirLoopNum;     // air loop number connected to this return node
+        Array1D_int ReturnNodeRetPathNum;     // ReturnPath number connected to this return node
+        Array1D_int ReturnNodeRetPathCompNum; // ReturnPath component number connected to this return node
         Array1D_int
             ReturnNodeInletNum; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
         Array1D_bool FixedReturnFlow;         // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
@@ -511,6 +514,7 @@ namespace DataZoneEquipment {
         Array1D_int PlenumIndex;
         int NumOutletNodes;
         Array1D_int OutletNode;
+        Array1D_int OutletNodeSupplyPathCompNum; // Index to the supply path ComponentName and ComponentType lists for this outlet node
         int NumNodes;
         Array1D_int Node;
         Array1D<DataZoneEquipment::AirNodeType> NodeType;
@@ -525,17 +529,13 @@ namespace DataZoneEquipment {
     {
         // Members
         std::string Name;
-        int NumOfComponents;
-        int OutletNodeNum;
+        int NumOfComponents = 0;
+        int OutletNodeNum = 0;        // Node num of return path outlet
+        int OutletRetPathCompNum = 0; // Index to return path component number for outlet node
         Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
         Array1D<DataZoneEquipment::AirLoopHVACZone> ComponentTypeEnum;
         Array1D_string ComponentName;
         Array1D_int ComponentIndex;
-
-        // Default Constructor
-        ReturnAir() : NumOfComponents(0), OutletNodeNum(0)
-        {
-        }
     };
 
     void GetZoneEquipmentData(EnergyPlusData &state);

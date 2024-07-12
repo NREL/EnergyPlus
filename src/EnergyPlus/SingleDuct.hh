@@ -269,6 +269,8 @@ namespace SingleDuct {
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
+        void reportTerminalUnit(EnergyPlusData &state);
+
         void UpdateSys(EnergyPlusData &state) const;
 
         void ReportSys(EnergyPlusData &state);

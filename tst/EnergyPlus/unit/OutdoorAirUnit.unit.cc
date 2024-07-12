@@ -289,6 +289,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    state->dataGlobal->CurrentTime = 0.25;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;            // sea level
@@ -365,6 +366,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     EXPECT_DOUBLE_EQ(SAFanPower, 75.0);
     EXPECT_DOUBLE_EQ(EAFanPower, 75.0);
     EXPECT_DOUBLE_EQ(SAFanPower + EAFanPower, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).ElecFanRate);
+    compare_err_stream_substring("", true);
+    EXPECT_TRUE(compare_err_stream("", true));
 
     // #6173
     state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).ExtAirMassFlow = 0.0;

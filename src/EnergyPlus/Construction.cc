@@ -51,6 +51,7 @@
 #include <EnergyPlus/DataConversions.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/Material.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus::Construction {
@@ -1915,6 +1916,19 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
                 static constexpr std::string_view Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
                 print(state.files.eio, Format_707, I, this->CTFTUserOut[I], this->CTFTUserIn[I], this->CTFTUserSource[I]);
             }
+        }
+    }
+}
+
+void ConstructionProps::reportLayers(EnergyPlusData &state)
+{
+    // Report the layers for each opaque construction in predefined tabular report
+    // J. Glazer March 2024
+    if (state.dataOutRptPredefined->pdchOpqConsLayCol.size() > 0) {
+        for (int i = 1; i <= this->TotLayers; ++i) {
+            int layerIndex = this->LayerPoint(i);
+            auto &thisMaterial = state.dataMaterial->Material(layerIndex);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpqConsLayCol[i - 1], this->Name, thisMaterial->Name);
         }
     }
 }
