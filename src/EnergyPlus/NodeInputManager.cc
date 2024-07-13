@@ -777,7 +777,7 @@ void GetNodeNums(EnergyPlusData &state,
                 if (node->fluidType == Node::FluidType::Blank) {
                     node->fluidType = nodeFluidType;
                 }
-                ++state.dataNodeInputMgr->NodeRef(NodeNumbers(Loop));
+                ++node->refs;
             }
         } else {
             ThisOne = AssignNodeNumber(state, Name, nodeFluidType, ErrorsFound);
@@ -826,8 +826,7 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
     auto &dln = state.dataLoopNodes;
     if (!state.dataNodeInputMgr->NodeVarsSetup) {
         if (!state.dataErrTracking->AbortProcessing) {
-            for (int NumNode = 1; NumNode <= state.dataNodeInputMgr->NumOfUniqueNodeNames; ++NumNode) {
-                auto *node = dln->nodes(NumNode);
+           for (auto *node : dln->nodes) {
                 // Setup Report variables for the Nodes for HVAC Reporting, CurrentModuleObject='Node Name'
                 SetupOutputVariable(state,
                                     "System Node Temperature",
@@ -1092,22 +1091,22 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
         // Show the node names on the Branch-Node Details file
         static constexpr std::string_view Format_700("! #Nodes,<Number of Unique Nodes>");
         print(state.files.bnd, "{}\n", Format_700);
-        print(state.files.bnd, " #Nodes,{}\n", state.dataNodeInputMgr->NumOfUniqueNodeNames);
-        if (state.dataNodeInputMgr->NumOfUniqueNodeNames > 0) {
+        print(state.files.bnd, " #Nodes,{}\n", dln->nodes.size());
+        if (dln->nodes.size() > 0) {
             static constexpr std::string_view Format_702(
                 "! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
             print(state.files.bnd, "{}\n", Format_702);
         }
+
         int Count0 = 0;
-        for (int NumNode = 1; NumNode <= state.dataNodeInputMgr->NumOfUniqueNodeNames; ++NumNode) {
-            auto const *node = dln->nodes(NumNode);
+        for (auto const *node : dln->nodes) {
             print(state.files.bnd,
                   " Node,{},{},{},{}\n",
-                  NumNode,
+                  node->Num,
                   node->Name,
                   fluidTypeNames[(int)node->fluidType],
-                  state.dataNodeInputMgr->NodeRef(NumNode));
-            if (state.dataNodeInputMgr->NodeRef(NumNode) == 0) ++Count0;
+                  node->refs);
+            if (node->refs == 0) ++Count0;
         }
         // Show suspicious node names on the Branch-Node Details file
         if (Count0 > 0) {
@@ -1117,15 +1116,14 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
             static constexpr std::string_view Format_703(
                 "! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
             print(state.files.bnd, "{}\n", Format_703);
-            for (int NumNode = 1; NumNode <= state.dataNodeInputMgr->NumOfUniqueNodeNames; ++NumNode) {
-                auto const *node = dln->nodes(NumNode);
-                if (state.dataNodeInputMgr->NodeRef(NumNode) > 0) continue;
+            for (auto const *node : dln->nodes) { 
+                if (node->refs > 0) continue;
                 print(state.files.bnd,
                       " Suspicious Node,{},{},{},{}\n",
-                      NumNode,
+                      node->Num,
                       node->Name,
                       fluidTypeNames[(int)node->fluidType],
-                      state.dataNodeInputMgr->NodeRef(NumNode));
+                      node->refs);
             }
         }
     }
@@ -1299,7 +1297,7 @@ int AssignNodeNumber(EnergyPlusData &state,
 
     if (auto found  = dln->nodeMap.find(Name); found != dln->nodeMap.end()) {
         auto *node = dln->nodes(found->second);
-        ++state.dataNodeInputMgr->NodeRef(found->second);
+        ++node->refs;
         if (nodeFluidType != FluidType::Blank) {
             if (node->fluidType != nodeFluidType && node->fluidType != FluidType::Blank) {
                 ShowSevereError(state, format("Existing Fluid type for node, incorrect for request. Node={}", node->Name));
@@ -1318,9 +1316,11 @@ int AssignNodeNumber(EnergyPlusData &state,
         node->fluidType = nodeFluidType;
         
         dln->nodes.push_back(node);
-        dln->nodeMap.insert_or_assign(Name, dln->nodes.size());
 
-        return dln->nodes.size();
+        node->Num = dln->nodes.size();
+        dln->nodeMap.insert_or_assign(node->Name, node->Num);
+
+        return node->Num;
     }
 }
 
@@ -1825,11 +1825,10 @@ void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound)
     // This subroutine checks "marked" nodes.
     auto &dln = state.dataLoopNodes;
         
-    for (int NodeNum = 1; NodeNum <= dln->nodes.isize(); ++NodeNum) {
-        auto const *node = dln->nodes(NodeNum);
+    for (auto const *node : dln->nodes) {
             
         if (node->IsMarked) {
-            if (state.dataNodeInputMgr->NodeRef(NodeNum) == 0) {
+            if (node->refs == 0) {
                 ShowSevereError(state, format("Node=\"{}\" did not find reference by another object.", node->Name));
                 ShowContinueError(state,
                                   format(R"(Object="{}", Name="{}", Field=[{}])",

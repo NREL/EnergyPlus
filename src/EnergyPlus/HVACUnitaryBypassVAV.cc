@@ -519,7 +519,7 @@ namespace HVACUnitaryBypassVAV {
                 ErrorsFound = true;
             }
 
-            thisCBVAV.MixerAirInNodeNum =
+            thisCBVAV.MixerReturnAirInNodeNum =
                 Node::GetSingleNode(state,
                                                     MixerInletNodeName,
                                                     ErrorsFound,
@@ -530,7 +530,7 @@ namespace HVACUnitaryBypassVAV {
                                                     Node::CompFluidStream::Primary,
                                                     Node::ObjectIsParent);
 
-            thisCBVAV.MixerAirInNodeNum = // Same question.  Why are we calling this twice?
+            thisCBVAV.MixerReturnAirInNodeNum = // Same question.  Why are we calling this twice?
                 Node::GetSingleNode(state,
                                                     MixerInletNodeName,
                                                     ErrorsFound,
@@ -575,7 +575,7 @@ namespace HVACUnitaryBypassVAV {
                 }
             }
 
-            if (thisCBVAV.MixerAirInNodeNum != OANodeNums(3)) {
+            if (thisCBVAV.MixerReturnAirInNodeNum != OANodeNums(3)) {
                 ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                 ShowContinueError(state, format("Illegal {} = {}.", cAlphaFields(5), MixerInletNodeName));
                 ShowContinueError(
@@ -583,7 +583,7 @@ namespace HVACUnitaryBypassVAV {
                 ErrorsFound = true;
             }
 
-            if (thisCBVAV.MixerAirInNodeNum == thisCBVAV.AirInNodeNum) {
+            if (thisCBVAV.MixerReturnAirInNodeNum == thisCBVAV.AirInNodeNum) {
                 ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                 ShowContinueError(state, format("Illegal {} = {}.", cAlphaFields(5), MixerInletNodeName));
                 ShowContinueError(state, format("{} must be different than the {}.", cAlphaFields(5), cAlphaFields(4)));
@@ -1469,7 +1469,7 @@ namespace HVACUnitaryBypassVAV {
             airOutNode->Temp = airInNode->Temp;
             airOutNode->HumRat = airInNode->HumRat;
             airOutNode->Enthalpy = airInNode->Enthalpy;
-            *mixerReliefAirOutNode = *mixerOutsideAirInNode;
+            mixerReliefAirOutNode->copyState(*mixerOutsideAirInNode);
             state.dataHVACUnitaryBypassVAV->MyEnvrnFlag(CBVAVNum) = false;
             cBVAV.LastMode = HeatingMode;
             cBVAV.changeOverTimer = -1.0;
@@ -1633,7 +1633,7 @@ namespace HVACUnitaryBypassVAV {
                 airOutNode->Temp = airInNode->Temp;
                 airOutNode->HumRat = airInNode->HumRat;
                 airOutNode->Enthalpy = airInNode->Enthalpy;
-                *mixerReliefAirOutNode = *mixerOutsideAirInNode;
+                mixerReliefAirOutNode->copyState(*mixerOutsideAirInNode);
                 cBVAV.CheckFanFlow = false;
                 if (cBVAV.FanVolFlow > 0.0) {
                     cBVAV.HeatingSpeedRatio = cBVAV.MaxHeatAirVolFlow / cBVAV.FanVolFlow;
@@ -1754,7 +1754,7 @@ namespace HVACUnitaryBypassVAV {
             OnOffAirFlowRatio = 1.0;
             if (FirstHVACIteration) {
                 dln->nodes(cBVAV.AirInNodeNum)->MassFlowRate = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
-                dln->nodes(cBVAV.MixerAirInNodeNum)->MassFlowRate = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
+                dln->nodes(cBVAV.MixerReturnAirInNodeNum)->MassFlowRate = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
                 dln->nodes(cBVAV.MixerOutsideAirInNodeNum)->MassFlowRate = state.dataHVACUnitaryBypassVAV->OACompOnMassFlow;
                 dln->nodes(cBVAV.MixerReliefAirOutNodeNum)->MassFlowRate = state.dataHVACUnitaryBypassVAV->OACompOnMassFlow;
                 state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction = 0.0;
@@ -1780,7 +1780,7 @@ namespace HVACUnitaryBypassVAV {
             airOutNode->MassFlowRate = 0.0;
             airOutNode->MassFlowRateMaxAvail = 0.0;
 
-            dln->nodes(cBVAV.MixerAirInNodeNum)->MassFlowRate = 0.0;
+            dln->nodes(cBVAV.MixerReturnAirInNodeNum)->MassFlowRate = 0.0;
             dln->nodes(cBVAV.MixerOutsideAirInNodeNum)->MassFlowRate = 0.0;
             dln->nodes(cBVAV.MixerReliefAirOutNodeNum)->MassFlowRate = 0.0;
 
@@ -1845,7 +1845,7 @@ namespace HVACUnitaryBypassVAV {
             state.dataHVACUnitaryBypassVAV->PartLoadFrac = 0.0;
             dln->nodes(cBVAV.AirInNodeNum)->MassFlowRate = 0.0;
             dln->nodes(cBVAV.AirOutNodeNum)->MassFlowRateMaxAvail = 0.0;
-            dln->nodes(cBVAV.MixerAirInNodeNum)->MassFlowRate = 0.0;
+            dln->nodes(cBVAV.MixerReturnAirInNodeNum)->MassFlowRate = 0.0;
             dln->nodes(cBVAV.MixerOutsideAirInNodeNum)->MassFlowRate = 0.0;
             dln->nodes(cBVAV.MixerReliefAirOutNodeNum)->MassFlowRate = 0.0;
         }
@@ -2091,9 +2091,9 @@ namespace HVACUnitaryBypassVAV {
 
         auto *airOutNode = dln->nodes(cBVAV.AirOutNodeNum);
         auto *airInNode = dln->nodes(cBVAV.AirInNodeNum);
-        auto *condenserNode = dln->nodes(cBVAV.CondenserNodeNum);
         
         if (cBVAV.CondenserNodeNum > 0) {
+            auto *condenserNode = dln->nodes(cBVAV.CondenserNodeNum);
             OutdoorDryBulbTemp = condenserNode->Temp;
             OutdoorBaroPress = condenserNode->Press;
         } else {
@@ -2104,19 +2104,19 @@ namespace HVACUnitaryBypassVAV {
         state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = 0.0;
 
         // Bypass excess system air through bypass duct and calculate new mixed air conditions at OA mixer inlet node
-        auto *mixerAirInNode = dln->nodes(cBVAV.MixerAirInNodeNum);
+        auto *mixerReturnAirInNode = dln->nodes(cBVAV.MixerReturnAirInNodeNum);
         if (cBVAV.plenumIndex > 0 || cBVAV.mixerIndex > 0) {
-            Real64 saveMixerInletAirNodeFlow = mixerAirInNode->MassFlowRate;
-            *mixerAirInNode = *airInNode;
-            mixerAirInNode->MassFlowRate = saveMixerInletAirNodeFlow;
+            Real64 saveMixerInletAirNodeFlow = mixerReturnAirInNode->MassFlowRate;
+            mixerReturnAirInNode->copyState(*airInNode);
+            mixerReturnAirInNode->MassFlowRate = saveMixerInletAirNodeFlow;
         } else {
-            mixerAirInNode->Temp =
+            mixerReturnAirInNode->Temp =
                 (1.0 - state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction) * airInNode->Temp +
                 state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction * airOutNode->Temp;
-            mixerAirInNode->HumRat =
+            mixerReturnAirInNode->HumRat =
                 (1.0 - state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction) * airInNode->HumRat +
                 state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction * airOutNode->HumRat;
-            mixerAirInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(mixerAirInNode->Temp, mixerAirInNode->HumRat);
+            mixerReturnAirInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(mixerReturnAirInNode->Temp, mixerReturnAirInNode->HumRat);
         }
         MixedAir::SimOAMixer(state, cBVAV.OAMixName, cBVAV.OAMixIndex);
 
@@ -2218,7 +2218,7 @@ namespace HVACUnitaryBypassVAV {
                         
                 case HVAC::CoilType::DXCoolingSingleSpeed: {
                     auto const *dxCoilAirOutNode = dln->nodes(cBVAV.DXCoilAirOutNodeNum);
-                    auto const *dxCoilAirInNode = dln->nodes(cBVAV.DXCoilAirOutNodeNum);
+                    auto const *dxCoilAirInNode = dln->nodes(cBVAV.DXCoilAirInNodeNum);
                     DXCoils::SimDXCoil(state,
                                        cBVAV.DXCoolCoilName,
                                        HVAC::CompressorOp::On,
@@ -3389,16 +3389,16 @@ namespace HVACUnitaryBypassVAV {
 
         auto *splitterOutNode = dln->nodes(cBVAV.SplitterAirOutNodeNum);
         splitterOutNode->MassFlowRateSetPoint = airOutNode->MassFlowRateSetPoint;
-        *airOutNode = *splitterOutNode;
+        airOutNode->copyState(*splitterOutNode);
         airOutNode->TempSetPoint = cBVAV.OutletTempSetPoint;
-        airOutNode->MassFlowRate = (1.0 - state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction) * mixerAirInNode->MassFlowRate;
+        airOutNode->MassFlowRate = (1.0 - state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction) * mixerReturnAirInNode->MassFlowRate;
         // report variable
-        cBVAV.BypassMassFlowRate = state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction * mixerAirInNode->MassFlowRate;
+        cBVAV.BypassMassFlowRate = state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction * mixerReturnAirInNode->MassFlowRate;
         // initialize bypass duct connected to mixer or plenum with flow rate and conditions
         if (cBVAV.plenumIndex > 0 || cBVAV.mixerIndex > 0) {
             auto *plenumOrMixerAirInNode = dln->nodes(cBVAV.PlenumMixerAirInNodeNum);
-            *plenumOrMixerAirInNode = *splitterOutNode;
-            plenumOrMixerAirInNode->MassFlowRate = state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction * mixerAirInNode->MassFlowRate;
+            plenumOrMixerAirInNode->copyState(*splitterOutNode);
+            plenumOrMixerAirInNode->MassFlowRate = state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction * mixerReturnAirInNode->MassFlowRate;
             plenumOrMixerAirInNode->MassFlowRateMaxAvail = plenumOrMixerAirInNode->MassFlowRate;
             state.dataAirLoop->AirLoopFlow(cBVAV.AirLoopNum).BypassMassFlow = plenumOrMixerAirInNode->MassFlowRate;
         }
@@ -3718,7 +3718,7 @@ namespace HVACUnitaryBypassVAV {
         auto *mixerMixedAirOutNode = dln->nodes(cBVAV.MixerMixedAirOutNodeNum);
         auto *mixerOutsideAirInNode = dln->nodes(cBVAV.MixerOutsideAirInNodeNum);
         auto *mixerReliefAirOutNode = dln->nodes(cBVAV.MixerReliefAirOutNodeNum);
-        auto *mixerAirInNode = dln->nodes(cBVAV.MixerAirInNodeNum);
+        auto *mixerReturnAirInNode = dln->nodes(cBVAV.MixerReturnAirInNodeNum);
 
         Real64 SystemMassFlow = 0.0; // System mass flow rate required for all zones [kg/s]
         Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnW(airOutNode->HumRat); // Specific heat of outlet air [J/kg-K]
@@ -3758,7 +3758,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 AverageOAMassFlow = state.dataHVACUnitaryBypassVAV->OACompOnMassFlow;
         state.dataHVACUnitaryBypassVAV->FanSpeedRatio = state.dataHVACUnitaryBypassVAV->CompOnFlowRatio;
 
-        *mixerAirInNode = *airInNode;
+        mixerReturnAirInNode->copyState(*airInNode);
 
         mixerMixedAirOutNode->MassFlowRateMin = 0.0;
 
@@ -3769,7 +3769,7 @@ namespace HVACUnitaryBypassVAV {
             OnOffAirFlowRatio = 0.0;
             state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction = 0.0;
         } else {
-            mixerAirInNode->MassFlowRate = AverageUnitMassFlow;
+            mixerReturnAirInNode->MassFlowRate = AverageUnitMassFlow;
             mixerOutsideAirInNode->MassFlowRate = AverageOAMassFlow;
             mixerReliefAirOutNode->MassFlowRate = AverageOAMassFlow;
             OnOffAirFlowRatio = 1.0;

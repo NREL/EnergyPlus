@@ -4443,14 +4443,14 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // Add cooling coil to component sets array
         if (thisVrfTU.CoolingCoilPresent) {
-
+            // Not the right way to handle missing or broken nodes
             SetUpCompSets(state,
                           cCurrentModuleObject,
                           thisVrfTU.Name,
                           HVAC::cAllCoilTypes(thisVrfTU.DXCoolCoilType_Num),
                           cAlphaArgs(12),
-                          dln->nodes(thisVrfTU.coolCoilAirInNodeNum)->Name,
-                          dln->nodes(thisVrfTU.coolCoilAirOutNodeNum)->Name);
+                          (thisVrfTU.coolCoilAirInNodeNum > 0) ? dln->nodes(thisVrfTU.coolCoilAirInNodeNum)->Name : "undefined",
+                          (thisVrfTU.coolCoilAirOutNodeNum > 0) ? dln->nodes(thisVrfTU.coolCoilAirOutNodeNum)->Name : "undefined");
             //     set heating coil present flag
             SetDXCoolingCoilData(
                 state, thisVrfTU.CoolCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, thisVrfTU.HeatingCoilPresent);
@@ -4480,14 +4480,14 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // Add heating coil to component sets array
         if (thisVrfTU.HeatingCoilPresent) {
-
+                // Not the right way to handle missing or broken nodes
             SetUpCompSets(state,
                           cCurrentModuleObject,
                           thisVrfTU.Name,
                           HVAC::cAllCoilTypes(thisVrfTU.DXHeatCoilType_Num),
                           cAlphaArgs(14),
-                          dln->nodes(thisVrfTU.heatCoilAirInNodeNum)->Name,
-                          dln->nodes(thisVrfTU.heatCoilAirOutNodeNum)->Name);
+                          (thisVrfTU.heatCoilAirInNodeNum > 0) ? dln->nodes(thisVrfTU.heatCoilAirInNodeNum)->Name : "undefined",
+                          (thisVrfTU.heatCoilAirOutNodeNum > 0) ? dln->nodes(thisVrfTU.heatCoilAirOutNodeNum)->Name : "undefined");
             //     set cooling coil present flag
             SetDXCoolingCoilData(
                 state, thisVrfTU.HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, thisVrfTU.CoolingCoilPresent);
@@ -5272,13 +5272,11 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
     bool const OAMixerUsed = vrfTU.OAMixerUsed;
 
     auto &dln = state.dataLoopNodes;
-    auto const *coolCoilAirOutNode = dln->nodes(vrfTU.coolCoilAirOutNodeNum);
-    auto const *heatCoilAirInNode = dln->nodes(vrfTU.heatCoilAirInNodeNum);
 
     // check that TU object internal nodes (TU inlet to TU outlet) are correctly connected
     // the following is checked regardless of fan placement
     if (CoolingCoilPresent && HeatingCoilPresent) {
-        if (coolCoilAirOutNode != heatCoilAirInNode) {
+        if (vrfTU.coolCoilAirOutNodeNum != vrfTU.heatCoilAirInNodeNum) {
             ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
             ShowContinueError(state, "The cooling coil air outlet node name must match the heating coil air inlet node name.");
             if (vrfTU.coolCoilAirOutNodeNum > 0 && vrfTU.heatCoilAirInNodeNum > 0) {
@@ -5596,12 +5594,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
     auto &dln = state.dataLoopNodes;
     auto *airInNode = dln->nodes(tu.AirInNodeNum);
     auto *airOutNode = dln->nodes(tu.AirOutNodeNum);
-    auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
-    auto *oaMixerReturnAirInNode = dln->nodes(tu.OAMixerReturnAirInNodeNum);
     IndexToTUInTUList = tu.IndexToTUInTUList;
 
-    auto const *condenserNode = dln->nodes(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserInNodeNum);
-                                           
     SuppHeatCoilCapacity = 0.0;
     SuppHeatCoilLoad = 0.0;
     LoadToCoolingSP = 0.0;
@@ -5611,11 +5605,13 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
 
     // set condenser inlet temp, used as surrogate for OAT (used to check limits of operation)
     if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
-        OutsideDryBulbTemp = condenserNode->Temp;
+        auto const *condenserInNode = dln->nodes(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserInNodeNum);
+        OutsideDryBulbTemp = condenserInNode->Temp;
     } else {
-        if (tu.AirOutNodeNum == 0) {
+        if (tu.OAMixerOutsideAirInNodeNum == 0) {
             OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         } else {
+            auto const *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
             OutsideDryBulbTemp = oaMixerOutsideAirInNode->Temp;
         }
     }
@@ -6253,6 +6249,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         // set the node max and min mass flow rates
         // outside air mixer is optional, check that node num > 0
         if (tu.OAMixerOutsideAirInNodeNum > 0) {
+            auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
             oaMixerOutsideAirInNode->MassFlowRateMax = max(tu.CoolOutAirMassFlow, tu.HeatOutAirMassFlow);
             oaMixerOutsideAirInNode->MassFlowRateMin = 0.0;
             oaMixerOutsideAirInNode->MassFlowRateMinAvail = 0.0;
@@ -6794,6 +6791,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed &&
          state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
         if (tu.OAMixerUsed) {
+            auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
+            auto *oaMixerReturnAirInNode = dln->nodes(tu.OAMixerReturnAirInNodeNum);
             oaMixerReturnAirInNode->MassFlowRate = tu.MaxHeatAirMassFlow;
             oaMixerOutsideAirInNode->MassFlowRate = tu.HeatOutAirMassFlow;
         } else {
@@ -6804,6 +6803,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed &&
                 state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
         if (tu.OAMixerUsed) {
+            auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
+            auto *oaMixerReturnAirInNode = dln->nodes(tu.OAMixerReturnAirInNodeNum);
             oaMixerReturnAirInNode->MassFlowRate = tu.MaxCoolAirMassFlow;
             oaMixerOutsideAirInNode->MassFlowRate = tu.CoolOutAirMassFlow;
         } else {
@@ -6813,6 +6814,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
     } else {
         if (state.dataHVACVarRefFlow->LastModeCooling(VRFCond)) {
             if (tu.OAMixerUsed) {
+                auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
+                auto *oaMixerReturnAirInNode = dln->nodes(tu.OAMixerReturnAirInNodeNum);
                 oaMixerReturnAirInNode->MassFlowRate = tu.MaxNoCoolAirMassFlow;
                 oaMixerOutsideAirInNode->MassFlowRate = tu.NoCoolHeatOutAirMassFlow;
             } else {
@@ -6821,6 +6824,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
             }
         } else if (state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
             if (tu.OAMixerUsed) {
+                auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
+                auto *oaMixerReturnAirInNode = dln->nodes(tu.OAMixerReturnAirInNodeNum);
                 oaMixerReturnAirInNode->MassFlowRate = tu.MaxNoHeatAirMassFlow;
                 oaMixerOutsideAirInNode->MassFlowRate = tu.NoCoolHeatOutAirMassFlow;
             } else {
@@ -6911,6 +6916,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                     if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                         // system last operated in cooling mode, change air flows and repeat coil off capacity test
                         if (tu.OAMixerUsed) {
+                            auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
+                            auto *oaMixerReturnAirInNode = dln->nodes(tu.OAMixerReturnAirInNodeNum);
                             oaMixerReturnAirInNode->MassFlowRate = tu.MaxHeatAirMassFlow;
                             oaMixerOutsideAirInNode->MassFlowRate = tu.HeatOutAirMassFlow;
                             MixedAir::SimOAMixer(state, tu.OAMixerName, tu.OAMixerIndex);
@@ -6960,6 +6967,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                     state.dataHeatBalFanSys->TempControlType(tu.ZoneNum) != HVAC::ThermostatType::Uncontrolled) {
                     if (!state.dataHVACVarRefFlow->LastModeCooling(VRFCond)) {
                         if (tu.OAMixerUsed) {
+                            auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
+                            auto *oaMixerReturnAirInNode = dln->nodes(tu.OAMixerReturnAirInNodeNum);
                             oaMixerReturnAirInNode->MassFlowRate = tu.MaxCoolAirMassFlow;
                             oaMixerOutsideAirInNode->MassFlowRate = tu.CoolOutAirMassFlow;
                             MixedAir::SimOAMixer(state, tu.OAMixerName, tu.OAMixerIndex);
@@ -6994,6 +7003,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                     state.dataHeatBalFanSys->TempControlType(tu.ZoneNum) != HVAC::ThermostatType::Uncontrolled) {
                     if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                         if (tu.OAMixerUsed) {
+                            auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
+                            auto *oaMixerReturnAirInNode = dln->nodes(tu.OAMixerReturnAirInNodeNum);
                             oaMixerReturnAirInNode->MassFlowRate = tu.MaxHeatAirMassFlow;
                             oaMixerOutsideAirInNode->MassFlowRate = tu.HeatOutAirMassFlow;
                             MixedAir::SimOAMixer(state, tu.OAMixerName, tu.OAMixerIndex);
@@ -7041,6 +7052,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                 state.dataHeatBalFanSys->TempControlType(tu.ZoneNum) != HVAC::ThermostatType::Uncontrolled) {
                 if (!state.dataHVACVarRefFlow->LastModeCooling(VRFCond)) {
                     if (tu.OAMixerUsed) {
+                        auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
+                        auto *oaMixerReturnAirInNode = dln->nodes(tu.OAMixerReturnAirInNodeNum);
                         oaMixerReturnAirInNode->MassFlowRate = tu.MaxCoolAirMassFlow;
                         oaMixerOutsideAirInNode->MassFlowRate = tu.CoolOutAirMassFlow;
                         MixedAir::SimOAMixer(state, tu.OAMixerName, tu.OAMixerIndex);
@@ -7079,6 +7092,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                 if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                     // system last operated in cooling mode, change air flows and repeat coil off capacity test
                     if (tu.OAMixerUsed) {
+                        auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
+                        auto *oaMixerReturnAirInNode = dln->nodes(tu.OAMixerReturnAirInNodeNum);
                         oaMixerReturnAirInNode->MassFlowRate = tu.MaxHeatAirMassFlow;
                         oaMixerOutsideAirInNode->MassFlowRate = tu.HeatOutAirMassFlow;
                         MixedAir::SimOAMixer(state, tu.OAMixerName, tu.OAMixerIndex);
@@ -9340,7 +9355,6 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     auto &dln = state.dataLoopNodes;
     auto const *airInNode = dln->nodes(this->AirInNodeNum);
     auto const *airOutNode = dln->nodes(this->AirOutNodeNum);
-    auto const *zoneAirNode = dln->nodes(this->ZoneAirNodeNum);
     
     // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
     SetAverageAirFlow(state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
@@ -9452,6 +9466,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     Real64 LatentLoadMet = 0.0; // latent load delivered [kgWater/s]
     Real64 TempOut = 0.0;
     Real64 TempIn = 0.0;
+
     if (this->ATMixerExists) {
         if (this->ATMixerType == HVAC::MixerType::SupplySide) {
             // Air terminal supply side mixer, calculate supply side mixer output
@@ -9465,12 +9480,14 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
             TempOut = airOutNode->Temp;
             SpecHumOut = airOutNode->HumRat;
         }
+        auto const *zoneAirNode = dln->nodes(this->ZoneAirNodeNum);
         TempIn = zoneAirNode->Temp;
         SpecHumIn = zoneAirNode->HumRat;
     } else {
         TempOut = airOutNode->Temp;
         SpecHumOut = airOutNode->HumRat;
         if (this->ZoneAirNodeNum > 0) {
+            auto const *zoneAirNode = dln->nodes(this->ZoneAirNodeNum);
             TempIn = zoneAirNode->Temp;
             SpecHumIn = zoneAirNode->HumRat;
         } else {
@@ -9524,7 +9541,6 @@ void ReportVRFTerminalUnit(EnergyPlusData &state, int const VRFTUNum) // index t
     ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
     auto &dln = state.dataLoopNodes;
-    auto const *atMixerMixedAirOutNode = dln->nodes(tu.ATMixerMixedAirOutNodeNum);
     auto const *zoneAirNode = dln->nodes(tu.ZoneAirNodeNum);
     auto *airInNode = dln->nodes(tu.AirInNodeNum);
     auto *airOutNode = dln->nodes(tu.AirOutNodeNum);
@@ -9609,6 +9625,7 @@ void ReportVRFTerminalUnit(EnergyPlusData &state, int const VRFTUNum) // index t
     Real64 TempIn = 0.0;
     if (tu.ATMixerExists) {
         if (tu.ATMixerType == HVAC::MixerType::SupplySide) {
+            auto const *atMixerMixedAirOutNode = dln->nodes(tu.ATMixerMixedAirOutNodeNum);
             // Air terminal supply side mixer
             TempOut = atMixerMixedAirOutNode->Temp;
             TempIn = zoneAirNode->Temp;
@@ -9766,8 +9783,6 @@ void SetAverageAirFlow(EnergyPlusData &state,
     auto &tu = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
     auto &dln = state.dataLoopNodes;
     auto *airInNode = dln->nodes(tu.AirInNodeNum);
-    auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
-    auto *oaMixerReliefAirOutNode = dln->nodes(tu.OAMixerReliefAirOutNodeNum);
 
     if (tu.fanOp == HVAC::FanOp::Cycling && tu.SpeedNum == 0) {
         Real64 partLoadRat = PartLoadRatio;
@@ -9825,6 +9840,8 @@ void SetAverageAirFlow(EnergyPlusData &state,
         if (!tu.isInOASys) airInNode->MassFlowRate = AverageUnitMassFlow;
         if (!tu.isInOASys) airInNode->MassFlowRateMaxAvail = AverageUnitMassFlow;
         if (tu.OAMixerOutsideAirInNodeNum > 0) {
+            auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
+            auto *oaMixerReliefAirOutNode = dln->nodes(tu.OAMixerReliefAirOutNodeNum);
             oaMixerOutsideAirInNode->MassFlowRate = AverageOAMassFlow;
             oaMixerOutsideAirInNode->MassFlowRateMaxAvail = AverageOAMassFlow;
             oaMixerReliefAirOutNode->MassFlowRate = AverageOAMassFlow;
@@ -9843,6 +9860,8 @@ void SetAverageAirFlow(EnergyPlusData &state,
             OnOffAirFlowRatio = 0.0;
         }
         if (tu.OAMixerOutsideAirInNodeNum > 0) {
+            auto *oaMixerOutsideAirInNode = dln->nodes(tu.OAMixerOutsideAirInNodeNum);
+            auto *oaMixerReliefAirOutNode = dln->nodes(tu.OAMixerReliefAirOutNodeNum);
             oaMixerOutsideAirInNode->MassFlowRate = 0.0;
             oaMixerReliefAirOutNode->MassFlowRate = 0.0;
         }

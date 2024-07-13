@@ -2522,15 +2522,18 @@ namespace SimulationManager {
                       state.dataZoneEquip->ZoneEquipConfig(Count).NumExhaustNodes,
                       state.dataZoneEquip->ZoneEquipConfig(Count).NumReturnNodes);
                 for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumInNodes; ++Count1) {
-                    std::string ChrName = dln->nodes(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNodeNum)->Name;
-                    if (ChrName == "Undefined") ChrName = "N/A";
+                    int heatInNodeNum = state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNodeNum;
+                    int coolInNodeNum = state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNodeNum;
+                    std::string heatInNodeName = (heatInNodeNum == 0) ? "N/A" : dln->nodes(heatInNodeNum)->Name;
+                    std::string coolInNodeName = (coolInNodeNum == 0) ? "N/A" : dln->nodes(coolInNodeNum)->Name;
+                    
                     print(state.files.bnd,
                           "   Controlled Zone Inlet,{},{},{},{},{}\n",
                           Count1,
                           state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
                           dln->nodes(state.dataZoneEquip->ZoneEquipConfig(Count).InNodeNums(Count1))->Name,
-                          dln->nodes(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNodeNum)->Name,
-                          ChrName);
+                          coolInNodeName,
+                          heatInNodeName);
                 }
                 for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumExhaustNodes; ++Count1) {
                     print(state.files.bnd,

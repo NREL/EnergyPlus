@@ -2050,7 +2050,7 @@ namespace HVACMultiSpeedHeatPump {
                 max(MSHeatPump(MSHeatPumpNum).CoolMassFlowRate(NumOfSpeedCooling), MSHeatPump(MSHeatPumpNum).HeatMassFlowRate(NumOfSpeedHeating));
             inNode->MassFlowRateMin = 0.0;
             inNode->MassFlowRateMinAvail = 0.0;
-            *outNode = *inNode;
+            outNode->copyState(*inNode);
             MSHeatPump(MSHeatPumpNum).LoadLoss = 0.0;
 
             if ((MSHeatPump(MSHeatPumpNum).HeatRecActive) && (!MSHeatPump(MSHeatPumpNum).MyPlantScantFlag)) {
@@ -2270,7 +2270,7 @@ namespace HVACMultiSpeedHeatPump {
                     max(MSHeatPump(MSHeatPumpNum).CoolMassFlowRate(NumOfSpeedCooling), MSHeatPump(MSHeatPumpNum).HeatMassFlowRate(NumOfSpeedHeating));
                 inNode->MassFlowRateMin = 0.0;
                 inNode->MassFlowRateMinAvail = 0.0;
-                *outNode = *inNode;
+                outNode->copyState(*inNode);
                 MSHeatPump(MSHeatPumpNum).CheckFanFlow = false;
             }
         }

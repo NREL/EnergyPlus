@@ -3314,14 +3314,15 @@ void InitOAMixer(EnergyPlusData &state, int const OAMixerNum)
     auto &dln = state.dataLoopNodes;
         
     auto const *outsideAirInNode = dln->nodes(state.dataMixedAir->OAMixer(OAMixerNum).OutsideAirInNodeNum);
+    auto const *returnAirInNode = dln->nodes(state.dataMixedAir->OAMixer(OAMixerNum).ReturnAirInNodeNum);
     auto const *reliefAirOutNode = dln->nodes(state.dataMixedAir->OAMixer(OAMixerNum).ReliefAirOutNodeNum);
 
     // Return air stream data
-    state.dataMixedAir->OAMixer(OAMixerNum).RetTemp = reliefAirOutNode->Temp;
-    state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat = reliefAirOutNode->HumRat;
-    state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy = reliefAirOutNode->Enthalpy;
-    state.dataMixedAir->OAMixer(OAMixerNum).RetPressure = reliefAirOutNode->Press;
-    state.dataMixedAir->OAMixer(OAMixerNum).RetMassFlowRate = reliefAirOutNode->MassFlowRate;
+    state.dataMixedAir->OAMixer(OAMixerNum).RetTemp = returnAirInNode->Temp;
+    state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat = returnAirInNode->HumRat;
+    state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy = returnAirInNode->Enthalpy;
+    state.dataMixedAir->OAMixer(OAMixerNum).RetPressure = returnAirInNode->Press;
+    state.dataMixedAir->OAMixer(OAMixerNum).RetMassFlowRate = returnAirInNode->MassFlowRate;
     // Outside air stream data
     state.dataMixedAir->OAMixer(OAMixerNum).OATemp = outsideAirInNode->Temp;
     state.dataMixedAir->OAMixer(OAMixerNum).OAHumRat = outsideAirInNode->HumRat;

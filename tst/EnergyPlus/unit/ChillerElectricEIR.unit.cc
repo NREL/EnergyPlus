@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
     EXPECT_EQ(18, thisEIR.EvapOutletTemp);
     EXPECT_EQ(35, thisEIR.CondOutletTemp);
 
-    for (int i = 0; i < 6; ++i) delete dln->nodes(i);
+    for (int i = 1; i <= 6; ++i) delete dln->nodes(i);
 }
 
 TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)

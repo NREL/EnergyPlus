@@ -584,16 +584,13 @@ void sizeZoneSpaceEquipmentPart2(EnergyPlusData &state,
                                  int spaceNum)
 {
     // MJW for now - use first return node, make a separate commit to add a dimension to all of the sizing rettemp variables
-    auto &dln = state.dataLoopNodes;
         
     int returnNodeNum = (zoneEquipConfig.NumReturnNodes > 0) ? zoneEquipConfig.ReturnNodeNums(1) : 0;
     int zoneNodeNum =
         (spaceNum > 0) ? state.dataHeatBal->space(spaceNum).SystemZoneNodeNum : state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNum;
 
-    auto const *returnNode = dln->nodes(returnNodeNum);
-    auto const *zoneNode = dln->nodes(zoneNodeNum);
-    
-    Real64 RetTemp = (returnNodeNum > 0) ? returnNode->Temp : zoneNode->Temp;
+    auto &dln = state.dataLoopNodes;
+    Real64 RetTemp = (returnNodeNum > 0) ? dln->nodes(returnNodeNum)->Temp : dln->nodes(zoneNodeNum)->Temp;
     auto &zoneTstatSP = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum);
     if (zsCalcSizing.HeatLoad > 0.0) {
         zsCalcSizing.HeatZoneRetTemp = RetTemp;

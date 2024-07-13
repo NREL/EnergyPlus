@@ -8063,8 +8063,8 @@ namespace InternalHeatGains {
             // Determine inlet air temperature and humidity
             AirConnection = state.dataHeatBal->ZoneITEq(Loop).AirConnectionType;
             RecircFrac = 0.0;
-            auto const *supplyNode = dln->nodes(state.dataHeatBal->ZoneITEq(Loop).SupplyAirInNodeNum);
             if (state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps) {
+                auto const *supplyNode = dln->nodes(state.dataHeatBal->ZoneITEq(Loop).SupplyAirInNodeNum);
                 TSupply = supplyNode->Temp;
                 WSupply = supplyNode->HumRat;
                 if (state.dataHeatBal->ZoneITEq(Loop).SupplyApproachTempSch != 0) {
@@ -8075,6 +8075,7 @@ namespace InternalHeatGains {
                 WAirIn = supplyNode->HumRat;
             } else {
                 if (AirConnection == ITEInletConnection::AdjustedSupply) {
+                    auto const *supplyNode = dln->nodes(state.dataHeatBal->ZoneITEq(Loop).SupplyAirInNodeNum);
                     TSupply = supplyNode->Temp;
                     WSupply = supplyNode->HumRat;
                     if (state.dataHeatBal->ZoneITEq(Loop).RecircFLTCurve != 0) {

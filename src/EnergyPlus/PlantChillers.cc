@@ -963,11 +963,12 @@ namespace PlantChillers {
         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) && (this->ModulatedFlowSetToLoop)) {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
-            auto const *tempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
             if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
+                auto const *tempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
                 evapOutNode->TempSetPoint = tempSetPointNode->TempSetPoint;
             } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme ==
                        DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+                auto const *tempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
                 evapOutNode->TempSetPointHi = tempSetPointNode->TempSetPointHi;
             }
         }
@@ -2000,8 +2001,6 @@ namespace PlantChillers {
         auto *evapOutNode = dln->nodes(this->EvapOutNodeNum);
         auto const *condInNode = dln->nodes(this->CondInNodeNum);
         auto *condOutNode = dln->nodes(this->CondOutNodeNum);
-        auto const *heatRecInNode = dln->nodes(this->HeatRecInNodeNum);
-        auto *heatRecOutNode = dln->nodes(this->HeatRecOutNodeNum);
         
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
@@ -2022,6 +2021,9 @@ namespace PlantChillers {
             }
 
             if (this->HeatRecActive) {
+
+                auto const *heatRecInNode = dln->nodes(this->HeatRecInNodeNum);
+                auto *heatRecOutNode = dln->nodes(this->HeatRecOutNodeNum);
 
                 PlantUtilities::SafeCopyPlantNode(state, this->HeatRecInNodeNum, this->HeatRecOutNodeNum);
                 this->HeatRecInletTemp = heatRecInNode->Temp;
@@ -2062,7 +2064,6 @@ namespace PlantChillers {
 
         auto &dln = state.dataLoopNodes;
         auto *evapOutNode = dln->nodes(this->EvapOutNodeNum);
-        auto const *cwTempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
         
         if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
@@ -2132,9 +2133,11 @@ namespace PlantChillers {
                     }
                     this->ModulatedFlowSetToLoop = true;
                     if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
+                        auto const *cwTempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
                         evapOutNode->TempSetPoint = cwTempSetPointNode->TempSetPoint;
                     } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme ==
                                DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+                        auto const *cwTempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
                         evapOutNode->TempSetPointHi = cwTempSetPointNode->TempSetPointHi;
                     }
                 }
@@ -3448,7 +3451,6 @@ namespace PlantChillers {
         auto const *evapInNode = dln->nodes(this->EvapInNodeNum);
         auto *evapOutNode = dln->nodes(this->EvapOutNodeNum);
         auto *condInNode = dln->nodes(this->CondInNodeNum);
-        auto const *heatRecInNode = dln->nodes(this->HeatRecInNodeNum);
         auto const *cwTempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
 
         // set module level inlet and outlet nodes
@@ -3475,6 +3477,7 @@ namespace PlantChillers {
         this->ExhaustStackTemp = 0.0;
 
         if (this->HeatRecActive) {
+            auto const *heatRecInNode = dln->nodes(this->HeatRecInNodeNum);
             this->HeatRecInletTemp = heatRecInNode->Temp;
             this->HeatRecOutletTemp = heatRecInNode->Temp;
         }
@@ -5488,7 +5491,6 @@ namespace PlantChillers {
         auto const *evapInNode = dln->nodes(this->EvapInNodeNum);
         auto *evapOutNode = dln->nodes(this->EvapOutNodeNum);
         auto *condInNode = dln->nodes(this->CondInNodeNum);
-        auto const *heatRecInNode = dln->nodes(this->HeatRecInNodeNum);
         auto const *cwTempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
         
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5971,6 +5973,7 @@ namespace PlantChillers {
 
             if (this->HeatRecActive) {
                 // This mdot is input specified mdot "Desired Flowrate", already set at node in init routine
+                auto const *heatRecInNode = dln->nodes(this->HeatRecInNodeNum);
                 heatRecMdot = heatRecInNode->MassFlowRate;
                 this->HeatRecInletTemp = heatRecInNode->Temp;
                 Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -6073,8 +6076,6 @@ namespace PlantChillers {
         auto *evapOutNode = dln->nodes(this->EvapOutNodeNum);
         auto *condInNode = dln->nodes(this->CondInNodeNum);
         auto *condOutNode = dln->nodes(this->CondOutNodeNum);
-        auto const *heatRecInNode = dln->nodes(this->HeatRecInNodeNum);
-        auto *heatRecOutNode = dln->nodes(this->HeatRecOutNodeNum);
         
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
@@ -6082,6 +6083,8 @@ namespace PlantChillers {
             condOutNode->Temp = condInNode->Temp;
 
             if (this->HeatRecActive) {
+                auto const *heatRecInNode = dln->nodes(this->HeatRecInNodeNum);
+                auto *heatRecOutNode = dln->nodes(this->HeatRecOutNodeNum);
                 PlantUtilities::SafeCopyPlantNode(state, this->HeatRecOutNodeNum, this->HeatRecInNodeNum);
                 this->HeatRecInletTemp = heatRecInNode->Temp;
                 this->HeatRecOutletTemp = heatRecOutNode->Temp;
@@ -6116,6 +6119,7 @@ namespace PlantChillers {
             condOutNode->Temp = this->CondOutletTemp;
 
             if (this->HeatRecActive) {
+                auto *heatRecOutNode = dln->nodes(this->HeatRecOutNodeNum);
                 PlantUtilities::SafeCopyPlantNode(state, this->HeatRecOutNodeNum, this->HeatRecInNodeNum);
                 heatRecOutNode->Temp = this->HeatRecOutletTemp;
             }
@@ -6743,7 +6747,6 @@ namespace PlantChillers {
         auto *evapOutNode = dln->nodes(this->EvapOutNodeNum);
         auto *condInNode = dln->nodes(this->CondInNodeNum);
         auto *condOutNode = dln->nodes(this->CondOutNodeNum);
-        auto const *cwTempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
         
         this->oneTimeInit(state);
 
@@ -6794,6 +6797,7 @@ namespace PlantChillers {
         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) && (this->ModulatedFlowSetToLoop)) {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
+            auto const *cwTempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
             evapOutNode->TempSetPoint = cwTempSetPointNode->TempSetPoint;
             evapOutNode->TempSetPointHi = cwTempSetPointNode->TempSetPointHi;
         }
@@ -7607,7 +7611,6 @@ namespace PlantChillers {
     {
         auto &dln = state.dataLoopNodes;
         auto *evapOutNode = dln->nodes(this->EvapOutNodeNum);
-        auto const *cwTempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
         
         // Init more variables
         if (this->MyFlag) {
@@ -7666,6 +7669,8 @@ namespace PlantChillers {
                         }
                     }
                     this->ModulatedFlowSetToLoop = true;
+
+                    auto const *cwTempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
                     evapOutNode->TempSetPoint = cwTempSetPointNode->TempSetPoint;
                     evapOutNode->TempSetPointHi = cwTempSetPointNode->TempSetPointHi;
                 }

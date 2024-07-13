@@ -1729,7 +1729,7 @@ namespace VentilatedSlab {
 
         // Initialize the relief air (same as inlet conditions to the Ventilated Slab ..
         // Note that mass flow rates will be taken care of later.
-        *reliefAirOutNode = *returnAirInNode;
+        reliefAirOutNode->copyState(*returnAirInNode);
         state.dataVentilatedSlab->OAMassFlowRate = 0.0;
 
         // Just in case the system is off and conditions do not get sent through
@@ -4436,12 +4436,12 @@ namespace VentilatedSlab {
 
         } else {
             if ((ventSlab.SysConfg == VentilatedSlabConfig::SlabOnly) || (ventSlab.SysConfg == VentilatedSlabConfig::SeriesSlabs)) {
-                *fanOutNode = *airOutNode;
+                fanOutNode->copyState(*airOutNode);
                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) = 0.0;
 
             } else if (ventSlab.SysConfg == VentilatedSlabConfig::SlabAndZone) {
-                *zoneAirInNode = *returnAirInNode;
-                *fanOutNode = *airOutNode; // Fan Resolve
+                zoneAirInNode->copyState(*returnAirInNode);
+                fanOutNode->copyState(*airOutNode); // Fan Resolve
                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) = 0.0;
             }
         }

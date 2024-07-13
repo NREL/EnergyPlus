@@ -1838,10 +1838,10 @@ namespace CondenserLoopTowers {
 
         // Each time initializations
         auto const *waterInNode = state.dataLoopNodes->nodes(this->WaterInNodeNum);
-        auto const *outdoorAirInNode = state.dataLoopNodes->nodes(this->OutdoorAirInNodeNum);
         this->WaterTemp = waterInNode->Temp;
 
         if (this->OutdoorAirInNodeNum != 0) {
+            auto const *outdoorAirInNode = state.dataLoopNodes->nodes(this->OutdoorAirInNodeNum);
             this->AirTemp = outdoorAirInNode->Temp;
             this->AirHumRat = outdoorAirInNode->HumRat;
             this->AirPress = outdoorAirInNode->Press;

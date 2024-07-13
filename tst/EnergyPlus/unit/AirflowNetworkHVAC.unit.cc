@@ -16433,7 +16433,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultistageHeatingCoil)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
 
     auto &dln = state->dataLoopNodes;
-    for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
+    dln->nodes.push_back(new Node::NodeData);
     dln->nodes(1)->fluidType = Node::FluidType::Air;
 
     dln->nodes(1)->Name = "ATTIC ZONE AIR NODE";

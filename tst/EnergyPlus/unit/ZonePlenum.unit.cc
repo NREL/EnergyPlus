@@ -120,17 +120,18 @@ TEST_F(EnergyPlusFixture, ZonePlenum_InitAirZoneReturnPlenumTest)
     int InducedNodeNum = 2;
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNodeNums(InducedNodeIndex) = InducedNodeNum;
 
-    auto *inducedNode = dln->nodes(InducedNodeNum);
-    inducedNode->MassFlowRate = 0.20;
-    inducedNode->MassFlowRateMaxAvail = 0.25;
-    inducedNode->MassFlowRateMinAvail = 0.10;
+    auto *inducedNode2 = dln->nodes(InducedNodeNum);
+    inducedNode2->MassFlowRate = 0.20;
+    inducedNode2->MassFlowRateMaxAvail = 0.25;
+    inducedNode2->MassFlowRateMinAvail = 0.10;
 
     InducedNodeIndex = 2;
     InducedNodeNum = 3;
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNodeNums(InducedNodeIndex) = InducedNodeNum;
-    inducedNode->MassFlowRate = 0.40;
-    inducedNode->MassFlowRateMaxAvail = 0.50;
-    inducedNode->MassFlowRateMinAvail = 0.22;
+    auto *inducedNode3 = dln->nodes(InducedNodeNum);
+    inducedNode3->MassFlowRate = 0.40;
+    inducedNode3->MassFlowRateMaxAvail = 0.50;
+    inducedNode3->MassFlowRateMinAvail = 0.22;
 
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).AirOutNodeNum = 4;
 
@@ -142,6 +143,7 @@ TEST_F(EnergyPlusFixture, ZonePlenum_InitAirZoneReturnPlenumTest)
 
     for (InducedNodeIndex = 1; InducedNodeIndex <= state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes; ++InducedNodeIndex) {
         InducedNodeNum = state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNodeNums(InducedNodeIndex);
+        auto const *inducedNode = dln->nodes(InducedNodeNum);
         EXPECT_EQ(inducedNode->MassFlowRate,
                   state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRate(InducedNodeIndex));
         EXPECT_EQ(inducedNode->MassFlowRateMaxAvail,

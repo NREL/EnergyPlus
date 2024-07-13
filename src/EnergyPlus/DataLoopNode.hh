@@ -402,6 +402,7 @@ namespace Node {
     struct NodeData
     {
         std::string Name;
+        int Num;
             
         FluidType fluidType = FluidType::Blank; // must be one of the valid parameters
         int FluidIndex = 0;                             // For Fluid Properties
@@ -449,6 +450,7 @@ namespace Node {
         Real64 OutAirWindDir = 0.0;              // {degree}
         bool EMSOverrideOutAirWindDir = false;   // if true, the EMS is calling to override outdoor air node wind direction setting
         Real64 EMSValueForOutAirWindDir = 0.0;   // value EMS is directing to use for outdoor air node's wind directio {degree}
+
         // Contaminant
         Real64 CO2 = 0.0;                  // {ppm}
         Real64 CO2SetPoint = 0.0;          // {ppm}
@@ -479,10 +481,35 @@ namespace Node {
         bool needsSetpointChecking = false;
         std::array<bool, (int)HVAC::CtrlVarType::Num> checkSetPoint = {false, false, false, false, false, false, false, false, false};
 
+        int refs = 0;
+            
         // Default Constructor
         NodeData() = default;
 
-
+        // Copy only the state variables, leaving the parameters and other meta-data unchanged
+        void copyState(NodeData const &node2) {
+            Temp = node2.Temp;
+            TempMin = node2.TempMin;
+            TempMax = node2.TempMax;
+            TempSetPoint = node2.TempSetPoint;
+            MassFlowRateRequest = node2.MassFlowRateRequest;
+            MassFlowRate = node2.MassFlowRate;
+            MassFlowRateMin = node2.MassFlowRateMin;
+            MassFlowRateMax = node2.MassFlowRateMax;
+            MassFlowRateMinAvail = node2.MassFlowRateMinAvail;
+            MassFlowRateMaxAvail = node2.MassFlowRateMaxAvail;
+            MassFlowRateSetPoint = node2.MassFlowRateSetPoint;
+            Quality = node2.Quality;
+            Press = node2.Press;
+            Enthalpy = node2.Enthalpy;
+            HumRat = node2.HumRat;
+            HumRatMin = node2.HumRatMin;
+            HumRatMax = node2.HumRatMax;
+            HumRatSetPoint = node2.HumRatSetPoint;
+            TempSetPointHi = node2.TempSetPointHi;
+            TempSetPointLo = node2.TempSetPointLo;
+        }
+            
 #ifdef GET_OUT            
         // Member Constructor
         NodeData(NodeFluidType const FluidType,     // must be one of the valid parameters

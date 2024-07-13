@@ -2424,8 +2424,7 @@ namespace DesiccantDehumidifiers {
         auto *regenAirInNode = dln->nodes(desicDehum.RegenAirInNodeNum);
         auto *regenFanInNode = dln->nodes(desicDehum.RegenFanInNodeNum);
         auto *regenFanOutNode = dln->nodes(desicDehum.RegenFanOutNodeNum);
-        auto *condenserInletNode = dln->nodes(desicDehum.CondenserInNodeNum);
-        
+       
         if (HumRatNeeded < procAirInNode->HumRat) {
             UnitOn = true;
         }
@@ -2461,11 +2460,12 @@ namespace DesiccantDehumidifiers {
                     state.dataHeatBal->HeatReclaimVS_DXCoil(desicDehum.DXCoilIndex).AvailCapacity = 0.0;
                 }
 
-                CpAir = Psychrometrics::PsyCpAirFnW(condenserInletNode->HumRat);
+                auto *condenserInNode = dln->nodes(desicDehum.CondenserInNodeNum);
+                CpAir = Psychrometrics::PsyCpAirFnW(condenserInNode->HumRat);
 
                 if (desicDehum.regenFanPlace == HVAC::FanPlace::BlowThru) {
                     state.dataFans->fans(desicDehum.RegenFanIndex)->simulate(state, FirstHVACIteration, _, _);
-                    FanDeltaT = dln->nodes(desicDehum.RegenFanOutNodeNum)->Temp - regenFanInNode->Temp;
+                    FanDeltaT = regenFanOutNode->Temp - regenFanInNode->Temp;
                     //       Adjust setpoint to account for fan heat
                     RegenSetPointTemp -= FanDeltaT;
                 }
@@ -2479,20 +2479,20 @@ namespace DesiccantDehumidifiers {
                         DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(desicDehum.DXCoilIndex);
                         if (state.dataDXCoils->DXCoilFanOp(desicDehum.DXCoilIndex) == HVAC::FanOp::Continuous) {
                             NewRegenInTemp =
-                                condenserInletNode->Temp +
+                                condenserInNode->Temp +
                                 CondenserWasteHeat / (CpAir * (regenAirInNode->MassFlowRate) * DDPartLoadRatio);
                             CondenserWasteHeat /= DDPartLoadRatio;
                         } else {
-                            NewRegenInTemp = condenserInletNode->Temp + CondenserWasteHeat / (CpAir * (regenAirInNode->MassFlowRate));
+                            NewRegenInTemp = condenserInNode->Temp + CondenserWasteHeat / (CpAir * (regenAirInNode->MassFlowRate));
                         }
                     } else if (desicDehum.coolingCoil_TypeNum == HVAC::Coil_CoolingAirToAirVariableSpeed) {
                         DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
-                        NewRegenInTemp = condenserInletNode->Temp + CondenserWasteHeat / (CpAir * (regenAirInNode->MassFlowRate));
+                        NewRegenInTemp = condenserInNode->Temp + CondenserWasteHeat / (CpAir * (regenAirInNode->MassFlowRate));
                     } else {
-                        NewRegenInTemp = condenserInletNode->Temp + CondenserWasteHeat / (CpAir * (regenAirInNode->MassFlowRate));
+                        NewRegenInTemp = condenserInNode->Temp + CondenserWasteHeat / (CpAir * (regenAirInNode->MassFlowRate));
                     }
                 } else {
-                    NewRegenInTemp = condenserInletNode->Temp + CondenserWasteHeat / (CpAir * (regenAirInNode->MassFlowRate));
+                    NewRegenInTemp = condenserInNode->Temp + CondenserWasteHeat / (CpAir * (regenAirInNode->MassFlowRate));
                 }
 
                 regenAirInNode->Temp = NewRegenInTemp;
@@ -2503,8 +2503,8 @@ namespace DesiccantDehumidifiers {
 
                     //       calculate mass flow rate required to maintain regen inlet setpoint temp
                     if (NewRegenInTemp > RegenSetPointTemp) {
-                        if (RegenSetPointTemp - condenserInletNode->Temp != 0.0) {
-                            MassFlowRateNew = max(0.0, CondenserWasteHeat / (CpAir * (RegenSetPointTemp - condenserInletNode->Temp)));
+                        if (RegenSetPointTemp - condenserInNode->Temp != 0.0) {
+                            MassFlowRateNew = max(0.0, CondenserWasteHeat / (CpAir * (RegenSetPointTemp - condenserInNode->Temp)));
                         } else {
                             MassFlowRateNew = regenAirInNode->MassFlowRate;
                         }
@@ -2515,9 +2515,9 @@ namespace DesiccantDehumidifiers {
                         ExhaustFanMassFlowRate = MassFlowRateNew - regenAirInNode->MassFlowRate;
                         ExhaustFanMassFlowRate = max(0.0, min(ExhaustFanMassFlowRate, desicDehum.ExhaustFanMaxMassFlowRate));
 
-                        regenAirInNode->Temp = condenserInletNode->Temp +
+                        regenAirInNode->Temp = condenserInNode->Temp +
                             CondenserWasteHeat / (CpAir * (regenAirInNode->MassFlowRate + ExhaustFanMassFlowRate));
-                        regenAirInNode->HumRat = condenserInletNode->HumRat;
+                        regenAirInNode->HumRat = condenserInNode->HumRat;
                         regenAirInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(regenAirInNode->Temp, regenAirInNode->HumRat);
                     }
                 }

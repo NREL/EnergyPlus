@@ -469,6 +469,8 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     auto *outNode = dln->nodes(thisSys->AirOutNodeNum);
     auto *controlledZoneNode = dln->nodes(thisSys->ControlledZoneNodeNum);
 
+    ControlZoneNum = thisSys->ControlledZoneNodeNum; // Is this right? The zone num is set to the zone node num?
+    
     // set up unitary system inlet condtions
     inNode->Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
     inNode->HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg

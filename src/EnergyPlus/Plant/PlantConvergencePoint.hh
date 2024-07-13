@@ -60,7 +60,7 @@ namespace DataPlant {
         Array1D<Real64> TemperatureHistory;
 
         // Default Constructor
-        PlantConvergencePoint() : MassFlowRateHistory(NumConvergenceHistoryTerms), TemperatureHistory(NumConvergenceHistoryTerms)
+            PlantConvergencePoint() : MassFlowRateHistory(NumConvergenceHistoryTerms, 0.0), TemperatureHistory(NumConvergenceHistoryTerms, 0.0)
         {
         }
 

@@ -415,31 +415,36 @@ void ControlCompOutput(EnergyPlusData &state,
             }
         }
 
-        auto const *tempOutNode = dln->nodes(TempOutNodeNum);
-        auto const *tempInNode = dln->nodes(TempInNodeNum);
-        
         switch (SimCompNum) {      // Tuned If block changed to switch
-        case ParallelPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
+
+        case ParallelPIUReheatNum: { // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
+            auto const *tempOutNode = dln->nodes(TempOutNodeNum); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            auto const *tempInNode = dln->nodes(TempInNodeNum);
+        
             // simulate series piu reheat coil
             WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
             
-            CpAir = Psychrometrics::PsyCpAirFnW(
-               tempOutNode->HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
-            LoadMet = CpAir * tempOutNode->MassFlowRate * (tempOutNode->Temp - tempInNode->Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            CpAir = Psychrometrics::PsyCpAirFnW(tempOutNode->HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            LoadMet = CpAir * tempOutNode->MassFlowRate * (tempOutNode->Temp - tempInNode->Temp); 
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
-            break;
+        } break;
 
-        case SeriesPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
+        case SeriesPIUReheatNum: { // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
+            auto const *tempOutNode = dln->nodes(TempOutNodeNum); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            auto const *tempInNode = dln->nodes(TempInNodeNum);
+        
             // simulate series piu reheat coil
             WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir = Psychrometrics::PsyCpAirFnW(tempOutNode->HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
-            LoadMet = CpAir * tempOutNode->MassFlowRate * (tempOutNode->Temp - tempInNode->Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            CpAir = Psychrometrics::PsyCpAirFnW(tempOutNode->HumRat); 
+            LoadMet = CpAir * tempOutNode->MassFlowRate * (tempOutNode->Temp - tempInNode->Temp);
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
-            break;
+        } break;
 
-        case HeatingCoilWaterNum: // 'COIL:HEATING:WATER'
+        case HeatingCoilWaterNum: { // 'COIL:HEATING:WATER'
+            auto const *tempOutNode = dln->nodes(TempOutNodeNum);
+
             // Simulate reheat coil for the VAV system
             WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
@@ -448,74 +453,74 @@ void ControlCompOutput(EnergyPlusData &state,
                 LoadMet = AirMassFlow * CpAir * tempOutNode->Temp;
                 ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             } else {
+                auto const *tempInNode = dln->nodes(TempInNodeNum); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
                 WaterCoilAirFlowControl = true;
-                LoadMet = tempOutNode->MassFlowRate * CpAir *
-                          (tempOutNode->Temp - tempInNode->Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+                LoadMet = tempOutNode->MassFlowRate * CpAir * (tempOutNode->Temp - tempInNode->Temp); 
                 ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             }
-            break;
+        } break;
 
-        case BBWaterConvOnlyNum: // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
+        case BBWaterConvOnlyNum: { // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
             // Simulate baseboard
             BaseboardRadiator::SimHWConvective(state, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
-            break;
+        } break;
 
-        case BBSteamRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
+        case BBSteamRadConvNum: { // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
             // Simulate baseboard
             SteamBaseboardRadiator::CalcSteamBaseboard(state, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
-            break;
+        } break;
 
-        case BBWaterRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
+        case BBWaterRadConvNum: { // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
             // Simulate baseboard
             HWBaseboardRadiator::CalcHWBaseboard(state, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
-            break;
+        } break;
 
-        case FourPipeFanCoilNum: // 'ZONEHVAC:FOURPIPEFANCOIL'
+        case FourPipeFanCoilNum: { // 'ZONEHVAC:FOURPIPEFANCOIL'
             // Simulate fancoil unit
             FanCoilUnits::Calc4PipeFanCoil(state, CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
-            break;
+        } break;
 
-        case OutdoorAirUnitNum: //'ZONEHVAC:OUTDOORAIRUNIT'
+        case OutdoorAirUnitNum: { //'ZONEHVAC:OUTDOORAIRUNIT'
             // Simulate outdoor air unit components
             OutdoorAirUnit::CalcOAUnitCoilComps(
                 state, CompNum, FirstHVACIteration, EquipIndex, LoadMet); // Autodesk:OPTIONAL EquipIndex used without PRESENT check
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
-            break;
+        } break;
 
-        case UnitHeaterNum: // 'ZONEHVAC:UNITHEATER'
+        case UnitHeaterNum: { // 'ZONEHVAC:UNITHEATER'
             // Simulate unit heater components
             UnitHeater::CalcUnitHeaterComponents(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
-            break;
+        } break;
 
-        case UnitVentilatorNum: // 'ZONEHVAC:UNITVENTILATOR'
+        case UnitVentilatorNum: { // 'ZONEHVAC:UNITVENTILATOR'
             // Simulate unit ventilator components
             UnitVentilator::CalcUnitVentilatorComponents(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
-            break;
+        } break;
 
-        case VentilatedSlabNum: // 'ZONEHVAC:VENTILATEDSLAB'
+        case VentilatedSlabNum: { // 'ZONEHVAC:VENTILATEDSLAB'
             // Simulate unit ventilator components
             VentilatedSlab::CalcVentilatedSlabComps(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
-            break;
+        } break;
 
-        default:
+        default: {
             ShowFatalError(state, format("ControlCompOutput: Illegal Component Number argument =[{}]", SimCompNum));
-            break;
-        }
+        } break;
+        } // switch 
 
         // Check for Controller convergence to see if within the offset
         if (std::abs(ZoneController.SensedValue) <= ControlOffset || std::abs(ZoneController.SensedValue) <= HalvingPrec) {

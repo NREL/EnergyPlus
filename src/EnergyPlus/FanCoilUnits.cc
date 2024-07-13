@@ -2062,8 +2062,6 @@ namespace FanCoilUnits {
         bool ColdFlowLocked = false; // if true cold water flow is locked
         bool HotFlowLocked = false;  // if true Hot water flow is locked
 
-        auto *heatCoilFluidInNode = dln->nodes(fanCoil.HeatCoilFluidInNodeNum);
-        auto *heatCoilFluidOutNode = dln->nodes(fanCoil.HeatCoilFluidOutNodeNum);
         auto *coolCoilFluidInNode = dln->nodes(fanCoil.CoolCoilFluidInNodeNum);
         auto *coolCoilFluidOutNode = dln->nodes(fanCoil.CoolCoilFluidOutNodeNum);
 
@@ -2353,7 +2351,8 @@ namespace FanCoilUnits {
                             state, mdot, fanCoil.HeatCoilFluidInNodeNum, fanCoil.HeatCoilFluidOutNodeNum, fanCoil.HeatCoilPlantLoc);
                         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut); // get QUnitOut
                     } else {
-                            
+                        auto *heatCoilFluidInNode = dln->nodes(fanCoil.HeatCoilFluidInNodeNum);
+                        auto *heatCoilFluidOutNode = dln->nodes(fanCoil.HeatCoilFluidOutNodeNum);
                         // flow lock on
                         if (MdotLockH > HWFlow) { // if mdot > HWFlow, bypass extra flow
                             Calc4PipeFanCoil(state,
@@ -2438,6 +2437,7 @@ namespace FanCoilUnits {
                 if (QCoilCoolSP < 0) {
                     coolCoilFluidInNode->MassFlowRate = fanCoil.MaxCoolCoilFluidFlow;
                 } else if (QCoilHeatSP > 0 && fanCoil.HCoilType_Num != HCoil::Electric) {
+                    auto *heatCoilFluidInNode = dln->nodes(fanCoil.HeatCoilFluidInNodeNum);
                     heatCoilFluidInNode->MassFlowRate = fanCoil.MaxHeatCoilFluidFlow;
                 }
 
@@ -2603,6 +2603,7 @@ namespace FanCoilUnits {
                             if (SolFlag == -1) {
                                 ++fanCoil.ConvgErrCountH;
                                 if (fanCoil.ConvgErrCountH < 2) {
+                                    auto *heatCoilFluidInNode = dln->nodes(fanCoil.HeatCoilFluidInNodeNum);
                                     ShowWarningError(state, format("Part-load ratio heating control failed in fan coil unit {}", fanCoil.Name));
                                     ShowContinueError(state, "  Iteration limit exceeded in calculating FCU part-load ratio ");
                                     heatCoilFluidInNode->MassFlowRate = PLR * fanCoil.MaxHeatCoilFluidFlow;

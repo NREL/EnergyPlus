@@ -148,11 +148,10 @@ struct NodeInputManagerData : BaseGlobalStruct
 {
 
     int NumOfNodeLists = 0;       // Total number of Node Lists in IDF
-    int NumOfUniqueNodeNames = 0; // Number of Unique Node Names (current)
     // The following is a module level flag because there are several possible "entries" into
     // this module that may need to get the Node Inputs.
     bool GetNodeInputFlag = true;    // Flag to Get Node Input(s)
-    Array1D_int NodeRef;             // Number of times a Node is "referenced"
+
     std::string CurCheckContextName; // Used in Uniqueness checks
     int NumCheckNodes = 0;           // Num of Unique nodes in check
     int MaxCheckNodes = 0;           // Current "max" unique nodes in check
@@ -181,9 +180,7 @@ struct NodeInputManagerData : BaseGlobalStruct
     {
         this->CalcMoreNodeInfoMyOneTimeFlag = true;
         this->NumOfNodeLists = 0;
-        this->NumOfUniqueNodeNames = 0;
         this->GetNodeInputFlag = true;
-        this->NodeRef.deallocate();
         this->CurCheckContextName = std::string();
         this->NumCheckNodes = 0;
         this->MaxCheckNodes = 0;

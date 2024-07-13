@@ -4124,42 +4124,47 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 if (thisZonePredefRep.isOccupied) {
                     state.dataSysRpts->SysVentRepVars(AirLoopNum).AnyZoneOccupied = true;
                 }
-            }
 
-            
-            // Find the mixed air node and return air node of the system that supplies the zone
-            int MixedAirNodeNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysOutNodeNum;
-            int ReturnAirNodeNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysInNodeNum;
-            if (MixedAirNodeNum == 0 || ReturnAirNodeNum == 0) {
+                int MixedAirNodeNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysOutNodeNum;
+                int ReturnAirNodeNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysInNodeNum;
+
+                if (MixedAirNodeNum != 0 && ReturnAirNodeNum != 0) {
+                    auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
+                    auto const *mixedAirNode = dln->nodes(MixedAirNodeNum);
+                    
+                    // Calculate return and mixed air ethalpies
+                    AirSysEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
+                    AirSysEnthMixedAir = Psychrometrics::PsyHFnTdbW(mixedAirNode->Temp, mixedAirNode->HumRat);
+                    
+                    if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysExists) {
+                        auto const *outAirNode = dln->nodes(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OAMixOAInNodeNum);
+                        AirSysOutAirFlow = outAirNode->MassFlowRate;
+                    } else {
+                        AirSysOutAirFlow = 0.0;
+                    }
+
+                    AirSysTotalMixFlowRate = mixedAirNode->MassFlowRate;
+                    
+                    if (AirSysTotalMixFlowRate != 0.0) {
+                        ZoneFlowFrac = (ADUCoolFlowrate + ADUHeatFlowrate) / AirSysTotalMixFlowRate;
+                        AirSysOutAirFlow *= ZoneFlowFrac;
+                    } else {
+                        ZoneFlowFrac = 0.0;
+                        AirSysOutAirFlow = 0.0;
+                    }
+                    // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
+                    AirSysZoneVentLoad = (ADUCoolFlowrate + ADUHeatFlowrate) * (AirSysEnthMixedAir - AirSysEnthReturnAir) * TimeStepSysSec; //*KJperJ
+
+                } else { // MixedAirNodeNum == 0 || ReturnAirNodeNum == 0
+                    AirSysZoneVentLoad = 0.0;
+                    AirSysOutAirFlow = 0.0;
+                }
+
+            } else { // AirLoopNum == 0
                 AirSysZoneVentLoad = 0.0;
                 AirSysOutAirFlow = 0.0;
-            } else {
-                auto const *returnAirNode = dln->nodes(ReturnAirNodeNum);
-                auto const *mixedAirNode = dln->nodes(MixedAirNodeNum);
-
-                // Calculate return and mixed air ethalpies
-                AirSysEnthReturnAir = Psychrometrics::PsyHFnTdbW(returnAirNode->Temp, returnAirNode->HumRat);
-                AirSysEnthMixedAir = Psychrometrics::PsyHFnTdbW(mixedAirNode->Temp, mixedAirNode->HumRat);
-
-                if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysExists) {
-                    auto const *outAirNode = dln->nodes(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OAMixOAInNodeNum);
-                    AirSysOutAirFlow = outAirNode->MassFlowRate;
-                } else {
-                    AirSysOutAirFlow = 0.0;
-                }
-
-                AirSysTotalMixFlowRate = mixedAirNode->MassFlowRate;
-
-                if (AirSysTotalMixFlowRate != 0.0) {
-                    ZoneFlowFrac = (ADUCoolFlowrate + ADUHeatFlowrate) / AirSysTotalMixFlowRate;
-                    AirSysOutAirFlow *= ZoneFlowFrac;
-                } else {
-                    ZoneFlowFrac = 0.0;
-                    AirSysOutAirFlow = 0.0;
-                }
-                // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                AirSysZoneVentLoad = (ADUCoolFlowrate + ADUHeatFlowrate) * (AirSysEnthMixedAir - AirSysEnthReturnAir) * TimeStepSysSec; //*KJperJ
             }
+            
             ZAirSysZoneVentLoad += AirSysZoneVentLoad;
             ZAirSysOutAirFlow += AirSysOutAirFlow;
         } // primary air system present

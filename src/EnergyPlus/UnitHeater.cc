@@ -1422,7 +1422,6 @@ namespace UnitHeater {
         SolFlag = 0; // # of iterations IF positive, -1 means failed to converge, -2 means bounds are incorrect
         auto *inNode = dln->nodes(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNodeNum);
         auto *outNode = dln->nodes(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNodeNum);
-        auto *controlNode = dln->nodes(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNodeNum);
         ControlOffset = state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlOffset;
         UnitOn = false;
         fanOp = state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanOp;
@@ -1528,6 +1527,7 @@ namespace UnitHeater {
                         MaxWaterFlow = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotWaterFlow;
                         MinWaterFlow = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MinHotWaterFlow;
                     } else {
+                        auto const *controlNode = dln->nodes(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNodeNum);
                         MaxWaterFlow = controlNode->MassFlowRateMaxAvail;
                         MinWaterFlow = controlNode->MassFlowRateMinAvail;
                     }

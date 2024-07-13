@@ -254,7 +254,7 @@ protected:
         cbvav.MixerOutsideAirInNodeNum = 3;
         cbvav.MixerReliefAirOutNodeNum = 4;
         cbvav.MixerMixedAirOutNodeNum = 5;
-        cbvav.MixerOutsideAirInNodeNum = 6;
+        cbvav.MixerReturnAirInNodeNum = 6;
         cbvav.HeatCoilAirOutNodeNum = 9;
         cbvav.SplitterAirOutNodeNum = 9;
         cbvav.NumControlledZones = 1;

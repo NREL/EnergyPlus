@@ -5594,8 +5594,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state->dataWaterCoils->WaterCoil(1).AirOutNodeNum = 5;
 
     auto *waterCoil1AirInNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).AirInNodeNum);
-    auto *waterCoil1WaterInNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).WaterInNodeNum);
-    auto *waterCoil1WaterOutNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).WaterOutNodeNum);
     waterCoil1AirInNode->Temp = 10.0;
     waterCoil1AirInNode->Enthalpy = 18000;
     waterCoil1AirInNode->HumRat = Psychrometrics::PsyWFnTdbH(*state, waterCoil1AirInNode->Temp, waterCoil1AirInNode->Enthalpy);
@@ -5613,6 +5611,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
+    auto *waterCoil1WaterInNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).WaterInNodeNum);
+    auto *waterCoil1WaterOutNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).WaterOutNodeNum);
     waterCoil1WaterInNode->MassFlowRate = HotWaterMassFlowRate;
     waterCoil1WaterInNode->MassFlowRateMaxAvail = HotWaterMassFlowRate;
     waterCoil1WaterInNode->Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
@@ -5755,8 +5755,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     state->dataWaterCoils->WaterCoil(1).InletAirMassFlowRate = AirMassFlowRate;
 
     auto *waterCoil1AirInNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).AirInNodeNum);
-    auto *waterCoil1WaterInNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).WaterInNodeNum);
-    auto *waterCoil1WaterOutNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).WaterOutNodeNum);
     waterCoil1AirInNode->MassFlowRate = AirMassFlowRate;
     waterCoil1AirInNode->MassFlowRateMax = AirMassFlowRate;
     waterCoil1AirInNode->Temp = 30.0;
@@ -5771,6 +5769,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     state->dataWaterCoils->WaterCoil(1).WaterOutNodeNum = 7;
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+
+    auto *waterCoil1WaterInNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).WaterInNodeNum);
+    auto *waterCoil1WaterOutNode = dln->nodes(state->dataWaterCoils->WaterCoil(1).WaterOutNodeNum);
     waterCoil1WaterInNode->Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
     waterCoil1WaterInNode->MassFlowRate = ColdWaterMassFlowRate;
     waterCoil1WaterInNode->MassFlowRateMaxAvail = HotWaterMassFlowRate;
@@ -6056,6 +6057,7 @@ Curve:Biquadratic,
     auto *airOutNode = dln->nodes(thisSys->AirOutNodeNum);
     auto *controlZoneNode = dln->nodes(thisSys->ControlledZoneNodeNum);
 
+    ControlZoneNum = thisSys->ControlledZoneNodeNum; // I don't get this, but alright
     // set up unitary system inlet condtions
     airInNode->Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
     airInNode->HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
@@ -7059,6 +7061,8 @@ Curve:Biquadratic,
     auto *airOutNode = dln->nodes(thisSys->AirOutNodeNum);
     auto *controlZoneNode = dln->nodes(thisSys->ControlledZoneNodeNum);
 
+    ControlZoneNum = thisSys->ControlledZoneNodeNum; // Don't understand assigning a node number to a zone number
+
     // set up unitary system inlet condtions
     airInNode->Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
     airInNode->HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
@@ -7552,6 +7556,7 @@ Curve:Biquadratic,
     auto *airInNode = dln->nodes(thisSys->AirInNodeNum);
     auto *airOutNode = dln->nodes(thisSys->AirOutNodeNum);
     auto *controlZoneNode = dln->nodes(thisSys->ControlledZoneNodeNum);
+    ControlZoneNum = thisSys->ControlledZoneNodeNum;
 
     // set up unitary system inlet condtions
     airInNode->Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
@@ -9772,7 +9777,7 @@ Curve:QuadLinear,
     auto *airInNode = dln->nodes(thisSys->AirInNodeNum);
     auto *airOutNode = dln->nodes(thisSys->AirOutNodeNum);
     auto *controlZoneNode = dln->nodes(thisSys->ControlledZoneNodeNum);
-
+    ControlZoneNum = thisSys->ControlledZoneNodeNum;
     // set up unitary system inlet condtions
     airInNode->Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
     airInNode->HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
@@ -10116,6 +10121,7 @@ Schedule:Compact,
     auto *airInNode = dln->nodes(thisSys->AirInNodeNum);
     auto *airOutNode = dln->nodes(thisSys->AirOutNodeNum);
     auto *controlZoneNode = dln->nodes(thisSys->ControlledZoneNodeNum);
+    ControlZoneNum = thisSys->ControlledZoneNodeNum;
 
     // set up unitary system inlet condtions
     airInNode->Temp = 20.0;    // zone winter dry-bulb temp
@@ -20120,9 +20126,6 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
             *state, state->dataWaterCoils->WaterCoil(i).InletAirTemp, state->dataWaterCoils->WaterCoil(i).InletAirEnthalpy);
         // water coil air inlet node condition
         auto *waterCoilAirInNode = dln->nodes(state->dataWaterCoils->WaterCoil(i).AirInNodeNum);
-        auto *waterCoilWaterInNode = dln->nodes(state->dataWaterCoils->WaterCoil(i).WaterInNodeNum);
-        auto *waterCoilWaterOutNode = dln->nodes(state->dataWaterCoils->WaterCoil(i).WaterOutNodeNum);
-
         waterCoilAirInNode->MassFlowRate = AirMassFlowRate;
         waterCoilAirInNode->MassFlowRateMax = AirMassFlowRate;
         waterCoilAirInNode->Temp = state->dataWaterCoils->WaterCoil(i).InletAirTemp;
@@ -20134,6 +20137,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
         state->dataWaterCoils->WaterCoil(i).WaterPlantLoc.branchNum = 1;
         state->dataWaterCoils->WaterCoil(i).WaterPlantLoc.compNum = i;
 
+        auto *waterCoilWaterInNode = dln->nodes(state->dataWaterCoils->WaterCoil(i).WaterInNodeNum);
+        auto *waterCoilWaterOutNode = dln->nodes(state->dataWaterCoils->WaterCoil(i).WaterOutNodeNum);
         waterCoilWaterInNode->Temp = state->dataWaterCoils->WaterCoil(i).InletWaterTemp;
         waterCoilWaterInNode->MassFlowRate = ColdWaterMassFlowRate;
         waterCoilWaterInNode->MassFlowRateMax = ColdWaterMassFlowRate;
@@ -21440,6 +21445,7 @@ Schedule:Constant,
     auto *airInNode = dln->nodes(thisSys->AirInNodeNum);
     auto *airOutNode = dln->nodes(thisSys->AirOutNodeNum);
     auto *controlZoneNode = dln->nodes(thisSys->ControlledZoneNodeNum);
+    ControlZoneNum = thisSys->ControlledZoneNodeNum;
 
     // set up unitary system inlet condtions
     airInNode->Temp = 22.0;
@@ -21449,6 +21455,7 @@ Schedule:Constant,
     state->dataSize->CurZoneEqNum = 1;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+
     auto &zoneSysEnergyDemand = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum);
     auto &zoneSysMoistureDemand = state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum);
     zoneSysEnergyDemand.RemainingOutputRequired = 0.0; // no heating or cooling load

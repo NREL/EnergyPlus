@@ -1927,14 +1927,17 @@ namespace OutdoorAirUnit {
         Real64 QUnitOut;
         Real64 Dxsystemouttemp;
 
+        // What is the point of the Sim parameter if setting it to
+        // false causes this function to do nothing?  If the parameter
+        // is false just don't call the function to start with.  What
+        // am I missing here?
+        if (!Sim) return;
+
         auto &thisOutAirUnit = state.dataOutdoorAirUnit->OutAirUnit(OAUnitNum);
         auto &thisOAEquip = thisOutAirUnit.OAEquip(EquipNum);
 
         auto &dln = state.dataLoopNodes;
         
-        auto *coilAirInNode = dln->nodes(thisOAEquip.CoilAirInNodeNum);
-        auto *coilAirOutNode = dln->nodes(thisOAEquip.CoilAirOutNodeNum);
-
         int UnitNum = OAUnitNum;
         int SimCompNum = EquipNum;
 
@@ -1961,6 +1964,7 @@ namespace OutdoorAirUnit {
                     SimHeatRecovery(state, EquipName, FirstHVACIteration, CompIndex, HVAC::FanOp::Continuous, _, _, _, _, false, false);
                 }
             } break;
+            
             // Desiccant Dehumidifier
             case CompType::Desiccant: { // 'Dehumidifier:Desiccant:NoFans'
                 if (Sim) {
@@ -1968,6 +1972,7 @@ namespace OutdoorAirUnit {
                 }
 
             } break;
+                    
             case CompType::WaterCoil_SimpleHeat: { // ('Coil:Heating:Water')
 
                 if (Sim) {
@@ -1983,6 +1988,7 @@ namespace OutdoorAirUnit {
 
                     // auto &whCoilOutletNode = state.dataLoopNodes->Node(OutletNodeNum);
 
+                    auto const *coilAirInNode = dln->nodes(thisOAEquip.CoilAirInNodeNum);
                     Real64 const CpAirZn = PsyCpAirFnW(coilAirInNode->HumRat);
 
                     if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) || (coilAirInNode->Temp > CompAirOutTemp)) {
@@ -2013,11 +2019,13 @@ namespace OutdoorAirUnit {
                                       thisOAEquip.plantLoc);
                 }
             } break;
+                    
             case CompType::SteamCoil_AirHeat: { // 'Coil:Heating:Steam'
                 if (Sim) {
                     CalcOAUnitCoilComps(state, UnitNum, FirstHVACIteration, SimCompNum, QUnitOut);
                 }
             } break;
+                    
             case CompType::Coil_ElectricHeat: // 'Coil:Heating:Electric'
             case CompType::Coil_GasHeat: {    // 'Coil:Heating:Fuel'
                 if (Sim) {
@@ -2025,6 +2033,7 @@ namespace OutdoorAirUnit {
                     CalcOAUnitCoilComps(state, UnitNum, FirstHVACIteration, SimCompNum, QUnitOut);
                 }
             } break;
+                    
                 // water cooling coil Types
             case CompType::WaterCoil_Cooling: { // 'Coil:Cooling:Water'
                 if (Sim) {
@@ -2041,6 +2050,8 @@ namespace OutdoorAirUnit {
                     // auto const &wcCoilInletNode = state.dataLoopNodes->Node(InletNodeNum);
                     // auto &wcCoilOutletNode = state.dataLoopNodes->Node(OutletNodeNum);
 
+                    auto const *coilAirInNode = dln->nodes(thisOAEquip.CoilAirInNodeNum);
+                    auto *coilAirOutNode = dln->nodes(thisOAEquip.CoilAirOutNodeNum);
                     Real64 const CpAirZn = PsyCpAirFnW(coilAirInNode->HumRat);
                     if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::HeatingMode) || (coilAirInNode->Temp < CompAirOutTemp)) {
                         QCompReq = 0.0;
@@ -2075,6 +2086,7 @@ namespace OutdoorAirUnit {
                                       thisOAEquip.plantLoc);
                 }
             } break;
+                    
             case CompType::WaterCoil_DetailedCool: { // 'Coil:Cooling:Water:DetailedGeometry'
                 if (Sim) {
                     auto *controlNode = dln->nodes(thisOAEquip.CoilWaterInNodeNum);
@@ -2090,6 +2102,7 @@ namespace OutdoorAirUnit {
                     // auto const &wcCoilInletNode = state.dataLoopNodes->Node(InletNodeNum);
                     // auto &wcCoilOutletNode = state.dataLoopNodes->Node(OutletNodeNum);
 
+                    auto const *coilAirInNode = dln->nodes(thisOAEquip.CoilAirInNodeNum);
                     Real64 const CpAirZn = PsyCpAirFnW(coilAirInNode->HumRat);
 
                     if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::HeatingMode) || (coilAirInNode->Temp < CompAirOutTemp)) {
@@ -2121,6 +2134,7 @@ namespace OutdoorAirUnit {
                                       thisOAEquip.plantLoc);
                 }
             } break;
+                    
             case CompType::WaterCoil_CoolingHXAsst: { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
                 if (Sim) {
                     MaxWaterFlow = thisOAEquip.MaxWaterMassFlow;
@@ -2134,6 +2148,7 @@ namespace OutdoorAirUnit {
                     }
                     // auto &wcCoilOutletNode = state.dataLoopNodes->Node(OutletNodeNum);
 
+                    auto const *coilAirInNode = dln->nodes(thisOAEquip.CoilAirInNodeNum);
                     Real64 const CpAirZn = PsyCpAirFnW(coilAirInNode->HumRat);
                     if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::HeatingMode) || (coilAirInNode->Temp < CompAirOutTemp)) {
                         QCompReq = 0.0;
@@ -2162,6 +2177,7 @@ namespace OutdoorAirUnit {
                                       thisOAEquip.plantLoc);
                 }
             } break;
+                    
             case CompType::DXSystem: { // CoilSystem:Cooling:DX  old 'CompType:UnitaryCoolOnly'
                 if (Sim) {
                     if (thisOAEquip.compPointer == nullptr) {
@@ -2193,6 +2209,7 @@ namespace OutdoorAirUnit {
                                                       latOut);
                 }
             } break;
+                    
             case CompType::DXHeatPumpSystem: {
                 if (Sim) {
                     if (((OpMode == Operation::NeutralMode) && (thisOutAirUnit.controlType == OAUnitCtrlType::Temperature)) ||
@@ -2205,6 +2222,7 @@ namespace OutdoorAirUnit {
                     SimDXHeatPumpSystem(state, EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
                 }
             } break;
+                    
                 // RAR need new CompType:UnitarySystem object here
             case CompType::UnitarySystemModel: { // 'CompType:UnitarySystem'
                 if (Sim) {

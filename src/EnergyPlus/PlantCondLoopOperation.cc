@@ -3523,8 +3523,6 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
 
     auto &this_component = CompData::getPlantComponent(state, plantLoc);
     auto &dln = state.dataLoopNodes;
-    auto const *inNode = dln->nodes(this_component.InNodeNum);
-
     // start of bad band-aid, need a general and comprehensive approach for determining current capacity of all kinds of equipment
     // Need to truncate the load down in case outlet temperature will hit a lower/upper limit
 
@@ -3533,6 +3531,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
     // Chillers
     case DataPlant::HowMet::ByNominalCapLowOutLimit: { // chillers with lower limit on outlet temperature
 
+        auto const *inNode = dln->nodes(this_component.InNodeNum);
         //- Retrieve data from the plant loop data structure
         CurMassFlowRate = inNode->MassFlowRate;
         ToutLowLimit = this_component.MinOutletTemp;
@@ -3548,9 +3547,8 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
         if (CurMassFlowRate > 0.0) {
             ChangeInLoad = min(ChangeInLoad, QdotTmp);
         }
+    } break;
 
-        break;
-    }
     case DataPlant::HowMet::ByNominalCapFreeCoolCntrl: {
         // for chillers with free cooling shutdown (HeatExchanger:Hydronic currently)
         // determine if free cooling controls shut off chiller
@@ -3558,12 +3556,12 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
         switch (this_component.FreeCoolCntrlMode) {
         case DataPlant::FreeCoolControlMode::WetBulb: {
             Tsensor = state.dataEnvrn->OutWetBulbTemp;
-            break;
-        }
+        } break;
+
         case DataPlant::FreeCoolControlMode::DryBulb: {
             Tsensor = state.dataEnvrn->OutDryBulbTemp;
-            break;
-        }
+        } break; 
+
         case DataPlant::FreeCoolControlMode::Loop: {
             ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
             if (ControlNodeNum > 0) {
@@ -3571,10 +3569,9 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
             } else {
                 Tsensor = 23.0;
             }
-            break;
-        }
-        default:
-            break;
+        } break; 
+        default: {
+        } break;
         }
 
         if (Tsensor < TinLowLimit) { // turn off chiller to initiate free cooling
@@ -3585,22 +3582,22 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
             this_component.Available = true;
             this_component.FreeCoolCntrlShutDown = false;
         }
+    } break;
 
-        break;
-    }
     case DataPlant::HowMet::ByNominalCapLowOutLimitFreeCoolCntrl: {
+        auto const *inNode = dln->nodes(this_component.InNodeNum);
         // for chillers with free cooling shutdown (HeatExchanger:Hydronic currently)
         // determine if free cooling controls shut off chiller
         TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
         switch (this_component.FreeCoolCntrlMode) {
         case DataPlant::FreeCoolControlMode::WetBulb: {
             Tsensor = state.dataEnvrn->OutWetBulbTemp;
-            break;
-        }
+        } break;
+
         case DataPlant::FreeCoolControlMode::DryBulb: {
             Tsensor = state.dataEnvrn->OutDryBulbTemp;
-            break;
-        }
+        } break;
+                
         case DataPlant::FreeCoolControlMode::Loop: {
             ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
             if (ControlNodeNum > 0) {
@@ -3608,10 +3605,9 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
             } else {
                 Tsensor = 23.0;
             }
-            break;
-        }
-        default:
-            break;
+        } break; 
+        default: {
+        } break;
         }
 
         if (Tsensor < TinLowLimit) { // turn off chiller to initiate free cooling
@@ -3638,10 +3634,10 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
                 ChangeInLoad = min(ChangeInLoad, QdotTmp);
             }
         }
-
-        break;
-    }
+    } break;
+            
     case DataPlant::HowMet::ByNominalCapHiOutLimit: { // boilers with upper limit on outlet temperature
+        auto const *inNode = dln->nodes(this_component.InNodeNum);
         //- Retrieve data from the plant loop data structure
         CurMassFlowRate = inNode->MassFlowRate;
         ToutHiLimit = this_component.MaxOutletTemp;
@@ -3656,16 +3652,14 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
         if (CurMassFlowRate > 0.0) {
             ChangeInLoad = min(ChangeInLoad, QdotTmp);
         }
-
-        break;
-    }
+    } break;
+            
     case DataPlant::HowMet::PassiveCap: { // need to estimate current capacity if more or less passive devices ??
-
-        break;
-    }
-    default:
-        break;
-    }
+    } break;
+            
+    default: {
+    } break;
+    } // switch (HowLoadServed)
 }
 
 void FindCompSPLoad(EnergyPlusData &state,

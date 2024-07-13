@@ -10789,7 +10789,6 @@ void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
     auto &AirChillerSet = state.dataRefrigCase->AirChillerSet;
 
     auto &dln = state.dataLoopNodes;
-    auto *waterInNode = dln->nodes(this->WaterInNodeNum);
 
     state.dataRefrigCase->TotalRackDeliveredCapacity = 0.0;
     state.dataRefrigCase->CompressorCOPactual = 0.0;
@@ -10915,6 +10914,7 @@ void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
 
         // Obtain water-cooled condenser inlet/outlet temps
         if (this->CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
+            auto const *waterInNode = dln->nodes(this->WaterInNodeNum);
             this->InletTemp = waterInNode->Temp;
             EffectTemp = waterInNode->Temp + 5.0; // includes approach temp
             if (this->InletTemp < this->InletTempMin) {

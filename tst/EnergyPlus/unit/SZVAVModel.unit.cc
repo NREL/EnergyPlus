@@ -176,7 +176,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataSize->CurOASysNum = 0;
 
     auto &dln = state->dataLoopNodes;
-    for (int i = 0; i < 10; ++i) dln->nodes.push_back(new Node::NodeData);
+    // for (int i = 0; i < 10; ++i) dln->nodes.push_back(new Node::NodeData);
 
     bool errFlag;
     UnitarySystems::UnitarySys thisUnit;
@@ -202,7 +202,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     airInNode->Temp = 21.0;
     airInNode->HumRat = 0.00773;
     airInNode->Enthalpy = 40747.4;
-    thisUnit.ControlledZoneNodeNum = 5;
+    thisUnit.ControlledZoneNodeNum = Node::GetNodeIndex(*state, "ZoneNode");
 
     auto *zoneNode = dln->nodes(zoneNodeNum);
     zoneNode->Temp = 21.0;
@@ -316,7 +316,6 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     auto *airOutNode = dln->nodes(thisUnit.AirOutNodeNum);
     airOutNode->Temp = 21.0;
     airOutNode->HumRat = 0.08;
-
     zoneNode->Temp = 24.0;
     zoneNode->HumRat = 0.011;
     zoneNode->Enthalpy = 52120.0;

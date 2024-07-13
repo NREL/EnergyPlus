@@ -655,7 +655,7 @@ void GetIHPInput(EnergyPlusData &state)
         int airOutNodeNum = ihp.HeatCoilAirInNodeNum = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirOutNodeNum;
 
         auto const *airInNode = dln->nodes(airInNodeNum);
-        auto const *airOutNode = dln->nodes(airInNodeNum);
+        auto const *airOutNode = dln->nodes(airOutNodeNum);
 
         TestCompSet(state, CurrentModuleObject, ihp.Name + " Cooling Coil", airInNode->Name, airOutNode->Name, "Cooling Air Nodes");
         RegisterNodeConnection(state,
@@ -698,7 +698,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    ErrorsFound);
 
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).AirInNodeNum != airInNodeNum) ||
-            (state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).AirOutNodeNum != airInNodeNum)) {
+            (state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).AirOutNodeNum != airOutNodeNum)) {
             ShowContinueError(state, format("Mistaken air node connection: {}{}-wrong coil node names.", CurrentModuleObject, ihp.SCWHCoilName));
             ErrorsFound = true;
         }

@@ -7183,17 +7183,17 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
             state, thisDXCoil.Name, thisDXCoil.DXCoilType, thisDXCoil.SupplyFanName, thisDXCoil.supplyFanType, thisDXCoil.SupplyFanIndex);
     }
 
-    auto const *airInletNode = dln->nodes(thisDXCoil.AirInNodeNum);
+    auto const *airInNode = dln->nodes(thisDXCoil.AirInNodeNum);
 
     // Each iteration, load the coil data structure with the inlet conditions
 
-    thisDXCoil.InletAirMassFlowRate = airInletNode->MassFlowRate;
-    thisDXCoil.InletAirMassFlowRateMax = max(airInletNode->MassFlowRateMax, airInletNode->MassFlowRate);
-    thisDXCoil.InletAirTemp = airInletNode->Temp;
-    thisDXCoil.InletAirHumRat = airInletNode->HumRat;
-    thisDXCoil.InletAirEnthalpy = airInletNode->Enthalpy;
+    thisDXCoil.InletAirMassFlowRate = airInNode->MassFlowRate;
+    thisDXCoil.InletAirMassFlowRateMax = max(airInNode->MassFlowRateMax, airInNode->MassFlowRate);
+    thisDXCoil.InletAirTemp = airInNode->Temp;
+    thisDXCoil.InletAirHumRat = airInNode->HumRat;
+    thisDXCoil.InletAirEnthalpy = airInNode->Enthalpy;
     //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
-    //  DXCoil(DXCoilNum)%InletAirPressure        = Node(AirInletNode)%Press
+    //  DXCoil(DXCoilNum)%InletAirPressure        = Node(AirInNode)%Press
 
     if (thisDXCoil.DXCoilType_Num == HVAC::CoilDX_HeatingEmpirical || thisDXCoil.DXCoilType_Num == HVAC::CoilDX_MultiSpeedHeating) {
         if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -8760,22 +8760,22 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
     auto &dln = state.dataLoopNodes;
     
     DXCoilData &Coil = state.dataDXCoils->DXCoil(DXCoilNum);
-    auto *airInletNode = dln->nodes(Coil.AirInNodeNum);
-    auto *waterInletNode = dln->nodes(Coil.WaterInNodeNum);
-    auto *waterOutletNode = dln->nodes(Coil.WaterOutNodeNum);
+    auto *airInNode = dln->nodes(Coil.AirInNodeNum);
+    auto *waterInNode = dln->nodes(Coil.WaterInNodeNum);
+    auto *waterOutNode = dln->nodes(Coil.WaterOutNodeNum);
 
     // If heat pump water heater is OFF, set outlet to inlet and RETURN
     // Also set the heating energy rate to zero
-    if (PartLoadRatio == 0.80) {
-        *waterOutletNode = *waterInletNode; // Is this supposed to be a copy?
+    if (PartLoadRatio == 0.0) {
+        waterOutNode->copyState(*waterInNode); // Is this supposed to be a copy?
         Coil.TotalHeatingEnergyRate = 0.0;
         return;
     } else {
         RatedHeatingCapacity = Coil.RatedTotCap2;
         RatedHeatingCOP = Coil.RatedCOP(1);
-        InletWaterTemp = waterInletNode->Temp;
-        CondInletMassFlowRate = waterInletNode->MassFlowRate / PartLoadRatio;
-        EvapInletMassFlowRate = airInletNode->MassFlowRate / PartLoadRatio;
+        InletWaterTemp = waterInNode->Temp;
+        CondInletMassFlowRate = waterInNode->MassFlowRate / PartLoadRatio;
+        EvapInletMassFlowRate = airInNode->MassFlowRate / PartLoadRatio;
         CpWater = CPHW(InletWaterTemp);
         CompressorPower = 0.0;
         OperatingHeatingPower = 0.0;
@@ -9040,9 +9040,9 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
         OutletWaterTemp = InletWaterTemp + TotalTankHeatingCapacity / (CpWater * CondInletMassFlowRate);
     }
 
-    waterOutletNode->Temp = OutletWaterTemp;
+    waterOutNode->Temp = OutletWaterTemp;
 
-    waterOutletNode->MassFlowRate = waterInletNode->MassFlowRate;
+    waterOutNode->MassFlowRate = waterInNode->MassFlowRate;
 
     // send heating capacity and COP to water heater module for standards rating calculation
     // total heating capacity including condenser pump
@@ -10083,9 +10083,9 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     thisDXCoil.CondInletTemp = CondInletTemp;
 
     // set outlet node conditions
-    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
-    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
-    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutNode->HumRat = thisDXCoil.OutletAirHumRat;
 
     // calc secondary coil if specified
     if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -10781,9 +10781,9 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     state.dataDXCoils->DXCoilCoolInletAirWBTemp(DXCoilNum) = PsyTwbFnTdbWPb(state, InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure);
 
     // set outlet node conditions
-    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
-    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
-    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutNode->HumRat = thisDXCoil.OutletAirHumRat;
 }
 
 void CalcDXHeatingCoil(EnergyPlusData &state,
@@ -11273,9 +11273,9 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
     state.dataDXCoils->DXCoilHeatInletAirWBTemp(DXCoilNum) = InletAirWetBulbC;
 
     // set outlet node conditions
-    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
-    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
-    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutNode->HumRat = thisDXCoil.OutletAirHumRat;
 
     // calc secondary coil if specified
     if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -11789,9 +11789,9 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
     thisDXCoil.CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
 
     // set outlet node conditions
-    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
-    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
-    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutNode->HumRat = thisDXCoil.OutletAirHumRat;
 
     // calc secondary coil if specified
     if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -13356,9 +13356,9 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
     thisDXCoil.CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
 
     // set outlet node conditions
-    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
-    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
-    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutNode->HumRat = thisDXCoil.OutletAirHumRat;
 
     // calc secondary coil if specified
     if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -14109,9 +14109,9 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
     thisDXCoil.MSCycRatio = CycRatio;
 
     // set outlet node conditions
-    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
-    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
-    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutNode->HumRat = thisDXCoil.OutletAirHumRat;
 
     // calc secondary coil if specified
     if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -14135,26 +14135,26 @@ void UpdateDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
     
     auto &thisDXCoil = state.dataDXCoils->DXCoil(DXCoilNum);
 
-    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
-    auto const *airInletNode = dln->nodes(thisDXCoil.AirInNodeNum);
+    auto *airOutNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    auto const *airInNode = dln->nodes(thisDXCoil.AirInNodeNum);
     // changed outputs
-    airOutletNode->Enthalpy = thisDXCoil.OutletAirEnthalpy;
-    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
-    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
-    airOutletNode->MassFlowRate = thisDXCoil.InletAirMassFlowRate;
+    airOutNode->Enthalpy = thisDXCoil.OutletAirEnthalpy;
+    airOutNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutNode->HumRat = thisDXCoil.OutletAirHumRat;
+    airOutNode->MassFlowRate = thisDXCoil.InletAirMassFlowRate;
     // pass through outputs
-    airOutletNode->Quality = airInletNode->Quality;
-    airOutletNode->Press = airInletNode->Press;
-    airOutletNode->MassFlowRateMin = airInletNode->MassFlowRateMin;
-    airOutletNode->MassFlowRateMax = airInletNode->MassFlowRateMax;
-    airOutletNode->MassFlowRateMinAvail = airInletNode->MassFlowRateMinAvail;
-    airOutletNode->MassFlowRateMaxAvail = airInletNode->MassFlowRateMaxAvail;
+    airOutNode->Quality = airInNode->Quality;
+    airOutNode->Press = airInNode->Press;
+    airOutNode->MassFlowRateMin = airInNode->MassFlowRateMin;
+    airOutNode->MassFlowRateMax = airInNode->MassFlowRateMax;
+    airOutNode->MassFlowRateMinAvail = airInNode->MassFlowRateMinAvail;
+    airOutNode->MassFlowRateMaxAvail = airInNode->MassFlowRateMaxAvail;
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        airOutletNode->CO2 = airInletNode->CO2;
+        airOutNode->CO2 = airInNode->CO2;
     }
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        airOutletNode->GenContam = airInletNode->GenContam;
+        airOutNode->GenContam = airInNode->GenContam;
     }
 }
 
@@ -14373,8 +14373,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     int PartLoadTestPoint;
     int countStaticInputs;
     int index;
-    int FanInletNodeNum;
-    int FanOutletNodeNum;
+    int FanInNodeNum;
+    int FanOutNodeNum;
 
     auto &dln = state.dataLoopNodes;
     
@@ -14436,22 +14436,22 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 ExternalStatic = 190.0;
             }
             FanStaticPressureRise = ExternalStatic + thisDXCoil.InternalStaticPressureDrop;
-            FanInletNodeNum = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->inNodeNum;
-            FanOutletNodeNum = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->outNodeNum;
+            FanInNodeNum = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->inNodeNum;
+            FanOutNodeNum = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->outNodeNum;
 
             // set node state variables in preparation for fan model.
-            auto *fanInletNode = dln->nodes(FanInletNodeNum);
-            auto *fanOutletNode = dln->nodes(FanOutletNodeNum);
-            fanInletNode->MassFlowRate = thisDXCoil.RatedAirMassFlowRate(1);
-            fanOutletNode->MassFlowRate = thisDXCoil.RatedAirMassFlowRate(1);
-            fanInletNode->Temp = CoolingCoilInletAirDryBulbTempRated;
-            fanInletNode->HumRat = PsyWFnTdbTwbPb(
+            auto *fanInNode = dln->nodes(FanInNodeNum);
+            auto *fanOutNode = dln->nodes(FanOutNodeNum);
+            fanInNode->MassFlowRate = thisDXCoil.RatedAirMassFlowRate(1);
+            fanOutNode->MassFlowRate = thisDXCoil.RatedAirMassFlowRate(1);
+            fanInNode->Temp = CoolingCoilInletAirDryBulbTempRated;
+            fanInNode->HumRat = PsyWFnTdbTwbPb(
                 state, CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, state.dataEnvrn->OutBaroPress, RoutineName);
-            fanInletNode->Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, fanInletNode->HumRat);
+            fanInNode->Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, fanInNode->HumRat);
             state.dataFans->fans(thisDXCoil.SupplyFanIndex)->simulate(state, true, _, FanStaticPressureRise);
             FanPowerCorrection = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->totalPower;
 
-            FanHeatCorrection = fanInletNode->MassFlowRate * (fanOutletNode->Enthalpy - fanInletNode->Enthalpy);
+            FanHeatCorrection = fanInNode->MassFlowRate * (fanOutNode->Enthalpy - fanInNode->Enthalpy);
 
             NetCoolingCapRated = thisDXCoil.RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
         }
@@ -14528,8 +14528,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
         int fanIndex = 0;
         if (thisDXCoil.RateWithInternalStaticAndFanObject) {
             par7 = 0.0;
-            fanInNodeNum = FanInletNodeNum;
-            fanOutNodeNum = FanOutletNodeNum;
+            fanInNodeNum = FanInNodeNum;
+            fanOutNodeNum = FanOutNodeNum;
             externalStatic = ExternalStatic;
             fanIndex = thisDXCoil.SupplyFanIndex;
         }
@@ -14563,15 +14563,15 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 if (coil.RateWithInternalStaticAndFanObject) {
                     // modify external static per AHRI 340/360, Table 6, note 1.
                     Real64 FanStaticPressureRise = coil.InternalStaticPressureDrop + (externalStatic * pow_2(AirMassFlowRatio));
-                    auto *inletNode = state.dataLoopNodes->nodes(fanInNodeNum);
-                    auto *outletNode = state.dataLoopNodes->nodes(fanOutNodeNum);
-                    inletNode->MassFlowRate = SupplyAirMassFlowRate;
-                    outletNode->MassFlowRate = SupplyAirMassFlowRate;
-                    inletNode->Temp = dbRated;
-                    inletNode->HumRat = PsyWFnTdbTwbPb(state, dbRated, wbRated, state.dataEnvrn->OutBaroPress, RoutineName);
-                    inletNode->Enthalpy = PsyHFnTdbW(dbRated, inletNode->HumRat);
+                    auto *inNode = state.dataLoopNodes->nodes(fanInNodeNum);
+                    auto *outNode = state.dataLoopNodes->nodes(fanOutNodeNum);
+                    inNode->MassFlowRate = SupplyAirMassFlowRate;
+                    outNode->MassFlowRate = SupplyAirMassFlowRate;
+                    inNode->Temp = dbRated;
+                    inNode->HumRat = PsyWFnTdbTwbPb(state, dbRated, wbRated, state.dataEnvrn->OutBaroPress, RoutineName);
+                    inNode->Enthalpy = PsyHFnTdbW(dbRated, inNode->HumRat);
                     state.dataFans->fans(coil.SupplyFanIndex)->simulate(state, true, _, FanStaticPressureRise);
-                    FanHeatCorrection = SupplyAirMassFlowRate * (outletNode->Enthalpy - inletNode->Enthalpy);
+                    FanHeatCorrection = SupplyAirMassFlowRate * (outNode->Enthalpy - inNode->Enthalpy);
                 } else {
                     FanHeatCorrection = par7 * SupplyAirVolFlowRate;
                 }
@@ -14636,18 +14636,18 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
             SupplyAirVolFlowRate = PartLoadAirMassFlowRate / SupplyAirRho;
 
             if (thisDXCoil.RateWithInternalStaticAndFanObject) {
-                auto *fanInletNode = dln->nodes(FanInletNodeNum);
-                auto *fanOutletNode = dln->nodes(FanOutletNodeNum);
+                auto *fanInNode = dln->nodes(FanInNodeNum);
+                auto *fanOutNode = dln->nodes(FanOutNodeNum);
                 FanStaticPressureRise = thisDXCoil.InternalStaticPressureDrop + (ExternalStatic * pow_2(AirMassFlowRatio));
-                fanInletNode->MassFlowRate = PartLoadAirMassFlowRate;
-                fanInletNode->Temp = CoolingCoilInletAirDryBulbTempRated;
-                fanInletNode->HumRat = SupplyAirHumRat;
-                fanInletNode->Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
+                fanInNode->MassFlowRate = PartLoadAirMassFlowRate;
+                fanInNode->Temp = CoolingCoilInletAirDryBulbTempRated;
+                fanInNode->HumRat = SupplyAirHumRat;
+                fanInNode->Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
 
                 state.dataFans->fans(thisDXCoil.SupplyFanIndex)->simulate(state, true, _, FanStaticPressureRise);
                 FanPowerCorrection = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->totalPower;
 
-                FanHeatCorrection = PartLoadAirMassFlowRate * (fanOutletNode->Enthalpy - fanInletNode->Enthalpy);
+                FanHeatCorrection = PartLoadAirMassFlowRate * (fanOutNode->Enthalpy - fanInNode->Enthalpy);
 
             } else {
                 FanPowerCorrection = FanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;

@@ -295,6 +295,9 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     dln->nodes(1)->Name = "Supply";
     dln->nodes(2)->Name = "Return";
 
+    dln->nodeMap.insert_or_assign(dln->nodes(1)->Name, 1);
+    dln->nodeMap.insert_or_assign(dln->nodes(2)->Name, 2);
+
     dln->nodes(1)->Temp = 20.0;
     dln->nodes(1)->HumRat = 0.001;
     dln->nodes(1)->MassFlowRate = 0.01;

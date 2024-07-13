@@ -700,8 +700,8 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                       hybridUnitaryAC.Name,
                       cCurrentModuleObject,
                       hybridUnitaryAC.Name,
-                      dln->nodes(hybridUnitaryAC.SecAirInNodeNum)->Name,
-                      dln->nodes(hybridUnitaryAC.SecAirOutNodeNum)->Name);
+                      (hybridUnitaryAC.SecAirInNodeNum > 0) ? dln->nodes(hybridUnitaryAC.SecAirInNodeNum)->Name : "undefined",
+                      (hybridUnitaryAC.SecAirOutNodeNum > 0) ? dln->nodes(hybridUnitaryAC.SecAirOutNodeNum)->Name : "undefined");
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Total Cooling Rate",

@@ -950,7 +950,6 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
     auto &dln = state.dataLoopNodes;
     auto const *supplyLoopInNode = dln->nodes(this->SupplySideLoop.InNodeNum);
     auto const *demandLoopInNode = dln->nodes(this->DemandSideLoop.InNodeNum);
-    auto const *setPointNode = dln->nodes(this->SetPointNodeNum);
     
     Real64 mdotSupSide;
     Real64 mdotDmdSide;
@@ -1153,6 +1152,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
         }
         case ControlType::HeatingSetPointModulated: {
 
+            auto const *setPointNode = dln->nodes(this->SetPointNodeNum);
             Real64 SetPointTemp = setPointNode->TempSetPoint;
             Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
             if ((DeltaTHeating > this->TempControlTol) && (SetPointTemp > this->SupplySideLoop.InletTemp)) {
@@ -1188,6 +1188,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
         }
         case ControlType::HeatingSetPointOnOff: {
 
+            auto const *setPointNode = dln->nodes(this->SetPointNodeNum);
             Real64 SetPointTemp = setPointNode->TempSetPoint;
             Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
             if ((DeltaTHeating > this->TempControlTol) && (SetPointTemp > this->SupplySideLoop.InletTemp)) {
@@ -1221,6 +1222,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
         }
         case ControlType::CoolingSetPointModulated: {
 
+            auto const *setPointNode = dln->nodes(this->SetPointNodeNum);
             Real64 SetPointTemp = setPointNode->TempSetPoint;
             Real64 DeltaTCooling = this->SupplySideLoop.InletTemp - this->DemandSideLoop.InletTemp;
             if ((DeltaTCooling > this->TempControlTol) && (SetPointTemp < this->SupplySideLoop.InletTemp)) {
@@ -1255,6 +1257,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
         }
         case ControlType::CoolingSetPointOnOff: {
 
+            auto const *setPointNode = dln->nodes(this->SetPointNodeNum);
             Real64 SetPointTemp = setPointNode->TempSetPoint;
             Real64 DeltaTCooling = this->SupplySideLoop.InletTemp - this->DemandSideLoop.InletTemp;
             if ((DeltaTCooling > this->TempControlTol) && (SetPointTemp < this->SupplySideLoop.InletTemp)) {
@@ -1288,6 +1291,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
         }
         case ControlType::DualDeadBandSetPointModulated: {
 
+            auto const *setPointNode = dln->nodes(this->SetPointNodeNum);
             Real64 SetPointTempLo = setPointNode->TempSetPointLo;
             Real64 SetPointTempHi = setPointNode->TempSetPointHi;
             Real64 DeltaTCooling = this->SupplySideLoop.InletTemp - this->DemandSideLoop.InletTemp;
@@ -1338,6 +1342,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
         }
         case ControlType::DualDeadBandSetPointOnOff: {
 
+            auto const *setPointNode = dln->nodes(this->SetPointNodeNum);
             Real64 SetPointTempLo = setPointNode->TempSetPointLo;
             Real64 SetPointTempHi = setPointNode->TempSetPointHi;
             Real64 DeltaTCooling = this->SupplySideLoop.InletTemp - this->DemandSideLoop.InletTemp;
@@ -1437,6 +1442,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
                 break;
             }
 
+            auto const *setPointNode = dln->nodes(this->SetPointNodeNum);
             Real64 SetPointTemp = setPointNode->TempSetPoint;
             Real64 DeltaTCooling = SetPointTemp - ControlSignalValue;
             // obtain shut down state

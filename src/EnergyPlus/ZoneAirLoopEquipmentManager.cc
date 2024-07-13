@@ -565,20 +565,19 @@ namespace ZoneAirLoopEquipmentManager {
         Real64 SpecHumIn(0.0);              // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 
         auto &dln = state.dataLoopNodes;
+        auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum);
 
         ProvideSysOutput = true;
-        for (AirDistCompNum = 1; AirDistCompNum <= state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).NumComponents; ++AirDistCompNum) {
+        for (AirDistCompNum = 1; AirDistCompNum <= airDistUnit.NumComponents; ++AirDistCompNum) {
             NonAirSysOutput = 0.0;
 
-            auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum);
-            auto *inNode = dln->nodes(airDistUnit.InNodeNum);
-            auto *outNode = dln->nodes(airDistUnit.OutNodeNum);
             MassFlowRateMaxAvail = 0.0;
             MassFlowRateMinAvail = 0.0;
             // check for no plenum
             // set the max and min avail flow rates taking into acount the upstream leak
             if (airDistUnit.UpStreamLeak) {
                 if (airDistUnit.InNodeNum > 0) {
+                    auto *inNode = dln->nodes(airDistUnit.InNodeNum);
                     MassFlowRateMaxAvail = inNode->MassFlowRateMaxAvail;
                     MassFlowRateMinAvail = inNode->MassFlowRateMinAvail;
                     if (airDistUnit.IsConstLeakageRate) {
@@ -742,6 +741,9 @@ namespace ZoneAirLoopEquipmentManager {
 
             // do leak mass flow calcs
             if (airDistUnit.InNodeNum > 0) { // InNodeNum is not always known when this is called, eg FPIU
+                auto *inNode = dln->nodes(airDistUnit.InNodeNum);
+                auto *outNode = dln->nodes(airDistUnit.OutNodeNum);
+                
                 if (airDistUnit.UpStreamLeak) {
                     inNode->MassFlowRateMaxAvail = MassFlowRateMaxAvail;
                     inNode->MassFlowRateMinAvail = MassFlowRateMinAvail;

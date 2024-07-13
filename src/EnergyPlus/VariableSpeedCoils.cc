@@ -4409,7 +4409,6 @@ namespace VariableSpeedCoils {
         // Set water and air inlet nodes
 
         auto *airInNode = dln->nodes(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInNodeNum);
-        auto *waterInNode = dln->nodes(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInNodeNum);
 
         if ((SensLoad != 0.0 || LatentLoad != 0.0) && (airInNode->MassFlowRate > 0.0)) {
 
@@ -4460,6 +4459,7 @@ namespace VariableSpeedCoils {
                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterOutNodeNum,
                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc);
 
+            auto *waterInNode = dln->nodes(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInNodeNum);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp = waterInNode->Temp;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterEnthalpy = waterInNode->Enthalpy;
         } else {
@@ -4468,6 +4468,7 @@ namespace VariableSpeedCoils {
         }
 
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == HVAC::CoilDX_HeatPumpWaterHeaterVariableSpeed) {
+            auto *waterInNode = dln->nodes(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInNodeNum);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp = waterInNode->Temp;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterEnthalpy = waterInNode->Enthalpy;
         };
@@ -6679,7 +6680,7 @@ namespace VariableSpeedCoils {
 
         // If heat pump water heater is OFF, set outlet to inlet and RETURN
         if (PartLoadRatio == 0.0) {
-            *condOutNode = *condInNode;
+            condOutNode->copyState(*condInNode);
             return;
         }            
 
@@ -8279,7 +8280,6 @@ namespace VariableSpeedCoils {
 
         auto *airInNode = dln->nodes(varSpeedCoil.AirInNodeNum);
         auto *airOutNode = dln->nodes(varSpeedCoil.AirOutNodeNum);
-        auto *waterOutNode = dln->nodes(varSpeedCoil.WaterOutNodeNum);
 
         // Set the air outlet  nodes of the WatertoAirHPSimple
         airOutNode->MassFlowRate = airInNode->MassFlowRate; // LoadSideMassFlowRate
@@ -8299,6 +8299,7 @@ namespace VariableSpeedCoils {
         // Set the water outlet nodes for properties that just pass through & not used
         if (varSpeedCoil.WaterInNodeNum != 0 && varSpeedCoil.WaterOutNodeNum != 0) {
             SafeCopyPlantNode(state, varSpeedCoil.WaterInNodeNum, varSpeedCoil.WaterOutNodeNum);
+            auto *waterOutNode = dln->nodes(varSpeedCoil.WaterOutNodeNum);
             waterOutNode->Temp = varSpeedCoil.OutletWaterTemp;
             waterOutNode->Enthalpy = varSpeedCoil.OutletWaterEnthalpy;
         }

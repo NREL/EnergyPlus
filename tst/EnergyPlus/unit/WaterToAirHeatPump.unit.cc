@@ -199,20 +199,20 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
     Real64 DesignAirflow(2.0);
 
     auto &dln = state->dataLoopNodes;
-    auto *waterInNode = dln->nodes(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInNodeNum);
-    auto *airInNode = dln->nodes(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInNodeNum);
-    waterInNode->Temp = 5.0;
-    waterInNode->Enthalpy = 44650.0;
+    auto *waterInNode1 = dln->nodes(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInNodeNum);
+    auto *airInNode1 = dln->nodes(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInNodeNum);
+    waterInNode1->Temp = 5.0;
+    waterInNode1->Enthalpy = 44650.0;
 
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
-    waterInNode->MassFlowRate = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    waterInNode->MassFlowRateMax = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    waterInNode->MassFlowRateMaxAvail =state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    waterInNode1->MassFlowRate = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    waterInNode1->MassFlowRateMax = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    waterInNode1->MassFlowRateMaxAvail =state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
 
-    airInNode->MassFlowRate = DesignAirflow;
-    airInNode->Temp = 26.0;
-    airInNode->HumRat = 0.007;
-    airInNode->Enthalpy = 43970.75;
+    airInNode1->MassFlowRate = DesignAirflow;
+    airInNode1->Temp = 26.0;
+    airInNode1->HumRat = 0.007;
+    airInNode1->Enthalpy = 43970.75;
 
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -261,6 +261,9 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
                 0.000000001);
 
     HPNum = 2;
+    auto *waterInNode2 = dln->nodes(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInNodeNum);
+    auto *airInNode2 = dln->nodes(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInNodeNum);
+    
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum = 2;
     state->dataPlnt->PlantLoop(2).Name = "HotWaterLoop";
     state->dataPlnt->PlantLoop(2).FluidName = "HotWater";
@@ -273,18 +276,18 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum =
         state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInNodeNum;
 
-    waterInNode->Temp = 35.0;
-    waterInNode->Enthalpy = 43950.0;
+    waterInNode2->Temp = 35.0;
+    waterInNode2->Enthalpy = 43950.0;
 
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
-    waterInNode->MassFlowRate = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    waterInNode->MassFlowRateMax = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    waterInNode->MassFlowRateMaxAvail = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    waterInNode2->MassFlowRate = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    waterInNode2->MassFlowRateMax = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    waterInNode2->MassFlowRateMaxAvail = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
 
-    airInNode->MassFlowRate = DesignAirflow;
-    airInNode->Temp = 15.0;
-    airInNode->HumRat = 0.004;
-    airInNode->Enthalpy = PsyHFnTdbW(15.0, 0.004);
+    airInNode2->MassFlowRate = DesignAirflow;
+    airInNode2->Temp = 15.0;
+    airInNode2->HumRat = 0.004;
+    airInNode2->Enthalpy = PsyHFnTdbW(15.0, 0.004);
 
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
 

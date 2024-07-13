@@ -6527,14 +6527,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             if (state.dataPlnt->PlantFirstSizesOkayToReport || !state.dataGlobal->AnyPlantInModel || this->AlreadyRated) this->MyHPSizeFlag = false;
         }
 
-        auto *hpAirInNode = dln->nodes(hpwh.HeatPumpAirInNodeNum);
-        auto *hpAirOutNode = dln->nodes(hpwh.HeatPumpAirOutNodeNum);
-        auto *outsideAirInNode = dln->nodes(hpwh.OutsideAirInNodeNum);
-        auto *exhaustAirOutNode = dln->nodes(hpwh.ExhaustAirOutNodeNum);
         auto *hpWaterInNode = dln->nodes(hpwh.CondWaterInNodeNum);
         auto *hpWaterOutNode = dln->nodes(hpwh.CondWaterOutNodeNum);
-        auto *mixerAirInNode = dln->nodes(hpwh.MixerAirInNodeNum);
-        auto *splitterAirOutNode = dln->nodes(hpwh.SplitterAirOutNodeNum);
         auto *fanOutNode = dln->nodes(hpwh.FanOutNodeNum);
 
         switch (hpwh.CrankcaseTempIndicator) {
@@ -6569,11 +6563,11 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         Real64 HPInletRelHum;
         switch (hpwh.InletAirConfiguration) {
         case WTTAmbientTemp::TempZone: {
+            auto const *hpAirInNode = dln->nodes(hpwh.HeatPumpAirInNodeNum);
             state.dataWaterThermalTanks->mixerInletAirSchedule = 0.0;
             HPInletDryBulbTemp = hpAirInNode->Temp;
             HPInletHumRat = hpAirInNode->HumRat;
-            break;
-        }
+        } break;
                 
         case WTTAmbientTemp::ZoneAndOA: {
             if (hpwh.InletAirMixerSchPtr > 0) {
@@ -6583,41 +6577,49 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             } else {
                 state.dataWaterThermalTanks->mixerInletAirSchedule = 0.0;
             }
+
+            auto *hpAirInNode = dln->nodes(hpwh.HeatPumpAirInNodeNum);
+            auto const *outsideAirInNode = dln->nodes(hpwh.OutsideAirInNodeNum);
             HPInletDryBulbTemp = state.dataWaterThermalTanks->mixerInletAirSchedule * outsideAirInNode->Temp +
                                  (1.0 - state.dataWaterThermalTanks->mixerInletAirSchedule) * hpAirInNode->Temp;
             HPInletHumRat = state.dataWaterThermalTanks->mixerInletAirSchedule * outsideAirInNode->HumRat +
                             (1.0 - state.dataWaterThermalTanks->mixerInletAirSchedule) * hpAirInNode->HumRat;
-            break;
-        }
-                
+        } break;
+
         case WTTAmbientTemp::OutsideAir: {
+            auto const *outsideAirInNode = dln->nodes(hpwh.OutsideAirInNodeNum);
             state.dataWaterThermalTanks->mixerInletAirSchedule = 1.0;
             HPInletDryBulbTemp = outsideAirInNode->Temp;
             HPInletHumRat = outsideAirInNode->HumRat;
+        } break;
 
-            break;
-        }
         case WTTAmbientTemp::Schedule: {
             HPInletDryBulbTemp =
                 ScheduleManager::GetCurrentScheduleValue(state, hpwh.AmbientTempSchedule);
             HPInletRelHum = ScheduleManager::GetCurrentScheduleValue(state, hpwh.AmbientRHSchedule);
             HPInletHumRat = Psychrometrics::PsyWFnTdbRhPb(state, HPInletDryBulbTemp, HPInletRelHum, state.dataEnvrn->OutBaroPress, RoutineName);
+
+            auto *hpAirInNode = dln->nodes(hpwh.HeatPumpAirInNodeNum);
             hpAirInNode->Temp = HPInletDryBulbTemp;
             hpAirInNode->HumRat = HPInletHumRat;
             hpAirInNode->Enthalpy = Psychrometrics::PsyHFnTdbW(HPInletDryBulbTemp, HPInletHumRat);
             hpAirInNode->Press = state.dataEnvrn->OutBaroPress;
+        } break;
 
-            break;
-        }
-        default:
+        default: {
             assert(false);
-            break;
-        }
+        } break;
+        } // switch ()
 
         state.dataWaterThermalTanks->mdotAir = hpwh.OperatingAirMassFlowRate;
 
         //   set up initial conditions on nodes
         if (hpwh.MixerAirInNodeNum > 0) {
+            auto *outsideAirInNode = dln->nodes(hpwh.OutsideAirInNodeNum);
+            auto *mixerAirInNode = dln->nodes(hpwh.MixerAirInNodeNum);
+            auto *exhaustAirOutNode = dln->nodes(hpwh.ExhaustAirOutNodeNum);
+            auto *hpAirInNode = dln->nodes(hpwh.HeatPumpAirInNodeNum);
+            auto *hpAirOutNode = dln->nodes(hpwh.HeatPumpAirInNodeNum);
             mixerAirInNode->MassFlowRate = 0.0;
             mixerAirInNode->MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
             mixerAirInNode->MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
@@ -6628,21 +6630,26 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             hpAirOutNode->MassFlowRate = 0.0;
             outsideAirInNode->MassFlowRate = 0.0;
             exhaustAirOutNode->MassFlowRate = 0.0;
+        } else if (hpwh.OutsideAirInNodeNum == 0) {
+            auto *hpAirInNode = dln->nodes(hpwh.HeatPumpAirInNodeNum);
+            auto *hpAirOutNode = dln->nodes(hpwh.HeatPumpAirInNodeNum);
+            hpAirInNode->MassFlowRate = 0.0;
+            hpAirInNode->MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
+            hpAirInNode->MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
+            hpAirOutNode->MassFlowRate = 0.0;
         } else {
-            if (hpwh.OutsideAirInNodeNum == 0) {
-                hpAirInNode->MassFlowRate = 0.0;
-                hpAirInNode->MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
-                hpAirInNode->MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
-                hpAirOutNode->MassFlowRate = 0.0;
-            } else {
-                outsideAirInNode->MassFlowRate = 0.0;
-                outsideAirInNode->MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
-                outsideAirInNode->MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
-                exhaustAirOutNode->MassFlowRate = 0.0;
-            }
+            auto *outsideAirInNode = dln->nodes(hpwh.OutsideAirInNodeNum);
+            auto *exhaustAirOutNode = dln->nodes(hpwh.ExhaustAirOutNodeNum);
+            outsideAirInNode->MassFlowRate = 0.0;
+            outsideAirInNode->MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
+            outsideAirInNode->MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
+            exhaustAirOutNode->MassFlowRate = 0.0;
         }
 
-        if (hpwh.SplitterAirOutNodeNum > 0) splitterAirOutNode->MassFlowRate = 0.0;
+        if (hpwh.SplitterAirOutNodeNum > 0) {
+            auto *splitterAirOutNode = dln->nodes(hpwh.SplitterAirOutNodeNum);
+            splitterAirOutNode->MassFlowRate = 0.0;
+        }
         // these are water nodes are not managed by plant. the HP connects
         // directly to the WH without using plant.
         if (hpwh.HPWHType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped) {
@@ -6778,7 +6785,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             }
         }
     }
-}
+} // WaterThermalTankData::initalize()
 
 void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // Water Heater being simulated
 {
@@ -7971,7 +7978,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
 
             // Heater Coefficients
             B[this->Heater1NodeNum - 1] += Qheater1;
-            B[this->Heater1NodeNum - 1] += Qheater2;
+            B[this->Heater2NodeNum - 1] += Qheater2;
 
             for (int i = 0; i < nTankNodes; i++) {
                 const int NodeNum = i + 1;
@@ -9000,14 +9007,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
     auto &dln = state.dataLoopNodes;
     
-    auto *hpAirInNode = dln->nodes(HeatPump.HeatPumpAirInNodeNum);
-    auto *hpAirOutNode = dln->nodes(HeatPump.HeatPumpAirOutNodeNum);
-    auto *outsideAirInNode = dln->nodes(HeatPump.OutsideAirInNodeNum);
-    auto *exhaustAirOutNode = dln->nodes(HeatPump.ExhaustAirOutNodeNum);
     auto *hpWaterInNode = dln->nodes(HeatPump.CondWaterInNodeNum);
     auto *hpWaterOutNode = dln->nodes(HeatPump.CondWaterOutNodeNum);
-    auto *mixerAirInNode = dln->nodes(HeatPump.MixerAirInNodeNum);
-    auto *splitterAirOutNode = dln->nodes(HeatPump.SplitterAirOutNodeNum);
     auto *dxCoilAirInNode = dln->nodes(HeatPump.DXCoilAirInNodeNum);
     auto *fanOutNode = dln->nodes(HeatPump.FanOutNodeNum);
     
@@ -9018,7 +9019,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     HeatPump.OffCycParaFuelRate = 0.0;
     HeatPump.OffCycParaFuelEnergy = 0.0;
     
-    *hpWaterOutNode = *hpWaterInNode;
+    hpWaterOutNode->copyState(*hpWaterInNode);
     int MaxSpeedNum = HeatPump.NumofSpeed; // speed number of variable speed HPWH coil
 
     // assign set point temperature (cut-out) and dead band temp diff (cut-in = cut-out minus dead band temp diff)
@@ -9052,7 +9053,9 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
         //   revert to float mode any time HPWH compressor is OFF
         HeatPump.Mode = TankOperatingMode::Floating;
         if (HeatPump.MixerAirInNodeNum > 0) {
-            *mixerAirInNode = *hpAirInNode;
+            auto *mixerAirInNode = dln->nodes(HeatPump.MixerAirInNodeNum);
+            auto const *hpAirInNode = dln->nodes(HeatPump.HeatPumpAirInNodeNum);
+            mixerAirInNode->copyState(*hpAirInNode);
         }
         //   pass node info and simulate crankcase heater
         if (MaxSpeedNum > 0) {
@@ -9184,7 +9187,9 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
         }
 
         if (HeatPump.SplitterAirOutNodeNum > 0) {
-            *hpAirOutNode = *splitterAirOutNode;
+            auto const *splitterAirOutNode = dln->nodes(HeatPump.SplitterAirOutNodeNum);
+            auto *hpAirOutNode = dln->nodes(HeatPump.HeatPumpAirOutNodeNum);
+            hpAirOutNode->copyState(*splitterAirOutNode);
         }
 
         //   Simulate tank if HP compressor unavailable for water heating
@@ -9807,6 +9812,9 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
     // set air-side mass flow rate for final calculation
     if (HeatPump.MixerAirInNodeNum > 0) {
+        auto *outsideAirInNode = dln->nodes(HeatPump.OutsideAirInNodeNum);
+        auto *mixerAirInNode = dln->nodes(HeatPump.MixerAirInNodeNum);
+        auto *hpAirInNode = dln->nodes(HeatPump.HeatPumpAirInNodeNum);
         mixerAirInNode->MassFlowRate = state.dataWaterThermalTanks->mdotAir * state.dataWaterThermalTanks->hpPartLoadRatio;
         hpAirInNode->MassFlowRate = state.dataWaterThermalTanks->mdotAir * state.dataWaterThermalTanks->hpPartLoadRatio *
                                                                  (1.0 - state.dataWaterThermalTanks->mixerInletAirSchedule);
@@ -9814,14 +9822,15 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             state.dataWaterThermalTanks->mdotAir * state.dataWaterThermalTanks->hpPartLoadRatio * state.dataWaterThermalTanks->mixerInletAirSchedule;
         //   IF HPWH is off, pass zone node conditions through HPWH air-side
         if (state.dataWaterThermalTanks->hpPartLoadRatio == 0)
-            *mixerAirInNode = *hpAirInNode;
+            mixerAirInNode->copyState(*hpAirInNode);
+    } else if (HeatPump.OutsideAirInNodeNum == 0) {
+        auto *hpAirInNode = dln->nodes(HeatPump.HeatPumpAirInNodeNum);
+        hpAirInNode->MassFlowRate = state.dataWaterThermalTanks->mdotAir * state.dataWaterThermalTanks->hpPartLoadRatio;
     } else {
-        if (HeatPump.OutsideAirInNodeNum == 0) {
-            hpAirInNode->MassFlowRate = state.dataWaterThermalTanks->mdotAir * state.dataWaterThermalTanks->hpPartLoadRatio;
-        } else {
-            outsideAirInNode->MassFlowRate = state.dataWaterThermalTanks->mdotAir * state.dataWaterThermalTanks->hpPartLoadRatio;
-        }
+        auto *outsideAirInNode = dln->nodes(HeatPump.OutsideAirInNodeNum);
+        outsideAirInNode->MassFlowRate = state.dataWaterThermalTanks->mdotAir * state.dataWaterThermalTanks->hpPartLoadRatio;
     }
+    
     if (state.dataWaterThermalTanks->hpPartLoadRatio == 0) this->SourceInletTemp = this->SourceOutletTemp;
 
     // set water-side mass flow rate for final calculation
@@ -9831,16 +9840,17 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
         // it is important to use mdotAir to reset the notes, otherwise, could fail to converge
         if (HeatPump.MixerAirInNodeNum > 0) {
+            auto *mixerAirInNode = dln->nodes(HeatPump.MixerAirInNodeNum);
             mixerAirInNode->MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
             mixerAirInNode->MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
+        } else if (HeatPump.OutsideAirInNodeNum == 0) {
+            auto *hpAirInNode = dln->nodes(HeatPump.HeatPumpAirInNodeNum);
+            hpAirInNode->MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
+            hpAirInNode->MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
         } else {
-            if (HeatPump.OutsideAirInNodeNum == 0) {
-                hpAirInNode->MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
-                hpAirInNode->MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
-            } else {
-                outsideAirInNode->MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
-                outsideAirInNode->MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
-            }
+            auto *outsideAirInNode = dln->nodes(HeatPump.OutsideAirInNodeNum);
+            outsideAirInNode->MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
+            outsideAirInNode->MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
         }
 
         //   set the max mass flow rate for outdoor fans
@@ -10033,12 +10043,17 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
     // set HPWH outlet node equal to the outlet air splitter node conditions if outlet air splitter node exists
     if (HeatPump.SplitterAirOutNodeNum > 0) {
-        *hpAirOutNode = *splitterAirOutNode;
-        *exhaustAirOutNode = *splitterAirOutNode;
+        auto const *splitterAirOutNode = dln->nodes(HeatPump.SplitterAirOutNodeNum);
+        auto *exhaustAirOutNode = dln->nodes(HeatPump.ExhaustAirOutNodeNum);
+        auto *hpAirOutNode = dln->nodes(HeatPump.HeatPumpAirOutNodeNum);
+        hpAirOutNode->copyState(*splitterAirOutNode);
+        exhaustAirOutNode->copyState(*splitterAirOutNode);
     }
 
     // Check schedule to divert air-side cooling to outdoors.
     if (HeatPump.OutletAirSplitterSchPtr > 0) {
+        auto *exhaustAirOutNode = dln->nodes(HeatPump.ExhaustAirOutNodeNum);
+        auto *hpAirOutNode = dln->nodes(HeatPump.HeatPumpAirOutNodeNum);
         Real64 OutletAirSplitterSch = ScheduleManager::GetCurrentScheduleValue(state, HeatPump.OutletAirSplitterSchPtr);
         hpAirOutNode->MassFlowRate =
             state.dataWaterThermalTanks->mdotAir * state.dataWaterThermalTanks->hpPartLoadRatio * (1.0 - OutletAirSplitterSch);
@@ -10070,27 +10085,26 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
         HeatPump.HPWaterHeaterLatentCapacity = 0.0;
 
         //   calculate sensible capacity to zone for inlet air configuration equals Zone Only or Zone And Outdoor Air configurations
-        break;
-    }
-    default:
+    } break;
+
+    default: {
+        auto *hpAirInNode = dln->nodes(HeatPump.HeatPumpAirInNodeNum);
+        auto *hpAirOutNode = dln->nodes(HeatPump.HeatPumpAirOutNodeNum);
 
         Real64 CpAir = Psychrometrics::PsyCpAirFnW(hpAirInNode->HumRat);
 
         //     add parasitics to zone heat balance if parasitic heat load is to zone otherwise neglect parasitics
         if (HeatPump.ParasiticTempIndicator == WTTAmbientTemp::TempZone) {
             HeatPump.HPWaterHeaterSensibleCapacity =
-                (hpAirOutNode->MassFlowRate * CpAir *
-                 (hpAirOutNode->Temp - hpAirInNode->Temp)) +
+                (hpAirOutNode->MassFlowRate * CpAir * (hpAirOutNode->Temp - hpAirInNode->Temp)) +
                 HeatPump.OnCycParaFuelRate + HeatPump.OffCycParaFuelRate;
         } else {
-            HeatPump.HPWaterHeaterSensibleCapacity =
-                hpAirOutNode->MassFlowRate * CpAir *
-                (hpAirOutNode->Temp - hpAirInNode->Temp);
+            HeatPump.HPWaterHeaterSensibleCapacity = hpAirOutNode->MassFlowRate * CpAir * (hpAirOutNode->Temp - hpAirInNode->Temp);
         }
 
         HeatPump.HPWaterHeaterLatentCapacity = hpAirOutNode->MassFlowRate * (hpAirOutNode->HumRat - hpAirInNode->HumRat);
-        break;
-    }
+    } break;
+    } // switch ()
 }
 
 void WaterThermalTankData::CalcWaterThermalTank(EnergyPlusData &state)
@@ -10220,7 +10234,7 @@ void WaterThermalTankData::SetVSHPWHFlowRates(EnergyPlusData &state,
     } // system fan will use the inlet node max avail.
 
     state.dataFans->fans(HPWH.FanNum)->simulate(state, FirstHVACIteration, _, _);
-}
+} // WaterThermalTankData::SetVSHPWHFlowRates()
 
 Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
                                                   Real64 const SpeedRatio, // speed ratio between two speed levels
@@ -11865,14 +11879,14 @@ void WaterThermalTankData::UpdateWaterThermalTank(EnergyPlusData &state)
     if (this->UseInNodeNum > 0 && this->UseOutNodeNum > 0) {
         auto *useOutNode = dln->nodes(this->UseOutNodeNum);
         auto const *useInNode = dln->nodes(this->UseInNodeNum);
-        *useOutNode = *useInNode; // this could wipe out setpoints on outlet node
+        useOutNode->copyState(*useInNode); // this could wipe out setpoints on outlet node
         useOutNode->Temp = this->UseOutletTemp;
     }
 
     if (this->SourceInNodeNum > 0 && this->SourceOutNodeNum > 0) {
         auto *sourceOutNode = dln->nodes(this->SourceOutNodeNum);
         auto const *sourceInNode = dln->nodes(this->SourceInNodeNum);
-        *sourceOutNode = *sourceInNode;
+        sourceOutNode->copyState(*sourceInNode);
         sourceOutNode->Temp = this->SourceOutletTemp;
     }
 }

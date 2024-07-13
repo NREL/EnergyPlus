@@ -1097,7 +1097,6 @@ namespace UnitVentilator {
         auto *airInNode = dln->nodes(unitVent.AirInNodeNum);
         auto *airOutNode = dln->nodes(unitVent.AirOutNodeNum);
         auto *outsideAirInNode = dln->nodes(unitVent.OAMixerOutsideAirInNodeNum);
-        auto *reliefAirOutNode = dln->nodes(unitVent.OAMixerReliefAirOutNodeNum);
 
         // Do the one time initializations
         if (state.dataGlobal->BeginEnvrnFlag && state.dataUnitVentilators->MyEnvrnFlag(UnitVentNum) &&
@@ -1208,6 +1207,7 @@ namespace UnitVentilator {
             outsideAirInNode->MassFlowRateMaxAvail = 0.0;
             outsideAirInNode->MassFlowRateMinAvail = 0.0;
             if (!unitVent.ATMixerExists) {
+                auto *reliefAirOutNode = dln->nodes(unitVent.OAMixerReliefAirOutNodeNum);
                 reliefAirOutNode->MassFlowRate = 0.0;
                 reliefAirOutNode->MassFlowRateMaxAvail = 0.0;
                 reliefAirOutNode->MassFlowRateMinAvail = 0.0;
@@ -1223,6 +1223,7 @@ namespace UnitVentilator {
             outsideAirInNode->MassFlowRateMaxAvail = unitVent.OutAirMassFlow;
             outsideAirInNode->MassFlowRateMinAvail = unitVent.OutAirMassFlow;
             if (!unitVent.ATMixerExists) {
+                auto *reliefAirOutNode = dln->nodes(unitVent.OAMixerReliefAirOutNodeNum);
                 reliefAirOutNode->MassFlowRate = unitVent.OutAirMassFlow;
                 reliefAirOutNode->MassFlowRateMaxAvail = unitVent.OutAirMassFlow;
                 reliefAirOutNode->MassFlowRateMinAvail = unitVent.OutAirMassFlow;
@@ -1232,7 +1233,8 @@ namespace UnitVentilator {
         // Initialize the relief air (same as inlet conditions to the unit ventilator...
         // Note that mass flow rates will be taken care of later.
         if (!unitVent.ATMixerExists) {
-            *reliefAirOutNode = *airInNode;
+            auto *reliefAirOutNode = dln->nodes(unitVent.OAMixerReliefAirOutNodeNum);
+            reliefAirOutNode->copyState(*airInNode); // Should this really copy everything or just the state variables?
         }
         state.dataUnitVentilators->OAMassFlowRate = 0.0;
 
@@ -2423,13 +2425,13 @@ namespace UnitVentilator {
             unitVent.FanPartLoadRatio = 1.0;
             if (state.dataUnitVentilators->QZnReq > HVAC::SmallLoad) { // HEATING MODE
 
-                auto *controlNode = dln->nodes(unitVent.HotControlNodeNum);
                 ControlOffset = unitVent.HotControlOffset;
                 MaxWaterFlow = unitVent.MaxHotWaterFlow;
                 MinWaterFlow = unitVent.MinHotWaterFlow;
                 // On the first HVAC iteration the system values are given to the controller, but after that
                 // the demand limits are in place and there needs to be feedback to the Zone Equipment
                 if (!FirstHVACIteration && unitVent.HCoilType == HeatCoilType::Water) {
+                    auto *controlNode = dln->nodes(unitVent.HotControlNodeNum);
                     MaxWaterFlow = controlNode->MassFlowRateMaxAvail;
                     MinWaterFlow = controlNode->MassFlowRateMinAvail;
                 }
@@ -2682,13 +2684,13 @@ namespace UnitVentilator {
 
             } else { // COOLING MODE
 
-                auto const *controlNode = dln->nodes(unitVent.ColdControlNodeNum);
                 ControlOffset = unitVent.ColdControlOffset;
                 MaxWaterFlow = unitVent.MaxColdWaterFlow;
                 MinWaterFlow = unitVent.MinColdWaterFlow;
                 // On the first HVAC iteration the system values are given to the controller, but after that
                 // the demand limits are in place and there needs to be feedback to the Zone Equipment
                 if ((!FirstHVACIteration) && (ControlNode > 0) && (unitVent.CCoilPresent)) {
+                    auto const *controlNode = dln->nodes(unitVent.ColdControlNodeNum);
                     MaxWaterFlow = controlNode->MassFlowRateMaxAvail;
                     MinWaterFlow = controlNode->MassFlowRateMinAvail;
                 }

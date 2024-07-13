@@ -1784,7 +1784,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                     if (Util::SameString(comp.TypeOf, "Fan:ConstantVolume") || Util::SameString(comp.TypeOf, "Fan:VariableVolume") ||
                                         Util::SameString(comp.TypeOf, "Fan:OnOff") || Util::SameString(comp.TypeOf, "Fan:ComponentModel")) {
                                         FanInNodeNum = comp.InNodeNum;
-                                        FanOutNodeNum = comp.InNodeNum;
+                                        FanOutNodeNum = comp.OutNodeNum;
                                         break;
                                     }
                                 }
@@ -2732,8 +2732,8 @@ void SPMSingleZoneReheat::calculate(EnergyPlusData &state)
 
     Real64 TMixAtMinOA;
     if (this->oaInNodeNum > 0) {
-        auto const &oaInNode = dln->nodes(this->oaInNodeNum);
-        auto const &retNode = dln->nodes(this->retNodeNum);
+        auto const *oaInNode = dln->nodes(this->oaInNodeNum);
+        auto const *retNode = dln->nodes(this->retNodeNum);
         Real64 HumRatMixAtMinOA = (1.0 - OAFrac) * retNode->HumRat + OAFrac * oaInNode->HumRat;
         Real64 EnthMixAtMinOA = (1.0 - OAFrac) * retNode->Enthalpy + OAFrac * oaInNode->Enthalpy;
         TMixAtMinOA = PsyTdbFnHW(EnthMixAtMinOA, HumRatMixAtMinOA);

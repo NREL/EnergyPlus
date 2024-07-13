@@ -4358,7 +4358,6 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     auto &dln = state.dataLoopNodes;
     auto *sysOutNode = dln->nodes(this->ReheatAirOutNodeNum);
     auto *zoneNode = dln->nodes(ZoneNodeNum);
-    auto const *reheatControlNode = dln->nodes(this->ReheatControlNodeNum);
     
     CpAirZn = PsyCpAirFnW(zoneNode->HumRat);
     MinFlowFrac = this->ZoneMinAirFrac;
@@ -4474,6 +4473,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
         this->UpdateSys(state);
 
         switch (this->ReheatComp_Num) {        // hot water heating coil
+
         case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
             // Determine the load required to pass to the Component controller
             // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
@@ -4521,6 +4521,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
             // hot water coil with fixed (maximum) hot water flow but allow the air flow to
             // vary up to the maximum (air damper opens to try to meet zone load).
             if (this->DamperHeatingAction == Action::Reverse) {
+                auto const *reheatControlNode = dln->nodes(this->ReheatControlNodeNum);
                 if (reheatControlNode->MassFlowRate == this->MaxReheatWaterFlow) {
                     ControlCompOutput(state,
                                       this->ReheatName,
@@ -4577,6 +4578,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
                 }
             }
         } break;
+
         case HeatingCoilType::SteamAirHeating: { // ! COIL:STEAM:AIRHEATING
             // Determine the load required to pass to the Component controller
             QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV -
@@ -4586,6 +4588,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
             // Simulate reheat coil for the VAV system
             SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, QZnReq);
         } break;
+
         case HeatingCoilType::Electric: { // COIL:ELECTRIC:HEATING
             // Determine the load required to pass to the Component controller
             QSupplyAir = MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCBVAV);
@@ -4595,6 +4598,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
             // Simulate reheat coil for the VAV system
             SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
         } break;
+
         case HeatingCoilType::Gas: { // COIL:GAS:HEATING
             // Determine the load required to pass to the Component controller
             QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV -
@@ -4604,18 +4608,21 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
             // Simulate reheat coil for the VAV system
             SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
         } break;
+
         case HeatingCoilType::None: { // blank
                                       // If no reheat is defined then assume that the damper is the only component.
             // If something else is there that is not a reheat coil then give the error message below.
         } break;
+
         default: {
             ShowFatalError(state, format("Invalid Reheat Component={}", this->ReheatComp));
         } break;
-        }
+        } // switch(ReheatComp_Num)
 
         // the COIL is OFF the properties are calculated for this special case.
     } else {
         switch (this->ReheatComp_Num) {
+                
         case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
             // Simulate reheat coil for the Const Volume system
             // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
@@ -4627,26 +4634,31 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
             // are passed through to the coil outlet correctly
             SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
         } break;
+
         case HeatingCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
             // Simulate reheat coil for the VAV system
             SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, 0.0);
         } break;
+
         case HeatingCoilType::Electric: { // COIL:ELECTRIC:HEATING
             // Simulate reheat coil for the VAV system
             SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
         } break;
+
         case HeatingCoilType::Gas: { // COIL:GAS:HEATING
             // Simulate reheat coil for the VAV system
             SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
         } break;
+
         case HeatingCoilType::None: { // blank
                                       // If no reheat is defined then assume that the damper is the only component.
                                       // If something else is there that is not a reheat coil then give the error message
         } break;
+
         default: {
             ShowFatalError(state, format("Invalid Reheat Component={}", this->ReheatComp));
         } break;
-        }
+        } // switch (ReheatComp)
     }
     // push the flow rate history
     this->MassFlow3 = this->MassFlow2;
@@ -6199,6 +6211,9 @@ void GetATMixer(EnergyPlusData &state,
         ATMixerNum = ATMixerIndex;
         ATMixerName = state.dataSingleDuct->SysATMixer(ATMixerIndex).Name;
 
+        ATMixerPriNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).PriAirInNodeNum;
+        ATMixerSecNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).SecAirInNodeNum;
+        ATMixerOutNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).MixedAirOutNodeNum;
         ATMixerType = state.dataSingleDuct->SysATMixer(ATMixerIndex).type;
         if (ATMixerType == HVAC::MixerType::InletSide) {
             state.dataSingleDuct->SysATMixer(ATMixerIndex).ZoneInNodeNum = ZoneEquipOutletNode;

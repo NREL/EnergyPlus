@@ -139,7 +139,6 @@ void SetComponentFlowRate(EnergyPlusData &state,
 
     auto &dln = state.dataLoopNodes;
     auto *inNode = dln->nodes(InNodeNum);
-    auto *outNode = dln->nodes(OutNodeNum);
         
     if (plantLoc.loopNum == 0) { // protect from hard crash below // These should be asserts, shouldn't need to protect anything
         if (InNodeNum > 0) {
@@ -158,6 +157,8 @@ void SetComponentFlowRate(EnergyPlusData &state,
     auto &loop_side = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum);
     auto &comp = loop_side.Branch(plantLoc.branchNum).Comp(plantLoc.compNum);
 
+    auto *outNode = dln->nodes(OutNodeNum);
+    
     if (comp.CurOpSchemeType == DataPlant::OpScheme::Demand) {
         // store flow request on inlet node
         inNode->MassFlowRateRequest = CompFlow;
@@ -1457,7 +1458,6 @@ void SafeCopyPlantNode(EnergyPlusData &state,
     // derived from adiabatic Pipes
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &loop = state.dataPlnt->PlantLoop(LoopNum);
     
     auto &dln = state.dataLoopNodes;
     auto const *inNode = dln->nodes(InNodeNum);
@@ -1478,14 +1478,9 @@ void SafeCopyPlantNode(EnergyPlusData &state,
     outNode->HumRat = inNode->HumRat; // air only?
 
     // Only pass pressure if we aren't doing a pressure simulation
-    if (present(LoopNum)) {
-        switch (loop.PressureSimType) {
-        case DataPlant::PressSimType::NoPressure:
-            outNode->Press = inNode->Press;
-        default:
-            // Don't do anything
-            break;
-        }
+    if (present(LoopNum) &&
+        state.dataPlnt->PlantLoop(LoopNum).PressureSimType == DataPlant::PressSimType::NoPressure) {
+        outNode->Press = inNode->Press;
     }
 }
 
@@ -1683,7 +1678,6 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
     int EndingLoopNum;
 
     auto &dln = state.dataLoopNodes;
-    auto *inNode = dln->nodes(InNodeNum);
     
     FoundCount = 0;
 
@@ -1762,7 +1756,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
             }
             if (present(InNodeNum)) {
                 if (FoundCompName) {
-                    ShowContinueError(state, format("Looking for matching inlet Node=\"{}\".", inNode->Name));
+                    ShowContinueError(state, format("Looking for matching inlet Node=\"{}\".", dln->nodes(InNodeNum)->Name));
                 }
             }
             if (present(SingleLoopSearch)) {

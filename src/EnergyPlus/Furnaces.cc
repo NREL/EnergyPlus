@@ -5338,7 +5338,7 @@ namespace Furnaces {
                     }
                     inNode->MassFlowRateMin = 0.0;
                     inNode->MassFlowRateMinAvail = 0.0;
-                    *outNode = *inNode;
+                    outNode->copyState(*inNode);
                 }
             }
 

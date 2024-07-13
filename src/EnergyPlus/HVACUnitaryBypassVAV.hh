@@ -130,7 +130,6 @@ namespace HVACUnitaryBypassVAV {
         int MixerMixedAirOutNodeNum = 0;             // Mixed air node number for OA mixer
         int MixerReliefAirOutNodeNum = 0;            // Relief air node number for OA mixer
         int MixerReturnAirInNodeNum = 0;             // Return air node number for OA mixer
-        int MixerAirInNodeNum = 0;               
         int SplitterAirOutNodeNum = 0;         // Air node number for splitter (last component outlet node)
         int PlenumMixerAirInNodeNum = 0;       // only used when bypass is connected to plenum or mixer
         std::string OAMixType;                 // type of outside air mixer

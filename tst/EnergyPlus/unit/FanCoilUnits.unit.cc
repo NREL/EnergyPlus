@@ -1371,7 +1371,6 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     state->dataFanCoilUnits->FanCoil(1).MaxHeatCoilFluidFlow = 0.14;
 
     auto *fanCoilCoolCoilFluidInNode = dln->nodes(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInNodeNum);
-    auto *fanCoilHeatCoilFluidInNode = dln->nodes(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInNodeNum);
     fanCoilOutsideAirInNode->MassFlowRateMax = 0.0;
 
     fanCoilCoolCoilFluidInNode->MassFlowRateMax = 0.14;
