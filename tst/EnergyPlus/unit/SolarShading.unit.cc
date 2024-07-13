@@ -3893,18 +3893,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     EXPECT_EQ(state->dataSolarShading->anyScheduledShadingSurface, true);
 
     EXPECT_EQ(state->dataErrTracking->AskForSurfacesReport, true);
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
     // Expect no severe errors at this point
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
-
-#ifdef EP_NO_OPENGL
-    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
-#else
-    if (!Penumbra::Penumbra::is_valid_context()) {
-        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
-    } else {
-        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
-    }
-#endif
 
     SolarShading::processShadowingInput(*state);
 
