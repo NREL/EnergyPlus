@@ -761,10 +761,20 @@ namespace VentilatedSlab {
                                                            Node::ConnObjType::ZoneHVACVentilatedSlab,
                                                            ventSlab.Name + "-OA MIXER",
                                                            Node::FluidType::Air,
-                                                           Node::ConnType::Internal,
+                                                           Node::ConnType::Outlet,
                                                            Node::CompFluidStream::Primary,
                                                           Node::ObjectIsNotParent);
+                ventSlab.ReturnAirInNodeNum = GetSingleNode(state,
+                                                           state.dataIPShortCut->cAlphaArgs(18),
+                                                           ErrorsFound,
+                                                           Node::ConnObjType::ZoneHVACVentilatedSlab,
+                                                           ventSlab.Name,
+                                                           Node::FluidType::Air,
+                                                           Node::ConnType::Inlet,
+                                                           Node::CompFluidStream::Primary,
+                                                            Node::ObjectIsParent);
                 ventSlab.RadInNodeNum = GetSingleNode(state,
+
                                                        state.dataIPShortCut->cAlphaArgs(19),
                                                        ErrorsFound,
                                                        Node::ConnObjType::ZoneHVACVentilatedSlab,
@@ -801,9 +811,18 @@ namespace VentilatedSlab {
                                                            Node::ConnObjType::ZoneHVACVentilatedSlab,
                                                            ventSlab.Name + "-OA MIXER",
                                                            Node::FluidType::Air,
-                                                           Node::ConnType::Internal,
+                                                           Node::ConnType::Outlet,
                                                            Node::CompFluidStream::Primary,
                                                        Node::ObjectIsNotParent);
+                ventSlab.ReturnAirInNodeNum = GetSingleNode(state,
+                                                           state.dataIPShortCut->cAlphaArgs(18),
+                                                           ErrorsFound,
+                                                           Node::ConnObjType::ZoneHVACVentilatedSlab,
+                                                           ventSlab.Name,
+                                                           Node::FluidType::Air,
+                                                           Node::ConnType::Inlet,
+                                                           Node::CompFluidStream::Primary,
+                                                           Node::ObjectIsParent);
                 ventSlab.RadInNodeNum = GetSingleNode(state,
                                                        state.dataIPShortCut->cAlphaArgs(19),
                                                        ErrorsFound,
@@ -844,6 +863,15 @@ namespace VentilatedSlab {
                                                            Node::ConnType::Inlet,
                                                            Node::CompFluidStream::Primary,
                                                        Node::ObjectIsParent);
+                ventSlab.ReturnAirInNodeNum = GetSingleNode(state,
+                                                           state.dataIPShortCut->cAlphaArgs(18),
+                                                           ErrorsFound,
+                                                           Node::ConnObjType::ZoneHVACVentilatedSlab,
+                                                           ventSlab.Name,
+                                                           Node::FluidType::Air,
+                                                           Node::ConnType::Inlet,
+                                                           Node::CompFluidStream::Primary,
+                                                            Node::ObjectIsParent);
                 ventSlab.ReturnAirInNodeNum = GetSingleNode(state,
                                                            state.dataIPShortCut->cAlphaArgs(18),
                                                            ErrorsFound,
@@ -976,7 +1004,7 @@ namespace VentilatedSlab {
             // Add fan to component sets array
             SetUpCompSets(state,
                           CurrentModuleObject,
-                          ventSlab.Name + "-SYSTEM",
+                          ventSlab.Name,
                           "UNDEFINED",
                           state.dataIPShortCut->cAlphaArgs(25),
                           state.dataIPShortCut->cAlphaArgs(23),
@@ -1244,7 +1272,7 @@ namespace VentilatedSlab {
                 // Add cooling coil to component sets array when present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(30),
                               state.dataIPShortCut->cAlphaArgs(31),
                               state.dataIPShortCut->cAlphaArgs(24),
@@ -1253,7 +1281,7 @@ namespace VentilatedSlab {
                 // Add heating coil to component sets array when cooling coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(27),
                               state.dataIPShortCut->cAlphaArgs(28),
                               "UNDEFINED",
@@ -1264,7 +1292,7 @@ namespace VentilatedSlab {
                 // Add heating coil to component sets array when no cooling coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(27),
                               state.dataIPShortCut->cAlphaArgs(28),
                               state.dataIPShortCut->cAlphaArgs(24),
@@ -1275,7 +1303,7 @@ namespace VentilatedSlab {
                 // Add cooling coil to component sets array when no heating coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(30),
                               state.dataIPShortCut->cAlphaArgs(31),
                               state.dataIPShortCut->cAlphaArgs(24),

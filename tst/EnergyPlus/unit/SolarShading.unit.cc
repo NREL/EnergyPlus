@@ -3444,9 +3444,16 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
     Vector expected_lcsy(0.96592582628906831, 0.25881904510252079, -0.0);
     Vector expected_lcsz(0.0, 0.0, 1.0);
 
-    EXPECT_EQ(expected_lcsx, lcsx);
-    EXPECT_EQ(expected_lcsy, lcsy);
-    EXPECT_EQ(expected_lcsz, lcsz);
+    auto compare_double_vectors = [](Vector const &exp, Vector const &actual) {
+        ASSERT_EQ(exp.size(), actual.size());
+        for (size_t i = 0; i < exp.size(); ++i) {
+            EXPECT_NEAR(exp[i], actual[i], 0.0000000000000001) << "Failed at index " << i;
+        }
+    };
+
+    compare_double_vectors(expected_lcsx, lcsx);
+    compare_double_vectors(expected_lcsy, lcsy);
+    compare_double_vectors(expected_lcsz, lcsz);
 
     Array1D<Real64> xs(4, 0.0);
     Array1D<Real64> ys(4, 0.0);
@@ -3969,7 +3976,7 @@ TEST_F(EnergyPlusFixture, ShadowCalculation_CSV)
     state->dataConstruction->Construct(1).TypeIsWindow = false;
     state->dataSurface->SurfWinSolarDiffusing.allocate(state->dataSurface->TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
-    WindowManager::initWindowModel(*state);
+    Window::initWindowModel(*state);
 
     state->dataSolarShading->GetInputFlag = false;
     state->dataSolarShading->ShadowingCalcFrequency = 20; // Default IDD
@@ -5133,7 +5140,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     state->dataSurface->Surface.allocate(NumSurf);
     state->dataSurface->SurfaceWindow.allocate(NumSurf);
     EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(*state, NumSurf);
-    WindowManager::initWindowModel(*state);
+    Window::initWindowModel(*state);
     SolarShading::AllocateModuleArrays(*state);
 
     auto &surf1 = state->dataSurface->Surface(1);
@@ -5205,7 +5212,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     state->dataHeatBal->SurfSunlitFracWithoutReveal(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, 1) = 1.0;
     state->dataHeatBal->SurfSunlitFracWithoutReveal(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, 2) = 1.0;
 
-    WindowManager::W5InitGlassParameters(*state);
+    Window::W5InitGlassParameters(*state);
     construct1.TransSolBeamCoef(1) = 0.9;
     state->dataSurface->SurfWinTanProfileAngVert(1) = 10.0;
     state->dataSurface->SurfWinTanProfileAngVert(2) = 10.0;

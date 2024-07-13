@@ -313,7 +313,9 @@ namespace EMSManager {
             anyProgramRan = true;
         }
 
-        if (!anyProgramRan) return;
+        if (!anyProgramRan) {
+            return;
+        }
 
         // Set actuated variables with new values
         for (int ActuatorUsedLoop = 1;
@@ -321,35 +323,43 @@ namespace EMSManager {
                                      state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
                                      state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed;
              ++ActuatorUsedLoop) {
-            int ErlVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
-            if (ErlVariableNum <= 0) continue; // this can happen for good reason during sizing
+            auto const &thisActuatorUsed = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop);
 
-            int EMSActuatorVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
-            if (EMSActuatorVariableNum <= 0) continue; // this can happen for good reason during sizing
+            int ErlVariableNum = thisActuatorUsed.ErlVariableNum;
+            if (ErlVariableNum <= 0) {
+                continue; // this can happen for good reason during sizing
+            }
 
-            if (state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Type == DataRuntimeLanguage::Value::Null) {
-                *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
+            int EMSActuatorVariableNum = thisActuatorUsed.ActuatorVariableNum;
+            if (EMSActuatorVariableNum <= 0) {
+                continue; // this can happen for good reason during sizing
+            }
+
+            auto const &thisErlVar = state.dataRuntimeLang->ErlVariable(ErlVariableNum);
+            auto &thisActuatorAvail = state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum);
+
+            if (thisErlVar.Value.Type == DataRuntimeLanguage::Value::Null) {
+                *thisActuatorAvail.Actuated = false;
             } else {
                 // Set the value and the actuated flag remotely on the actuated object via the pointer
-                switch (state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed) {
+                switch (thisActuatorAvail.PntrVarTypeUsed) {
                 case DataRuntimeLanguage::PtrDataType::Real: {
-                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
-                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).RealValue =
-                        state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number;
+                    *thisActuatorAvail.Actuated = true;
+                    *thisActuatorAvail.RealValue = thisErlVar.Value.Number;
                 } break;
                 case DataRuntimeLanguage::PtrDataType::Integer: {
-                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
-                    int tmpInteger = std::floor(state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number);
-                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = tmpInteger;
+                    *thisActuatorAvail.Actuated = true;
+                    int tmpInteger = std::floor(thisErlVar.Value.Number);
+                    *thisActuatorAvail.IntValue = tmpInteger;
                 } break;
                 case DataRuntimeLanguage::PtrDataType::Logical: {
-                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
-                    if (state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number == 0.0) {
-                        *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
-                    } else if (state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number == 1.0) {
-                        *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = true;
+                    *thisActuatorAvail.Actuated = true;
+                    if (thisErlVar.Value.Number == 0.0) {
+                        *thisActuatorAvail.LogValue = false;
+                    } else if (thisErlVar.Value.Number == 1.0) {
+                        *thisActuatorAvail.LogValue = true;
                     } else {
-                        *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
+                        *thisActuatorAvail.LogValue = false;
                     }
                 } break;
                 default:

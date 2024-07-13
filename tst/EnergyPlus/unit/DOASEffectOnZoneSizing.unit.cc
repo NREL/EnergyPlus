@@ -138,6 +138,8 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
 
 TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
 {
+    state->init_state(*state);
+
     auto &dln = state->dataLoopNodes;
     for (int i = 0; i < 10; ++i) dln->nodes.push_back(new Node::NodeData);
 

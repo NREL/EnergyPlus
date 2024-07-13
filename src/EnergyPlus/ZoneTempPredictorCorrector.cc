@@ -5154,10 +5154,10 @@ void InverseModelTemperature(EnergyPlusData &state,
 
     int ZoneMult = zone.Multiplier * zone.ListMultiplier;
     zone.ZoneMeasuredTemperature = ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneMeasuredTemperatureSchedulePtr);
+    zone.ZoneVolCapMultpSensHM = 1.0; // Initialize to 1.0 in case hybrid not active
 
     // HM calculation only HM calculation period start
     if (state.dataEnvrn->DayOfYear >= hybridModelZone.HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= hybridModelZone.HybridEndDayOfYear) {
-        Real64 HMMultiplierAverage(1.0);
         Real64 MultpHM(1.0);
 
         thisZoneHB.ZT = zone.ZoneMeasuredTemperature; // Array1D<Real64> ZT -- Zone
@@ -5256,31 +5256,14 @@ void InverseModelTemperature(EnergyPlusData &state,
                                                              thisZoneHB.airHumRat) *
                            Psychrometrics::PsyCpAirFnW(thisZoneHB.airHumRat)) *
                           (state.dataGlobal->TimeStepZone * Constant::SecInHour); // Inverse equation
-                if ((MultpHM < 1.0) || (MultpHM > 30.0)) {                        // Temperature capacity multiplier greater than
-                                                                                  // 1 and less than 30
-                    MultpHM = 1.0;                                                // Default value 1.0
-                }
             } else {
                 MultpHM = 1.0; // Default value 1.0
             }
 
-            zone.ZoneVolCapMultpSensHM = MultpHM; // For timestep output
+            processInverseModelMultpHM(
+                state, MultpHM, zone.ZoneVolCapMultpSensHMSum, zone.ZoneVolCapMultpSensHMCountSum, zone.ZoneVolCapMultpSensHMAverage, ZoneNum);
+            zone.ZoneVolCapMultpSensHM = MultpHM;
 
-            // Calculate the average multiplier of the zone for the whole running period
-            {
-                // count for hybrid model calculations
-                if (MultpHM > 1.0) {
-                    zone.ZoneVolCapMultpSensHMSum += MultpHM;
-                    zone.ZoneVolCapMultpSensHMCountSum++;
-                }
-
-                // Calculate and store the multiplier average at the end of HM
-                // simulations
-                if (state.dataEnvrn->DayOfYear == hybridModelZone.HybridEndDayOfYear && state.dataGlobal->EndDayFlag) {
-                    HMMultiplierAverage = zone.ZoneVolCapMultpSensHMSum / zone.ZoneVolCapMultpSensHMCountSum;
-                    zone.ZoneVolCapMultpSensHMAverage = HMMultiplierAverage;
-                }
-            }
         } // Hybrid model internal thermal mass calcualtion end
 
         // Hybrid model people count calculation
@@ -5352,6 +5335,43 @@ void InverseModelTemperature(EnergyPlusData &state,
     state.dataHeatBalFanSys->PreviousMeasuredZT3(ZoneNum) = state.dataHeatBalFanSys->PreviousMeasuredZT2(ZoneNum);
     state.dataHeatBalFanSys->PreviousMeasuredZT2(ZoneNum) = state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum);
     state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum) = thisZoneHB.ZT;
+}
+
+void processInverseModelMultpHM(EnergyPlusData &state,
+                                Real64 &multiplierHM, // Hybrid model thermal mass multiplier
+                                Real64 &multSumHM,    // Sum of Hybrid model thermal mass multipliers
+                                Real64 &countSumHM,   // Count of number of points in sum
+                                Real64 &multAvgHM,    // Average of hybrid model mass multipier
+                                int zoneNum           // Zone number for the hybrid model
+)
+{
+    Real64 constexpr minHMMultValue = 1.0;
+    Real64 constexpr maxHMMultValue = 30.0;
+
+    auto &zone = state.dataHeatBal->Zone(zoneNum);
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
+
+    // Apply limits and generate warnings as needed
+    if (multiplierHM < minHMMultValue) { // don't allow this to be less than minimum (potential for instability)
+        multiplierHM = minHMMultValue;
+    } else if (multiplierHM > maxHMMultValue) { // as per suggestions in Defect #10508, only warn if greater than the max
+        if (thisZoneHB.hmThermalMassMultErrIndex == 0) {
+            ShowWarningMessage(state, format("Hybrid model thermal mass multiplier higher than the limit for {}", zone.Name));
+            ShowContinueError(state, "This means that the ratio of the zone air heat capacity for the current time step to the");
+            ShowContinueError(state, format("zone air heat storage is higher than the maximum limit of {:.1R}.", maxHMMultValue));
+        }
+        ShowRecurringWarningErrorAtEnd(
+            state, "Hybrid model thermal mass multiplier limit exceeded in zone " + zone.Name, thisZoneHB.hmThermalMassMultErrIndex);
+    }
+
+    // Update running totals (but only when there is a valid multiplier, i.e. multiplier is greater than min but not higher than the max)
+    if (multiplierHM > minHMMultValue) {
+        multSumHM += multiplierHM;
+        countSumHM++;
+    }
+
+    // Calculate average (always so that it does get calculated)
+    if (countSumHM >= 1) multAvgHM = multSumHM / countSumHM;
 }
 
 void InverseModelHumidity(EnergyPlusData &state,
@@ -7061,6 +7081,45 @@ temperatureAndCountInSch(EnergyPlusData &state, int const scheduleIndex, bool co
     }
 
     return std::make_tuple(valueAtSelectTime, countOfSame, monthName);
+}
+
+void FillPredefinedTableOnThermostatSchedules(EnergyPlusData &state)
+{
+    // add values to the System Summary tabular report related to schedules used by the thermostat objects
+    // J.Glazer - March 2024
+    using OutputReportPredefined::PreDefTableEntry;
+    auto &orp = state.dataOutRptPredefined;
+    for (int idx = 1; idx <= state.dataZoneCtrls->NumTempControlledZones; ++idx) {
+        auto &tcz = state.dataZoneCtrls->TempControlledZone(idx);
+        PreDefTableEntry(state, orp->pdchStatName, tcz.ZoneName, tcz.Name);
+        PreDefTableEntry(state, orp->pdchStatCtrlTypeSchd, tcz.ZoneName, tcz.ControlTypeSchedName);
+        for (int ctInx = 1; ctInx <= tcz.NumControlTypes; ++ctInx) {
+            PreDefTableEntry(state, orp->pdchStatSchdType1, tcz.ZoneName, HVAC::thermostatTypeNames[(int)tcz.ControlTypeEnum(ctInx)]);
+            PreDefTableEntry(state, orp->pdchStatSchdTypeName1, tcz.ZoneName, tcz.ControlTypeName(1));
+            switch (tcz.ControlTypeEnum(ctInx)) {
+            case HVAC::ThermostatType::DualSetPointWithDeadBand:
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdHeatName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_DualSetPointWDeadBandHeat));
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdCoolName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_DualSetPointWDeadBandCool));
+                break;
+            case HVAC::ThermostatType::SingleHeatCool:
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdHeatName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleHeatCoolSetPoint));
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdCoolName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleHeatCoolSetPoint));
+                break;
+            case HVAC::ThermostatType::SingleCooling:
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdHeatName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleCoolSetPoint));
+                break;
+            case HVAC::ThermostatType::SingleHeating:
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdCoolName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleHeatSetPoint));
+                break;
+            }
+        }
+    }
 }
 
 void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,

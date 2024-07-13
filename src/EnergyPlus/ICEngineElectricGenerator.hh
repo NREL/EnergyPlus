@@ -186,6 +186,10 @@ struct ICEngineElectricGeneratorData : BaseGlobalStruct
     bool getICEInput = true;                                                      // When TRUE, calls subroutine to read input file.
     Array1D<ICEngineElectricGenerator::ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->getICEInput = true;

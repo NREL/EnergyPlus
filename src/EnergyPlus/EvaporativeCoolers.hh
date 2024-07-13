@@ -450,9 +450,13 @@ struct EvaporativeCoolersData : BaseGlobalStruct
     bool MySetPointCheckFlag = true;
     bool ZoneEquipmentListChecked = false;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = EvaporativeCoolersData();
+        new (this) EvaporativeCoolersData();
     }
 };
 

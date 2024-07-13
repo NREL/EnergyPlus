@@ -232,9 +232,13 @@ struct ErrorTrackingData : BaseGlobalStruct
         MatchCounts = Array1D_int(DataErrorTracking::SearchCounts, 0);
     }
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = ErrorTrackingData();
+        new (this) ErrorTrackingData();
     }
 };
 

@@ -276,6 +276,10 @@ struct MicroCHPElectricGeneratorData : BaseGlobalStruct
     bool MyOneTimeFlag = true;
     bool MyEnvrnFlag = true;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->NumMicroCHPs = 0;

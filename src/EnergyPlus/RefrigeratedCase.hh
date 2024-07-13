@@ -1626,6 +1626,10 @@ struct RefrigeratedCaseData : BaseGlobalStruct
     Real64 MyStepStartTimeSaved = 0.0; // Used to determine whether the system time step is a repetition
     Real64 TimeStepFraction = 0.0;     // Used to calculate my current time
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) RefrigeratedCaseData();

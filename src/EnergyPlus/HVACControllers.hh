@@ -367,9 +367,13 @@ struct HVACControllersData : BaseGlobalStruct
     Array1D_bool MySizeFlag;
     Array1D_bool MyPlantIndexsFlag;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = HVACControllersData();
+        new (this) HVACControllersData();
     }
 };
 

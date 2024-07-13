@@ -2552,21 +2552,23 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         curReport = AddMonthlyReport(state, "WindowZoneSummaryMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Rate", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Transmitted Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Windows Total Transmitted Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(42).show) {
         curReport = AddMonthlyReport(state, "WindowEnergyZoneSummaryMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Transmitted Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Windows Total Transmitted Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(
+            state, curReport, "Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(
+            state, curReport, "Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Interior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(43).show) {
         curReport = AddMonthlyReport(state, "AverageOutdoorConditionsMonthly", 2, true);
@@ -6895,6 +6897,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
     }
     // fill the LEED setpoint table
     ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state);
+    ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSchedules(state);
 }
 
 void WriteMonthlyTables(EnergyPlusData &state)

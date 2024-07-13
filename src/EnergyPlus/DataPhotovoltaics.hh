@@ -350,6 +350,10 @@ struct PhotovoltaicsData : BaseGlobalStruct
     Real64 ShuntResistance = 0.0;   // old "RSH" in common block of trnsys code
     Array1D<DataPhotovoltaics::PVArrayStruct> PVarray;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         NumPVs = 0;

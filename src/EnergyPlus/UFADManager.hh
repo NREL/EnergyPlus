@@ -109,6 +109,10 @@ struct UFADManagerData : BaseGlobalStruct
     bool MyOneTimeFlag = true;
     Array1D_bool MySizeFlag;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->MyOneTimeFlag = true;

@@ -185,6 +185,10 @@ struct PlantCondLoopOperationData : BaseGlobalStruct
     bool LoadSupervisoryChillerHeaterOpScheme = true;
     Array1D<DataPlant::ChillerHeaterSupervisoryOperationData> ChillerHeaterSupervisoryOperationSchemes;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->GetPlantOpInput = true;

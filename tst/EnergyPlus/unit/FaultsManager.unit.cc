@@ -157,7 +157,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
         "ScheduleTypeLimits,",
         "  Fraction,                !- Name",
         "  0,                       !- Lower Limit Value",
-        "  1,                       !- Upper Limit Value",
+        "  1.5,                     !- Upper Limit Value",
         "  Continuous;              !- Numeric Type",
 
         "ScheduleTypeLimits,",
@@ -244,7 +244,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
         "ScheduleTypeLimits,",
         "  Fraction,                !- Name",
         "  0,                       !- Lower Limit Value",
-        "  1,                       !- Upper Limit Value",
+        "  1.5,                     !- Upper Limit Value",
         "  Continuous;              !- Numeric Type",
 
         "ScheduleTypeLimits,",

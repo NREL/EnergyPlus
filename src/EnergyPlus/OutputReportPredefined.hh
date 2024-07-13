@@ -246,7 +246,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFanPurpose = 0;
     int pdchFanAutosized = 0;
     int pdchFanMotorEff = 0;
-    int pdchFanMotorHeatToZoneFrac = 0;
+    int pdchFanMotorHeatToZoneFrac = 0; // Motor Heat to Zone Fraction
+    int pdchFanMotorHeatZone = 0;       // Motor Loss Zone Name
     int pdchFanAirLoopName = 0;
 
     // Pump subtable
@@ -299,6 +300,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
 
     // DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
     int pdstDXCoolCoil2 = 0;
+    int pdchDXCoolCoilType2 = 0;      // DX cooling coil type
     int pdchDXCoolCoilNetCapSIA = 0;  // Standard Rated (Net) Cooling Capacity [W], Test A
     int pdchDXCoolCoilElecPowerA = 0; // Standard Rated Electric Power [W], Test A
     int pdchDXCoolCoilNetCapSIB = 0;  // Standard Rated (Net) Cooling Capacity [W], Test B
@@ -349,6 +351,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXHeatCoilRegionNum = 0; // Region number for which HSPF is calculated
     // Standard 229 Predef outputs for DX Heating Coils
     int pdchDXHeatCoilMinOADBTforCompOp = 0;
+    int pdchDXHeatCoilSuppHiT = 0; // Supplemental Heat High Shutoff Temperature
     int pdchDXHeatCoilAirloopName = 0;
 
     // DX Heating Coil subtable| AHRI std. 210/240 2023 conditions
@@ -359,6 +362,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXHeatCoilHSPF2SI_2023 = 0;   // HSPF2 value in SI unit at AHRI std. 340/360 conditions [W/W]
     int pdchDXHeatCoilHSPF2IP_2023 = 0;   // HSPF2 value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
     int pdchDXHeatCoilRegionNum_2023 = 0; // Region number for which HSPF is calculated
+    int pdchDXHeatCoilMinOADBTforCompOp_2023 = 0;
+    int pdchDXHeatCoilAirloopName_2023 = 0;
 
     // Heating Coil subtable
     int pdstHeatCoil = 0;
@@ -448,6 +453,17 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchAirTermSupHeatingSP = 0;   // Supply heating setpoint
     int pdchAirTermHeatingCap = 0;     // Heating capacity
     int pdchAirTermCoolingCap = 0;     // Cooling capacity
+    int pdchAirTermTypeInp = 0;        // Type of Input Object
+    int pdchAirTermHeatCoilType = 0;   // Heat/Reheat Coil Object Type
+    int pdchAirTermCoolCoilType = 0;   // Chilled Water Coil Object Type
+    int pdchAirTermFanType = 0;        // Fan Object Type
+    int pdchAirTermFanName = 0;        // Fan Name
+    int pdchAirTermPrimFlow = 0;       // Primary Air Flow Rate
+    int pdchAirTermSecdFlow = 0;       // Secondary Air Flow Rate
+    int pdchAirTermMinFlowSch = 0;     // Minimum Flow Schedule Name
+    int pdchAirTermMaxFlowReh = 0;     // Maximum Flow During Reheat
+    int pdchAirTermMinOAflowSch = 0;   // Minimum Outdoor Flow Schedule Name
+    int pdchAirTermTempCntl = 0;       // Temperature Control
 
     // Std 229 Air Heat Recovery
     int pdstAirHR = 0;
@@ -465,6 +481,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdrEnvelope = 0;
     int pdstOpaque = 0;
     int pdchOpCons = 0;
+    int pdchOpZone = 0;
     int pdchOpRefl = 0;
     int pdchOpUfactFilm = 0;
     int pdchOpUfactNoFilm = 0;
@@ -475,6 +492,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchOpDir = 0;
     int pdstIntOpaque = 0;
     int pdchIntOpCons = 0;
+    int pdchIntOpZone = 0;
+    int pdchIntOpAdjSurf = 0;
     int pdchIntOpRefl = 0;
     int pdchIntOpUfactFilm = 0;
     int pdchIntOpUfactNoFilm = 0;
@@ -536,6 +555,9 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchIntFenSHGC = 0;
     int pdchIntFenVisTr = 0;
     int pdchIntFenParent = 0;
+
+    int pdstOpqConsLayers = 0;
+    std::vector<int> pdchOpqConsLayCol;
 
     // Shading Report
     int pdrShading = 0;
@@ -853,6 +875,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDCVZoneADEffCooling = 0;
     int pdchDCVZoneADEffHeating = 0;
     int pdchDCVZoneADEffSchName = 0;
+    int pdchDCVType = 0;
 
     int pdstSimpleComfort = 0;
     int pdchSCwinterClothes = 0;
@@ -863,6 +886,62 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchULnotMetCool = 0;
     int pdchULnotMetHeatOcc = 0;
     int pdchULnotMetCoolOcc = 0;
+
+    int pdstStatSchd = 0;
+    int pdchStatName = 0;
+    int pdchStatCtrlTypeSchd = 0;
+    int pdchStatSchdType1 = 0;
+    int pdchStatSchdTypeName1 = 0;
+    int pdchStatSchdHeatName = 0;
+    int pdchStatSchdCoolName = 0;
+
+    // HVAC Topology
+    int pdrTopology = 0;
+
+    int pdstTopAirLoop = 0;
+    int pdchTopAirLoopName = 0;
+    int pdchTopAirSplitName = 0;
+    int pdchTopAirBranchName = 0;
+    int pdchTopAirSupplyBranchType = 0;
+    int pdchTopAirCompType = 0;
+    int pdchTopAirCompName = 0;
+    int pdchTopAirSubCompType = 0;
+    int pdchTopAirSubCompName = 0;
+    int pdchTopAirSubSubCompType = 0;
+    int pdchTopAirSubSubCompName = 0;
+    int pdchTopAirDownSplitMixName = 0;
+    int pdchTopAirMixName = 0;
+
+    int pdstTopAirDemand = 0;
+    int pdchTopAirDemandName = 0;
+    int pdchTopAirSupplyBranchName = 0;
+    int pdchTopAirSupplyDuctType = 0;
+    int pdchTopAirSupplyPCompType = 0;
+    int pdchTopAirSupplyPCompName = 0;
+    int pdchTopAirTermUnitType = 0;
+    int pdchTopAirTermUnitName = 0;
+    int pdchTopAirZoneName = 0;
+    int pdchTopAirReturnPCompType = 0;
+    int pdchTopAirReturnPCompName = 0;
+
+    int pdstTopZnEqp = 0;
+    int pdchTopZnEqpName = 0;
+    int pdchTopZnEqpCompType = 0;
+    int pdchTopZnEqpCompName = 0;
+    int pdchTopZnEqpSubCompType = 0;
+    int pdchTopZnEqpSubCompName = 0;
+    int pdchTopZnEqpSubSubCompType = 0;
+    int pdchTopZnEqpSubSubCompName = 0;
+
+    int pdstTopPlantLoop2 = 0;
+    int pdchTopPlantLoopType2 = 0;
+    int pdchTopPlantLoopName2 = 0;
+    int pdchTopPlantSide2 = 0;
+    int pdchTopPlantSplitName2 = 0;
+    int pdchTopPlantBranchName2 = 0;
+    int pdchTopPlantCompType2 = 0;
+    int pdchTopPlantCompName2 = 0;
+    int pdchTopPlantMixName2 = 0;
 
     // Outdoor Air Report
     int pdrOutsideAir = 0;
@@ -1458,9 +1537,13 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     Array1D<OutputReportPredefined::CompSizeTableEntryType> CompSizeTableEntry;
     Array1D<OutputReportPredefined::ShadowRelateType> ShadowRelate;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = OutputReportPredefinedData();
+        new (this) OutputReportPredefinedData();
     }
 };
 

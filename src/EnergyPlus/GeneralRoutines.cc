@@ -1307,6 +1307,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                     } else {
                         ++CountNodes;
                         AllNodes(CountNodes) = state.dataMixerComponent->MixerCond(Count2).OutNodeNum;
+                        if (state.dataZoneEquip->ReturnAirPath(BCount).OutNodeNum == state.dataMixerComponent->MixerCond(Count2).OutNodeNum) {
+                            state.dataZoneEquip->ReturnAirPath(BCount).OutletRetPathCompNum = NumComp;
+                        }
                         for (int Loop = 1; Loop <= state.dataMixerComponent->MixerCond(Count2).NumInNodes; ++Loop) {
                             ++CountNodes;
                             AllNodes(CountNodes) = state.dataMixerComponent->MixerCond(Count2).InNodeNums(Loop);
@@ -1345,6 +1348,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                     } else {
                         ++CountNodes;
                         AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).AirOutNodeNum;
+                        if (state.dataZoneEquip->ReturnAirPath(BCount).OutNodeNum == state.dataZonePlenum->ZoneRetPlenCond(Count2).AirOutNodeNum) {
+                            state.dataZoneEquip->ReturnAirPath(BCount).OutletRetPathCompNum = NumComp;
+                        }
                         for (int Loop = 1; Loop <= state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInNodes; ++Loop) {
                             ++CountNodes;
                             AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).InNodeNums(Loop);

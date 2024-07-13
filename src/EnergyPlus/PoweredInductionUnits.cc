@@ -58,7 +58,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -76,6 +75,7 @@
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
@@ -240,9 +240,6 @@ void GetPIUs(EnergyPlusData &state)
     static constexpr std::string_view routineName = "GetPIUs";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumAlphas = 0;                                          // Number of Alpha input fields for each GetObjectItem call
-    int NumNumbers = 0;                                         // Number of Numeric input fields for each GetObjectItem call
-    int IOStatus = 0;                                           // Used in GetObjectItem
     bool ErrorsFound(false);                                    // Set to true if errors in input, fatal at end of routine
     static constexpr std::string_view RoutineName("GetPIUs: "); // include trailing blank space
     bool SteamMessageNeeded = true;
@@ -268,462 +265,300 @@ void GetPIUs(EnergyPlusData &state)
     state.dataPowerInductionUnits->PIU.allocate(state.dataPowerInductionUnits->NumPIUs);
     state.dataPowerInductionUnits->PiuUniqueNames.reserve(static_cast<unsigned>(state.dataPowerInductionUnits->NumPIUs));
     state.dataPowerInductionUnits->CheckEquipName.dimension(state.dataPowerInductionUnits->NumPIUs, true);
-    auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+
+    int PIUNum{0};
+    auto &ip = state.dataInputProcessing->inputProcessor;
     // loop over Series PIUs; get and load the input data
-    for (int PIUIndex = 1; PIUIndex <= state.dataPowerInductionUnits->NumSeriesPIUs; ++PIUIndex) {
+    for (const std::string cCurrentModuleObject : {"AirTerminal:SingleDuct:SeriesPIU:Reheat", "AirTerminal:SingleDuct:ParallelPIU:Reheat"}) {
+        auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
+        auto const &PIUsInstances = ip->epJSON.find(cCurrentModuleObject);
+        if (PIUsInstances != ip->epJSON.end()) {
+            auto &PIUInstances = PIUsInstances.value();
+            for (auto instance = PIUInstances.begin(); instance != PIUInstances.end(); ++instance) {
+                ++PIUNum;
+                auto const &fields = instance.value();
 
-        cCurrentModuleObject = "AirTerminal:SingleDuct:SeriesPIU:Reheat";
-
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 PIUIndex,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNumbers,
-                                                                 IOStatus,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-
-        ErrorObjectHeader eoh{routineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
-        GlobalNames::VerifyUniqueInterObjectName(state,
-                                                 state.dataPowerInductionUnits->PiuUniqueNames,
-                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                 cCurrentModuleObject,
-                                                 state.dataIPShortCut->cAlphaFieldNames(1),
-                                                 ErrorsFound);
-        auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUIndex);
-        thisPIU.Name = state.dataIPShortCut->cAlphaArgs(1);
-        thisPIU.UnitType = cCurrentModuleObject;
-        thisPIU.UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
-        thisPIU.Sched = state.dataIPShortCut->cAlphaArgs(2);
-        if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisPIU.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
-        } else {
-            thisPIU.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
-            if (thisPIU.SchedPtr == 0) {
-                ShowSevereError(state,
-                                format("{}{}: invalid {} entered ={} for {}={}",
-                                       RoutineName,
-                                       cCurrentModuleObject,
-                                       state.dataIPShortCut->cAlphaFieldNames(2),
-                                       state.dataIPShortCut->cAlphaArgs(2),
-                                       state.dataIPShortCut->cAlphaFieldNames(1),
-                                       state.dataIPShortCut->cAlphaArgs(1)));
-                ErrorsFound = true;
-            }
-        }
-
-        thisPIU.MaxTotAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
-        thisPIU.MaxPriAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
-        thisPIU.MinPriAirFlowFrac = state.dataIPShortCut->rNumericArgs(3);
-        thisPIU.HCoilType = static_cast<HtgCoilType>(getEnumValue(HCoilNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
-        switch (thisPIU.HCoilType) {
-        case HtgCoilType::SimpleHeating: {
-            thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-            break;
-        }
-        case HtgCoilType::Electric:
-        case HtgCoilType::Gas: {
-            break;
-        }
-        case HtgCoilType::SteamAirHeating: {
-            thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
-            thisPIU.HCoil_FluidIndex = FindRefrigerant(state, "Steam");
-            if (thisPIU.HCoil_FluidIndex == 0) {
-                ShowSevereError(state, format("{}Steam Properties for {} not found.", RoutineName, state.dataIPShortCut->cAlphaArgs(1)));
-                if (SteamMessageNeeded) {
-                    ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
+                GlobalNames::VerifyUniqueInterObjectName(
+                    state, state.dataPowerInductionUnits->PiuUniqueNames, Util::makeUPPER(instance.key()), cCurrentModuleObject, "Name", ErrorsFound);
+                auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUNum);
+                thisPIU.Name = Util::makeUPPER(instance.key());
+                thisPIU.UnitType = cCurrentModuleObject;
+                ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
+                if (cCurrentModuleObject == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+                    thisPIU.UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
+                } else if (cCurrentModuleObject == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+                    thisPIU.UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
                 }
-                ErrorsFound = true;
-                SteamMessageNeeded = false;
-            }
-            break;
-        }
-        default: {
-            ShowSevereError(state, format("Illegal {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
-            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisPIU.Name));
-            ErrorsFound = true;
-        }
-        }
-
-        thisPIU.PriAirInNodeNum = GetSingleNode(state,
-                                                 state.dataIPShortCut->cAlphaArgs(3),
-                                                 ErrorsFound,
-                                                 Node::ConnObjType::AirTerminalSingleDuctSeriesPIUReheat,
-                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                 Node::FluidType::Air,
-                                                 Node::ConnType::Inlet,
-                                                 Node::CompFluidStream::Primary,
-                                             Node::ObjectIsParent,
-                                                 state.dataIPShortCut->cAlphaFieldNames(3));
-
-        thisPIU.SecAirInNodeNum = GetSingleNode(state,
-                                                 state.dataIPShortCut->cAlphaArgs(4),
-                                                 ErrorsFound,
-                                                 Node::ConnObjType::AirTerminalSingleDuctSeriesPIUReheat,
-                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                 Node::FluidType::Air,
-                                                 Node::ConnType::Inlet,
-                                                 Node::CompFluidStream::Primary,
-                                             Node::ObjectIsParent,
-                                                 state.dataIPShortCut->cAlphaFieldNames(4));
-
-        thisPIU.AirOutNodeNum = GetSingleNode(state,
-                                               state.dataIPShortCut->cAlphaArgs(5),
-                                               ErrorsFound,
-                                               Node::ConnObjType::AirTerminalSingleDuctSeriesPIUReheat,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               Node::FluidType::Air,
-                                               Node::ConnType::Outlet,
-                                               Node::CompFluidStream::Primary,
-                                           Node::ObjectIsParent,
-                                               state.dataIPShortCut->cAlphaFieldNames(5));
-
-        thisPIU.HCoilAirInNodeNum = GetSingleNode(state,
-                                                   state.dataIPShortCut->cAlphaArgs(6),
-                                                   ErrorsFound,
-                                                   Node::ConnObjType::AirTerminalSingleDuctSeriesPIUReheat,
-                                                   state.dataIPShortCut->cAlphaArgs(1),
-                                                   Node::FluidType::Air,
-                                                   Node::ConnType::Internal,
-                                                   Node::CompFluidStream::Primary,
-                                               Node::ObjectIsParent,
-                                                   state.dataIPShortCut->cAlphaFieldNames(6));
-        // The reheat coil control node is necessary for hot water reheat, but not necessary for
-        // electric or gas reheat.
-        if (thisPIU.HCoilType == HtgCoilType::SimpleHeating) {
-            thisPIU.HotControlNodeNum =
-                GetCoilWaterInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
-        }
-        if (thisPIU.HCoilType == HtgCoilType::SteamAirHeating) {
-            thisPIU.HotControlNodeNum =
-                GetCoilSteamInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
-        }
-        thisPIU.MixerName = state.dataIPShortCut->cAlphaArgs(7); // name of zone mixer object
-        thisPIU.FanName = state.dataIPShortCut->cAlphaArgs(8);   // name of fan object
-
-        // find fan type
-        // test if Fan:SystemModel fan of this name exists
-        if ((thisPIU.Fan_Index = Fans::GetFanIndex(state, thisPIU.FanName)) == 0) {
-            ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(8), thisPIU.FanName);
-            ErrorsFound = true;
-        } else {
-            auto *fan = state.dataFans->fans(thisPIU.Fan_Index);
-            thisPIU.fanType = fan->type;
-            // assert(thisPIU.fanType == HVAC::FanType::Constant);
-            thisPIU.FanAvailSchedPtr = fan->availSchedNum;
-        }
-
-        thisPIU.HCoil = state.dataIPShortCut->cAlphaArgs(10); // name of heating coil object
-        bool IsNotOK = false;
-        ValidateComponent(state, HCoilNamesUC[static_cast<int>(thisPIU.HCoilType)], thisPIU.HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil");
-        if (IsNotOK) {
-            ShowContinueError(state, format("In {} = {}", cCurrentModuleObject, thisPIU.Name));
-            ErrorsFound = true;
-        }
-        thisPIU.MaxVolHotWaterFlow = state.dataIPShortCut->rNumericArgs(4);
-        thisPIU.MinVolHotWaterFlow = state.dataIPShortCut->rNumericArgs(5);
-        thisPIU.HotControlOffset = state.dataIPShortCut->rNumericArgs(6);
-        // Set default convergence tolerance
-        if (thisPIU.HotControlOffset <= 0.0) {
-            thisPIU.HotControlOffset = 0.001;
-        }
-
-        // Add fan to component sets array
-        SetUpCompSets(state,
-                      thisPIU.UnitType,
-                      thisPIU.Name,
-                      "UNDEFINED",
-                      state.dataIPShortCut->cAlphaArgs(8),
-                      "UNDEFINED",
-                      state.dataIPShortCut->cAlphaArgs(6));
-
-        // Add reheat coil to component sets array
-        SetUpCompSets(state,
-                      thisPIU.UnitType,
-                      thisPIU.Name,
-                      state.dataIPShortCut->cAlphaArgs(9),
-                      state.dataIPShortCut->cAlphaArgs(10),
-                      state.dataIPShortCut->cAlphaArgs(6),
-                      state.dataIPShortCut->cAlphaArgs(5));
-
-        // Register component set data
-        TestCompSet(state,
-                    thisPIU.UnitType,
-                    thisPIU.Name,
-                    dln->nodes(thisPIU.PriAirInNodeNum)->Name,
-                    dln->nodes(thisPIU.AirOutNodeNum)->Name,
-                    "Air Nodes");
-
-        for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (thisPIU.AirOutNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
-                thisPIU.ADUNum = ADUNum;
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum = thisPIU.PriAirInNodeNum;
-            }
-        }
-        // one assumes if there isn't one assigned, it's an error?
-        if (thisPIU.ADUNum == 0) {
-            ShowSevereError(state, format("{}No matching Air Distribution Unit, for PIU = [{},{}].", RoutineName, thisPIU.UnitType, thisPIU.Name));
-            ShowContinueError(state, format("...should have outlet node = {}", dln->nodes(thisPIU.AirOutNodeNum)->Name));
-            ErrorsFound = true;
-        } else {
-
-            bool AirNodeFound = false;
-            // Fill the Zone Equipment data with the supply air inlet node number of this unit.
-            for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) {
-                    continue;
+                thisPIU.Sched = ip->getAlphaFieldValue(fields, objectSchemaProps, "availability_schedule_name");
+                if (!thisPIU.Sched.empty()) {
+                    thisPIU.SchedPtr = ScheduleManager::GetScheduleIndex(state, thisPIU.Sched);
+                    if (thisPIU.SchedPtr == 0) {
+                        ShowWarningError(
+                            state,
+                            format("GetPIUs {}=\"{}\", invalid Availability Schedule Name = {}", cCurrentModuleObject, thisPIU.Name, thisPIU.Sched));
+                        ShowContinueError(state, "Set the default as Always On. Simulation continues.");
+                        thisPIU.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
+                    }
+                } else {
+                    thisPIU.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 }
-                for (int SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
-                    if (thisPIU.AirOutNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum = thisPIU.PriAirInNodeNum;
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum = thisPIU.AirOutNodeNum;
-                        state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).TermUnitSizingNum =
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                        state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).ZoneEqNum = CtrlZone;
-                        AirNodeFound = true;
-                        thisPIU.CtrlZoneNum = CtrlZone; // fill index for later use in finding air loop index
-                        thisPIU.ctrlZoneInNodeNum = SupAirIn;
-                        break;
+                if (cCurrentModuleObject == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+                    thisPIU.MaxTotAirVolFlow = ip->getRealFieldValue(fields, objectSchemaProps, "maximum_air_flow_rate");
+                }
+                if (cCurrentModuleObject == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+                    thisPIU.MaxSecAirVolFlow = ip->getRealFieldValue(fields, objectSchemaProps, "maximum_secondary_air_flow_rate");
+                }
+                thisPIU.MaxPriAirVolFlow = ip->getRealFieldValue(fields, objectSchemaProps, "maximum_primary_air_flow_rate");
+                thisPIU.MinPriAirFlowFrac = ip->getRealFieldValue(fields, objectSchemaProps, "minimum_primary_air_flow_fraction");
+                if (cCurrentModuleObject == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+                    thisPIU.FanOnFlowFrac = ip->getRealFieldValue(fields, objectSchemaProps, "fan_on_flow_fraction");
+                }
+                thisPIU.HCoilType = static_cast<HtgCoilType>(
+                    getEnumValue(HCoilNamesUC, Util::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_object_type"))));
+
+                switch (thisPIU.HCoilType) {
+                case HtgCoilType::SimpleHeating: {
+                    thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+                    break;
+                }
+                case HtgCoilType::Electric:
+                case HtgCoilType::Gas: {
+                    break;
+                }
+                case HtgCoilType::SteamAirHeating: {
+                    thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
+                    thisPIU.HCoil_FluidIndex = FindRefrigerant(state, "Steam");
+                    if (thisPIU.HCoil_FluidIndex == 0) {
+                        ShowSevereError(state, format("{} Steam Properties for {} not found.", RoutineName, thisPIU.Name));
+                        if (SteamMessageNeeded) {
+                            ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
+                        }
+                        ErrorsFound = true;
+                        SteamMessageNeeded = false;
+                    }
+                    break;
+                }
+                default: {
+                    ShowSevereError(state, format("Illegal Reheat Coil Type = {}", thisPIU.HCoilType));
+                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisPIU.Name));
+                    ErrorsFound = true;
+                }
+                }
+
+                Node::ConnObjType connObjType = Node::ConnObjType::AirTerminalSingleDuctSeriesPIUReheat;
+                if (cCurrentModuleObject == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+                    connObjType = Node::ConnObjType::AirTerminalSingleDuctParallelPIUReheat;
+                }
+
+                thisPIU.PriAirInNodeNum = GetSingleNode(state,
+                                                         ip->getAlphaFieldValue(fields, objectSchemaProps, "supply_air_inlet_node_name"),
+                                                         ErrorsFound,
+                                                         connObjType,
+                                                         thisPIU.Name,
+                                                         Node::FluidType::Air,
+                                                         Node::ConnType::Inlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsParent,
+                                                         "Supply Air Inlet Node Name");
+
+                thisPIU.SecAirInNodeNum = GetSingleNode(state,
+                                                         ip->getAlphaFieldValue(fields, objectSchemaProps, "secondary_air_inlet_node_name"),
+                                                         ErrorsFound,
+                                                         connObjType,
+                                                         thisPIU.Name,
+                                                         Node::FluidType::Air,
+                                                         Node::ConnType::Inlet,
+                                                         Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsParent,
+                                                         "Secondary Air Inlet Node Name");
+
+                thisPIU.AirOutNodeNum = GetSingleNode(state,
+                                                       ip->getAlphaFieldValue(fields, objectSchemaProps, "outlet_node_name"),
+                                                       ErrorsFound,
+                                                       connObjType,
+                                                       thisPIU.Name,
+                                                       Node::FluidType::Air,
+                                                       Node::ConnType::Outlet,
+                                                       Node::CompFluidStream::Primary,
+                                                       Node::ObjectIsParent,
+                                                       "Outlet Node Name");
+
+                thisPIU.HCoilAirInNodeNum = GetSingleNode(state,
+                                                           ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_air_inlet_node_name"),
+                                                           ErrorsFound,
+                                                           connObjType,
+                                                           thisPIU.Name,
+                                                           Node::FluidType::Air,
+                                                           Node::ConnType::Internal,
+                                                           Node::CompFluidStream::Primary,
+                                                          Node::ObjectIsParent,
+                                                           "Reheat Coil Air Inlet Node Name");
+                // The reheat coil control node is necessary for hot water reheat, but not necessary for
+                // electric or gas reheat.
+                if (thisPIU.HCoilType == HtgCoilType::SimpleHeating) {
+                    thisPIU.HotControlNodeNum = GetCoilWaterInletNode(state,
+                                                                   ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_object_type"),
+                                                                   ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_name"),
+                                                                   ErrorsFound);
+                }
+                if (thisPIU.HCoilType == HtgCoilType::SteamAirHeating) {
+                    thisPIU.HotControlNodeNum = GetCoilSteamInletNode(state,
+                                                                   ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_object_type"),
+                                                                   ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_name"),
+                                                                   ErrorsFound);
+                }
+                thisPIU.MixerName = ip->getAlphaFieldValue(fields, objectSchemaProps, "zone_mixer_name");
+                thisPIU.FanName = ip->getAlphaFieldValue(fields, objectSchemaProps, "fan_name");
+
+                // find fan type
+                // test if Fan:SystemModel fan of this name exists
+                ErrorObjectHeader eoh{routineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(8)};
+                if ((thisPIU.Fan_Index = Fans::GetFanIndex(state, thisPIU.FanName)) == 0) {
+                    ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(8), thisPIU.FanName);
+                    ErrorsFound = true;
+                } else {
+                    // Assert that this is a constant volume fan?
+                    auto *fan = state.dataFans->fans(thisPIU.Fan_Index);
+                    thisPIU.fanType = fan->type;
+                    thisPIU.FanAvailSchedPtr = fan->availSchedNum;
+                }
+
+                thisPIU.HCoil = ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_name");
+                bool IsNotOK = false;
+                ValidateComponent(
+                    state, HCoilNamesUC[static_cast<int>(thisPIU.HCoilType)], thisPIU.HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil");
+                if (IsNotOK) {
+                    ShowContinueError(state, format("In {} = {}", cCurrentModuleObject, thisPIU.Name));
+                    ErrorsFound = true;
+                }
+                thisPIU.MaxVolHotWaterFlow = ip->getRealFieldValue(fields, objectSchemaProps, "maximum_hot_water_or_steam_flow_rate");
+                thisPIU.MinVolHotWaterFlow = ip->getRealFieldValue(fields, objectSchemaProps, "minimum_hot_water_or_steam_flow_rate");
+                thisPIU.HotControlOffset = ip->getRealFieldValue(fields, objectSchemaProps, "convergence_tolerance");
+                // Set default convergence tolerance
+                if (thisPIU.HotControlOffset <= 0.0) {
+                    thisPIU.HotControlOffset = 0.001;
+                }
+
+                // Variable speed fan inputs
+                std::string fan_control_type = "ConstantSpeed";
+                fan_control_type = ip->getAlphaFieldValue(fields, objectSchemaProps, "fan_control_type");
+                thisPIU.fanControlType = FanCntrlType::ConstantSpeedFan;
+                if (Util::SameString(fan_control_type, "VariableSpeed")) {
+                    thisPIU.fanControlType = FanCntrlType::VariableSpeedFan;
+                    if (thisPIU.fanType != HVAC::FanType::SystemModel) {
+                        ErrorsFound = true;
+                        ShowSevereError(state, format("Fan type must be Fan:SystemModel when Fan Control Type = {}", fan_control_type));
+                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisPIU.Name));
+                    }
+                } else if (Util::SameString(fan_control_type, "ConstantSpeed")) {
+                    thisPIU.fanControlType = FanCntrlType::ConstantSpeedFan;
+                } else {
+                    ShowSevereError(state, format("Illegal Fan Control Type = {}", fan_control_type));
+                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisPIU.Name));
+                    ErrorsFound = true;
+                }
+
+                std::string const heating_control_type = ip->getAlphaFieldValue(fields, objectSchemaProps, "heating_control_type");
+                thisPIU.heatingControlType = HeatCntrlBehaviorType::Invalid;
+                if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+                    if (Util::SameString(heating_control_type, "Staged")) {
+                        thisPIU.heatingControlType = HeatCntrlBehaviorType::StagedHeaterBehavior;
+                    } else if (Util::SameString(heating_control_type, "Modulated")) {
+                        thisPIU.heatingControlType = HeatCntrlBehaviorType::ModulatedHeaterBehavior;
+                    } else {
+                        ShowSevereError(state, format("Illegal Heating Control Type = {}", heating_control_type));
+                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisPIU.Name));
+                        ErrorsFound = true;
                     }
                 }
-            }
-            if (!AirNodeFound) {
-                ShowSevereError(state, format("The outlet air node from the {} Unit = {}", cCurrentModuleObject, thisPIU.Name));
-                ShowContinueError(state, format("did not have a matching Zone Equipment Inlet Node, Node = {}", state.dataIPShortCut->cAlphaArgs(5)));
-                ErrorsFound = true;
-            }
-        }
-    }
 
-    for (int PIUIndex = 1; PIUIndex <= state.dataPowerInductionUnits->NumParallelPIUs; ++PIUIndex) {
+                thisPIU.MinFanTurnDownRatio = ip->getRealFieldValue(fields, objectSchemaProps, "minimum_fan_turn_down_ratio");
+                thisPIU.designHeatingDAT = ip->getRealFieldValue(fields, objectSchemaProps, "design_heating_discharge_air_temperature");
+                thisPIU.highLimitDAT = ip->getRealFieldValue(fields, objectSchemaProps, "high_limit_heating_discharge_air_temperature");
 
-        cCurrentModuleObject = "AirTerminal:SingleDuct:ParallelPIU:Reheat";
-
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 PIUIndex,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNumbers,
-                                                                 IOStatus,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-
-        auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUIndex + state.dataPowerInductionUnits->NumSeriesPIUs);
-
-        ErrorObjectHeader eoh{routineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
-
-        GlobalNames::VerifyUniqueInterObjectName(state,
-                                                 state.dataPowerInductionUnits->PiuUniqueNames,
-                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                 cCurrentModuleObject,
-                                                 state.dataIPShortCut->cAlphaFieldNames(1),
-                                                 ErrorsFound);
-        thisPIU.Name = state.dataIPShortCut->cAlphaArgs(1);
-        thisPIU.UnitType = cCurrentModuleObject;
-        thisPIU.UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
-        thisPIU.Sched = state.dataIPShortCut->cAlphaArgs(2);
-        if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisPIU.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
-        } else {
-            thisPIU.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
-            if (thisPIU.SchedPtr == 0) {
-                ShowSevereError(state,
-                                format("{}{}: invalid {} entered ={} for {}={}",
-                                       RoutineName,
-                                       cCurrentModuleObject,
-                                       state.dataIPShortCut->cAlphaFieldNames(2),
-                                       state.dataIPShortCut->cAlphaArgs(2),
-                                       state.dataIPShortCut->cAlphaFieldNames(1),
-                                       state.dataIPShortCut->cAlphaArgs(1)));
-                ErrorsFound = true;
-            }
-        }
-        thisPIU.MaxPriAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
-        thisPIU.MaxSecAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
-        thisPIU.MinPriAirFlowFrac = state.dataIPShortCut->rNumericArgs(3);
-        thisPIU.FanOnFlowFrac = state.dataIPShortCut->rNumericArgs(4);
-        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
-            thisPIU.HCoilType = HtgCoilType::SimpleHeating;
-            thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
-            thisPIU.HCoilType = HtgCoilType::Gas;
-        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
-            thisPIU.HCoilType = HtgCoilType::SteamAirHeating;
-            thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
-            thisPIU.HCoil_FluidIndex = FindRefrigerant(state, "Steam");
-            if (thisPIU.HCoil_FluidIndex == 0) {
-                ShowSevereError(state, format("{}Steam Properties for {} not found.", RoutineName, state.dataIPShortCut->cAlphaArgs(1)));
-                if (SteamMessageNeeded) {
-                    ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
+                // Add fan to component sets array
+                if (cCurrentModuleObject == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+                    SetUpCompSets(state,
+                                  thisPIU.UnitType,
+                                  thisPIU.Name,
+                                  "UNDEFINED",
+                                  thisPIU.FanName,
+                                  "UNDEFINED",
+                                  ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_air_inlet_node_name"));
+                } else if (cCurrentModuleObject == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+                    SetUpCompSets(state,
+                                  thisPIU.UnitType,
+                                  thisPIU.Name,
+                                  "UNDEFINED",
+                                  thisPIU.FanName,
+                                  ip->getAlphaFieldValue(fields, objectSchemaProps, "secondary_air_inlet_node_name"),
+                                  "UNDEFINED");
                 }
-                ErrorsFound = true;
-                SteamMessageNeeded = false;
-            }
-        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
-            thisPIU.HCoilType = HtgCoilType::Electric;
-        } else {
-            ShowSevereError(state, format("Illegal {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
-            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisPIU.Name));
-            ErrorsFound = true;
-        }
 
-        thisPIU.PriAirInNodeNum = GetSingleNode(state,
-                                                 state.dataIPShortCut->cAlphaArgs(3),
-                                                 ErrorsFound,
-                                                 Node::ConnObjType::AirTerminalSingleDuctParallelPIUReheat,
-                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                 Node::FluidType::Air,
-                                                 Node::ConnType::Inlet,
-                                                 Node::CompFluidStream::Primary,
-                                                Node::ObjectIsParent,
-                                                 state.dataIPShortCut->cAlphaFieldNames(3));
+                // Add reheat coil to component sets array
+                SetUpCompSets(state,
+                              thisPIU.UnitType,
+                              thisPIU.Name,
+                              ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_object_type"),
+                              ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_name"),
+                              ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_air_inlet_node_name"),
+                              ip->getAlphaFieldValue(fields, objectSchemaProps, "outlet_node_name"));
 
-        thisPIU.SecAirInNodeNum = GetSingleNode(state,
-                                                 state.dataIPShortCut->cAlphaArgs(4),
-                                                 ErrorsFound,
-                                                 Node::ConnObjType::AirTerminalSingleDuctParallelPIUReheat,
-                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                 Node::FluidType::Air,
-                                                 Node::ConnType::Inlet,
-                                                 Node::CompFluidStream::Primary,
-                                                Node::ObjectIsParent,
-                                                 state.dataIPShortCut->cAlphaFieldNames(4));
+                // Register component set data
+                TestCompSet(state,
+                            thisPIU.UnitType,
+                            thisPIU.Name,
+                            dln->nodes(thisPIU.PriAirInNodeNum)->Name,
+                            dln->nodes(thisPIU.AirOutNodeNum)->Name,
+                            "Air Nodes");
 
-        thisPIU.AirOutNodeNum = GetSingleNode(state,
-                                               state.dataIPShortCut->cAlphaArgs(5),
-                                               ErrorsFound,
-                                               Node::ConnObjType::AirTerminalSingleDuctParallelPIUReheat,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               Node::FluidType::Air,
-                                               Node::ConnType::Outlet,
-                                               Node::CompFluidStream::Primary,
-                                              Node::ObjectIsParent,
-                                               state.dataIPShortCut->cAlphaFieldNames(5));
-
-        thisPIU.HCoilAirInNodeNum = GetSingleNode(state,
-                                                   state.dataIPShortCut->cAlphaArgs(6),
-                                                   ErrorsFound,
-                                                   Node::ConnObjType::AirTerminalSingleDuctParallelPIUReheat,
-                                                   state.dataIPShortCut->cAlphaArgs(1),
-                                                   Node::FluidType::Air,
-                                                   Node::ConnType::Internal,
-                                                   Node::CompFluidStream::Primary,
-                                                  Node::ObjectIsParent,
-                                                   state.dataIPShortCut->cAlphaFieldNames(6));
-        if (thisPIU.HCoilType == HtgCoilType::SimpleHeating) {
-            thisPIU.HotControlNodeNum =
-                GetCoilWaterInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
-        }
-        else if (thisPIU.HCoilType == HtgCoilType::SteamAirHeating) {
-            thisPIU.HotControlNodeNum =
-                GetCoilSteamInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
-        }
-        thisPIU.MixerName = state.dataIPShortCut->cAlphaArgs(7); // name of zone mixer object
-        thisPIU.FanName = state.dataIPShortCut->cAlphaArgs(8);   // name of fan object
-        // find fan type
-        // test if Fan:SystemModel fan of this name exists
-        if ((thisPIU.Fan_Index = Fans::GetFanIndex(state, thisPIU.FanName)) == 0) {
-            ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(8), thisPIU.FanName);
-            ErrorsFound = true;
-        } else {
-            // Assert that this is a constant volume fan?
-            auto *fan = state.dataFans->fans(thisPIU.Fan_Index);
-            thisPIU.fanType = fan->type;
-            thisPIU.FanAvailSchedPtr = fan->availSchedNum;
-        }
-
-        thisPIU.HCoil = state.dataIPShortCut->cAlphaArgs(10); // name of heating coil object
-        bool IsNotOK = false;
-        ValidateComponent(state, HCoilNamesUC[static_cast<int>(thisPIU.HCoilType)], thisPIU.HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil");
-        if (IsNotOK) {
-            ShowContinueError(state, format("In {} = {}", cCurrentModuleObject, thisPIU.Name));
-            ErrorsFound = true;
-        }
-        thisPIU.MaxVolHotWaterFlow = state.dataIPShortCut->rNumericArgs(5);
-        thisPIU.MinVolHotWaterFlow = state.dataIPShortCut->rNumericArgs(6);
-        thisPIU.HotControlOffset = state.dataIPShortCut->rNumericArgs(7);
-        // Set default convergence tolerance
-        if (thisPIU.HotControlOffset <= 0.0) {
-            thisPIU.HotControlOffset = 0.001;
-        }
-
-        // Add fan to component sets array
-        SetUpCompSets(state,
-                      thisPIU.UnitType,
-                      thisPIU.Name,
-                      "UNDEFINED",
-                      state.dataIPShortCut->cAlphaArgs(8),
-                      state.dataIPShortCut->cAlphaArgs(4),
-                      "UNDEFINED");
-
-        // Add reheat coil to component sets array
-        SetUpCompSets(state,
-                      thisPIU.UnitType,
-                      thisPIU.Name,
-                      state.dataIPShortCut->cAlphaArgs(9),
-                      state.dataIPShortCut->cAlphaArgs(10),
-                      state.dataIPShortCut->cAlphaArgs(6),
-                      state.dataIPShortCut->cAlphaArgs(5));
-
-        // Register component set data
-        TestCompSet(state,
-                    thisPIU.UnitType,
-                    thisPIU.Name,
-                    dln->nodes(thisPIU.PriAirInNodeNum)->Name,
-                    dln->nodes(thisPIU.AirOutNodeNum)->Name,
-                    "Air Nodes");
-
-        for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (thisPIU.AirOutNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
-                //      AirDistUnit(ADUNum)%InletNodeNum = PIU(PIUNum)%InletNodeNum
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum = thisPIU.PriAirInNodeNum;
-                thisPIU.ADUNum = ADUNum;
-            }
-        }
-        // one assumes if there isn't one assigned, it's an error?
-        if (thisPIU.ADUNum == 0) {
-            ShowSevereError(state, format("{}No matching Air Distribution Unit, for PIU = [{},{}].", RoutineName, thisPIU.UnitType, thisPIU.Name));
-            ShowContinueError(state, format("...should have outlet node = {}", dln->nodes(thisPIU.AirOutNodeNum)->Name));
-            ErrorsFound = true;
-        } else {
-
-            // Fill the Zone Equipment data with the supply air inlet node number of this unit.
-            bool AirNodeFound = false;
-            for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) {
-                    continue;
-                }
-                for (int SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
-                    if (thisPIU.AirOutNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum = thisPIU.PriAirInNodeNum;
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum = thisPIU.AirOutNodeNum;
-                        state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).TermUnitSizingNum =
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                        state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).ZoneEqNum = CtrlZone;
-                        thisPIU.CtrlZoneNum = CtrlZone;
-                        thisPIU.ctrlZoneInNodeNum = SupAirIn;
-                        AirNodeFound = true;
+                for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
+                    if (thisPIU.AirOutNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
+                        thisPIU.ADUNum = ADUNum;
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum = thisPIU.PriAirInNodeNum;
                     }
                 }
-            }
-            if (!AirNodeFound) {
-                ShowSevereError(state, format("The outlet air node from the {} Unit = {}", cCurrentModuleObject, thisPIU.Name));
-                ShowContinueError(state, format("did not have a matching Zone Equipment Inlet Node, Node = {}", state.dataIPShortCut->cAlphaArgs(5)));
-                ErrorsFound = true;
+                // one assumes if there isn't one assigned, it's an error?
+                if (thisPIU.ADUNum == 0) {
+                    ShowSevereError(state,
+                                    format("{}No matching Air Distribution Unit, for PIU = [{},{}].", RoutineName, thisPIU.UnitType, thisPIU.Name));
+                    ShowContinueError(state, format("...should have outlet node = {}", dln->nodes(thisPIU.AirOutNodeNum)->Name));
+                    ErrorsFound = true;
+                } else {
+
+                    bool AirNodeFound = false;
+                    // Fill the Zone Equipment data with the supply air inlet node number of this unit.
+                    for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) {
+                            continue;
+                        }
+                        for (int SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
+                            if (thisPIU.AirOutNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum = thisPIU.PriAirInNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum = thisPIU.AirOutNodeNum;
+                                state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).TermUnitSizingNum =
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).ZoneEqNum = CtrlZone;
+                                AirNodeFound = true;
+                                thisPIU.CtrlZoneNum = CtrlZone; // fill index for later use in finding air loop index
+                                thisPIU.ctrlZoneInNodeNum = SupAirIn;
+                                break;
+                            }
+                        }
+                    }
+                    if (!AirNodeFound) {
+                        ShowSevereError(state, format("The outlet air node from the {} Unit = {}", cCurrentModuleObject, thisPIU.Name));
+                        ShowContinueError(
+                            state, format("did not have a matching Zone Equipment Inlet Node, Node = {}", state.dataIPShortCut->cAlphaArgs(5)));
+                        ErrorsFound = true;
+                    }
+                }
             }
         }
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, format("{}Errors found in getting input.  Preceding conditions cause termination.", RoutineName));
+        ShowFatalError(state, format("{} Errors found in getting input.  Preceding conditions cause termination.", RoutineName));
     }
 
     for (int PIUNum = 1; PIUNum <= state.dataPowerInductionUnits->NumPIUs; ++PIUNum) {
@@ -772,6 +607,41 @@ void GetPIUs(EnergyPlusData &state)
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             thisPIU.Name);
+        SetupOutputVariable(state,
+                            "Zone Air Terminal Total Air Mass Flow Rate",
+                            Constant::Units::kg_s,
+                            thisPIU.TotMassFlowRate,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            state.dataPowerInductionUnits->PIU(PIUNum).Name);
+        SetupOutputVariable(state,
+                            "Zone Air Terminal Primary Air Mass Flow Rate",
+                            Constant::Units::kg_s,
+                            thisPIU.PriMassFlowRate,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            state.dataPowerInductionUnits->PIU(PIUNum).Name);
+        SetupOutputVariable(state,
+                            "Zone Air Terminal Secondary Air Mass Flow Rate",
+                            Constant::Units::kg_s,
+                            thisPIU.SecMassFlowRate,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            state.dataPowerInductionUnits->PIU(PIUNum).Name);
+        SetupOutputVariable(state,
+                            "Zone Air Terminal Outlet Discharge Air Temperature",
+                            Constant::Units::C,
+                            thisPIU.DischargeAirTemp,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            state.dataPowerInductionUnits->PIU(PIUNum).Name);
+        SetupOutputVariable(state,
+                            "Zone Air Terminal Current Operation Control Stage",
+                            Constant::Units::unknown,
+                            thisPIU.CurOperationControlStage,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            state.dataPowerInductionUnits->PIU(PIUNum).Name);
     }
 }
 
@@ -883,7 +753,6 @@ void InitPIU(EnergyPlusData &state,
         Real64 const RhoAir = state.dataEnvrn->StdRhoAir;
         // set the mass flow rates from the input volume flow rates
         if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
-            // series
             thisPIU.MaxTotAirMassFlow = RhoAir * thisPIU.MaxTotAirVolFlow;
             thisPIU.MaxPriAirMassFlow = RhoAir * thisPIU.MaxPriAirVolFlow;
             thisPIU.MinPriAirMassFlow = RhoAir * thisPIU.MinPriAirFlowFrac * thisPIU.MaxPriAirVolFlow;
@@ -899,6 +768,18 @@ void InitPIU(EnergyPlusData &state,
             priAirInNode->MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
             priAirInNode->MassFlowRateMin = thisPIU.MinPriAirMassFlow;
             airOutNode->MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
+        }
+        if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+            if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+                thisPIU.MinTotAirMassFlow = thisPIU.MaxTotAirMassFlow * thisPIU.MinFanTurnDownRatio;
+                thisPIU.MaxSecAirVolFlow = thisPIU.MaxTotAirMassFlow - thisPIU.MinPriAirMassFlow;
+                thisPIU.MaxSecAirMassFlow = RhoAir * thisPIU.MaxSecAirVolFlow;
+                thisPIU.MinSecAirMassFlow = max(0.0, thisPIU.MinTotAirMassFlow - thisPIU.MinPriAirMassFlow);
+            } else {
+                thisPIU.MaxSecAirMassFlow = RhoAir * thisPIU.MaxSecAirVolFlow;
+                thisPIU.MinSecAirMassFlow = max(0.0, thisPIU.MaxSecAirMassFlow * thisPIU.MinFanTurnDownRatio);
+                thisPIU.MinTotAirMassFlow = thisPIU.MinSecAirMassFlow + thisPIU.MinPriAirMassFlow;
+            }
         }
 
         if (((thisPIU.HCoilType == HtgCoilType::SimpleHeating) || (thisPIU.HCoilType == HtgCoilType::SteamAirHeating)) &&
@@ -1489,7 +1370,8 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
     }
 
     if (CurTermUnitSizingNum > 0) {
-        TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac = thisPIU.MinPriAirFlowFrac;
+        TermUnitSizing(CurTermUnitSizingNum).MinPriFlowFrac = thisPIU.MinPriAirFlowFrac;
+        TermUnitSizing(CurTermUnitSizingNum).plenumIndex = thisPIU.plenumIndex;
         TermUnitSizing(CurTermUnitSizingNum).MaxHWVolFlow = thisPIU.MaxVolHotWaterFlow;
         TermUnitSizing(CurTermUnitSizingNum).MaxSTVolFlow = thisPIU.MaxVolHotSteamFlow;
         TermUnitSizing(CurTermUnitSizingNum).DesHeatingLoad = DesCoilLoad; // coil report
@@ -1564,15 +1446,12 @@ void CalcSeriesPIU(EnergyPlusData &state,
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool UnitOn(true);  // TRUE if unit is on
-    bool PriOn(true);   // TRUE if primary air available
-    bool HCoilOn(true); // TRUE if heating coil is on
+    bool UnitOn(true); // TRUE if unit is on
+    bool PriOn(true);  // TRUE if primary air available
 
-    Real64 QCoilReq;     // required heating coil outlet to meet zone load
-    Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/s]
-    Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/s]
-    Real64 MinSteamFlow; // TODO: this is unused
-    Real64 MaxSteamFlow; // TODO: this is unused
+    Real64 QCoilReq = 0.0;     // required heating coil outlet to meet zone load
+    Real64 MaxWaterFlow = 0.0; // maximum water flow for heating or cooling [kg/s]
+    Real64 MinWaterFlow = 0.0; // minimum water flow for heating or cooling [kg/s]
 
     // initialize local variables
     auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUNum);
@@ -1584,15 +1463,23 @@ void CalcSeriesPIU(EnergyPlusData &state,
     auto *heatCoilAirInNode = dln->nodes(thisPIU.HCoilAirInNodeNum);
     auto *zoneNode = dln->nodes(ZoneNodeNum);
     
-    Real64 PriAirMassFlow = priAirInNode->MassFlowRate;                  // primary air mass flow rate [kg/s]
     Real64 const PriAirMassFlowMax = priAirInNode->MassFlowRateMaxAvail; // max primary air mass flow rate [kg/s]
     Real64 const PriAirMassFlowMin = priAirInNode->MassFlowRateMinAvail; // min primary air mass flow rate [kg/s]
-    Real64 SecAirMassFlow = secAirInNode->MassFlowRate;                  // secondary air mass flow rate [kg/s]
+
     Real64 const QZnReq =
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired; // heating or cooling needed by zone [Watts]
     Real64 const QToHeatSetPt =
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // [W]  remaining load to heating setpoint
+
     Real64 const CpAirZn = PsyCpAirFnW(zoneNode->HumRat);          // zone air specific heat [J/kg-C]
+    thisPIU.PriAirMassFlow = priAirInNode->MassFlowRate;   // primary air mass flow rate [kg/s]
+    thisPIU.SecAirMassFlow = secAirInNode->MassFlowRate;   // secondary air mass flow rate [kg/s]
+    if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+        thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
+    } else {
+        thisPIU.heatingOperatingMode = HeatOpModeType::ConstantVolumeHeat;
+    }
+    thisPIU.coolingOperatingMode = CoolOpModeType::CoolerOff;
 
     // On the first HVAC iteration the system values are given to the controller, but after that
     // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -1601,13 +1488,9 @@ void CalcSeriesPIU(EnergyPlusData &state,
         if (FirstHVACIteration) {
             MaxWaterFlow = thisPIU.MaxHotWaterFlow;
             MinWaterFlow = thisPIU.MinHotWaterFlow;
-            MaxSteamFlow = thisPIU.MaxHotWaterFlow; // TODO: Need TO change THESE******************************
-            MinSteamFlow = thisPIU.MinHotWaterFlow;
         } else {
             MaxWaterFlow = hotControlNode->MassFlowRateMaxAvail;
             MinWaterFlow = hotControlNode->MassFlowRateMinAvail;
-            MaxSteamFlow = hotControlNode->MassFlowRateMaxAvail;
-            MinSteamFlow = hotControlNode->MassFlowRateMinAvail;
         }
     }
     if (GetCurrentScheduleValue(state, thisPIU.SchedPtr) <= 0.0) {
@@ -1616,7 +1499,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
     if ((GetCurrentScheduleValue(state, thisPIU.FanAvailSchedPtr) <= 0.0 || state.dataHVACGlobal->TurnFansOff) && !state.dataHVACGlobal->TurnFansOn) {
         UnitOn = false;
     }
-    if (PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow) {
+    if (thisPIU.PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow) {
         PriOn = false;
     }
     // Set the mass flow rates
@@ -1624,81 +1507,176 @@ void CalcSeriesPIU(EnergyPlusData &state,
         // unit is on
         if (!PriOn) {
             // no primary air flow
-            PriAirMassFlow = 0.0;
+            thisPIU.PriAirMassFlow = 0.0;
             // PIU fan off if there is no heating load, also reset fan flag if fan should be off
             if (QZnReq <= SmallLoad) {
-                SecAirMassFlow = 0.0;
+                thisPIU.SecAirMassFlow = 0.0;
                 state.dataHVACGlobal->TurnFansOn = false;
             } else {
-                SecAirMassFlow = thisPIU.MaxTotAirMassFlow;
+                if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan &&
+                    thisPIU.heatingControlType == HeatCntrlBehaviorType::StagedHeaterBehavior) {
+                    CalcVariableSpeedPIUStagedHeatingBehavior(state, PIUNum, ZoneNodeNum, QZnReq, PriOn, thisPIU.PriAirMassFlow);
+                } else if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan &&
+                           thisPIU.heatingControlType == HeatCntrlBehaviorType::ModulatedHeaterBehavior) {
+                    CalcVariableSpeedPIUModulatedHeatingBehavior(state, PIUNum, ZoneNodeNum, QZnReq, PriOn, thisPIU.PriAirMassFlow);
+                } else if (thisPIU.fanControlType == FanCntrlType::ConstantSpeedFan) {
+                    thisPIU.heatingOperatingMode = HeatOpModeType::ConstantVolumeHeat;
+                    thisPIU.SecAirMassFlow = thisPIU.MaxTotAirMassFlow;
+                }
             }
         } else if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
             // in deadband or very small load: set primary air flow to the minimum
-            PriAirMassFlow = PriAirMassFlowMin;
-            SecAirMassFlow = max(0.0, thisPIU.MaxTotAirMassFlow - PriAirMassFlow);
+            thisPIU.PriAirMassFlow = PriAirMassFlowMin;
+            if (thisPIU.fanControlType == FanCntrlType::ConstantSpeedFan) {
+                thisPIU.heatingOperatingMode = HeatOpModeType::ConstantVolumeHeat;
+                thisPIU.SecAirMassFlow = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.PriAirMassFlow);
+            } else if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+                thisPIU.SecAirMassFlow = max(0.0, thisPIU.MinTotAirMassFlow - thisPIU.PriAirMassFlow);
+            }
         } else if (QZnReq > SmallLoad) {
             // heating: set primary air flow to the minimum
-            PriAirMassFlow = PriAirMassFlowMin;
-            SecAirMassFlow = max(0.0, thisPIU.MaxTotAirMassFlow - PriAirMassFlow);
-        } else {
-            // cooling: set the primary air flow rate to meet the load.
-            // First calculate the fan temperature rise
-            // use only secondary air for this calculation
-            priAirInNode->MassFlowRate = 0.0;
-            secAirInNode->MassFlowRate = thisPIU.MaxTotAirMassFlow;
-            SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
-            state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
-
-            // fan temperature rise [C]
-            Real64 const FanDeltaTemp = heatCoilAirInNode->Temp - secAirInNode->Temp;
-            // using the required zone load, calculate the air temperature needed to meet the load
-            // PIU(PIUNum)%MaxTotAirMassFlow * CpAirZn * (OutletTempNeeded - dln->Node(ZoneNodeNum)%Temp) = QZnReq
-            Real64 const OutletTempNeeded = zoneNode->Temp + QZnReq / (thisPIU.MaxTotAirMassFlow * CpAirZn);
-            // mixer outlet temperature needed to meet cooling load
-            Real64 const MixTempNeeded = OutletTempNeeded - FanDeltaTemp;
-            if (MixTempNeeded <= priAirInNode->Temp) {
-                PriAirMassFlow = PriAirMassFlowMax;
-            } else if (MixTempNeeded >= priAirInNode->Temp && MixTempNeeded >= secAirInNode->Temp) {
-                PriAirMassFlow = PriAirMassFlowMin;
-            } else {
-                PriAirMassFlow = thisPIU.MaxTotAirMassFlow * (secAirInNode->Temp - MixTempNeeded) / max(SmallTempDiff, secAirInNode->Temp - priAirInNode->Temp);
-                PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
+            thisPIU.PriAirMassFlow = PriAirMassFlowMin;
+            // determine secondary flow rate
+            if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan &&
+                thisPIU.heatingControlType == HeatCntrlBehaviorType::StagedHeaterBehavior) {
+                CalcVariableSpeedPIUStagedHeatingBehavior(state, PIUNum, ZoneNodeNum, QZnReq, PriOn, thisPIU.PriAirMassFlow);
+            } else if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan &&
+                       thisPIU.heatingControlType == HeatCntrlBehaviorType::ModulatedHeaterBehavior) {
+                CalcVariableSpeedPIUModulatedHeatingBehavior(state, PIUNum, ZoneNodeNum, QZnReq, PriOn, thisPIU.PriAirMassFlow);
+            } else if (thisPIU.fanControlType == FanCntrlType::ConstantSpeedFan) {
+                thisPIU.heatingOperatingMode = HeatOpModeType::ConstantVolumeHeat;
+                thisPIU.SecAirMassFlow = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.PriAirMassFlow);
             }
-            SecAirMassFlow = max(0.0, thisPIU.MaxTotAirMassFlow - PriAirMassFlow);
+        } else {
+            if (thisPIU.fanControlType == FanCntrlType::ConstantSpeedFan) {
+                // cooling: set the primary air flow rate to meet the load.
+                // First calculate the fan temperature rise
+                // use only secondary air for this calculation
+                priAirInNode->MassFlowRate = 0.0;
+                secAirInNode->MassFlowRate = thisPIU.MaxTotAirMassFlow;
+                SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
+                state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
+
+                // fan temperature rise [C]
+                Real64 const FanDeltaTemp = heatCoilAirInNode->Temp - secAirInNode->Temp;
+
+                // using the required zone load, calculate the air temperature needed to meet the load
+                Real64 const OutletTempNeeded = zoneNode->Temp + QZnReq / (thisPIU.MaxTotAirMassFlow * CpAirZn);
+
+                // mixer outlet temperature needed to meet cooling load
+                Real64 const MixTempNeeded = OutletTempNeeded - FanDeltaTemp;
+
+                if (MixTempNeeded <= priAirInNode->Temp) { //
+                    thisPIU.PriAirMassFlow = PriAirMassFlowMax;
+                } else if (MixTempNeeded >= priAirInNode->Temp && MixTempNeeded >= secAirInNode->Temp) {
+                    thisPIU.PriAirMassFlow = PriAirMassFlowMin;
+                } else {
+                    thisPIU.PriAirMassFlow =
+                        thisPIU.MaxTotAirMassFlow * (secAirInNode->Temp - MixTempNeeded) /
+                        max(SmallTempDiff, secAirInNode->Temp - priAirInNode->Temp);
+                    thisPIU.PriAirMassFlow = min(max(thisPIU.PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
+                }
+                thisPIU.SecAirMassFlow = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.PriAirMassFlow);
+                if (QZnReq < 0) {
+                    thisPIU.coolingOperatingMode = CoolOpModeType::ConstantVolumeCool;
+                }
+            } else if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+                CalcVariableSpeedPIUCoolingBehavior(state, PIUNum, ZoneNodeNum, QZnReq, QToHeatSetPt, PriAirMassFlowMin, PriAirMassFlowMax);
+            }
         }
     } else {
         // unit is off ; no flow
-        PriAirMassFlow = 0.0;
-        SecAirMassFlow = 0.0;
+        thisPIU.PriAirMassFlow = 0.0;
+        thisPIU.SecAirMassFlow = 0.0;
     }
+
     // Set inlet node flowrates
-    priAirInNode->MassFlowRate = PriAirMassFlow;
-    secAirInNode->MassFlowRate = SecAirMassFlow;
+    priAirInNode->MassFlowRate = thisPIU.PriAirMassFlow;
+    secAirInNode->MassFlowRate = thisPIU.SecAirMassFlow;
     if (PriAirMassFlowMax == 0) {
         thisPIU.PriDamperPosition = 0;
     } else {
-        thisPIU.PriDamperPosition = PriAirMassFlow / PriAirMassFlowMax;
+        thisPIU.PriDamperPosition = thisPIU.PriAirMassFlow / PriAirMassFlowMax;
     }
-    // now that inlet airflows have been set, the terminal bos components can be simulated.
 
+    // now that inlet airflows have been set, the terminal components can be simulated.
     // fire the mixer
     SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);
+
     // fire the fan
-    state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
+    if (thisPIU.fanType == HVAC::FanType::SystemModel) {
+        if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+            // calculate fan speed ratio
+            Real64 fanFlowRatio(1.0);
+            if (thisPIU.MaxTotAirMassFlow > 0.0) {
+                fanFlowRatio = (thisPIU.PriAirMassFlow + thisPIU.SecAirMassFlow) / thisPIU.MaxTotAirMassFlow;
+            }
+            state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, fanFlowRatio, _);
+        } else {
+            state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
+        }
+    } else if (thisPIU.fanType == HVAC::FanType::Constant) {
+        state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
+    }
 
     // the heating load seen by the reheat coil [W]
-    Real64 const QActualHeating = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
+    Real64 QActualHeating = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
     // check if heating coil is off
-    if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
-        (PriAirMassFlow > PriAirMassFlowMin)) {
-        HCoilOn = false;
+    if (((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
+         (thisPIU.PriAirMassFlow > PriAirMassFlowMin)) &&
+        (thisPIU.heatingOperatingMode != HeatOpModeType::StagedHeatFirstStage)) { // reheat is off during the first stage of heating
+        thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
     }
+
+    // determine what is required of heater for current operating stage
+    switch (thisPIU.heatingOperatingMode) {
+    case HeatOpModeType::HeaterOff: 
+    case HeatOpModeType::StagedHeatFirstStage: {
+        QCoilReq = 0.0;
+        QCoilReq = 0.0;
+    } break;
+
+    case HeatOpModeType::ConstantVolumeHeat:
+    case HeatOpModeType::StagedHeatSecondStage:
+    case HeatOpModeType::ModulatedHeatFirstStage: {
+        QCoilReq = QActualHeating;
+    } break;
+            
+    case HeatOpModeType::ModulatedHeatSecondStage: {
+        // find heater power to deliver design discharge air temperature
+        Real64 targetDATEnthalpy = Psychrometrics::PsyHFnTdbW(thisPIU.designHeatingDAT, zoneNode->HumRat);
+        Real64 mixAirEnthalpy = Psychrometrics::PsyHFnTdbW(heatCoilAirInNode->Temp, zoneNode->HumRat);
+        QCoilReq = heatCoilAirInNode->MassFlowRate * (targetDATEnthalpy - mixAirEnthalpy);
+    } break;
+
+    case HeatOpModeType::ModulatedHeatThirdStage: {
+        // find heater power to deliver maximum discharge air temperature
+        Real64 HiLimitDATEnthalpy = Psychrometrics::PsyHFnTdbW(thisPIU.highLimitDAT, zoneNode->HumRat);
+        Real64 mixAirEnthalpy = Psychrometrics::PsyHFnTdbW(heatCoilAirInNode->Temp, zoneNode->HumRat);
+        Real64 QcoilLimit = heatCoilAirInNode->MassFlowRate * (HiLimitDATEnthalpy - mixAirEnthalpy);
+        if (QcoilLimit < QActualHeating) { // if requried power is too high use limit of coil discharge
+            QCoilReq = QcoilLimit;
+        } else {
+            QCoilReq = QActualHeating;
+        }
+    } break;
+
+    default: {
+        ShowSevereError(state, "Incorrect series PIU heating operation.");
+        ShowFatalError(state, format("Series PIU control failed for {}:{}", thisPIU.UnitType, thisPIU.Name));
+    } break;
+    } // switch()
+    
+    if ((QCoilReq < SmallLoad) &&
+        (thisPIU.heatingOperatingMode != HeatOpModeType::StagedHeatFirstStage)) { // reheat is off during the first stage of heating
+        thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
+        QCoilReq = 0.0;
+    }
+
     // fire the heating coil
-
     switch (thisPIU.HCoilType) {
-
     case HtgCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
-        if (!HCoilOn) {
+        if ((thisPIU.heatingOperatingMode == HeatOpModeType::HeaterOff) || (thisPIU.heatingOperatingMode == HeatOpModeType::StagedHeatFirstStage)) {
             // call the reheat coil with the NO FLOW condition
             Real64 mdot = 0.0;
             SetComponentFlowRate(state, mdot, thisPIU.HotControlNodeNum, thisPIU.HotCoilOutNodeNum, thisPIU.HWplantLoc);
@@ -1711,7 +1689,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
                               thisPIU.UnitType,
                               thisPIU.HCoil_Index,
                               FirstHVACIteration,
-                              QActualHeating,
+                              QCoilReq,
                               thisPIU.HotControlNodeNum,
                               MaxWaterFlow,
                               MinWaterFlow,
@@ -1728,32 +1706,14 @@ void CalcSeriesPIU(EnergyPlusData &state,
         break;
     }
     case HtgCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
-        if (!HCoilOn) {
-            QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
-        }
         SimulateSteamCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, thisPIU.HCoil_Index, QCoilReq);
-
         break;
     }
     case HtgCoilType::Electric: { // COIL:ELECTRIC:HEATING
-        if (!HCoilOn) {
-            QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
-        }
         SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
-
         break;
     }
     case HtgCoilType::Gas: { // COIL:GAS:HEATING
-        if (!HCoilOn) {
-            QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
-        }
-        SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
         break;
     }
     default:
@@ -1761,12 +1721,17 @@ void CalcSeriesPIU(EnergyPlusData &state,
     }
 
     // Power supplied
-    Real64 const PowerMet = airOutNode->MassFlowRate * (PsyHFnTdbW(airOutNode->Temp, zoneNode->HumRat) - PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat));
+    Real64 PowerMet = airOutNode->MassFlowRate * (PsyHFnTdbW(airOutNode->Temp, zoneNode->HumRat) - PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat));
     thisPIU.HeatingRate = max(0.0, PowerMet);
     thisPIU.SensCoolRate = std::abs(min(DataPrecisionGlobals::constant_zero, PowerMet));
+    thisPIU.TotMassFlowRate = airOutNode->MassFlowRate;
+    thisPIU.SecMassFlowRate = secAirInNode->MassFlowRate;
+    thisPIU.PriMassFlowRate = priAirInNode->MassFlowRate;
+    thisPIU.DischargeAirTemp = airOutNode->Temp;
     if (airOutNode->MassFlowRate == 0.0) {
         priAirInNode->MassFlowRate = 0.0;
         secAirInNode->MassFlowRate = 0.0;
+
     }
     if (thisPIU.InducesPlenumAir) {
         state.dataHVACGlobal->PlenumInducedMassFlow = secAirInNode->MassFlowRate;
@@ -1774,7 +1739,10 @@ void CalcSeriesPIU(EnergyPlusData &state,
         state.dataHVACGlobal->PlenumInducedMassFlow = 0.0;
     }
     state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).MassFlowRatePlenInd = state.dataHVACGlobal->PlenumInducedMassFlow;
+
     airOutNode->MassFlowRateMax = thisPIU.MaxTotAirMassFlow;
+
+    ReportCurOperatingControlStage(state, PIUNum, UnitOn, thisPIU.heatingOperatingMode, thisPIU.coolingOperatingMode);
 }
 
 void CalcParallelPIU(EnergyPlusData &state,
@@ -1820,13 +1788,12 @@ void CalcParallelPIU(EnergyPlusData &state,
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
 
-    bool UnitOn(true);  // TRUE if unit is on
-    bool PriOn(true);   // TRUE if primary air available
-    bool HCoilOn(true); // TRUE if heating coil is on
+    bool UnitOn(true); // TRUE if unit is on
+    bool PriOn(true);  // TRUE if primary air available
 
-    Real64 QCoilReq;     // required heating coil outlet to meet zone load
-    Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/s]
-    Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/s]
+    Real64 QCoilReq = 0.0;     // required heating coil outlet to meet zone load
+    Real64 MaxWaterFlow = 0.0; // maximum water flow for heating or cooling [kg/s]
+    Real64 MinWaterFlow = 0.0; // minimum water flow for heating or cooling [kg/s]
 
     // initialize local variables
     auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUNum);
@@ -1842,11 +1809,18 @@ void CalcParallelPIU(EnergyPlusData &state,
     Real64 const PriAirMassFlowMax = priAirInNode->MassFlowRateMaxAvail; // max primary air mass flow rate [kg/s]
     Real64 const PriAirMassFlowMin = priAirInNode->MassFlowRateMinAvail; // min primary air mass flow rate [kg/s]
     Real64 SecAirMassFlow = secAirInNode->MassFlowRate;                  // secondary air mass flow rate [kg/s]
+
+    thisPIU.PriAirMassFlow = priAirInNode->MassFlowRate;                 // primary air mass flow rate [kg/s]
+    thisPIU.SecAirMassFlow = secAirInNode->MassFlowRate;                 // secondary air mass flow rate [kg/s]
+
     Real64 const QZnReq =
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired; // heating or cooling needed by zone [Watts]
     Real64 const QToHeatSetPt =
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // [W]  remaining load to heating setpoint
+
     Real64 const CpAirZn = PsyCpAirFnW(zoneNode->HumRat);          // zone air specific heat [J/kg-C]
+    thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
+    thisPIU.coolingOperatingMode = CoolOpModeType::CoolerOff;
 
     // On the first HVAC iteration the system values are given to the controller, but after that
     // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -1863,7 +1837,7 @@ void CalcParallelPIU(EnergyPlusData &state,
     if (GetCurrentScheduleValue(state, thisPIU.SchedPtr) <= 0.0) {
         UnitOn = false;
     }
-    if (PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow) {
+    if (thisPIU.PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow) {
         PriOn = false;
     }
     // Set the mass flow rates
@@ -1880,29 +1854,60 @@ void CalcParallelPIU(EnergyPlusData &state,
 
         if (!PriOn) {
             // no primary air flow
-            PriAirMassFlow = 0.0;
+            thisPIU.PriAirMassFlow = 0.0;
             // PIU fan off if there is no heating load, also reset fan flag if fan should be off
             if (QZnReq <= SmallLoad) {
-                SecAirMassFlow = 0.0;
+                thisPIU.SecAirMassFlow = 0.0;
                 state.dataHVACGlobal->TurnFansOn = false;
             } else {
-                SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
+                if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan &&
+                    thisPIU.heatingControlType == HeatCntrlBehaviorType::StagedHeaterBehavior) {
+                    CalcVariableSpeedPIUStagedHeatingBehavior(state, PIUNum, ZoneNodeNum, QZnReq, PriOn, thisPIU.PriAirMassFlow);
+                } else if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan &&
+                           thisPIU.heatingControlType == HeatCntrlBehaviorType::ModulatedHeaterBehavior) {
+                    CalcVariableSpeedPIUModulatedHeatingBehavior(state, PIUNum, ZoneNodeNum, QZnReq, PriOn, thisPIU.PriAirMassFlow);
+                } else if (thisPIU.fanControlType == FanCntrlType::ConstantSpeedFan) {
+                    thisPIU.heatingOperatingMode = HeatOpModeType::ConstantVolumeHeat;
+                    thisPIU.SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
+                }
             }
         } else if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
             // in deadband or very small load: set primary air flow to the minimum
-            PriAirMassFlow = PriAirMassFlowMin;
+            thisPIU.PriAirMassFlow = PriAirMassFlowMin;
             // PIU fan off if reheat is not needed, also reset fan flag if fan should be off
             if (ReheatRequired) {
-                SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
                 state.dataHVACGlobal->TurnFansOn = true;
+                if (thisPIU.fanControlType == FanCntrlType::ConstantSpeedFan) {
+                    thisPIU.heatingOperatingMode = HeatOpModeType::ConstantVolumeHeat;
+                    thisPIU.SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
+                } else if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+                    if (thisPIU.heatingControlType == HeatCntrlBehaviorType::StagedHeaterBehavior) {
+                        thisPIU.heatingOperatingMode = HeatOpModeType::StagedHeatFirstStage;
+                    } else {
+                        thisPIU.heatingOperatingMode = HeatOpModeType::ModulatedHeatFirstStage;
+                    }
+                    thisPIU.SecAirMassFlow = thisPIU.MinSecAirMassFlow;
+                }
             } else {
-                SecAirMassFlow = 0.0;
+                thisPIU.SecAirMassFlow = 0.0;
                 state.dataHVACGlobal->TurnFansOn = false;
+                thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
             }
         } else if (QZnReq > SmallLoad) {
-            // heating: set primary air flow to the minimum
-            PriAirMassFlow = PriAirMassFlowMin;
-            SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
+            // heating
+            // set primary air flow to the minimum
+            thisPIU.PriAirMassFlow = PriAirMassFlowMin;
+            // determine secondary flow rate
+            if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan &&
+                thisPIU.heatingControlType == HeatCntrlBehaviorType::StagedHeaterBehavior) {
+                CalcVariableSpeedPIUStagedHeatingBehavior(state, PIUNum, ZoneNodeNum, QZnReq, PriOn, thisPIU.PriAirMassFlow);
+            } else if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan &&
+                       thisPIU.heatingControlType == HeatCntrlBehaviorType::ModulatedHeaterBehavior) {
+                CalcVariableSpeedPIUModulatedHeatingBehavior(state, PIUNum, ZoneNodeNum, QZnReq, PriOn, thisPIU.PriAirMassFlow);
+            } else if (thisPIU.fanControlType == FanCntrlType::ConstantSpeedFan) {
+                thisPIU.heatingOperatingMode = HeatOpModeType::ConstantVolumeHeat;
+                thisPIU.SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
+            }
         } else {
             // cooling: set the primary air flow rate to meet the load.
             // First calculate the fan temperature rise
@@ -1916,62 +1921,130 @@ void CalcParallelPIU(EnergyPlusData &state,
             // fan temperature rise [C]
             Real64 const FanDeltaTemp = heatCoilAirInNode->Temp - secAirInNode->Temp;
             // Assuming the fan is off, calculate the primary air flow needed to meet the zone cooling demand.
-            // CpAir*PriAirMassFlow*(Node(thisPIU.PriAirInNode)%Temp - Node(ZoneNodeNum)%Temp) = QZnReq
-            PriAirMassFlow =
-                QZnReq /
-                (CpAirZn * min(-SmallTempDiff, (priAirInNode->Temp - zoneNode->Temp)));
-            PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
+            thisPIU.PriAirMassFlow = QZnReq / (CpAirZn * min(-SmallTempDiff, (priAirInNode->Temp - zoneNode->Temp)));
+            thisPIU.PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
+
             // check for fan on or off
-            if ((PriAirMassFlow > thisPIU.FanOnAirMassFlow) && !ReheatRequired) {
-                SecAirMassFlow = 0.0; // Fan is off unless reheat is required; no secondary air; also reset fan flag
+            if ((thisPIU.PriAirMassFlow > thisPIU.FanOnAirMassFlow) && !ReheatRequired) {
+                thisPIU.SecAirMassFlow = 0.0; // Fan is off unless reheat is required; no secondary air; also reset fan flag
                 state.dataHVACGlobal->TurnFansOn = false;
             } else {
                 // fan is on; recalc primary air flow
+
                 // CpAir*PriAirMassFlow*(Node(thisPIU.PriAirInNode)%Temp - Node(ZoneNodeNum)%Temp) +
                 //   CpAir*SecAirMassFlow*(Node(thisPIU.SecAirInNode)%Temp + FanDeltaTemp - Node(ZoneNodeNum)%Temp) = QZnReq
-                PriAirMassFlow =
-                    (QZnReq - CpAirZn * SecAirMassFlow *
-                                  (secAirInNode->Temp + FanDeltaTemp - zoneNode->Temp)) /
-                    (CpAirZn *
-                     min(-SmallTempDiff, (priAirInNode->Temp - zoneNode->Temp)));
-                PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
-                SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
+                thisPIU.PriAirMassFlow = (QZnReq - CpAirZn * SecAirMassFlow * (secAirInNode->Temp + FanDeltaTemp - zoneNode->Temp)) /
+                    (CpAirZn * min(-SmallTempDiff, (priAirInNode->Temp - zoneNode->Temp)));
+                thisPIU.PriAirMassFlow = min(max(thisPIU.PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
+                thisPIU.SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
+            }
+            if (QZnReq < 0) {
+                if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+                    if (thisPIU.PriAirMassFlow == PriAirMassFlowMax) {
+                        thisPIU.coolingOperatingMode = CoolOpModeType::CoolSecondStage;
+                    } else {
+                        thisPIU.coolingOperatingMode = CoolOpModeType::CoolFirstStage;
+                    }
+                } else {
+                    thisPIU.coolingOperatingMode = CoolOpModeType::ConstantVolumeCool;
+                }
             }
         }
     } else {
         // unit is off; no flow
-        PriAirMassFlow = 0.0;
-        SecAirMassFlow = 0.0;
+        thisPIU.PriAirMassFlow = 0.0;
+        thisPIU.SecAirMassFlow = 0.0;
     }
+
     // Set inlet node flowrates
-    priAirInNode->MassFlowRate = PriAirMassFlow;
-    secAirInNode->MassFlowRate = SecAirMassFlow;
-    secAirInNode->MassFlowRateMaxAvail = SecAirMassFlow;
+    priAirInNode->MassFlowRate = thisPIU.PriAirMassFlow;
+    secAirInNode->MassFlowRate = thisPIU.SecAirMassFlow;
+    secAirInNode->MassFlowRateMaxAvail = thisPIU.SecAirMassFlow;
+
     if (PriAirMassFlowMax == 0) {
         thisPIU.PriDamperPosition = 0;
     } else {
-        thisPIU.PriDamperPosition = PriAirMassFlow / PriAirMassFlowMax;
+        thisPIU.PriDamperPosition = thisPIU.PriAirMassFlow / PriAirMassFlowMax;
     }
+
     // now that inlet airflows have been set, the terminal box components can be simulated.
     // fire the fan
-
-    state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
+    if (thisPIU.fanType == HVAC::FanType::SystemModel) {
+        if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+            // calculate fan speed ratio
+            Real64 fanFlowRatio(1.0);
+            if (thisPIU.MaxSecAirMassFlow > 0.0) {
+                fanFlowRatio = thisPIU.SecAirMassFlow / thisPIU.MaxSecAirMassFlow;
+            }
+            state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, fanFlowRatio, _);
+        } else {
+            state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
+        }
+    } else if (thisPIU.fanType == HVAC::FanType::Constant) {
+        state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
+    }
 
     // fire the mixer
     SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);
+
     // the heating load seen by the reheat coil [W]
-    Real64 const QActualHeating =
-        QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
+    Real64 QActualHeating = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
+
     // check if heating coil is off
-    if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
-        (PriAirMassFlow > PriAirMassFlowMin)) {
-        HCoilOn = false;
+    if (((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
+         (thisPIU.PriAirMassFlow > PriAirMassFlowMin)) &&
+        (thisPIU.heatingOperatingMode != HeatOpModeType::StagedHeatFirstStage)) { // reheat is off during the first stage of heating
+        thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
     }
+
+    // determine what is required of heater for current operating stage
+    switch (thisPIU.heatingOperatingMode) {
+    case HeatOpModeType::HeaterOff:
+    case HeatOpModeType::StagedHeatFirstStage: {
+        QCoilReq = 0.0;
+    } break;
+
+    case HeatOpModeType::ConstantVolumeHeat:
+    case HeatOpModeType::StagedHeatSecondStage: 
+    case HeatOpModeType::ModulatedHeatFirstStage: {
+        QCoilReq = QActualHeating;
+    } break;
+            
+    case HeatOpModeType::ModulatedHeatSecondStage: {
+        // find heater power to deliver design discharge air temperature
+        Real64 targetDATEnthalpy = Psychrometrics::PsyHFnTdbW(thisPIU.designHeatingDAT, zoneNode->HumRat);
+        Real64 mixAirEnthalpy = Psychrometrics::PsyHFnTdbW(heatCoilAirInNode->Temp, zoneNode->HumRat);
+        QCoilReq = heatCoilAirInNode->MassFlowRate * (targetDATEnthalpy - mixAirEnthalpy);
+    } break;
+            
+    case HeatOpModeType::ModulatedHeatThirdStage: {
+        // find heater power to deliver maximum discharge air temperature
+        Real64 HiLimitDATEnthalpy = Psychrometrics::PsyHFnTdbW(thisPIU.highLimitDAT, zoneNode->HumRat);
+        Real64 mixAirEnthalpy = Psychrometrics::PsyHFnTdbW(heatCoilAirInNode->Temp, zoneNode->HumRat);
+        Real64 QcoilLimit = heatCoilAirInNode->MassFlowRate * (HiLimitDATEnthalpy - mixAirEnthalpy);
+        if (QcoilLimit < QActualHeating) { // if requried power is too high use limit of coil discharge
+            QCoilReq = QcoilLimit;
+        } else {
+            QCoilReq = QActualHeating;
+        }
+    } break;
+
+    default: {
+        ShowSevereError(state, "Incorrect parallel PIU heating operation.");
+        ShowFatalError(state, format("Parallel PIU control failed for {}:{}", thisPIU.UnitType, thisPIU.Name));
+    } break;
+    } // switch()
+    
+    if ((QCoilReq < SmallLoad) &&
+        (thisPIU.heatingOperatingMode != HeatOpModeType::StagedHeatFirstStage)) { // reheat is off during the first stage of heating
+        thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
+        QCoilReq = 0.0;
+    }
+
     // fire the heating coil
     switch (thisPIU.HCoilType) {
-
     case HtgCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
-        if (!HCoilOn) {
+        if ((thisPIU.heatingOperatingMode == HeatOpModeType::HeaterOff) || (thisPIU.heatingOperatingMode == HeatOpModeType::StagedHeatFirstStage)) {
             // call the reheat coil with the NO FLOW condition
             Real64 mdot = 0.0;
             SetComponentFlowRate(state, mdot, thisPIU.HotControlNodeNum, thisPIU.HotCoilOutNodeNum, thisPIU.HWplantLoc);
@@ -1983,7 +2056,7 @@ void CalcParallelPIU(EnergyPlusData &state,
                               thisPIU.UnitType,
                               thisPIU.HCoil_Index,
                               FirstHVACIteration,
-                              QActualHeating,
+                              QCoilReq,
                               thisPIU.HotControlNodeNum,
                               MaxWaterFlow,
                               MinWaterFlow,
@@ -2000,30 +2073,14 @@ void CalcParallelPIU(EnergyPlusData &state,
         break;
     }
     case HtgCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
-        if (!HCoilOn) {
-            QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
-        }
         SimulateSteamCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, thisPIU.HCoil_Index, QCoilReq);
         break;
     }
     case HtgCoilType::Electric: { // COIL:ELECTRIC:HEATING
-        if (!HCoilOn) {
-            QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
-        }
         SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
-
         break;
     }
     case HtgCoilType::Gas: { // COIL:GAS:HEATING
-        if (!HCoilOn) {
-            QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
-        }
         SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
         break;
     }
@@ -2031,9 +2088,14 @@ void CalcParallelPIU(EnergyPlusData &state,
         break;
     }
     // Power supplied
-    Real64 const PowerMet = airOutNode->MassFlowRate * (PsyHFnTdbW(airOutNode->Temp, zoneNode->HumRat) - PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat));
+    Real64 PowerMet = airOutNode->MassFlowRate * (PsyHFnTdbW(airOutNode->Temp, zoneNode->HumRat) - PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat));
     thisPIU.HeatingRate = max(0.0, PowerMet);
     thisPIU.SensCoolRate = std::abs(min(DataPrecisionGlobals::constant_zero, PowerMet));
+    thisPIU.TotMassFlowRate = airOutNode->MassFlowRate;
+    thisPIU.SecMassFlowRate = secAirInNode->MassFlowRate;
+    thisPIU.PriMassFlowRate = priAirInNode->MassFlowRate;
+    thisPIU.DischargeAirTemp = airOutNode->Temp;
+
     if (airOutNode->MassFlowRate == 0.0) {
         priAirInNode->MassFlowRate = 0.0;
         secAirInNode->MassFlowRate = 0.0;
@@ -2044,7 +2106,445 @@ void CalcParallelPIU(EnergyPlusData &state,
         state.dataHVACGlobal->PlenumInducedMassFlow = 0.0;
     }
     state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).MassFlowRatePlenInd = state.dataHVACGlobal->PlenumInducedMassFlow;
+
     airOutNode->MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
+
+    ReportCurOperatingControlStage(state, PIUNum, UnitOn, thisPIU.heatingOperatingMode, thisPIU.coolingOperatingMode);
+}
+
+void ReportCurOperatingControlStage(EnergyPlusData &state, int const piuNum, bool const unitOn, HeatOpModeType heaterMode, CoolOpModeType coolingMode)
+{
+    int undetermined(-1);
+    int off(0);
+    int constantVolumeCooling(1);
+    int constantVolumeHeating(2);
+    int deadband(3);
+    int variableSpeedFirstStageCooling(4);
+    int variableSpeedSecondStageCooling(5);
+    int variableSpeedStagedHeatFirstStageHeating(6);
+    int variableSpeedStagedHeatSecondStageHeating(7);
+    int variableSpeedModulatedHeatFirstStageHeating(8);
+    int variableSpeedModulatedHeatSecondStageHeating(9);
+    int variableSpeedModulatedHeatThirdStageHeating(10);
+
+    state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = undetermined;
+
+    if (!unitOn) {
+        state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = off;
+    } else {
+        if (state.dataPowerInductionUnits->PIU(piuNum).fanControlType == FanCntrlType::ConstantSpeedFan) {
+            if (heaterMode != HeatOpModeType::HeaterOff && coolingMode == CoolOpModeType::CoolerOff) {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = constantVolumeHeating;
+            } else if (coolingMode != CoolOpModeType::CoolerOff && heaterMode == HeatOpModeType::HeaterOff) {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = constantVolumeCooling;
+            } else {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = deadband;
+            }
+        }
+        if (state.dataPowerInductionUnits->PIU(piuNum).fanControlType == FanCntrlType::VariableSpeedFan) {
+            if (heaterMode != HeatOpModeType::HeaterOff) {
+                if (state.dataPowerInductionUnits->PIU(piuNum).heatingControlType == HeatCntrlBehaviorType::StagedHeaterBehavior) {
+                    if (heaterMode == HeatOpModeType::StagedHeatFirstStage) {
+                        state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedStagedHeatFirstStageHeating;
+                    } else if (heaterMode == HeatOpModeType::StagedHeatSecondStage) {
+                        state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedStagedHeatSecondStageHeating;
+                    }
+                } else if (state.dataPowerInductionUnits->PIU(piuNum).heatingControlType == HeatCntrlBehaviorType::ModulatedHeaterBehavior) {
+                    if (heaterMode == HeatOpModeType::ModulatedHeatFirstStage) {
+                        state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedModulatedHeatFirstStageHeating;
+                    } else if (heaterMode == HeatOpModeType::ModulatedHeatSecondStage) {
+                        state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedModulatedHeatSecondStageHeating;
+                    } else if (heaterMode == HeatOpModeType::ModulatedHeatThirdStage) {
+                        state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedModulatedHeatThirdStageHeating;
+                    }
+                }
+            } else if (coolingMode == CoolOpModeType::CoolFirstStage) {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedFirstStageCooling;
+            } else if (coolingMode == CoolOpModeType::CoolSecondStage) {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedSecondStageCooling;
+            } else if (heaterMode == HeatOpModeType::HeaterOff && coolingMode == CoolOpModeType::CoolerOff) {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = deadband;
+            }
+        }
+    }
+}
+
+void CalcVariableSpeedPIUCoolingBehavior(EnergyPlusData &state,
+                                         int const piuNum,   // number of the current PIU being simulated
+                                         int const zoneNode, // zone node number
+                                         Real64 const zoneLoad,
+                                         Real64 const loadToHeatSetPt,
+                                         Real64 const priAirMassFlowMin,
+                                         [[maybe_unused]] Real64 const priAirMassFlowMax)
+{
+    auto &thisPIU = state.dataPowerInductionUnits->PIU(piuNum);
+    thisPIU.coolingOperatingMode = CoolOpModeType::CoolerOff;
+
+    auto &dln = state.dataLoopNodes;
+    auto *priAirInNode = dln->nodes(thisPIU.PriAirInNodeNum);
+    auto *secAirInNode = dln->nodes(thisPIU.SecAirInNodeNum);
+    // set min primary flow and low secondary
+    priAirInNode->MassFlowRate = priAirMassFlowMin;
+    Real64 TotAirMassFlow = thisPIU.MinTotAirMassFlow;
+    secAirInNode->MassFlowRate = max(0.0, TotAirMassFlow - priAirMassFlowMin);
+
+    // calculate cooling provided to zone at minimum fan speed and minimum primary air mass flow
+    Real64 qdotDelivMinPrim = CalcVariableSpeedPIUQdotDelivered(state, piuNum, zoneNode, false, TotAirMassFlow, thisPIU.MinFanTurnDownRatio);
+
+    if (qdotDelivMinPrim <= zoneLoad) { // will provide more cooling than required at minimum primary flow
+        thisPIU.PriAirMassFlow = priAirMassFlowMin;
+        if (qdotDelivMinPrim >=
+            loadToHeatSetPt) { // will provide more cooling than required but not enough to drop below the heating thermostat setpoint
+            thisPIU.SecAirMassFlow = max(0.0, thisPIU.MinTotAirMassFlow - thisPIU.PriAirMassFlow);
+            thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
+        } else {
+            if (thisPIU.heatingControlType == HeatCntrlBehaviorType::StagedHeaterBehavior) {
+                CalcVariableSpeedPIUStagedHeatingBehavior(state, piuNum, zoneNode, loadToHeatSetPt, true, thisPIU.PriAirMassFlow);
+            } else if (thisPIU.heatingControlType == HeatCntrlBehaviorType::ModulatedHeaterBehavior) {
+                CalcVariableSpeedPIUModulatedHeatingBehavior(state, piuNum, zoneNode, loadToHeatSetPt, true, thisPIU.PriAirMassFlow);
+            }
+        }
+    } else {
+        // check how much cooling provided at max fan and primary air
+        priAirInNode->MassFlowRate = thisPIU.MaxPriAirMassFlow;
+        Real64 TotAirMassFlow = thisPIU.MaxTotAirMassFlow;
+        secAirInNode->MassFlowRate = max(0.0, TotAirMassFlow - thisPIU.MaxPriAirMassFlow);
+        Real64 qdotDelivMaxFan = CalcVariableSpeedPIUQdotDelivered(state, piuNum, zoneNode, false, TotAirMassFlow, 1.0);
+
+        if (zoneLoad <= qdotDelivMaxFan) { // not going to make it just run at max
+            thisPIU.PriAirMassFlow = thisPIU.PriAirMassFlow;
+            Real64 TotAirMassFlow = thisPIU.MaxTotAirMassFlow;
+            thisPIU.SecAirMassFlow = max(0.0, TotAirMassFlow - thisPIU.PriAirMassFlow);
+            thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
+            thisPIU.coolingOperatingMode = CoolOpModeType::CoolSecondStage;
+        } else {
+            // call regula falsi solver, vary a coooling control signal for fan speed and primary air flow together from min to max.
+            int constexpr MaxIte(500);    // Maximum number of iterations
+            Real64 constexpr Acc(0.0001); // Accuracy of result
+            int SolFla(0);                // Flag of solver
+            Real64 coolSignal = 0.5;      // starting value
+            auto f = [&state, piuNum, zoneLoad, zoneNode](Real64 const coolSignal) {
+                return CalcVariableSpeedPIUCoolingResidual(state, coolSignal, piuNum, zoneLoad, zoneNode);
+            };
+
+            General::SolveRoot(state, Acc, MaxIte, SolFla, coolSignal, f, 0.0, 1.0);
+
+            if (SolFla == -1) {
+                ShowSevereError(state, "Iteration limit exceeded in calculating variable speed fan powered box cooling signal");
+                ShowContinueErrorTimeStamp(state, "");
+                ShowFatalError(state, format("Series PIU control failed for {}:{} ", thisPIU.UnitType, thisPIU.Name));
+            } else if (SolFla == -2) {
+                ShowSevereError(state, "Bad starting values for in calculating variable speed fan powered box cooling signal");
+                ShowContinueError(state, format("Zone Load to Cooling Setpoint = {:.2R} [W]", zoneLoad));
+                ShowContinueError(state, format("Load Delivered to Zone at Minimum Fan Speed  = {:.2R} [W]", qdotDelivMinPrim));
+                ShowContinueErrorTimeStamp(state, "");
+                ShowFatalError(state, format("Series PIU control failed for {}:{}", thisPIU.UnitType, thisPIU.Name));
+            } else {
+                thisPIU.PriAirMassFlow = coolSignal * (thisPIU.MaxPriAirMassFlow - thisPIU.MinPriAirMassFlow) + thisPIU.MinPriAirMassFlow;
+                Real64 TotAirMassFlow = coolSignal * (thisPIU.MaxTotAirMassFlow - thisPIU.MinTotAirMassFlow) + thisPIU.MinTotAirMassFlow;
+                thisPIU.SecAirMassFlow = max(0.0, TotAirMassFlow - thisPIU.PriAirMassFlow);
+                thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
+                thisPIU.coolingOperatingMode = CoolOpModeType::CoolFirstStage;
+            }
+        }
+    }
+}
+
+void CalcVariableSpeedPIUStagedHeatingBehavior(EnergyPlusData &state,
+                                               int const piuNum,   // number of the current PIU being simulated
+                                               int const zoneNodeNum, // zone node number
+                                               Real64 const zoneLoad,
+                                               bool const pri,
+                                               Real64 const primaryAirMassFlow)
+{
+    auto &thisPIU = state.dataPowerInductionUnits->PIU(piuNum);
+
+    auto &dln = state.dataLoopNodes;
+    auto *priAirInNode = dln->nodes(thisPIU.PriAirInNodeNum);
+    auto *secAirInNode = dln->nodes(thisPIU.SecAirInNodeNum);
+    
+    // Calculate heating provided to zone with no coil at the maximum secondary flow rate: "1st stage, max fan"
+    if (pri) {
+        if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") { // Why are we comparing strings here?
+            priAirInNode->MassFlowRate = thisPIU.MinPriAirMassFlow;
+            secAirInNode->MassFlowRate = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.MinPriAirMassFlow);
+        } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+            priAirInNode->MassFlowRate = thisPIU.MinPriAirMassFlow;
+            secAirInNode->MassFlowRate = thisPIU.MaxSecAirMassFlow;
+        }
+    } else {
+        if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+            priAirInNode->MassFlowRate = 0.0;
+            secAirInNode->MassFlowRate = thisPIU.MaxTotAirMassFlow;
+        } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+            priAirInNode->MassFlowRate = 0.0;
+            secAirInNode->MassFlowRate = thisPIU.MaxSecAirMassFlow;
+        }
+    }
+    Real64 TotAirMassFlow = priAirInNode->MassFlowRate + secAirInNode->MassFlowRate;
+    Real64 qdotDelivered1stStageMaxFan = CalcVariableSpeedPIUQdotDelivered(state, piuNum, zoneNodeNum, false, TotAirMassFlow, 1.0);
+
+    // Calculate heating provided to zone with no coil at the minimum secondary flow rate: "1st stage, min fan"
+    if (pri) {
+        if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+            priAirInNode->MassFlowRate = thisPIU.MinPriAirMassFlow;
+            secAirInNode->MassFlowRate = max(0.0, thisPIU.MinTotAirMassFlow - thisPIU.MinPriAirMassFlow);
+        } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+            priAirInNode->MassFlowRate = thisPIU.MinPriAirMassFlow;
+            secAirInNode->MassFlowRate = thisPIU.MinSecAirMassFlow;
+        }
+    } else {
+        if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+            priAirInNode->MassFlowRate = 0.0;
+            secAirInNode->MassFlowRate = thisPIU.MinTotAirMassFlow;
+        } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+            priAirInNode->MassFlowRate = 0.0;
+            secAirInNode->MassFlowRate = thisPIU.MinSecAirMassFlow;
+        }
+    }
+    TotAirMassFlow = priAirInNode->MassFlowRate + secAirInNode->MassFlowRate;
+    Real64 qdotDelivered1stStageMinFan =
+        CalcVariableSpeedPIUQdotDelivered(state, piuNum, zoneNodeNum, false, TotAirMassFlow, thisPIU.MinFanTurnDownRatio);
+
+    if (qdotDelivered1stStageMinFan <= zoneLoad && qdotDelivered1stStageMaxFan >= zoneLoad) { // 1st of heating (no coil) can meet the load
+        // Find fan speed/flow that meets the load through iteration
+        thisPIU.heatingOperatingMode = HeatOpModeType::StagedHeatFirstStage;
+        int constexpr MaxIte(500);   // Maximum number of iterations
+        Real64 constexpr Acc(0.001); // Accuracy of result
+        int SolFla(0);               // Flag of solver
+        Real64 fanSignal = 0.0;
+        fanSignal = (1.0 - thisPIU.MinFanTurnDownRatio) * 0.5 + thisPIU.MinFanTurnDownRatio; // average speed as the initial value
+        auto f = [&state, piuNum, zoneLoad, zoneNodeNum, primaryAirMassFlow](Real64 const fanSignal) {
+            return CalcVariableSpeedPIUHeatingResidual(state, fanSignal, piuNum, zoneLoad, zoneNodeNum, primaryAirMassFlow, false, fanSignal);
+        };
+
+        General::SolveRoot(state, Acc, MaxIte, SolFla, fanSignal, f, thisPIU.MinFanTurnDownRatio, 1.0);
+
+        if (SolFla == -1) {
+            ShowSevereError(state, "Iteration limit exceeded in calculating variable speed fan powered box 1st stage heating fan speed");
+            ShowContinueErrorTimeStamp(state, "");
+            ShowFatalError(state, format("PIU control failed for {}:{} ", thisPIU.UnitType, thisPIU.Name));
+        } else if (SolFla == -2) {
+            ShowSevereError(state, "Bad starting values in calculating variable speed fan powered box 1st stage heating fan speed");
+            ShowContinueErrorTimeStamp(state, "");
+            ShowFatalError(state, format("PIU control failed for {}:{}", thisPIU.UnitType, thisPIU.Name));
+        } else {
+            if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+                thisPIU.SecAirMassFlow = max(0.0, fanSignal * thisPIU.MaxTotAirMassFlow - primaryAirMassFlow);
+            } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+                thisPIU.SecAirMassFlow = max(0.0, fanSignal * thisPIU.MaxSecAirMassFlow);
+            }
+        }
+    } else if (qdotDelivered1stStageMaxFan < zoneLoad) {
+        thisPIU.heatingOperatingMode = HeatOpModeType::StagedHeatSecondStage;
+        if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+            thisPIU.SecAirMassFlow = max(0.0, thisPIU.MaxTotAirMassFlow - primaryAirMassFlow);
+        } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+            thisPIU.SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
+        }
+    } else if (qdotDelivered1stStageMinFan > zoneLoad) {
+        thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
+        if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+            thisPIU.SecAirMassFlow = max(0.0, thisPIU.MinTotAirMassFlow - thisPIU.MinPriAirMassFlow);
+        } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+            thisPIU.SecAirMassFlow = 0.0;
+        }
+    }
+}
+
+Real64 CalcVariableSpeedPIUQdotDelivered(EnergyPlusData &state,
+                                         int const piuNum,   // number of the current PIU being simulated
+                                         int const zoneNodeNum, // zone node number
+                                         bool const useDAT,
+                                         Real64 const totAirMassFlow,
+                                         Real64 const fanTurnDown)
+{
+    auto &thisPIU = state.dataPowerInductionUnits->PIU(piuNum);
+
+    auto &dln = state.dataLoopNodes;
+    auto const *zoneNode = dln->nodes(zoneNodeNum);
+    
+    if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+        MixerComponent::SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);
+        state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, false, fanTurnDown, _);
+    } else {
+        state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, false, fanTurnDown, _);
+        MixerComponent::SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);
+    }
+
+    
+    Real64 zoneEnthalpy = Psychrometrics::PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat);
+    Real64 piuTemp = 0.0;
+    if (useDAT) {
+        piuTemp = thisPIU.designHeatingDAT;
+    } else {
+        piuTemp = dln->nodes(thisPIU.HCoilAirInNodeNum)->Temp;
+    }
+    Real64 piuEnthalpy = Psychrometrics::PsyHFnTdbW(piuTemp, zoneNode->HumRat);
+    return totAirMassFlow * (piuEnthalpy - zoneEnthalpy);
+}
+
+void CalcVariableSpeedPIUModulatedHeatingBehavior(EnergyPlusData &state,
+                                                  int const piuNum,   // number of the current PIU being simulated
+                                                  int const zoneNode, // zone node number
+                                                  Real64 const zoneLoad,
+                                                  bool const pri,
+                                                  Real64 const primaryAirMassFlow)
+{
+    auto &thisPIU = state.dataPowerInductionUnits->PIU(piuNum);
+ 
+    auto &dln = state.dataLoopNodes;
+    auto *priAirInNode = dln->nodes(thisPIU.PriAirInNodeNum);
+    auto *secAirInNode = dln->nodes(thisPIU.SecAirInNodeNum);
+   
+    // Calculate heating provided to zone with no coil at the minimum secondary flow rate: "1st stage, min fan"
+    if (pri) {
+            if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") { // Why are we using string compare here?
+            priAirInNode->MassFlowRate = thisPIU.MinPriAirMassFlow;
+            secAirInNode->MassFlowRate = max(0.0, thisPIU.MinTotAirMassFlow - thisPIU.MinPriAirMassFlow);
+        } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+            priAirInNode->MassFlowRate = thisPIU.MinPriAirMassFlow;
+            secAirInNode->MassFlowRate = thisPIU.MinSecAirMassFlow;
+        }
+    } else {
+        if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+            priAirInNode->MassFlowRate = 0.0;
+            secAirInNode->MassFlowRate = thisPIU.MinTotAirMassFlow;
+        } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+            priAirInNode->MassFlowRate = 0.0;
+            secAirInNode->MassFlowRate = thisPIU.MinSecAirMassFlow;
+        }
+    }
+    Real64 TotAirMassFlow =
+        priAirInNode->MassFlowRate + secAirInNode->MassFlowRate;
+    Real64 qdotDeliveredEnd1stStage = CalcVariableSpeedPIUQdotDelivered(state, piuNum, zoneNode, true, TotAirMassFlow, thisPIU.MinFanTurnDownRatio);
+    if (qdotDeliveredEnd1stStage >= zoneLoad) { // 1st stage, find heating power at minimum fan speed
+        thisPIU.heatingOperatingMode = HeatOpModeType::ModulatedHeatFirstStage;
+        if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+            thisPIU.SecAirMassFlow = thisPIU.MinSecAirMassFlow;
+        } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+            thisPIU.SecAirMassFlow = thisPIU.MinSecAirMassFlow;
+        }
+    } else {
+        if (pri) {
+            if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+                priAirInNode->MassFlowRate = thisPIU.MinPriAirMassFlow;
+                secAirInNode->MassFlowRate = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.MinPriAirMassFlow);
+            } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+                priAirInNode->MassFlowRate = thisPIU.MinPriAirMassFlow;
+                secAirInNode->MassFlowRate = thisPIU.MaxSecAirMassFlow;
+            }
+        } else {
+            if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+                priAirInNode->MassFlowRate = 0.0;
+                secAirInNode->MassFlowRate = thisPIU.MaxTotAirMassFlow;
+            } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+                priAirInNode->MassFlowRate = 0.0;
+                secAirInNode->MassFlowRate = thisPIU.MaxSecAirMassFlow;
+            }
+        }
+        TotAirMassFlow = priAirInNode->MassFlowRate + secAirInNode->MassFlowRate;
+        Real64 qdotDeliveredEnd2ndStage =
+            CalcVariableSpeedPIUQdotDelivered(state, piuNum, zoneNode, true, TotAirMassFlow, thisPIU.MinFanTurnDownRatio);
+        if (qdotDeliveredEnd2ndStage > zoneLoad) { // 2nd stage
+            thisPIU.heatingOperatingMode = HeatOpModeType::ModulatedHeatSecondStage;
+            // Find fan speed that meets zone heating load
+            int constexpr MaxIte(500);                                                                  // Maximum number of iterations
+            Real64 constexpr Acc(0.0001);                                                               // Accuracy of result
+            int SolFla(0);                                                                              // Flag of solver
+            Real64 fanSignal = (1.0 - thisPIU.MinFanTurnDownRatio) * 0.5 + thisPIU.MinFanTurnDownRatio; // starting value in middle
+            auto f = [&state, piuNum, zoneLoad, zoneNode, primaryAirMassFlow](Real64 const fanSignal) {
+                return CalcVariableSpeedPIUHeatingResidual(state, fanSignal, piuNum, zoneLoad, zoneNode, primaryAirMassFlow, true, fanSignal);
+            };
+
+            General::SolveRoot(state, Acc, MaxIte, SolFla, fanSignal, f, thisPIU.MinFanTurnDownRatio, 1.0);
+
+            if (SolFla == -1) {
+                ShowSevereError(state, "Iteration limit exceeded in calculating variable speed fan powered box 2nd stage heating fan speed");
+                ShowContinueErrorTimeStamp(state, "");
+                ShowFatalError(state, format("PIU control failed for {}:{}", thisPIU.UnitType, thisPIU.Name));
+            } else if (SolFla == -2) {
+                ShowSevereError(state, "Bad starting values for in calculating variable speed fan powered box 2nd stage heating fan speed");
+                ShowContinueErrorTimeStamp(state, "");
+                ShowFatalError(state, format("PIU control failed for {}:{}", thisPIU.UnitType, thisPIU.Name));
+            } else {
+                if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+                    thisPIU.SecAirMassFlow = max(0.0, fanSignal * thisPIU.MaxTotAirMassFlow - primaryAirMassFlow);
+                } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+                    thisPIU.SecAirMassFlow = max(0.0, fanSignal * thisPIU.MaxSecAirMassFlow);
+                }
+            }
+        } else { // 3rd stage, full fan speed
+            thisPIU.heatingOperatingMode = HeatOpModeType::ModulatedHeatThirdStage;
+            if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+                thisPIU.SecAirMassFlow = thisPIU.MaxTotAirMassFlow - thisPIU.MinPriAirMassFlow;
+            } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
+                thisPIU.SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
+            }
+        }
+    }
+}
+
+Real64 CalcVariableSpeedPIUHeatingResidual(EnergyPlusData &state,
+                                           Real64 const fanSignal,
+                                           int const piuNum,
+                                           Real64 const targetQznReq,
+                                           int const zoneNodeNum,
+                                           Real64 const primaryMassFlow,
+                                           bool useDAT,
+                                           Real64 const fanTurnDown)
+
+{
+    // used to find a fan speed to meet load to heating setpoint with no heater power
+    // 1st stage heating for staged heat, also used for undershoot case where cooling at min primary flow would push below heating
+    // setpoint.
+    auto &thisPIU = state.dataPowerInductionUnits->PIU(piuNum);
+
+    auto &dln = state.dataLoopNodes;
+    auto *priAirInNode = dln->nodes(thisPIU.PriAirInNodeNum);
+    auto *secAirInNode = dln->nodes(thisPIU.SecAirInNodeNum);
+
+    priAirInNode->MassFlowRate = primaryMassFlow;
+    Real64 TotAirMassFlow = 0.0;
+    if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
+        TotAirMassFlow = fanSignal * thisPIU.MaxTotAirMassFlow;
+        secAirInNode->MassFlowRate = max(0.0, TotAirMassFlow - primaryMassFlow);
+    } else {
+        // parallel
+        TotAirMassFlow = fanSignal * thisPIU.MaxSecAirMassFlow + primaryMassFlow;
+        secAirInNode->MassFlowRate = fanSignal * thisPIU.MaxSecAirMassFlow;
+    }
+
+    // calculate heating provided to zone
+    Real64 qdotDelivered = CalcVariableSpeedPIUQdotDelivered(state, piuNum, zoneNodeNum, useDAT, TotAirMassFlow, fanTurnDown);
+    // formulate residual and return
+    Real64 Residuum = (targetQznReq - qdotDelivered);
+    return Residuum;
+}
+
+Real64 CalcVariableSpeedPIUCoolingResidual(EnergyPlusData &state, Real64 const coolSignal, int piuNum, Real64 targetQznReq, int zoneNodeNum)
+{
+    // used for cooling control with VS fan.  Simultaneous control of fan speed and primary air damper
+    // given trial cooling signal, calculate the cooling provided and a residual that compares what is delivered vs what the zone
+    // needs. set the flows, controller acts on fan and damper simultaneously
+    auto &thisPIU = state.dataPowerInductionUnits->PIU(piuNum);
+
+    auto &dln = state.dataLoopNodes;
+    auto *priAirInNode = dln->nodes(thisPIU.PriAirInNodeNum);
+    auto *secAirInNode = dln->nodes(thisPIU.SecAirInNodeNum);
+
+    Real64 PriAirMassFlow = coolSignal * (thisPIU.MaxPriAirMassFlow - thisPIU.MinPriAirMassFlow) + thisPIU.MinPriAirMassFlow;
+    Real64 TotAirMassFlow = coolSignal * (thisPIU.MaxTotAirMassFlow - thisPIU.MinTotAirMassFlow) + thisPIU.MinTotAirMassFlow;
+    Real64 SecAirMassFlow = max(0.0, TotAirMassFlow - PriAirMassFlow);
+
+    priAirInNode->MassFlowRate = PriAirMassFlow;
+    secAirInNode->MassFlowRate = SecAirMassFlow;
+
+    Real64 fanTurnDown = coolSignal * (1.0 - thisPIU.MinFanTurnDownRatio) + thisPIU.MinFanTurnDownRatio;
+    Real64 qdotDelivered = CalcVariableSpeedPIUQdotDelivered(state, piuNum, zoneNodeNum, false, TotAirMassFlow, fanTurnDown);
+    // formulate residual and return
+    Real64 Residuum = (targetQznReq - qdotDelivered);
+    return Residuum;
 }
 
 void ReportPIU(EnergyPlusData &state, int const PIUNum) // number of the current fan coil unit being simulated
@@ -2103,7 +2603,7 @@ bool PIUnitHasMixer(EnergyPlusData &state, std::string_view CompName) // compone
     return YesNo;
 }
 
-void PIUInducesPlenumAir(EnergyPlusData &state, int const NodeNum) // induced air node number
+void PIUInducesPlenumAir(EnergyPlusData &state, int const NodeNum, int const plenumNum) // induced air node number
 {
 
     // SUBROUTINE INFORMATION:
@@ -2124,6 +2624,7 @@ void PIUInducesPlenumAir(EnergyPlusData &state, int const NodeNum) // induced ai
     for (int PIUIndex = 1; PIUIndex <= state.dataPowerInductionUnits->NumPIUs; ++PIUIndex) {
         if (NodeNum == state.dataPowerInductionUnits->PIU(PIUIndex).SecAirInNodeNum) {
             state.dataPowerInductionUnits->PIU(PIUIndex).InducesPlenumAir = true;
+            state.dataPowerInductionUnits->PIU(PIUIndex).plenumIndex = plenumNum;
             break;
         }
     }
@@ -2140,6 +2641,32 @@ void PowIndUnitData::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     } else {
         this->OutdoorAirFlowRate = 0.0;
     }
+}
+
+void PowIndUnitData::reportTerminalUnit(EnergyPlusData &state)
+{
+    // populate the predefined equipment summary report related to air terminals
+    auto &orp = state.dataOutRptPredefined;
+    auto &adu = state.dataDefineEquipment->AirDistUnit(this->ADUNum);
+    if (!state.dataSize->TermUnitFinalZoneSizing.empty()) {
+        auto &sizing = state.dataSize->TermUnitFinalZoneSizing(adu.TermUnitSizingNum);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinFlow, adu.Name, sizing.DesCoolVolFlowMin);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinOutdoorFlow, adu.Name, sizing.MinOA);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSupCoolingSP, adu.Name, sizing.CoolDesTemp);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSupHeatingSP, adu.Name, sizing.HeatDesTemp);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatingCap, adu.Name, sizing.DesHeatLoad);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolingCap, adu.Name, sizing.DesCoolLoad);
+    }
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermTypeInp, adu.Name, this->UnitType);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermPrimFlow, adu.Name, this->MaxPriAirVolFlow);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSecdFlow, adu.Name, this->MaxSecAirVolFlow);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinFlowSch, adu.Name, "n/a");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMaxFlowReh, adu.Name, "n/a");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinOAflowSch, adu.Name, "n/a");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatCoilType, adu.Name, HCoilNamesUC[(int)this->HCoilType]);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolCoilType, adu.Name, "n/a");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanType, adu.Name, HVAC::fanTypeNames[(int)this->fanType]);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanName, adu.Name, this->FanName);
 }
 
 } // namespace EnergyPlus::PoweredInductionUnits

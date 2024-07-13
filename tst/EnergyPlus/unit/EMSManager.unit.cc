@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -70,12 +71,16 @@
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+
+#include <algorithm>
+#include <array>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
@@ -2251,4 +2256,340 @@ TEST_F(EnergyPlusFixture, EMS_ViewFactorToGround)
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_EQ(state->dataSurface->Surface(winSurfNum).ViewFactorGround, 0.425);
     EXPECT_EQ(state->dataSurface->Surface(wallSurfNum).ViewFactorGround, 0.425);
+}
+
+TEST_F(EnergyPlusFixture, EMSManager_TrendValue_to_Actuator)
+{
+
+    // Test for #10279 - Make sure that assigning the result of a TendVariable @TrendValue results in proper actuator behavior
+    std::string const idf_objects = delimited_string({
+        "Schedule:Constant,",
+        "  Actuated Schedule Direct,               !- Name",
+        "  ,                                       !- Schedule Type Limits Name",
+        "  18;                                     !- Hourly Value",
+
+        "Schedule:Constant,",
+        "  Actuated Schedule Indirect,             !- Name",
+        "  ,                                       !- Schedule Type Limits Name",
+        "  18;                                     !- Hourly Value",
+
+        "EnergyManagementSystem:GlobalVariable,",
+        "  argTrendValue,                          !- Erl Variable Name 1",
+        "  resultValue1;                           !- Erl Variable Name 2",
+
+        "EnergyManagementSystem:TrendVariable,",
+        "  Trend_argTrendValue,                    !- Name",
+        "  argTrendValue,                          !- EMS Variable Name",
+        "  12;                                     !- Number of Timesteps to be Logged",
+
+        "EnergyManagementSystem:Actuator,",
+        "  actuator_sch_Direct,                    !- Name",
+        "  Actuated Schedule Direct,               !- Actuated Component Unique Name",
+        "  Schedule:Constant,                      !- Actuated Component Type",
+        "  Schedule Value;                         !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "  actuator_sch_Indirect,                  !- Name",
+        "  Actuated Schedule Indirect,             !- Actuated Component Unique Name",
+        "  Schedule:Constant,                      !- Actuated Component Type",
+        "  Schedule Value;                         !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Program,",
+        "  sch_test,                               !- Name",
+        "  SET actuator_sch_Direct   = @TrendValue Trend_argTrendValue 1,  !- Program Line 1",
+        "  SET        resultValue1   = @TrendValue Trend_argTrendValue 1,  !- Program Line 2",
+        "  SET actuator_sch_Indirect = resultValue1,                       !- Program Line 3",
+        "  SET         argTrendValue = MINUTE;                             !- Program Line 4",
+
+        "EnergyManagementSystem:ProgramCallingManager,",
+        "  sch_test_pcm,                           !- Name",
+        "  BeginTimestepBeforePredictor,           !- EnergyPlus Model Calling Point",
+        "  sch_test;                               !- Program Name 1",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->TimeStepZone = 0.25;
+
+    EMSManager::CheckIfAnyEMS(*state); // get EMS input
+    EXPECT_TRUE(state->dataGlobal->AnyEnergyManagementSystemInModel);
+
+    state->dataEMSMgr->FinishProcessingUserInput = true;
+
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * Constant::SecInHour;
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+
+    EXPECT_EQ(2, state->dataScheduleMgr->NumSchedules);
+    auto &schDirect = state->dataScheduleMgr->Schedule(1);
+    EXPECT_EQ("ACTUATED SCHEDULE DIRECT", schDirect.Name);
+    auto &schIndirect = state->dataScheduleMgr->Schedule(2);
+    EXPECT_EQ("ACTUATED SCHEDULE INDIRECT", schIndirect.Name);
+
+    state->dataEnvrn->Month = 12;
+    state->dataEnvrn->DayOfMonth = 31;
+    state->dataGlobal->HourOfDay = 23;
+    state->dataEnvrn->DayOfWeek = 4;
+    state->dataEnvrn->DayOfWeekTomorrow = 5;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 24;
+    state->dataGlobal->CurrentTime = 24.0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+
+    state->dataEnvrn->DSTIndicator = 0; // DST IS OFF
+    ScheduleManager::UpdateScheduleValues(*state);
+    EXPECT_EQ(18.0, schDirect.CurrentValue);
+    EXPECT_FALSE(schDirect.EMSActuatedOn);
+    EXPECT_EQ(0.0, schDirect.EMSValue);
+    EXPECT_EQ(18.0, schIndirect.CurrentValue);
+    EXPECT_FALSE(schIndirect.EMSActuatedOn);
+    EXPECT_EQ(0.0, schIndirect.EMSValue);
+
+    EMSManager::InitEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor);
+
+    constexpr int numBuiltInErlVars = 27; // 27 ErlVariables are constant and built-in variables
+    constexpr std::array<std::string_view, numBuiltInErlVars> builtInErlVarNames = {
+        "NULL",
+        "FALSE",
+        "TRUE",
+        "OFF",
+        "ON",
+        "PI",
+        "TIMESTEPSPERHOUR",
+        "YEAR",
+        "CALENDARYEAR",
+        "MONTH",
+        "DAYOFMONTH",
+        "DAYOFWEEK",
+        "DAYOFYEAR",
+        "HOUR",
+        "TIMESTEPNUM",
+        "MINUTE",
+        "HOLIDAY",
+        "DAYLIGHTSAVINGS",
+        "CURRENTTIME",
+        "SUNISUP",
+        "ISRAINING",
+        "SYSTEMTIMESTEP",
+        "ZONETIMESTEP",
+        "CURRENTENVIRONMENT",
+        "ACTUALDATEANDTIME",
+        "ACTUALTIME",
+        "WARMUPFLAG",
+    };
+
+    constexpr int expectedUserErlVarNums = 4;
+    EXPECT_EQ(numBuiltInErlVars + expectedUserErlVarNums, state->dataRuntimeLang->NumErlVariables);
+    EXPECT_EQ(1, state->dataRuntimeLang->NumErlTrendVariables);
+
+    // Actuators are first
+    auto &actuatorDirectErlVar = state->dataRuntimeLang->ErlVariable(1);
+    EXPECT_EQ("ACTUATOR_SCH_DIRECT", actuatorDirectErlVar.Name);
+    EXPECT_FALSE(actuatorDirectErlVar.ReadOnly);
+    EXPECT_FALSE(actuatorDirectErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Null, actuatorDirectErlVar.Value.Type); // Note: this is Null for an actuator to begin with
+    EXPECT_EQ(0.0, actuatorDirectErlVar.Value.Number);
+    EXPECT_TRUE(actuatorDirectErlVar.Value.String.empty());
+    EXPECT_EQ(0, actuatorDirectErlVar.Value.Expression);
+    EXPECT_FALSE(actuatorDirectErlVar.Value.TrendVariable);
+    EXPECT_EQ(0, actuatorDirectErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(actuatorDirectErlVar.Value.Error.empty());
+    EXPECT_TRUE(actuatorDirectErlVar.Value.initialized);
+
+    auto &actuatorIndirectErlVar = state->dataRuntimeLang->ErlVariable(2);
+    EXPECT_EQ("ACTUATOR_SCH_INDIRECT", actuatorIndirectErlVar.Name);
+    EXPECT_FALSE(actuatorIndirectErlVar.ReadOnly);
+    EXPECT_FALSE(actuatorIndirectErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Null, actuatorIndirectErlVar.Value.Type); // Note: this is Null for an actuator to begin with
+    EXPECT_EQ(0.0, actuatorIndirectErlVar.Value.Number);
+    EXPECT_TRUE(actuatorIndirectErlVar.Value.String.empty());
+    EXPECT_EQ(0, actuatorIndirectErlVar.Value.Expression);
+    EXPECT_FALSE(actuatorIndirectErlVar.Value.TrendVariable);
+    EXPECT_EQ(0, actuatorIndirectErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(actuatorIndirectErlVar.Value.Error.empty());
+    EXPECT_TRUE(actuatorIndirectErlVar.Value.initialized);
+
+    // Then we have the built in ones
+    for (int i = 1; i <= numBuiltInErlVars; ++i) {
+        EXPECT_EQ(builtInErlVarNames[i - 1], state->dataRuntimeLang->ErlVariable(2 + i).Name);
+    }
+
+    auto &argTrendValueErlVar = state->dataRuntimeLang->ErlVariable(3 + numBuiltInErlVars);
+    EXPECT_EQ("ARGTRENDVALUE", argTrendValueErlVar.Name);
+    EXPECT_FALSE(argTrendValueErlVar.ReadOnly);
+    EXPECT_FALSE(argTrendValueErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Number, argTrendValueErlVar.Value.Type);
+    EXPECT_EQ(0.0, argTrendValueErlVar.Value.Number);
+    EXPECT_TRUE(argTrendValueErlVar.Value.String.empty());
+    EXPECT_EQ(0, argTrendValueErlVar.Value.Expression);
+    EXPECT_TRUE(argTrendValueErlVar.Value.TrendVariable);
+    EXPECT_EQ(1, argTrendValueErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(argTrendValueErlVar.Value.Error.empty());
+    EXPECT_TRUE(argTrendValueErlVar.Value.initialized);
+
+    auto &trendVar = state->dataRuntimeLang->TrendVariable(1);
+    std::array<Real64, 12> trendValues = {45, 30, 15, 60, 45, 30, 15, 60, 45, 30, 15, 60};
+
+    // rotate right is the same as shift right + insert 60 at first pos in our case
+    // [60, 45, 30, 15, 60, 45, 30, 15, 60, 45, 30, 15]
+    auto trenValuesAfterCallAt60Minute = trendValues;
+    std::rotate(trenValuesAfterCallAt60Minute.rbegin(), trenValuesAfterCallAt60Minute.rbegin() + 1, trenValuesAfterCallAt60Minute.rend());
+    trendVar.TrendValARR = trendValues;
+    EXPECT_EQ("TREND_ARGTRENDVALUE", trendVar.Name);
+    EXPECT_EQ(12, trendVar.LogDepth);
+    EXPECT_EQ(3 + numBuiltInErlVars, trendVar.ErlVariablePointer);
+
+    auto &resultValueErlVar = state->dataRuntimeLang->ErlVariable(4 + numBuiltInErlVars);
+    EXPECT_EQ("RESULTVALUE1", resultValueErlVar.Name);
+    EXPECT_FALSE(resultValueErlVar.ReadOnly);
+    EXPECT_FALSE(resultValueErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Number, resultValueErlVar.Value.Type);
+    EXPECT_EQ(0.0, resultValueErlVar.Value.Number);
+    EXPECT_TRUE(resultValueErlVar.Value.String.empty());
+    EXPECT_EQ(0, resultValueErlVar.Value.Expression);
+    EXPECT_FALSE(resultValueErlVar.Value.TrendVariable);
+    EXPECT_EQ(0, resultValueErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(resultValueErlVar.Value.Error.empty());
+    EXPECT_FALSE(resultValueErlVar.Value.initialized); // Note
+
+    bool anyEMSRan = false;
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyEMSRan, ObjexxFCL::Optional_int_const());
+    EXPECT_TRUE(anyEMSRan);
+
+    EXPECT_EQ("ACTUATOR_SCH_DIRECT", actuatorDirectErlVar.Name);
+    EXPECT_FALSE(actuatorDirectErlVar.ReadOnly);
+    EXPECT_FALSE(actuatorDirectErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Number, actuatorDirectErlVar.Value.Type); // Note: this is Null for an actuator to begin with
+    EXPECT_EQ(45.0, actuatorDirectErlVar.Value.Number);
+    EXPECT_TRUE(actuatorDirectErlVar.Value.String.empty());
+    EXPECT_EQ(0, actuatorDirectErlVar.Value.Expression);
+    EXPECT_FALSE(actuatorDirectErlVar.Value.TrendVariable);
+    EXPECT_EQ(0, actuatorDirectErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(actuatorDirectErlVar.Value.Error.empty());
+    EXPECT_TRUE(actuatorDirectErlVar.Value.initialized);
+
+    EXPECT_EQ("ACTUATOR_SCH_INDIRECT", actuatorIndirectErlVar.Name);
+    EXPECT_FALSE(actuatorIndirectErlVar.ReadOnly);
+    EXPECT_FALSE(actuatorIndirectErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Number, actuatorIndirectErlVar.Value.Type); // Note: this is Null for an actuator to begin with
+    EXPECT_EQ(45.0, actuatorIndirectErlVar.Value.Number);
+    EXPECT_TRUE(actuatorIndirectErlVar.Value.String.empty());
+    EXPECT_EQ(0, actuatorIndirectErlVar.Value.Expression);
+    EXPECT_FALSE(actuatorIndirectErlVar.Value.TrendVariable);
+    EXPECT_EQ(0, actuatorIndirectErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(actuatorIndirectErlVar.Value.Error.empty());
+    EXPECT_TRUE(actuatorIndirectErlVar.Value.initialized);
+
+    EXPECT_EQ("ARGTRENDVALUE", argTrendValueErlVar.Name);
+    EXPECT_FALSE(argTrendValueErlVar.ReadOnly);
+    EXPECT_FALSE(argTrendValueErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Number, argTrendValueErlVar.Value.Type);
+    EXPECT_EQ(60.0, argTrendValueErlVar.Value.Number);
+    EXPECT_TRUE(argTrendValueErlVar.Value.String.empty());
+    EXPECT_EQ(0, argTrendValueErlVar.Value.Expression);
+    EXPECT_TRUE(argTrendValueErlVar.Value.TrendVariable);
+    EXPECT_EQ(1, argTrendValueErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(argTrendValueErlVar.Value.Error.empty());
+    EXPECT_TRUE(argTrendValueErlVar.Value.initialized);
+
+    EXPECT_EQ("RESULTVALUE1", resultValueErlVar.Name);
+    EXPECT_FALSE(resultValueErlVar.ReadOnly);
+    EXPECT_FALSE(resultValueErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Number, resultValueErlVar.Value.Type);
+    EXPECT_EQ(45.0, resultValueErlVar.Value.Number);
+    EXPECT_TRUE(resultValueErlVar.Value.String.empty());
+    EXPECT_EQ(0, resultValueErlVar.Value.Expression);
+    EXPECT_FALSE(resultValueErlVar.Value.TrendVariable);
+    EXPECT_EQ(0, resultValueErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(resultValueErlVar.Value.Error.empty());
+    EXPECT_TRUE(resultValueErlVar.Value.initialized);
+
+    ScheduleManager::UpdateScheduleValues(*state);
+    EXPECT_EQ(45.0, schDirect.CurrentValue);
+    EXPECT_TRUE(schDirect.EMSActuatedOn);
+    EXPECT_EQ(45.0, schDirect.EMSValue);
+    EXPECT_EQ(45.0, schIndirect.CurrentValue);
+    EXPECT_TRUE(schIndirect.EMSActuatedOn);
+    EXPECT_EQ(45.0, schIndirect.EMSValue);
+
+    EMSManager::UpdateEMSTrendVariables(*state);
+    for (int i = 0; i < 12; ++i) {
+        EXPECT_EQ(trenValuesAfterCallAt60Minute[i], trendVar.TrendValARR(i + 1));
+    }
+    // Now, here's the kicker. Once we get to the Simulation itself again, we go into a different block, because t thinks it's a trend variable
+    // BeginEnvrnInitializeRuntimeLanguage is called, which resets the actuators to a Value with Type Null
+    // And the assignment for trend variable only sets Number, not Type, so Type stays Null, and the actuator is not actuating
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyEMSRan, ObjexxFCL::Optional_int_const());
+    EXPECT_FALSE(anyEMSRan);
+
+    trendVar.TrendValARR = trendValues;
+
+    state->dataGlobal->CurrentTime = 24.00;
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyEMSRan, ObjexxFCL::Optional_int_const());
+    EXPECT_TRUE(anyEMSRan);
+
+    EMSManager::UpdateEMSTrendVariables(*state);
+    for (int i = 0; i < 12; ++i) {
+        EXPECT_EQ(trenValuesAfterCallAt60Minute[i], trendVar.TrendValARR(i + 1));
+    }
+
+    EXPECT_EQ("ACTUATOR_SCH_DIRECT", actuatorDirectErlVar.Name);
+    EXPECT_FALSE(actuatorDirectErlVar.ReadOnly);
+    EXPECT_FALSE(actuatorDirectErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Number, actuatorDirectErlVar.Value.Type); // Note: this is Null for an actuator to begin with
+    EXPECT_EQ(45.0, actuatorDirectErlVar.Value.Number);
+    EXPECT_TRUE(actuatorDirectErlVar.Value.String.empty());
+    EXPECT_EQ(0, actuatorDirectErlVar.Value.Expression);
+    EXPECT_FALSE(actuatorDirectErlVar.Value.TrendVariable);
+    EXPECT_EQ(0, actuatorDirectErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(actuatorDirectErlVar.Value.Error.empty());
+    EXPECT_TRUE(actuatorDirectErlVar.Value.initialized);
+
+    EXPECT_EQ("ACTUATOR_SCH_INDIRECT", actuatorIndirectErlVar.Name);
+    EXPECT_FALSE(actuatorIndirectErlVar.ReadOnly);
+    EXPECT_FALSE(actuatorIndirectErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Number, actuatorIndirectErlVar.Value.Type); // Note: this is Null for an actuator to begin with
+    EXPECT_EQ(45.0, actuatorIndirectErlVar.Value.Number);
+    EXPECT_TRUE(actuatorIndirectErlVar.Value.String.empty());
+    EXPECT_EQ(0, actuatorIndirectErlVar.Value.Expression);
+    EXPECT_FALSE(actuatorIndirectErlVar.Value.TrendVariable);
+    EXPECT_EQ(0, actuatorIndirectErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(actuatorIndirectErlVar.Value.Error.empty());
+    EXPECT_TRUE(actuatorIndirectErlVar.Value.initialized);
+
+    EXPECT_EQ("ARGTRENDVALUE", argTrendValueErlVar.Name);
+    EXPECT_FALSE(argTrendValueErlVar.ReadOnly);
+    EXPECT_FALSE(argTrendValueErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Number, argTrendValueErlVar.Value.Type);
+    EXPECT_EQ(60.0, argTrendValueErlVar.Value.Number);
+    EXPECT_TRUE(argTrendValueErlVar.Value.String.empty());
+    EXPECT_EQ(0, argTrendValueErlVar.Value.Expression);
+    EXPECT_TRUE(argTrendValueErlVar.Value.TrendVariable);
+    EXPECT_EQ(1, argTrendValueErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(argTrendValueErlVar.Value.Error.empty());
+    EXPECT_TRUE(argTrendValueErlVar.Value.initialized);
+
+    EXPECT_EQ("RESULTVALUE1", resultValueErlVar.Name);
+    EXPECT_FALSE(resultValueErlVar.ReadOnly);
+    EXPECT_FALSE(resultValueErlVar.SetByExternalInterface);
+    EXPECT_ENUM_EQ(DataRuntimeLanguage::Value::Number, resultValueErlVar.Value.Type);
+    EXPECT_EQ(45.0, resultValueErlVar.Value.Number);
+    EXPECT_TRUE(resultValueErlVar.Value.String.empty());
+    EXPECT_EQ(0, resultValueErlVar.Value.Expression);
+    EXPECT_FALSE(resultValueErlVar.Value.TrendVariable);
+    EXPECT_EQ(0, resultValueErlVar.Value.TrendVarPointer);
+    EXPECT_TRUE(resultValueErlVar.Value.Error.empty());
+    EXPECT_TRUE(resultValueErlVar.Value.initialized);
+
+    ScheduleManager::UpdateScheduleValues(*state);
+    EXPECT_EQ(45.0, schDirect.CurrentValue);
+    EXPECT_TRUE(schDirect.EMSActuatedOn);
+    EXPECT_EQ(45.0, schDirect.EMSValue);
+    EXPECT_EQ(45.0, schIndirect.CurrentValue);
+    EXPECT_TRUE(schIndirect.EMSActuatedOn);
+    EXPECT_EQ(45.0, schIndirect.EMSValue);
 }

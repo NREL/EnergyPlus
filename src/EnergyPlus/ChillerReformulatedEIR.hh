@@ -81,8 +81,7 @@ namespace ChillerReformulatedEIR {
         std::string CAPFTName;   // CAPFT curve name
         std::string EIRFTName;   // EIRFT curve name
         std::string EIRFPLRName; // EIRPLR curve name
-        DataPlant::CondenserType CondenserType =
-            DataPlant::CondenserType::Invalid;                       // Type of Condenser. Water Cooled is the only available option for now
+        DataPlant::CondenserType CondenserType = DataPlant::CondenserType::Invalid; // Type of Condenser. Water Cooled is the only available option for now
         PLR PartLoadCurveType = PLR::Invalid;                        // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
         Real64 RefCap = 0.0;                                         // Reference capacity of the chiller [W]
         bool RefCapWasAutoSized = false;                             // reference capacity was autosized on input
@@ -106,6 +105,9 @@ namespace ChillerReformulatedEIR {
         Real64 OptPartLoadRat = 0.0;                                 // Optimal operating fraction of full load
         Real64 MinUnloadRat = 0.0;                                   // Minimum unloading ratio
         Real64 TempRefCondIn = 0.0;                                  // The reference secondary loop fluid temperature at the
+
+        DataPlant::CondenserFlowControl CondenserFlowControl = DataPlant::CondenserFlowControl::Invalid;
+            
         // chiller condenser side inlet for the reformulated chiller [C]
         Real64 TempRefCondOut = 0.0; // The reference secondary loop fluid temperature at the
         // chiller condenser side outlet for the reformulated chiller [C]
@@ -195,23 +197,30 @@ namespace ChillerReformulatedEIR {
         Real64 HeatRecOutletTemp = 0.0;
         Real64 QHeatRecovery = 0.0; // Heat recovered from water-cooled condenser [W]
         Real64 QCondenser = 0.0;
-        Real64 QEvaporator = 0.0;        // Evaporator heat transfer rate [W]
-        Real64 Power = 0.0;              // Chiller power [W]
-        Real64 EvapOutletTemp = 0.0;     // Evaporator outlet temperature [C]
-        Real64 CondOutletTemp = 0.0;     // Condenser outlet temperature [C]
-        Real64 EvapMassFlowRate = 0.0;   // Evaporator mass flow rate [kg/s]
-        Real64 CondMassFlowRate = 0.0;   // Condenser mass flow rate [kg/s]
-        Real64 ChillerFalseLoad = 0.0;   // Chiller false load over and above water side load [W]
-        Real64 Energy = 0.0;             // Chiller electric consumption [J]
-        Real64 EvapEnergy = 0.0;         // Evaporator heat transfer energy [J]
-        Real64 CondEnergy = 0.0;         // Condenser heat transfer energy [J]
-        Real64 CondInletTemp = 0.0;      // Condenser inlet temperature [C]
-        Real64 EvapInletTemp = 0.0;      // Evaporator inlet temperature [C]
-        Real64 ActualCOP = 0.0;          // Coefficient of performance
-        Real64 EnergyHeatRecovery = 0.0; // Energy recovered from water-cooled condenser [J]
-        Real64 HeatRecInletTemp = 0.0;   // Heat reclaim inlet temperature [C]
-        Real64 HeatRecMassFlow = 0.0;    // Heat reclaim mass flow rate [kg/s]
+        Real64 QEvaporator = 0.0;                 // Evaporator heat transfer rate [W]
+        Real64 Power = 0.0;                       // Chiller power [W]
+        Real64 EvapOutletTemp = 0.0;              // Evaporator outlet temperature [C]
+        Real64 CondOutletTemp = 0.0;              // Condenser outlet temperature [C]
+        Real64 EvapMassFlowRate = 0.0;            // Evaporator mass flow rate [kg/s]
+        Real64 CondMassFlowRate = 0.0;            // Condenser mass flow rate [kg/s]
+        Real64 ChillerFalseLoad = 0.0;            // Chiller false load over and above water side load [W]
+        Real64 Energy = 0.0;                      // Chiller electric consumption [J]
+        Real64 EvapEnergy = 0.0;                  // Evaporator heat transfer energy [J]
+        Real64 CondEnergy = 0.0;                  // Condenser heat transfer energy [J]
+        Real64 CondInletTemp = 0.0;               // Condenser inlet temperature [C]
+        Real64 EvapInletTemp = 0.0;               // Evaporator inlet temperature [C]
+        Real64 ActualCOP = 0.0;                   // Coefficient of performance
+        Real64 EnergyHeatRecovery = 0.0;          // Energy recovered from water-cooled condenser [J]
+        Real64 HeatRecInletTemp = 0.0;            // Heat reclaim inlet temperature [C]
+        Real64 HeatRecMassFlow = 0.0;             // Heat reclaim mass flow rate [kg/s]
+        int ChillerCondLoopFlowFLoopPLRIndex = 0; // Condenser loop flow rate fraction function of loop PLR
+        int CondDT = 0;                           // Temperature difference across condenser
+        int CondDTScheduleNum = 0;                // Temperature difference across condenser schedule index
+        Real64 MinCondFlowRatio = 0.2;            // Minimum condenser flow fraction
         DataBranchAirLoopPlant::ControlType EquipFlowCtrl = DataBranchAirLoopPlant::ControlType::Invalid;
+        Real64 VSBranchPumpMinLimitMassFlowCond = 0.0;
+        bool VSBranchPumpFoundCond = false;
+        bool VSLoopPumpFoundCond = false;
 
         static ReformulatedEIRChillerSpecs *factory(EnergyPlusData &state, std::string const &objectName);
 
@@ -258,9 +267,13 @@ struct ChillerReformulatedEIRData : BaseGlobalStruct
     bool GetInputREIR = true;
     Array1D<ChillerReformulatedEIR::ReformulatedEIRChillerSpecs> ElecReformEIRChiller;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = ChillerReformulatedEIRData();
+        new (this) ChillerReformulatedEIRData();
     }
 };
 

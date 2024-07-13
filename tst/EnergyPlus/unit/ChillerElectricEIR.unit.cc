@@ -56,6 +56,8 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -93,6 +95,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
 
 TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
 {
+    state->init_state(*state);
     // unit test for autosizing heat recovery in Chiller:Electric:EIR
     state->dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
     auto &thisEIR = state->dataChillerElectricEIR->ElectricEIRChiller(1);
@@ -144,11 +147,6 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     state->dataPlnt->TotNumLoops = 2;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.20;
-    state->dataGlobal->NumOfTimeStepInHour = 1;
-    state->dataGlobal->TimeStep = 1;
-    state->dataGlobal->MinutesPerTimeStep = 60;
-
-    Psychrometrics::InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "Chiller:Electric:EIR,",
@@ -194,6 +192,9 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
@@ -209,7 +210,6 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     auto &thisEIR = state->dataChillerElectricEIR->ElectricEIRChiller(1);
 
     state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
-    state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
@@ -315,7 +315,6 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     auto &thisEIRChiller = state->dataChillerElectricEIR->ElectricEIRChiller(1);
 
     state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
-    state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
@@ -373,4 +372,172 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     EXPECT_NEAR(2.31460814, thisEIRChiller.CondMassFlowRate, 0.0000001);
     EXPECT_NEAR(6.22019725E-06, EvapCondWaterVolFlowRate, 0.000000001);
     EXPECT_NEAR(EvapCondWaterVolFlowRate, thisEIRChiller.EvapWaterConsumpRate, 0.000000001);
+}
+
+TEST_F(EnergyPlusFixture, ChillerElectricEIR_WaterCooledChillerVariableSpeedCondenser)
+{
+
+    bool RunFlag(true);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    Psychrometrics::InitializePsychRoutines(*state);
+
+    std::string const idf_objects = delimited_string({
+        "Chiller:Electric:EIR,",
+        "  WaterChiller,                       !- Name",
+        "  autosize,                           !- Reference Capacity {W}",
+        "  1.0,                               !- Reference COP {W/W}",
+        "  6.67,                               !- Reference Leaving Chilled Water Temperature {C}",
+        "  29.40,                              !- Reference Entering Condenser Fluid Temperature {C}",
+        "  autosize,                           !- Reference Chilled Water Flow Rate {m3/s}",
+        "  0.001,                              !- Reference Condenser Fluid Flow Rate {m3/s}",
+        "  DummyCapfT,                         !- Cooling Capacity Function of Temperature Curve Name",
+        "  DummyEIRfT,                         !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name",
+        "  DummyEIRfPLR,                       !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name",
+        "  0.10,                               !- Minimum Part Load Ratio",
+        "  1.00,                               !- Maximum Part Load Ratio",
+        "  1.00,                               !- Optimum Part Load Ratio",
+        "  0.25,                               !- Minimum Unloading Ratio",
+        "  CHW Inlet Node,                     !- Chilled Water Inlet Node Name",
+        "  CHW Outlet Node,                    !- Chilled Water Outlet Node Name",
+        "  Condenser Inlet Node,               !- Condenser Inlet Node Name",
+        "  Condenser Outlet Node,              !- Condenser Outlet Node Name",
+        "  WaterCooled,                        !- Condenser Type",
+        "  0.04,                               !- Condenser Fan Power Ratio {W/W}",
+        "  1.00,                               !- Fraction of Compressor Electric Consumption Rejected by Condenser",
+        "  5.00,                               !- Leaving Chilled Water Lower Temperature Limit {C}",
+        "  NotModulated,                       !- Chiller Flow Mode",
+        "  0.0,                                !- Design Heat Recovery Water Flow Rate {m3/s}",
+        "  ,                                   !- Heat Recovery Inlet Node Name",
+        "  ,                                   !- Heat Recovery Outlet Node Name",
+        "  1.00,                               !- Sizing Factor",
+        "  0.00,                               !- Basin Heater Capacity {W/K}",
+        "  2.00,                               !- Basin Heater Setpoint Temperature {C}",
+        "  ,                                   !- Basin Heater Operating Schedule Name",
+        "  1.00,                               !- Condenser Heat Recovery Relative Capacity Fraction",
+        "  ,                                   !- Heat Recovery Inlet High Temperature Limit Schedule Name",
+        "  ,                                   !- Heat Recovery Leaving Temperature Setpoint Node Name",
+        "  ,                                   !- End-Use Subcategory",
+        "  ModulatedLoopPLR,                   !- Condenser Flow Control",
+        "  Y=F(X),                             !- Condenser Loop Flow Rate Fraction Function of Loop Part Load Ratio Curve Name",
+        "  CondenserdT,                        !- Temperature Difference Across Condenser Schedule Name",
+        "  0.35;                               !- Condenser Minimum Flow Fraction",
+        "Curve:Linear,Y=F(X),0,1,0,1;",
+        "Schedule:Constant,CondenserdT,,10;"
+        "Curve:Biquadratic, DummyCapfT, 1, 0, 0, 0, 0, 0, 5, 10, 24, 35, , , , , ;",
+        "Curve:Biquadratic, DummyEIRfT, 1, 0,  0, 0, 0, 0,   5, 10, 24, 35, , , , , ;",
+        "Curve:Quadratic, DummyEIRfPLR, 1,  0,  0, 0, 1, , , , ;",
+
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects, false));
+
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+
+    GetElectricEIRChillerInput(*state);
+    auto &thisChiller = state->dataChillerElectricEIR->ElectricEIRChiller(1);
+
+    auto &dln = state->dataLoopNodes;
+    for (int i = 0; i < 10; ++i) dln->nodes.push_back(new Node::NodeData);
+
+    state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).TempSetPointNodeNum = 10;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = thisChiller.Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::Chiller_ElectricEIR;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = thisChiller.EvapInNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = thisChiller.EvapOutNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).TempSetPoint = 4.4;
+
+    state->dataSize->PlantSizData.allocate(2);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.001;
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
+
+    state->dataPlnt->PlantLoop(2).Name = "CondenserWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = thisChiller.Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::Chiller_ElectricEIR;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).InNodeNum = thisChiller.CondInNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).OutNodeNum = thisChiller.CondOutNodeNum;
+
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.001;
+    state->dataSize->PlantSizData(2).DeltaT = 5.0;
+
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+
+    Real64 MyLoad(0.0);
+    thisChiller.initialize(*state, RunFlag, MyLoad);
+    thisChiller.size(*state);
+    MyLoad = -thisChiller.RefCap;
+    state->dataSize->PlantSizData(1).DesCapacity = std::abs(MyLoad) * 2;
+    ScheduleManager::UpdateScheduleValues(*state);
+
+    // run through init again after sizing is complete to set mass flow rate
+    state->dataGlobal->BeginEnvrnFlag = true;
+    thisChiller.initialize(*state, RunFlag, MyLoad);
+
+    auto *condInNode = dln->nodes(thisChiller.CondInNodeNum);
+    auto *evapInNode = dln->nodes(thisChiller.EvapInNodeNum);
+    auto *tempSetPointNode = dln->nodes(state->dataPlnt->PlantLoop(thisChiller.CWPlantLoc.loopNum).TempSetPointNodeNum);
+    // set node temperatures
+    condInNode->Temp = 25.0;
+    evapInNode->Temp = 15.0;
+    state->dataPlnt->PlantLoop(thisChiller.CWPlantLoc.loopNum).LoopSide(thisChiller.CWPlantLoc.loopSideNum).UpdatedDemandToLoopSetPoint = MyLoad;
+    tempSetPointNode->TempSetPoint = 21.0;
+
+    // Test the different control approaches
+    thisChiller.calculate(*state, MyLoad, RunFlag);
+    EXPECT_NEAR(thisChiller.CondMassFlowRate, thisChiller.CondMassFlowRateMax / 2, 0.00001);
+
+    thisChiller.CondenserFlowControl = DataPlant::CondenserFlowControl::ModulatedChillerPLR;
+    MyLoad /= 2;
+    thisChiller.calculate(*state, MyLoad, RunFlag);
+    EXPECT_NEAR(thisChiller.CondMassFlowRate, thisChiller.CondMassFlowRateMax / 2, 0.00001);
+
+    thisChiller.CondenserFlowControl = DataPlant::CondenserFlowControl::ModulatedDeltaTemperature;
+    thisChiller.calculate(*state, MyLoad, RunFlag);
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(*state,
+                                                       state->dataPlnt->PlantLoop(thisChiller.CWPlantLoc.loopNum).FluidName,
+                                                       thisChiller.CondInletTemp,
+                                                       state->dataPlnt->PlantLoop(thisChiller.CWPlantLoc.loopNum).FluidIndex,
+                                                       "ChillerElectricEIR_WaterCooledChillerVariableSpeedCondenser");
+    Real64 ActualCondFlow = 3.0 * std::abs(MyLoad) / (Cp * 10.0);
+    EXPECT_NEAR(thisChiller.CondMassFlowRate, ActualCondFlow, 0.00001);
+
+    thisChiller.CondenserFlowControl = DataPlant::CondenserFlowControl::ConstantFlow;
+    thisChiller.calculate(*state, MyLoad, RunFlag);
+    EXPECT_NEAR(thisChiller.CondMassFlowRate, thisChiller.CondMassFlowRateMax, 0.00001);
+
+    // Test the minimum condenser flow rate
+    MyLoad = -500;
+    thisChiller.CondenserFlowControl = DataPlant::CondenserFlowControl::ModulatedChillerPLR;
+    thisChiller.calculate(*state, MyLoad, RunFlag);
+    EXPECT_NEAR(thisChiller.CondMassFlowRate, thisChiller.CondMassFlowRateMax * 0.35, 0.00001);
 }

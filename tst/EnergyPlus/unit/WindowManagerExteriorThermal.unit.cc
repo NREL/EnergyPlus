@@ -72,7 +72,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::WindowManager;
+using namespace EnergyPlus::Window;
 
 TEST_F(EnergyPlusFixture, test_overallUfactorFromFilmsAndCond)
 {

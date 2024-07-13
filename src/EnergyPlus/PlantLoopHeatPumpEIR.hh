@@ -418,6 +418,11 @@ struct EIRPlantLoopHeatPumpsData : BaseGlobalStruct
 {
     std::vector<EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump> heatPumps;
     bool getInputsPLHP = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) EIRPlantLoopHeatPumpsData();
@@ -428,6 +433,11 @@ struct EIRFuelFiredHeatPumpsData : BaseGlobalStruct
 {
     std::vector<EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump> heatPumps;
     bool getInputsFFHP = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) EIRFuelFiredHeatPumpsData();

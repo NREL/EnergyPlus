@@ -159,6 +159,10 @@ struct PondGroundHeatExchangerData : BaseGlobalStruct
     int NumOfPondGHEs = 0;
     Array1D<PondGroundHeatExchanger::PondGroundHeatExchangerData> PondGHE;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->GetInputFlag = true;

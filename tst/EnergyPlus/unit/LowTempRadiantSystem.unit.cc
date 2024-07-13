@@ -206,6 +206,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantElectric)
 
 TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
     SystemType = LowTempRadiantSystem::SystemType::HydronicSystem;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).Name = "LowTempVarFlow 1";
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ZonePtr = 1;
@@ -299,6 +300,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
 
 TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
     SystemType = LowTempRadiantSystem::SystemType::HydronicSystem;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).Name = "LowTempVarFlow 1";
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ZonePtr = 1;
@@ -375,6 +377,7 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
 
 TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
     SystemType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).Name = "LowTempConstantFlow 1";
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ZonePtr = 1;
@@ -2596,6 +2599,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
 
     Real64 Density;
     Real64 Cp;
+    FluidProperties::GetFluidPropertiesData(*state);
 
     SystemType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).Name = "LowTempConstantFlow";
@@ -2686,6 +2690,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     Real64 TubeDiameter;
     Real64 HXEffectFuncResult;
     int SurfNum;
+    FluidProperties::GetFluidPropertiesData(*state);
 
     // Set values of items that will stay constant for all calls to HX Effectiveness function
     RadSysNum = 1;

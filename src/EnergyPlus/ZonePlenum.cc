@@ -404,7 +404,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                         ShowContinueError(state, format("Occurs for ReturnPlenum = {}", AlphArray(1)));
                         ErrorsFound = true;
                     }
-                    PIUInducesPlenumAir(state, thisRetPlenum.InducedNodeNums(NodeNum));
+                    PIUInducesPlenumAir(state, thisRetPlenum.InducedNodeNums(NodeNum), ZonePlenumNum);
                 }
             }
         } else {

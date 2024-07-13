@@ -1460,6 +1460,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
 TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
 {
+    state->init_state(*state);
     auto &dln = state->dataLoopNodes;
     for (int i = 0; i < 2; ++i) dln->nodes.push_back(new Node::NodeData);
 

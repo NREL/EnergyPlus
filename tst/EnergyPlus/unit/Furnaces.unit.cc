@@ -86,6 +86,7 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 {
 
+    state->init_state(*state);
     int FurnaceNum(1);
     Real64 OnOffAirFlowRatio; // This is a return value
     Real64 PartLoadRatio(1.0);

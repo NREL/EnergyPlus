@@ -135,6 +135,7 @@ namespace Fans {
         int outNodeNum = 0;
         int airLoopNum = 0;
         bool airPathFlag = false; // Yes, this fan is a part of airpath
+        bool isAFNFan = false;    // Is fan part of and AirFlowNetwork distribution system
 
         Real64 maxAirFlowRate = 0.0; // Max Specified Volume Flow Rate of Fan [m3/sec]
         Real64 minAirFlowRate = 0.0; // Max Specified Volume Flow Rate of Fan [m3/sec]
@@ -394,8 +395,7 @@ namespace Fans {
         bool isSecondaryDriver = false; // true if this fan is used to augment flow and may pass air when off.
 
         // FEI
-        static Real64 report_fei(
-            EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
+        static Real64 report_fei(EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress);
 
         void init(EnergyPlusData &state);
 
@@ -454,6 +454,10 @@ struct FansData : BaseGlobalStruct
 
     Array1D<Fans::FanBase *> fans;
     std::map<std::string, int> fanMap;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

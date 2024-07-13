@@ -332,9 +332,13 @@ struct AirSystemsData : BaseGlobalStruct
     Array1D<DataAirSystems::ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
     Array1D<DataAirSystems::ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = AirSystemsData();
+        new (this) AirSystemsData();
     }
 };
 

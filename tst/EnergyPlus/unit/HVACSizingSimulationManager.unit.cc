@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -136,7 +137,9 @@ protected:
 TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 {
     auto &dln = state->dataLoopNodes;
-        
+
+    FluidProperties::GetFluidPropertiesData(*state);
+
     // this test emulates two design days and two sizing weather file days periods
     // calls code related to coincident plant sizing with HVAC sizing simulation
     // this test runs 3 system timesteps for each zone timestep
@@ -372,6 +375,8 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 {
     auto &dln = state->dataLoopNodes;
+
+    FluidProperties::GetFluidPropertiesData(*state);
     // this test emulates two design days and calls nearly all the OO code related
     // to coincident plant sizing with HVAC sizing simulation
     // this test runs 3 system timesteps for each zone timestep
@@ -518,6 +523,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
 {
     auto &dln = state->dataLoopNodes;
+    FluidProperties::GetFluidPropertiesData(*state);
     // this test emulates two design days and calls nearly all the OO code related
     // to coincident plant sizing with HVAC sizing simulation
     // this test runs 1 system timestep for each zone timestep
@@ -607,6 +613,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
 TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
 {
     auto &dln = state->dataLoopNodes;
+    FluidProperties::GetFluidPropertiesData(*state);
     // this test emulates two design days and calls nearly all the OO code related
     // to coincident plant sizing with HVAC sizing simulation
     // this test run varies the system timestep some to test irregular

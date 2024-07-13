@@ -67,6 +67,7 @@
 namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
 {
+    state->init_state(*state);
     using namespace DataPlant;
     using namespace HVACInterfaceManager;
     Real64 TankOutletTemp;

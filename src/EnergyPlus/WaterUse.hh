@@ -255,6 +255,10 @@ struct WaterUseData : BaseGlobalStruct
     EPVector<WaterUse::WaterEquipmentType> WaterEquipment;
     EPVector<WaterUse::WaterConnectionsType> WaterConnections;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) WaterUseData();

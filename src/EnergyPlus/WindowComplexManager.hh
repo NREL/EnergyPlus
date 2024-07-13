@@ -375,7 +375,11 @@ struct WindowComplexManagerData : BaseGlobalStruct
     Array1D_int iMinDT = Array1D_int(1, 0);
     Array1D_int IDConst = Array1D_int(100, 0);
 
-    void clear_state() // override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
+    void clear_state() override
     {
         this->NumComplexWind = 0;
         this->BasisList.deallocate();

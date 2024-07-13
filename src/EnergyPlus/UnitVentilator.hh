@@ -312,6 +312,10 @@ struct UnitVentilatorsData : BaseGlobalStruct
     int ATMixerPriInNodeNum = 0; // primary air node of ATM Mixer
     int ZoneNodeNum = 0;       // zone node
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->HCoilOn = false;

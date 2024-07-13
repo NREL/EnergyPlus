@@ -10473,8 +10473,13 @@ namespace AirflowNetwork {
                         ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
                                    .FanIndex)
                         ->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans
+                        ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
+                                   .FanIndex)
+                        ->isAFNFan = true;
                 } else {
                     m_state.dataFans->fans(n)->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans->fans(n)->isAFNFan = true;
                 }
             }
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == iEPlusComponentType::COI) {

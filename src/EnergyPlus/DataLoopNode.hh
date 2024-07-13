@@ -652,6 +652,10 @@ struct LoopNodeData : BaseGlobalStruct
                 // contaminant setpoint {ppm} | Set to true when node has SPM which follows wetbulb
 #endif // GET_OUT        
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) LoopNodeData();

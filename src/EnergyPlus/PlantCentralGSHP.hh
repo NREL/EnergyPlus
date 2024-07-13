@@ -72,6 +72,14 @@ namespace PlantCentralGSHP {
         Num
     };
 
+    enum class CondenserModeTemperature
+    {
+        Invalid = -1,
+        EnteringCondenser,
+        LeavingCondenser,
+        Num
+    };
+
     struct CGSHPNodeData
     {
         // Members
@@ -169,9 +177,9 @@ namespace PlantCentralGSHP {
     struct ChillerHeaterSpecs
     {
         std::string Name;                 // Name of the Chiller Heater object
-        std::string CondModeCooling;      // Cooling mode temperature curve input variable
-        std::string CondModeHeating;      // Clg/Htg mode temperature curve input variable
-        std::string CondMode;             // Current mode temperature curve input variable
+        CondenserModeTemperature CondModeCooling;      // Cooling mode temperature curve input variable
+        CondenserModeTemperature CondModeHeating;      // Clg/Htg mode temperature curve input variable
+        CondenserModeTemperature CondMode;             // Current mode temperature curve input variable
         bool ConstantFlow;                // True if this is a Constant Flow Chiller
         bool VariableFlow;                // True if this is a Variable Flow Chiller
         bool CoolSetPointSetToLoop;       // True if the setpoint is missing at the outlet node
@@ -407,6 +415,35 @@ namespace PlantCentralGSHP {
 
         void CalcChillerHeaterModel(EnergyPlusData &state);
 
+        void adjustChillerHeaterFlowTemp(EnergyPlusData &state,
+                                         Real64 &QCondenser,
+                                         Real64 &CondMassFlowRate,
+                                         Real64 &CondOutletTemp,
+                                         Real64 const CondInletTemp,
+                                         Real64 const CondDeltaTemp);
+
+        Real64
+        setChillerHeaterCondTemp(EnergyPlusData &state, int const numChillerHeater, Real64 const condEnteringTemp, Real64 const condLeavingTemp);
+
+        Real64 calcChillerCapFT(EnergyPlusData &state, int const numChillerHeater, Real64 const evapOutletTemp, Real64 const condTemp);
+
+        void checkEvapOutletTemp(EnergyPlusData &state,
+                                 int const numChillerHeater,
+                                 Real64 &evapOutletTemp,
+                                 Real64 const lowTempLimitEout,
+                                 Real64 evapInletTemp,
+                                 Real64 &qEvaporator,
+                                 Real64 &evapMassFlowRate,
+                                 Real64 const Cp);
+
+        void calcPLRAndCyclingRatio(EnergyPlusData &state,
+                                    Real64 const availChillerCap,
+                                    Real64 &actualPartLoadRatio,
+                                    Real64 const minPartLoadRatio,
+                                    Real64 const maxPartLoadRatio,
+                                    Real64 const qEvaporator,
+                                    Real64 &frac);
+
         void UpdateChillerHeaterRecords(EnergyPlusData &state);
 
         void UpdateChillerRecords(EnergyPlusData &state);
@@ -438,6 +475,10 @@ struct PlantCentralGSHPData : BaseGlobalStruct
     Real64 ChillerFalseLoadRate = 0.0; // Chiller/heater false load over and above the water-side load [W]
     EPVector<PlantCentralGSHP::WrapperSpecs> Wrapper;
     EPVector<PlantCentralGSHP::ChillerHeaterSpecs> ChillerHeater;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

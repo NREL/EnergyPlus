@@ -256,6 +256,10 @@ struct PhotovoltaicThermalCollectorsData : BaseGlobalStruct
     int NumPVT = 0;           // count of all types of PVT in input file
     Array1D<PhotovoltaicThermalCollectors::PVTCollectorStruct> PVT;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) PhotovoltaicThermalCollectorsData();

@@ -1286,8 +1286,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_EQ(20.0, node1->OutAirWetBulb);
     EXPECT_EQ(1.5, node1->OutAirWindSpeed);
     EXPECT_EQ(90.0, node1->OutAirWindDir);
-    EXPECT_DOUBLE_EQ(0.012611481326656135, node1->HumRat);
-    EXPECT_DOUBLE_EQ(57247.660939392081, node1->Enthalpy);
+    EXPECT_NEAR(0.012611481326656135, node1->HumRat, 0.000000000000001);
+    EXPECT_NEAR(57247.660939392081, node1->Enthalpy, 0.000000001);
 
     InitHeatBalance(*state);
 

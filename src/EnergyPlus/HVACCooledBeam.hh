@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -143,6 +144,7 @@ namespace HVACCooledBeam {
         }
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void reportTerminalUnit(EnergyPlusData &state);
     };
 
     void SimCoolBeam(EnergyPlusData &state,
@@ -192,6 +194,10 @@ struct HVACCooledBeamData : BaseGlobalStruct
     Array1D<HVACCooledBeam::CoolBeamData> CoolBeam;
     bool GetInputFlag = true;              // First time, input is "gotten"
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

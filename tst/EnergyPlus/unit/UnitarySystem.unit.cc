@@ -299,6 +299,8 @@ public:
 TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 {
 
+    FluidProperties::GetFluidPropertiesData(*state);
+
     // Set up raw water coil sizes as coil-on-branch configuration then
     // test against sizing of same water coils in UnitarySystem
 
@@ -5509,6 +5511,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
 TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
 {
 
+    FluidProperties::GetFluidPropertiesData(*state);
     int AirLoopNum(1);
     bool FirstHVACIteration(false);
     HVAC::CompressorOp CompressorOn(HVAC::CompressorOp::On);
@@ -5654,6 +5657,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
 TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
 {
 
+    FluidProperties::GetFluidPropertiesData(*state);
     HVAC::CompressorOp CompressorOn(HVAC::CompressorOp::On);
     int AirLoopNum(1);
     bool FirstHVACIteration(false);
@@ -20279,6 +20283,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
 
 TEST_F(AirloopUnitarySysTest, WSHPVariableSpeedCoilSizing)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
     // test that correct CapFT inputs are used for the WSHP cooling coil
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);

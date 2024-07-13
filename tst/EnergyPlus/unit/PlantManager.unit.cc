@@ -74,6 +74,7 @@ namespace PlantManager {
 
     TEST_F(EnergyPlusFixture, PlantManager_SizePlantLoopTest)
     {
+        state->init_state(*state);
         state->dataPlnt->PlantLoop.allocate(1);
         state->dataPlnt->PlantLoop(1).VolumeWasAutoSized = true;
         state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 5;

@@ -236,6 +236,10 @@ struct SteamBaseboardRadiatorData : BaseGlobalStruct
     Array1D<SteamBaseboardRadiator::SteamBaseboardDesignNumericFieldData> SteamBaseboardDesignNumericFields;
     Array1D_string SteamBaseboardDesignNames; // Array that contains the names of Design objects
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         NumSteamBaseboards = 0;

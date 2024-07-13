@@ -289,9 +289,13 @@ struct SteamCoilsData : BaseGlobalStruct
     int ErrCount = 0;
     Array1D<SteamCoils::SteamCoilEquipConditions> SteamCoil;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = SteamCoilsData();
+        new (this) SteamCoilsData();
     }
 };
 } // namespace EnergyPlus

@@ -197,6 +197,10 @@ struct HumidifiersData : BaseGlobalStruct
     Array1D<Humidifiers::HumidifierData> Humidifier;
     std::unordered_map<std::string, std::string> HumidifierUniqueNames;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->NumHumidifiers = 0;

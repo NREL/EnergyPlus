@@ -264,13 +264,11 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         state.dataZoneEquip->ReturnAirPath.allocate(state.dataZoneEquip->NumReturnAirPaths);
     }
 
-    state.dataZoneEquip->ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones); // Allocate the array containing the configuration
+    state.dataZoneEquip->ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones); // Allocate the array containing the configuration data for each zone
     if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
-        state.dataZoneEquip->spaceEquipConfig.allocate(state.dataGlobal->numSpaces); // Allocate the array containing the configuration
+        state.dataZoneEquip->spaceEquipConfig.allocate(
+            state.dataGlobal->numSpaces); // Allocate the array containing the configuration data for each space
     }
-    // data for each zone to the number of controlled zones
-    // found in the input file.  This may or may not
-    // be the same as the number of zones in the building
     state.dataZoneEquip->ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
     state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, Avail::Status::NoAction);
     state.dataZoneEquip->UniqueZoneEquipListNames.reserve(state.dataGlobal->NumOfZones);
@@ -1111,6 +1109,8 @@ void processZoneEquipmentInput(EnergyPlusData &state,
         thisEquipConfig.ReturnNodeNums = 0;                                         // initialize to zero here
         thisEquipConfig.ReturnNodeAirLoopNum = 0;                               // initialize to zero here
         thisEquipConfig.ReturnNodeInletNums = 0;                                 // initialize to zero here
+        thisEquipConfig.ReturnNodeRetPathNum.allocate(NumNodes);
+        thisEquipConfig.ReturnNodeRetPathCompNum.allocate(NumNodes);
         thisEquipConfig.FixedReturnFlow = false;                                // initialize to false here
         thisEquipConfig.ReturnNodePlenumNum = 0;                                // initialize to zero here
         thisEquipConfig.ReturnNodeExhaustNodeNums = 0;                           // initialize to zero here

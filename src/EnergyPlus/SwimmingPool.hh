@@ -218,6 +218,10 @@ struct SwimmingPoolsData : BaseGlobalStruct
     bool getSwimmingPoolInput = true;
     Array1D<SwimmingPool::SwimmingPoolData> Pool;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         NumSwimmingPools = 0;

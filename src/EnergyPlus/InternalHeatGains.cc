@@ -6911,7 +6911,7 @@ namespace InternalHeatGains {
 
                 SetupOutputVariable(state,
                                     "Zone ITE Adjusted Return Air Temperature",
-                                    Constant::Units::W,
+                                    Constant::Units::C,
                                     state.dataHeatBal->ZoneRpt(zoneNum).ITEAdjReturnTemp,
                                     OutputProcessor::TimeStepType::Zone,
                                     OutputProcessor::StoreType::Average,
@@ -8218,7 +8218,7 @@ namespace InternalHeatGains {
                 state.dataHeatBal->spaceRpt(spaceNum).EnergyRpt[i] += state.dataHeatBal->ZoneITEq(Loop).EnergyRpt[i];
             }
 
-            state.dataHeatBal->ZoneITEq(Loop).AirVolFlowStdDensity = AirMassFlowRate * state.dataEnvrn->StdRhoAir;
+            state.dataHeatBal->ZoneITEq(Loop).AirVolFlowStdDensity = AirMassFlowRate / state.dataEnvrn->StdRhoAir;
             state.dataHeatBal->ZoneITEq(Loop).AirVolFlowCurDensity = AirVolFlowRate;
             state.dataHeatBal->ZoneITEq(Loop).AirMassFlow = AirMassFlowRate;
             state.dataHeatBal->ZoneITEq(Loop).AirInletDryBulbT = TAirIn;

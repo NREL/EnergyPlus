@@ -2489,10 +2489,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // Refrigerant type
         thisVrfFluidCtrl.RefrigerantName = cAlphaArgs(4);
-        if (state.dataFluidProps->GetInput) {
-            EnergyPlus::FluidProperties::GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
         if (Util::FindItemInList(thisVrfFluidCtrl.RefrigerantName, state.dataFluidProps->RefrigData, state.dataFluidProps->NumOfRefrigerants) == 0) {
             ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfFluidCtrl.Name);
             ShowContinueError(state, "Illegal " + cAlphaFieldNames(4) + " = " + cAlphaArgs(4));
@@ -2888,10 +2884,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // Refrigerant type
         thisVrfFluidCtrlHR.RefrigerantName = cAlphaArgs(4);
-        if (state.dataFluidProps->GetInput) {
-            EnergyPlus::FluidProperties::GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
         if (Util::FindItemInList(thisVrfFluidCtrlHR.RefrigerantName, state.dataFluidProps->RefrigData, state.dataFluidProps->NumOfRefrigerants) ==
             0) {
             ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfFluidCtrlHR.Name);

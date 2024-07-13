@@ -331,9 +331,13 @@ struct OutdoorAirUnitData : BaseGlobalStruct
     bool HeatActive = false;
     bool CoolActive = false;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = OutdoorAirUnitData();
+        new (this) OutdoorAirUnitData();
     }
 };
 

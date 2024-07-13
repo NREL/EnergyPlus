@@ -233,6 +233,10 @@ struct UnitHeatersData : BaseGlobalStruct
 
     int RefrigIndex = 0;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->HCoilOn = false;

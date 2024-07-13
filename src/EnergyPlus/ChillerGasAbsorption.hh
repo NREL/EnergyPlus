@@ -222,9 +222,13 @@ struct ChillerGasAbsorptionData : BaseGlobalStruct
     bool getGasAbsorberInputs = true;
     Array1D<ChillerGasAbsorption::GasAbsorberSpecs> GasAbsorber;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = ChillerGasAbsorptionData();
+        new (this) ChillerGasAbsorptionData();
     }
 };
 

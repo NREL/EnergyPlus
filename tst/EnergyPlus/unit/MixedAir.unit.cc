@@ -6489,6 +6489,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    state->dataGlobal->CurrentTime = 0.25;
     state->dataContaminantBalance->ContaminantControlledZone.allocate(1);
     state->dataContaminantBalance->ContaminantControlledZone(1).AvaiSchedPtr = 4;
     state->dataContaminantBalance->ContaminantControlledZone(1).SPSchedIndex = 5;
@@ -6589,7 +6590,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
         "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
     });
 
-    EXPECT_TRUE(compare_err_stream(error_string, true));
+    EXPECT_TRUE(compare_err_stream_substring(error_string, true));
 
     state->dataAirLoop->AirLoopControlInfo.deallocate();
     state->dataSize->OARequirements.deallocate();

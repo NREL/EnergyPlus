@@ -74,7 +74,6 @@ namespace EnergyPlus::DataSurfaces {
 //                      Dec 2006, DJS (PSU) added logical ecoroof variable
 //                      Dec 2008, TH added new properties to SurfaceWindowCalc for thermochromic windows
 //                      Jul 2011, M.J. Witte and C.O. Pedersen, add new fields to OSC for last T, max and min
-//       RE-ENGINEERED  na
 
 // Using/Aliasing
 using namespace DataVectorTypes;
@@ -83,19 +82,10 @@ using namespace DataHeatBalance;
 using namespace DataZoneEquipment;
 using namespace Psychrometrics;
 using namespace DataEnvironment;
-using namespace WindowManager;
+using namespace Window;
 
 Array1D_string const cExtBoundCondition({-6, 0}, {"KivaFoundation", "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
 
-// Parameters to indicate surface classes
-// Surface Class (FLOOR, WALL, ROOF (incl's CEILING), WINDOW, DOOR, GLASSDOOR,
-// SHADING (includes OVERHANG, WING), DETACHED, INTMASS),
-// TDD:DOME, TDD:DIFFUSER (for tubular daylighting device)
-// (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
-// in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
-// why aren't these sequential (LKL - 13 Aug 2007)
-
-// Constructor
 Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2D const &vl, Vector2D const &vu)
     : axis(axis), vertices(v), vl(vl), vu(vu)
 {
@@ -179,7 +169,7 @@ Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v,
                 xt = xte;
             }
 #endif
-            assert((shapeCat == ShapeCat::Nonconvex) || (crossEdges.size() == 2));
+            assert((shapeCat == ShapeCat::Nonconvex) || (crossEdges.size() == 2u));
             for (auto const &edge : crossEdges) {
                 size_type const iEdge(std::get<2>(edge));
                 slab.edges.push_back(iEdge); // Add edge to slab
@@ -325,11 +315,11 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
         value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(ExtBoundCond);
     } else {
         Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + Constant::Kelvin;
-        value = state.dataWindowManager->sigma * pow_4(tout);
-        value = ViewFactorSkyIR *
-                    (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) +
-                     (1.0 - state.dataSurface->SurfAirSkyRadSplit(t_SurfNum)) * value) +
-                ViewFactorGroundIR * value;
+        value = Constant::StefanBoltzmann * pow_4(tout);
+        value =
+            ViewFactorSkyIR * (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * Constant::StefanBoltzmann * pow_4(state.dataEnvrn->SkyTempKelvin) +
+                               (1.0 - state.dataSurface->SurfAirSkyRadSplit(t_SurfNum)) * value) +
+            ViewFactorGroundIR * value;
     }
     return value;
 }
@@ -469,7 +459,7 @@ Surface2D SurfaceData::computed_surface2d() const
 
 Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
 {
-    if (std::abs(SinTilt) < 1.e-4) {
+    if (std::abs(SinTilt) < Constant::SmallDistance) {
         return 0.0;
     }
     using Vertex2D = ObjexxFCL::Vector2<Real64>;

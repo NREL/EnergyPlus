@@ -272,7 +272,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     // Test 9 - Zone Equipment, powered induction unit
     state->dataSize->TermUnitPIU = true;
-    state->dataSize->TermUnitSizing(1).MinFlowFrac = 0.3;
+    state->dataSize->TermUnitSizing(1).MinPriFlowFrac = 0.3;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing

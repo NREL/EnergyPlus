@@ -284,9 +284,10 @@ namespace DataZoneEquipment {
         bool SupplyAirPathExists;
         int MainBranchIndex;
         int SupplyBranchIndex;
-        int AirDistUnitIndex;    // equipment number in EquipList
-        int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
-        int SupplyAirPathIndex;
+        int AirDistUnitIndex;          // equipment number in EquipList
+        int TermUnitSizingIndex;       // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
+        int SupplyAirPathIndex;        // Pointer to SupplyAirPath serving this terminal unit
+        int SupplyAirPathOutNodeIndex; // Pointer to SupplyAirPath OutletNode serving this terminal unit
         Array1D<SubSubEquipmentData> Coil;
 
         // Default Constructor
@@ -304,6 +305,7 @@ namespace DataZoneEquipment {
         std::string EquipListName;
         int EquipListIndex;
         std::string ControlListName;
+
         int ZoneNodeNum = 0;
         int NumInNodes;                // number of inlet nodes
         int NumExhaustNodes;              // number of exhaust nodes
@@ -317,6 +319,9 @@ namespace DataZoneEquipment {
         Array1D_int ExhaustNodeNums;          // zone air exhaust nodes
         Array1D_int ReturnNodeNums;           // zone return air nodes (node numbers)
         Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
+
+        Array1D_int ReturnNodeRetPathNum;     // ReturnPath number connected to this return node
+        Array1D_int ReturnNodeRetPathCompNum; // ReturnPath component number connected to this return node
         Array1D_int
             ReturnNodeInletNums; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
         Array1D_bool FixedReturnFlow;         // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
@@ -509,10 +514,12 @@ namespace DataZoneEquipment {
         Array1D_int ComponentIndex;
         Array1D_int SplitterIndex;
         Array1D_int PlenumIndex;
+
         int NumOutNodes = 0;
         Array1D_int OutNodeNums;
         int NumNodes = 0;
         Array1D_int NodeNums;
+        Array1D_int OutletNodeSupplyPathCompNum; // Index to the supply path ComponentName and ComponentType lists for this outlet node
         Array1D<DataZoneEquipment::AirNodeType> NodeType;
 
         // Default Constructor
@@ -525,17 +532,14 @@ namespace DataZoneEquipment {
     {
         // Members
         std::string Name;
-        int NumOfComponents;
+        int NumOfComponents = 0;
         int OutNodeNum = 0;
+
+        int OutletRetPathCompNum = 0; // Index to return path component number for outlet node
         Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
         Array1D<DataZoneEquipment::AirLoopHVACZone> ComponentTypeEnum;
         Array1D_string ComponentName;
         Array1D_int ComponentIndex;
-
-        // Default Constructor
-        ReturnAir() : NumOfComponents(0)
-        {
-        }
     };
 
     void GetZoneEquipmentData(EnergyPlusData &state);
@@ -623,6 +627,10 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     Array1D<ExhaustAirSystemManager::ZoneExhaustControl> ZoneExhaustControlSystem; // 2022-01: maybe a better name?
     std::vector<DataZoneEquipment::ZoneEquipmentSplitter> zoneEquipSplitter;
     std::vector<DataZoneEquipment::ZoneEquipmentMixer> zoneEquipMixer;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

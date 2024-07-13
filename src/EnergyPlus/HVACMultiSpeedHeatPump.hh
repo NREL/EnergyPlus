@@ -431,6 +431,10 @@ struct HVACMultiSpeedHeatPumpData : BaseGlobalStruct
 
     std::string HeatCoilName; // TODO: What's the best plan here?
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->NumMSHeatPumps = 0;

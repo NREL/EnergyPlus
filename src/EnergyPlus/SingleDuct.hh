@@ -269,6 +269,8 @@ namespace SingleDuct {
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
+        void reportTerminalUnit(EnergyPlusData &state);
+
         void UpdateSys(EnergyPlusData &state) const;
 
         void ReportSys(EnergyPlusData &state);
@@ -433,6 +435,10 @@ struct SingleDuctData : BaseGlobalStruct
                                                     // available air mass flow rate [W]
     Real64 MinMassAirFlowSDAT = 0.0;                // the air flow rate during heating for normal acting damper
     Real64 QZoneMax2SDAT = 0.0;                     // temporary variable
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

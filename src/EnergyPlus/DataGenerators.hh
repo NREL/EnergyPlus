@@ -327,9 +327,13 @@ struct GeneratorsData : BaseGlobalStruct
     Real64 TrialMdotcw = 0.0;    // test or estimate of what the plant flows are going to be (kg/s)
     Real64 LimitMinMdotcw = 0.0; // lower limit for cooling water flow for generatior operation (kg/s)
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = GeneratorsData();
+        new (this) GeneratorsData();
     }
 };
 

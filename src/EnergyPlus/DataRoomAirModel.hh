@@ -650,6 +650,10 @@ struct RoomAirModelData : BaseGlobalStruct
     EPVector<RoomAir::AirPatternInfobyZone> AirPatternZoneInfo;             // added zone information for user defined patterns
     EPVector<RoomAir::AFNInfoByZone> AFNZoneInfo;                           // added zone info
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         anyNonMixingRoomAirModel = false;

@@ -207,6 +207,17 @@ namespace DataSizing {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(SysOAMethod::Num)> SysOAMethodNames{"Zone Sum",
+                                                                                                "Ventilation Rate Procedure",
+                                                                                                "IAQ Proc",
+                                                                                                "Proportional - Sch Occupancy",
+                                                                                                "IAQ Proc - Generic Contaminant",
+                                                                                                "IAQ Proc - Max Gen Cont or CO2.",
+                                                                                                "Proportional - Des Occupancy",
+                                                                                                "Proportional - Des OA Rate",
+                                                                                                "Simplified Procure",
+                                                                                                "Ventilation Rate Procedure Level"};
+
     // Zone HVAC Equipment Sizing Option
     enum class DesignSizingType
     {
@@ -618,7 +629,7 @@ namespace DataSizing {
         Real64 MaxHWVolFlow;           // design Hot Water vol flow for single duct terminal unit [m3/s]
         Real64 MaxSTVolFlow;           // design Steam vol flow rate for single duct terminal unit [m3/s]
         Real64 MaxCWVolFlow;           // design Cold Water vol flow for single duct terminal unit [m3/s]
-        Real64 MinFlowFrac;            // design minimum flow fraction for a terminal unit
+        Real64 MinPriFlowFrac;         // design minimum primary flow fraction for a terminal unit
         Real64 InducRat;               // design induction ratio for a terminal unit
         bool InducesPlenumAir;         // True if secondary air comes from the plenum
         Real64 ReheatAirFlowMult;      // multiplier for air flow in reheat coil UA calculation
@@ -630,10 +641,11 @@ namespace DataSizing {
         Real64 SpecDesSensHeatingFrac; // Fraction of Design Sensible Heating Load from DesignSpecification:AirTerminal:Sizing
         Real64 SpecDesHeatSATRatio;    // Heating Design Supply Air Temperature Difference Ratio from DesignSpecification:AirTerminal:Sizing
         Real64 SpecMinOAFrac;          // Fraction of Minimum Outdoor Air Flow from DesignSpecification:AirTerminal:Sizing
+        int plenumIndex = 0;           // plenum index for PIU inlet conditions
 
         // Default Constructor
         TermUnitSizingData()
-            : CtrlZoneNum(0), AirVolFlow(0.0), MaxHWVolFlow(0.0), MaxSTVolFlow(0.0), MaxCWVolFlow(0.0), MinFlowFrac(0.0), InducRat(0.0),
+            : CtrlZoneNum(0), AirVolFlow(0.0), MaxHWVolFlow(0.0), MaxSTVolFlow(0.0), MaxCWVolFlow(0.0), MinPriFlowFrac(0.0), InducRat(0.0),
               InducesPlenumAir(false), ReheatAirFlowMult(1.0), ReheatLoadMult(1.0), DesCoolingLoad(0.0), DesHeatingLoad(0.0),
               SpecDesSensCoolingFrac(1.0), SpecDesCoolSATRatio(1.0), SpecDesSensHeatingFrac(1.0), SpecDesHeatSATRatio(1.0), SpecMinOAFrac(1.0)
         {
@@ -1336,6 +1348,10 @@ struct SizingData : BaseGlobalStruct
     Array1D<Real64> EvzMinBySysCool; // saved value of EvzMin used in 62.1 tabular report
     Array1D<Real64> FaByZoneCool;    // triggers allocation in UpdateSysSizing
     Array1D<Real64> SensCoolCapTemp; // triggers allocation in UpdateSysSizing
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

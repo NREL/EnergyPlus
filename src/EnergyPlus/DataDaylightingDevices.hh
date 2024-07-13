@@ -136,6 +136,10 @@ struct DataDaylightingDevicesData : BaseGlobalStruct
     Array1D<Dayltg::TDDPipeData> TDDPipe;
     Array1D<Dayltg::ShelfData> Shelf;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) DataDaylightingDevicesData();
