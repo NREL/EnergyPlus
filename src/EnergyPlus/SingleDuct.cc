@@ -3786,7 +3786,6 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
     Real64 CpAirAvg;
     Real64 DeltaTemp;
-    int SysOutletNode;        // The node number of the terminal unit outlet node
     Real64 MaxFlowWater;      // This is the value passed to the Controller depending if FirstHVACIteration or not
     Real64 MinFlowWater;      // This is the value passed to the Controller depending if FirstHVACIteration or not
     Real64 QActualHeating;    // the heating load seen by the reheat coil
@@ -4056,7 +4055,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                               this->ControlCompTypeNum,
                               this->CompErrIndex,
                               _,
-                              SysOutletNode,
+                              this->ReheatAirOutNodeNum,
                               MassFlow,
                               _,
                               _,
@@ -4097,7 +4096,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                                       this->ControlCompTypeNum,
                                       this->CompErrIndex,
                                       ZoneNodeNum,
-                                      SysOutletNode); // why not QZnReq  ?
+                                      this->ReheatAirOutNodeNum); // why not QZnReq  ?
                     // air flow controller, not on plant, don't pass plant topology info
                     // reset terminal unit inlet air mass flow to new value.
                     outNode->MassFlowRateMaxAvail = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;
@@ -4128,7 +4127,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                                           this->ControlCompTypeNum,
                                           this->CompErrIndex,
                                           _,
-                                          SysOutletNode,
+                                          this->ReheatAirOutNodeNum,
                                           MassFlow,
                                           _,
                                           _,
