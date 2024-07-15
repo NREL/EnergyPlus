@@ -43,7 +43,7 @@ In this example, the parameter \$insDepth is used in the \hyperref[material]{Mat
 
 A new IDF file is created for each of these simulations and is named the original name of the file plus either a number or a user defined suffix (if \hyperref[parametricfilenamesuffix]{Parametric:FileNameSuffix} is used). Looking at how these created IDF files show the substituted values can help understand problems that may occur.
 
-The `` = \$insDepth'' is a simple substation but could also be a more complex expression involving operators and predefined functions such as
+The `` = \$insDepth'' is a simple substitution but could also be a more complex expression involving operators and predefined functions such as
 
 ~ = \$insDepth * 1.1 + 0.0004 * SQRT(12)
 
@@ -51,7 +51,7 @@ Many sets of simulations can be defined just using different \hyperref[parametri
 
 \subsection{Expressions}\label{expressions}
 
-Expressions can occur anywhere in the IDF file as a field value if the expression begins with an equals sign ( = ) and can also occur in assignment statements in the \hyperref[parametriclogic]{Parametric:Logic} object. The operators include: +, -, *, /, \^{} (exponent), \&\& (and), \textbar{}\textbar{} (or), = = , \textgreater{}, \textless{}, \textless{} = , \textgreater{} = ,~ \textless{}\textgreater{}, and //. These are computed using standard operator precedence rules. The parenthesis are used to execute sub-expressions with higher precedence. Some built in functions, such as ABS, ACOS, ASIN, ATAN, COS, EXP, INT, LEN, LOG, MOD, NOT, SIN, SQRT, TAN are supported in expressions. Theses built in functions all take a single argument.
+Expressions can occur anywhere in the IDF file as a field value if the expression begins with an equals sign ( = ) and can also occur in assignment statements in the \hyperref[parametriclogic]{Parametric:Logic} object. The operators include: +, -, *, /, \^{} (exponent), \&\& (and), \textbar{}\textbar{} (or), = = , \textgreater{}, \textless{}, \textless{} = , \textgreater{} = ,~ \textless{}\textgreater{}, and //. These are computed using standard operator precedence rules. The parenthesis are used to execute sub-expressions with higher precedence. Some built in functions, such as ABS, ACOS, ASIN, ATAN, COS, EXP, INT, LEN, LOG, MOD, NOT, SIN, SQRT, TAN are supported in expressions. These built-in functions all take a single argument.
 
 \subsection{Processing Order}\label{processing-order}
 
@@ -97,7 +97,7 @@ The name of the parameter. It must begin with the dollar sign character, and the
 
 \paragraph{Field: Value for run n}\label{field-value-for-run-n}
 
-The value that should be substituted for the parameter on the n-th simulation. If multiple Parametric:SetValueForRun objects exist and they have different number of fields, the last field value will be used for the remaining field values. This means that to set all values the same, only the first value needed to be entered.
+The value that should be substituted for the parameter on the n-th simulation. If multiple Parametric:SetValueForRun objects exist and they have different number of fields, the last field value will be used for the remaining field values. This means that to set all values the same, only the first value needs to be entered.
 
 \subsection{Parametric:Logic}\label{parametriclogic}
 

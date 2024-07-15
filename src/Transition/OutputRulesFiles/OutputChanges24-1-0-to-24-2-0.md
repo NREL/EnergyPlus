@@ -39,11 +39,41 @@ with
 
 These changes will also make corresponding changes in the HTML Intialization Summary report
 
+
 ### Adding an Output:Variable, Zone/Space Wetbulb Globe Temperature
 
 An output variable will be added at both zone and space level: Zone Wetbulb Globe Temperature, and Space Wetbulb Globe
 Temperature
 
+
+### EIO DX Heating Coil Standard Rating Information 
+
+The EIO and html tabular output files now have a seprate heading and data stream for DX Heating Coils with the AHRI 2023 and prior versions.
+
+! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number
+! <DX Heating Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF2 {Btu/W-h}, Region Number
+
+
+### Euipment Summary Report 
+
+Renamed a table name in the Equipment Summary report:
+
+- from "DX Heating Coils [ HSPF2 ]" 
+- to   "DX Heating Coils AHRI 2023"
+
+Added two new columnuns to the named `DX Heating Coils AHRI 2023` table to make it equivalent to an exiting `DX Heating Coils` table. 
+
+New columns header added:
+
+- "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation [C]"
+- "AirLoop Name"
+
+Renamed a column header by adding units to the `DX Heating Coils` table:
+
+- from "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation"
+- to   "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation [C]"
+
+  
 ### Update Headers in EIO and existing tabular reports for Equipment Ratings
 
 EIO updated for the following:
@@ -62,3 +92,31 @@ See Pull Request [#10311](https://github.com/NREL/EnergyPlus/pull/10311) for mor
 EXTRA NOTE: As a follow-up to this work, the EIO/tabular ratings tables were cleaned up to avoid duplicated table names and mismatches between the word Rating and Rated.
 More information can be found in PR [#10597](https://github.com/NREL/EnergyPlus/pull/10597)
  
+ 
+### EnvelopeSummary in Tabular Reports
+
+In the Opaque Exterior table added �Zone� column
+
+Add an entirely new table called Opaque Construction Layers which shows the layers of materials for each construction
+
+
+###	EquipmentSummary in Tabular Reports
+
+In the DX Heating Coils table added "Supplemental Heat High Shutoff Temperature�
+
+In the Fans table added "Motor Loss Zone Name"
+
+Added an entirely new table called Air Terminals
+
+
+###	SystemSummary in Tabular Reports
+
+In the Demand Controlled Ventilation table added the "type"
+
+Added an entirely new table called Thermostat Schedules
+
+## New HVAC Topology report in Tabular Reports
+
+The HVAC Topology report provides information about the arrangement of HVAC components in the supply and demand side of the airloop, zone equipment, and plant loop. Each row shows the additional component, sub-component, or sub-sub-component being added to the arrangement. 
+
+
