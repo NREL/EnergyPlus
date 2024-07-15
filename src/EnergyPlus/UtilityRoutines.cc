@@ -888,17 +888,25 @@ void emitErrorMessages(EnergyPlusData &state, int idOne, std::initializer_list<s
         }
     }
 }
-void emitWarningMessage(EnergyPlusData &state, int idOne, std::string const &msg)
+void emitWarningMessage(EnergyPlusData &state, int idOne, std::string const &msg, bool const countAsError)
 {
     (void)idOne;
-    ShowWarningMessage(state, msg);
+    if (countAsError) { // ideally this path goes away and we just have distinct warnings and errors
+        ShowWarningError(state, msg);
+    } else {
+        ShowWarningMessage(state, msg);
+    }
 }
-void emitWarningMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs)
+void emitWarningMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs, bool const countAsError)
 {
     (void)idOne;
     for (auto msg = msgs.begin(); msg != msgs.end(); ++msg) {
         if (msg == msgs.begin()) {
-            ShowWarningMessage(state, *msg);
+            if (countAsError) { // ideally this path goes away and we just have distinct warnings and errors
+                ShowWarningError(state, *msg);
+            } else {
+                ShowWarningMessage(state, *msg);
+            }
         } else {
             ShowContinueError(state, *msg);
         }

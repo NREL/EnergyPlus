@@ -134,8 +134,8 @@ using OptionalOutputFileRef = std::optional<std::reference_wrapper<EnergyPlus::I
 
 void emitErrorMessage(EnergyPlusData &state, int idOne, std::string const &msg, bool shouldFatal);
 void emitErrorMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs, bool shouldFatal);
-void emitWarningMessage(EnergyPlusData &state, int idOne, std::string const &msg);
-void emitWarningMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs);
+void emitWarningMessage(EnergyPlusData &state, int idOne, std::string const &msg, bool countAsError = false);
+void emitWarningMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs, bool countAsError = false);
 
 void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {});
 
