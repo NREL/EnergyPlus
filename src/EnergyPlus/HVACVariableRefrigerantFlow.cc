@@ -9620,7 +9620,8 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
         }
     }
     // calculate sensible load met using delta enthalpy
-    Real64 TotalOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(TempOut, SpecHumOut) - Psychrometrics::PsyHFnTdbW(TempIn, SpecHumIn)); // total addition/removal rate, {W};
+    Real64 TotalOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(TempOut, SpecHumOut) -
+                                        Psychrometrics::PsyHFnTdbW(TempIn, SpecHumIn));         // total addition/removal rate, {W};
     LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
     LatentLoadMet = TotalOutput - LoadMet;
     if (present(LatOutputProvided)) {
@@ -12917,7 +12918,8 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         }
     }
     // calculate sensible load met using delta enthalpy
-    Real64 TotalOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(TempOut, SpecHumOut) - Psychrometrics::PsyHFnTdbW(TempIn, SpecHumIn)); // total addition/removal rate, {W};
+    Real64 TotalOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(TempOut, SpecHumOut) -
+                                        Psychrometrics::PsyHFnTdbW(TempIn, SpecHumIn));         // total addition/removal rate, {W};
     LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
     LatentLoadMet = TotalOutput - LoadMet;
     if (present(LatOutputProvided)) {
