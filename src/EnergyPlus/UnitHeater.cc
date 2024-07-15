@@ -1894,21 +1894,20 @@ namespace UnitHeater {
         }
     }
 
-    int getUnitHeaterIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
+    int getUnitHeaterIndex(EnergyPlusData &state, std::string_view CompName)
     {
         if (state.dataUnitHeaters->GetUnitHeaterInputFlag) {
             GetUnitHeaterInput(state);
             state.dataUnitHeaters->GetUnitHeaterInputFlag = false;
         }
-        int EquipIndex = 0;
+
         for (int UnitHeatNum = 1; UnitHeatNum <= state.dataUnitHeaters->NumOfUnitHeats; ++UnitHeatNum) {
             if (Util::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name, CompName)) {
-                EquipIndex = UnitHeatNum;
+                return UnitHeatNum;
             }
         }
 
-        if (EquipIndex == 0) errFlag = true;
-        return EquipIndex;
+        return 0;
     }
 
 } // namespace UnitHeater

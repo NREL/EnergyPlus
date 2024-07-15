@@ -974,7 +974,7 @@ namespace HVACVariableRefrigerantFlow {
                                    Real64 const T_suc // Compressor suction temperature Te' [C]
     );
 
-    int getEqIndex(EnergyPlusData &state, std::string_view VRFTUName, bool &errFlag);
+    int getEqIndex(EnergyPlusData &state, std::string_view VRFTUName);
 
 } // namespace HVACVariableRefrigerantFlow
 

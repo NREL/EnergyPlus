@@ -383,7 +383,7 @@ namespace VentilatedSlab {
 
     void ReportVentilatedSlab(EnergyPlusData &state, int const Item); // Index for the ventilated slab under consideration within the derived types
 
-    int getVentilatedSlabIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag);
+    int getVentilatedSlabIndex(EnergyPlusData &state, std::string_view CompName);
     //*****************************************************************************************
 
 } // namespace VentilatedSlab

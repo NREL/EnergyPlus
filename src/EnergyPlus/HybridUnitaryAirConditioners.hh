@@ -98,7 +98,7 @@ namespace HybridUnitaryAirConditioners {
 
     int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int UnitNum);
 
-    int getHybridUnitaryACIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag);
+    int getHybridUnitaryACIndex(EnergyPlusData &state, std::string_view CompName);
 
 } // namespace HybridUnitaryAirConditioners
 

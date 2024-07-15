@@ -3365,21 +3365,19 @@ namespace UnitVentilator {
         return GetUnitVentilatorReturnAirNode;
     }
 
-    int getUnitVentilatorIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
+    int getUnitVentilatorIndex(EnergyPlusData &state, std::string_view CompName)
     {
         if (state.dataUnitVentilators->GetUnitVentilatorInputFlag) {
             GetUnitVentilatorInput(state);
             state.dataUnitVentilators->GetUnitVentilatorInputFlag = false;
         }
-        int EquipIndex = 0;
         for (int UnitVentNum = 1; UnitVentNum <= state.dataUnitVentilators->NumOfUnitVents; ++UnitVentNum) {
             if (Util::SameString(state.dataUnitVentilators->UnitVent(UnitVentNum).Name, CompName)) {
-                EquipIndex = UnitVentNum;
+                return UnitVentNum;
             }
         }
 
-        if (EquipIndex == 0) errFlag = true;
-        return EquipIndex;
+        return 0;
     }
 
     Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state,

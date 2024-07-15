@@ -380,7 +380,7 @@ namespace FanCoilUnits {
                                               int WaterControlNode,
                                               Real64 MinWaterFlow);
 
-    int getEqIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag);
+    int getEqIndex(EnergyPlusData &state, std::string_view CompName);
 } // namespace FanCoilUnits
 
 struct FanCoilUnitsData : BaseGlobalStruct

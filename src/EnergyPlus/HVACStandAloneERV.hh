@@ -186,7 +186,7 @@ namespace HVACStandAloneERV {
 
     bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int NodeNumber);
 
-    int getEqIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag);
+    int getEqIndex(EnergyPlusData &state, std::string_view CompName);
 
 } // namespace HVACStandAloneERV
 

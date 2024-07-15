@@ -969,7 +969,6 @@ namespace UnitarySystems {
     int getZoneEqIndex(EnergyPlusData &state,
                        std::string const &UnitarySysName,
                        DataZoneEquipment::ZoneEquipType zoneEquipType,
-                       bool &errFlag,
                        int const OAUnitNum = 0);
 
 } // namespace UnitarySystems

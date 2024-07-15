@@ -1685,23 +1685,20 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
     return false;
 }
 
-int getEqIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
+int getEqIndex(EnergyPlusData &state, std::string_view CompName)
 {
     if (state.dataHVACStandAloneERV->GetERVInputFlag) {
         GetStandAloneERV(state);
         state.dataHVACStandAloneERV->GetERVInputFlag = false;
     }
 
-    int EqIndex = 0;
-
     for (int StandAloneERVNum = 1; StandAloneERVNum <= state.dataHVACStandAloneERV->NumStandAloneERVs; StandAloneERVNum++) {
         if (Util::SameString(CompName, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name)) {
-            EqIndex = StandAloneERVNum;
+            return StandAloneERVNum;
             break;
         }
     }
-    if (EqIndex == 0) errFlag = true;
-    return EqIndex;
+    return 0;
 }
 
 } // namespace EnergyPlus::HVACStandAloneERV

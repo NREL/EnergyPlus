@@ -4419,23 +4419,21 @@ namespace FanCoilUnits {
         }
     }
 
-    int getEqIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
+    int getEqIndex(EnergyPlusData &state, std::string_view CompName)
     {
         if (state.dataFanCoilUnits->GetFanCoilInputFlag) {
             GetFanCoilUnits(state);
             state.dataFanCoilUnits->GetFanCoilInputFlag = false;
         }
 
-        int EquipIndex = 0;
         for (int FanCoilIndex = 1; FanCoilIndex <= state.dataFanCoilUnits->NumFanCoils; ++FanCoilIndex) {
             auto &fanCoil = state.dataFanCoilUnits->FanCoil(FanCoilIndex);
             if (Util::SameString(fanCoil.Name, CompName)) {
-                EquipIndex = FanCoilIndex;
+                return FanCoilIndex;
             }
         }
 
-        if (EquipIndex == 0) errFlag = true;
-        return EquipIndex;
+        return 0;
     }
 
 } // namespace FanCoilUnits

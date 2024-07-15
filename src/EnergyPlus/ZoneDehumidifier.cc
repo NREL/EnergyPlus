@@ -1179,22 +1179,20 @@ namespace ZoneDehumidifier {
         return FindZoneDehumidifierNodeNumber;
     }
 
-    int getZoneDehumidifierIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
+    int getZoneDehumidifierIndex(EnergyPlusData &state, std::string_view CompName)
     {
         if (state.dataZoneDehumidifier->GetInputFlag) {
             GetZoneDehumidifierInput(state);
             state.dataZoneDehumidifier->GetInputFlag = false;
         }
 
-        int EquipIndex = 0;
         for (int ZoneDehumidNum = 1; ZoneDehumidNum <= (int)state.dataZoneDehumidifier->ZoneDehumid.size(); ++ZoneDehumidNum) {
             if (Util::SameString(state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidNum).Name, CompName)) {
-                EquipIndex = ZoneDehumidNum;
+                return ZoneDehumidNum;
             }
         }
 
-        if (EquipIndex == 0) errFlag = true;
-        return EquipIndex;
+        return 0;
     }
 
 } // namespace ZoneDehumidifier
