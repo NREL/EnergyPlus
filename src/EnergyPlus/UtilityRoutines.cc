@@ -866,31 +866,35 @@ bool env_var_on(std::string const &env_var_str)
     return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
 }
 
-void emitErrorMessage(EnergyPlusData &state, int idOne, std::string const &msg, bool shouldFatal) {
+void emitErrorMessage(EnergyPlusData &state, int idOne, std::string const &msg, bool shouldFatal)
+{
     (void)idOne;
     if (!shouldFatal) {
         ShowSevereError(state, msg);
-    } else {  // should fatal
+    } else { // should fatal
         ShowFatalError(state, msg);
     }
 }
-void emitErrorMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs, bool shouldFatal) {
+void emitErrorMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs, bool shouldFatal)
+{
     (void)idOne;
     for (auto msg = msgs.begin(); msg != msgs.end(); ++msg) {
         if (msg == msgs.begin()) {
             ShowSevereError(state, *msg);
         } else if (std::next(msg) == msgs.end() && shouldFatal) {
             ShowFatalError(state, *msg);
-        } else {  // should be an intermediate message, or a final one where there is no fatal
+        } else { // should be an intermediate message, or a final one where there is no fatal
             ShowContinueError(state, *msg);
         }
     }
 }
-void emitWarningMessage(EnergyPlusData &state, int idOne, std::string const &msg) {
+void emitWarningMessage(EnergyPlusData &state, int idOne, std::string const &msg)
+{
     (void)idOne;
     ShowWarningMessage(state, msg);
 }
-void emitWarningMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs) {
+void emitWarningMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs)
+{
     (void)idOne;
     for (auto msg = msgs.begin(); msg != msgs.end(); ++msg) {
         if (msg == msgs.begin()) {
