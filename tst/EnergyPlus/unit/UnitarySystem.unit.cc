@@ -24186,7 +24186,7 @@ TEST_F(ZoneUnitarySysTest, ZeroCoolingSpeedTest)
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     bool ErrorsFound(false);
     std::string compName = "SYS 1 FURNACE DX COOL UNITARY SYSTEM";
-    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     auto thisSys = &state->dataUnitarySystems->unitarySys[0];
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound);
 
@@ -24205,7 +24205,7 @@ TEST_F(ZoneUnitarySysTest, ZeroCoolingSpeedTest)
 
     Real64 OnOffAirFlowRatio(1.0);
     Real64 CoilCoolHeatRat(1.0);
-    DataHVACGlobals::CompressorOperation CompressorOn(DataHVACGlobals::CompressorOperation::On);
+    HVAC::CompressorOp CompressorOn(HVAC::CompressorOp::On);
     thisSys->m_CoolingSpeedNum = 0;
     thisSys->m_SingleMode = 0;
     thisSys->m_CoolingPartLoadFrac = 0.5;
