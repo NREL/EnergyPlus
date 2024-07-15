@@ -85,14 +85,14 @@ struct CoilCoolingDX
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data);
     void oneTimeInit(EnergyPlusData &state);
     void simulate(EnergyPlusData &state,
-                  int useAlternateMode,
+                  HVAC::CoilMode coilMode,
                   Real64 PLR,
                   int speedNum,
                   Real64 speedRatio,
-                  int const fanOpMode,
+                  HVAC::FanOp const fanOp,
                   bool const singleMode,
                   Real64 LoadSHR = -1.0);
-    void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
+    void setData(int fanIndex, HVAC::FanType fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
                       int &evapOutletNodeIndex,
                       int &condInletNodeIndex,
@@ -107,8 +107,8 @@ struct CoilCoolingDX
     void size(EnergyPlusData &state);
 
     int getNumModes();
-    int getOpModeCapFTIndex(bool useAlternateMode = false);
-    Real64 condMassFlowRate(bool useAlternateMode);
+    int getOpModeCapFTIndex(HVAC::CoilMode mode = HVAC::CoilMode::Normal);
+    Real64 condMassFlowRate(HVAC::CoilMode mode);
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;
@@ -131,7 +131,7 @@ struct CoilCoolingDX
     Real64 evapCondPumpElecConsumption = 0.0;
     int airLoopNum = 0; // Add for AFN compatibility, revisit at a later date
     int supplyFanIndex = 0;
-    int supplyFanType = 0;
+    HVAC::FanType supplyFanType = HVAC::FanType::Invalid;
     std::string supplyFanName = "";
     bool SubcoolReheatFlag = false; // Subcool reheat coil control
 
@@ -164,7 +164,7 @@ struct CoilCoolingDX
     Real64 recoveredHeatEnergy = 0.0;
     Real64 recoveredHeatEnergyRate = 0.0;
     Real64 condenserInletTemperature = 0.0;
-    int dehumidificationMode = 0;
+    HVAC::CoilMode dehumidificationMode = HVAC::CoilMode::Normal;
     bool reportCoilFinalSizes = true;
     bool isSecondaryDXCoilInZone = false;
     Real64 secCoilSensHeatRejEnergyRate = 0.0;
@@ -181,6 +181,10 @@ struct CoilCoolingDXData : BaseGlobalStruct
     bool coilCoolingDXGetInputFlag = true;
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
     bool stillNeedToReportStandardRatings = true; // standard ratings flag for all coils to report at the same time
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         coilCoolingDXs.clear();

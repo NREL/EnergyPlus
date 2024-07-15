@@ -80,7 +80,7 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
             } else {
-                switch (this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::CoolingAirflowSizing)) {
+                switch (this->zoneEqSizing(this->curZoneEqNum).SizingMethod(HVAC::CoolingAirflowSizing)) {
                 case DataSizing::SupplyAirFlowRate:
                 case DataSizing::None:
                 case DataSizing::FlowPerFloorArea: {
@@ -304,13 +304,13 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                     } else if (this->unitarySysEqSizing(this->curSysNum).CoolingAirFlow) {
                         this->autoSizedValue = this->unitarySysEqSizing(this->curSysNum).CoolingAirVolFlow;
                     } else {
-                        if (this->curDuctType == DataHVACGlobals::AirDuctType::Main) {
+                        if (this->curDuctType == HVAC::AirDuctType::Main) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
-                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Cooling) {
+                        } else if (this->curDuctType == HVAC::AirDuctType::Cooling) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
-                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Heating) {
+                        } else if (this->curDuctType == HVAC::AirDuctType::Heating) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
-                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Other) {
+                        } else if (this->curDuctType == HVAC::AirDuctType::Other) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                         } else {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
@@ -337,7 +337,7 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             if (Util::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
                 this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
                 if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
-            } else if (this->coilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
+            } else if (this->coilType_Num == HVAC::CoilDX_CoolingTwoSpeed) {
                 if (this->dataDXSpeedNum == 1) { // mode 1 is high speed in DXCoils loop
                     if (this->isEpJSON) {
                         this->sizingString = "high_speed_rated_air_flow_rate [m3/s]";

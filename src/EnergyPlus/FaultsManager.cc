@@ -223,7 +223,7 @@ namespace FaultsManager {
 
         // METHODOLOGY EMPLOYED:
         // Get number of faults-related input objects and assign faults input to data structure
-
+        static constexpr std::string_view routineName = "CheckAndReadFaults";
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetobjectItem call
         int NumNumbers; // Number of Numbers for each GetobjectItem call
@@ -338,36 +338,24 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            faultsECFouling.FaultType = cFaultCurrentObject;
-            faultsECFouling.FaultTypeEnum = Fault::Fouling_EvapCooler;
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            faultsECFouling.type = FaultType::Fouling_EvapCooler;
             faultsECFouling.Name = cAlphaArgs(1);
 
             // Fault availability schedule
-            faultsECFouling.AvaiSchedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                faultsECFouling.AvaiSchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsECFouling.AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
-                if (faultsECFouling.AvaiSchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsECFouling.availSchedNum = -1; // returns schedule value of 1
+            } else if ((faultsECFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Fault severity schedule
-            faultsECFouling.SeveritySchedule = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                faultsECFouling.SeveritySchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsECFouling.SeveritySchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
-                if (faultsECFouling.SeveritySchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsECFouling.severitySchedNum = -1; // returns schedule value of 1
+            } else if ((faultsECFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // CapReductionFactor - degree of fault
@@ -431,36 +419,24 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            faultsChillerFouling.FaultType = cFaultCurrentObject;
-            faultsChillerFouling.FaultTypeEnum = Fault::Fouling_Chiller;
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            faultsChillerFouling.type = FaultType::Fouling_Chiller;
             faultsChillerFouling.Name = cAlphaArgs(1);
 
             // Fault availability schedule
-            faultsChillerFouling.AvaiSchedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                faultsChillerFouling.AvaiSchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsChillerFouling.AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
-                if (faultsChillerFouling.AvaiSchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsChillerFouling.availSchedNum = -1; // returns schedule value of 1
+            } else if ((faultsChillerFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Fault severity schedule
-            faultsChillerFouling.SeveritySchedule = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                faultsChillerFouling.SeveritySchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsChillerFouling.SeveritySchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
-                if (faultsChillerFouling.SeveritySchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsChillerFouling.severitySchedNum = -1; // returns schedule value of 1
+            } else if ((faultsChillerFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // CapReductionFactor - degree of fault
@@ -711,36 +687,24 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            faultsBoilerFouling.FaultType = cFaultCurrentObject;
-            faultsBoilerFouling.FaultTypeEnum = Fault::Fouling_Boiler;
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            faultsBoilerFouling.type = FaultType::Fouling_Boiler;
             faultsBoilerFouling.Name = cAlphaArgs(1);
 
             // Fault availability schedule
-            faultsBoilerFouling.AvaiSchedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                faultsBoilerFouling.AvaiSchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsBoilerFouling.AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
-                if (faultsBoilerFouling.AvaiSchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsBoilerFouling.availSchedNum = -1; // returns schedule value of 1
+            } else if ((faultsBoilerFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Fault severity schedule
-            faultsBoilerFouling.SeveritySchedule = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                faultsBoilerFouling.SeveritySchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsBoilerFouling.SeveritySchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
-                if (faultsBoilerFouling.SeveritySchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsBoilerFouling.severitySchedNum = -1; // returns schedule value of 1
+            } else if ((faultsBoilerFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // CapReductionFactor - degree of fault
@@ -801,36 +765,24 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            faultsCoilSATFouling.FaultType = cFaultCurrentObject;
-            faultsCoilSATFouling.FaultTypeEnum = Fault::TemperatureSensorOffset_CoilSupplyAir;
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            faultsCoilSATFouling.type = FaultType::TemperatureSensorOffset_CoilSupplyAir;
             faultsCoilSATFouling.Name = cAlphaArgs(1);
 
             // Fault availability schedule
-            faultsCoilSATFouling.AvaiSchedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                faultsCoilSATFouling.AvaiSchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsCoilSATFouling.AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
-                if (faultsCoilSATFouling.AvaiSchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsCoilSATFouling.availSchedNum = -1; // returns schedule value of 1
+            } else if ((faultsCoilSATFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Fault severity schedule
-            faultsCoilSATFouling.SeveritySchedule = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                faultsCoilSATFouling.SeveritySchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsCoilSATFouling.SeveritySchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
-                if (faultsCoilSATFouling.SeveritySchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsCoilSATFouling.severitySchedNum = -1; // returns schedule value of 1
+            } else if ((faultsCoilSATFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // offset - degree of fault
@@ -1033,36 +985,24 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            faultsTowerFouling.FaultType = cFaultCurrentObject;
-            faultsTowerFouling.FaultTypeEnum = Fault::Fouling_Tower;
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            faultsTowerFouling.type = FaultType::Fouling_Tower;
             faultsTowerFouling.Name = cAlphaArgs(1);
 
             // Fault availability schedule
-            faultsTowerFouling.AvaiSchedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                faultsTowerFouling.AvaiSchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsTowerFouling.AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
-                if (faultsTowerFouling.AvaiSchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsTowerFouling.availSchedNum = -1; // returns schedule value of 1
+            } else if ((faultsTowerFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Fault severity schedule
-            faultsTowerFouling.SeveritySchedule = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                faultsTowerFouling.SeveritySchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsTowerFouling.SeveritySchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
-                if (faultsTowerFouling.SeveritySchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsTowerFouling.severitySchedNum = -1; // returns schedule value of 1
+            } else if ((faultsTowerFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // UAReductionFactor - degree of fault
@@ -1153,36 +1093,24 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            faultsCondSWTFouling.FaultType = cFaultCurrentObject;
-            faultsCondSWTFouling.FaultTypeEnum = Fault::TemperatureSensorOffset_CondenserSupplyWater;
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            faultsCondSWTFouling.type = FaultType::TemperatureSensorOffset_CondenserSupplyWater;
             faultsCondSWTFouling.Name = cAlphaArgs(1);
 
             // Fault availability schedule
-            faultsCondSWTFouling.AvaiSchedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                faultsCondSWTFouling.AvaiSchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsCondSWTFouling.AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
-                if (faultsCondSWTFouling.AvaiSchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsCondSWTFouling.availSchedNum = -1; // returns schedule value of 1
+            } else if ((faultsCondSWTFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Fault severity schedule
-            faultsCondSWTFouling.SeveritySchedule = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                faultsCondSWTFouling.SeveritySchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsCondSWTFouling.SeveritySchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
-                if (faultsCondSWTFouling.SeveritySchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsCondSWTFouling.severitySchedNum = -1; // returns schedule value of 1
+            } else if ((faultsCondSWTFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // offset - degree of fault
@@ -1258,36 +1186,24 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            faultsChillerSWT.FaultType = cFaultCurrentObject;
-            faultsChillerSWT.FaultTypeEnum = Fault::TemperatureSensorOffset_ChillerSupplyWater;
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            faultsChillerSWT.type = FaultType::TemperatureSensorOffset_ChillerSupplyWater;
             faultsChillerSWT.Name = cAlphaArgs(1);
 
             // Fault availability schedule
-            faultsChillerSWT.AvaiSchedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                faultsChillerSWT.AvaiSchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsChillerSWT.AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
-                if (faultsChillerSWT.AvaiSchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsChillerSWT.availSchedNum = -1; // returns schedule value of 1
+            } else if ((faultsChillerSWT.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Fault severity schedule
-            faultsChillerSWT.SeveritySchedule = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                faultsChillerSWT.SeveritySchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsChillerSWT.SeveritySchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
-                if (faultsChillerSWT.SeveritySchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsChillerSWT.severitySchedNum = -1; // returns schedule value of 1
+            } else if ((faultsChillerSWT.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // offset - degree of fault
@@ -1498,65 +1414,51 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            faultsAirFilter.FaultType = cFaultCurrentObject;
-            faultsAirFilter.FaultTypeEnum = Fault::Fouling_AirFilter;
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            faultsAirFilter.type = FaultType::Fouling_AirFilter;
             faultsAirFilter.Name = cAlphaArgs(1);
 
             // Information of the fan associated with the fouling air filter
-            faultsAirFilter.FaultyAirFilterFanType = cAlphaArgs(2);
-            faultsAirFilter.FaultyAirFilterFanName = cAlphaArgs(3);
-
-            // Check whether the specified fan exists in the fan list
-            if (Util::FindItemInList(cAlphaArgs(3), state.dataFans->Fan, &Fans::FanEquipConditions::FanName) <= 0) {
-                ShowSevereError(
-                    state,
-                    format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
+            faultsAirFilter.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, cAlphaArgs(2)));
+            if (faultsAirFilter.fanType == HVAC::FanType::SystemModel) {
+                ShowSevereError(state, "Fault:AirFilter cannot be applied to a Fan:SystemModel object");
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
-            // Assign fault index to the fan object
-            for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
-                if (Util::SameString(state.dataFans->Fan(FanNum).FanName, cAlphaArgs(3))) {
-                    state.dataFans->Fan(FanNum).FaultyFilterFlag = true;
-                    state.dataFans->Fan(FanNum).FaultyFilterIndex = jFault_AirFilter;
-                    break;
-                }
+            faultsAirFilter.fanName = cAlphaArgs(3);
+
+            // Check whether the specified fan exists in the fan list
+            if ((faultsAirFilter.fanNum = Fans::GetFanIndex(state, cAlphaArgs(3))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
+                state.dataFaultsMgr->ErrorsFound = true;
+            } else {
+                auto *fanComp = dynamic_cast<Fans::FanComponent *>(state.dataFans->fans(faultsAirFilter.fanNum));
+                assert(fanComp != nullptr);
+
+                fanComp->faultyFilterFlag = true;
+                fanComp->faultyFilterIndex = jFault_AirFilter;
             }
 
             // Fault availability schedule
-            faultsAirFilter.AvaiSchedule = cAlphaArgs(4);
             if (lAlphaFieldBlanks(4)) {
-                faultsAirFilter.AvaiSchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsAirFilter.AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4));
-                if (faultsAirFilter.AvaiSchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsAirFilter.availSchedNum = -1; // returns schedule value of 1
+            } else if ((faultsAirFilter.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(4), cAlphaArgs(4));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Fan pressure increase fraction schedule
-            faultsAirFilter.FaultyAirFilterPressFracSche = cAlphaArgs(5);
             if (lAlphaFieldBlanks(5)) {
-                faultsAirFilter.FaultyAirFilterPressFracSchePtr = -1; // returns schedule value of 1
-            } else {
-                faultsAirFilter.FaultyAirFilterPressFracSchePtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5));
-                if (faultsAirFilter.FaultyAirFilterPressFracSchePtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsAirFilter.pressFracSchedNum = -1; // returns schedule value of 1
+            } else if ((faultsAirFilter.pressFracSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(5), cAlphaArgs(5));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Fan curve describing the relationship between fan pressure rise and air flow rate
-            faultsAirFilter.FaultyAirFilterFanCurve = cAlphaArgs(6);
-            faultsAirFilter.FaultyAirFilterFanCurvePtr = Curve::GetCurveIndex(state, cAlphaArgs(6));
-            if (faultsAirFilter.FaultyAirFilterFanCurvePtr == 0) {
-                ShowSevereError(state, format("{} = \"{}\"", cFaultCurrentObject, cAlphaArgs(1)));
-                ShowContinueError(state, format("Invalid {} = \"{}\" not found.", cAlphaFieldNames(6), cAlphaArgs(6)));
+
+            if ((faultsAirFilter.fanCurveNum = Curve::GetCurveIndex(state, cAlphaArgs(6))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(6), cAlphaArgs(6));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
@@ -1584,8 +1486,8 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            faultsHStat.FaultType = cFaultCurrentObject;
-            faultsHStat.FaultTypeEnum = Fault::HumidistatOffset;
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            faultsHStat.type = FaultType::HumidistatOffset;
             faultsHStat.Name = cAlphaArgs(1);
             faultsHStat.FaultyHumidistatName = cAlphaArgs(2);
             faultsHStat.FaultyHumidistatType = cAlphaArgs(3);
@@ -1609,37 +1511,19 @@ namespace FaultsManager {
                 // For Humidistat Offset Type: ThermostatOffsetIndependent
 
                 // Availability schedule
-                faultsHStat.AvaiSchedule = cAlphaArgs(4);
                 if (lAlphaFieldBlanks(4)) {
-                    faultsHStat.AvaiSchedPtr = -1; // returns schedule value of 1
-                } else {
-                    faultsHStat.AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4));
-                    if (faultsHStat.AvaiSchedPtr == 0) {
-                        ShowSevereError(state,
-                                        format("{} = \"{}\" invalid {} = \"{}\" not found.",
-                                               cFaultCurrentObject,
-                                               cAlphaArgs(1),
-                                               cAlphaFieldNames(4),
-                                               cAlphaArgs(4)));
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    }
+                    faultsHStat.availSchedNum = -1; // returns schedule value of 1
+                } else if ((faultsHStat.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4))) == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(4), cAlphaArgs(4));
+                    state.dataFaultsMgr->ErrorsFound = true;
                 }
 
                 // Severity schedule
-                faultsHStat.SeveritySchedule = cAlphaArgs(5);
                 if (lAlphaFieldBlanks(5)) {
-                    faultsHStat.SeveritySchedPtr = -1; // returns schedule value of 1
-                } else {
-                    faultsHStat.SeveritySchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5));
-                    if (faultsHStat.SeveritySchedPtr == 0) {
-                        ShowSevereError(state,
-                                        format("{} = \"{}\" invalid {} = \"{}\" not found.",
-                                               cFaultCurrentObject,
-                                               cAlphaArgs(1),
-                                               cAlphaFieldNames(5),
-                                               cAlphaArgs(5)));
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    }
+                    faultsHStat.severitySchedNum = -1; // returns schedule value of 1
+                } else if ((faultsHStat.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5))) == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(5), cAlphaArgs(5));
+                    state.dataFaultsMgr->ErrorsFound = true;
                 }
 
                 // Reference offset value is required for Humidistat Offset Type: ThermostatOffsetIndependent
@@ -1674,37 +1558,25 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            faultsTStat.FaultType = cFaultCurrentObject;
-            faultsTStat.FaultTypeEnum = Fault::ThermostatOffset;
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            faultsTStat.type = FaultType::ThermostatOffset;
             faultsTStat.Name = cAlphaArgs(1);
             faultsTStat.FaultyThermostatName = cAlphaArgs(2);
 
             // Availability schedule
-            faultsTStat.AvaiSchedule = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                faultsTStat.AvaiSchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsTStat.AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
-                if (faultsTStat.AvaiSchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsTStat.availSchedNum = -1; // returns schedule value of 1
+            } else if ((faultsTStat.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Severity schedule
-            faultsTStat.SeveritySchedule = cAlphaArgs(4);
             if (lAlphaFieldBlanks(4)) {
-                faultsTStat.SeveritySchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsTStat.SeveritySchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4));
-                if (faultsTStat.SeveritySchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsTStat.severitySchedNum = -1; // returns schedule value of 1
+            } else if ((faultsTStat.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(4), cAlphaArgs(4));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Reference offset value is required
@@ -1734,37 +1606,25 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            faultsFoulCoil.FaultType = cFaultCurrentObject;
-            faultsFoulCoil.FaultTypeEnum = Fault::Fouling_Coil;
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            faultsFoulCoil.type = FaultType::Fouling_Coil;
             faultsFoulCoil.Name = cAlphaArgs(1);
             faultsFoulCoil.FouledCoilName = cAlphaArgs(2);
 
             // Availability schedule
-            faultsFoulCoil.AvaiSchedule = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                faultsFoulCoil.AvaiSchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsFoulCoil.AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
-                if (faultsFoulCoil.AvaiSchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsFoulCoil.availSchedNum = -1; // returns schedule value of 1
+            } else if ((faultsFoulCoil.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Severity schedule
-            faultsFoulCoil.SeveritySchedule = cAlphaArgs(4);
             if (lAlphaFieldBlanks(4)) {
-                faultsFoulCoil.SeveritySchedPtr = -1; // returns schedule value of 1
-            } else {
-                faultsFoulCoil.SeveritySchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4));
-                if (faultsFoulCoil.SeveritySchedPtr == 0) {
-                    ShowSevereError(
-                        state,
-                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
-                    state.dataFaultsMgr->ErrorsFound = true;
-                }
+                faultsFoulCoil.severitySchedNum = -1; // returns schedule value of 1
+            } else if ((faultsFoulCoil.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4))) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(4), cAlphaArgs(4));
+                state.dataFaultsMgr->ErrorsFound = true;
             }
 
             faultsFoulCoil.FoulingInputMethod = static_cast<FouledCoil>(getEnumValue(FouledCoilNamesUC, Util::makeUPPER(cAlphaArgs(5))));
@@ -1810,8 +1670,8 @@ namespace FaultsManager {
                                             "Coil Fouling Factor",
                                             Constant::Units::K_W,
                                             state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFactor,
-                                            OutputProcessor::SOVTimeStepType::System,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::System,
+                                            OutputProcessor::StoreType::Average,
                                             state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                         // Coil:Cooling:Water doesn't report UA because it's not variable,
@@ -1821,48 +1681,48 @@ namespace FaultsManager {
                                                 "Cooling Coil Total U Factor Times Area Value",
                                                 Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil External U Factor Times Area Value",
                                                 Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil Internal U Factor Times Area Value",
                                                 Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil Total U Factor Times Area Value Before Fouling",
                                                 Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilVariable,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil External U Factor Times Area Value Before Fouling",
                                                 Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilExternal,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil Internal U Factor Times Area Value Before Fouling",
                                                 Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilInternal,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                         } else {
@@ -1870,8 +1730,8 @@ namespace FaultsManager {
                                                 "Heating Coil U Factor Times Area Value Before Fouling",
                                                 Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilVariable,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
                         }
                     } else {
@@ -1905,46 +1765,31 @@ namespace FaultsManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                ++j;
-                state.dataFaultsMgr->FaultsEconomizer(j).FaultType = cFaultCurrentObject;
-                state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum = static_cast<Fault>(i);
+                ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
 
-                state.dataFaultsMgr->FaultsEconomizer(j).Name = cAlphaArgs(1);
-                state.dataFaultsMgr->FaultsEconomizer(j).AvaiSchedule = cAlphaArgs(2);
+                ++j;
+                auto &fault = state.dataFaultsMgr->FaultsEconomizer(j);
+                fault.type = static_cast<FaultType>(i);
+
+                fault.Name = cAlphaArgs(1);
+
                 // check availability schedule
                 if (lAlphaFieldBlanks(2)) {
-                    state.dataFaultsMgr->FaultsEconomizer(j).AvaiSchedPtr = -1; // returns schedule value of 1
-                } else {
-                    state.dataFaultsMgr->FaultsEconomizer(j).AvaiSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).AvaiSchedPtr == 0) {
-                        ShowSevereError(state,
-                                        format("{} = \"{}\" invalid {} = \"{}\" not found.",
-                                               cFaultCurrentObject,
-                                               cAlphaArgs(1),
-                                               cAlphaFieldNames(2),
-                                               cAlphaArgs(2)));
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    }
+                    fault.availSchedNum = -1; // returns schedule value of 1
+                } else if ((fault.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
+                    state.dataFaultsMgr->ErrorsFound = true;
                 }
 
-                state.dataFaultsMgr->FaultsEconomizer(j).SeveritySchedule = cAlphaArgs(3);
                 // check severity schedule
                 if (lAlphaFieldBlanks(3)) {
-                    state.dataFaultsMgr->FaultsEconomizer(j).SeveritySchedPtr = -1; // returns schedule value of 1
-                } else {
-                    state.dataFaultsMgr->FaultsEconomizer(j).SeveritySchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).SeveritySchedPtr == 0) {
-                        ShowSevereError(state,
-                                        format("{} = \"{}\" invalid {} = \"{}\" not found.",
-                                               cFaultCurrentObject,
-                                               cAlphaArgs(1),
-                                               cAlphaFieldNames(3),
-                                               cAlphaArgs(3)));
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    }
+                    fault.severitySchedNum = -1; // returns schedule value of 1
+                } else if ((fault.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
+                    state.dataFaultsMgr->ErrorsFound = true;
                 }
 
-                state.dataFaultsMgr->FaultsEconomizer(j).ControllerType = cAlphaArgs(4);
+                fault.ControllerType = cAlphaArgs(4);
                 // check controller type
                 if (lAlphaFieldBlanks(4)) {
                     ShowSevereError(
@@ -1953,7 +1798,7 @@ namespace FaultsManager {
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     if (Util::makeUPPER(cAlphaArgs(4)) == "CONTROLLER:OUTDOORAIR") {
-                        state.dataFaultsMgr->FaultsEconomizer(j).ControllerTypeEnum = iController_AirEconomizer;
+                        fault.ControllerTypeEnum = iController_AirEconomizer;
 
                         // CASE ...
 
@@ -1997,11 +1842,11 @@ namespace FaultsManager {
         Real64 OffsetAct;     // actual offset after applying the modification factor
 
         // Check fault availability schedules
-        if (ScheduleManager::GetCurrentScheduleValue(state, this->AvaiSchedPtr) > 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, this->availSchedNum) > 0.0) {
 
             // Check fault severity schedules
-            if (this->SeveritySchedPtr >= 0) {
-                FaultFac = ScheduleManager::GetCurrentScheduleValue(state, this->SeveritySchedPtr);
+            if (this->severitySchedNum >= 0) {
+                FaultFac = ScheduleManager::GetCurrentScheduleValue(state, this->severitySchedNum);
             } else {
                 FaultFac = 1.0;
             }
@@ -2029,11 +1874,11 @@ namespace FaultsManager {
             1.0); // Actual Nominal Fouling Factor, ratio between the nominal capacity or efficiency at fouling case and that at fault free case
 
         // Check fault availability schedules
-        if (ScheduleManager::GetCurrentScheduleValue(state, this->AvaiSchedPtr) > 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, this->availSchedNum) > 0.0) {
 
             // Check fault severity schedules
-            if (this->SeveritySchedPtr >= 0) {
-                FaultFac = ScheduleManager::GetCurrentScheduleValue(state, this->SeveritySchedPtr);
+            if (this->severitySchedNum >= 0) {
+                FaultFac = ScheduleManager::GetCurrentScheduleValue(state, this->severitySchedNum);
             } else {
                 FaultFac = 1.0;
             }
@@ -2061,11 +1906,11 @@ namespace FaultsManager {
         Real64 UAReductionFactorAct(1.0); // actual UA Reduction Factor, ratio between the UA value at fouling case and that at fault free case
 
         // Check fault availability schedules
-        if (ScheduleManager::GetCurrentScheduleValue(state, this->AvaiSchedPtr) > 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, this->availSchedNum) > 0.0) {
 
             // Check fault severity schedules
-            if (this->SeveritySchedPtr >= 0) {
-                FaultFac = ScheduleManager::GetCurrentScheduleValue(state, this->SeveritySchedPtr);
+            if (this->severitySchedNum >= 0) {
+                FaultFac = ScheduleManager::GetCurrentScheduleValue(state, this->severitySchedNum);
             } else {
                 FaultFac = 1.0;
             }
@@ -2087,10 +1932,10 @@ namespace FaultsManager {
         // Calculate the Fault Fraction based on Availability and Severity Schedules
 
         // Check fault availability schedules
-        if (ScheduleManager::GetCurrentScheduleValue(state, this->AvaiSchedPtr) > 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, this->availSchedNum) > 0.0) {
 
             // Check fault severity schedules (Ptr initialized to -1, so would return a FaultFrac of 1 if not set)
-            return ScheduleManager::GetCurrentScheduleValue(state, this->SeveritySchedPtr);
+            return ScheduleManager::GetCurrentScheduleValue(state, this->severitySchedNum);
         }
 
         return 0.0;
@@ -2166,34 +2011,9 @@ namespace FaultsManager {
         // To check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
         // covers the rated operational point of the corresponding fan
         // Return true if the curve covers the fan rated operational point
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 FanMaxAirFlowRate; // Design Max Specified Volume Flow Rate of Fan [m3/sec]
-        Real64 FanDeltaPress;     // Design Delta Pressure Across the Fan [Pa]
-        Real64 FanDeltaPressCal;  // Calculated Delta Pressure Across the Fan [Pa]
-        bool FanFound;            // Whether the fan is found or not
-
-        std::string const FanName = this->FaultyAirFilterFanName; // name of the fan
-        int const FanCurvePtr = this->FaultyAirFilterFanCurvePtr; // pointer of the fan curve
-
-        FanFound = false;
-
-        for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
-            if (Util::SameString(state.dataFans->Fan(FanNum).FanName, FanName)) {
-                FanMaxAirFlowRate = state.dataFans->Fan(FanNum).MaxAirFlowRate;
-                FanDeltaPress = state.dataFans->Fan(FanNum).DeltaPress;
-                FanFound = true;
-                break;
-            }
-        }
-
-        if (!FanFound) {
-            return false;
-        }
-
-        FanDeltaPressCal = Curve::CurveValue(state, FanCurvePtr, FanMaxAirFlowRate);
-
-        return ((FanDeltaPressCal > 0.95 * FanDeltaPress) && (FanDeltaPressCal < 1.05 * FanDeltaPress));
+        auto *fan = state.dataFans->fans(this->fanNum);
+        Real64 deltaPressCal = Curve::CurveValue(state, this->fanCurveNum, fan->maxAirFlowRate);
+        return ((deltaPressCal > 0.95 * fan->deltaPress) && (deltaPressCal < 1.05 * fan->deltaPress));
     }
 
     void SetFaultyCoilSATSensor(

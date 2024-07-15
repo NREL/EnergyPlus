@@ -374,7 +374,9 @@ namespace ResultsFramework {
 
         void initializeMeters(const std::vector<OutputProcessor::Meter *> &EnergyMeters, const ReportFreq reportFrequency);
 
-        std::array<DataFrame, (int)TimeStepType::Num> detailedTSData = {DataFrame("Dummy"), DataFrame("Detailed-Zone"), DataFrame("Detailed-HVAC")};
+        std::array<DataFrame, (int)TimeStepType::Num> detailedTSData = {// DataFrame("Dummy"),
+                                                                        DataFrame("Detailed-Zone"),
+                                                                        DataFrame("Detailed-HVAC")};
 
         std::array<DataFrame, (int)ReportFreq::Num> freqTSData = {DataFrame("Each Call"),
                                                                   DataFrame("TimeStep"),
@@ -571,6 +573,10 @@ struct ResultsFrameworkData : BaseGlobalStruct
 {
 
     std::unique_ptr<ResultsFramework::ResultsFramework> resultsFramework = std::make_unique<ResultsFramework::ResultsFramework>();
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

@@ -149,7 +149,7 @@ struct BaseSizer
     int curSysNum = 0;
     int curOASysNum = 0;
     int curZoneEqNum = 0;
-    DataHVACGlobals::AirDuctType curDuctType = DataHVACGlobals::AirDuctType::Invalid;
+    HVAC::AirDuctType curDuctType = HVAC::AirDuctType::Invalid;
     int curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
     int numPrimaryAirSys = 0;
     int numSysSizInput = 0;
@@ -185,8 +185,8 @@ struct BaseSizer
     // HeatingWaterDesCoilWaterVolFlowUsedForUASizer, HeaterWaterflowSizing
     int dataWaterLoopNum = 0;
     // CoolingWaterflowSizing, CoolingWaterDesAirInletTempSizer
-    int dataFanIndex = -1;
-    int dataFanEnumType = -1;
+    int dataFanIndex = 0;
+    HVAC::FanType dataFanType = HVAC::FanType::Invalid;
     // CoolingWaterflowSizing
     Real64 dataWaterCoilSizCoolDeltaT = 0.0;
     // HeaterWaterflowSizing
@@ -202,7 +202,7 @@ struct BaseSizer
     Real64 dataAirFlowUsedForSizing = 0.0;
     Real64 dataDesInletAirTemp = 0.0;
     bool dataDesAccountForFanHeat = false;
-    DataSizing::ZoneFanPlacement dataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
+    HVAC::FanPlace dataFanPlacement = HVAC::FanPlace::Invalid;
 
     // CoolingWaterDesAirInletHumRatSizer, HeatingWaterDesAirInletHumRatSizer,
     // HeatingWaterDesAirInletTempSizer
@@ -235,7 +235,7 @@ struct BaseSizer
     // WaterHeatingCoilUASizing
     bool dataNomCapInpMeth = false;
     int dataCoilNum = 0;
-    int dataFanOpMode = 0;
+    HVAC::FanOp dataFanOp = HVAC::FanOp::Invalid;
     Real64 dataDesignCoilCapacity = 0.0;
     bool dataErrorsFound = false;
 

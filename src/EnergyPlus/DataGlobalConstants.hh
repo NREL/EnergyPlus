@@ -49,7 +49,8 @@
 #define DataGlobalConstants_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
+#include <fmt/format.h>
+// #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -363,7 +364,7 @@ namespace Constant {
         eResourceNames[(int)eFuel2eResource[(int)eFuel::Water]],
         eResourceNames[(int)eFuel2eResource[(int)eFuel::None]]};
 
-    enum class Units
+    enum class Units : signed int
     {
         Invalid = -1,
         kg_s,
@@ -476,6 +477,21 @@ namespace Constant {
         "customEMS"         // customEMS
     };
 
+    inline std::string unitToString(Units unit)
+    {
+        switch (unit) {
+        case Units::Invalid:
+            return "invalid";
+        default:
+            const int iUnit = static_cast<int>(unit);
+            constexpr int numUnitNames = unitNames.size();
+            if (0 <= iUnit && iUnit < numUnitNames) {
+                return fmt::format("[{}]", unitNames[iUnit]);
+            }
+            return "invalid-out-of-range";
+        }
+    }
+
     constexpr std::array<std::string_view, (int)Units::Num> unitNamesUC = {
         "KG/S",             // kg_s
         "C",                // C
@@ -571,13 +587,19 @@ namespace Constant {
     Real64 constexpr OneFifth = 1.0 / 5.0;   // 1/5 in highest precision
     Real64 constexpr OneSixth = 1.0 / 6.0;   // 1/6 in highest precision
     Real64 constexpr FourFifths = 4.0 / 5.0; // 4/5 in highest precision
+    Real64 constexpr OneThousandth = 1.0e-3; // Used as a tolerance in various places
+    Real64 constexpr OneMillionth = 1.0e-6;  // Used as a tolerance in various places
 
+    Real64 constexpr OneCentimeter = 0.01;     // Geometric tolerance in meters
+    Real64 constexpr TwoCentimeters = 0.02;    // Geometric tolerance in meters
+    Real64 constexpr SmallDistance = 1.0e-4;   // Geometric tolerance in meters
     Real64 constexpr MaxEXPArg = 709.78;       // maximum exponent in EXP() function
     Real64 constexpr Pi = 3.14159265358979324; // Pi 3.1415926535897932384626435
     Real64 constexpr PiOvr2 = Pi / 2.0;        // Pi/2
     Real64 constexpr TwoPi = 2.0 * Pi;         // 2*Pi 6.2831853071795864769252868
     Real64 constexpr GravityConstant = 9.807;
     Real64 constexpr DegToRadians = Pi / 180.0;                           // Conversion for Degrees to Radians
+    Real64 constexpr DegToRad = Pi / 180.0;                               // Why is it DegToRadians and RadToDeg? Why? WHY?
     Real64 constexpr RadToDeg = 180.0 / Pi;                               // Conversion for Radians to Degrees
     Real64 constexpr SecInHour = 3600.0;                                  // Conversion for hours to seconds
     Real64 constexpr HoursInDay = 24.0;                                   // Number of Hours in Day

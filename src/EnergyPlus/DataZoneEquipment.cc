@@ -180,7 +180,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     using NodeInputManager::GetNodeNums;
     using NodeInputManager::GetOnlySingleNode;
     using NodeInputManager::InitUniqueNodeCheck;
-    using namespace DataHVACGlobals;
     using namespace DataLoopNode;
     using namespace ScheduleManager;
 
@@ -264,15 +263,13 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         state.dataZoneEquip->ReturnAirPath.allocate(state.dataZoneEquip->NumReturnAirPaths);
     }
 
-    state.dataZoneEquip->ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones); // Allocate the array containing the configuration
+    state.dataZoneEquip->ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones); // Allocate the array containing the configuration data for each zone
     if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
-        state.dataZoneEquip->spaceEquipConfig.allocate(state.dataGlobal->numSpaces); // Allocate the array containing the configuration
+        state.dataZoneEquip->spaceEquipConfig.allocate(
+            state.dataGlobal->numSpaces); // Allocate the array containing the configuration data for each space
     }
-    // data for each zone to the number of controlled zones
-    // found in the input file.  This may or may not
-    // be the same as the number of zones in the building
     state.dataZoneEquip->ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
-    state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, NoAction);
+    state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, Avail::Status::NoAction);
     state.dataZoneEquip->UniqueZoneEquipListNames.reserve(state.dataGlobal->NumOfZones);
 
     if (state.dataZoneEquip->NumOfZoneEquipLists != numControlledZones) {
@@ -947,7 +944,7 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                         // loop index accesses correct pointer to equipment on this equipment list
                         // EquipIndex is used to access specific equipment for a single class of equipment (e.g., PTAC 1, 2 and 3)
                         thisZoneEquipList.compPointer[ZoneEquipTypeNum] = UnitarySystems::UnitarySys::factory(
-                            state, DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
+                            state, HVAC::UnitarySysType::Unitary_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
                         thisZoneEquipList.EquipIndex(ZoneEquipTypeNum) = thisZoneEquipList.compPointer[ZoneEquipTypeNum]->getEquipIndex();
                     }
 
@@ -1103,14 +1100,18 @@ void processZoneEquipmentInput(EnergyPlusData &state,
 
         thisEquipConfig.ReturnNode.allocate(NumNodes);
         thisEquipConfig.ReturnNodeAirLoopNum.allocate(NumNodes);
+        thisEquipConfig.ReturnNodeRetPathNum.allocate(NumNodes);
+        thisEquipConfig.ReturnNodeRetPathCompNum.allocate(NumNodes);
         thisEquipConfig.ReturnNodeInletNum.allocate(NumNodes);
         thisEquipConfig.FixedReturnFlow.allocate(NumNodes);
         thisEquipConfig.ReturnNodePlenumNum.allocate(NumNodes);
         thisEquipConfig.ReturnNodeExhaustNodeNum.allocate(NumNodes);
         thisEquipConfig.SharedExhaustNode.allocate(NumNodes);
-        thisEquipConfig.ReturnNode = 0;                                         // initialize to zero here
-        thisEquipConfig.ReturnNodeAirLoopNum = 0;                               // initialize to zero here
-        thisEquipConfig.ReturnNodeInletNum = 0;                                 // initialize to zero here
+        thisEquipConfig.ReturnNode = 0;           // initialize to zero here
+        thisEquipConfig.ReturnNodeAirLoopNum = 0; // initialize to zero here
+        thisEquipConfig.ReturnNodeInletNum = 0;   // initialize to zero here
+        thisEquipConfig.ReturnNodeRetPathNum = 0;
+        thisEquipConfig.ReturnNodeRetPathCompNum = 0;
         thisEquipConfig.FixedReturnFlow = false;                                // initialize to false here
         thisEquipConfig.ReturnNodePlenumNum = 0;                                // initialize to zero here
         thisEquipConfig.ReturnNodeExhaustNodeNum = 0;                           // initialize to zero here
@@ -1426,11 +1427,6 @@ int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName) /
     // This function returns the index into the Controlled Zone Equipment structure
     // of the indicated zone.
 
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
-
     return Util::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
 }
 
@@ -1447,11 +1443,6 @@ int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
     // zone node num.  Returns 0 if did not find zone node in any Zone
 
     int ControlledZoneIndex = 0; // Index into Controlled Zone structure
-
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) {
@@ -1478,11 +1469,6 @@ int GetSystemNodeNumberForZone(EnergyPlusData &state, int const zoneNum)
     // zone.  Returns 0 if the Zone is not a controlled zone.
 
     int SystemZoneNodeNumber = 0; // System node number for controlled zone
-
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
 
     if (zoneNum > 0) {
         if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) {
@@ -1513,11 +1499,6 @@ int GetReturnAirNodeForZone(EnergyPlusData &state,
 
     // Return value
     int ReturnAirNodeNumber = 0; // Return Air node number for controlled zone
-
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
 
     ReturnAirNodeNumber = 0; // default is not found
     if (zoneNum > 0) {
@@ -1565,11 +1546,6 @@ int GetReturnNumForZone(EnergyPlusData &state,
     // Return value
     int ReturnIndex = 0; // Return number for the given zone (not the node number)
 
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
-
     if (zoneNum > 0) {
         if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) {
             if (NodeName.empty()) {
@@ -1592,11 +1568,6 @@ int GetReturnNumForZone(EnergyPlusData &state,
 bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum)
 {
     bool exhaustNodeError = true;
-
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
 
     for (int ExhaustNum = 1; ExhaustNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++ExhaustNum) {
         if (ZoneExhaustNodeNum == state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(ExhaustNum)) {
@@ -1833,6 +1804,7 @@ void ZoneEquipmentMixer::setOutletConditions(EnergyPlusData &state)
     Real64 sumEnthalpy = 0.0;
     Real64 sumHumRat = 0.0;
     Real64 sumCO2 = 0.0;
+    Real64 sumGenContam = 0.0;
     Real64 sumPressure = 0.0;
     Real64 sumFractions = 0.0;
     auto &equipInletNode = state.dataLoopNodes->Node(this->zoneEquipInletNodeNum);
@@ -1840,13 +1812,23 @@ void ZoneEquipmentMixer::setOutletConditions(EnergyPlusData &state)
         auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
         sumEnthalpy += spaceOutletNode.Enthalpy * mixerSpace.fraction;
         sumHumRat += spaceOutletNode.HumRat * mixerSpace.fraction;
-        sumCO2 += spaceOutletNode.CO2 * mixerSpace.fraction;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            sumCO2 += spaceOutletNode.CO2 * mixerSpace.fraction;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            sumGenContam += spaceOutletNode.GenContam * mixerSpace.fraction;
+        }
         sumPressure += spaceOutletNode.Press * mixerSpace.fraction;
         sumFractions += mixerSpace.fraction;
     }
     equipInletNode.Enthalpy = sumEnthalpy / sumFractions;
     equipInletNode.HumRat = sumHumRat / sumFractions;
-    equipInletNode.CO2 = sumCO2 / sumFractions;
+    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+        equipInletNode.CO2 = sumCO2 / sumFractions;
+    }
+    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+        equipInletNode.GenContam = sumGenContam / sumFractions;
+    }
     equipInletNode.Press = sumPressure / sumFractions;
 
     // Use Enthalpy and humidity ratio to get outlet temperature from psych chart

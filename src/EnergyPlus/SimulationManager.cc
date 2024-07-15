@@ -209,17 +209,16 @@ namespace SimulationManager {
              state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || state.dataSysVars->FullAnnualRun);
         state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
 
-        OpenOutputFiles(state);
-        GetProjectData(state);
-        Psychrometrics::InitializePsychRoutines(state);
+        state.init_state(state);
+
         CheckForMisMatchedEnvironmentSpecifications(state);
         CheckForRequestedReporting(state);
         OutputReportPredefined::SetPredefinedTables(state);
         SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
         OutputProcessor::SetupTimePointers(
-            state, OutputProcessor::SOVTimeStepType::Zone, state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-        OutputProcessor::SetupTimePointers(state, OutputProcessor::SOVTimeStepType::HVAC, state.dataHVACGlobal->TimeStepSys);
+            state, OutputProcessor::TimeStepType::Zone, state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        OutputProcessor::SetupTimePointers(state, OutputProcessor::TimeStepType::System, state.dataHVACGlobal->TimeStepSys);
 
         createFacilityElectricPowerServiceObject(state);
         createCoilSelectionReportObj(state);

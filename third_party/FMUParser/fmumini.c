@@ -520,7 +520,10 @@ int unpackmz(const char *filNam, char *tmpPat)
 
     printfDebug("%s opened\n", filename_try);
 
-    cmd = calloc(strlen(dirname) + 11, sizeof(char));
+    // the new string will be `mkdir -p "%s"`, so num characters added:
+    //                         1234567890  1
+    // appears to be 11.  However, sprintf puts a null terminator, so you need one more, making it 12
+    cmd = calloc(strlen(dirname) + 12, sizeof(char));
     if (cmd == NULL) {
         printfError("Fail to allocate memory for cmd.\n", tmpPat);
         return -1;

@@ -436,10 +436,11 @@ std::vector<fs::path> parse_input_paths(fs::path const &inputFilePath)
     return input_paths;
 }
 
-int main(/** [[maybe_unused]] int argc, [[maybe_unused]] const char *argv[] */)
+int main(int argc, char **argv)
 {
 
     CLI::App app{"ConvertInputFormat"};
+    argv = app.ensure_utf8(argv);
     app.description("Run input file conversion tool");
     app.set_version_flag("-v,--version", EnergyPlus::DataStringGlobals::VerString);
 
@@ -502,7 +503,7 @@ Select one (case insensitive):
 
     // We are not modifying argc/argv, so we defer to CLI11 to find the argc/argv instead. It'll use GetCommandLineW & CommandLineToArgvW on windows
     try {
-        app.parse();
+        app.parse(argc, argv);
     } catch (const CLI::ParseError &e) {
         return app.exit(e);
     }

@@ -700,102 +700,100 @@ namespace HWBaseboardRadiator {
                                 "Baseboard Total Heating Rate",
                                 Constant::Units::W,
                                 thisHWBaseboard.TotPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisHWBaseboard.Name);
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Rate",
                                 Constant::Units::W,
                                 thisHWBaseboard.ConvPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisHWBaseboard.Name);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Rate",
                                 Constant::Units::W,
                                 thisHWBaseboard.RadPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisHWBaseboard.Name);
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Energy",
                                 Constant::Units::J,
                                 thisHWBaseboard.TotEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisHWBaseboard.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::Baseboard,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Baseboard);
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Energy",
                                 Constant::Units::J,
                                 thisHWBaseboard.ConvEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisHWBaseboard.Name);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Energy",
                                 Constant::Units::J,
                                 thisHWBaseboard.RadEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisHWBaseboard.Name);
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Energy",
                                 Constant::Units::J,
                                 thisHWBaseboard.Energy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisHWBaseboard.Name,
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                OutputProcessor::SOVEndUseCat::Baseboard,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Baseboard);
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Mass Flow Rate",
                                 Constant::Units::kg_s,
                                 thisHWBaseboard.WaterMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisHWBaseboard.Name);
             SetupOutputVariable(state,
                                 "Baseboard Air Mass Flow Rate",
                                 Constant::Units::kg_s,
                                 thisHWBaseboard.AirMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisHWBaseboard.Name);
             SetupOutputVariable(state,
                                 "Baseboard Air Inlet Temperature",
                                 Constant::Units::C,
                                 thisHWBaseboard.AirInletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisHWBaseboard.Name);
             SetupOutputVariable(state,
                                 "Baseboard Air Outlet Temperature",
                                 Constant::Units::C,
                                 thisHWBaseboard.AirOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisHWBaseboard.Name);
             SetupOutputVariable(state,
                                 "Baseboard Water Inlet Temperature",
                                 Constant::Units::C,
                                 thisHWBaseboard.WaterInletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisHWBaseboard.Name);
             SetupOutputVariable(state,
                                 "Baseboard Water Outlet Temperature",
                                 Constant::Units::C,
                                 thisHWBaseboard.WaterOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisHWBaseboard.Name);
         }
     }
@@ -1001,7 +999,7 @@ namespace HWBaseboardRadiator {
             state.dataSize->DataHeatSizeRatio = 1.0;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = hWBaseboard.ZonePtr;
-            int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+            int SizingMethod = HVAC::HeatingCapacitySizing;
             int FieldNum = 3; // IDD numeric field number where input field description is found
             std::string SizingString = state.dataHWBaseboardRad->HWBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
             int CapSizingMethod = hWBaseboard.HeatingCapMethod;
@@ -1069,7 +1067,7 @@ namespace HWBaseboardRadiator {
                 } else {
                     CheckZoneSizing(state, cCMO_BBRadiator_Water, hWBaseboard.Name);
                     DesCoilLoad = RatedCapacityDes;
-                    if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
+                    if (DesCoilLoad >= HVAC::SmallLoad) {
                         Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                     state.dataPlnt->PlantLoop(hWBaseboard.plantLoc.loopNum).FluidName,
                                                                     Constant::HWInitConvTemp,
@@ -1129,7 +1127,7 @@ namespace HWBaseboardRadiator {
                                                             RoutineNameFull);
                     WaterMassFlowRateStd = hWBaseboard.WaterVolFlowRateMax * rho;
                 }
-                if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
+                if (DesCoilLoad >= HVAC::SmallLoad) {
                     // Calculate UA value
                     // Air mass flow rate is obtained from the following linear equation
                     // m_dot = 0.0062 + 2.75e-05*q
@@ -1186,7 +1184,7 @@ namespace HWBaseboardRadiator {
             hWBaseboard.RatedCapacity = RatedCapacityDes;
             DesCoilLoad = RatedCapacityDes;
 
-            if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
+            if (DesCoilLoad >= HVAC::SmallLoad) {
                 WaterMassFlowRateStd = hWBaseboard.WaterMassFlowRateStd;
                 // m_dot = 0.0062 + 2.75e-05*q
                 AirMassFlowRate = Constant + Coeff * DesCoilLoad;
@@ -1286,7 +1284,7 @@ namespace HWBaseboardRadiator {
         Real64 WaterInletTemp = hWBaseboard.WaterInletTemp;
         Real64 WaterMassFlowRate = state.dataLoopNodes->Node(hWBaseboard.WaterInletNode).MassFlowRate;
 
-        if (QZnReq > DataHVACGlobals::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
+        if (QZnReq > HVAC::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
             (ScheduleManager::GetCurrentScheduleValue(state, hWBaseboard.SchedPtr) > 0) && (WaterMassFlowRate > 0.0)) {
 
             HWBaseboardDesignData const &HWBaseboardDesignDataObject{

@@ -57,6 +57,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -67,6 +68,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -145,7 +147,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
 
     // node number table
     //  1   Zone 1 Air Node
@@ -320,7 +322,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
 
     // node number table
     //  1   Zone 1 Air Node
@@ -2638,7 +2640,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
 
     // InletSideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
-    state->dataSingleDuct->SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_InletSide;
+    state->dataSingleDuct->SysATMixer(1).type = HVAC::MixerType::InletSide;
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
     EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
@@ -2649,7 +2651,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.10, 0.0001);
 
     // SupplySideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
-    state->dataSingleDuct->SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_SupplySide;
+    state->dataSingleDuct->SysATMixer(1).type = HVAC::MixerType::SupplySide;
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
     EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
@@ -2784,7 +2786,7 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     state->dataSingleDuct->SysATMixer.allocate(1);
     state->dataSingleDuct->SysATMixer(1).CtrlZoneInNodeIndex = 1;
     state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate = state->dataSize->FinalSysSizing(1).DesMainVolFlow;
-    state->dataSingleDuct->SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_InletSide;
+    state->dataSingleDuct->SysATMixer(1).type = HVAC::MixerType::InletSide;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).CentralCoolCoilExists = true;
@@ -3013,4 +3015,106 @@ TEST_F(EnergyPlusFixture, VAVConstantVolTU_Reheat_Sizing)
     EXPECT_GT(actualCoilSize, desCoilSize);
     EXPECT_NEAR(actualCoilSize, 12192.0, 0.1);
     EXPECT_NEAR(actualCoilSize, 2.0 * desCoilSize, 0.1); // heating coil is twice the size of autosized value
+}
+
+TEST_F(EnergyPlusFixture, SingleDuctAirTerminal_reportTerminalUnit)
+{
+    using namespace EnergyPlus::OutputReportPredefined;
+    auto &orp = *state->dataOutRptPredefined;
+
+    SetPredefinedTables(*state);
+
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    auto &sch = state->dataScheduleMgr->Schedule;
+    sch.allocate(5);
+    sch(1).Name = "schA";
+    sch(2).Name = "schB";
+
+    auto &adu = state->dataDefineEquipment->AirDistUnit;
+    adu.allocate(2);
+    adu(1).Name = "ADU a";
+    adu(1).TermUnitSizingNum = 1;
+
+    auto &siz = state->dataSize->TermUnitFinalZoneSizing;
+    siz.allocate(2);
+    siz(1).DesCoolVolFlowMin = 0.15;
+    siz(1).MinOA = 0.05;
+    siz(1).CoolDesTemp = 12.5;
+    siz(1).HeatDesTemp = 40.0;
+    siz(1).DesHeatLoad = 2000.0;
+    siz(1).DesCoolLoad = 3000.0;
+
+    auto &sdat = state->dataSingleDuct->sd_airterminal;
+    sdat.allocate(2);
+    sdat(1).ADUNum = 1;
+    sdat(1).sysType = "AirTerminal:SingleDuct:ConstantVolume:NoReheat";
+    sdat(1).MaxAirVolFlowRate = 0.30;
+    sdat(1).ZoneMinAirFracSchPtr = 1;
+    sdat(1).MaxAirVolFlowRateDuringReheat = 0.25;
+    sdat(1).OARequirementsPtr = 0;
+    sdat(1).ReheatComp = "watercoil";
+    sdat(1).fanType = HVAC::FanType::VAV;
+    sdat(1).FanName = "FanA";
+
+    sdat(1).reportTerminalUnit(*state);
+
+    EXPECT_EQ("0.15", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinFlow, "ADU a"));
+    EXPECT_EQ("0.05", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOutdoorFlow, "ADU a"));
+    EXPECT_EQ("12.50", RetrievePreDefTableEntry(*state, orp.pdchAirTermSupCoolingSP, "ADU a"));
+    EXPECT_EQ("40.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermSupHeatingSP, "ADU a"));
+    EXPECT_EQ("2000.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatingCap, "ADU a"));
+    EXPECT_EQ("3000.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolingCap, "ADU a"));
+    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:NoReheat", RetrievePreDefTableEntry(*state, orp.pdchAirTermTypeInp, "ADU a"));
+    EXPECT_EQ("0.30", RetrievePreDefTableEntry(*state, orp.pdchAirTermPrimFlow, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermSecdFlow, "ADU a"));
+    EXPECT_EQ("schA", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinFlowSch, "ADU a"));
+    EXPECT_EQ("0.25", RetrievePreDefTableEntry(*state, orp.pdchAirTermMaxFlowReh, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOAflowSch, "ADU a"));
+    EXPECT_EQ("watercoil", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatCoilType, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolCoilType, "ADU a"));
+    EXPECT_EQ("Fan:VariableVolume", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanType, "ADU a"));
+    EXPECT_EQ("FanA", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanName, "ADU a"));
+
+    adu(2).Name = "ADU b";
+    adu(2).TermUnitSizingNum = 2;
+
+    siz(2).DesCoolVolFlowMin = 0.16;
+    siz(2).MinOA = 0.06;
+    siz(2).CoolDesTemp = 12.6;
+    siz(2).HeatDesTemp = 41.0;
+    siz(2).DesHeatLoad = 2100.0;
+    siz(2).DesCoolLoad = 3100.0;
+
+    sdat(2).ADUNum = 2;
+    sdat(2).sysType = "AirTerminal:SingleDuct:ConstantVolume:Reheat";
+    sdat(2).MaxAirVolFlowRate = 0.31;
+    sdat(2).ZoneMinAirFracSchPtr = 0;
+    sdat(2).MaxAirVolFlowRateDuringReheat = 0.26;
+    sdat(2).OARequirementsPtr = 1;
+    sdat(2).ReheatComp = "furncoil";
+    sdat(2).fanType = HVAC::FanType::OnOff;
+    sdat(2).FanName = "FanB";
+
+    auto &oa = state->dataSize->OARequirements;
+    oa.allocate(1);
+    oa(1).OAFlowFracSchPtr = 2;
+
+    sdat(2).reportTerminalUnit(*state);
+
+    EXPECT_EQ("0.16", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinFlow, "ADU b"));
+    EXPECT_EQ("0.06", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOutdoorFlow, "ADU b"));
+    EXPECT_EQ("12.60", RetrievePreDefTableEntry(*state, orp.pdchAirTermSupCoolingSP, "ADU b"));
+    EXPECT_EQ("41.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermSupHeatingSP, "ADU b"));
+    EXPECT_EQ("2100.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatingCap, "ADU b"));
+    EXPECT_EQ("3100.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolingCap, "ADU b"));
+    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:Reheat", RetrievePreDefTableEntry(*state, orp.pdchAirTermTypeInp, "ADU b"));
+    EXPECT_EQ("0.31", RetrievePreDefTableEntry(*state, orp.pdchAirTermPrimFlow, "ADU b"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermSecdFlow, "ADU b"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinFlowSch, "ADU b"));
+    EXPECT_EQ("0.26", RetrievePreDefTableEntry(*state, orp.pdchAirTermMaxFlowReh, "ADU b"));
+    EXPECT_EQ("schB", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOAflowSch, "ADU b"));
+    EXPECT_EQ("furncoil", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatCoilType, "ADU b"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolCoilType, "ADU b"));
+    EXPECT_EQ("Fan:OnOff", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanType, "ADU b"));
+    EXPECT_EQ("FanB", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanName, "ADU b"));
 }

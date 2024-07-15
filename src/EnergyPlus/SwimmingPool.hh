@@ -177,6 +177,12 @@ namespace SwimmingPool {
 
         void calculate(EnergyPlusData &state);
 
+        void calcMassFlowRate(EnergyPlusData &state,
+                              Real64 &massFlowRate, // Mass Flow Rate (to be calculated)
+                              Real64 TH22,          // Pool water temperature from previous time step
+                              Real64 TLoopInletTemp //
+        );
+
         void calcSwimmingPoolEvap(EnergyPlusData &state,
                                   Real64 &EvapRate, // Evaporation rate
                                   int SurfNum,      // Surface index
@@ -211,6 +217,10 @@ struct SwimmingPoolsData : BaseGlobalStruct
     Array1D_bool CheckEquipName;
     bool getSwimmingPoolInput = true;
     Array1D<SwimmingPool::SwimmingPoolData> Pool;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

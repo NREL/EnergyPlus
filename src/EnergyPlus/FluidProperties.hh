@@ -344,8 +344,6 @@ namespace FluidProperties {
         }
     };
 
-    void InitializeGlycRoutines();
-
     void GetFluidPropertiesData(EnergyPlusData &state);
 
     template <size_t NumOfTemps, size_t NumOfConcs>
@@ -627,7 +625,6 @@ namespace FluidProperties {
 struct FluidPropertiesData : BaseGlobalStruct
 {
 
-    bool GetInput = true;      // Used to get the input once only
     int NumOfRefrigerants = 0; // Total number of refrigerants input by user
     int NumOfGlycols = 0;      // Total number of glycols input by user
     bool DebugReportGlycols = false;
@@ -661,6 +658,11 @@ struct FluidPropertiesData : BaseGlobalStruct
 #ifdef EP_cache_GlycolSpecificHeat
     std::array<FluidProperties::cached_tsh, FluidProperties::t_sh_cache_size> cached_t_sh;
 #endif
+
+    void init_state(EnergyPlusData &state) override
+    {
+        FluidProperties::GetFluidPropertiesData(state);
+    }
 
     void clear_state() override
     {

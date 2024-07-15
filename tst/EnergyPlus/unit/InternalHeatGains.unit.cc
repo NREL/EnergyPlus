@@ -72,6 +72,7 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
@@ -129,9 +130,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
     for (unsigned long i = 1; i <= state->dataHeatBal->ZoneOtherEq.size(); ++i) {
         const DataHeatBalance::ZoneEquipData &equip = state->dataHeatBal->ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
-            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, Constant::eFuel::None));
+            ASSERT_ENUM_EQ(equip.OtherEquipFuelType, Constant::eFuel::None);
         } else if (equip.Name == "OTHEREQ2") {
-            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, Constant::eFuel::Propane));
+            ASSERT_ENUM_EQ(equip.OtherEquipFuelType, Constant::eFuel::Propane);
         }
     }
 }
@@ -1339,6 +1340,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataHeatBal->Zone(1).FloorArea = 20.0;
     state->dataHeatBal->space(1).FloorArea = 5.0;
@@ -1873,6 +1875,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
@@ -2324,6 +2327,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
@@ -3292,7 +3296,10 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
     // Test the processing results of the Environmental Class H1 input
     EXPECT_TRUE(thisZoneITEq.Class == DataHeatBalance::ITEClass::H1);
 
+    state->dataEnvrn->StdRhoAir = 0.8;
     InternalHeatGains::CalcZoneITEq(*state);
+    // add a test to verify the standard density air volume flow rate calculation
+    EXPECT_NEAR(state->dataHeatBal->ZoneITEq(1).AirVolFlowStdDensity, 0.2469055, 1e-6);
 
     int NZ = 1;
     int spaceNum = 1;
@@ -3339,7 +3346,7 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
     // if (TDPAirIn > DPMax[EnvClass])
     EXPECT_EQ(thisZoneITEq.TimeAboveDewpointT, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
+    EXPECT_NEAR(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass], 0.000000000001);
     EXPECT_EQ(thisZnRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
@@ -3420,15 +3427,14 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
     // if (TDPAirIn > DPMax[EnvClass])
     EXPECT_EQ(thisZoneITEq.TimeAboveDewpointT, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
-    EXPECT_EQ(thisZnRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_NEAR(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass], 0.000000000001);
     EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
     EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
 
     EXPECT_EQ(thisZoneITEq.TimeAboveDewpointT, 1.0);
     EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, 1.0);
-    EXPECT_EQ(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
+    EXPECT_NEAR(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass], 0.000000000001);
     EXPECT_EQ(thisZnRpt.ITEqTimeAboveDewpointT, 1.0);
     EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, 1.0);
     EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDewpointT, 1.0);

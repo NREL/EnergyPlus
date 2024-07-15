@@ -265,7 +265,7 @@ TEST_F(EnergyPlusFixture, TableLookup)
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(3, state->dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(compare_enums(Curve::InterpType::BtwxtMethod, state->dataCurveManager->PerfCurve(1)->interpolationType));
+    EXPECT_ENUM_EQ(Curve::InterpType::BtwxtMethod, state->dataCurveManager->PerfCurve(1)->interpolationType);
     EXPECT_EQ("CAPMODFUNCOFWATERFLOW", state->dataCurveManager->PerfCurve(1)->Name);
 
     EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.minPresent);
@@ -474,6 +474,48 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
     for (auto data_point : table_data) {
         EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_divisor, Curve::CurveValue(*state, 1, data_point.first, data_point.second));
     }
+}
+
+TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnlyButItIsZero)
+{
+    std::string const idf_objects = delimited_string({"Table:Lookup,",
+                                                      "y_values,                              !- Name",
+                                                      "y_values_list,                         !- Independent Variable List Name",
+                                                      "DivisorOnly,                           !- Normalization Method",
+                                                      "0.0,                                   !- Normalization Divisor",
+                                                      "2.0,                                   !- Minimum Output",
+                                                      "21.0,                                  !- Maximum Output",
+                                                      "Dimensionless,                         !- Output Unit Type",
+                                                      ",                                      !- External File Name",
+                                                      ",                                      !- External File Column Number",
+                                                      ",                                      !- External File Starting Row Number",
+                                                      "2.0,                                   !- Value 1",
+                                                      "4.0;                                   !- Value 2",
+
+                                                      "Table:IndependentVariableList,",
+                                                      "y_values_list,                         !- Name",
+                                                      "x_values_1;                            !- Independent Variable Name 1",
+
+                                                      "Table:IndependentVariable,",
+                                                      "x_values_1,                            !- Name",
+                                                      ",                                      !- Interpolation Method",
+                                                      ",                                      !- Extrapolation Method",
+                                                      ",                                      !- Minimum value",
+                                                      ",                                      !- Maximum value",
+                                                      ",                                      !- Normalization Reference Value",
+                                                      "Dimensionless                          !- Output Unit Type",
+                                                      ",                                      !- External File Name",
+                                                      ",                                      !- External File Column Number",
+                                                      ",                                      !- External File Starting Row Number",
+                                                      ",",
+                                                      "2.0,                                   !- Value 1",
+                                                      "3.0;                                   !- Value 3"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_EQ(0, state->dataCurveManager->NumCurves);
+
+    EXPECT_THROW(Curve::GetCurveInput(*state), std::runtime_error);
+    EXPECT_TRUE(this->compare_err_stream_substring("Normalization divisor entered as zero"));
 }
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)

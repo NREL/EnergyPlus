@@ -112,6 +112,10 @@ struct DaylightingDevicesData : BaseGlobalStruct
     bool GetShelfInputErrorsFound = false; // Set to true if errors in input, fatal at end of routine
     bool MyEnvrnFlag = true;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->COSAngle = Array1D<Real64>(Dayltg::NumOfAngles);

@@ -163,7 +163,7 @@
 
   Output:Variable,West Zone,Zone Air Temperature,Hourly;
 
-  Version,24.1;
+  Version,24.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

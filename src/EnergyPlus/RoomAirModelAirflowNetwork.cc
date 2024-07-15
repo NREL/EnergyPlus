@@ -198,29 +198,29 @@ namespace RoomAir {
                                         "RoomAirflowNetwork Node NonAirSystemResponse",
                                         Constant::Units::W,
                                         afnNode.NonAirSystemResponse,
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         afnNode.Name);
                     SetupOutputVariable(state,
                                         "RoomAirflowNetwork Node SysDepZoneLoadsLagged",
                                         Constant::Units::W,
                                         afnNode.SysDepZoneLoadsLagged,
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         afnNode.Name);
                     SetupOutputVariable(state,
                                         "RoomAirflowNetwork Node SumIntSensibleGain",
                                         Constant::Units::W,
                                         afnNode.SumIntSensibleGain,
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         afnNode.Name);
                     SetupOutputVariable(state,
                                         "RoomAirflowNetwork Node SumIntLatentGain",
                                         Constant::Units::W,
                                         afnNode.SumIntLatentGain,
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         afnNode.Name);
                 }
             }
@@ -341,15 +341,15 @@ namespace RoomAir {
                                                 "RoomAirflowNetwork Node HVAC Supply Fraction",
                                                 Constant::Units::None,
                                                 afnHVAC.SupplyFraction,
-                                                OutputProcessor::SOVTimeStepType::HVAC,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 afnHVAC.Name);
                             SetupOutputVariable(state,
                                                 "RoomAirflowNetwork Node HVAC Return Fraction",
                                                 Constant::Units::None,
                                                 afnHVAC.ReturnFraction,
-                                                OutputProcessor::SOVTimeStepType::HVAC,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 afnHVAC.Name);
                         }
                     }

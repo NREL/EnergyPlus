@@ -75,7 +75,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Furnaces;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace DataZoneEnergyDemands;
 using namespace ScheduleManager;
@@ -88,6 +87,7 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 {
 
+    state->init_state(*state);
     int FurnaceNum(1);
     Real64 OnOffAirFlowRatio; // This is a return value
     Real64 PartLoadRatio(1.0);
@@ -100,7 +100,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 
     state->dataFurnaces->Furnace.allocate(1);
 
-    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatCool;
+    state->dataFurnaces->Furnace(FurnaceNum).type = HVAC::UnitarySysType::Unitary_HeatCool;
 
     state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = 1;
     state->dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = 2;
@@ -136,7 +136,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
 
-    state->dataFurnaces->Furnace(FurnaceNum).OpMode = CycFanCycCoil;
+    state->dataFurnaces->Furnace(FurnaceNum).fanOp = HVAC::FanOp::Cycling;
     // heating air flow at various speeds
 
     state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 0;
@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     EXPECT_DOUBLE_EQ(1.2, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
     // constant fan mode should drop to idle flow rate
-    state->dataFurnaces->Furnace(FurnaceNum).OpMode = ContFanCycCoil;
+    state->dataFurnaces->Furnace(FurnaceNum).fanOp = HVAC::FanOp::Continuous;
 
     state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 0;
     state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling = 0;
@@ -252,7 +252,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     EXPECT_DOUBLE_EQ(0.5, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
     bool firstHVACIteration = true;
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOp compressorOp = HVAC::CompressorOp::On;
     Real64 zoneLoad = 1000;
     Real64 moistureLoad = 0.0;
     Real64 heatCoilLoad = 0.0;
@@ -261,15 +261,15 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     bool hXUnitOn = false;
 
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    state->dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType = 1; // switch to water to air heat pump
-    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = 6;
+    state->dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType = WAHPCoilType::Simple; // switch to water to air heat pump
+    state->dataFurnaces->Furnace(FurnaceNum).type = HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir;
     state->dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone = 1; // use inlet node as surrogate for zone node number
 
     state->dataFurnaces->HeatingLoad = false;
     state->dataFurnaces->CoolingLoad = false;
 
     CalcNewZoneHeatCoolFlowRates(
-        *state, FurnaceNum, firstHVACIteration, CompressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+        *state, FurnaceNum, firstHVACIteration, compressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(state->dataFurnaces->Furnace(1).MdotFurnace, 0.5); // CompOnMassFlow rate
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, 0.5);  // furnace inlet node mass flow rate
     EXPECT_EQ(state->dataFurnaces->Furnace(1).CoolPartLoadRatio, 0.0);
@@ -344,7 +344,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 
     state->dataWaterToAirHeatPumpSimple->GetCoilsInputFlag = false; // turn off water source coil GetInput
     CalcNewZoneHeatCoolFlowRates(
-        *state, FurnaceNum, firstHVACIteration, CompressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+        *state, FurnaceNum, firstHVACIteration, compressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(state->dataFurnaces->Furnace(1).MdotFurnace, 0.2); // flow rate is at idle speed flow rate
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, 0.2);  // furnace inlet node mass flow rate is at idle speed flow rate
     EXPECT_EQ(state->dataFurnaces->Furnace(1).CoolPartLoadRatio, 0.0);
@@ -353,7 +353,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->Furnace(1).HeatPartLoadRatio = 1.0;
     state->dataFurnaces->HeatingLoad = true;
     CalcNewZoneHeatCoolFlowRates(
-        *state, FurnaceNum, firstHVACIteration, CompressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+        *state, FurnaceNum, firstHVACIteration, compressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(state->dataFurnaces->Furnace(1).HeatPartLoadRatio, 1.0);
 }
 
@@ -367,11 +367,11 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 
     FurnaceNum = 1;
     state->dataFurnaces->Furnace.allocate(1);
-    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatPump_AirToAir;
+    state->dataFurnaces->Furnace(FurnaceNum).type = HVAC::UnitarySysType::Unitary_HeatPump_AirToAir;
 
     state->dataFurnaces->CompOnMassFlow = 2.0;
     state->dataFurnaces->CompOffMassFlow = 0.0;
-    state->dataFurnaces->Furnace(FurnaceNum).OpMode = 1;
+    state->dataFurnaces->Furnace(FurnaceNum).fanOp = HVAC::FanOp::Cycling;
     state->dataFurnaces->Furnace(FurnaceNum).MdotFurnace = 2.0;
     state->dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate = 2.2;
     state->dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
@@ -383,10 +383,10 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 
     EXPECT_EQ(2.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate);
     EXPECT_EQ(0.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOffMassFlowrate);
-    EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode);
+    EXPECT_EQ((int)HVAC::FanOp::Cycling, (int)state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode);
     EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
-    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatCool;
+    state->dataFurnaces->Furnace(FurnaceNum).type = HVAC::UnitarySysType::Unitary_HeatCool;
     state->dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
     state->dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
     state->dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow = 2.2;
@@ -1244,7 +1244,7 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
     bool ErrFound = false;
 
     // Test HXAsssisted type with new coil
-    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = CoilDX_CoolingHXAssisted;
+    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = HVAC::CoilDX_CoolingHXAssisted;
     SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
     EXPECT_FALSE(ErrFound);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 0.0, 1e-6);
@@ -1254,8 +1254,8 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
     state->dataFurnaces->Furnace(1).MinOATCompressorHeating = -999.0;
 
     // Check that each coil type returns correctly
-    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
-    state->dataFurnaces->Furnace(1).HeatingCoilType_Num = Coil_HeatingElectric;
+    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = HVAC::Coil_CoolingAirToAirVariableSpeed;
+    state->dataFurnaces->Furnace(1).HeatingCoilType_Num = HVAC::Coil_HeatingElectric;
     // Each test should return 30 for cooling coil (limited) and -1000 for heating coil (no limit)
     SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
     EXPECT_FALSE(ErrFound);
@@ -1265,7 +1265,7 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
     state->dataFurnaces->Furnace(1).MinOATCompressorCooling = -999.0;
     state->dataFurnaces->Furnace(1).MinOATCompressorHeating = -999.0;
 
-    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
+    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = HVAC::CoilDX_CoolingSingleSpeed;
     SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
     EXPECT_FALSE(ErrFound);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
@@ -1273,13 +1273,13 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
 
     // check heating coil types
     // should return 30 in each case since cooling and heating coil now have limit
-    state->dataFurnaces->Furnace(1).HeatingCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
+    state->dataFurnaces->Furnace(1).HeatingCoilType_Num = HVAC::Coil_HeatingAirToAirVariableSpeed;
     SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
     EXPECT_FALSE(ErrFound);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6); // same as above
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, 30.0, 1e-6); // now returns 30
 
-    state->dataFurnaces->Furnace(1).HeatingCoilType_Num = CoilDX_HeatingEmpirical;
+    state->dataFurnaces->Furnace(1).HeatingCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
     SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
     EXPECT_FALSE(ErrFound);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);

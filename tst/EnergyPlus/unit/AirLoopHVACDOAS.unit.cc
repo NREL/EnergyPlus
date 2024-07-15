@@ -68,7 +68,6 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -8876,7 +8875,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestFanHeatAddeToCoolingCoilSize)
     // 9066
     std::string const idf_objects = delimited_string({
 
-        "  Version,24.1;",
+        "  Version,24.2;",
 
         "  SimulationControl,",
         "    YES,                     !- Do Zone Sizing Calculation",
@@ -10393,6 +10392,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompConnectionError)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true);
 
     MixedAir::GetOutsideAirSysInputs(*state);
     state->dataMixedAir->GetOASysInputFlag = false;
@@ -10436,7 +10436,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestFanDrawThroughPlacement)
     // 9066
     std::string const idf_objects = delimited_string({
 
-        "  Version,24.1;",
+        "  Version,24.2;",
 
         "  SimulationControl,",
         "    YES,                     !- Do Zone Sizing Calculation",

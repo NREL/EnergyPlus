@@ -11,6 +11,6 @@ Some additional details for this issue (if relevant):
 ### Checklist
 Add to this list or remove from it as applicable.  This is a simple templated set of guidelines.
  - [ ] Defect file added (list location of defect file here)
- - [ ] Ticket added to Pivotal for defect (development team task)
+ - [ ] Ticket added to EnergyPlus Defect Complexity (Github Project)
  - [ ] Pull request created (the pull request will have additional tasks related to reviewing changes that fix this defect)
 

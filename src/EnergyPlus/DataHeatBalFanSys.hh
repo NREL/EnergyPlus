@@ -157,9 +157,9 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> PreviousMeasuredHumRat1; // Hybrid model zone humidity ratio at previous timestep
     Array1D<Real64> PreviousMeasuredHumRat2; // Hybrid model zone humidity ratio at previous timestep
     Array1D<Real64> PreviousMeasuredHumRat3; // Hybrid model zone humidity ratio at previous timestep
-    EPVector<DataHVACGlobals::ThermostatType> TempControlType;
+    EPVector<HVAC::ThermostatType> TempControlType;
     EPVector<int> TempControlTypeRpt;
-    EPVector<DataHVACGlobals::ThermostatType> ComfortControlType;
+    EPVector<HVAC::ThermostatType> ComfortControlType;
     EPVector<int> ComfortControlTypeRpt;
 
     Array2D<bool> CrossedColdThreshRepPeriod;
@@ -195,9 +195,13 @@ struct HeatBalFanSysData : BaseGlobalStruct
 
     EPVector<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = HeatBalFanSysData();
+        new (this) HeatBalFanSysData();
     }
 };
 

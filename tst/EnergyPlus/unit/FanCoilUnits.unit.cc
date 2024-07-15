@@ -80,7 +80,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEquipment;
@@ -255,12 +254,12 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
-    EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::MultiSpeedFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFanCoilUnits->FanCoil(1).fanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
     EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
@@ -300,13 +299,15 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
+
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
@@ -576,12 +577,12 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
-    EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::MultiSpeedFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFanCoilUnits->FanCoil(1).fanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
     EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
@@ -622,13 +623,14 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
@@ -894,12 +896,12 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
-    EXPECT_TRUE(compare_enums(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFanCoilUnits->FanCoil(1).fanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
     EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
@@ -946,13 +948,14 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
@@ -993,7 +996,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     }
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataWaterCoils->WaterCoil(2).WaterPlantLoc.loopNum = 1;
     state->dataWaterCoils->WaterCoil(2).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
@@ -1292,12 +1295,12 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
-    EXPECT_TRUE(compare_enums(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFanCoilUnits->FanCoil(1).fanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
@@ -1342,13 +1345,14 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMax = 0.14;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(1).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(1).UACoilExternal = 611.0;
@@ -1381,7 +1385,7 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     }
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopNum = 1;
     state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
@@ -1619,12 +1623,12 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
-    EXPECT_TRUE(compare_enums(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFanCoilUnits->FanCoil(1).fanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
     EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
@@ -1672,13 +1676,14 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
@@ -1719,7 +1724,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     }
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataWaterCoils->WaterCoil(2).WaterPlantLoc.loopNum = 1;
     state->dataWaterCoils->WaterCoil(2).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
@@ -1990,12 +1995,12 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
-    EXPECT_TRUE(compare_enums(CCM::ASHRAE, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::ASHRAE, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFanCoilUnits->FanCoil(1).fanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
     EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
@@ -2036,13 +2041,14 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).NodeNumOfControlledZone).Temp = 22.0;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
@@ -2144,12 +2150,12 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     UpdateScheduleValues(*state);
 
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
@@ -2720,12 +2726,12 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
-    EXPECT_TRUE(compare_enums(CCM::CycFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::CycFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFanCoilUnits->FanCoil(1).fanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
     EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
@@ -2765,13 +2771,14 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
@@ -2874,12 +2881,12 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     UpdateScheduleValues(*state);
 
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
@@ -3168,12 +3175,11 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
 
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
 
-    EXPECT_TRUE(compare_enums(CCM::CycFan, thisFanCoil.CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::CycFan, thisFanCoil.CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-    EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
+    EXPECT_EQ((int)HVAC::FanType::SystemModel, (int)thisFanCoil.fanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
-    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -3303,12 +3309,12 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     UpdateScheduleValues(*state);
 
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
@@ -3567,12 +3573,11 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, thisFanCoil.CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::MultiSpeedFan, thisFanCoil.CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-    EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
-    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
+    EXPECT_EQ((int)HVAC::FanType::SystemModel, (int)thisFanCoil.fanType);
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -3665,12 +3670,12 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     UpdateScheduleValues(*state);
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->FinalZoneSizing.allocate(1);
     auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
@@ -3934,12 +3939,11 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, thisFanCoil.CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::MultiSpeedFan, thisFanCoil.CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-    EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
-    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
+    EXPECT_EQ((int)HVAC::FanType::SystemModel, (int)thisFanCoil.fanType);
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -4032,12 +4036,12 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     UpdateScheduleValues(*state);
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->FinalZoneSizing.allocate(1);
     auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
@@ -4301,12 +4305,11 @@ TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, thisFanCoil.CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::MultiSpeedFan, thisFanCoil.CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-    EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
-    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
+    EXPECT_EQ((int)HVAC::FanType::SystemModel, (int)thisFanCoil.fanType);
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -4399,12 +4402,12 @@ TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     UpdateScheduleValues(*state);
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->FinalZoneSizing.allocate(1);
     auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
@@ -4616,9 +4619,9 @@ TEST_F(EnergyPlusFixture, FanCoil_ElectricHeatingCoilASHRAE90VariableFan)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_TRUE(compare_enums(CCM::ASHRAE, thisFanCoil.CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::ASHRAE, thisFanCoil.CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-    EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)thisFanCoil.fanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
 
@@ -4706,7 +4709,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ElectricHeatingCoilASHRAE90VariableFan)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
     thisFanCoil.DesignHeatingCapacity = 6000.0;

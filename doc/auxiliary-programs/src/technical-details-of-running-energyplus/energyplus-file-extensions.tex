@@ -105,10 +105,10 @@ Output:VariableDictionary, IDF;
 This is a text file containing \emph{debug} output for use by EnergyPlus developers. Generally developers will add debug print statements wherever in the code that that they wish. There is a ``standard'' debug output that prints out conditions at all the HVAC nodes. This output is triggered by placing
 
 \begin{lstlisting}
-Output:DebuggingData,1;
+Output:DebuggingData,Yes;
 \end{lstlisting}
 
-in the IDF file. If Output:DebuggingData, 0 is entered, you will get an empty eplusout.dbg file.
+in the IDF file. If Output:DebuggingData,No is entered, you will get an empty eplusout.dbg file.
 
 \subsubsection{dxf}\label{dxf}
 
