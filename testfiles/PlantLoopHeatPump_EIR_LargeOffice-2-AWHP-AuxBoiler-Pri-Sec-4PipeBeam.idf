@@ -10354,7 +10354,7 @@ Curve:Biquadratic,
   Output:Variable,*,Heat Pump Electricity Rate,hourly; !- HVAC Average [W]
   Output:Variable,*,Heat Pump Load Side Mass Flow Rate,hourly; !- HVAC Average [kg/s]
   Output:Variable,*,Heat Pump Source Side Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-  Output:Variable,*,Heat Pump Thermosiphon Status,hourly; !- HVAC Average [kg/s]
+  Output:Variable,*,Thermosiphon Status,hourly; !- HVAC Average [kg/s]
 
   Output:Variable,*,Boiler Heating Rate,hourly; !- HVAC Average [W]
   Output:Variable,*,Boiler Inlet Temperature,hourly; !- HVAC Average [C]
