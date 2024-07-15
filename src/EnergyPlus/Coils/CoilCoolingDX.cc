@@ -989,10 +989,15 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData &state)
 {
     if (!state.dataCoilCooingDX->coilCoolingDXs.empty()) {
         Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
-        static constexpr std::string_view Format_990(
-            "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-            "Cooling Capacity {W}, Standard Rating Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, SEER Standard {Btu/W-h}, IEER {Btu/W-h}\n");
-        print(state.files.eio, "{}", Format_990);
+        if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
+            static constexpr std::string_view Format_994(
+                "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                "Cooling Capacity {W}, Standard Rating Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, "
+                "IEER "
+                "{Btu/W-h}");
+            print(state.files.eio, "{}\n", Format_994);
+            state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag = false;
+        }
         for (auto &coil : state.dataCoilCooingDX->coilCoolingDXs) {
             coil.performance.calcStandardRatings210240(state);
             PopulateCoolingCoilStandardRatingInformation(state.files.eio,
@@ -1057,10 +1062,16 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData &state)
                 "from the appropriate AHRI standard.");
 
             // AHRI 2023 Standard SEER2 Calculations
-            static constexpr std::string_view Format_991(
-                "! <DX Cooling Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                "Cooling Capacity {W}, Standard Rating Net COP2 {W/W}, EER2 {Btu/W-h}, SEER2 {Btu/W-h}, SEER2 Standard {Btu/W-h}, IEER {Btu/W-h}\n");
-            print(state.files.eio, "{}", Format_991);
+            if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag2) {
+                static constexpr std::string_view Format_991_(
+                    "! <DX Cooling Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                    "Cooling Capacity {W}, Standard Rating Net COP2 {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard "
+                    "{Btu/W-h}, "
+                    "IEER 2022 "
+                    "{Btu/W-h}");
+                print(state.files.eio, "{}\n", Format_991_);
+                state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag2 = false;
+            }
             PopulateCoolingCoilStandardRatingInformation(state.files.eio,
                                                          coil.name,
                                                          coil.performance.standardRatingCoolingCapacity2023,

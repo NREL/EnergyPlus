@@ -1143,7 +1143,7 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
         } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Water) {
 
             if (!((state.dataLoopNodes->Node(iNode).FluidIndex > 0) &&
-                  (state.dataLoopNodes->Node(iNode).FluidIndex <= state.dataFluidProperties->NumOfGlycols))) {
+                  (state.dataLoopNodes->Node(iNode).FluidIndex <= state.dataFluidProps->NumOfGlycols))) {
                 rho = RhoWaterStdInit;
                 rhoStd = RhoWaterStdInit;
                 Cp = CPCW(state.dataLoopNodes->Node(iNode).Temp);

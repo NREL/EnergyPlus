@@ -1032,13 +1032,15 @@ namespace VariableSpeedCoils {
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower = NumArray(10);
 
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower < 0.0) {
-                ShowSevereError(
-                    state,
-                    format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(10)));
-                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(10)));
-                ErrorsFound = true;
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower != DataSizing::AutoSize) {
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower < 0.0) {
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
+                    ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(10)));
+                    ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(10)));
+                    ErrorsFound = true;
+                }
             }
 
             // Set crankcase heater capacity

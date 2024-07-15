@@ -166,6 +166,7 @@ public:
 
 TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
@@ -228,7 +229,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     state->dataSize->DataWaterLoopNum = 1;
-    state->dataFluidProperties->NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     createCoilSelectionReportObj(*state);
     SizeWaterCoil(*state, CoilNum);
@@ -400,6 +401,7 @@ TEST_F(WaterCoilsTest, TdbFnHRhPbTest)
 
 TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
@@ -463,7 +465,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->DataWaterLoopNum = 1;
-    state->dataFluidProperties->NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -556,6 +558,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
 
 TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
@@ -619,7 +622,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->DataWaterLoopNum = 1;
-    state->dataFluidProperties->NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -715,6 +718,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
 
 TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
@@ -779,7 +783,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     state->dataSize->CurOASysNum = 0;
 
     state->dataSize->DataWaterLoopNum = 1;
-    state->dataFluidProperties->NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -832,6 +836,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
 TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
 {
     InitializePsychRoutines(*state);
+    FluidProperties::GetFluidPropertiesData(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ShowMessage(*state, "Begin Test: state->dataWaterCoils->WaterCoilsTest, CoilCoolingWaterSimpleSizing");
@@ -899,7 +904,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
 
     state->dataSize->DataWaterLoopNum = 1;
-    state->dataFluidProperties->NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     // run water coil sizing
     createCoilSelectionReportObj(*state);
@@ -935,6 +940,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
 TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
 {
     InitializePsychRoutines(*state);
+    FluidProperties::GetFluidPropertiesData(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ShowMessage(*state, "Begin Test: state->dataWaterCoils->WaterCoilsTest, CoilCoolingWaterDetailedSizing");
@@ -1017,7 +1023,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->DataWaterLoopNum = 1;
-    state->dataFluidProperties->NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     // run water coil sizing
     createCoilSelectionReportObj(*state);
@@ -1050,6 +1056,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
 TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
 {
     InitializePsychRoutines(*state);
+    FluidProperties::GetFluidPropertiesData(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
@@ -1142,7 +1149,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->DataWaterLoopNum = 1;
-    state->dataFluidProperties->NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     OutputReportPredefined::SetPredefinedTables(*state);
 
@@ -1234,6 +1241,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
 TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
 {
     InitializePsychRoutines(*state);
+    FluidProperties::GetFluidPropertiesData(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ShowMessage(*state, "Begin Test: state->dataWaterCoils->WaterCoilsTest, CoilHeatingWaterSimpleSizing");
@@ -1298,7 +1306,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     state->dataSize->PlantSizData(1).DeltaT = 10.0;
 
     state->dataSize->DataWaterLoopNum = 1;
-    state->dataFluidProperties->NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     // run water coil sizing
     createCoilSelectionReportObj(*state);
@@ -1331,6 +1339,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
 }
 TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
@@ -1394,7 +1403,7 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
     state->dataSize->CurOASysNum = 0;
 
     state->dataSize->DataWaterLoopNum = 1;
-    state->dataFluidProperties->NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;

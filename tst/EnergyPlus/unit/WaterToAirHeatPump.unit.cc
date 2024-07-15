@@ -137,8 +137,8 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataFluidProperties->RefrigData.allocate(1);
-    auto &refrig = state->dataFluidProperties->RefrigData(1);
+    state->dataFluidProps->RefrigData.allocate(1);
+    auto &refrig = state->dataFluidProps->RefrigData(1);
     refrig.Name = "R22";
     refrig.Num = 1;
     refrig.PsLowTempIndex = 1;
@@ -308,5 +308,5 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     // clean up
     state->dataWaterToAirHeatPump->WatertoAirHP.deallocate();
-    state->dataFluidProperties->RefrigData.deallocate();
+    state->dataFluidProps->RefrigData.deallocate();
 }

@@ -79,6 +79,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -6455,6 +6456,46 @@ void SingleDuctAirTerminal::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     } else {
         this->OutdoorAirFlowRate = 0.0;
     }
+}
+
+void SingleDuctAirTerminal::reportTerminalUnit(EnergyPlusData &state)
+{
+    // populate the predefined equipment summary report related to air terminals
+    auto &orp = state.dataOutRptPredefined;
+    auto &adu = state.dataDefineEquipment->AirDistUnit(this->ADUNum);
+    if (!state.dataSize->TermUnitFinalZoneSizing.empty()) {
+        auto &sizing = state.dataSize->TermUnitFinalZoneSizing(adu.TermUnitSizingNum);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinFlow, adu.Name, sizing.DesCoolVolFlowMin);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinOutdoorFlow, adu.Name, sizing.MinOA);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSupCoolingSP, adu.Name, sizing.CoolDesTemp);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSupHeatingSP, adu.Name, sizing.HeatDesTemp);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatingCap, adu.Name, sizing.DesHeatLoad);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolingCap, adu.Name, sizing.DesCoolLoad);
+    }
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermTypeInp, adu.Name, this->sysType);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermPrimFlow, adu.Name, this->MaxAirVolFlowRate);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSecdFlow, adu.Name, "n/a");
+    if (this->ZoneMinAirFracSchPtr > 0) {
+        OutputReportPredefined::PreDefTableEntry(
+            state, orp->pdchAirTermMinFlowSch, adu.Name, ScheduleManager::GetScheduleName(state, this->ZoneMinAirFracSchPtr));
+    } else {
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinFlowSch, adu.Name, "n/a");
+    }
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMaxFlowReh, adu.Name, this->MaxAirVolFlowRateDuringReheat);
+    std::string schName = "n/a";
+    if (this->OARequirementsPtr > 0) {
+        int minOAsch = state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowFracSchPtr;
+        if (minOAsch > 0) schName = ScheduleManager::GetScheduleName(state, minOAsch);
+    }
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinOAflowSch, adu.Name, schName);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatCoilType, adu.Name, this->ReheatComp);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolCoilType, adu.Name, "n/a");
+    if ((int)this->fanType >= 0) {
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanType, adu.Name, HVAC::fanTypeNames[(int)this->fanType]);
+    } else {
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanType, adu.Name, "n/a");
+    }
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanName, adu.Name, this->FanName);
 }
 
 //        End of Reporting subroutines for the Sys Module

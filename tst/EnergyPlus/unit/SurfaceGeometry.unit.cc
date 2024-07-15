@@ -3912,6 +3912,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
+        "  Timestep, 20;"
         "  HeatBalanceAlgorithm,",
         "  MoisturePenetrationDepthConductionTransferFunction; !- Algorithm",
         "Material,",

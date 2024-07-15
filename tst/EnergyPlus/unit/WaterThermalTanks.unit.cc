@@ -1751,7 +1751,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     Tank.CalcWaterThermalTankStratified(*state);
 
     // check source inlet and outlet temperatures are different
-    EXPECT_EQ(Tank.SourceInletTemp, 5.0);
+    EXPECT_DOUBLE_EQ(Tank.SourceInletTemp, 5.0);
     EXPECT_NEAR(Tank.SourceOutletTemp, 10.34, 0.01);
 }
 

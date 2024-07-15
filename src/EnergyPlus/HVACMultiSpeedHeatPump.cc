@@ -76,6 +76,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -453,6 +454,8 @@ namespace HVACMultiSpeedHeatPump {
 
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will get the input required by the multispeed heat pump model
+
+        using namespace OutputReportPredefined;
 
         // PARAMETERS
         static constexpr std::string_view RoutineName("GetMSHeatPumpInput: "); // include trailing blank space
@@ -1229,6 +1232,8 @@ namespace HVACMultiSpeedHeatPump {
                 ShowContinueError(state, format("The input value is {:.2R}", Numbers(3)));
                 ErrorsFound = true;
             }
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXHeatCoilSuppHiT, thisMSHP.DXHeatCoilName, thisMSHP.SuppMaxOATemp);
 
             thisMSHP.AuxOnCyclePower = Numbers(4);
             thisMSHP.AuxOffCyclePower = Numbers(5);

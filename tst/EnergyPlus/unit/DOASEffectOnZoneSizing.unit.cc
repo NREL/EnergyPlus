@@ -139,7 +139,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
 
 TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
 {
-
+    state->init_state(*state);
     state->dataLoopNodes->Node.allocate(10);
     state->dataSize->ZoneEqSizing.allocate(2);
     state->dataHeatBal->Zone.allocate(2);

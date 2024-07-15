@@ -8691,6 +8691,14 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                                                  equipName,
                                                  thisDXCoil.AirLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(thisDXCoil.AirLoopNum).Name
                                                                            : "N/A");
+        // std 229 existing table DX Heating coil 2023 AHRI new reporting variables
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchDXHeatCoilMinOADBTforCompOp_2023, equipName, thisDXCoil.MinOATCompressor);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchDXHeatCoilAirloopName_2023,
+                                                 equipName,
+                                                 thisDXCoil.AirLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(thisDXCoil.AirLoopNum).Name
+                                                                           : "N/A");
     } break;
     default:
         break;
@@ -14871,10 +14879,9 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
           SupAirMdot_TestPoint(4));
 
     if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
-
         static constexpr std::string_view Format_994(
             "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-            "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, "
+            "Cooling Capacity {W}, Standard Rating Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, "
             "IEER "
             "{Btu/W-h}");
         print(state.files.eio, "{}\n", Format_994);

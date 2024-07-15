@@ -75,6 +75,7 @@ class AverageZoneTemps(EnergyPlusPlugin):
                     self.api.exchange.get_variable_handle(state, "Zone Mean Air Temperature", zone_name)
                 )
             self.data["avg_temp_variable"] = self.api.exchange.get_global_handle(state, "AverageBuildingTemp")
+            #  x = self.api.exchange.get_api_data(state)  # use this to inspect API data
             self.do_setup = False
         zone_temps = list()
         for t_handle in self.data["zone_temps"]:

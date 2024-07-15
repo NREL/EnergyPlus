@@ -390,7 +390,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<FansData> dataFans;
     std::unique_ptr<FaultsManagerData> dataFaultsMgr;
     std::unique_ptr<FluidCoolersData> dataFluidCoolers;
-    std::unique_ptr<FluidData> dataFluidProperties;
+    std::unique_ptr<FluidData> dataFluidProps;
     std::unique_ptr<FourPipeBeamData> dataFourPipeBeam;
     std::unique_ptr<FuelCellElectricGeneratorData> dataFuelCellElectGen;
     std::unique_ptr<FurnacesData> dataFurnaces;
@@ -577,6 +577,7 @@ struct EnergyPlusData : BaseGlobalStruct
     EnergyPlusData(EnergyPlusData &&) = delete;
 
     void init_state([[maybe_unused]] EnergyPlusData &state) override;
+    bool init_state_called = false;
 
     void clear_state() override;
 };
