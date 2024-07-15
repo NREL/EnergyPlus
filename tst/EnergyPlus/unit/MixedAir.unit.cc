@@ -7667,4 +7667,88 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
     EXPECT_TRUE(AirLoopCntrlInfo.HeatingActiveFlag);
     EXPECT_EQ(1, curOACntrl.HRHeatingCoilActive);
 }
+
+TEST_F(EnergyPlusFixture, MixedAir_TemperatureError)
+{
+    std::string const idf_objects = delimited_string({
+        "  OutdoorAir:NodeList,",
+        "    Outdoor Air Inlet;  !-Node or NodeList Name 1",
+
+        "  Controller:OutdoorAir,",
+        "    OA Controller 1,         !- Name",
+        "    Relief Air Outlet Node,  !- Relief Air Outlet Node Name",
+        "    Air Loop Inlet Node,     !- Return Air Node Name",
+        "    Mixed Air Node,          !- Mixed Air Node Name",
+        "    Outdoor Air Inlet,       !- Actuator Node Name",
+        "    autosize,                     !- Minimum Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                     !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "    DifferentialDryBulb,            !- Economizer Control Type", // Economizer should open for this one, so OA flow should be > min OA
+        "    ModulateFlow,            !- Economizer Control Action Type",
+        "    20,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+        "    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+        "    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+        "    ,                        !- Electronic Enthalpy Limit Curve Name",
+        "    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+        "    NoLockout,               !- Lockout Type", // No lockout
+        "    FixedMinimum,     !- Minimum Limit Type",
+        "    ,                        !- Minimum Outdoor Air Schedule Name",
+        "    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+        "    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+        "    ,                        !- Mechanical Ventilation Controller Name",
+        "    ,                        !- Time of Day Economizer Control Schedule Name",
+        "    No,                      !- High Humidity Control",
+        "    ,                        !- Humidistat Control Zone Name",
+        "    ,                        !- High Humidity Outdoor Air Flow Ratio",
+        "    No;                      !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+
+        "  OutdoorAir:Mixer,",
+        "    OA Mixer,                !- Name",
+        "    Mixed Air Node,          !- Mixed Air Node Name",
+        "    Outdoor Air Inlet, !- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node,  !- Relief Air Stream Node Name",
+        "    Air Loop Inlet Node;     !- Return Air Stream Node Name",
+
+        " AirLoopHVAC:ControllerList,",
+        "    OA Sys 1 controller,     !- Name",
+        "    Controller:OutdoorAir,   !- Controller 1 Object Type",
+        "    OA Controller 1;         !- Controller 1 Name",
+
+        " AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
+        "    OA Sys 1 Equipment list, !- Name",
+        "    OutdoorAir:Mixer,        !- Component 2 Object Type",
+        "    OA Mixer;                !- Component 2 Name",
+
+        " AirLoopHVAC:OutdoorAirSystem,",
+        "    OA Sys 1, !- Name",
+        "    OA Sys 1 controller,     !- Controller List Name",
+        "    OA Sys 1 Equipment list; !- Outdoor Air Equipment List Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    GetOAControllerInputs(*state);
+
+    EXPECT_EQ(1, GetNumOAMixers(*state));
+
+    auto return_node = state->dataMixedAir->OAMixer(1).RetNode;
+    auto outdoor_air_node = state->dataMixedAir->OAMixer(1).InletNode;
+
+    state->dataLoopNodes->Node(outdoor_air_node).Temp = -17.3;
+    state->dataLoopNodes->Node(outdoor_air_node).HumRat = 0.0008;
+    state->dataLoopNodes->Node(outdoor_air_node).Enthalpy = -15312;
+    state->dataLoopNodes->Node(outdoor_air_node).Press = 99063;
+    state->dataLoopNodes->Node(outdoor_air_node).MassFlowRate = 0.1223;
+    state->dataLoopNodes->Node(return_node).Temp = 20.0;
+    state->dataLoopNodes->Node(return_node).HumRat = 0.0146;
+    state->dataLoopNodes->Node(return_node).Enthalpy = 57154;
+    state->dataLoopNodes->Node(return_node).Press = 99063;
+    state->dataLoopNodes->Node(return_node).MassFlowRate = 0.2923;
+
+    MixedAir::SimOAMixer(*state, state->dataAirLoop->OutsideAirSys(1).ComponentName(1), state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1));
+
+    auto T_sat = Psychrometrics::PsyTsatFnHPb(*state, state->dataMixedAir->OAMixer(1).MixEnthalpy, state->dataMixedAir->OAMixer(1).MixPressure);
+
+    // T_db must be >= T_sat at the mixed-air node to remain physical
+    EXPECT_TRUE(state->dataMixedAir->OAMixer(1).MixTemp >= T_sat);
+}
+
 } // namespace EnergyPlus
