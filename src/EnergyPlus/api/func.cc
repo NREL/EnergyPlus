@@ -62,7 +62,7 @@ void initializeFunctionalAPI(EnergyPlusState state)
         thisState->dataInputProcessing->inputProcessor = EnergyPlus::InputProcessor::factory();
     }
     EnergyPlus::Psychrometrics::InitializePsychRoutines(*thisState);
-    EnergyPlus::Fluid::InitializeGlycRoutines();
+    EnergyPlus::FluidProperties::InitializeGlycRoutines();
 }
 
 const char *apiVersionFromEPlus(EnergyPlusState)
@@ -89,68 +89,68 @@ void registerErrorCallback(EnergyPlusState state, void (*f)(int, const char *))
 Glycol glycolNew(EnergyPlusState state, const char *glycolName)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    auto *glycol = new EnergyPlus::Fluid::GlycolAPI(*thisState, glycolName);
+    auto *glycol = new EnergyPlus::FluidProperties::GlycolAPI(*thisState, glycolName);
     return reinterpret_cast<Glycol>(glycol);
 }
 void glycolDelete(EnergyPlusState, Glycol glycol)
 {
-    delete reinterpret_cast<EnergyPlus::Fluid::GlycolAPI *>(glycol);
+    delete reinterpret_cast<EnergyPlus::FluidProperties::GlycolAPI *>(glycol);
 }
 Real64 glycolSpecificHeat(EnergyPlusState state, Glycol glycol, Real64 temperature)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    return reinterpret_cast<EnergyPlus::Fluid::GlycolAPI *>(glycol)->specificHeat(*thisState, temperature);
+    return reinterpret_cast<EnergyPlus::FluidProperties::GlycolAPI *>(glycol)->specificHeat(*thisState, temperature);
 }
 Real64 glycolDensity(EnergyPlusState state, Glycol glycol, Real64 temperature)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    return reinterpret_cast<EnergyPlus::Fluid::GlycolAPI *>(glycol)->density(*thisState, temperature);
+    return reinterpret_cast<EnergyPlus::FluidProperties::GlycolAPI *>(glycol)->density(*thisState, temperature);
 }
 Real64 glycolConductivity(EnergyPlusState state, Glycol glycol, Real64 temperature)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    return reinterpret_cast<EnergyPlus::Fluid::GlycolAPI *>(glycol)->conductivity(*thisState, temperature);
+    return reinterpret_cast<EnergyPlus::FluidProperties::GlycolAPI *>(glycol)->conductivity(*thisState, temperature);
 }
 Real64 glycolViscosity(EnergyPlusState state, Glycol glycol, Real64 temperature)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    return reinterpret_cast<EnergyPlus::Fluid::GlycolAPI *>(glycol)->viscosity(*thisState, temperature);
+    return reinterpret_cast<EnergyPlus::FluidProperties::GlycolAPI *>(glycol)->viscosity(*thisState, temperature);
 }
 
 Refrigerant refrigerantNew(EnergyPlusState state, const char *refrigerantName)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    auto *refrigerant = new EnergyPlus::Fluid::RefrigerantAPI(*thisState, refrigerantName);
+    auto *refrigerant = new EnergyPlus::FluidProperties::RefrigerantAPI(*thisState, refrigerantName);
     return reinterpret_cast<Refrigerant>(refrigerant);
 }
 void refrigerantDelete(EnergyPlusState, Refrigerant refrigerant)
 {
-    delete reinterpret_cast<EnergyPlus::Fluid::RefrigerantAPI *>(refrigerant);
+    delete reinterpret_cast<EnergyPlus::FluidProperties::RefrigerantAPI *>(refrigerant);
 }
 Real64 refrigerantSaturationPressure(EnergyPlusState state, Refrigerant refrigerant, Real64 temperature)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    return reinterpret_cast<EnergyPlus::Fluid::RefrigerantAPI *>(refrigerant)->saturationPressure(*thisState, temperature);
+    return reinterpret_cast<EnergyPlus::FluidProperties::RefrigerantAPI *>(refrigerant)->saturationPressure(*thisState, temperature);
 }
 Real64 refrigerantSaturationTemperature(EnergyPlusState state, Refrigerant refrigerant, Real64 pressure)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    return reinterpret_cast<EnergyPlus::Fluid::RefrigerantAPI *>(refrigerant)->saturationTemperature(*thisState, pressure);
+    return reinterpret_cast<EnergyPlus::FluidProperties::RefrigerantAPI *>(refrigerant)->saturationTemperature(*thisState, pressure);
 }
 Real64 refrigerantSaturatedEnthalpy(EnergyPlusState state, Refrigerant refrigerant, Real64 temperature, Real64 quality)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    return reinterpret_cast<EnergyPlus::Fluid::RefrigerantAPI *>(refrigerant)->saturatedEnthalpy(*thisState, temperature, quality);
+    return reinterpret_cast<EnergyPlus::FluidProperties::RefrigerantAPI *>(refrigerant)->saturatedEnthalpy(*thisState, temperature, quality);
 }
 Real64 refrigerantSaturatedDensity(EnergyPlusState state, Refrigerant refrigerant, Real64 temperature, Real64 quality)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    return reinterpret_cast<EnergyPlus::Fluid::RefrigerantAPI *>(refrigerant)->saturatedDensity(*thisState, temperature, quality);
+    return reinterpret_cast<EnergyPlus::FluidProperties::RefrigerantAPI *>(refrigerant)->saturatedDensity(*thisState, temperature, quality);
 }
 Real64 refrigerantSaturatedSpecificHeat(EnergyPlusState state, Refrigerant refrigerant, Real64 temperature, Real64 quality)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    return reinterpret_cast<EnergyPlus::Fluid::RefrigerantAPI *>(refrigerant)->saturatedSpecificHeat(*thisState, temperature, quality);
+    return reinterpret_cast<EnergyPlus::FluidProperties::RefrigerantAPI *>(refrigerant)->saturatedSpecificHeat(*thisState, temperature, quality);
 }
 // Real64 refrigerantSuperHeatedEnthalpy(EnergyPlusState, Refrigerant refrigerant, Real64 temperature, Real64 pressure) {
 //    return reinterpret_cast<EnergyPlus::FluidProperties::RefrigerantAPI *>(refrigerant)->superHeatedEnthalpy(temperature, pressure);

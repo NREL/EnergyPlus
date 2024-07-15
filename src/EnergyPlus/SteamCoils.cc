@@ -214,7 +214,6 @@ namespace SteamCoils {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using Fluid::FindRefrigerant;
         using GlobalNames::VerifyUniqueCoilName;
         using NodeInputManager::GetOnlySingleNode;
 
@@ -371,7 +370,7 @@ namespace SteamCoils {
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
 
             if (state.dataSteamCoils->SteamIndex == 0 && CoilNum == 1) {
-                state.dataSteamCoils->SteamIndex = FindRefrigerant(state, "Steam");
+                state.dataSteamCoils->SteamIndex = FluidProperties::GetRefrigNum(state, "Steam");
                 if (state.dataSteamCoils->SteamIndex == 0) {
                     ShowSevereError(state, format("{}Steam Properties for {} not found.", RoutineName, AlphArray(1)));
                     ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
@@ -467,8 +466,8 @@ namespace SteamCoils {
         // na
 
         // Using/Aliasing
-        using Fluid::GetSatDensityRefrig;
-        using Fluid::GetSatEnthalpyRefrig;
+        using FluidProperties::GetSatDensityRefrig;
+        using FluidProperties::GetSatEnthalpyRefrig;
         using PlantUtilities::InitComponentNodes;
 
         // Locals
@@ -663,8 +662,8 @@ namespace SteamCoils {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using Fluid::GetSatDensityRefrig;
-        using Fluid::GetSatEnthalpyRefrig;
+        using FluidProperties::GetSatDensityRefrig;
+        using FluidProperties::GetSatEnthalpyRefrig;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -827,7 +826,7 @@ namespace SteamCoils {
                         //                                              TempSteamIn, &
                         //                                              PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                         //                                             'SizeSteamCoil')
-                        CpWater = Fluid::GetSatSpecificHeatRefrig(
+                        CpWater = FluidProperties::GetSatSpecificHeatRefrig(
                             state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                         state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate =
@@ -896,7 +895,7 @@ namespace SteamCoils {
                             //                                             TempSteamIn, &
                             //                                             PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                             //                                            'SizeSteamCoil')
-                            CpWater = Fluid::GetSatSpecificHeatRefrig(
+                            CpWater = FluidProperties::GetSatSpecificHeatRefrig(
                                 state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                             state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate =
@@ -1117,9 +1116,9 @@ namespace SteamCoils {
                 // converted to water and only then the steam trap allows it to leave the heat
                 // exchanger, subsequently heat exchange is latent heat + subcooling.
                 EnthSteamInDry =
-                    Fluid::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                    FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                 EnthSteamOutWet =
-                    Fluid::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                    FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
@@ -1128,7 +1127,7 @@ namespace SteamCoils {
                 //                                           PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                 //                                           'CalcSteamAirCoil')
 
-                CpWater = Fluid::GetSatSpecificHeatRefrig(
+                CpWater = FluidProperties::GetSatSpecificHeatRefrig(
                     state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
 
                 // Max Heat Transfer
@@ -1180,7 +1179,7 @@ namespace SteamCoils {
                 // considering saturated state.
                 //              StdBaroPress=101325
 
-                TempWaterAtmPress = Fluid::GetSatTemperatureRefrig(
+                TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(
                     state, fluidNameSteam, state.dataEnvrn->StdBaroPress, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                 // Point 4 at atm - loop delta subcool during return journery back to pump
@@ -1188,15 +1187,15 @@ namespace SteamCoils {
 
                 // Actual Steam Coil Outlet Enthalpy
                 EnthCoilOutlet =
-                    Fluid::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
+                    FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
                     CpWater * SubcoolDeltaTemp;
 
                 // Enthalpy at Point 4
-                EnthAtAtmPress = Fluid::GetSatEnthalpyRefrig(
+                EnthAtAtmPress = FluidProperties::GetSatEnthalpyRefrig(
                     state, fluidNameSteam, TempWaterAtmPress, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                 // Reported value of coil outlet enthalpy at the node to match the node outlet temperature
-                CpWater = Fluid::GetSatSpecificHeatRefrig(
+                CpWater = FluidProperties::GetSatSpecificHeatRefrig(
                     state, fluidNameSteam, TempLoopOutToPump, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
 
                 EnthPumpInlet = EnthAtAtmPress - CpWater * state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
@@ -1232,16 +1231,16 @@ namespace SteamCoils {
                 // converted to water and only then the steam trap allows it to leave the heat
                 // exchanger, subsequently heat exchange is latent heat + subcooling.
                 EnthSteamInDry =
-                    Fluid::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                    FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                 EnthSteamOutWet =
-                        Fluid::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                        FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
                 //          CpWater = GetSpecificHeatGlycol('WATER',  &
                 //                                           TempSteamIn, &
                 //                                           PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                 //                                           'CalcSteamAirCoil')
-                CpWater = Fluid::GetSatSpecificHeatRefrig(
+                CpWater = FluidProperties::GetSatSpecificHeatRefrig(
                     state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
 
                 // Max Heat Transfer
@@ -1352,22 +1351,22 @@ namespace SteamCoils {
                     // considering saturated state.
                     //              StdBaroPress=101325
 
-                    TempWaterAtmPress = Fluid::GetSatTemperatureRefrig(
+                    TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(
                         state, fluidNameSteam, state.dataEnvrn->StdBaroPress, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                     // Point 4 at atm - loop delta subcool during return journery back to pump
                     TempLoopOutToPump = TempWaterAtmPress - state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
 
                     // Actual Steam Coil Outlet Enthalpy
-                    EnthCoilOutlet = Fluid::GetSatEnthalpyRefrig(
+                    EnthCoilOutlet = FluidProperties::GetSatEnthalpyRefrig(
                                          state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
                                      CpWater * SubcoolDeltaTemp;
 
                     // Enthalpy at Point 4
-                    EnthAtAtmPress = Fluid::GetSatEnthalpyRefrig(
+                    EnthAtAtmPress = FluidProperties::GetSatEnthalpyRefrig(
                         state, fluidNameSteam, TempWaterAtmPress, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
-                    CpWater = Fluid::GetSatSpecificHeatRefrig(
+                    CpWater = FluidProperties::GetSatSpecificHeatRefrig(
                         state, fluidNameSteam, TempLoopOutToPump, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
 
                     // Reported value of coil outlet enthalpy at the node to match the node outlet temperature

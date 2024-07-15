@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/SingleDuct.hh>
@@ -359,7 +360,8 @@ namespace HVACVariableRefrigerantFlow {
         Real64 OUCondHeatRate;            // Outdoor Unit Condenser Heat Release Rate, excluding piping loss [W]
         Real64 OUEvapHeatRate;            // Outdoor Unit Evaporator Heat Extract Rate, excluding piping loss  [W]
         Real64 OUFanPower;                // Outdoor unit fan power at real conditions[W]
-        std::string RefrigerantName;      // Name of refrigerant, must match name in FluidName (see fluidpropertiesrefdata.idf)
+        std::string refrigName;      // Name of refrigerant, must match name in FluidName (see fluidpropertiesrefdata.idf)
+        FluidProperties::RefrigerantData *refrig;
         Real64 RatedEvapCapacity;         // Rated Evaporative Capacity [W]
         Real64 RatedHeatCapacity;         // Rated Heating Capacity [W]
         Real64 RatedCompPower;            // Rated Compressor Power [W]

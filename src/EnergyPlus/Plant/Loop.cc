@@ -133,7 +133,7 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
 
     if (this->FluidType == DataLoopNode::NodeFluidType::Water) {
 
-            Cp = Fluid::GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
+            Cp = FluidProperties::GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
 
         switch (this->LoopDemandCalcScheme) {
         case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
@@ -177,7 +177,7 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
 
     } else if (this->FluidType == DataLoopNode::NodeFluidType::Steam) {
 
-        Cp = Fluid::GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
+        Cp = FluidProperties::GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
 
         switch (this->LoopDemandCalcScheme) {
         case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
@@ -188,8 +188,8 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
             // Calculate the delta temperature
             DeltaTemp = LoopSetPointTemperature - TargetTemp;
 
-            EnthalpySteamSatVapor = Fluid::GetSatEnthalpyRefrig(state, this->FluidName, LoopSetPointTemperature, 1.0, this->FluidIndex, RoutineNameAlt);
-            EnthalpySteamSatLiquid = Fluid::GetSatEnthalpyRefrig(state, this->FluidName, LoopSetPointTemperature, 0.0, this->FluidIndex, RoutineNameAlt);
+            EnthalpySteamSatVapor = FluidProperties::GetSatEnthalpyRefrig(state, this->FluidName, LoopSetPointTemperature, 1.0, this->FluidIndex, RoutineNameAlt);
+            EnthalpySteamSatLiquid = FluidProperties::GetSatEnthalpyRefrig(state, this->FluidName, LoopSetPointTemperature, 0.0, this->FluidIndex, RoutineNameAlt);
 
             LatentHeatSteam = EnthalpySteamSatVapor - EnthalpySteamSatLiquid;
 

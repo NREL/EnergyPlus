@@ -118,7 +118,7 @@ void EnergyPlusFixture::SetUp()
     state->dataUtilityRoutines->outputErrorHeader = false;
 
     Psychrometrics::InitializePsychRoutines(*state);
-    Fluid::InitializeGlycRoutines();
+    FluidProperties::InitializeGlycRoutines();
     createCoilSelectionReportObj(*state);
 }
 
@@ -349,8 +349,8 @@ bool EnergyPlusFixture::process_idf(std::string_view const idf_snippet, bool use
     inputProcessor->initializeMaps();
     SimulationManager::PostIPProcessing(*state);
 
-    Fluid::GetFluidPropertiesData(*state);
-    state->dataFluid->GetInput = false;
+    FluidProperties::GetFluidPropertiesData(*state);
+    state->dataFluidProperties->GetInput = false;
 
     if (state->dataSQLiteProcedures->sqlite) {
         bool writeOutputToSQLite = false;

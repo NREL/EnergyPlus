@@ -300,7 +300,7 @@ void FigureHeightPattern(EnergyPlusData &state, int const PattrnID, int const Zo
     // treat profile as lookup table and interpolate
 
     // Using/Aliasing
-    using Fluid::FindArrayIndex;
+    using FluidProperties::FindArrayIndex;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

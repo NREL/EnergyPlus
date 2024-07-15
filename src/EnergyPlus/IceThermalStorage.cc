@@ -224,7 +224,7 @@ namespace IceThermalStorage {
         }
         Real64 DemandMdot = this->DesignMassFlowRate;
 
-        Real64 Cp = Fluid::GetSpecificHeatGlycol(state,
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                            TempIn,
                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -361,7 +361,7 @@ namespace IceThermalStorage {
         }
 
         // Calculate the current load on the ice storage unit
-        Real64 Cp = Fluid::GetSpecificHeatGlycol(state,
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                            TempIn,
                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -1688,7 +1688,7 @@ namespace IceThermalStorage {
         //----------------------------
         int loopNum = this->plantLoc.loopNum;
 
-        Real64 CpFluid = Fluid::GetDensityGlycol(state,
+        Real64 CpFluid = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(loopNum).FluidName,
                                                            state.dataLoopNodes->Node(this->PltInletNodeNum).Temp,
                                                            state.dataPlnt->PlantLoop(loopNum).FluidIndex,

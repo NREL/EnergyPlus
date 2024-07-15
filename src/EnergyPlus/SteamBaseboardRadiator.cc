@@ -267,7 +267,6 @@ namespace SteamBaseboardRadiator {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using Fluid::FindRefrigerant;
 
         using GlobalNames::VerifyUniqueBaseboardName;
         using NodeInputManager::GetOnlySingleNode;
@@ -780,7 +779,7 @@ namespace SteamBaseboardRadiator {
             }
 
             if (state.dataSteamBaseboardRadiator->SteamIndex == 0 && BaseboardNum == 1) {
-                state.dataSteamBaseboardRadiator->SteamIndex = FindRefrigerant(state, "Steam");
+                state.dataSteamBaseboardRadiator->SteamIndex = FluidProperties::GetRefrigNum(state, "Steam");
                 if (state.dataSteamBaseboardRadiator->SteamIndex == 0) {
                     ShowSevereError(state, format("{}Steam Properties for {} not found.", RoutineName, state.dataIPShortCut->cAlphaArgs(1)));
                     if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
@@ -909,8 +908,8 @@ namespace SteamBaseboardRadiator {
         // REFERENCES:
 
         // Using/Aliasing
-        using Fluid::GetSatDensityRefrig;
-        using Fluid::GetSatEnthalpyRefrig;
+        using FluidProperties::GetSatDensityRefrig;
+        using FluidProperties::GetSatEnthalpyRefrig;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
@@ -1069,9 +1068,9 @@ namespace SteamBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using Fluid::GetSatDensityRefrig;
-        using Fluid::GetSatEnthalpyRefrig;
-        using Fluid::GetSatSpecificHeatRefrig;
+        using FluidProperties::GetSatDensityRefrig;
+        using FluidProperties::GetSatEnthalpyRefrig;
+        using FluidProperties::GetSatSpecificHeatRefrig;
         using HVAC::HeatingCapacitySizing;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -1295,9 +1294,9 @@ namespace SteamBaseboardRadiator {
         // REFERENCES:
 
         // Using/Aliasing
-        using Fluid::GetSatDensityRefrig;
-        using Fluid::GetSatEnthalpyRefrig;
-        using Fluid::GetSatSpecificHeatRefrig;
+        using FluidProperties::GetSatDensityRefrig;
+        using FluidProperties::GetSatEnthalpyRefrig;
+        using FluidProperties::GetSatSpecificHeatRefrig;
         using HVAC::SmallLoad;
         using ScheduleManager::GetCurrentScheduleValue;
 

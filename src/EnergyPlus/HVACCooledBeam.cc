@@ -508,7 +508,7 @@ namespace HVACCooledBeam {
 
         // Using/Aliasing
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using Fluid::GetDensityGlycol;
+        using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
@@ -647,8 +647,8 @@ namespace HVACCooledBeam {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using Fluid::GetDensityGlycol;
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetDensityGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -1021,8 +1021,8 @@ namespace HVACCooledBeam {
         // na
 
         // Using/Aliasing
-        using Fluid::GetDensityGlycol;
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetDensityGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SetComponentFlowRate;
 
         // Locals

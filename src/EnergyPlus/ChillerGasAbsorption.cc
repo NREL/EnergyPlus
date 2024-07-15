@@ -948,7 +948,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
         if (this->isWaterCooled) {
             // init max available condenser water flow rate
             if (this->CDplantLoc.loopNum > 0) {
-                rho = Fluid::GetDensityGlycol(state,
+                rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).FluidName,
                                                         Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).FluidIndex,
@@ -962,7 +962,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
         }
 
         if (this->HWplantLoc.loopNum > 0) {
-            rho = Fluid::GetDensityGlycol(state,
+            rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidName,
                                                     Constant::HWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidIndex,
@@ -975,7 +975,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
         PlantUtilities::InitComponentNodes(state, 0.0, this->DesHeatMassFlowRate, HeatInletNode, HeatOutletNode);
 
         if (this->CWplantLoc.loopNum > 0) {
-            rho = Fluid::GetDensityGlycol(state,
+            rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidName,
                                                     Constant::CWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidIndex,
@@ -1059,12 +1059,12 @@ void GasAbsorberSpecs::size(EnergyPlusData &state)
 
     if (PltSizCoolNum > 0) {
         if (state.dataSize->PlantSizData(PltSizCoolNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
-            Cp = Fluid::GetSpecificHeatGlycol(state,
+            Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidName,
                                                         Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidIndex,
                                                         RoutineName);
-            rho = Fluid::GetDensityGlycol(state,
+            rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidName,
                                                     Constant::CWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidIndex,
@@ -1288,12 +1288,12 @@ void GasAbsorberSpecs::size(EnergyPlusData &state)
     if (PltSizCondNum > 0 && PltSizCoolNum > 0) {
         if (state.dataSize->PlantSizData(PltSizCoolNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow && tmpNomCap > 0.0) {
 
-            Cp = Fluid::GetSpecificHeatGlycol(state,
+            Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).FluidName,
                                                         this->TempDesCondReturn,
                                                         state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).FluidIndex,
                                                         RoutineName);
-            rho = Fluid::GetDensityGlycol(state,
+            rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).FluidName,
                                                     this->TempDesCondReturn,
                                                     state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).FluidIndex,
@@ -1532,7 +1532,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
     Real64 ChillDeltaTemp = std::abs(lChillReturnTemp - ChillSupplySetPointTemp);
 
     // local fluid specific heat for chilled water
-    Real64 Cp_CW = Fluid::GetSpecificHeatGlycol(state,
+    Real64 Cp_CW = FluidProperties::GetSpecificHeatGlycol(state,
                                                           state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidName,
                                                           lChillReturnTemp,
                                                           state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidIndex,
@@ -1540,7 +1540,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
     // local fluid specific heat for condenser water
     Real64 Cp_CD = 0; // putting this here as a dummy initialization to hush the compiler warning, in real runs this value should never be used
     if (this->CDplantLoc.loopNum > 0) {
-        Cp_CD = Fluid::GetSpecificHeatGlycol(state,
+        Cp_CD = FluidProperties::GetSpecificHeatGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).FluidName,
                                                        lChillReturnTemp,
                                                        state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).FluidIndex,
@@ -1854,7 +1854,7 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
     LoopNum = this->HWplantLoc.loopNum;
     LoopSideNum = this->HWplantLoc.loopSideNum;
 
-    Cp_HW = Fluid::GetSpecificHeatGlycol(
+    Cp_HW = FluidProperties::GetSpecificHeatGlycol(
         state, state.dataPlnt->PlantLoop(LoopNum).FluidName, lHotWaterReturnTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
 
     lCoolElectricPower = this->CoolElectricPower;

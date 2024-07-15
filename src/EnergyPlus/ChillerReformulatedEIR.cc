@@ -990,7 +990,7 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
 
     if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
-        Real64 rho = Fluid::GetDensityGlycol(state,
+        Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                        Constant::CWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
@@ -1002,7 +1002,7 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
 
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
 
-            rho = Fluid::GetDensityGlycol(state,
+            rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                     this->TempRefCondIn,
                                                     state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
@@ -1027,7 +1027,7 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
         }
 
         if (this->HeatRecActive) {
-            rho = Fluid::GetDensityGlycol(state,
+            rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                     Constant::HWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
@@ -1197,12 +1197,12 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                 SizingEvapOutletTemp = state.dataSize->PlantSizData(PltSizNum).ExitTemp;
                 SizingCondOutletTemp = state.dataSize->PlantSizData(PltSizCondNum).ExitTemp + state.dataSize->PlantSizData(PltSizCondNum).DeltaT;
             }
-            Real64 Cp = Fluid::GetSpecificHeatGlycol(state,
+            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                                Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
-            Real64 rho = Fluid::GetDensityGlycol(state,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                            Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
@@ -1263,12 +1263,12 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
 
     if (PltSizCondNum > 0 && PltSizNum > 0 && this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow && tmpNomCap > 0.0) {
-            Real64 rho = Fluid::GetDensityGlycol(state,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                            Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
-            Real64 Cp = Fluid::GetSpecificHeatGlycol(state,
+            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                                this->TempRefCondIn,
                                                                state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
@@ -1607,13 +1607,13 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
         }
 
         //  Initialize condenser reference inlet temperature (not a user input)
-        Real64 Density = Fluid::GetDensityGlycol(state,
+        Real64 Density = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                            this->TempRefCondOut,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
-        Real64 SpecificHeat = Fluid::GetSpecificHeatGlycol(state,
+        Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol(state,
                                                                      state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                                      this->TempRefCondOut,
                                                                      state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
@@ -1846,14 +1846,14 @@ void ReformulatedEIRChillerSpecs::calcHeatRecovery(EnergyPlusData &state,
     Real64 heatRecInletTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
     Real64 HeatRecMassFlowRate = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;
 
-    Real64 CpHeatRec = Fluid::GetSpecificHeatGlycol(state,
+    Real64 CpHeatRec = FluidProperties::GetSpecificHeatGlycol(state,
                                                               state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                               heatRecInletTemp,
                                                               state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                               RoutineName);
     Real64 CpCond;
     if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-        CpCond = Fluid::GetSpecificHeatGlycol(state,
+        CpCond = FluidProperties::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                         condInletTemp,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
@@ -2158,7 +2158,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     // This chiller is currently has only a water-cooled condenser
 
     // Calculate water side load
-    Real64 Cp = Fluid::GetSpecificHeatGlycol(state,
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                        state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp,
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
@@ -2442,7 +2442,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
         // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
         if (this->HeatRecActive) this->calcHeatRecovery(state, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovery);
-        Cp = Fluid::GetSpecificHeatGlycol(state,
+        Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                     condInletTemp,
                                                     state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,

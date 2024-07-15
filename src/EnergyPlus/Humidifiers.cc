@@ -721,10 +721,8 @@ namespace Humidifiers {
 
         // Using/Aliasing
         using DataSizing::AutoSize;
-        using Fluid::FindGlycol;
-        using Fluid::FindRefrigerant;
-        using Fluid::GetSatEnthalpyRefrig;
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetSatEnthalpyRefrig;
+        using FluidProperties::GetSpecificHeatGlycol;
 
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::RhoH2O;
@@ -880,8 +878,8 @@ namespace Humidifiers {
             }
 
             NomCap = RhoH2O(Constant::InitConvTemp) * NomCapVol;
-            RefrigerantIndex = FindRefrigerant(state, format(fluidNameSteam));
-            WaterIndex = FindGlycol(state, format(fluidNameWater));
+            RefrigerantIndex = FluidProperties::GetRefrigNum(state, format(fluidNameSteam));
+            WaterIndex = FluidProperties::GetGlycolNum(state, format(fluidNameWater));
             SteamSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 1.0, RefrigerantIndex, CalledFrom);
             WaterSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 0.0, RefrigerantIndex, CalledFrom);
             WaterSpecHeatAvg = 0.5 * (GetSpecificHeatGlycol(state, format(fluidNameWater), TSteam, WaterIndex, CalledFrom) +
@@ -1164,10 +1162,8 @@ namespace Humidifiers {
 
         // Using/Aliasing
         using Curve::CurveValue;
-        using Fluid::FindGlycol;
-        using Fluid::FindRefrigerant;
-        using Fluid::GetSatEnthalpyRefrig;
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetSatEnthalpyRefrig;
+        using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyWFnTdbRhPb;
@@ -1256,8 +1252,8 @@ namespace Humidifiers {
                     CurMakeupWaterTemp = state.dataEnvrn->WaterMainsTemp;
                 }
                 Tref = CurMakeupWaterTemp;
-                RefrigerantIndex = FindRefrigerant(state, format(fluidNameSteam));
-                WaterIndex = FindGlycol(state, format(fluidNameWater));
+                RefrigerantIndex = FluidProperties::GetRefrigNum(state, format(fluidNameSteam));
+                WaterIndex = FluidProperties::GetGlycolNum(state, format(fluidNameWater));
                 SteamSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 1.0, RefrigerantIndex, RoutineName);
                 WaterSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 0.0, RefrigerantIndex, RoutineName);
                 WaterSpecHeatAvg = 0.5 * (GetSpecificHeatGlycol(state, format(fluidNameWater), TSteam, WaterIndex, RoutineName) +

@@ -2354,7 +2354,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     // Read in IDF
     ProcessScheduleInput(*state);                    // read schedules
     Curve::GetCurveInput(*state);                    // read curves
-    Fluid::GetFluidPropertiesData(*state); // read refrigerant properties
+    FluidProperties::GetFluidPropertiesData(*state); // read refrigerant properties
 
     // set up ZoneEquipConfig data
     state->dataGlobal->NumOfZones = 1;
@@ -2395,7 +2395,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         state->dataEnvrn->OutDryBulbTemp = 10.35;
 
         // Run
-        Temperature = Fluid::GetSupHeatTempRefrig(*state, Refrigerant, Pressure, Enthalpy, TempLow, TempUp, RefrigIndex, CalledFrom);
+        Temperature = FluidProperties::GetSupHeatTempRefrig(*state, Refrigerant, Pressure, Enthalpy, TempLow, TempUp, RefrigIndex, CalledFrom);
 
         // Test
         EXPECT_NEAR(Temperature, 44.5, 0.5);
@@ -5859,12 +5859,12 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR > 0.0);
     EXPECT_NEAR(SysOutputProvided, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP, 1.0);
 
-    rho = Fluid::GetDensityGlycol(*state,
+    rho = FluidProperties::GetDensityGlycol(*state,
                            state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
                            state->dataSize->PlantSizData(1).ExitTemp,
                            state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
                            RoutineName);
-    Cp = Fluid::GetSpecificHeatGlycol(*state,
+    Cp = FluidProperties::GetSpecificHeatGlycol(*state,
                                state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
                                state->dataSize->PlantSizData(1).ExitTemp,
                                state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
@@ -5874,7 +5874,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 
     EXPECT_DOUBLE_EQ(CondVolFlowRate, state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate);
 
-    rho = Fluid::GetDensityGlycol(*state,
+    rho = FluidProperties::GetDensityGlycol(*state,
                            state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
                            Constant::InitConvTemp,
                            state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
@@ -22715,7 +22715,7 @@ TEST_F(EnergyPlusFixture, VRF_MixedTypes)
     // Read in IDF
     ProcessScheduleInput(*state);                    // read schedules
     Curve::GetCurveInput(*state);                    // read curves
-    Fluid::GetFluidPropertiesData(*state); // read refrigerant properties
+    FluidProperties::GetFluidPropertiesData(*state); // read refrigerant properties
 
     // set up ZoneEquipConfig data
     state->dataGlobal->NumOfZones = 1;

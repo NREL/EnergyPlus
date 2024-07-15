@@ -851,7 +851,7 @@ void FluidCoolerspecs::oneTimeInit_new(EnergyPlusData &state)
 void FluidCoolerspecs::initEachEnvironment(EnergyPlusData &state)
 {
     static constexpr std::string_view RoutineName("FluidCoolerspecs::initEachEnvironment");
-    Real64 const rho = Fluid::GetDensityGlycol(state,
+    Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                          Constant::InitConvTemp,
                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -1008,12 +1008,12 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
 
     if (this->PerformanceInputMethod_Num == PerfInputMethod::U_FACTOR && this->HighSpeedFluidCoolerUAWasAutoSized) {
         if (PltSizCondNum > 0) {
-            rho = Fluid::GetDensityGlycol(state,
+            rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                     Constant::InitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                     CalledFrom);
-            Cp = Fluid::GetSpecificHeatGlycol(state,
+            Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                         state.dataSize->PlantSizData(PltSizCondNum).ExitTemp,
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -1054,12 +1054,12 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                                           "Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler.");
                         ShowFatalError(state, "Review and revise design input values as appropriate.");
                     }
-                    rho = Fluid::GetDensityGlycol(state,
+                    rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             Constant::InitConvTemp,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             CalledFrom);
-                    Cp = Fluid::GetSpecificHeatGlycol(state,
+                    Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                 state.dataSize->PlantSizData(PltSizCondNum).ExitTemp,
                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -1143,12 +1143,12 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                                           "Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler.");
                         ShowFatalError(state, "Review and revise design input values as appropriate.");
                     }
-                    rho = Fluid::GetDensityGlycol(state,
+                    rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             Constant::InitConvTemp,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             CalledFrom);
-                    Cp = Fluid::GetSpecificHeatGlycol(state,
+                    Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                 state.dataSize->PlantSizData(PltSizCondNum).ExitTemp,
                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -1225,12 +1225,12 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                                       "must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler.");
                     ShowFatalError(state, "Review and revise design input values as appropriate.");
                 }
-                rho = Fluid::GetDensityGlycol(state,
+                rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                         Constant::InitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                         CalledFrom);
-                Cp = Fluid::GetSpecificHeatGlycol(state,
+                Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             state.dataSize->PlantSizData(PltSizCondNum).ExitTemp,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -1339,12 +1339,12 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
 
     if (this->PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY) {
         if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
-            rho = Fluid::GetDensityGlycol(state,
+            rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                     Constant::InitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                     CalledFrom);
-            Cp = Fluid::GetSpecificHeatGlycol(state,
+            Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                         this->DesignEnteringWaterTemp,
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -1523,12 +1523,12 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
         }
 
         if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow && this->FluidCoolerLowSpeedNomCap > 0.0) {
-            rho = Fluid::GetDensityGlycol(state,
+            rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                     Constant::InitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                     CalledFrom);
-            Cp = Fluid::GetSpecificHeatGlycol(state,
+            Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                         this->DesignEnteringWaterTemp,
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -1759,7 +1759,7 @@ void FluidCoolerspecs::calcSingleSpeed(EnergyPlusData &state)
         //    Setpoint was not met, fluid cooler ran at full capacity
         this->FanPower = FanPowerOn;
     }
-    Real64 CpWater = Fluid::GetSpecificHeatGlycol(state,
+    Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -1885,7 +1885,7 @@ void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
             this->FanPower = FanPowerHigh;
         }
     }
-    Real64 CpWater = Fluid::GetSpecificHeatGlycol(state,
+    Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -1928,7 +1928,7 @@ void CalcFluidCoolerOutlet(
                                                           state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).AirHumRat);
     Real64 AirMassFlowRate = AirFlowRate * AirDensity;
     Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).AirHumRat);
-    Real64 CpWater = Fluid::GetSpecificHeatGlycol(
+    Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(
         state,
         state.dataPlnt->PlantLoop(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).plantLoc.loopNum).FluidName,
         _InletWaterTemp,

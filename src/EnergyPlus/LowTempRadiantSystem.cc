@@ -272,7 +272,6 @@ namespace LowTempRadiantSystem {
         using DataSizing::FractionOfAutosizedCoolingCapacity;
         using DataSizing::FractionOfAutosizedHeatingCapacity;
         using DataSizing::HeatingDesignCapacity;
-        using Fluid::FindGlycol;
 
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
@@ -376,7 +375,7 @@ namespace LowTempRadiantSystem {
 
         state.dataLowTempRadSys->HydrRadSys.allocate(state.dataLowTempRadSys->NumOfHydrLowTempRadSys);
         if (state.dataLowTempRadSys->NumOfHydrLowTempRadSys > 0) {
-            GlycolIndex = FindGlycol(state, fluidNameWater);
+            GlycolIndex = FluidProperties::GetGlycolNum(state, fluidNameWater);
             for (auto &e : state.dataLowTempRadSys->HydrRadSys)
                 e.GlycolIndex = GlycolIndex;
             if (GlycolIndex == 0) {
@@ -390,7 +389,7 @@ namespace LowTempRadiantSystem {
 
         state.dataLowTempRadSys->CFloRadSys.allocate(state.dataLowTempRadSys->NumOfCFloLowTempRadSys);
         if (state.dataLowTempRadSys->NumOfCFloLowTempRadSys > 0) {
-            GlycolIndex = FindGlycol(state, fluidNameWater);
+            GlycolIndex = FluidProperties::GetGlycolNum(state, fluidNameWater);
             for (auto &e : state.dataLowTempRadSys->CFloRadSys)
                 e.GlycolIndex = GlycolIndex;
             if (GlycolIndex == 0) {
@@ -1904,7 +1903,7 @@ namespace LowTempRadiantSystem {
 
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using Fluid::GetDensityGlycol;
+        using FluidProperties::GetDensityGlycol;
 
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -2633,8 +2632,8 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using Fluid::GetDensityGlycol;
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetDensityGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
         using HVAC::AutoCalculateSizing;
         using HVAC::CoolingCapacitySizing;
         using HVAC::HeatingCapacitySizing;
@@ -4181,7 +4180,7 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataHeatBalance::ZoneData;
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
         using HVAC::SmallLoad;
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -4691,7 +4690,7 @@ namespace LowTempRadiantSystem {
         auto &Zone = state.dataHeatBal->Zone;
 
         // Using/Aliasing
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -5328,7 +5327,7 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
 
@@ -5414,7 +5413,7 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
 
@@ -5645,7 +5644,7 @@ namespace LowTempRadiantSystem {
         // Code based loosely on code from IBLAST program (research version)
 
         // Using/Aliasing
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
 
         // Return value
         Real64 calculateHXEffectivenessTerm;
@@ -5980,7 +5979,7 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
 
         constexpr std::string_view routineName("ReportConstantFlowSystem");
         Real64 cpFluid;               // Specific heat of the fluid in the radiant system

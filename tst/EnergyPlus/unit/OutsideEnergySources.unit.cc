@@ -139,7 +139,7 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
     thisDistrictHeatingWater.BeginEnvrnInitFlag = true;
     thisDistrictHeatingWater.simulate(*state, locHotWater, firstHVAC, MyLoad, RunFlag);
 
-    Real64 Cp = Fluid::GetSpecificHeatGlycol(
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
         *state, thisHotWaterLoop.FluidName, thisDistrictHeatingWater.InletTemp, thisHotWaterLoop.FluidIndex, RoutineName);
     Real64 calOutletTemp =
         (MyLoad + thisHotWaterLoop.MaxMassFlowRate * Cp * thisDistrictHeatingWater.InletTemp) / (thisHotWaterLoop.MaxMassFlowRate * Cp);
@@ -173,7 +173,7 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
     thisDistrictCooling.BeginEnvrnInitFlag = true;
     thisDistrictCooling.simulate(*state, locChilledWater, firstHVAC, MyLoad, RunFlag);
 
-    Cp = Fluid::GetSpecificHeatGlycol(
+    Cp = FluidProperties::GetSpecificHeatGlycol(
         *state, thisChilledWaterLoop.FluidName, thisDistrictCooling.InletTemp, thisChilledWaterLoop.FluidIndex, RoutineName);
     calOutletTemp =
         (MyLoad + thisChilledWaterLoop.MaxMassFlowRate * Cp * thisDistrictCooling.InletTemp) / (thisChilledWaterLoop.MaxMassFlowRate * Cp);
@@ -204,14 +204,14 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
     thisDistrictHeatingSteam.BeginEnvrnInitFlag = true;
     thisDistrictHeatingSteam.simulate(*state, locSteam, firstHVAC, MyLoad, RunFlag);
 
-    Real64 SatTempAtmPress = Fluid::GetSatTemperatureRefrig(
+    Real64 SatTempAtmPress = FluidProperties::GetSatTemperatureRefrig(
         *state, thisSteamLoop.FluidName, DataEnvironment::StdPressureSeaLevel, thisSteamLoop.FluidIndex, RoutineName);
-    Real64 CpCondensate = Fluid::GetSpecificHeatGlycol(
+    Real64 CpCondensate = FluidProperties::GetSpecificHeatGlycol(
         *state, thisSteamLoop.FluidName, thisDistrictHeatingSteam.InletTemp, thisSteamLoop.FluidIndex, RoutineName);
     Real64 deltaTsensible = SatTempAtmPress - thisDistrictHeatingSteam.InletTemp;
-    Real64 EnthSteamInDry = Fluid::GetSatEnthalpyRefrig(
+    Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(
         *state, thisSteamLoop.FluidName, thisDistrictHeatingSteam.InletTemp, 1.0, thisSteamLoop.FluidIndex, RoutineName);
-    Real64 EnthSteamOutWet = Fluid::GetSatEnthalpyRefrig(
+    Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(
         *state, thisSteamLoop.FluidName, thisDistrictHeatingSteam.InletTemp, 0.0, thisSteamLoop.FluidIndex, RoutineName);
     Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
     Real64 calOutletMdot = MyLoad / (LatentHeatSteam + (CpCondensate * deltaTsensible));

@@ -375,8 +375,8 @@ void BranchPressureDrop(EnergyPlusData &state,
     // Using/Aliasing
     using Curve::CurveValue;
     using Curve::PressureCurveValue;
-    using Fluid::GetDensityGlycol;
-    using Fluid::GetViscosityGlycol;
+    using FluidProperties::GetDensityGlycol;
+    using FluidProperties::GetViscosityGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcPlantPressureSystem");
@@ -839,8 +839,8 @@ Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
 
     // Using/Aliasing
     using Curve::CurveValue;
-    using Fluid::GetDensityGlycol;
-    using Fluid::GetViscosityGlycol;
+    using FluidProperties::GetDensityGlycol;
+    using FluidProperties::GetViscosityGlycol;
 
     // Return value
     Real64 ResolvedLoopMassFlowRate;

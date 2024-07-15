@@ -942,8 +942,8 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     // Using/Aliasing
     Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    using Fluid::GetDensityGlycol;
-    using Fluid::GetSpecificHeatGlycol;
+    using FluidProperties::GetDensityGlycol;
+    using FluidProperties::GetSpecificHeatGlycol;
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1713,8 +1713,8 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
     // Code based loosely on code from IBLAST program (research version)
 
     // Using/Aliasing
-    using Fluid::GetConductivityGlycol;
-    using Fluid::GetViscosityGlycol;
+    using FluidProperties::GetConductivityGlycol;
+    using FluidProperties::GetViscosityGlycol;
 
     // Return value
     Real64 CalcPipeHeatTransCoef;

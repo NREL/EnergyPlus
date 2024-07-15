@@ -137,61 +137,63 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataFluid->RefrigData.allocate(1);
-    state->dataFluid->RefrigData(1).Name = "R22";
-    state->dataFluid->RefrigData(1).PsLowTempIndex = 1;
-    state->dataFluid->RefrigData(1).PsHighTempIndex = 2;
-    state->dataFluid->RefrigData(1).PsTemps.allocate(2);
-    state->dataFluid->RefrigData(1).PsTemps(1) = -157.42;
-    state->dataFluid->RefrigData(1).PsTemps(2) = 96.145;
-    state->dataFluid->RefrigData(1).PsValues.allocate(2);
-    state->dataFluid->RefrigData(1).PsValues(1) = 0.3795;
-    state->dataFluid->RefrigData(1).PsValues(2) = 4990000.0;
+    state->dataFluidProperties->RefrigData.allocate(1);
+    auto &refrig = state->dataFluidProperties->RefrigData(1);
+    refrig.Name = "R22";
+    refrig.Num = 1;
+    refrig.PsLowTempIndex = 1;
+    refrig.PsHighTempIndex = 2;
+    refrig.PsTemps.allocate(2);
+    refrig.PsTemps(1) = -157.42;
+    refrig.PsTemps(2) = 96.145;
+    refrig.PsValues.allocate(2);
+    refrig.PsValues(1) = 0.3795;
+    refrig.PsValues(2) = 4990000.0;
 
-    state->dataFluid->RefrigData(1).HfLowTempIndex = 1;
-    state->dataFluid->RefrigData(1).HfHighTempIndex = 2;
-    state->dataFluid->RefrigData(1).PsLowPresIndex = 1;
-    state->dataFluid->RefrigData(1).PsHighPresIndex = 2;
-    state->dataFluid->RefrigData(1).HTemps.allocate(2);
-    state->dataFluid->RefrigData(1).HfValues.allocate(2);
-    state->dataFluid->RefrigData(1).HfgValues.allocate(2);
+    refrig.HfLowTempIndex = 1;
+    refrig.HfHighTempIndex = 2;
+    refrig.PsLowPresIndex = 1;
+    refrig.PsHighPresIndex = 2;
+    refrig.HTemps.allocate(2);
+    refrig.HfValues.allocate(2);
+    refrig.HfgValues.allocate(2);
 
-    state->dataFluid->RefrigData(1).HTemps(1) = -157.42;
-    state->dataFluid->RefrigData(1).HTemps(2) = 96.145;
-    state->dataFluid->RefrigData(1).HfValues(1) = 29600.0;
-    state->dataFluid->RefrigData(1).HfValues(2) = 366900.0;
-    state->dataFluid->RefrigData(1).HfgValues(1) = 332700.0;
-    state->dataFluid->RefrigData(1).HfgValues(2) = 366900.0;
-    state->dataFluid->RefrigData(1).NumSuperTempPts = 2;
-    state->dataFluid->RefrigData(1).NumSuperPressPts = 2;
-    state->dataFluid->RefrigData(1).SHTemps.allocate(2);
-    state->dataFluid->RefrigData(1).SHPress.allocate(2);
-    state->dataFluid->RefrigData(1).SHTemps(1) = -157.15;
-    state->dataFluid->RefrigData(1).SHTemps(2) = 152.85;
-    state->dataFluid->RefrigData(1).SHPress(1) = 0.4043;
-    state->dataFluid->RefrigData(1).SHPress(2) = 16500000.0;
-    state->dataFluid->RefrigData(1).HshValues.allocate(2, 2);
-    state->dataFluid->RefrigData(1).HshValues(1, 1) = 332800.0;
-    state->dataFluid->RefrigData(1).HshValues(1, 2) = 537000.0;
-    state->dataFluid->RefrigData(1).HshValues(2, 1) = 332800.0;
-    state->dataFluid->RefrigData(1).HshValues(2, 2) = 537000.0;
-    state->dataFluid->RefrigData(1).RhoshValues.allocate(2, 2);
-    state->dataFluid->RefrigData(1).RhoshValues(1, 1) = 0.00003625;
-    state->dataFluid->RefrigData(1).RhoshValues(1, 2) = 0.0;
-    state->dataFluid->RefrigData(1).RhoshValues(2, 1) = 0.00003625;
-    state->dataFluid->RefrigData(1).RhoshValues(2, 2) = 0.0;
+    refrig.HTemps(1) = -157.42;
+    refrig.HTemps(2) = 96.145;
+    refrig.HfValues(1) = 29600.0;
+    refrig.HfValues(2) = 366900.0;
+    refrig.HfgValues(1) = 332700.0;
+    refrig.HfgValues(2) = 366900.0;
+    refrig.NumSuperTempPts = 2;
+    refrig.NumSuperPressPts = 2;
+    refrig.SHTemps.allocate(2);
+    refrig.SHPress.allocate(2);
+    refrig.SHTemps(1) = -157.15;
+    refrig.SHTemps(2) = 152.85;
+    refrig.SHPress(1) = 0.4043;
+    refrig.SHPress(2) = 16500000.0;
+    refrig.HshValues.allocate(2, 2);
+    refrig.HshValues(1, 1) = 332800.0;
+    refrig.HshValues(1, 2) = 537000.0;
+    refrig.HshValues(2, 1) = 332800.0;
+    refrig.HshValues(2, 2) = 537000.0;
+    refrig.RhoshValues.allocate(2, 2);
+    refrig.RhoshValues(1, 1) = 0.00003625;
+    refrig.RhoshValues(1, 2) = 0.0;
+    refrig.RhoshValues(2, 1) = 0.00003625;
+    refrig.RhoshValues(2, 2) = 0.0;
 
-    state->dataFluid->RefrigData(1).RhofLowTempIndex = 1;
-    state->dataFluid->RefrigData(1).RhofHighTempIndex = 2;
-    state->dataFluid->RefrigData(1).RhoTemps.allocate(2);
-    state->dataFluid->RefrigData(1).RhoTemps(1) = -157.42;
-    state->dataFluid->RefrigData(1).RhoTemps(2) = 96.145;
-    state->dataFluid->RefrigData(1).RhofValues.allocate(2);
-    state->dataFluid->RefrigData(1).RhofValues(1) = 1721.0;
-    state->dataFluid->RefrigData(1).RhofValues(2) = 523.8;
-    state->dataFluid->RefrigData(1).RhofgValues.allocate(2);
-    state->dataFluid->RefrigData(1).RhofgValues(1) = 0.341;
-    state->dataFluid->RefrigData(1).RhofgValues(2) = 523.8;
+    refrig.RhofLowTempIndex = 1;
+    refrig.RhofHighTempIndex = 2;
+    refrig.RhoTemps.allocate(2);
+    refrig.RhoTemps(1) = -157.42;
+    refrig.RhoTemps(2) = 96.145;
+    refrig.RhofValues.allocate(2);
+    refrig.RhofValues(1) = 1721.0;
+    refrig.RhofValues(2) = 523.8;
+    refrig.RhofgValues.allocate(2);
+    refrig.RhofgValues(1) = 0.341;
+    refrig.RhofgValues(2) = 523.8;
 
     GetWatertoAirHPInput(*state);
 
@@ -306,5 +308,5 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     // clean up
     state->dataWaterToAirHeatPump->WatertoAirHP.deallocate();
-    state->dataFluid->RefrigData.deallocate();
+    state->dataFluidProperties->RefrigData.deallocate();
 }

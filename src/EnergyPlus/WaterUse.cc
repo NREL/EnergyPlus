@@ -1702,7 +1702,7 @@ namespace WaterUse {
 
         if (state.dataWaterUse->calcRhoH2O) {
             int DummyValue = 1;
-            state.dataWaterUse->rhoH2OStd = Fluid::GetDensityGlycol(state, "WATER", Constant::InitConvTemp, DummyValue, RoutineName);
+            state.dataWaterUse->rhoH2OStd = FluidProperties::GetDensityGlycol(state, "WATER", Constant::InitConvTemp, DummyValue, RoutineName);
             state.dataWaterUse->calcRhoH2O = false;
         }
         return state.dataWaterUse->rhoH2OStd;

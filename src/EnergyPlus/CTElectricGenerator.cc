@@ -555,7 +555,7 @@ namespace CTElectricGenerator {
             int heatRecInNode = this->HeatRecInletNodeNum;
             heatRecInTemp = state.dataLoopNodes->Node(heatRecInNode).Temp;
 
-            heatRecCp = Fluid::GetSpecificHeatGlycol(state,
+            heatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                                heatRecInTemp,
                                                                state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
@@ -810,7 +810,7 @@ namespace CTElectricGenerator {
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
 
             // size mass flow rate
-            Real64 rho = Fluid::GetDensityGlycol(state,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                            Constant::InitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,

@@ -883,7 +883,7 @@ namespace DataPlant {
         // Calculate load on primary chilled water loop and store in PrimaryPlantCoolingLoad
 
         Real64 CW_RetMdot = state.dataLoopNodes->Node(this->PlantOps.PrimaryChWLoopSupInletNode).MassFlowRate;
-        Real64 const CpCW = Fluid::GetSpecificHeatGlycol(state,
+        Real64 const CpCW = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).FluidName,
                                                                    state.dataLoopNodes->Node(this->PlantOps.PrimaryChWLoopSupInletNode).Temp,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).FluidIndex,
@@ -899,7 +899,7 @@ namespace DataPlant {
         // int HWSupInletNode = this->PlantOps.PrimaryHWLoopSupInletNode;
         //      state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
         Real64 HW_RetMdot = state.dataLoopNodes->Node(this->PlantOps.PrimaryHWLoopSupInletNode).MassFlowRate;
-        Real64 const CpHW = Fluid::GetSpecificHeatGlycol(state,
+        Real64 const CpHW = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).FluidName,
                                                                    state.dataLoopNodes->Node(this->PlantOps.PrimaryHWLoopSupInletNode).Temp,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).FluidIndex,
@@ -1372,7 +1372,7 @@ namespace DataPlant {
         // step 2. calculate the loads to adjust the
         // returns to hit the associated setpoints at their current mass flow
         Real64 const CpCW =
-            Fluid::GetSpecificHeatGlycol(state,
+            FluidProperties::GetSpecificHeatGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum).FluidName,
                                                    state.dataLoopNodes->Node(inletChWReturnNodeNum).Temp,
                                                    state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum).FluidIndex,
@@ -1381,7 +1381,7 @@ namespace DataPlant {
             CW_RetMdot * CpCW *
             (this->Setpoint.SecCW - state.dataLoopNodes->Node(inletChWReturnNodeNum).Temp); // power = Mdot Cp Delta T, cooling load is negative
         Real64 const CpHW =
-            Fluid::GetSpecificHeatGlycol(state,
+            FluidProperties::GetSpecificHeatGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopNum).FluidName,
                                                    state.dataLoopNodes->Node(inletHWReturnNodeNum).Temp,
                                                    state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopNum).FluidIndex,
@@ -1605,7 +1605,7 @@ namespace DataPlant {
                 Real64 Mdot = state.dataLoopNodes->Node(inletBoilerNodeNum).MassFlowRate;
 
                 Real64 const CpHW =
-                    Fluid::GetSpecificHeatGlycol(state,
+                    FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).FluidName,
                                                            Tin,
                                                            state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).FluidIndex,

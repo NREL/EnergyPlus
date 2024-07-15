@@ -139,7 +139,6 @@ namespace VariableSpeedCoils {
         // This subroutine manages variable-speed Water to Air Heat Pump component simulation.
 
         // Using/Aliasing
-        using Fluid::FindGlycol;
         using General::SolveRoot;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3880,8 +3879,8 @@ namespace VariableSpeedCoils {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using Fluid::GetDensityGlycol;
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetDensityGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
 
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -5283,12 +5282,12 @@ namespace VariableSpeedCoils {
                                                                false);
 
             if (PltSizNum > 0) {
-                rho = Fluid::GetDensityGlycol(state,
+                rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(varSpeedCoil.plantLoc.loopNum).FluidName,
                                                         state.dataSize->PlantSizData(PltSizNum).ExitTemp,
                                                         state.dataPlnt->PlantLoop(varSpeedCoil.plantLoc.loopNum).FluidIndex,
                                                         RoutineNameAlt);
-                cp = Fluid::GetSpecificHeatGlycol(state,
+                cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                             state.dataPlnt->PlantLoop(varSpeedCoil.plantLoc.loopNum).FluidName,
                                                             state.dataSize->PlantSizData(PltSizNum).ExitTemp,
                                                             state.dataPlnt->PlantLoop(varSpeedCoil.plantLoc.loopNum).FluidIndex,
@@ -5426,7 +5425,7 @@ namespace VariableSpeedCoils {
             if (PltSizNum > 0) {
                 rhoW = rho;
             } else {
-                rhoW = Fluid::GetDensityGlycol(state,
+                rhoW = FluidProperties::GetDensityGlycol(state,
                                                          state.dataPlnt->PlantLoop(varSpeedCoil.plantLoc.loopNum).FluidName,
                                                          RatedSourceTempCool,
                                                          state.dataPlnt->PlantLoop(varSpeedCoil.plantLoc.loopNum).FluidIndex,
@@ -5874,7 +5873,7 @@ namespace VariableSpeedCoils {
         // Using/Aliasing
         using Curve::CurveValue;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -7236,7 +7235,7 @@ namespace VariableSpeedCoils {
         // Using/Aliasing
         using Curve::CurveValue;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-        using Fluid::GetSpecificHeatGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -7747,7 +7746,6 @@ namespace VariableSpeedCoils {
         // as negative.
 
         // Using/Aliasing
-        using Fluid::FindGlycol;
 
         // Return value
         Real64 CoilCapacity; // returned capacity of matched coil
@@ -7807,9 +7805,6 @@ namespace VariableSpeedCoils {
         // This function looks up the coil index for the given coil and returns it.  If
         // incorrect coil type or name is given, ErrorsFound is returned as true and index is returned
         // as zero.
-
-        // Using/Aliasing
-        using Fluid::FindGlycol;
 
         // Return value
         int IndexNum; // returned index of matched coil
@@ -7991,9 +7986,6 @@ namespace VariableSpeedCoils {
         // incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
         // as zero.
 
-        // Using/Aliasing
-        using Fluid::FindGlycol;
-
         // Return value
         int NodeNumber; // returned outlet node of matched coil
 
@@ -8038,9 +8030,6 @@ namespace VariableSpeedCoils {
         // This function looks up the given coil and returns the outlet node.  If
         // incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
         // as zero.
-
-        // Using/Aliasing
-        using Fluid::FindGlycol;
 
         // Return value
         int NodeNumber; // returned outlet node of matched coil
@@ -8215,9 +8204,6 @@ namespace VariableSpeedCoils {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine was designed to "push" information from a parent object to
         // this WSHP coil object.
-
-        // Using/Aliasing
-        using Fluid::FindGlycol;
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataVariableSpeedCoils->GetCoilsInputFlag) { // First time subroutine has been entered

@@ -1127,7 +1127,7 @@ namespace UnitVentilator {
 
                 if (unitVent.HCoilType == HeatCoilType::Water) {
 
-                    Real64 rho = Fluid::GetDensityGlycol(state,
+                    Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidName,
                                                                    Constant::HWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidIndex,
@@ -1142,7 +1142,7 @@ namespace UnitVentilator {
                 if (unitVent.HCoilType == HeatCoilType::Steam) {
                     Real64 TempSteamIn = 100.00;
                     Real64 SteamDensity =
-                        Fluid::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, unitVent.HCoil_FluidIndex, RoutineName);
+                        FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, unitVent.HCoil_FluidIndex, RoutineName);
                     unitVent.MaxHotSteamFlow = SteamDensity * unitVent.MaxVolHotSteamFlow;
                     unitVent.MinHotSteamFlow = SteamDensity * unitVent.MinVolHotSteamFlow;
 
@@ -1152,7 +1152,7 @@ namespace UnitVentilator {
             } //(UnitVent(UnitVentNum)%HCoilPresent)
 
             if (unitVent.CCoilPresent) { // Only initialize these if a cooling coil is actually present
-                Real64 rho = Fluid::GetDensityGlycol(state,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(unitVent.CWPlantLoc.loopNum).FluidName,
                                                                5.0,
                                                                state.dataPlnt->PlantLoop(unitVent.CWPlantLoc.loopNum).FluidIndex,
@@ -1881,12 +1881,12 @@ namespace UnitVentilator {
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                                     DesHeatingLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 }
-                                rho = Fluid::GetDensityGlycol(state,
+                                rho = FluidProperties::GetDensityGlycol(state,
                                                                         state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidName,
                                                                         Constant::HWInitConvTemp,
                                                                         state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidIndex,
                                                                         RoutineName);
-                                Cp = Fluid::GetSpecificHeatGlycol(state,
+                                Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                             state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidName,
                                                                             Constant::HWInitConvTemp,
                                                                             state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidIndex,
@@ -2012,14 +2012,14 @@ namespace UnitVentilator {
                                     DesHeatingLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 }
                                 TempSteamIn = 100.00;
-                                EnthSteamInDry = Fluid::GetSatEnthalpyRefrig(
+                                EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(
                                     state, fluidNameSteam, TempSteamIn, 1.0, state.dataUnitVentilators->RefrigIndex, RoutineName);
-                                EnthSteamOutWet = Fluid::GetSatEnthalpyRefrig(
+                                EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(
                                     state, fluidNameSteam, TempSteamIn, 0.0, state.dataUnitVentilators->RefrigIndex, RoutineName);
                                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-                                SteamDensity = Fluid::GetSatDensityRefrig(
+                                SteamDensity = FluidProperties::GetSatDensityRefrig(
                                     state, fluidNameSteam, TempSteamIn, 1.0, state.dataUnitVentilators->RefrigIndex, RoutineName);
-                                Cp = Fluid::GetSpecificHeatGlycol(state,
+                                Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                             fluidNameWater,
                                                                             state.dataSize->PlantSizData(PltSizHeatNum).ExitTemp,
                                                                             state.dataUnitVentilators->DummyWaterIndex,
@@ -2170,12 +2170,12 @@ namespace UnitVentilator {
                                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                                     DesCoolingLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                                 }
-                                rho = Fluid::GetDensityGlycol(state,
+                                rho = FluidProperties::GetDensityGlycol(state,
                                                                         state.dataPlnt->PlantLoop(unitVent.CWPlantLoc.loopNum).FluidName,
                                                                         5.,
                                                                         state.dataPlnt->PlantLoop(unitVent.CWPlantLoc.loopNum).FluidIndex,
                                                                         RoutineName);
-                                Cp = Fluid::GetSpecificHeatGlycol(state,
+                                Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                             state.dataPlnt->PlantLoop(unitVent.CWPlantLoc.loopNum).FluidName,
                                                                             5.,
                                                                             state.dataPlnt->PlantLoop(unitVent.CWPlantLoc.loopNum).FluidIndex,
