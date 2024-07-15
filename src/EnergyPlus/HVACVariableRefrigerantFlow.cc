@@ -9620,11 +9620,12 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
         }
     }
     // calculate sensible load met using delta enthalpy
+    Real64 TotalOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(TempOut, SpecHumOut) - Psychrometrics::PsyHFnTdbW(TempIn, SpecHumIn)); // total addition/removal rate, {W};
     LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-    LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn);                                     // latent {kgWater/s}
+    LatentLoadMet = TotalOutput - LoadMet;
     if (present(LatOutputProvided)) {
         //   CR9155 Remove specific humidity calculations
-        LatOutputProvided = LatentLoadMet;
+        LatOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn);
     }
 }
 
@@ -9771,10 +9772,7 @@ void ReportVRFTerminalUnit(EnergyPlusData &state, int const VRFTUNum) // index t
         TempOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
         TempIn = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp;
     }
-    // latent heat vaporization/condensation used in moist air psychrometrics
-    Real64 const H2OHtOfVap = PsyHgAirFnWTdb(0.0, TempOut);
-    // convert latent in kg/s to watts
-    TotalConditioning = SensibleConditioning + (LatentConditioning * H2OHtOfVap);
+    TotalConditioning = SensibleConditioning + LatentConditioning;
 
     if (TotalConditioning <= 0.0) {
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).TotalCoolingRate = std::abs(TotalConditioning);
@@ -9791,11 +9789,11 @@ void ReportVRFTerminalUnit(EnergyPlusData &state, int const VRFTUNum) // index t
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SensibleHeatingRate = SensibleConditioning;
     }
     if (LatentConditioning <= 0.0) {
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentCoolingRate = std::abs(LatentConditioning) * H2OHtOfVap;
+        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentCoolingRate = std::abs(LatentConditioning);
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentHeatingRate = 0.0;
     } else {
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentCoolingRate = 0.0;
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentHeatingRate = LatentConditioning * H2OHtOfVap;
+        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentHeatingRate = LatentConditioning;
     }
     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).TotalCoolingEnergy = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).TotalCoolingRate * ReportingConstant;
     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SensibleCoolingEnergy =
@@ -12919,10 +12917,11 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         }
     }
     // calculate sensible load met using delta enthalpy
+    Real64 TotalOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(TempOut, SpecHumOut) - Psychrometrics::PsyHFnTdbW(TempIn, SpecHumIn)); // total addition/removal rate, {W};
     LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-    LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn);                                     // latent {kgWater/s}
+    LatentLoadMet = TotalOutput - LoadMet;
     if (present(LatOutputProvided)) {
-        LatOutputProvided = LatentLoadMet;
+        LatOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn);
     }
 }
 

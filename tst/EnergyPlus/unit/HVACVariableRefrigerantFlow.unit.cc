@@ -13247,9 +13247,9 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     EXPECT_EQ(0.0, thisVRFTU.CoolOutAirMassFlow);
     EXPECT_EQ(0.0, thisVRFTU.HeatOutAirMassFlow);
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
-    EXPECT_NEAR(5125.0840, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
-    EXPECT_NEAR(4999.8265, thisVRFTU.TotalCoolingRate, 0.0001);
-    EXPECT_NEAR(125.2573, thisFan->totalPower, 0.0001);
+    EXPECT_NEAR(5730.4055, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
+    EXPECT_NEAR(5645.5696, thisVRFTU.TotalCoolingRate, 0.0001);
+    EXPECT_NEAR(84.8359, thisFan->totalPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan->totalPower), 0.0001);
 }
 
@@ -18256,7 +18256,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
     // test the TU1 outputs; TU1 provides cooling
     EXPECT_NEAR(156.0, TU1_fan->totalPower, 0.1);
     EXPECT_NEAR(6153.6, TU1_dx_clg_coil.SensCoolingEnergyRate, 0.1);
-    EXPECT_NEAR(6723.6, VRFTU1.TotalCoolingRate, 0.1);
+    EXPECT_NEAR(6731.2, VRFTU1.TotalCoolingRate, 0.1);
     EXPECT_NEAR(-5997.6, VRFTU1.TerminalUnitSensibleRate, 0.1);
     EXPECT_EQ(0.0, TU1_dx_htg_coil.TotalHeatingEnergyRate);
     EXPECT_EQ(0.0, VRFTU1.SuppHeatingCoilLoad);
@@ -20369,7 +20369,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
     // test the TU1 outputs; TU1 provides cooling with supp heating coil scheduled off
     EXPECT_NEAR(156.0, TU1_fan->totalPower, 0.1);
     EXPECT_NEAR(6153.6, TU1_dx_clg_coil.SensCoolingEnergyRate, 0.1);
-    EXPECT_NEAR(6723.6, VRFTU1.TotalCoolingRate, 0.1);
+    EXPECT_NEAR(6731.2, VRFTU1.TotalCoolingRate, 0.1);
     EXPECT_NEAR(-5997.6, VRFTU1.TerminalUnitSensibleRate, 0.1);
     EXPECT_EQ(0.0, TU1_dx_htg_coil.TotalHeatingEnergyRate);
     EXPECT_EQ(0.0, VRFTU1.SuppHeatingCoilLoad);
@@ -20393,7 +20393,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
     EXPECT_NEAR(27.1, TU2_fan->totalPower, 0.1);
     EXPECT_EQ(0.0, TU2_dx_clg_coil.SensCoolingEnergyRate);
     EXPECT_NEAR(2085.6, VRFTU2.SensibleCoolingRate, 0.1);
-    EXPECT_NEAR(3961.64, VRFTU2.TotalCoolingRate, 0.1);
+    EXPECT_NEAR(3988.04, VRFTU2.TotalCoolingRate, 0.1);
     EXPECT_NEAR(VRFTU2.TotalCoolingRate, VRFTU2.SensibleCoolingRate + VRFTU2.LatentCoolingRate, 0.1);
     EXPECT_NEAR(-2085.6, VRFTU2.TerminalUnitSensibleRate, 0.1);
     EXPECT_EQ(0.0, TU2_dx_htg_coil.TotalHeatingEnergyRate);
