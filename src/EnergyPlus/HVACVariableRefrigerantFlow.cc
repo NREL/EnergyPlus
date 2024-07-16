@@ -9626,7 +9626,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     LatentLoadMet = TotalOutput - LoadMet;
     if (present(LatOutputProvided)) {
         //   CR9155 Remove specific humidity calculations
-        LatOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn);
+        LatOutputProvided = LatentLoadMet;
     }
 }
 
@@ -12923,7 +12923,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
     LatentLoadMet = TotalOutput - LoadMet;
     if (present(LatOutputProvided)) {
-        LatOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn);
+        LatOutputProvided = LatentLoadMet;
     }
 }
 
