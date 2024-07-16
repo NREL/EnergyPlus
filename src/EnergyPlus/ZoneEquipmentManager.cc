@@ -1866,6 +1866,12 @@ void updateZoneSizingEndDay(DataSizing::ZoneSizingData &zsCalcSizing,
 
 void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, DataSizing::ZoneSizingData const &zsCalcSizing)
 {
+    // Use this to set or override finalzonesizing data for non-coincident sizing
+    return;
+}
+
+void updateZoneSizingEndZoneSizingCalc2(EnergyPlusData &state, DataSizing::ZoneSizingData &zsCalcSizing)
+{
     if (std::abs(zsCalcSizing.DesCoolLoad) <= 1.e-8) {
         ShowWarningError(state, format("Calculated design cooling load for zone={} is zero.", zsCalcSizing.ZoneName));
         ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
@@ -1960,10 +1966,6 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, DataSizing::ZoneS
                               "flow calculations");
         }
     }
-}
-
-void updateZoneSizingEndZoneSizingCalc2(EnergyPlusData &state, DataSizing::ZoneSizingData &zsCalcSizing)
-{
     zsCalcSizing.HeatPeakDateHrMin = zsCalcSizing.cHeatDDDate + ' ' + sizingPeakTimeStamp(state, zsCalcSizing.TimeStepNumAtHeatMax);
 
     zsCalcSizing.CoolPeakDateHrMin = zsCalcSizing.cCoolDDDate + ' ' + sizingPeakTimeStamp(state, zsCalcSizing.TimeStepNumAtCoolMax);
