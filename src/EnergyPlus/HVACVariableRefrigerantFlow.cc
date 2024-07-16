@@ -12865,8 +12865,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     }
 
     Real64 OnOffFanPartLoadFraction = 1.0;
-    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp == HVAC::FanOp::Cycling &&
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::VAV) {
+    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp == HVAC::FanOp::Cycling) {
         OnOffFanPartLoadFraction = state.dataHVACGlobal->OnOffFanPartLoadFraction;
     }
     // if draw through, simulate coils then fan
@@ -12874,7 +12873,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         auto *fan = state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex);
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::SystemModel) {
             if (OnOffAirFlowRatio > 0.0) {
-                fan->simulate(state, FirstHVACIteration, _, _);
+                fan->simulate(state, FirstHVACIteration, _, _, _, _, fan->inletAirMassFlowRate, OnOffFanPartLoadFraction, 0, 0, _);
             } else {
                 fan->simulate(state, FirstHVACIteration, _, _, PartLoadRatio);
             }
