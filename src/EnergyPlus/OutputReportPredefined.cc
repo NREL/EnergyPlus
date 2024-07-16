@@ -404,17 +404,21 @@ namespace OutputReportPredefined {
         s->pdchDXHeatCoilRegionNum = newPreDefColumn(state, s->pdstDXHeatCoil, "Region Number");
         // Std 229 Predef outputs for DX Heating Coils
         s->pdchDXHeatCoilMinOADBTforCompOp =
-            newPreDefColumn(state, s->pdstDXHeatCoil, "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation");
+            newPreDefColumn(state, s->pdstDXHeatCoil, "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation [C]");
         s->pdchDXHeatCoilSuppHiT = newPreDefColumn(state, s->pdstDXHeatCoil, "Supplemental Heat High Shutoff Temperature [C]");
         s->pdchDXHeatCoilAirloopName = newPreDefColumn(state, s->pdstDXHeatCoil, "Airloop Name");
 
         // for DX Heating Coil AHRI Standard 2023 Ratings | HSPF2
-        s->pdstDXHeatCoil_2023 = newPreDefSubTable(state, s->pdrEquip, "DX Heating Coils [ HSPF2 ]");
+        s->pdstDXHeatCoil_2023 = newPreDefSubTable(state, s->pdrEquip, "DX Heating Coils AHRI 2023");
         s->pdchDXHeatCoilType_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "DX Heating Coil Type");
         s->pdchDXHeatCoilHighCap_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "High Temperature Heating (net) Rating Capacity [W]");
         s->pdchDXHeatCoilLowCap_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Low Temperature Heating (net) Rating Capacity [W]");
         s->pdchDXHeatCoilHSPF2IP_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "HSPF2 [Btu/W-h]");
         s->pdchDXHeatCoilRegionNum_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Region Number");
+        // Std 229 Predef outputs for DX Heating Coils AHRI 2023
+        s->pdchDXHeatCoilMinOADBTforCompOp_2023 =
+            newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation [C]");
+        s->pdchDXHeatCoilAirloopName_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Airloop Name");
 
         s->pdstHeatCoil = newPreDefSubTable(state, s->pdrEquip, "Heating Coils");
 
