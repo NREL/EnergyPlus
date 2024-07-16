@@ -122,6 +122,7 @@ TEST_F(EnergyPlusFixture, LoadProfile_GetInput)
 
 TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Waterloop)
 {
+    state->init_state(*state);
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataLoopNodes->Node.allocate(2);
     state->dataPlantLoadProfile->PlantProfile.allocate(1);
@@ -190,6 +191,7 @@ TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Waterloop)
 
 TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Steamloop)
 {
+    state->init_state(*state);
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataLoopNodes->Node.allocate(2);
     state->dataPlantLoadProfile->PlantProfile.allocate(1);

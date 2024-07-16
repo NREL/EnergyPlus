@@ -979,6 +979,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                                                  this->DesignWaterFlowRate);
                 }
             }
+            this->DesignLeavingWaterTemp = state.dataSize->PlantSizData(PltSizCondNum).ExitTemp;
         } else {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, format("Autosizing error for fluid cooler object = {}", this->Name));
@@ -1636,7 +1637,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignEnteringWaterTemp - this->DesignLeavingWaterTemp);
         OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignLeavingWaterTemp - this->DesignEnteringAirWetBulbTemp);
+            state, state.dataOutRptPredefined->pdchCTFCApproach, this->Name, this->DesignLeavingWaterTemp - this->DesignEnteringAirWetBulbTemp);
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchCTFCDesFanPwr, this->Name, this->HighSpeedFanPower); // eqival to Design Fan Power?
         OutputReportPredefined::PreDefTableEntry(

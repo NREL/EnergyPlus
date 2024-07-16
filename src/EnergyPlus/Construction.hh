@@ -299,6 +299,8 @@ namespace Construction {
 
         void reportTransferFunction(EnergyPlusData &state, int cCounter);
 
+        void reportLayers(EnergyPlusData &state);
+
         bool isGlazingConstruction(EnergyPlusData &state) const;
 
         Real64 setThicknessPerpendicular(EnergyPlusData &state, Real64 userValue);
