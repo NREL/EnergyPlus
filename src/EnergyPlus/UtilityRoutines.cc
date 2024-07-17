@@ -866,18 +866,19 @@ bool env_var_on(std::string const &env_var_str)
     return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
 }
 
-void emitErrorMessage(EnergyPlusData &state, int idOne, std::string const &msg, bool shouldFatal)
+void emitErrorMessage(EnergyPlusData &state, [[maybe_unused]] ErrorMessageCategory category, std::string const &msg, bool shouldFatal)
 {
-    (void)idOne;
     if (!shouldFatal) {
         ShowSevereError(state, msg);
     } else { // should fatal
         ShowFatalError(state, msg);
     }
 }
-void emitErrorMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs, bool shouldFatal)
+void emitErrorMessages(EnergyPlusData &state,
+                       [[maybe_unused]] ErrorMessageCategory category,
+                       std::initializer_list<std::string> const &msgs,
+                       bool shouldFatal)
 {
-    (void)idOne;
     for (auto msg = msgs.begin(); msg != msgs.end(); ++msg) {
         if (msg == msgs.begin()) {
             ShowSevereError(state, *msg);
@@ -888,18 +889,19 @@ void emitErrorMessages(EnergyPlusData &state, int idOne, std::initializer_list<s
         }
     }
 }
-void emitWarningMessage(EnergyPlusData &state, int idOne, std::string const &msg, bool const countAsError)
+void emitWarningMessage(EnergyPlusData &state, [[maybe_unused]] ErrorMessageCategory category, std::string const &msg, bool const countAsError)
 {
-    (void)idOne;
     if (countAsError) { // ideally this path goes away and we just have distinct warnings and errors
         ShowWarningError(state, msg);
     } else {
         ShowWarningMessage(state, msg);
     }
 }
-void emitWarningMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs, bool const countAsError)
+void emitWarningMessages(EnergyPlusData &state,
+                         [[maybe_unused]] ErrorMessageCategory category,
+                         std::initializer_list<std::string> const &msgs,
+                         bool const countAsError)
 {
-    (void)idOne;
     for (auto msg = msgs.begin(); msg != msgs.end(); ++msg) {
         if (msg == msgs.begin()) {
             if (countAsError) { // ideally this path goes away and we just have distinct warnings and errors

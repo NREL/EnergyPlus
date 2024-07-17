@@ -132,10 +132,34 @@ bool env_var_on(std::string const &env_var_str);
 
 using OptionalOutputFileRef = std::optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
-void emitErrorMessage(EnergyPlusData &state, int idOne, std::string const &msg, bool shouldFatal);
-void emitErrorMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs, bool shouldFatal);
-void emitWarningMessage(EnergyPlusData &state, int idOne, std::string const &msg, bool countAsError = false);
-void emitWarningMessages(EnergyPlusData &state, int idOne, std::initializer_list<std::string> const &msgs, bool countAsError = false);
+enum class ErrorMessageCategory
+{
+    Invalid = -1,
+    Unclassified,
+    Input_invalid,
+    Input_field_not_found,
+    Input_field_blank,
+    Input_object_not_found,
+    Input_cannot_find_object,
+    Input_topology_problem,
+    Input_unused,
+    Input_fatal,
+    Runtime_general,
+    Runtime_flow_out_of_range,
+    Runtime_temp_out_of_range,
+    Runtime_airflow_network,
+    Fatal_general,
+    Developer_general,
+    Developer_invalid_index,
+    Num
+};
+void emitErrorMessage(EnergyPlusData &state, ErrorMessageCategory category, std::string const &msg, bool shouldFatal);
+void emitErrorMessages(EnergyPlusData &state, ErrorMessageCategory category, std::initializer_list<std::string> const &msgs, bool shouldFatal);
+void emitWarningMessage(EnergyPlusData &state, ErrorMessageCategory category, std::string const &msg, bool countAsError = false);
+void emitWarningMessages(EnergyPlusData &state,
+                         ErrorMessageCategory category,
+                         std::initializer_list<std::string> const &msgs,
+                         bool countAsError = false);
 
 void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {});
 
