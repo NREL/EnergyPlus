@@ -72,6 +72,7 @@ set(test_src
     Coils/CoilCoolingDXCurveFitSpeed.unit.cc
     Coils/CoilCoolingDXFixture.hh
     CondenserLoopTowers.unit.cc
+    Construction.unit.cc
     ConstructionInternalSource.unit.cc
     ConvectionCoefficients.unit.cc
     CoolTower.unit.cc
@@ -123,6 +124,7 @@ set(test_src
     GeneralRoutines.unit.cc
     GroundHeatExchangers.unit.cc
     HVACControllers.unit.cc
+    HVACCooledBeam.unit.cc
     HVACDXSystem.unit.cc
     HVACDXHeatPumpSystem.unit.cc
     HVACFan.unit.cc

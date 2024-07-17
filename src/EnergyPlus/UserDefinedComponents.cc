@@ -2109,6 +2109,10 @@ namespace UserDefinedComponents {
                                     state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.InletNodeNum;
                                 state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
                                     state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum;
+                                state.dataDefineEquipment->AirDistUnit(state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ADUNum)
+                                    .TermUnitSizingNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                state.dataDefineEquipment->AirDistUnit(state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ADUNum).ZoneEqNum =
+                                    CtrlZone;
                             }
 
                             state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ActualCtrlZoneNum = CtrlZone;

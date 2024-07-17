@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -143,6 +144,7 @@ namespace HVACCooledBeam {
         }
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void reportTerminalUnit(EnergyPlusData &state);
     };
 
     void SimCoolBeam(EnergyPlusData &state,

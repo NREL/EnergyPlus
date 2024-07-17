@@ -49,7 +49,8 @@
 #define DataGlobalConstants_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
+#include <fmt/format.h>
+// #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -363,7 +364,7 @@ namespace Constant {
         eResourceNames[(int)eFuel2eResource[(int)eFuel::Water]],
         eResourceNames[(int)eFuel2eResource[(int)eFuel::None]]};
 
-    enum class Units
+    enum class Units : signed int
     {
         Invalid = -1,
         kg_s,
@@ -475,6 +476,21 @@ namespace Constant {
         "unknown",          // unknown
         "customEMS"         // customEMS
     };
+
+    inline std::string unitToString(Units unit)
+    {
+        switch (unit) {
+        case Units::Invalid:
+            return "invalid";
+        default:
+            const int iUnit = static_cast<int>(unit);
+            constexpr int numUnitNames = unitNames.size();
+            if (0 <= iUnit && iUnit < numUnitNames) {
+                return fmt::format("[{}]", unitNames[iUnit]);
+            }
+            return "invalid-out-of-range";
+        }
+    }
 
     constexpr std::array<std::string_view, (int)Units::Num> unitNamesUC = {
         "KG/S",             // kg_s

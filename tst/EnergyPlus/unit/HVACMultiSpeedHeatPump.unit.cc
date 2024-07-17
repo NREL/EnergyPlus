@@ -1458,7 +1458,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
 TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
 {
-
+    state->init_state(*state);
     state->dataLoopNodes->Node.allocate(2);
     state->dataHVACMultiSpdHP->MSHeatPump.allocate(1);
     int HeatRecInNode(1);

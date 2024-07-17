@@ -501,6 +501,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_reportTest)
     Real64 constexpr closeEnough = 0.000001;
     SwimmingPoolData myPool;
 
+    state->init_state(*state);
     // Test Data
     myPool.Name = "This Pool";
     myPool.SurfacePtr = 1;

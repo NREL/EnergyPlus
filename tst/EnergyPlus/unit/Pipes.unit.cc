@@ -82,7 +82,7 @@ TEST_F(EnergyPlusFixture, TestPipesInput)
 
 TEST_F(EnergyPlusFixture, CalcPipeHeatTransCoef)
 {
-
+    state->init_state(*state);
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataLoopNodes->Node.allocate(2);

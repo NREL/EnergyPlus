@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -330,6 +331,23 @@ namespace SystemReports {
     );
 
     void ReportAirLoopConnections(EnergyPlusData &state);
+
+    void reportAirLoopToplogy(EnergyPlusData &state);
+
+    void fillAirloopToplogyComponentRow(EnergyPlusData &state,
+                                        const std::string_view &loopName,
+                                        const std::string_view &branchName,
+                                        const HVAC::AirDuctType ductType,
+                                        const std::string_view &compType,
+                                        const std::string_view &compName,
+                                        int &rowCounter);
+
+    void reportZoneEquipmentToplogy(EnergyPlusData &state);
+
+    void fillZoneEquipToplogyComponentRow(
+        EnergyPlusData &state, const std::string_view &zoneName, const std::string_view &compType, const std::string_view &compName, int &rowCounter);
+
+    void reportAirDistributionUnits(EnergyPlusData &state);
 
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************

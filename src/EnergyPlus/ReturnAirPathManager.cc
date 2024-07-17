@@ -209,21 +209,6 @@ namespace ReturnAirPathManager {
         }
     }
 
-    void InitReturnAirPath([[maybe_unused]] int &ReturnAirPathNum) // unused1208
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          Russ Taylor
-        //       DATE WRITTEN:    Nov 1997
-
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-    }
-
     void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum)
     {
         // SUBROUTINE INFORMATION:
