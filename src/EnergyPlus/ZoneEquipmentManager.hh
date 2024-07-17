@@ -140,7 +140,7 @@ namespace ZoneEquipmentManager {
                                 DataSizing::DesDayWeathData const &desDayWeath,
                                 Real64 const stdRhoAir);
 
-    void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, DataSizing::ZoneSizingData const &zsCalcSizing);
+    void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum);
 
     void updateZoneSizingEndZoneSizingCalc2(EnergyPlusData &state, DataSizing::ZoneSizingData &zsCalcSizing);
 
