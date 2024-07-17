@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,11 +102,6 @@ namespace FluidProperties {
     // supplying the same data for concentrations of 0.0 and 1.0 only.
     // Temperature data has to be supplied in ascending order only.
 
-    void InitializeGlycRoutines()
-    {
-        // TODO: Delete this, the cache is now part of state and initialized with the state constructor
-    }
-
     void GetFluidPropertiesData(EnergyPlusData &state)
     {
 
@@ -161,6 +156,9 @@ namespace FluidProperties {
         //   In several cases we need to pass water data to the initializer, but an
         //   Array initializer only takes one argument.  std::bind is used to convert the
         //   actual initializer into a function of one argument.
+
+        state.dataFluidProps->NumOfRefrigerants = 0;
+        state.dataFluidProps->NumOfGlycols = 0;
 
         // For default "glycol" fluids of Water, Ethylene Glycol, and Propylene Glycol
 
@@ -657,8 +655,6 @@ namespace FluidProperties {
         cNumericFieldNames = "";
         lNumericFieldBlanks = false;
 
-        InitializeGlycRoutines();
-
         // Check to see if there is any FluidName input.  If not, this is okay as
         // long as the user only desires to simulate loops with water.  More than
         // one FluidName input is not allowed.
@@ -685,10 +681,10 @@ namespace FluidProperties {
                                                                      cNumericFieldNames);
             ++FluidNum;
             FluidNames(FluidNum).Name = Alphas(1);
-            if (UtilityRoutines::SameString(Alphas(2), Refrig)) {
+            if (Util::SameString(Alphas(2), Refrig)) {
                 ++state.dataFluidProps->NumOfRefrigerants;
                 FluidNames(FluidNum).IsGlycol = false;
-            } else if (UtilityRoutines::SameString(Alphas(2), Glycol)) {
+            } else if (Util::SameString(Alphas(2), Glycol)) {
                 ++state.dataFluidProps->NumOfGlycols;
                 FluidNames(FluidNum).IsGlycol = true;
             } else {
@@ -844,12 +840,12 @@ namespace FluidProperties {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), Pressure)) && (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (Util::SameString(Alphas(2), Pressure)) &&
+                    (Util::SameString(Alphas(3), GasFluid))) {
 
                     for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
-                        if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
+                        if (Util::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
                             TempsName = FluidTemps(TempLoop).Name;
                             // At this point, we have found the correct input line and found a match
                             // for the temperature array.  It's time to load up the local derived type.
@@ -926,12 +922,12 @@ namespace FluidProperties {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), Enthalpy)) && (UtilityRoutines::SameString(Alphas(3), Fluid))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (Util::SameString(Alphas(2), Enthalpy)) &&
+                    (Util::SameString(Alphas(3), Fluid))) {
 
                     for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
-                        if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
+                        if (Util::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
                             TempsName = FluidTemps(TempLoop).Name;
                             // At this point, we have found the correct input line and found a match
                             // for the temperature array.  It's time to load up the local derived type.
@@ -1006,13 +1002,13 @@ namespace FluidProperties {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), Enthalpy)) && (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (Util::SameString(Alphas(2), Enthalpy)) &&
+                    (Util::SameString(Alphas(3), GasFluid))) {
 
                     for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
-                        if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
-                            if (!UtilityRoutines::SameString(FluidTemps(TempLoop).Name, TempsName)) {
+                        if (Util::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
+                            if (!Util::SameString(FluidTemps(TempLoop).Name, TempsName)) {
                                 ShowSevereError(
                                     state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                                 ShowContinueError(state, "Temperatures for enthalpy fluid and gas/fluid points are not the same");
@@ -1092,12 +1088,12 @@ namespace FluidProperties {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), SpecificHeat)) && (UtilityRoutines::SameString(Alphas(3), Fluid))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (Util::SameString(Alphas(2), SpecificHeat)) &&
+                    (Util::SameString(Alphas(3), Fluid))) {
 
                     for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
-                        if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
+                        if (Util::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
                             TempsName = FluidTemps(TempLoop).Name;
                             // At this point, we have found the correct input line and found a match
                             // for the temperature array.  It's time to load up the local derived type.
@@ -1173,13 +1169,13 @@ namespace FluidProperties {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), SpecificHeat)) && (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (Util::SameString(Alphas(2), SpecificHeat)) &&
+                    (Util::SameString(Alphas(3), GasFluid))) {
 
                     for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
-                        if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
-                            if (!UtilityRoutines::SameString(FluidTemps(TempLoop).Name, TempsName)) {
+                        if (Util::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
+                            if (!Util::SameString(FluidTemps(TempLoop).Name, TempsName)) {
                                 ShowSevereError(
                                     state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                                 ShowContinueError(state, "Temperatures for specific heat fluid and gas/fluid points are not the same");
@@ -1261,12 +1257,12 @@ namespace FluidProperties {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), Density)) && (UtilityRoutines::SameString(Alphas(3), Fluid))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (Util::SameString(Alphas(2), Density)) &&
+                    (Util::SameString(Alphas(3), Fluid))) {
 
                     for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
-                        if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
+                        if (Util::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
                             TempsName = FluidTemps(TempLoop).Name;
                             // At this point, we have found the correct input line and found a match
                             // for the temperature array.  It's time to load up the local derived type.
@@ -1341,13 +1337,13 @@ namespace FluidProperties {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), Density)) && (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (Util::SameString(Alphas(2), Density)) &&
+                    (Util::SameString(Alphas(3), GasFluid))) {
 
                     for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
-                        if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
-                            if (!UtilityRoutines::SameString(FluidTemps(TempLoop).Name, TempsName)) {
+                        if (Util::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
+                            if (!Util::SameString(FluidTemps(TempLoop).Name, TempsName)) {
                                 ShowSevereError(
                                     state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                                 ShowContinueError(state, "Temperatures for density fluid and gas/fluid points are not the same");
@@ -1449,9 +1445,9 @@ namespace FluidProperties {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                if (UtilityRoutines::SameString(Alphas(3), Fluid)) {
-                    if (!UtilityRoutines::SameString(Alphas(2), Enthalpy) && !UtilityRoutines::SameString(Alphas(2), SpecificHeat) &&
-                        !UtilityRoutines::SameString(Alphas(2), Density)) {
+                if (Util::SameString(Alphas(3), Fluid)) {
+                    if (!Util::SameString(Alphas(2), Enthalpy) && !Util::SameString(Alphas(2), SpecificHeat) &&
+                        !Util::SameString(Alphas(2), Density)) {
                         if (iTemp == 0) {
                             ShowWarningError(state,
                                              format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
@@ -1464,9 +1460,9 @@ namespace FluidProperties {
                         }
                         ++iTemp;
                     }
-                } else if (UtilityRoutines::SameString(Alphas(3), GasFluid)) {
-                    if (!UtilityRoutines::SameString(Alphas(2), Pressure) && !UtilityRoutines::SameString(Alphas(2), Enthalpy) &&
-                        !UtilityRoutines::SameString(Alphas(2), SpecificHeat) && !UtilityRoutines::SameString(Alphas(2), Density)) {
+                } else if (Util::SameString(Alphas(3), GasFluid)) {
+                    if (!Util::SameString(Alphas(2), Pressure) && !Util::SameString(Alphas(2), Enthalpy) &&
+                        !Util::SameString(Alphas(2), SpecificHeat) && !Util::SameString(Alphas(2), Density)) {
                         if (iTemp == 0) {
                             ShowWarningError(state,
                                              format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
@@ -1518,14 +1514,13 @@ namespace FluidProperties {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), Enthalpy))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (Util::SameString(Alphas(2), Enthalpy))) {
                     ++NumOfPressPts;
                     if (FirstSHMatch) {
                         TempsName = Alphas(3);
                         FirstSHMatch = false;
                     } else {
-                        if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
+                        if (!Util::SameString(TempsName, Alphas(3))) {
                             ShowSevereError(state,
                                             format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                             ShowContinueError(state, "All superheated data for the same property must use the same temperature list");
@@ -1544,7 +1539,7 @@ namespace FluidProperties {
             // Now allocate the arrays and read the data into the proper place
             // First, allocate the temperature array and transfer the data from the FluidTemp array
             for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
-                if (UtilityRoutines::SameString(TempsName, FluidTemps(TempLoop).Name)) {
+                if (Util::SameString(TempsName, FluidTemps(TempLoop).Name)) {
                     state.dataFluidProps->RefrigData(Loop).NumSuperTempPts = FluidTemps(TempLoop).NumOfTemps;
                     state.dataFluidProps->RefrigData(Loop).SHTemps.allocate(state.dataFluidProps->RefrigData(Loop).NumSuperTempPts);
                     state.dataFluidProps->RefrigData(Loop).SHTemps = FluidTemps(TempLoop).Temps;
@@ -1582,8 +1577,7 @@ namespace FluidProperties {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), Enthalpy))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (Util::SameString(Alphas(2), Enthalpy))) {
                     ++NumOfPressPts;
                     if (Numbers(1) <= 0.0) {
                         ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
@@ -1674,8 +1668,7 @@ namespace FluidProperties {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), Density))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (Util::SameString(Alphas(2), Density))) {
                     ++NumOfPressPts;
                     if (Numbers(1) <= 0.0) {
                         ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
@@ -1721,7 +1714,7 @@ namespace FluidProperties {
                     ShowContinueError(state, "All superheated data for the same refrigerant must use the same pressure data");
                     ErrorsFound = true;
                 }
-                if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
+                if (!Util::SameString(TempsName, Alphas(3))) {
                     ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                     ShowContinueError(state, "All superheated data for the same property must use the same temperature list");
                     ErrorsFound = true;
@@ -1755,7 +1748,7 @@ namespace FluidProperties {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                if (!UtilityRoutines::SameString(Alphas(2), Enthalpy) && !UtilityRoutines::SameString(Alphas(2), Density)) {
+                if (!Util::SameString(Alphas(2), Enthalpy) && !Util::SameString(Alphas(2), Density)) {
                     if (iTemp == 0) {
                         ShowWarningError(state,
                                          format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
@@ -1812,14 +1805,13 @@ namespace FluidProperties {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), SpecificHeat))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (Util::SameString(Alphas(2), SpecificHeat))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
                         TempsName = Alphas(3);
                         FirstSHMatch = false;
                     } else {
-                        if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
+                        if (!Util::SameString(TempsName, Alphas(3))) {
                             ShowSevereError(state,
                                             format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->GlyRawData(Loop).Name));
                             ShowContinueError(state, "All glycol specific heat data for the same glycol must use the same temperature list");
@@ -1834,7 +1826,7 @@ namespace FluidProperties {
                 // First, allocate the temperature array and transfer the data from the FluidTemp array
                 state.dataFluidProps->GlyRawData(Loop).CpDataPresent = true;
                 for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
-                    if (UtilityRoutines::SameString(TempsName, FluidTemps(TempLoop).Name)) {
+                    if (Util::SameString(TempsName, FluidTemps(TempLoop).Name)) {
                         state.dataFluidProps->GlyRawData(Loop).NumCpTempPts = FluidTemps(TempLoop).NumOfTemps;
                         state.dataFluidProps->GlyRawData(Loop).CpTemps.allocate(state.dataFluidProps->GlyRawData(Loop).NumCpTempPts);
                         state.dataFluidProps->GlyRawData(Loop).CpTemps = FluidTemps(TempLoop).Temps;
@@ -1869,8 +1861,7 @@ namespace FluidProperties {
                                                                              lAlphaFieldBlanks,
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
-                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
-                        (UtilityRoutines::SameString(Alphas(2), SpecificHeat))) {
+                    if ((Util::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (Util::SameString(Alphas(2), SpecificHeat))) {
                         ++NumOfConcPts;
                         state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts) = Numbers(1);
                         // a little error trapping
@@ -1923,14 +1914,13 @@ namespace FluidProperties {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), Density))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (Util::SameString(Alphas(2), Density))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
                         TempsName = Alphas(3);
                         FirstSHMatch = false;
                     } else {
-                        if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
+                        if (!Util::SameString(TempsName, Alphas(3))) {
                             ShowSevereError(state,
                                             format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->GlyRawData(Loop).Name));
                             ShowContinueError(state, "All glycol density data for the same glycol must use the same temperature list");
@@ -1945,7 +1935,7 @@ namespace FluidProperties {
                 // First, allocate the temperature array and transfer the data from the FluidTemp array
                 state.dataFluidProps->GlyRawData(Loop).RhoDataPresent = true;
                 for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
-                    if (UtilityRoutines::SameString(TempsName, FluidTemps(TempLoop).Name)) {
+                    if (Util::SameString(TempsName, FluidTemps(TempLoop).Name)) {
                         state.dataFluidProps->GlyRawData(Loop).NumRhoTempPts = FluidTemps(TempLoop).NumOfTemps;
                         state.dataFluidProps->GlyRawData(Loop).RhoTemps.allocate(state.dataFluidProps->GlyRawData(Loop).NumRhoTempPts);
                         state.dataFluidProps->GlyRawData(Loop).RhoTemps = FluidTemps(TempLoop).Temps;
@@ -1980,8 +1970,7 @@ namespace FluidProperties {
                                                                              lAlphaFieldBlanks,
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
-                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
-                        (UtilityRoutines::SameString(Alphas(2), Density))) {
+                    if ((Util::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (Util::SameString(Alphas(2), Density))) {
                         ++NumOfConcPts;
                         state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts) = Numbers(1);
                         // a little error trapping
@@ -2034,14 +2023,13 @@ namespace FluidProperties {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), Conductivity))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (Util::SameString(Alphas(2), Conductivity))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
                         TempsName = Alphas(3);
                         FirstSHMatch = false;
                     } else {
-                        if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
+                        if (!Util::SameString(TempsName, Alphas(3))) {
                             ShowSevereError(state,
                                             format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->GlyRawData(Loop).Name));
                             ShowContinueError(state, "All glycol conductivity data for the same glycol must use the same temperature list");
@@ -2056,7 +2044,7 @@ namespace FluidProperties {
                 // First, allocate the temperature array and transfer the data from the FluidTemp array
                 state.dataFluidProps->GlyRawData(Loop).CondDataPresent = true;
                 for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
-                    if (UtilityRoutines::SameString(TempsName, FluidTemps(TempLoop).Name)) {
+                    if (Util::SameString(TempsName, FluidTemps(TempLoop).Name)) {
                         state.dataFluidProps->GlyRawData(Loop).NumCondTempPts = FluidTemps(TempLoop).NumOfTemps;
                         state.dataFluidProps->GlyRawData(Loop).CondTemps.allocate(state.dataFluidProps->GlyRawData(Loop).NumCondTempPts);
                         state.dataFluidProps->GlyRawData(Loop).CondTemps = FluidTemps(TempLoop).Temps;
@@ -2091,8 +2079,7 @@ namespace FluidProperties {
                                                                              lAlphaFieldBlanks,
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
-                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
-                        (UtilityRoutines::SameString(Alphas(2), Conductivity))) {
+                    if ((Util::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (Util::SameString(Alphas(2), Conductivity))) {
                         ++NumOfConcPts;
                         state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts) = Numbers(1);
                         // a little error trapping
@@ -2145,14 +2132,13 @@ namespace FluidProperties {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
-                    (UtilityRoutines::SameString(Alphas(2), Viscosity))) {
+                if ((Util::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (Util::SameString(Alphas(2), Viscosity))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
                         TempsName = Alphas(3);
                         FirstSHMatch = false;
                     } else {
-                        if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
+                        if (!Util::SameString(TempsName, Alphas(3))) {
                             ShowSevereError(state,
                                             format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->GlyRawData(Loop).Name));
                             ShowContinueError(state, "All glycol viscosity data for the same glycol must use the same temperature list");
@@ -2167,7 +2153,7 @@ namespace FluidProperties {
                 // Now allocate the arrays and read the data into the proper place
                 // First, allocate the temperature array and transfer the data from the FluidTemp array
                 for (int TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
-                    if (UtilityRoutines::SameString(TempsName, FluidTemps(TempLoop).Name)) {
+                    if (Util::SameString(TempsName, FluidTemps(TempLoop).Name)) {
                         state.dataFluidProps->GlyRawData(Loop).NumViscTempPts = FluidTemps(TempLoop).NumOfTemps;
                         state.dataFluidProps->GlyRawData(Loop).ViscTemps.allocate(state.dataFluidProps->GlyRawData(Loop).NumViscTempPts);
                         state.dataFluidProps->GlyRawData(Loop).ViscTemps = FluidTemps(TempLoop).Temps;
@@ -2202,8 +2188,7 @@ namespace FluidProperties {
                                                                              lAlphaFieldBlanks,
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
-                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
-                        (UtilityRoutines::SameString(Alphas(2), Viscosity))) {
+                    if ((Util::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (Util::SameString(Alphas(2), Viscosity))) {
                         ++NumOfConcPts;
                         state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts) = Numbers(1);
                         // a little error trapping
@@ -2320,19 +2305,19 @@ namespace FluidProperties {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
             bool GlycolFound = false;
-            if (UtilityRoutines::SameString(Alphas(2), EthyleneGlycol)) {
+            if (Util::SameString(Alphas(2), EthyleneGlycol)) {
                 GlycolFound = true;
                 ++NumOfGlyConcs;
                 state.dataFluidProps->GlycolData(NumOfGlyConcs).Name = Alphas(1);
                 state.dataFluidProps->GlycolData(NumOfGlyConcs).GlycolName = Alphas(2);
-            } else if (UtilityRoutines::SameString(Alphas(2), PropyleneGlycol)) {
+            } else if (Util::SameString(Alphas(2), PropyleneGlycol)) {
                 GlycolFound = true;
                 ++NumOfGlyConcs;
                 state.dataFluidProps->GlycolData(NumOfGlyConcs).Name = Alphas(1);
                 state.dataFluidProps->GlycolData(NumOfGlyConcs).GlycolName = Alphas(2);
-            } else if (UtilityRoutines::SameString(Alphas(2), "UserDefinedGlycolType")) {
+            } else if (Util::SameString(Alphas(2), "UserDefinedGlycolType")) {
                 for (InData = 1; InData <= state.dataFluidProps->NumOfGlycols; ++InData) {
-                    if (UtilityRoutines::SameString(Alphas(3), state.dataFluidProps->GlyRawData(InData).Name)) {
+                    if (Util::SameString(Alphas(3), state.dataFluidProps->GlyRawData(InData).Name)) {
                         GlycolFound = true;
                         break; // DO LOOP through user defined glycols
                     }
@@ -2359,14 +2344,13 @@ namespace FluidProperties {
         // Now initialize the rest of the data for the glycols
         for (int Loop = 2; Loop <= NumOfGlyConcs; ++Loop) {
             // Check to see if glycol name is one of the defaults or is listed in the Fluid Name list
-            if (UtilityRoutines::SameString(state.dataFluidProps->GlycolData(Loop).GlycolName, EthyleneGlycol)) {
+            if (Util::SameString(state.dataFluidProps->GlycolData(Loop).GlycolName, EthyleneGlycol)) {
                 state.dataFluidProps->GlycolData(Loop).GlycolIndex = EthyleneGlycolIndex;
-            } else if (UtilityRoutines::SameString(state.dataFluidProps->GlycolData(Loop).GlycolName, PropyleneGlycol)) {
+            } else if (Util::SameString(state.dataFluidProps->GlycolData(Loop).GlycolName, PropyleneGlycol)) {
                 state.dataFluidProps->GlycolData(Loop).GlycolIndex = PropyleneGlycolIndex;
             } else {
                 for (InData = 1; InData <= state.dataFluidProps->NumOfGlycols; ++InData) {
-                    if (UtilityRoutines::SameString(state.dataFluidProps->GlycolData(Loop).GlycolName,
-                                                    state.dataFluidProps->GlyRawData(InData).Name)) {
+                    if (Util::SameString(state.dataFluidProps->GlycolData(Loop).GlycolName, state.dataFluidProps->GlyRawData(InData).Name)) {
                         state.dataFluidProps->GlycolData(Loop).GlycolIndex = InData;
                         break; // DO LOOP through user defined glycols
                     }
@@ -4938,8 +4922,6 @@ namespace FluidProperties {
         Real64 Temperature; // Temperature to drive values
         Real64 ReturnValue; // Values returned from glycol functions
 
-        state.dataFluidProps->GetInput = false; // input has already been gotten
-
         for (int GlycolNum = 1; GlycolNum <= state.dataFluidProps->NumOfGlycols; ++GlycolNum) {
             auto &glycol = state.dataFluidProps->GlycolData(GlycolNum);
             int GlycolIndex = 0; // used in routine calls -- value is returned when first 0
@@ -5179,8 +5161,6 @@ namespace FluidProperties {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Temperature; // Temperature to drive values
         Real64 ReturnValue; // Values returned from refrigerant functions
-
-        state.dataFluidProps->GetInput = false; // input has already been gotten
 
         for (int RefrigNum = 1; RefrigNum <= state.dataFluidProps->NumOfRefrigerants; ++RefrigNum) {
             int RefrigIndex = 0; // used in routine calls -- value is returned when first 0
@@ -5618,23 +5598,15 @@ namespace FluidProperties {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int HiTempIndex;        // index value of next highest Temperature from table
         int LoTempIndex;        // index value of next lowest Temperature from table
-        int RefrigNum;          // index for refrigerant under consideration
         Real64 TempInterpRatio; // ratio to interpolate in temperature domain
-        // error counters and dummy string
-        bool ErrorFlag; // error flag for current call
 
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
-        RefrigNum = 0;
+        int RefrigNum = 0; // index for refrigerant under consideration
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
             ReportFatalRefrigerantErrors(
                 state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
         }
 
-        ErrorFlag = false;
+        bool ErrorFlag = false;
 
         if (RefrigIndex > 0) {
             RefrigNum = RefrigIndex;
@@ -5729,23 +5701,15 @@ namespace FluidProperties {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int HiPresIndex;        // index value of next highest Temperature from table
         int LoPresIndex;        // index value of next lowest Temperature from table
-        int RefrigNum;          // index for refrigerant under consideration
         Real64 PresInterpRatio; // ratio to interpolate in temperature domain
-        // error counters and dummy string
-        bool ErrorFlag; // error flag for current call
 
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
-        RefrigNum = 0;
+        int RefrigNum = 0; // index for refrigerant under consideration
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
             ReportFatalRefrigerantErrors(
                 state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatTemperatureRefrig", "properties", CalledFrom);
         }
 
-        ErrorFlag = false;
+        bool ErrorFlag = false;
 
         if (RefrigIndex > 0) {
             RefrigNum = RefrigIndex;
@@ -5844,14 +5808,7 @@ namespace FluidProperties {
         static constexpr std::string_view RoutineName("GetSatEnthalpyRefrig");
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int RefrigNum; // index for refrigerant under consideration
-
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
-        RefrigNum = 0;
+        int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
             ReportFatalRefrigerantErrors(
                 state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
@@ -5916,13 +5873,6 @@ namespace FluidProperties {
         Real64 LoSatProp;       // Sat. prop. at lower temp & given quality
         Real64 HiSatProp;       // Sat. prop. at higher temp & given quality
         Real64 TempInterpRatio; // ratio to interpolate in temperature domain
-
-        // error counters and dummy string
-
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
@@ -6052,11 +6002,6 @@ namespace FluidProperties {
         // FUNCTION PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetSatSpecificHeatRefrig: ");
 
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
             ReportFatalRefrigerantErrors(
@@ -6157,12 +6102,6 @@ namespace FluidProperties {
 
         int HiTempIndex;  // high temperature index value
         int HiPressIndex; // high pressure index value
-
-        // see if data is there
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
@@ -6409,11 +6348,6 @@ namespace FluidProperties {
         int HiTempIndex;     // Index value of higher temperature from data
         int LoEnthalpyIndex; // Index value of lower enthalpy from data
         int HiEnthalpyIndex; // Index value of higher enthalpy from data
-
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
@@ -6686,11 +6620,6 @@ namespace FluidProperties {
         Real64 RefTSat;      // Saturated temperature of the refrigerant. Used to check whether the refrigernat is in the superheat area
         Real64 Temp;         // Temperature of the superheated refrigerant at the given enthalpy and pressure
 
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
             ReportFatalRefrigerantErrors(
@@ -6833,12 +6762,6 @@ namespace FluidProperties {
 
         int HiTempIndex;  // high temperature index value
         int HiPressIndex; // high pressure index value
-
-        // see if data is there
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
@@ -7103,12 +7026,6 @@ namespace FluidProperties {
         // FUNCTION PARAMETERS:
         static constexpr std::string_view RoutineName("GetSpecificHeatGlycol: ");
 
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         // If no glycols, no fluid properties can be evaluated
         int GlycolNum(0);
         if (state.dataFluidProps->NumOfGlycols == 0)
@@ -7254,12 +7171,6 @@ namespace FluidProperties {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         bool LowErrorThisTime = false;
         bool HighErrorThisTime = false;
-
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         // If no glycols, no fluid properties can be evaluated
         int GlycolNum = 0;
@@ -7417,12 +7328,6 @@ namespace FluidProperties {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         bool LowErrorThisTime = false;
         bool HighErrorThisTime = false;
-
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         // If no glycols, no fluid properties can be evaluated
         int GlycolNum = 0;
@@ -7584,12 +7489,6 @@ namespace FluidProperties {
         bool LowErrorThisTime = false;
         bool HighErrorThisTime = false;
 
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         // If no glycols, no fluid properties can be evaluated
         int GlycolNum = 0;
         if (state.dataFluidProps->NumOfGlycols == 0)
@@ -7739,14 +7638,8 @@ namespace FluidProperties {
         // Return value
         int FindRefrigerant;
 
-        // Make sure we have already read in the input
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         // Check to see if this glycol shows up in the glycol data
-        int Found = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(Refrigerant), state.dataFluidProps->RefrigData);
+        int Found = Util::FindItemInList(Util::makeUPPER(Refrigerant), state.dataFluidProps->RefrigData);
 
         if (Found > 0) {
             FindRefrigerant = Found;
@@ -7781,16 +7674,10 @@ namespace FluidProperties {
         // Return value
         int FindGlycol;
 
-        // Make sure we have already read in the input
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         // Check to see if this glycol shows up in the glycol data
-        int Found = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(Glycol),
-                                                    state.dataFluidProps->GlycolData,
-                                                    state.dataFluidProps->NumOfGlycols); // GlycolData is allocated to NumOfGlyConcs
+        int Found = Util::FindItemInList(Util::makeUPPER(Glycol),
+                                         state.dataFluidProps->GlycolData,
+                                         state.dataFluidProps->NumOfGlycols); // GlycolData is allocated to NumOfGlyConcs
 
         if (Found > 0) {
             FindGlycol = Found;
@@ -8036,19 +7923,14 @@ namespace FluidProperties {
         // Return value
         int CheckFluidPropertyName;
 
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         // Item must be either in Refrigerant or Glycol list
         int Found = 0;
         if (state.dataFluidProps->NumOfRefrigerants > 0) {
-            Found = UtilityRoutines::FindItemInList(NameToCheck, state.dataFluidProps->RefrigData);
+            Found = Util::FindItemInList(NameToCheck, state.dataFluidProps->RefrigData);
         }
         if (Found == 0) {
             if (state.dataFluidProps->NumOfGlycols > 0) {
-                Found = UtilityRoutines::FindItemInList(
+                Found = Util::FindItemInList(
                     NameToCheck, state.dataFluidProps->GlycolData, state.dataFluidProps->NumOfGlycols); // GlycolData is allocated to NumOfGlyConcs
             }
         }
@@ -8074,7 +7956,7 @@ namespace FluidProperties {
 
         for (int Item = 1; Item <= state.dataFluidProps->NumOfRefrigerants; ++Item) {
             if (state.dataFluidProps->RefrigUsed(Item)) continue;
-            if (UtilityRoutines::SameString(state.dataFluidProps->RefrigData(Item).Name, Steam)) continue;
+            if (Util::SameString(state.dataFluidProps->RefrigData(Item).Name, Steam)) continue;
             if (NeedOrphanMessage && state.dataGlobal->DisplayUnusedObjects) {
                 ShowWarningError(state, "The following fluid names are \"Unused Fluids\".  These fluids are in the idf");
                 ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
@@ -8091,9 +7973,9 @@ namespace FluidProperties {
 
         for (int Item = 1; Item <= state.dataFluidProps->NumOfGlycols; ++Item) {
             if (state.dataFluidProps->GlycolUsed(Item)) continue;
-            if (UtilityRoutines::SameString(state.dataFluidProps->GlycolData(Item).Name, Water)) continue;
-            if (UtilityRoutines::SameString(state.dataFluidProps->GlycolData(Item).Name, EthyleneGlycol)) continue;
-            if (UtilityRoutines::SameString(state.dataFluidProps->GlycolData(Item).Name, PropyleneGlycol)) continue;
+            if (Util::SameString(state.dataFluidProps->GlycolData(Item).Name, Water)) continue;
+            if (Util::SameString(state.dataFluidProps->GlycolData(Item).Name, EthyleneGlycol)) continue;
+            if (Util::SameString(state.dataFluidProps->GlycolData(Item).Name, PropyleneGlycol)) continue;
             if (NeedOrphanMessage && state.dataGlobal->DisplayUnusedObjects) {
                 ShowWarningError(state, "The following fluid names are \"Unused Fluids\".  These fluids are in the idf");
                 ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
@@ -8204,12 +8086,6 @@ namespace FluidProperties {
     void GetFluidDensityTemperatureLimits(EnergyPlusData &state, int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
 
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         if (FluidIndex > 0) {
             MinTempLimit = state.dataFluidProps->GlycolData(FluidIndex).RhoLowTempValue;
             MaxTempLimit = state.dataFluidProps->GlycolData(FluidIndex).RhoHighTempValue;
@@ -8218,12 +8094,6 @@ namespace FluidProperties {
 
     void GetFluidSpecificHeatTemperatureLimits(EnergyPlusData &state, int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         if (FluidIndex > 0) {
             MinTempLimit = state.dataFluidProps->GlycolData(FluidIndex).CpLowTempValue;
             MaxTempLimit = state.dataFluidProps->GlycolData(FluidIndex).CpHighTempValue;
@@ -8232,7 +8102,7 @@ namespace FluidProperties {
 
     GlycolAPI::GlycolAPI(EnergyPlusData &state, std::string const &glycolName)
     {
-        this->glycolName = EnergyPlus::UtilityRoutines::MakeUPPERCase(glycolName);
+        this->glycolName = EnergyPlus::Util::makeUPPER(glycolName);
         this->glycolIndex = 0;
         this->cf = "GlycolAPI:Instance";
         if (this->glycolName != "WATER") {
@@ -8258,7 +8128,7 @@ namespace FluidProperties {
 
     RefrigerantAPI::RefrigerantAPI(EnergyPlusData &state, std::string const &refrigName)
     {
-        this->rName = EnergyPlus::UtilityRoutines::MakeUPPERCase(refrigName);
+        this->rName = EnergyPlus::Util::makeUPPER(refrigName);
         this->rIndex = 0;
         this->cf = "RefrigerantAPI:Instance";
         if (this->rName != "STEAM") {

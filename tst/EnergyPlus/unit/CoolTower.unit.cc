@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -92,7 +92,7 @@ TEST_F(EnergyPlusFixture, ExerciseCoolTower)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPC = 1;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTC = 1;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 1;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 1;
 
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutWetBulbTemp = 26.0;

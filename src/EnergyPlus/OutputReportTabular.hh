@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -120,9 +120,12 @@ namespace OutputReportTabular {
         JtoMJ,
         JtoGJ,
         InchPound,
+        InchPoundExceptElectricity,
         NotFound,
         Num
     };
+    constexpr std::array<std::string_view, static_cast<int>(UnitsStyle::Num) - 1> UnitsStyleNamesUC{
+        "NONE", "JTOKWH", "JTOMJ", "JTOGJ", "INCHPOUND", "INCHPOUNDEXCEPTELECTRICITY"};
 
     enum class EndUseSubTableType
     {
@@ -254,27 +257,20 @@ namespace OutputReportTabular {
     struct OutputTableBinnedType
     {
         // Members
-        std::string keyValue;   // the key value (usually an asterisk to indicate all variables
-        std::string varOrMeter; // the name of the variable or meter
-        Real64 intervalStart;   // The lowest value for the intervals being binned into.
-        Real64 intervalSize;    // The size of the bins starting with Interval start.
-        int intervalCount;      // The number of bins used. The number of hours below the start of
+        std::string keyValue;       // the key value (usually an asterisk to indicate all variables
+        std::string varOrMeter;     // the name of the variable or meter
+        Real64 intervalStart = 0.0; // The lowest value for the intervals being binned into.
+        Real64 intervalSize = 0.0;  // The size of the bins starting with Interval start.
+        int intervalCount = 0;      // The number of bins used. The number of hours below the start of
         // the lowest bin and above the value of the last bin are also shown.
-        int resIndex; // result index - pointer to BinResults array
-        int numTables;
-        OutputProcessor::VariableType typeOfVar;
-        OutputProcessor::StoreType avgSum;      // Variable  is Averaged=1 or Summed=2
-        OutputProcessor::TimeStepType stepType; // Variable time step is Zone=1 or HVAC=2
-        OutputProcessor::Unit units;            // the units enumeration
-        std::string ScheduleName;               // the name of the schedule
-        int scheduleIndex;                      // index to the schedule specified - if no schedule use zero
-
-        // Default Constructor
-        OutputTableBinnedType()
-            : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(OutputProcessor::VariableType::NotFound),
-              avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::Zone), scheduleIndex(0)
-        {
-        }
+        int resIndex = 0; // result index - pointer to BinResults array
+        int numTables = 0;
+        OutputProcessor::VariableType typeOfVar = OutputProcessor::VariableType::Invalid; // Was NotFound
+        OutputProcessor::StoreType avgSum = OutputProcessor::StoreType::Average;          // Variable  is Averaged=1 or Summed=2
+        OutputProcessor::TimeStepType stepType = OutputProcessor::TimeStepType::Zone;     // Variable time step is Zone=1 or HVAC=2
+        Constant::Units units = Constant::Units::Invalid;                                 // the units enumeration
+        std::string ScheduleName;                                                         // the name of the schedule
+        int scheduleIndex = 0;                                                            // index to the schedule specified - if no schedule use zero
     };
 
     struct BinResultsType
@@ -331,27 +327,23 @@ namespace OutputReportTabular {
     struct MonthlyInputType
     {
         // Members
-        std::string name;  // identifier
-        int numFieldSet;   // number of monthly field sets
-        int firstFieldSet; // pointer to the first field set
-        int numTables;     // number of tables
-        int firstTable;    // pointer to the first table
-        int showDigits;    // the number of digits to be shown
-
-        // Default Constructor
-        MonthlyInputType() : numFieldSet(0), firstFieldSet(0), numTables(0), firstTable(0), showDigits(0)
-        {
-        }
+        std::string name;      // identifier
+        int numFieldSet = 0;   // number of monthly field sets
+        int firstFieldSet = 0; // pointer to the first field set
+        int numTables = 0;     // number of tables
+        int firstTable = 0;    // pointer to the first table
+        int showDigits = 0;    // the number of digits to be shown
+        bool isNamedMonthly = false;
     };
 
     struct MonthlyFieldSetInputType
     {
         // Members
-        std::string variMeter;          // the name of the variable or meter
-        std::string colHead;            // the column header to use instead of the variable name (only for predefined)
-        AggType aggregate;              // the type of aggregation for the variable (see aggType parameters)
-        OutputProcessor::Unit varUnits; // Units enumeration
-        std::string variMeterUpper;     // the name of the variable or meter uppercased
+        std::string variMeter;      // the name of the variable or meter
+        std::string colHead;        // the column header to use instead of the variable name (only for predefined)
+        AggType aggregate;          // the type of aggregation for the variable (see aggType parameters)
+        Constant::Units varUnits;   // Units enumeration
+        std::string variMeterUpper; // the name of the variable or meter uppercased
         OutputProcessor::VariableType typeOfVar;
         int keyCount;                              // noel
         OutputProcessor::StoreType varAvgSum;      // Variable  is Averaged=1 or Summed=2
@@ -361,8 +353,8 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyFieldSetInputType()
-            : aggregate(AggType::Invalid), varUnits(OutputProcessor::Unit::None), typeOfVar(OutputProcessor::VariableType::NotFound), keyCount(0),
-              varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::Zone)
+            : aggregate(AggType::Invalid), varUnits(Constant::Units::None), typeOfVar(OutputProcessor::VariableType::Invalid), keyCount(0),
+              varAvgSum(OutputProcessor::StoreType::Average), varStepType(OutputProcessor::TimeStepType::Zone)
         {
         }
     };
@@ -389,7 +381,7 @@ namespace OutputReportTabular {
         OutputProcessor::VariableType typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
         OutputProcessor::StoreType avgSum;       // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType stepType;  // Variable time step is Zone=1 or HVAC=2
-        OutputProcessor::Unit units;             // the units string, may be blank
+        Constant::Units units;                   // the units string, may be blank
         AggType aggType;                         // index to the type of aggregation (see list of parameters)
         Array1D<Real64> reslt;                   // monthly results
         Array1D<Real64> duration;                // the time during which results are summed for use in averages
@@ -399,8 +391,8 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyColumnsType()
-            : varNum(0), typeOfVar(OutputProcessor::VariableType::NotFound), avgSum(OutputProcessor::StoreType::Averaged),
-              stepType(OutputProcessor::TimeStepType::Zone), units(OutputProcessor::Unit::None), aggType(AggType::Invalid), reslt(12, 0.0),
+            : varNum(0), typeOfVar(OutputProcessor::VariableType::Invalid), avgSum(OutputProcessor::StoreType::Average),
+              stepType(OutputProcessor::TimeStepType::Zone), units(Constant::Units::None), aggType(AggType::Invalid), reslt(12, 0.0),
               duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
         }
@@ -439,49 +431,39 @@ namespace OutputReportTabular {
     struct CompLoadTablesType
     {
         // members
-        int desDayNum;             // design day number
-        int timeStepMax;           // times step of the day that the maximum occurs
-        Array2D<Real64> cells;     // main component table results (column, row)
-        Array2D_bool cellUsed;     // flag if the cell is used for the table of results (column, row)
-        std::string peakDateHrMin; // string containing peak timestamp
-        Real64 outsideDryBulb;     // outside dry bulb temperature at peak
-        Real64 outsideWetBulb;     // outside wet bulb temperature at peak
-        Real64 outsideHumRatio;    // outside humidity ratio at peak
-        Real64 zoneDryBulb;        // zone dry bulb temperature at peak
-        Real64 zoneRelHum;         // zone relative humidity at peak
-        Real64 zoneHumRatio;       // zone humidity ratio at peak
+        int desDayNum = 0;              // design day number
+        int timeStepMax = 0;            // times step of the day that the maximum occurs
+        Array2D<Real64> cells;          // main component table results (column, row)
+        Array2D_bool cellUsed;          // flag if the cell is used for the table of results (column, row)
+        std::string peakDateHrMin = ""; // string containing peak timestamp
+        Real64 outsideDryBulb = 0.0;    // outside dry bulb temperature at peak
+        Real64 outsideWetBulb = 0.0;    // outside wet bulb temperature at peak
+        Real64 outsideHumRatio = 0.0;   // outside humidity ratio at peak
+        Real64 zoneDryBulb = 0.0;       // zone dry bulb temperature at peak
+        Real64 zoneRelHum = 0.0;        // zone relative humidity at peak
+        Real64 zoneHumRatio = 0.0;      // zone humidity ratio at peak
 
-        Real64 supAirTemp;     // supply air temperature
-        Real64 mixAirTemp;     // mixed air temperature
-        Real64 mainFanAirFlow; // main fan air flow
-        Real64 outsideAirFlow; // outside air flow
-        Real64 designPeakLoad; // design peak load
-        Real64 diffDesignPeak; // difference between Design and Peak Load
+        Real64 supAirTemp = 0.0;     // supply air temperature
+        Real64 mixAirTemp = 0.0;     // mixed air temperature
+        Real64 mainFanAirFlow = 0.0; // main fan air flow
+        Real64 outsideAirFlow = 0.0; // outside air flow
+        Real64 designPeakLoad = 0.0; // design peak load
+        Real64 diffDesignPeak = 0.0; // difference between Design and Peak Load
 
-        Real64 peakDesSensLoad;    // peak design sensible load
-        Real64 estInstDelSensLoad; // estimated instant plus delayed sensible load
-        Real64 diffPeakEst;        // difference between the peak design sensible load and the estimated instant plus delayed sensible load
-        Array1D_int zoneIndices;   // the zone numbers covered by the report
+        Real64 peakDesSensLoad = 0.0;    // peak design sensible load
+        Real64 estInstDelSensLoad = 0.0; // estimated instant plus delayed sensible load
+        Real64 diffPeakEst = 0.0;        // difference between the peak design sensible load and the estimated instant plus delayed sensible load
+        Array1D_int zoneIndices;         // the zone numbers covered by the report
 
-        Real64 outsideAirRatio;   // outside Air
-        Real64 floorArea;         // floor area
-        Real64 airflowPerFlrArea; // airflow per floor area
-        Real64 airflowPerTotCap;  // airflow per total capacity
-        Real64 areaPerTotCap;     // area per total capacity
-        Real64 totCapPerArea;     // total capacity per area
-        Real64 chlPumpPerFlow;    // chiller pump power per flow
-        Real64 cndPumpPerFlow;    // condenser pump power per flow
-        Real64 numPeople;         // number of people
-
-        // default constructor
-        CompLoadTablesType()
-            : desDayNum(0), timeStepMax(0), outsideDryBulb(0.), outsideWetBulb(0.), outsideHumRatio(0.), zoneDryBulb(0.), zoneRelHum(0.),
-              supAirTemp(0.), mixAirTemp(0.), mainFanAirFlow(0.), outsideAirFlow(0.), designPeakLoad(0.), diffDesignPeak(0.), peakDesSensLoad(0.),
-              estInstDelSensLoad(0.), diffPeakEst(0.), outsideAirRatio(0.), floorArea(0.), airflowPerFlrArea(0.), airflowPerTotCap(0.),
-              areaPerTotCap(0.), totCapPerArea(0.), chlPumpPerFlow(0.), cndPumpPerFlow(0.), numPeople(0.)
-
-        {
-        }
+        Real64 outsideAirRatio = 0.0;   // outside Air
+        Real64 floorArea = 0.0;         // floor area
+        Real64 airflowPerFlrArea = 0.0; // airflow per floor area
+        Real64 airflowPerTotCap = 0.0;  // airflow per total capacity
+        Real64 areaPerTotCap = 0.0;     // area per total capacity
+        Real64 totCapPerArea = 0.0;     // total capacity per area
+        Real64 chlPumpPerFlow = 0.0;    // chiller pump power per flow
+        Real64 cndPumpPerFlow = 0.0;    // condenser pump power per flow
+        Real64 numPeople = 0.0;         // number of people
     };
 
     struct ZompComponentAreasType
@@ -523,7 +505,7 @@ namespace OutputReportTabular {
 
     void GetInputTabularMonthly(EnergyPlusData &state);
 
-    int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown);
+    int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown, bool isNamedMonthly = false);
 
     void AddMonthlyFieldSetInput(
         EnergyPlusData &state, int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, AggType const inAggregate);
@@ -568,7 +550,7 @@ namespace OutputReportTabular {
 
     void AddTOCReportPeriod(const int nReportPeriods,
                             const std::string &kw,
-                            const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                            const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData,
                             std::ostream &tbl_stream);
 
     //======================================================================================================================
@@ -654,7 +636,7 @@ namespace OutputReportTabular {
                                        Array2D_string &tableBody,
                                        const int rowid,
                                        const int periodIdx,
-                                       const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData);
+                                       const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData);
 
     void WriteVeriSumTable(EnergyPlusData &state);
 
@@ -667,7 +649,7 @@ namespace OutputReportTabular {
     void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
                                           const std::string &reportKeyWord,
                                           const int periodIdx,
-                                          const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData);
+                                          const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData);
 
     void WriteReportPeriodTimeConsumption(EnergyPlusData &state);
 
@@ -991,6 +973,11 @@ struct OutputReportTabularData : BaseGlobalStruct
 {
 
     OutputReportTabular::UnitsStyle unitsStyle = OutputReportTabular::UnitsStyle::None;
+    bool ip() const
+    {
+        return this->unitsStyle == OutputReportTabular::UnitsStyle::InchPound ||
+               this->unitsStyle == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity;
+    }
     OutputReportTabular::UnitsStyle unitsStyle_SQLite = OutputReportTabular::UnitsStyle::NotFound;
     int OutputTableBinnedCount = 0;
     int BinResultsTableCount = 0;
@@ -1050,14 +1037,15 @@ struct OutputReportTabularData : BaseGlobalStruct
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
     // arrays that hold the meter numbers that are initialized at get input
-    Array1D_int meterNumTotalsBEPS = Array1D_int(OutputReportTabular::numResourceTypes, 0);
-    Array1D_int meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, 0);
+
+    Array1D_int meterNumTotalsBEPS = Array1D_int(OutputReportTabular::numResourceTypes, -1);
+    Array1D_int meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, -1);
     Array1D_bool fuelfactorsused = Array1D_bool(OutputReportTabular::numSourceTypes, false);
     Array1D_bool ffUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
     Array1D<Real64> SourceFactors = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
     Array1D_bool ffSchedUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
     Array1D_int ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
-    Array2D_int meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0);
+    Array2D_int meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), -1);
     Array3D_int meterNumEndUseSubBEPS;
     Array3D_int meterNumEndUseSpTypeBEPS;
     // arrays that hold the names of the resource and end uses
@@ -1139,8 +1127,8 @@ struct OutputReportTabularData : BaseGlobalStruct
     Real64 sourceFactorElectric = 0.0;
     Real64 sourceFactorNaturalGas = 0.0;
     Real64 efficiencyDistrictCooling = 0.0;
-    Real64 efficiencyDistrictHeating = 0.0;
-    Real64 sourceFactorSteam = 0.0;
+    Real64 efficiencyDistrictHeatingWater = 0.0;
+    Real64 sourceFactorDistrictHeatingSteam = 0.0;
     Real64 sourceFactorGasoline = 0.0;
     Real64 sourceFactorDiesel = 0.0;
     Real64 sourceFactorCoal = 0.0;
@@ -1244,7 +1232,6 @@ struct OutputReportTabularData : BaseGlobalStruct
     int numPeopleAdaptive = 0;
 
     Real64 BigNum = 0.0;
-    bool VarWarning = true;
     int ErrCount1 = 0;
     Array1D<OutputProcessor::VariableType> MonthlyColumnsTypeOfVar;
     Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
@@ -1343,6 +1330,10 @@ struct OutputReportTabularData : BaseGlobalStruct
     std::string Wm2_unitName;
     std::string curColHeadWithSI;
     std::string curColHead;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {
@@ -1469,8 +1460,8 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->sourceFactorElectric = 0.0;
         this->sourceFactorNaturalGas = 0.0;
         this->efficiencyDistrictCooling = 0.0;
-        this->efficiencyDistrictHeating = 0.0;
-        this->sourceFactorSteam = 0.0;
+        this->efficiencyDistrictHeatingWater = 0.0;
+        this->sourceFactorDistrictHeatingSteam = 0.0;
         this->sourceFactorGasoline = 0.0;
         this->sourceFactorDiesel = 0.0;
         this->sourceFactorCoal = 0.0;
@@ -1545,7 +1536,6 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->numPeopleAdaptive = 0;
 
         this->BigNum = 0.0;
-        this->VarWarning = true;
         this->ErrCount1 = 0;
         this->MonthlyColumnsTypeOfVar.clear();
         this->MonthlyColumnsStepType.clear();

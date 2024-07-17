@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,7 +62,9 @@
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
+
 #include <algorithm>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -116,7 +118,6 @@ void EnergyPlusFixture::SetUp()
     state->dataUtilityRoutines->outputErrorHeader = false;
 
     Psychrometrics::InitializePsychRoutines(*state);
-    FluidProperties::InitializeGlycRoutines();
     createCoilSelectionReportObj(*state);
 }
 
@@ -182,6 +183,15 @@ bool EnergyPlusFixture::compare_eio_stream(std::string const &expected_string, b
     return are_equal;
 }
 
+bool EnergyPlusFixture::compare_eio_stream_substring(std::string const &search_string, bool reset_stream)
+{
+    auto const stream_str = state->files.eio.get_output();
+    bool const found = stream_str.find(search_string) != std::string::npos;
+    EXPECT_TRUE(found);
+    if (reset_stream) state->files.eio.open_as_stringstream();
+    return found;
+}
+
 bool EnergyPlusFixture::compare_mtr_stream(std::string const &expected_string, bool reset_stream)
 {
     auto const stream_str = state->files.mtr.get_output();
@@ -198,6 +208,15 @@ bool EnergyPlusFixture::compare_err_stream(std::string const &expected_string, b
     bool are_equal = (expected_string == stream_str);
     if (reset_stream) this->err_stream->str(std::string());
     return are_equal;
+}
+
+bool EnergyPlusFixture::compare_err_stream_substring(std::string const &search_string, bool reset_stream)
+{
+    auto const stream_str = this->err_stream->str();
+    bool const found = stream_str.find(search_string) != std::string::npos;
+    EXPECT_TRUE(found);
+    if (reset_stream) this->err_stream->str(std::string());
+    return found;
 }
 
 bool EnergyPlusFixture::compare_cout_stream(std::string const &expected_string, bool reset_stream)
@@ -289,69 +308,6 @@ bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool
     return match_found;
 }
 
-bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
-{
-    bool success = true;
-    auto &inputProcessor = state->dataInputProcessing->inputProcessor;
-    inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema(), success);
-
-    // Add common objects that will trigger a warning if not present
-    if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {
-        inputProcessor->epJSON["Version"] = {{"", {{"idf_order", 0}, {"version_identifier", DataStringGlobals::MatchVersion}}}};
-    }
-    if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
-        inputProcessor->epJSON["Building"] = {{"Bldg",
-                                               {{"idf_order", 0},
-                                                {"north_axis", 0.0},
-                                                {"terrain", "Suburbs"},
-                                                {"loads_convergence_tolerance_value", 0.04},
-                                                {"temperature_convergence_tolerance_value", 0.4000},
-                                                {"solar_distribution", "FullExterior"},
-                                                {"maximum_number_of_warmup_days", 25},
-                                                {"minimum_number_of_warmup_days", 6}}}};
-    }
-    if (inputProcessor->epJSON.find("GlobalGeometryRules") == inputProcessor->epJSON.end()) {
-        inputProcessor->epJSON["GlobalGeometryRules"] = {{"",
-                                                          {{"idf_order", 0},
-                                                           {"starting_vertex_position", "UpperLeftCorner"},
-                                                           {"vertex_entry_direction", "Counterclockwise"},
-                                                           {"coordinate_system", "Relative"},
-                                                           {"daylighting_reference_point_coordinate_system", "Relative"},
-                                                           {"rectangular_surface_coordinate_system", "Relative"}}}};
-    }
-
-    int MaxArgs = 0;
-    int MaxAlpha = 0;
-    int MaxNumeric = 0;
-    inputProcessor->getMaxSchemaArgs(MaxArgs, MaxAlpha, MaxNumeric);
-
-    state->dataIPShortCut->cAlphaFieldNames.allocate(MaxAlpha);
-    state->dataIPShortCut->cAlphaArgs.allocate(MaxAlpha);
-    state->dataIPShortCut->lAlphaFieldBlanks.dimension(MaxAlpha, false);
-    state->dataIPShortCut->cNumericFieldNames.allocate(MaxNumeric);
-    state->dataIPShortCut->rNumericArgs.dimension(MaxNumeric, 0.0);
-    state->dataIPShortCut->lNumericFieldBlanks.dimension(MaxNumeric, false);
-
-    bool is_valid = inputProcessor->validation->validate(inputProcessor->epJSON);
-    bool hasErrors = inputProcessor->processErrors(*state);
-
-    inputProcessor->initializeMaps();
-    SimulationManager::PostIPProcessing(*state);
-
-    FluidProperties::GetFluidPropertiesData(*state);
-    state->dataFluidProps->GetInput = false;
-
-    // inputProcessor->state->printErrors();
-
-    bool successful_processing = success && is_valid && !hasErrors;
-
-    if (!successful_processing && use_assertions) {
-        EXPECT_TRUE(compare_err_stream(""));
-    }
-
-    return successful_processing;
-}
-
 bool EnergyPlusFixture::process_idf(std::string_view const idf_snippet, bool use_assertions)
 {
     bool success = true;
@@ -359,6 +315,9 @@ bool EnergyPlusFixture::process_idf(std::string_view const idf_snippet, bool use
     inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema(), success);
 
     // Add common objects that will trigger a warning if not present
+    if (inputProcessor->epJSON.find("Timestep") == inputProcessor->epJSON.end()) {
+        inputProcessor->epJSON["Timestep"] = {{"", {{"idf_order", 0}, {"number_of_timesteps_per_hour", 4}}}};
+    }
     if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {
         inputProcessor->epJSON["Version"] = {{"", {{"idf_order", 0}, {"version_identifier", DataStringGlobals::MatchVersion}}}};
     }
@@ -400,9 +359,13 @@ bool EnergyPlusFixture::process_idf(std::string_view const idf_snippet, bool use
 
     inputProcessor->initializeMaps();
     SimulationManager::PostIPProcessing(*state);
+    state->init_state(*state);
 
-    FluidProperties::GetFluidPropertiesData(*state);
-    state->dataFluidProps->GetInput = false;
+    if (state->dataSQLiteProcedures->sqlite) {
+        bool writeOutputToSQLite = false;
+        bool writeTabularDataToSQLite = false;
+        ParseSQLiteInput(*state, writeOutputToSQLite, writeTabularDataToSQLite);
+    }
 
     // inputProcessor->state->printErrors();
 

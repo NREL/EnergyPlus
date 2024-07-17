@@ -119,7 +119,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,23.1;
+  Version,24.2;
 
   Building,
     Building,                !- Name

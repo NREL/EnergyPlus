@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -135,8 +135,8 @@ namespace Photovoltaics {
                 Real64 &XX,
                 std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
                 std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
-                Real64 const &II, // Autodesk Aliased to XX in some calls
-                Real64 const &VV, // Autodesk Aliased to XX in some calls
+                Real64 const &II, // Autodesk Aliased to XX in some calls, this is absolutely wacky and needs to go
+                Real64 const &VV, // Autodesk Aliased to XX in some calls, this too
                 Real64 const IO,
                 Real64 const IL,
                 Real64 const RSER,
@@ -333,6 +333,10 @@ struct PhotovoltaicStateData : BaseGlobalStruct
     bool firstTime = true;
     Real64 PVTimeStep; // internal timestep (in seconds) for cell temperature mode 3
     Array1D_bool MyEnvrnFlag;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

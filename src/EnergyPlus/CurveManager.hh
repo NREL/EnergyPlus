@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,8 +60,8 @@
 #include <nlohmann/json.hpp>
 
 // Btwxt Headers
-#include <btwxt.h>
-#include <griddeddata.h>
+#include <btwxt/btwxt.h>
+#include <btwxt/grid-axis.h>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -69,7 +69,9 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlusLogger.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -227,12 +229,18 @@ namespace Curve {
     {
     public:
         // Map RGI collection to string name of independent variable list
-        int addGrid(const std::string &indVarListName, Btwxt::GriddedData grid)
+        int addGrid(const std::string &indVarListName, const std::vector<Btwxt::GridAxis> grid)
         {
-            grids.emplace_back(grid);
+            grids.emplace_back(grid, btwxt_logger);
             gridMap.emplace(indVarListName, grids.size() - 1);
             return static_cast<int>(grids.size()) - 1;
-        };
+        }
+        void setLoggingContext(void *context)
+        {
+            for (auto &btwxt : grids) {
+                btwxt.get_logger()->set_message_context(context); // TODO: set_context can be its own function
+            }
+        }
         double normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, double scalar = 1.0);
         int addOutputValues(int gridIndex, std::vector<double> values);
         int getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound);
@@ -240,6 +248,7 @@ namespace Curve {
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
         std::map<std::string, const nlohmann::json &> independentVarRefs;
         std::map<fs::path, TableFile> tableFiles;
+        static std::shared_ptr<EnergyPlusLogger> btwxt_logger;
         void clear();
 
     private:
@@ -247,9 +256,7 @@ namespace Curve {
         std::vector<Btwxt::RegularGridInterpolator> grids;
     };
 
-    void BtwxtMessageCallback(Btwxt::MsgLevel messageType, std::string message, void *contextPtr);
-
-    void ResetPerformanceCurveOutput(EnergyPlusData &state);
+    void ResetPerformanceCurveOutput(const EnergyPlusData &state);
 
     Real64 CurveValue(EnergyPlusData &state,
                       int CurveIndex, // index of curve in curve array
@@ -306,9 +313,16 @@ namespace Curve {
 
     bool IsCurveOutputTypeValid(std::string const &InOutputType); // index of curve in curve array
 
+    void ShowErrorCurveDims(EnergyPlusData &state,
+                            ErrorObjectHeader const &eoh,
+                            std::string_view fieldName,
+                            std::string_view curveName,
+                            std::string_view validDims,
+                            int dim);
+
     bool CheckCurveDims(EnergyPlusData &state,
                         int CurveIndex,
-                        std::vector<int> validDims,
+                        std::vector<int> const &validDims,
                         std::string_view routineName,
                         std::string_view objectType,
                         std::string_view objectName,
@@ -453,6 +467,10 @@ struct CurveManagerData : BaseGlobalStruct
         this->NumCurves = count;
         for (int curveIndex = 1; curveIndex <= count; curveIndex++)
             this->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    }
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
     }
 
     void clear_state() override

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -144,13 +144,9 @@ public: // Methods
 
     Real64 pvWattsDCtoACSizeRatio();
 
-    Real64 thermLossRate() const;
-
     Real64 getLossRateForOutputPower(EnergyPlusData &state, Real64 const powerOutOfInverter);
 
     Real64 aCPowerOut() const;
-
-    Real64 aCEnergyOut() const;
 
     InverterModelType modelType() const;
 
@@ -208,12 +204,6 @@ public: // Methods
     void reinitAtBeginEnvironment();
 
     void reinitZoneGainsAtBeginEnvironment();
-
-    Real64 thermLossRate() const;
-
-    Real64 dCPowerOut() const;
-
-    Real64 dCEnergyOut() const;
 
     Real64 aCPowerIn() const;
 
@@ -440,7 +430,9 @@ private: // data
     // Li-ion NMC battery objects from SAM Simulation Core lib_battery
     std::unique_ptr<battery_t> ssc_battery_;
     std::unique_ptr<battery_state> ssc_lastBatteryState_;
+    Real64 ssc_lastBatteryTimeStep_ = 0.0;
     std::unique_ptr<battery_state> ssc_initBatteryState_;
+    Real64 ssc_initBatteryTimeStep_ = 0.0;
     // battery life calculation variables
     int count0_;
     std::vector<Real64> b10_;
@@ -509,7 +501,7 @@ private: // data
     int zoneNum_;                                      // destination zone for heat losses from inverter.
     Real64 zoneRadFrac_;                               // radiative fraction for thermal losses to zone
     Real64 ratedCapacity_;                             // rated capacity [VA]
-    int phase_;                                        // phase
+                                                       //    int phase_;                                        // phase
     Real64 factorTempCoeff_;                           // thermal coefficient of resistance for winding material
     Real64 tempRise_;                                  // full load temperature rise [C]
     Real64 eddyFrac_;                                  // fraction of eddy current losses []
@@ -539,7 +531,7 @@ private: // data
     Real64 loadLossRate_;                // [W]
     Real64 loadLossEnergy_;              // [J]
     Real64 totalLossRate_;               // [W]
-    Real64 totalLossEnergy_;             // [J]
+                                         //    Real64 totalLossEnergy_;             // [J]
     Real64 thermalLossRate_;             // [W]
     Real64 thermalLossEnergy_;           // [J]
     Real64 elecUseMeteredUtilityLosses_; // [J] Energy consumption for a utility transformer (power in)
@@ -622,8 +614,6 @@ public: // Methods
 
     void reinitZoneGainsAtBeginEnvironment();
 
-    std::string const &transformerName() const;
-
     std::string const &generatorListName() const;
 
     void updateLoadCenterGeneratorRecords(EnergyPlusData &state);
@@ -705,11 +695,8 @@ private: // data
     std::string generationMeterName_;      // Name of Generated Energy Meter for "on demand" operation
     bool generatorsPresent_;               // true if any generators
     bool myCoGenSetupFlag_;
-    Real64 demandLimit_;            // Demand Limit in Watts(W) which the generator will operate above
-    int trackSchedPtr_;             // "pointer" to schedule for electrical demand to meet.
-    Real64 dCElectricityProd_;      // Current DC Elect produced (J) (if buss type DCbussInverter)
-    Real64 dCElectProdRate_;        // Current DC Elect power produced (W) (if buss type DCbussInverter)
-    Real64 dCpowerConditionLosses_; // current DC to AC inverter losses (W) (if DCbussInverter)
+    Real64 demandLimit_; // Demand Limit in Watts(W) which the generator will operate above
+    int trackSchedPtr_;  // "pointer" to schedule for electrical demand to meet.
     bool storagePresent_;
     std::string storageName_;            // hold name for verificaton and error messages
     bool transformerPresent_;            // should only be transformers for on-site load center, not facility service
@@ -747,13 +734,13 @@ public: // Creation
     // Default Constructor
     ElectricPowerServiceManager()
         : newEnvironmentInternalGainsFlag(true), numElecStorageDevices(0), getInputFlag_(true), newEnvironmentFlag_(true), numLoadCenters_(0),
-          numTransformers_(0), setupMeterIndexFlag_(true), elecFacilityIndex_(0), elecProducedCoGenIndex_(0), elecProducedPVIndex_(0),
-          elecProducedWTIndex_(0), elecProducedStorageIndex_(0), elecProducedPowerConversionIndex_(0), name_("Whole Building"),
-          facilityPowerInTransformerPresent_(false), numPowerOutTransformers_(0), wholeBldgRemainingLoad_(0.0), electricityProd_(0.0),
-          electProdRate_(0.0), electricityPurch_(0.0), electPurchRate_(0.0), electSurplusRate_(0.0), electricitySurplus_(0.0),
-          electricityNetRate_(0.0), electricityNet_(0.0), totalBldgElecDemand_(0.0), totalHVACElecDemand_(0.0), totalElectricDemand_(0.0),
-          elecProducedPVRate_(0.0), elecProducedWTRate_(0.0), elecProducedStorageRate_(0.0), elecProducedPowerConversionRate_(0.0),
-          elecProducedCoGenRate_(0.0)
+          numTransformers_(0), setupMeterIndexFlag_(true), elecFacilityMeterIndex_(-1), elecProducedCoGenMeterIndex_(-1),
+          elecProducedPVMeterIndex_(-1), elecProducedWTMeterIndex_(-1), elecProducedStorageMeterIndex_(-1),
+          elecProducedPowerConversionMeterIndex_(-1), name_("Whole Building"), facilityPowerInTransformerPresent_(false), numPowerOutTransformers_(0),
+          wholeBldgRemainingLoad_(0.0), electricityProd_(0.0), electProdRate_(0.0), electricityPurch_(0.0), electPurchRate_(0.0),
+          electSurplusRate_(0.0), electricitySurplus_(0.0), electricityNetRate_(0.0), electricityNet_(0.0), totalBldgElecDemand_(0.0),
+          totalHVACElecDemand_(0.0), totalElectricDemand_(0.0), elecProducedPVRate_(0.0), elecProducedWTRate_(0.0), elecProducedStorageRate_(0.0),
+          elecProducedPowerConversionRate_(0.0), elecProducedCoGenRate_(0.0), pvTotalCapacity_(0.0), windTotalCapacity_(0.0)
     {
     }
 
@@ -794,12 +781,12 @@ private:                      // data
     int numLoadCenters_;
     int numTransformers_;
     bool setupMeterIndexFlag_; // control if object needs to make calls to GetMeterIndex
-    int elecFacilityIndex_;
-    int elecProducedCoGenIndex_;
-    int elecProducedPVIndex_;
-    int elecProducedWTIndex_;
-    int elecProducedStorageIndex_;
-    int elecProducedPowerConversionIndex_;
+    int elecFacilityMeterIndex_;
+    int elecProducedCoGenMeterIndex_;
+    int elecProducedPVMeterIndex_;
+    int elecProducedWTMeterIndex_;
+    int elecProducedStorageMeterIndex_;
+    int elecProducedPowerConversionMeterIndex_;
     std::string name_;
     bool facilityPowerInTransformerPresent_;
     std::string facilityPowerInTransformerName_; // hold name for verificaton and error messages
@@ -833,10 +820,17 @@ void createFacilityElectricPowerServiceObject(const EnergyPlusData &state);
 
 Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName, bool &errorsFound);
 
+void checkChargeDischargeVoltageCurves(
+    EnergyPlusData &state, std::string_view nameBatt, Real64 const E0c, Real64 const E0d, int const chargeIndex, int const dischargeIndex);
+
 struct ElectPwrSvcMgrData : BaseGlobalStruct
 {
 
     std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

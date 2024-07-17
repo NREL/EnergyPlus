@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -132,6 +132,35 @@ bool env_var_on(std::string const &env_var_str);
 
 using OptionalOutputFileRef = std::optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
+enum class ErrorMessageCategory
+{
+    Invalid = -1,
+    Unclassified,
+    Input_invalid,
+    Input_field_not_found,
+    Input_field_blank,
+    Input_object_not_found,
+    Input_cannot_find_object,
+    Input_topology_problem,
+    Input_unused,
+    Input_fatal,
+    Runtime_general,
+    Runtime_flow_out_of_range,
+    Runtime_temp_out_of_range,
+    Runtime_airflow_network,
+    Fatal_general,
+    Developer_general,
+    Developer_invalid_index,
+    Num
+};
+void emitErrorMessage(EnergyPlusData &state, ErrorMessageCategory category, std::string const &msg, bool shouldFatal);
+void emitErrorMessages(EnergyPlusData &state, ErrorMessageCategory category, std::initializer_list<std::string> const &msgs, bool shouldFatal);
+void emitWarningMessage(EnergyPlusData &state, ErrorMessageCategory category, std::string const &msg, bool countAsError = false);
+void emitWarningMessages(EnergyPlusData &state,
+                         ErrorMessageCategory category,
+                         std::initializer_list<std::string> const &msgs,
+                         bool countAsError = false);
+
 void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {});
 
 void ShowSevereError(EnergyPlusData &state,
@@ -220,7 +249,45 @@ void SummarizeErrors(EnergyPlusData &state);
 
 void ShowRecurringErrors(EnergyPlusData &state);
 
-namespace UtilityRoutines {
+struct ErrorObjectHeader
+{
+    std::string_view routineName;
+    std::string_view objectType;
+    std::string_view objectName;
+};
+
+void ShowSevereDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
+void ShowSevereEmptyField(EnergyPlusData &state,
+                          ErrorObjectHeader const &eoh,
+                          std::string_view fieldName,
+                          std::string_view depFieldName = {},
+                          std::string_view depFieldValue = {});
+void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
+void ShowSevereInvalidKey(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view msg = {});
+void ShowSevereInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
+
+void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
+void ShowWarningDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
+void ShowWarningEmptyField(EnergyPlusData &state,
+                           ErrorObjectHeader const &eoh,
+                           std::string_view fieldName,
+                           std::string_view defaultValue,
+                           std::string_view depFieldName = {},
+                           std::string_view depFieldValue = {});
+void ShowWarningItemNotFound(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
+void ShowWarningInvalidKey(EnergyPlusData &state,
+                           ErrorObjectHeader const &eoh,
+                           std::string_view fieldName,
+                           std::string_view fieldValue,
+                           std::string_view defaultValue,
+                           std::string_view msg = {});
+void ShowWarningInvalidBool(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
+void ShowWarningCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
+
+namespace Util {
 
     static constexpr std::array<std::string_view, 12> MonthNamesCC{
         "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
@@ -235,15 +302,13 @@ namespace UtilityRoutines {
     {
     };
 
-    Real64 epElapsedTime();
-
     Real64 ProcessNumber(std::string_view String, bool &ErrorFlag);
 
     int FindItemInList(std::string_view const String, Array1_string const &ListOfItems, int NumItems);
 
     inline int FindItemInList(std::string_view const String, Array1_string const &ListOfItems)
     {
-        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+        return Util::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     int FindItemInList(std::string_view const String, Array1S_string const ListOfItems, int NumItems);
@@ -260,7 +325,7 @@ namespace UtilityRoutines {
 
     inline int FindItemInList(std::string_view const String, Array1S_string const ListOfItems)
     {
-        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+        return Util::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename A> inline int FindItemInList(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
@@ -273,7 +338,7 @@ namespace UtilityRoutines {
 
     template <typename A> inline int FindItemInList(std::string_view const String, MArray1<A, std::string> const &ListOfItems)
     {
-        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+        return Util::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
@@ -300,14 +365,14 @@ namespace UtilityRoutines {
     // Container needs and operator[i] and elements need Name
     inline int FindItemInPtrList(std::string_view const String, Container const &ListOfItems)
     {
-        return UtilityRoutines::FindItemInPtrList(String, ListOfItems, ListOfItems.isize());
+        return Util::FindItemInPtrList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs isize() and operator[i] and elements need Name
     inline int FindItemInList(std::string_view const String, Container const &ListOfItems)
     {
-        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+        return Util::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
@@ -325,7 +390,7 @@ namespace UtilityRoutines {
     // Container needs isize() and operator[i] and value_type
     inline int FindItemInList(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p)
     {
-        return UtilityRoutines::FindItemInList(String, ListOfItems, name_p, ListOfItems.isize());
+        return Util::FindItemInList(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
     int FindItemInSortedList(std::string_view const string, Array1S_string const ListOfItems, int NumItems);
@@ -414,7 +479,7 @@ namespace UtilityRoutines {
 
     template <typename A> inline int FindItem(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
     {
-        int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, NumItems));
+        int const item_number(Util::FindItemInList(String, ListOfItems, NumItems));
         if (item_number != 0) return item_number;
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (equali(String, ListOfItems(Count))) return Count;
@@ -431,7 +496,7 @@ namespace UtilityRoutines {
     // Container needs size() and operator[i] and elements need Name
     inline int FindItem(std::string_view const String, Container const &ListOfItems, int const NumItems)
     {
-        int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, NumItems));
+        int const item_number(Util::FindItemInList(String, ListOfItems, NumItems));
         if (item_number != 0) return item_number;
         for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
             if (equali(String, ListOfItems[i].Name)) return i + 1; // 1-based return index
@@ -450,7 +515,7 @@ namespace UtilityRoutines {
     // Container needs size() and operator[i] and value_type
     inline int FindItem(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
     {
-        int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, name_p, NumItems));
+        int const item_number(Util::FindItemInList(String, ListOfItems, name_p, NumItems));
         if (item_number != 0) return item_number;
         for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
             if (equali(String, ListOfItems[i].*name_p)) return i + 1; // 1-based return index
@@ -465,7 +530,7 @@ namespace UtilityRoutines {
         return FindItem(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
-    inline std::string MakeUPPERCase(std::string_view const InputString) // Input String
+    inline std::string makeUPPER(std::string_view const InputString) // Input String
     {
 
         // FUNCTION INFORMATION:
@@ -647,20 +712,9 @@ namespace UtilityRoutines {
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
 
-    bool ValidateFuelType(EnergyPlusData &state,
-                          std::string const &FuelTypeInput,
-                          std::string &FuelTypeOutput,
-                          bool &FuelTypeErrorsFound,
-                          bool AllowSteamAndDistrict = false);
+} // namespace Util
 
-    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
-                                                   std::string &FuelTypeOutput,
-                                                   Constant::ResourceType &FuelTypeNum,
-                                                   bool &FuelTypeErrorsFound);
-
-} // namespace UtilityRoutines
-
-constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)
+constexpr int getEnumValue(const gsl::span<const std::string_view> sList, const std::string_view s)
 {
     for (unsigned int i = 0; i < sList.size(); ++i) {
         if (sList[i] == s) return i;
@@ -668,10 +722,16 @@ constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList,
     return -1;
 }
 
+constexpr std::array<std::string_view, 2> yesNoNamesUC = {"NO", "YES"};
+
 constexpr BooleanSwitch getYesNoValue(const std::string_view s)
 {
-    constexpr std::array<std::string_view, 2> yesNo = {"NO", "YES"};
-    return static_cast<BooleanSwitch>(getEnumerationValue(yesNo, s));
+    return static_cast<BooleanSwitch>(getEnumValue(yesNoNamesUC, s));
+}
+
+constexpr Real64 fclamp(Real64 v, Real64 min, Real64 max)
+{
+    return (v < min) ? min : ((v > max) ? max : v);
 }
 
 struct UtilityRoutinesData : BaseGlobalStruct
@@ -681,6 +741,10 @@ struct UtilityRoutinesData : BaseGlobalStruct
     std::string appendPerfLog_headerRow;
     std::string appendPerfLog_valuesRow;
     bool GetMatrixInputFlag = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

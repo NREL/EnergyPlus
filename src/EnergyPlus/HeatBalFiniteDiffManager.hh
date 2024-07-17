@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -142,8 +142,9 @@ namespace HeatBalFiniteDiffManager {
         int SourceNodeNum;               // Node number for internal source layer (zero if no source)
         Real64 QSource;                  // Internal source flux [W/m2]
         int GSloopCounter;               // count of inner loop iterations
-        int GSloopErrorCount;            // recurring error counter
         Real64 MaxNodeDelTemp;           // largest change in node temps after calc
+        int indexNodeMaxTempLimit = 0;   // index for recurring error message if node temperature exceeds maximum node temperature for this surface
+        int indexNodeMinTempLimit = 0;   // index for recurring error message if node temperature is below minimum node temperature for this surfac
         Real64 EnthalpyM;                // Melting enthalpy at a particular temperature
         Real64 EnthalpyF;                // Freezing enthalpy at a particular temperature
         Array1D<int> PhaseChangeState;
@@ -163,9 +164,7 @@ namespace HeatBalFiniteDiffManager {
         Array1D<Real64> heatSourceEMSFluxEnergyLayerReport;
 
         // Default Constructor
-        SurfaceDataFD()
-            : SourceNodeNum(0), QSource(0.0), GSloopCounter(0), GSloopErrorCount(0), MaxNodeDelTemp(0.0), EnthalpyM(0.0), EnthalpyF(0.0),
-              PhaseChangeState(0)
+        SurfaceDataFD() : SourceNodeNum(0), QSource(0.0), GSloopCounter(0), MaxNodeDelTemp(0.0), EnthalpyM(0.0), EnthalpyF(0.0), PhaseChangeState(0)
         {
         }
 
@@ -205,6 +204,8 @@ namespace HeatBalFiniteDiffManager {
     );
 
     void GetCondFDInput(EnergyPlusData &state);
+
+    int setSizeMaxProperties(EnergyPlusData &state);
 
     void InitHeatBalFiniteDiff(EnergyPlusData &state);
 
@@ -300,6 +301,12 @@ namespace HeatBalFiniteDiffManager {
                                   Real64 CheckTemperature // calculated temperature, not reset
     );
 
+    void CheckFDNodeTempLimits(EnergyPlusData &state,
+                               int surfNum,     // surface number
+                               int nodeNum,     // node number
+                               Real64 &nodeTemp // calculated temperature, not reset
+    );
+
     void adjustPropertiesForPhaseChange(EnergyPlusData &state,
                                         int finiteDifferenceLayerIndex,
                                         int surfaceIndex,
@@ -310,7 +317,7 @@ namespace HeatBalFiniteDiffManager {
                                         Real64 &updatedDensity,
                                         Real64 &updatedThermalConductivity);
 
-    bool findAnySurfacesUsingConstructionAndCondFD(EnergyPlusData &state, int const constructionNum);
+    bool findAnySurfacesUsingConstructionAndCondFD(EnergyPlusData const &state, int const constructionNum);
 
 } // namespace HeatBalFiniteDiffManager
 
@@ -335,6 +342,10 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct
     Array1D<HeatBalFiniteDiffManager::SurfaceDataFD> SurfaceFD;
     Array1D<HeatBalFiniteDiffManager::MaterialDataFD> MaterialFD;
     bool MyEnvrnFlag = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

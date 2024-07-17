@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -96,8 +96,7 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _
 
     if (this->wasAutoSized) {
         if (this->autoSizedValue > this->dataDesInletAirHumRat &&
-            (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
-             UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
+            (Util::SameString(this->compType, "COIL:COOLING:WATER") || Util::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
             std::string msg =
                 this->callingRoutine + ":" + " Coil=\"" + this->compName + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.";
             this->addErrorMessage(msg);
@@ -126,8 +125,7 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _
         Real64 desHumRatAtWaterInTemp = Psychrometrics::PsyWFnTdbH(state, this->dataDesInletWaterTemp, desSatEnthAtWaterInTemp, this->callingRoutine);
         if (this->autoSizedValue < this->dataDesInletAirHumRat && desHumRatAtWaterInTemp > this->dataDesInletAirHumRat) {
             if (this->autoSizedValue < this->dataDesInletAirHumRat &&
-                (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
-                 UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
+                (Util::SameString(this->compType, "COIL:COOLING:WATER") || Util::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
                 std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
                                   "\", Cooling Coil is running dry for sizing and has minimum humidity ratio at saturation for inlet chilled water "
                                   "temperature > design air entering humidity ratio.";

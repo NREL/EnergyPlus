@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -105,11 +105,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
         "    autosize,                !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    PLF Curve MultiComp 30% unloading, !- Energy Part Load Fraction Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    ,                        !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -121,6 +125,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
         "    0.70,                    !- Speed 1 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    4.328973,                !- Speed 1 Reference Unit COP At Rated Conditions {dimensionless}",
         "    1.396964,                !- Speed 1 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
         "    ,                        !- Speed 1 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 1 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    5CapacityCurveIpakCS,    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
@@ -131,6 +137,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
         "    0.78,                    !- Speed 2 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    4.540061,                !- Speed 2 Reference Unit COP At Rated Conditions {dimensionless}",
         "    1.88779,                 !- Speed 2 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
         "    ,                        !- Speed 2 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 2 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    4CapacityCurve,          !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
@@ -141,6 +149,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
         "    0.70,                    !- Speed 3 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    4.164418,                !- Speed 3 Reference Unit COP At Rated Conditions {dimensionless}",
         "    2.831685,                !- Speed 3 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
         "    ,                        !- Speed 3 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 3 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    3CapacityCurveIpakCS,    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
@@ -151,6 +161,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
         "    0.62,                    !- Speed 4 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    3.469661,                !- Speed 4 Reference Unit COP At Rated Conditions {dimensionless}",
         "    3.553764,                !- Speed 4 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
         "    ,                        !- Speed 4 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 4 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    2CapacityCurveIpakCS,    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
@@ -161,6 +173,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
         "    0.69,                    !- Speed 5 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    3.822957,                !- Speed 5 Reference Unit COP At Rated Conditions {dimensionless}",
         "    5.66336932,              !- Speed 5 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
         "    ,                        !- Speed 5 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 5 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    1CapacityCurveIpakCS,    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
@@ -415,13 +429,13 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
 
     std::string compName = "DX COOLING COIL SYSTEM";
     bool zoneEquipment = false;
-    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     EXPECT_EQ(thisSys->Name, "DX COOLING COIL SYSTEM");
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
-    EXPECT_EQ(thisSys->m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(thisSys->m_CoolingCoilType_Num, HVAC::Coil_CoolingAirToAirVariableSpeed);
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
@@ -454,11 +468,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
         "    5.66336932,              !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    PLFCurve,                !- Energy Part Load Fraction Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    ,                        !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -470,6 +488,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
         "    0.78,                    !- Speed 1 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    4.328973,                !- Speed 1 Reference Unit COP At Rated Conditions {dimensionless}",
         "    1.396964,                !- Speed 1 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
         "    ,                        !- Speed 1 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 1 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    1Cap,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
@@ -480,6 +500,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
         "    0.78,                    !- Speed 2 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    4.540061,                !- Speed 2 Reference Unit COP At Rated Conditions {dimensionless}",
         "    1.88779,                 !- Speed 2 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
         "    ,                        !- Speed 2 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 2 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    1Cap,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
@@ -490,6 +512,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
         "    0.77,                    !- Speed 3 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    4.164418,                !- Speed 3 Reference Unit COP At Rated Conditions {dimensionless}",
         "    2.831685,                !- Speed 3 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
         "    ,                        !- Speed 3 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 3 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    1Cap,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
@@ -500,6 +524,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
         "    0.76,                    !- Speed 4 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    3.469661,                !- Speed 4 Reference Unit COP At Rated Conditions {dimensionless}",
         "    3.553764,                !- Speed 4 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
         "    ,                        !- Speed 4 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 4 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    1Cap,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
@@ -510,6 +536,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
         "    0.76,                    !- Speed 5 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    3.822957,                !- Speed 5 Reference Unit COP At Rated Conditions {dimensionless}",
         "    5.66336932,              !- Speed 5 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
         "    ,                        !- Speed 5 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 5 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    1Cap,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
@@ -559,7 +587,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     int airLoopNum = 1;
 
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     // call again to get the rest of the input when sysNum > -1
     UnitarySystems::UnitarySys::getUnitarySystemInput(*state, compName, false, 0);
@@ -567,7 +595,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     EXPECT_EQ(thisSys->Name, "DX COOLING COIL SYSTEM");
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
-    EXPECT_EQ(thisSys->m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(thisSys->m_CoolingCoilType_Num, HVAC::Coil_CoolingAirToAirVariableSpeed);
     EXPECT_EQ(2, thisSys->CoolCtrlNode);
 
     // set up outdoor environment
@@ -589,7 +617,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     state->dataLoopNodes->Node(ControlNode).HumRatMax = RHControlHumRat;
 
     // test sensible control
-    DataHVACGlobals::CompressorOperation CompressorOn = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOp CompressorOn = HVAC::CompressorOp::On;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
     // system meets temperature set point
     EXPECT_NEAR(thisSys->m_DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp, 0.001);
@@ -639,11 +667,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
         "    5.66336932,              !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    PLFCurve,                !- Energy Part Load Fraction Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    ,                        !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -655,6 +687,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
         "    0.78,                    !- Speed 1 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    4.328973,                !- Speed 1 Reference Unit COP At Rated Conditions {dimensionless}",
         "    1.396964,                !- Speed 1 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    ,                        !- Speed 1 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 1 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    1Cap,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
@@ -665,6 +699,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
         "    0.78,                    !- Speed 2 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    4.540061,                !- Speed 2 Reference Unit COP At Rated Conditions {dimensionless}",
         "    1.88779,                 !- Speed 2 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    ,                        !- Speed 2 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 2 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    1Cap,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
@@ -675,6 +711,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
         "    0.77,                    !- Speed 3 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    4.164418,                !- Speed 3 Reference Unit COP At Rated Conditions {dimensionless}",
         "    2.831685,                !- Speed 3 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    ,                        !- Speed 3 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 3 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    1Cap,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
@@ -685,6 +723,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
         "    0.76,                    !- Speed 4 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    3.469661,                !- Speed 4 Reference Unit COP At Rated Conditions {dimensionless}",
         "    3.553764,                !- Speed 4 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    ,                        !- Speed 4 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 4 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    1Cap,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
@@ -695,6 +735,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
         "    0.76,                    !- Speed 5 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    3.822957,                !- Speed 5 Reference Unit COP At Rated Conditions {dimensionless}",
         "    5.66336932,              !- Speed 5 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    ,                        !- Speed 5 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
         "    ,                        !- Speed 5 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
         "    1Cap,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
@@ -744,7 +786,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     int airLoopNum = 1;
 
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     // call again to get the rest of the input when sysNum > -1
     UnitarySystems::UnitarySys::getUnitarySystemInput(*state, compName, false, 0);
@@ -766,7 +808,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataLoopNodes->Node(ControlNode).TempSetPoint = thisSys->m_DesiredOutletTemp;
 
     // test sensible control
-    DataHVACGlobals::CompressorOperation CompressorOn = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOp CompressorOn = HVAC::CompressorOp::On;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
     Real64 SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.49605, 0.0001);
@@ -843,6 +885,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "  Coil:Cooling:DX:CurveFit:Performance,",
         "    DX Cool Cooling Coil Performance,  !- Name",
         "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Unit Internal Static Air Pressure {Pa}",
@@ -1019,7 +1062,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     int airLoopNum = 1;
 
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     // call again to get the rest of the input when sysNum > -1
     UnitarySystems::UnitarySys::getUnitarySystemInput(*state, compName, false, 0);
@@ -1027,7 +1070,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     EXPECT_EQ(thisSys->Name, "DX COOLING COIL SYSTEM");
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
-    EXPECT_EQ(thisSys->m_CoolingCoilType_Num, DataHVACGlobals::CoilDX_Cooling);
+    EXPECT_EQ(thisSys->m_CoolingCoilType_Num, HVAC::CoilDX_Cooling);
     EXPECT_EQ(2, thisSys->CoolCtrlNode);
 
     // set up outdoor environment
@@ -1058,7 +1101,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     state->dataSize->UnitarySysEqSizing.allocate(1);
     // run init to size system
     thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0.0);
-    DataHVACGlobals::CompressorOperation CompOn = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOp CompOn = HVAC::CompressorOp::On;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
     // system meets temperature set point
     Real64 outTemp1 = state->dataLoopNodes->Node(ControlNode).Temp;

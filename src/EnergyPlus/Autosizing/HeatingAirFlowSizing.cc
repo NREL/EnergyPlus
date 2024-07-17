@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,7 +72,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
             } else {
-                switch (this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::HeatingAirflowSizing)) {
+                switch (this->zoneEqSizing(this->curZoneEqNum).SizingMethod(HVAC::HeatingAirflowSizing)) {
                 case DataSizing::SupplyAirFlowRate:
                 case DataSizing::None:
                 case DataSizing::FlowPerFloorArea: {
@@ -211,8 +211,8 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                     } else if (this->unitarySysEqSizing(this->curSysNum).HeatingAirFlow) {
                         this->autoSizedValue = this->unitarySysEqSizing(this->curSysNum).HeatingAirVolFlow;
                     } else {
-                        if (this->curDuctType == DataHVACGlobals::AirDuctType::Main) {
-                            if (UtilityRoutines::SameString(this->compType, "COIL:HEATING:WATER")) {
+                        if (this->curDuctType == HVAC::AirDuctType::Main) {
+                            if (Util::SameString(this->compType, "COIL:HEATING:WATER")) {
                                 if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                     this->autoSizedValue =
                                         this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesMainVolFlow;
@@ -222,8 +222,8 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                             } else {
                                 this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Cooling) {
-                            if (UtilityRoutines::SameString(this->compType, "COIL:HEATING:WATER")) {
+                        } else if (this->curDuctType == HVAC::AirDuctType::Cooling) {
+                            if (Util::SameString(this->compType, "COIL:HEATING:WATER")) {
                                 if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                     this->autoSizedValue =
                                         this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
@@ -233,9 +233,9 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                             } else {
                                 this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Heating) {
+                        } else if (this->curDuctType == HVAC::AirDuctType::Heating) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
-                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Other) {
+                        } else if (this->curDuctType == HVAC::AirDuctType::Other) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                         } else {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,11 +60,9 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/CallingOrder.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/Loop.hh>
-#include <EnergyPlus/Plant/PlantAvailManager.hh>
 #include <EnergyPlus/Plant/ReportLoopData.hh>
 
 namespace EnergyPlus {
@@ -113,7 +111,7 @@ namespace DataPlant {
         "Pipe:Indoor",
         "Pipe:Underground",
         "DistrictCooling",
-        "DistrictHeating",
+        "DistrictHeating:Water",
         "ThermalStorage:Ice:Detailed",
         "ThermalStorage:Ice:Simple",
         "TemperingValve",
@@ -184,7 +182,8 @@ namespace DataPlant {
         "HeatPump:PlantLoop:EIR:Cooling",
         "HeatPump:PlantLoop:EIR:Heating",
         "HeatPump:AirToWater:FuelFired:Cooling",
-        "HeatPump:AirToWater:FuelFired:Heating"};
+        "HeatPump:AirToWater:FuelFired:Heating",
+        "DistrictHeating:Steam"};
 
     static constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
         "BOILER:HOTWATER",
@@ -214,7 +213,7 @@ namespace DataPlant {
         "PIPE:INDOOR",
         "PIPE:UNDERGROUND",
         "DISTRICTCOOLING",
-        "DISTRICTHEATING",
+        "DISTRICTHEATING:WATER",
         "THERMALSTORAGE:ICE:DETAILED",
         "THERMALSTORAGE:ICE:SIMPLE",
         "TEMPERINGVALVE",
@@ -285,7 +284,8 @@ namespace DataPlant {
         "HEATPUMP:PLANTLOOP:EIR:COOLING",
         "HEATPUMP:PLANTLOOP:EIR:HEATING",
         "HEATPUMP:AIRTOWATER:FUELFIRED:COOLING",
-        "HEATPUMP:AIRTOWATER:FUELFIRED:HEATING"};
+        "HEATPUMP:AIRTOWATER:FUELFIRED:HEATING",
+        "DISTRICTHEATING:STEAM"};
 
     static constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
         LoopType::Plant, //	"Boiler:HotWater"
@@ -315,7 +315,7 @@ namespace DataPlant {
         LoopType::Both,  //	"Pipe:Indoor"
         LoopType::Both,  //	"Pipe:Underground"
         LoopType::Both,  //	"DistrictCooling"
-        LoopType::Both,  //	"DistrictHeating"
+        LoopType::Both,  //	"DistrictHeating:Water"
         LoopType::Plant, //	"ThermalStorage:Ice:Detailed"
         LoopType::Plant, //	"ThermalStorage:Ice:Simple"
         LoopType::Both,  //	"TemperingValve"
@@ -384,7 +384,8 @@ namespace DataPlant {
         LoopType::Plant, //	"AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam"
         LoopType::Plant, //	"ZoneHVAC:CoolingPanel:RadiantConvective:Water"
         LoopType::Both,  //	"HeatPump:PlantLoop:EIR:Cooling"
-        LoopType::Both   //	"HeatPump:PlantLoop:EIR:Heating"
+        LoopType::Both,  //	"HeatPump:PlantLoop:EIR:Heating"
+        LoopType::Both   //	"DistrictHeating:Steam"
     };
 } // namespace DataPlant
 
@@ -402,10 +403,13 @@ struct DataPlantData : BaseGlobalStruct
     int PlantManageSubIterations = 0; // tracks plant iterations to characterize solver
     int PlantManageHalfLoopCalls = 0; // tracks number of half loop calls
     Array1D<DataPlant::PlantLoopData> PlantLoop;
-    Array1D<DataPlant::PlantAvailMgrData> PlantAvailMgr;
     std::array<Array1D<DataPlant::ReportLoopData>, static_cast<int>(DataPlant::LoopSideLocation::Num)> VentRepPlant;
     std::array<Array1D<DataPlant::ReportLoopData>, static_cast<int>(DataPlant::LoopSideLocation::Num)> VentRepCond;
     Array1D<DataPlant::PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {
@@ -420,7 +424,6 @@ struct DataPlantData : BaseGlobalStruct
         this->PlantManageSubIterations = 0;
         this->PlantManageHalfLoopCalls = 0;
         this->PlantLoop.deallocate();
-        this->PlantAvailMgr.deallocate();
         this->VentRepPlant[static_cast<int>(DataPlant::LoopSideLocation::Demand)].deallocate();
         this->VentRepPlant[static_cast<int>(DataPlant::LoopSideLocation::Supply)].deallocate();
         this->VentRepCond[static_cast<int>(DataPlant::LoopSideLocation::Demand)].deallocate();

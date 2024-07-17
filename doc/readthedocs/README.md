@@ -10,7 +10,7 @@ Then you can browse the built docs at: `doc/readthedocs/sphinx/static/c_prebuilt
 
 ## Building the Sphinx (Python) Documentation
 The Sphinx documentation is essentially the main documentation engine, since it is what gets executed by ReadTheDocs.
-Make sure that your currently active Python version has Sphinx installed (`pip install sphinx`).
+Make sure that your currently active Python version has Sphinx and the theme we use installed (`pip install sphinx sphinx_rtd_theme`).
 Also, this process will build the Doxygen based C documentation, so you'll need that installed as well.
 Move into the Python API doc folder: `cd doc/readthedoc/sphinx/`.
 Run the Sphinx built Makefile: `make html`.
@@ -28,9 +28,9 @@ ReadTheDocs will build "latest" and "stable" versions of EnergyPlus commits by d
 [`latest`](https://energyplus.readthedocs.io/en/latest/) always points to the latest commit made to the `develop` branch, almost always due to a pull request merge.
 [`stable`](https://energyplus.readthedocs.io/en/stable/) always points to the last release tag made to EnergyPlus.
 
-In addition, any number of other versions can be added.  This should be done at each major release of EnergyPlus.
+All major release versions of EnergyPlus should be added as well.
 To accomplish this, simply go into ReadTheDocs [version configuration](https://readthedocs.org/projects/energyplus/versions/) and "Activate a Version".
-This will trigger a build of that tag.  Make sure that build is labeled as "active", and not "hidden", because this should be in the main list of official versions.
+This will trigger a build of that tag.  Make sure that build is labeled as "active", and not "hidden", to make sure it is included in the main list of official versions.
 
-In the same way, if a branch is specifically modifying the documentation, and it is desired to get ReadTheDocs building commits to that branch, just activate that branch but keep it hidden.
+In a similar way, if a branch is specifically modifying the documentation, and it is desired to get ReadTheDocs building commits to that branch, just activate that branch but keep it hidden.
 The developer will still be able to see the build results, but they won't be advertised in the main list of official release documentation versions.

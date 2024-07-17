@@ -499,7 +499,7 @@ The time varying calculations proceed as follows. First, the \emph{UA} is determ
 UA = U{A_{des}}({r_{hA}} + 1)/({({\dot m_{p,des}}{T_{p,des}}/{\dot m_p}{T_p})^{.78}} + {r_{hA}}{({\dot m_{s,des}}{T_{s,des}}/{\dot m_s}{T_s})^{.78}})
 \end{equation}
 
-where \emph{des} means \emph{design}, \emph{p} means \emph{primary}, \emph{s} means \emph{secondary}, \emph{T} is air stream temperature, and \(\dot m\) is air stream mass flow rate. From the \emph{UA} and the capacity flow ratio the \emph{NTU} is determined: \(NTU = UA/{C_{\min }}\). Then the NTU -- effectiveness formulas are used to calculate the effectiveness. From the effectiveness and the inlet conditions, outlet condtions are determined.
+where \emph{des} means \emph{design}, \emph{p} means \emph{primary}, \emph{s} means \emph{secondary}, \emph{T} is air stream temperature, and \(\dot m\) is air stream mass flow rate. From the \emph{UA} and the capacity flow ratio the \emph{NTU} is determined: \(NTU = UA/{C_{\min }}\). Then the NTU -- effectiveness formulas are used to calculate the effectiveness. From the effectiveness and the inlet conditions, outlet conditions are determined.
 
 \subsubsection{Economizer Operation}\label{economizer-operation-1}
 
@@ -949,7 +949,7 @@ where:
 
 \(t\) is the simulation time
 
-\(u_1\) is the starting discretization point for borhole
+\(u_1\) is the starting discretization point for borehole
 
 \(u_2\) is the final discretization point for borehole
 
@@ -986,7 +986,7 @@ Thus, the algorithm keeps track of the sub hourly loads along with their time of
 \begin{figure}[hbtp] % fig 256
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5657.png}
-\caption{Schematic Showing the Calculation of Hourly Load from the Sub Houly Loads. \protect \label{fig:schematic-showing-the-calculation-of-hourly}}
+\caption{Schematic Showing the Calculation of Hourly Load from the Sub Hourly Loads. \protect \label{fig:schematic-showing-the-calculation-of-hourly}}
 \end{figure}
 
 The bottom text in the boxes represents the magnitude of the sub hourly loads in W/m for each time step. The duration of the occurrence of each time-step for the each block is shown below the respective block. The first hourly load is given by the expression:
@@ -1192,7 +1192,7 @@ Compute the hourly loads as each hour and monthly loads as each month passes. Ca
 
 \subsection{GroundHeatExchanger:Slinky}\label{groundheatexchangerslinky}
 
-This model reuses much of the same code including the load aggregation and temperature response caluclations which are described above in the GroundHeatExchanger:Vertical model. As a result, that section can also be used as reference material. This model is unique in that it generates it's own temperature response factor g-functions, rather than relying on the other software or data to generate the g-functions. These are generated based on the work by Xiong et al. 2015.
+This model reuses much of the same code including the load aggregation and temperature response calculations which are described above in the GroundHeatExchanger:Vertical model. As a result, that section can also be used as reference material. This model is unique in that it generates it's own temperature response factor g-functions, rather than relying on the other software or data to generate the g-functions. These are generated based on the work by Xiong et al. 2015.
 
 \subsubsection{Horizontal Slinky Temperature Response Functions}\label{horizontal-slinky-temperature-response-functions}
 
@@ -1265,11 +1265,11 @@ d\left(P_{io},P_{j'}\right) = \sqrt{\left[x_{0i} + \left(R+r\right)\cos \varphi 
 
 \subsubsection{Model Simplifications for Computational Efficiency}\label{model-simplifications-for-computational-efficiency}
 
-Several simplifications were used to ensure the g-function temperature response factors are computationally efficient. The first simplification is achieved by taking advantage of symmetry. In the Figure~\ref{fig:slinky-first-and-second-improvements} below, we can see that by taking advantage of symmettry the temperature response for only one quarter of the rings needs be calculated.
+Several simplifications were used to ensure the g-function temperature response factors are computationally efficient. The first simplification is achieved by taking advantage of symmetry. In the Figure~\ref{fig:slinky-first-and-second-improvements} below, we can see that by taking advantage of symmetry the temperature response for only one quarter of the rings needs be calculated.
 
-The second simplification occurs by realizing that the effect between two rings decreases exponentially as the distance between the rings increases. Near-field rings are defined as rings whose centers are within 2.5m + D distance from the center of ring i as is seen in Figure~\ref{fig:slinky-first-and-second-improvements}. Far-field rings are defined as rings whose centers are beyond 10m + D, with middle-field rings occupying the space in between the near-field and far-field rings. Near-field ring temperature response factors are determined as indicated above for horzontal or vertical slinkys. Middle-field rings are considerably simplified -- the interaction between ring is approximated as that of two point sources at their centers. Thermal effect of far-field rings are ignored.
+The second simplification occurs by realizing that the effect between two rings decreases exponentially as the distance between the rings increases. Near-field rings are defined as rings whose centers are within 2.5m + D distance from the center of ring i as is seen in Figure~\ref{fig:slinky-first-and-second-improvements}. Far-field rings are defined as rings whose centers are beyond 10m + D, with middle-field rings occupying the space in between the near-field and far-field rings. Near-field ring temperature response factors are determined as indicated above for horizontal or vertical slinkys. Middle-field rings are considerably simplified -- the interaction between ring is approximated as that of two point sources at their centers. Thermal effect of far-field rings are ignored.
 
-The third and final simplification takes advantatge of geometric similarity that ring share. Ring pairs that are geometrically similar do not require recalculation of distances or reponse factors. Thus the calculations for geometrically similar ring pairs can be reused.
+The third and final simplification takes advantage of geometric similarity that ring share. Ring pairs that are geometrically similar do not require recalculation of distances or response factors. Thus the calculations for geometrically similar ring pairs can be reused.
 
 For more information, see the Xiong et al. (2015) reference listed below.
 
@@ -1603,7 +1603,7 @@ where \(\mu\) is the absolute viscosity of water.
 
 This component (Object: HeatExchanger:FluidToFluid) is a simple hydronic heat exchanger that can be used to couple two (hydronic) plant or condenser loops.~ Sizing and nominal capacity calculations are discussed elsewhere in this document, see the section called Plant Heat Exchanger Sizing. This section first discusses the heat transfer modeling and the control issues.
 
-Heat exchanger performance modeling uses classic effectiveness-NTU correlations. The heat exchanger model can be specified as one of seven types: ~cross flow both fluid streams unmixed, cross flow both fluid streams mixed, cross flow Loop Supply Side mixed and Loop Demand Side unmixed, cross flow Loop Supply Side unmixed and Loop Demand Side mixed, counter flow, parallel flow, or ideal. The model correlations determine a heat transfer effectiveness value, \(\varepsilon\), which is a function of heat exchanger UA, the mass flow rates through boths sides, and the specific heat of the fluids in the streams.~ The effectiveness of an ideal heat exchanger is set to 1.0 and no correlation is needed.
+Heat exchanger performance modeling uses classic effectiveness-NTU correlations. The heat exchanger model can be specified as one of seven types: ~cross flow both fluid streams unmixed, cross flow both fluid streams mixed, cross flow Loop Supply Side mixed and Loop Demand Side unmixed, cross flow Loop Supply Side unmixed and Loop Demand Side mixed, counter flow, parallel flow, or ideal. The model correlations determine a heat transfer effectiveness value, \(\varepsilon\), which is a function of heat exchanger UA, the mass flow rates through both sides, and the specific heat of the fluids in the streams.~ The effectiveness of an ideal heat exchanger is set to 1.0 and no correlation is needed.
 
 Because the heat exchanger is intended to be generic, its two sides are distinguished by the nature of loop side being connected.~ One side is called ``Loop Supply Side'' to indicate the heat exchanger is situated on the supply side of a loop. The other side is called ``Loop Demand Side'' to indicate it is on the demand side of a loop.~ The heat exchanger is intended to act as a supply component for the loop connected to it as the ``Loop Supply Side'' and as a demand component for the loop connected to it as the ``Loop Demand Side.''~ From the point of view of the heat exchanger component itself, the Loop Demand Side acts like a supply source/sink for the Loop Supply Side which acts like a demand to the component.
 

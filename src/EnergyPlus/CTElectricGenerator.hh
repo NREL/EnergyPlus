@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,11 +53,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -72,7 +74,7 @@ namespace CTElectricGenerator {
         std::string Name;                                   // user identifier
         std::string TypeOf = "Generator:CombustionTurbine"; // Type of Generator
         GeneratorType CompType_Num = GeneratorType::CombTurbine;
-        std::string FuelType;           // Type of Fuel - DIESEL, GASOLINE, GAS
+        Constant::eFuel FuelType;       // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 RatedPowerOutput = 0.0;  // W - design nominal capacity of Generator
         int ElectricCircuitNode = 0;    // Electric Circuit Node
         Real64 MinPartLoadRat = 0.0;    // (CT MIN) min allowed operating frac full load
@@ -153,9 +155,13 @@ struct CTElectricGeneratorData : BaseGlobalStruct
     bool getCTInputFlag = true;
     Array1D<CTElectricGenerator::CTGeneratorData> CTGenerator;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = CTElectricGeneratorData();
+        new (this) CTElectricGeneratorData();
     }
 };
 

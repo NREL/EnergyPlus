@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,17 +45,25 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// EnergyPlus Headers
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
+
+#include <CLI/CLI11.hpp>
 
 #ifdef DEBUG_ARITHM_GCC_OR_CLANG
 #include <EnergyPlus/fenv_missing.h>
 #endif
 
-int main(int argc, const char *argv[])
+int main(int argc, char **argv)
 {
 #ifdef DEBUG_ARITHM_GCC_OR_CLANG
     feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
 
-    return EnergyPlusPgm(argc, argv);
+#ifdef _WIN32
+    const std::vector<std::string> args = CLI::detail::compute_win32_argv();
+#else
+    const std::vector<std::string> args(argv, std::next(argv, static_cast<std::ptrdiff_t>(argc)));
+#endif
+    return EnergyPlusPgm(args);
 }

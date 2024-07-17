@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -88,12 +88,11 @@ using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
 using namespace EnergyPlus::ZoneContaminantPredictorCorrector;
 using namespace EnergyPlus::DataLoopNode;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
-using namespace EnergyPlus::DataRoomAirModel;
+using namespace EnergyPlus::RoomAir;
 using namespace EnergyPlus::HybridModel;
 using namespace EnergyPlus::DataPrecisionGlobals;
 
@@ -104,10 +103,10 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBal->Zone.allocate(1);
     state->dataHybridModel->HybridModelZone.allocate(1);
     state->dataHybridModel->FlagHybridModel = true;
-    state->dataRoomAirMod->AirModel.allocate(1);
-    state->dataRoomAirMod->ZTOC.allocate(1);
-    state->dataRoomAirMod->ZTMX.allocate(1);
-    state->dataRoomAirMod->ZTM1MX.allocate(1);
+    state->dataRoomAir->AirModel.allocate(1);
+    state->dataRoomAir->ZTOC.allocate(1);
+    state->dataRoomAir->ZTMX.allocate(1);
+    state->dataRoomAir->ZTMMX.allocate(1);
     state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
@@ -125,11 +124,10 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataSurface->Surface.allocate(2);
     state->dataHeatBalSurf->SurfHConvInt.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    state->dataRoomAirMod->IsZoneDV.dimension(1, false);
-    state->dataRoomAirMod->IsZoneCV.dimension(1, false);
-    state->dataRoomAirMod->IsZoneCV.dimension(1, false);
-    state->dataRoomAirMod->IsZoneUI.dimension(1, false);
-    state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
+    state->dataRoomAir->IsZoneDispVent3Node.dimension(1, false);
+    state->dataRoomAir->IsZoneCrossVent.dimension(1, false);
+    state->dataRoomAir->IsZoneUFAD.dimension(1, false);
+    state->dataRoomAir->ZoneDispVent3NodeMixedFlag.allocate(1);
     state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
@@ -211,7 +209,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBalFanSys->PreviousMeasuredZT2(1) = 0.2;
     state->dataHeatBalFanSys->PreviousMeasuredZT3(1) = 0.3;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -5.21;
-    thisZoneHB.ZoneAirHumRat = 0.002083;
+    thisZoneHB.airHumRat = 0.002083;
     thisZoneHB.MCPV = 1414.60;   // Assign TempDepCoef
     thisZoneHB.MCPTV = -3335.10; // Assign TempIndCoef
     state->dataEnvrn->OutBaroPress = 99166.67;
@@ -236,7 +234,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBalFanSys->PreviousMeasuredZT3(1) = 0.06;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 8.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
-    thisZoneHB.ZoneAirHumRat = 0.002083;
+    thisZoneHB.airHumRat = 0.002083;
     thisZoneHB.MCPV = 539.49;  // Assign TempDepCoef
     thisZoneHB.MCPTV = 270.10; // Assign TempIndCoef
     state->dataEnvrn->OutBaroPress = 99250;
@@ -258,7 +256,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
-    thisZoneHB.ZoneAirHumRat = 0.001120003;
+    thisZoneHB.airHumRat = 0.001120003;
     thisZoneHB.ZT = -6.08;
     state->dataEnvrn->OutHumRat = 0.0011366887816818931;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat1(1) = 0.0011186324286;
@@ -291,7 +289,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBalFanSys->PreviousMeasuredZT3(1) = -2.909294101;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 1.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
-    thisZoneHB.ZoneAirHumRat = 0.0024964;
+    thisZoneHB.airHumRat = 0.0024964;
     state->dataEnvrn->OutBaroPress = 98916.7;
     thisZoneHB.MCPV = 5163.5;    // Assign TempDepCoef
     thisZoneHB.MCPTV = -15956.8; // Assign TempIndCoef
@@ -315,13 +313,13 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
-    thisZoneHB.ZoneAirHumRat = 0.0024964;
+    thisZoneHB.airHumRat = 0.0024964;
     thisZoneHB.ZT = -2.92;
     state->dataEnvrn->OutHumRat = 0.0025365002784602363;
     state->dataEnvrn->OutBaroPress = 98916.7;
     thisZoneHB.OAMFL = 0.700812;
-    thisZoneHB.ZoneLatentGain = 211.2;
-    thisZoneHB.ZoneLatentGainExceptPeople = 0.0;
+    thisZoneHB.latentGain = 211.2;
+    thisZoneHB.latentGainExceptPeople = 0.0;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat1(1) = 0.002496356;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat2(1) = 0.002489048;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat3(1) = 0.002480404;
@@ -350,7 +348,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBalFanSys->PreviousMeasuredZT3(1) = 15.56;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 1.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
-    thisZoneHB.ZoneAirHumRat = 0.0077647;
+    thisZoneHB.airHumRat = 0.0077647;
     thisZoneHB.MCPV = 4456;   // Assign TempDepCoef
     thisZoneHB.MCPTV = 60650; // Assign TempIndCoef
     state->dataEnvrn->OutBaroPress = 99500;
@@ -380,7 +378,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
-    thisZoneHB.ZoneAirHumRat = 0.001120003;
+    thisZoneHB.airHumRat = 0.001120003;
     thisZoneHB.ZT = -6.08;
     state->dataEnvrn->OutHumRat = 0.0011366887816818931;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat1(1) = 0.007855718;
@@ -415,7 +413,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBalFanSys->PreviousMeasuredZT3(1) = 21.11;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 1.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
-    thisZoneHB.ZoneAirHumRat = 0.0024964;
+    thisZoneHB.airHumRat = 0.0024964;
     state->dataEnvrn->OutBaroPress = 98916.7;
     thisZoneHB.MCPV = 6616;      // Assign TempDepCoef
     thisZoneHB.MCPTV = 138483.2; // Assign TempIndCoef
@@ -449,7 +447,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
-    thisZoneHB.ZoneAirHumRat = 0.001120003;
+    thisZoneHB.airHumRat = 0.001120003;
     thisZoneHB.ZT = -6.08;
     state->dataEnvrn->OutHumRat = 0.0011366887816818931;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat1(1) = 0.011085257;
@@ -480,8 +478,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBal->Zone.allocate(1);
     state->dataHybridModel->HybridModelZone.allocate(1);
     state->dataHybridModel->FlagHybridModel = true;
-    state->dataRoomAirMod->AirModel.allocate(1);
-    state->dataRoomAirMod->ZTOC.allocate(1);
+    state->dataRoomAir->AirModel.allocate(1);
+    state->dataRoomAir->ZTOC.allocate(1);
     state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
@@ -501,10 +499,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataSurface->SurfaceWindow.allocate(1);
     state->dataSurface->Surface.allocate(2);
     state->dataHeatBalSurf->SurfHConvInt.allocate(1);
-    state->dataRoomAirMod->IsZoneDV.dimension(1, false);
-    state->dataRoomAirMod->IsZoneCV.dimension(1, false);
-    state->dataRoomAirMod->IsZoneUI.dimension(1, false);
-    state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
+    state->dataRoomAir->IsZoneDispVent3Node.dimension(1, false);
+    state->dataRoomAir->IsZoneCrossVent.dimension(1, false);
+    state->dataRoomAir->IsZoneUFAD.dimension(1, false);
+    state->dataRoomAir->ZoneDispVent3NodeMixedFlag.allocate(1);
     state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -579,7 +577,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHybridModel->HybridModelZone(1).HybridStartDayOfYear = 1;
     state->dataHybridModel->HybridModelZone(1).HybridEndDayOfYear = 2;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
-    thisZoneHB.ZoneAirHumRat = 0.001120003;
+    thisZoneHB.airHumRat = 0.001120003;
     state->dataContaminantBalance->OutdoorCO2 = 387.6064554;
     state->dataEnvrn->OutHumRat = 0.001147;
     state->dataEnvrn->OutBaroPress = 99500;
@@ -608,7 +606,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -1.0394166434012677;
     thisZoneHB.ZT = -2.92;
-    thisZoneHB.ZoneAirHumRat = 0.00112;
+    thisZoneHB.airHumRat = 0.00112;
     state->dataContaminantBalance->OutdoorCO2 = 387.6064554;
     state->dataEnvrn->OutBaroPress = 98916.7;
     thisZoneHB.OAMFL = 0.700812;
@@ -635,7 +633,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHybridModel->HybridModelZone(1).HybridEndDayOfYear = 2;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
     thisZoneHB.ZT = 15.56;
-    thisZoneHB.ZoneAirHumRat = 0.00809;
+    thisZoneHB.airHumRat = 0.00809;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.7;
     state->dataEnvrn->OutBaroPress = 99500;
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0;
@@ -667,7 +665,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHybridModel->HybridModelZone(1).HybridEndDayOfYear = 2;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
     thisZoneHB.ZT = 21.1;
-    thisZoneHB.ZoneAirHumRat = 0.01102;
+    thisZoneHB.airHumRat = 0.01102;
     state->dataEnvrn->OutBaroPress = 98933.3;
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.00003333814;
     state->dataContaminantBalance->ZoneCO2GainExceptPeople(1) = 0.0;

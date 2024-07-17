@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -64,10 +65,10 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace WeatherManager {
+namespace Weather {
     enum class DateType;
     struct ReportPeriodData;
-} // namespace WeatherManager
+} // namespace Weather
 
 namespace General {
 
@@ -81,9 +82,49 @@ namespace General {
                    Real64 X_0,  // 1st bound of interval that contains the solution
                    Real64 X_1); // 2nd bound of interval that contains the solution
 
-    constexpr Real64 InterpGeneral(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
+    constexpr Real64 Interp(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
     {
         return Lower + InterpFac * (Upper - Lower);
+    }
+
+    // Disaggregated implementation of bilinear interpolation so that coefficients can be used with multiple variables
+    struct BilinearInterpCoeffs
+    {
+        Real64 denom;
+        Real64 x1y1;
+        Real64 x1y2;
+        Real64 x2y1;
+        Real64 x2y2;
+    };
+
+    inline void GetBilinearInterpCoeffs(
+        Real64 const X, Real64 const Y, Real64 const X1, Real64 const X2, Real64 const Y1, Real64 const Y2, BilinearInterpCoeffs &coeffs)
+    {
+        if (X1 == X2 && Y1 == Y2) {
+            coeffs.denom = coeffs.x1y1 = 1.0;
+            coeffs.x1y2 = coeffs.x2y1 = coeffs.x2y2 = 0.0;
+        } else if (X1 == X2) {
+            coeffs.denom = (Y2 - Y1);
+            coeffs.x1y1 = (Y2 - Y);
+            coeffs.x1y2 = (Y - Y1);
+            coeffs.x2y1 = coeffs.x2y2 = 0.0;
+        } else if (Y1 == Y2) {
+            coeffs.denom = (X2 - X1);
+            coeffs.x1y1 = (X2 - X);
+            coeffs.x2y1 = (X - X1);
+            coeffs.x1y2 = coeffs.x2y2 = 0.0;
+        } else {
+            coeffs.denom = (X2 - X1) * (Y2 - Y1);
+            coeffs.x1y1 = (X2 - X) * (Y2 - Y);
+            coeffs.x2y1 = (X - X1) * (Y2 - Y);
+            coeffs.x1y2 = (X2 - X) * (Y - Y1);
+            coeffs.x2y2 = (X - X1) * (Y - Y1);
+        }
+    }
+
+    inline Real64 BilinearInterp(Real64 const Fx1y1, Real64 const Fx1y2, Real64 const Fx2y1, Real64 const Fx2y2, BilinearInterpCoeffs const &coeffs)
+    {
+        return (coeffs.x1y1 * Fx1y1 + coeffs.x2y1 * Fx2y1 + coeffs.x1y2 * Fx1y2 + coeffs.x2y2 * Fx2y2) / coeffs.denom;
     }
 
     constexpr Real64 POLYF(Real64 const X,          // Cosine of angle of incidence
@@ -104,18 +145,18 @@ namespace General {
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
-                           WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                           Weather::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                            bool &ErrorsFound,
                            ObjexxFCL::Optional_int PYear = _);
 
     void DetermineDateTokens(EnergyPlusData &state,
                              std::string const &String,
-                             int &NumTokens,                     // Number of tokens found in string
-                             int &TokenDay,                      // Value of numeric field found
-                             int &TokenMonth,                    // Value of Month field found (1=Jan, 2=Feb, etc)
-                             int &TokenWeekday,                  // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                             WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
-                             bool &ErrorsFound,                  // Set to true if cannot process this string as a date
+                             int &NumTokens,              // Number of tokens found in string
+                             int &TokenDay,               // Value of numeric field found
+                             int &TokenMonth,             // Value of Month field found (1=Jan, 2=Feb, etc)
+                             int &TokenWeekday,           // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
+                             Weather::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                             bool &ErrorsFound,           // Set to true if cannot process this string as a date
                              ObjexxFCL::Optional_int TokenYear = _ // Value of Year if one appears to be present and this argument is present
     );
 
@@ -244,9 +285,11 @@ namespace General {
     bool isReportPeriodBeginning(EnergyPlusData &state, int periodIdx);
 
     void findReportPeriodIdx(EnergyPlusData &state,
-                             const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                             const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData,
                              int nReportPeriods,
                              Array1D_bool &inReportPeriodFlags);
+
+    Real64 rotAzmDiffDeg(Real64 AzmA, Real64 AzmB);
 
     inline Real64 epexp(const Real64 numerator, const Real64 denominator)
     {
@@ -256,7 +299,6 @@ namespace General {
             return std::exp(numerator / denominator);
         }
     }
-
 } // namespace General
 
 struct GeneralData : BaseGlobalStruct
@@ -286,6 +328,10 @@ struct GeneralData : BaseGlobalStruct
     std::string LineRptOption1;
     std::string VarDictOption1;
     std::string VarDictOption2;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

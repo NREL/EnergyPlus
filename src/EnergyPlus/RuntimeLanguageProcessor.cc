@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -138,6 +138,7 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
 
         // Create dynamic built-in variables
         state.dataRuntimeLangProcessor->YearVariableNum = NewEMSVariable(state, "YEAR", 0);
+        state.dataRuntimeLangProcessor->CalendarYearVariableNum = NewEMSVariable(state, "CALENDARYEAR", 0);
         state.dataRuntimeLangProcessor->MonthVariableNum = NewEMSVariable(state, "MONTH", 0);
         state.dataRuntimeLangProcessor->DayOfMonthVariableNum = NewEMSVariable(state, "DAYOFMONTH", 0); // 'DAYOFMONTH'?
         state.dataRuntimeLangProcessor->DayOfWeekVariableNum = NewEMSVariable(state, "DAYOFWEEK", 0);
@@ -180,6 +181,8 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
 
     // Update built-in variables
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->YearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Year));
+    state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->CalendarYearVariableNum).Value =
+        SetErlValueNumber(double(state.dataGlobal->CalendarYear));
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->MonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Month));
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->DayOfMonthVariableNum).Value =
         SetErlValueNumber(double(state.dataEnvrn->DayOfMonth));
@@ -407,9 +410,11 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
     SavedWhileExpressionNum = 0;
     NumWhileGotos = 0;
 
-    while (LineNum <= state.dataRuntimeLang->ErlStack(StackNum).NumLines) {
+    auto &thisErlStack = state.dataRuntimeLang->ErlStack(StackNum);
 
-        Line = stripped(state.dataRuntimeLang->ErlStack(StackNum).Line(LineNum));
+    while (LineNum <= thisErlStack.NumLines) {
+
+        Line = stripped(thisErlStack.Line(LineNum));
         if (len(Line) == 0) {
             ++LineNum;
             continue; // Blank lines can be skipped
@@ -422,12 +427,14 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
         } else {
             Remainder = stripped(Line.substr(Pos + 1));
         }
-        //    Keyword = UtilityRoutines::MakeUPPERCase(Line(1:Pos-1))
+        //    Keyword = Util::makeUPPER(Line(1:Pos-1))
         Keyword = Line.substr(0, Pos);
 
         // the functionality in each block of this parser structure is so different that a regular IF block seems reasonable
         if (Keyword == "RETURN") {
-            if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "RETURN \"{}\"\n", Line);
+            if (state.dataSysVars->DeveloperFlag) {
+                print(state.files.debug, "RETURN \"{}\"\n", Line);
+            }
             if (Remainder.empty()) {
                 InstructionNum = AddInstruction(state, StackNum, LineNum, RuntimeLanguageProcessor::ErlKeywordParam::Return);
             } else {
@@ -436,7 +443,9 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
             }
 
         } else if (Keyword == "SET") {
-            if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "SET \"{}\"\n", Line);
+            if (state.dataSysVars->DeveloperFlag) {
+                print(state.files.debug, "SET \"{}\"\n", Line);
+            }
             Pos = scan(Remainder, '=');
             if (Pos == std::string::npos) {
                 AddError(state, StackNum, LineNum, "Equal sign missing for the SET instruction.");
@@ -461,15 +470,16 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
             }
 
         } else if (Keyword == "RUN") {
-            if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "RUN \"{}\"\n", Line);
+            if (state.dataSysVars->DeveloperFlag) {
+                print(state.files.debug, "RUN \"{}\"\n", Line);
+            }
             if (Remainder.empty()) {
                 AddError(state, StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction.");
             } else {
                 Pos = scan(Remainder, ' ');
                 if (Pos == std::string::npos) Pos = Remainder.length();
-                Variable =
-                    UtilityRoutines::MakeUPPERCase(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
-                StackNum2 = UtilityRoutines::FindItemInList(Variable, state.dataRuntimeLang->ErlStack);
+                Variable = Util::makeUPPER(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
+                StackNum2 = Util::FindItemInList(Variable, state.dataRuntimeLang->ErlStack);
                 if (StackNum2 == 0) {
                     AddError(state, StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");
                 } else {
@@ -538,7 +548,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
                                             LineNum,
                                             DataRuntimeLanguage::ErlKeywordParam::If,
                                             ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
-            state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
+            thisErlStack.Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
             SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
         } else if (Keyword == "ELSE") {
@@ -570,7 +580,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
             }
 
             InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Else); // can make this into a KeywordIf?
-            state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
+            thisErlStack.Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
             SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
         } else if (Keyword == "ENDIF") {
@@ -594,12 +604,12 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
             }
 
             InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::EndIf);
-            state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
+            thisErlStack.Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
 
             // Go back and complete all of the GOTOs that terminate each IF and ELSEIF block
             for (GotoNum = 1; GotoNum <= NumGotos(NestedIfDepth); ++GotoNum) {
                 InstructionNum2 = SavedGotoInstructionNum(GotoNum, NestedIfDepth);
-                state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum2).Argument1 = InstructionNum;
+                thisErlStack.Instruction(InstructionNum2).Argument1 = InstructionNum;
                 SavedGotoInstructionNum(GotoNum, NestedIfDepth) = 0;
             }
 
@@ -638,9 +648,9 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
             }
 
             InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::EndWhile);
-            state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedWhileInstructionNum).Argument2 = InstructionNum;
-            state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 = SavedWhileExpressionNum;
-            state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2 = SavedWhileInstructionNum;
+            thisErlStack.Instruction(SavedWhileInstructionNum).Argument2 = InstructionNum;
+            thisErlStack.Instruction(InstructionNum).Argument1 = SavedWhileExpressionNum;
+            thisErlStack.Instruction(InstructionNum).Argument2 = SavedWhileInstructionNum;
 
             NestedWhileDepth = 0;
             SavedWhileInstructionNum = 0;
@@ -694,24 +704,29 @@ int AddInstruction(EnergyPlusData &state,
     // Object Data
     ErlStackType TempStack;
 
-    if (state.dataRuntimeLang->ErlStack(StackNum).NumInstructions == 0) {
-        state.dataRuntimeLang->ErlStack(StackNum).Instruction.allocate(1);
-        state.dataRuntimeLang->ErlStack(StackNum).NumInstructions = 1;
+    auto &thisErlStack = state.dataRuntimeLang->ErlStack(StackNum);
+
+    if (thisErlStack.NumInstructions == 0) {
+        thisErlStack.Instruction.allocate(1);
+        thisErlStack.NumInstructions = 1;
     } else {
-        TempStack = state.dataRuntimeLang->ErlStack(StackNum);
-        state.dataRuntimeLang->ErlStack(StackNum).Instruction.deallocate();
-        state.dataRuntimeLang->ErlStack(StackNum).Instruction.allocate(state.dataRuntimeLang->ErlStack(StackNum).NumInstructions + 1);
-        state.dataRuntimeLang->ErlStack(StackNum).Instruction({1, state.dataRuntimeLang->ErlStack(StackNum).NumInstructions}) =
-            TempStack.Instruction({1, state.dataRuntimeLang->ErlStack(StackNum).NumInstructions});
-        ++state.dataRuntimeLang->ErlStack(StackNum).NumInstructions;
+        TempStack = thisErlStack;
+        thisErlStack.Instruction.deallocate();
+        thisErlStack.Instruction.allocate(thisErlStack.NumInstructions + 1);
+        thisErlStack.Instruction({1, thisErlStack.NumInstructions}) = TempStack.Instruction({1, thisErlStack.NumInstructions});
+        ++thisErlStack.NumInstructions;
     }
 
-    InstructionNum = state.dataRuntimeLang->ErlStack(StackNum).NumInstructions;
-    state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).LineNum = LineNum;
-    state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword = Keyword;
+    InstructionNum = thisErlStack.NumInstructions;
+    thisErlStack.Instruction(InstructionNum).LineNum = LineNum;
+    thisErlStack.Instruction(InstructionNum).Keyword = Keyword;
 
-    if (present(Argument1)) state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 = Argument1;
-    if (present(Argument2)) state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2 = Argument2;
+    if (present(Argument1)) {
+        thisErlStack.Instruction(InstructionNum).Argument1 = Argument1;
+    }
+    if (present(Argument2)) {
+        thisErlStack.Instruction(InstructionNum).Argument2 = Argument2;
+    }
 
     return InstructionNum;
 }
@@ -743,24 +758,23 @@ void AddError(EnergyPlusData &state,
     // Object Data
     ErlStackType TempStack; // temporary copy of single ErlStack
 
-    if (state.dataRuntimeLang->ErlStack(StackNum).NumErrors == 0) {
-        state.dataRuntimeLang->ErlStack(StackNum).Error.allocate(1);
-        state.dataRuntimeLang->ErlStack(StackNum).NumErrors = 1;
+    auto &thisErlStack = state.dataRuntimeLang->ErlStack(StackNum);
+    if (thisErlStack.NumErrors == 0) {
+        thisErlStack.Error.allocate(1);
+        thisErlStack.NumErrors = 1;
     } else {
-        TempStack = state.dataRuntimeLang->ErlStack(StackNum);
-        state.dataRuntimeLang->ErlStack(StackNum).Error.deallocate();
-        state.dataRuntimeLang->ErlStack(StackNum).Error.allocate(state.dataRuntimeLang->ErlStack(StackNum).NumErrors + 1);
-        state.dataRuntimeLang->ErlStack(StackNum).Error({1, state.dataRuntimeLang->ErlStack(StackNum).NumErrors}) =
-            TempStack.Error({1, state.dataRuntimeLang->ErlStack(StackNum).NumErrors});
-        ++state.dataRuntimeLang->ErlStack(StackNum).NumErrors;
+        TempStack = thisErlStack;
+        thisErlStack.Error.deallocate();
+        thisErlStack.Error.allocate(thisErlStack.NumErrors + 1);
+        thisErlStack.Error({1, thisErlStack.NumErrors}) = TempStack.Error({1, thisErlStack.NumErrors});
+        ++thisErlStack.NumErrors;
     }
 
-    ErrorNum = state.dataRuntimeLang->ErlStack(StackNum).NumErrors;
+    ErrorNum = thisErlStack.NumErrors;
     if (LineNum > 0) {
-        state.dataRuntimeLang->ErlStack(StackNum).Error(ErrorNum) =
-            format("Line {}:  {} \"{}\"", LineNum, Error, state.dataRuntimeLang->ErlStack(StackNum).Line(LineNum));
+        thisErlStack.Error(ErrorNum) = format("Line {}:  {} \"{}\"", LineNum, Error, thisErlStack.Line(LineNum));
     } else {
-        state.dataRuntimeLang->ErlStack(StackNum).Error(ErrorNum) = Error;
+        thisErlStack.Error(ErrorNum) = Error;
     }
 }
 
@@ -795,34 +809,39 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
     ReturnValue.Type = Value::Number;
     ReturnValue.Number = 0.0;
 
+    auto const &thisErlStack = state.dataRuntimeLang->ErlStack(StackNum);
+
     InstructionNum = 1;
-    while (InstructionNum <= state.dataRuntimeLang->ErlStack(StackNum).NumInstructions) {
+    while (InstructionNum <= thisErlStack.NumInstructions) {
+
+        auto const &thisInstruction = thisErlStack.Instruction(InstructionNum);
 
         {
-            DataRuntimeLanguage::ErlKeywordParam const SELECT_CASE_var =
-                state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword;
+            DataRuntimeLanguage::ErlKeywordParam const SELECT_CASE_var = thisInstruction.Keyword;
 
             if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::None) {
                 // There probably shouldn't be any of these
 
             } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Return) {
-                if (state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
-                    ReturnValue =
-                        EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
+                if (thisInstruction.Argument1 > 0) ReturnValue = EvaluateExpression(state, thisInstruction.Argument1, seriousErrorFound);
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                 break; // RETURN always terminates an instruction stack
 
             } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Set) {
 
-                ReturnValue =
-                    EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
-                ESVariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                if ((!state.dataRuntimeLang->ErlVariable(ESVariableNum).ReadOnly) &&
-                    (!state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable)) {
-                    state.dataRuntimeLang->ErlVariable(ESVariableNum).Value = ReturnValue;
-                } else if (state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable) {
-                    state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Number = ReturnValue.Number;
-                    state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Error = ReturnValue.Error;
+                ESVariableNum = thisInstruction.Argument1;
+                auto &thisErlVar = state.dataRuntimeLang->ErlVariable(ESVariableNum);
+                ReturnValue = EvaluateExpression(state, thisInstruction.Argument2, seriousErrorFound);
+                if ((!thisErlVar.ReadOnly) && (!thisErlVar.Value.TrendVariable)) {
+                    // #10279 - We don't do `thisErlVar.Value = ReturnValue;` because we don't want to copy TrendVariable stuff
+                    thisErlVar.Value.Type = ReturnValue.Type;
+                    thisErlVar.Value.Number = ReturnValue.Number;
+                    // thisErlVar.Value.String = ReturnValue.String;
+                    thisErlVar.Value.Error = ReturnValue.Error;
+                    thisErlVar.Value.initialized = ReturnValue.initialized;
+                } else if (thisErlVar.Value.TrendVariable) {
+                    thisErlVar.Value.Number = ReturnValue.Number;
+                    thisErlVar.Value.Error = ReturnValue.Error;
                 }
 
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
@@ -831,11 +850,11 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                 ReturnValue.Type = Value::String;
                 ReturnValue.String = "";
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                ReturnValue = EvaluateStack(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+                ReturnValue = EvaluateStack(state, thisInstruction.Argument1);
             } else if ((SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::If) ||
                        (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Else)) { // same???
-                ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+                ExpressionNum = thisInstruction.Argument1;
+                InstructionNum2 = thisInstruction.Argument2;
                 if (ExpressionNum > 0) { // could be 0 if this was an ELSE
                     ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
@@ -851,7 +870,7 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                 }
             } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Goto) {
-                InstructionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                InstructionNum = thisInstruction.Argument1;
 
                 // For debug purposes only...
                 ReturnValue.Type = Value::String;
@@ -867,8 +886,8 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
 
             } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::While) {
                 // evaluate expression at while, skip to past endwhile if not true
-                ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+                ExpressionNum = thisInstruction.Argument1;
+                InstructionNum2 = thisInstruction.Argument2;
                 ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                 if (ReturnValue.Number == 0.0) { //  This is the FALSE case
@@ -879,8 +898,8 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
             } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::EndWhile) {
 
                 // reevaluate expression at While and goto there if true, otherwise continue
-                ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+                ExpressionNum = thisInstruction.Argument1;
+                InstructionNum2 = thisInstruction.Argument2;
                 ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                 if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
                     // Eventually should handle strings and arrays too
@@ -1158,7 +1177,7 @@ void ParseExpression(EnergyPlusData &state,
                 state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = Token::Number;
                 state.dataRuntimeLangProcessor->PEToken(NumTokens).String = StringToken;
                 if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "Number=\"{}\"\n", StringToken);
-                state.dataRuntimeLangProcessor->PEToken(NumTokens).Number = UtilityRoutines::ProcessNumber(StringToken, ErrorFlag);
+                state.dataRuntimeLangProcessor->PEToken(NumTokens).Number = Util::ProcessNumber(StringToken, ErrorFlag);
                 if (state.dataSysVars->DeveloperFlag && ErrorFlag) print(state.files.debug, "{}\n", "Numeric error flagged");
                 if (MinusFound) {
                     state.dataRuntimeLangProcessor->PEToken(NumTokens).Number = -state.dataRuntimeLangProcessor->PEToken(NumTokens).Number;
@@ -1243,7 +1262,7 @@ void ParseExpression(EnergyPlusData &state,
                 const size_t len = strlen(string);
                 const std::string potential_match = String.substr(Pos, len);
 
-                if ((case_insensitive && UtilityRoutines::SameString(potential_match, string)) || (!case_insensitive && potential_match == string)) {
+                if ((case_insensitive && Util::SameString(potential_match, string)) || (!case_insensitive && potential_match == string)) {
                     if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "OPERATOR \"{}\"\n", potential_match);
                     state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = op;
                     state.dataRuntimeLangProcessor->PEToken(NumTokens).String = potential_match;
@@ -1498,8 +1517,6 @@ int ProcessTokens(
         ShowFatalError(state, "Program terminates due to preceding error.");
     }
 
-    SetupPossibleOperators(state); // includes built-in functions
-
     // Process operators and builtin functions
     // Loop thru all operators and group expressions in the order of precedence
     for (OperatorNum = 1; OperatorNum <= NumPossibleOperators; ++OperatorNum) {
@@ -1519,7 +1536,7 @@ int ProcessTokens(
                 if (static_cast<int>(Token(TokenNum).Operator) > static_cast<int>(ErlFunc::LogicalOR)) { // we have a function expression to set up
                     ExpressionNum = NewExpression(state);
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = static_cast<ErlFunc>(OperatorNum);
-                    NumOperands = state.dataRuntimeLang->PossibleOperators(OperatorNum).NumOperands;
+                    NumOperands = ErlFuncNumOperands[OperatorNum];
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = NumOperands;
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(NumOperands);
 
@@ -1575,23 +1592,19 @@ int ProcessTokens(
                     }
                     break;
                 } else {
-                    ShowSevereError(state,
-                                    format("The operator \"{}\" is missing the left-hand operand!",
-                                           state.dataRuntimeLang->PossibleOperators(OperatorNum).Symbol));
+                    ShowSevereError(state, format("The operator \"{}\" is missing the left-hand operand!", ErlFuncNamesUC[OperatorNum]));
                     ShowContinueError(state, format("String being parsed=\"{}\".", ParsingString));
                     break;
                 }
             } else if (Pos == NumTokens) {
-                ShowSevereError(
-                    state,
-                    format("The operator \"{}\" is missing the right-hand operand!", state.dataRuntimeLang->PossibleOperators(OperatorNum).Symbol));
+                ShowSevereError(state, format("The operator \"{}\" is missing the right-hand operand!", ErlFuncNamesUC[OperatorNum]));
                 ShowContinueError(state, format("String being parsed=\"{}\".", ParsingString));
                 break;
             } else {
 
                 ExpressionNum = NewExpression(state);
                 state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = static_cast<ErlFunc>(OperatorNum);
-                NumOperands = state.dataRuntimeLang->PossibleOperators(OperatorNum).NumOperands;
+                NumOperands = ErlFuncNumOperands[OperatorNum];
                 state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = NumOperands;
                 state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(NumOperands);
 
@@ -1740,30 +1753,32 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
     ReturnValue.Number = 0.0;
 
     if (ExpressionNum > 0) {
+        auto const &thisErlExpression = state.dataRuntimeLang->ErlExpression(ExpressionNum);
         // is there a way to keep these and not allocate and deallocate all the time?
-        Operand.allocate(state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands);
+        Operand.allocate(thisErlExpression.NumOperands);
         // Reduce operands down to literals
-        for (OperandNum = 1; OperandNum <= state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands; ++OperandNum) {
-            Operand(OperandNum) = state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(OperandNum);
-            if (Operand(OperandNum).Type == Value::Expression) {
-                Operand(OperandNum) = EvaluateExpression(state, Operand(OperandNum).Expression, seriousErrorFound); // recursive call
+        for (OperandNum = 1; OperandNum <= thisErlExpression.NumOperands; ++OperandNum) {
+            auto &thisOperand = Operand(OperandNum);
+            thisOperand = thisErlExpression.Operand(OperandNum);
+            if (thisOperand.Type == Value::Expression) {
+                thisOperand = EvaluateExpression(state, thisOperand.Expression, seriousErrorFound); // recursive call
                 // check if recursive call found an error in nested expression, want to preserve error message from that
                 if (seriousErrorFound) {
                     ReturnValue.Type = Value::Error;
-                    ReturnValue.Error = Operand(OperandNum).Error;
+                    ReturnValue.Error = thisOperand.Error;
                 }
 
-            } else if (Operand(OperandNum).Type == Value::Variable) {
-                if (state.dataRuntimeLang->ErlVariable(Operand(OperandNum).Variable).Value.initialized) { // check that value has been initialized
-                    Operand(OperandNum) = state.dataRuntimeLang->ErlVariable(Operand(OperandNum).Variable).Value;
+            } else if (thisOperand.Type == Value::Variable) {
+                auto const &thisErlVar = state.dataRuntimeLang->ErlVariable(thisOperand.Variable);
+                if (thisErlVar.Value.initialized) { // check that value has been initialized
+                    thisOperand = thisErlVar.Value;
                 } else { // value has never been set
                     ReturnValue.Type = Value::Error;
-                    ReturnValue.Error = "EvaluateExpression: Variable = '" + state.dataRuntimeLang->ErlVariable(Operand(OperandNum).Variable).Name +
-                                        "' used in expression has not been initialized!";
+                    ReturnValue.Error = "EvaluateExpression: Variable = '" + thisErlVar.Name + "' used in expression has not been initialized!";
                     if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataEMSMgr->FinishProcessingUserInput) {
 
                         // check if this is an arg in CurveValue,
-                        if (state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator !=
+                        if (thisErlExpression.Operator !=
                             ErlFunc::CurveValue) { // padding the argument list for CurveValue is too common to fatal on.  only reported to EDD
                             seriousErrorFound = true;
                         }
@@ -1776,7 +1791,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
 
             // Perform the operation
 
-            switch (state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator) {
+            switch (thisErlExpression.Operator) {
 
             case ErlFunc::Literal:
                 ReturnValue = Operand(1);
@@ -2510,283 +2525,170 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                 break;
 
             case ErlFunc::TodayIsRain:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TodayIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsRain, ReturnValue);
-                break;
-
             case ErlFunc::TodayIsSnow:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TodayIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsSnow, ReturnValue);
-                break;
-
             case ErlFunc::TodayOutDryBulbTemp:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TodayOutDryBulbTemp,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TodayOutDryBulbTemp,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TodayOutDewPointTemp:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TodayOutDewPointTemp,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TodayOutDewPointTemp,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TodayOutBaroPress:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TodayOutBaroPress,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TodayOutBaroPress,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TodayOutRelHum:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TodayOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutRelHum, ReturnValue);
-                break;
-
             case ErlFunc::TodayWindSpeed:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TodayWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindSpeed, ReturnValue);
-                break;
-
             case ErlFunc::TodayWindDir:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TodayWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindDir, ReturnValue);
-                break;
-
             case ErlFunc::TodaySkyTemp:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TodaySkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodaySkyTemp, ReturnValue);
-                break;
-
             case ErlFunc::TodayHorizIRSky:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TodayHorizIRSky, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayHorizIRSky, ReturnValue);
-                break;
-
             case ErlFunc::TodayBeamSolarRad:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TodayBeamSolarRad,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TodayBeamSolarRad,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TodayDifSolarRad:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TodayDifSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayDifSolarRad, ReturnValue);
-                break;
-
             case ErlFunc::TodayAlbedo:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TodayAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayAlbedo, ReturnValue);
-                break;
-
-            case ErlFunc::TodayLiquidPrecip:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TodayLiquidPrecip,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TodayLiquidPrecip,
-                                     ReturnValue);
-                break;
+            case ErlFunc::TodayLiquidPrecip: {
+                int iHour = (Operand(1).Number + 1); // Operand 1 is hour from 0:23
+                int iTimeStep = Operand(2).Number;
+                if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
+                    auto const &today = state.dataWeather->wvarsHrTsToday(iTimeStep, iHour);
+                    ReturnValue.initialized = true;
+                    ReturnValue.Type = Value::Number;
+                    switch (thisErlExpression.Operator) {
+                    case ErlFunc::TodayIsRain: {
+                        ReturnValue.Number = today.IsRain ? 1.0 : 0.0;
+                    } break;
+                    case ErlFunc::TodayIsSnow: {
+                        ReturnValue.Number = today.IsSnow ? 1.0 : 0.0;
+                    } break;
+                    case ErlFunc::TodayOutDryBulbTemp: {
+                        ReturnValue.Number = today.OutDryBulbTemp;
+                    } break;
+                    case ErlFunc::TodayOutDewPointTemp: {
+                        ReturnValue.Number = today.OutDewPointTemp;
+                    } break;
+                    case ErlFunc::TodayOutBaroPress: {
+                        ReturnValue.Number = today.OutBaroPress;
+                    } break;
+                    case ErlFunc::TodayOutRelHum: {
+                        ReturnValue.Number = today.OutRelHum;
+                    } break;
+                    case ErlFunc::TodayWindSpeed: {
+                        ReturnValue.Number = today.WindSpeed;
+                    } break;
+                    case ErlFunc::TodayWindDir: {
+                        ReturnValue.Number = today.WindDir;
+                    } break;
+                    case ErlFunc::TodaySkyTemp: {
+                        ReturnValue.Number = today.SkyTemp;
+                    } break;
+                    case ErlFunc::TodayHorizIRSky: {
+                        ReturnValue.Number = today.HorizIRSky;
+                    } break;
+                    case ErlFunc::TodayBeamSolarRad: {
+                        ReturnValue.Number = today.BeamSolarRad;
+                    } break;
+                    case ErlFunc::TodayDifSolarRad: {
+                        ReturnValue.Number = today.DifSolarRad;
+                    } break;
+                    case ErlFunc::TodayAlbedo: {
+                        ReturnValue.Number = today.Albedo;
+                    } break;
+                    case ErlFunc::TodayLiquidPrecip: {
+                        ReturnValue.Number = today.LiquidPrecip;
+                    } break;
+                    default: {
+                        assert(false);
+                    } break;
+                    }
+                } else {
+                    ReturnValue.Type = DataRuntimeLanguage::Value::Error;
+                    ReturnValue.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
+                                               ErlFuncNamesUC[(int)thisErlExpression.Operator],
+                                               Operand(1).Number,
+                                               Operand(2).Number);
+                }
+            } break;
 
             case ErlFunc::TomorrowIsRain:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TomorrowIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsRain, ReturnValue);
-                break;
-
             case ErlFunc::TomorrowIsSnow:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TomorrowIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsSnow, ReturnValue);
-                break;
-
             case ErlFunc::TomorrowOutDryBulbTemp:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TomorrowOutDryBulbTemp,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowOutDryBulbTemp,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TomorrowOutDewPointTemp:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TomorrowOutDewPointTemp,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowOutDewPointTemp,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TomorrowOutBaroPress:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TomorrowOutBaroPress,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowOutBaroPress,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TomorrowOutRelHum:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TomorrowOutRelHum,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowOutRelHum,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TomorrowWindSpeed:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TomorrowWindSpeed,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowWindSpeed,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TomorrowWindDir:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TomorrowWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowWindDir, ReturnValue);
-                break;
-
             case ErlFunc::TomorrowSkyTemp:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TomorrowSkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowSkyTemp, ReturnValue);
-                break;
-
             case ErlFunc::TomorrowHorizIRSky:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TomorrowHorizIRSky,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowHorizIRSky,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TomorrowBeamSolarRad:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TomorrowBeamSolarRad,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowBeamSolarRad,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TomorrowDifSolarRad:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TomorrowDifSolarRad,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowDifSolarRad,
-                                     ReturnValue);
-                break;
-
             case ErlFunc::TomorrowAlbedo:
-                TodayTomorrowWeather(
-                    state, ErlFunc::TomorrowAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowAlbedo, ReturnValue);
-                break;
+            case ErlFunc::TomorrowLiquidPrecip: {
+                int iHour = (Operand(1).Number + 1); // Operand 1 is hour from 0:23
+                int iTimeStep = Operand(2).Number;
+                if ((iHour > 0) && (iHour <= Constant::HoursInDay) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
+                    auto const &tomorrow = state.dataWeather->wvarsHrTsTomorrow(iTimeStep, iHour);
+                    ReturnValue.initialized = true;
+                    ReturnValue.Type = Value::Number;
+                    switch (thisErlExpression.Operator) {
+                    case ErlFunc::TomorrowIsRain: {
+                        ReturnValue.Number = tomorrow.IsRain ? 1.0 : 0.0;
+                    } break;
+                    case ErlFunc::TomorrowIsSnow: {
+                        ReturnValue.Number = tomorrow.IsSnow ? 1.0 : 0.0;
+                    } break;
+                    case ErlFunc::TomorrowOutDryBulbTemp: {
+                        ReturnValue.Number = tomorrow.OutDryBulbTemp;
+                    } break;
+                    case ErlFunc::TomorrowOutDewPointTemp: {
+                        ReturnValue.Number = tomorrow.OutDewPointTemp;
+                    } break;
+                    case ErlFunc::TomorrowOutBaroPress: {
+                        ReturnValue.Number = tomorrow.OutBaroPress;
+                    } break;
+                    case ErlFunc::TomorrowOutRelHum: {
+                        ReturnValue.Number = tomorrow.OutRelHum;
+                    } break;
+                    case ErlFunc::TomorrowWindSpeed: {
+                        ReturnValue.Number = tomorrow.WindSpeed;
+                    } break;
+                    case ErlFunc::TomorrowWindDir: {
+                        ReturnValue.Number = tomorrow.WindDir;
+                    } break;
+                    case ErlFunc::TomorrowSkyTemp: {
+                        ReturnValue.Number = tomorrow.SkyTemp;
+                    } break;
+                    case ErlFunc::TomorrowHorizIRSky: {
+                        ReturnValue.Number = tomorrow.HorizIRSky;
+                    } break;
+                    case ErlFunc::TomorrowBeamSolarRad: {
+                        ReturnValue.Number = tomorrow.BeamSolarRad;
+                    } break;
+                    case ErlFunc::TomorrowDifSolarRad: {
+                        ReturnValue.Number = tomorrow.DifSolarRad;
+                    } break;
+                    case ErlFunc::TomorrowAlbedo: {
+                        ReturnValue.Number = tomorrow.Albedo;
+                    } break;
+                    case ErlFunc::TomorrowLiquidPrecip: {
+                        ReturnValue.Number = tomorrow.LiquidPrecip;
+                    } break;
+                    default: {
+                        assert(false);
+                    } break;
+                    }
+                } else {
+                    ReturnValue.Type = DataRuntimeLanguage::Value::Error;
+                    ReturnValue.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
+                                               ErlFuncNamesUC[(int)thisErlExpression.Operator],
+                                               Operand(1).Number,
+                                               Operand(2).Number);
+                }
+            } break;
 
-            case ErlFunc::TomorrowLiquidPrecip:
-                TodayTomorrowWeather(state,
-                                     ErlFunc::TomorrowLiquidPrecip,
-                                     Operand(1).Number,
-                                     Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowLiquidPrecip,
-                                     ReturnValue);
-                break;
             case ErlFunc::Invalid:
             case ErlFunc::Null:
             case ErlFunc::TsatFnPb:
-            case ErlFunc::Num:
+            case ErlFunc::Num: {
                 // throw Error, these cases are not supported -- they all make sense except TsatFnPb which was commented out above a long time ago
                 ShowFatalError(state, "caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression");
-            }
+            } break;
+            } // switch (FunctionCode)
         }
         Operand.deallocate();
     }
 
     return ReturnValue;
-}
-
-void TodayTomorrowWeather(EnergyPlusData &state,
-                          ErlFunc const FunctionCode,
-                          Real64 const Operand1,
-                          Real64 const Operand2,
-                          Array2D<Real64> &TodayTomorrowWeatherSource,
-                          ErlValueType &ReturnVal)
-{
-    int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
-    int iTimeStep = Operand2;
-    if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
-        ReturnVal = SetErlValueNumber(TodayTomorrowWeatherSource(iTimeStep, iHour));
-    } else {
-        ReturnVal.Type = DataRuntimeLanguage::Value::Error;
-        ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
-                                 state.dataRuntimeLang->PossibleOperators(static_cast<int>(FunctionCode)).Symbol,
-                                 Operand1,
-                                 Operand2);
-    }
-}
-
-void TodayTomorrowWeather(EnergyPlusData &state,
-                          ErlFunc const FunctionCode,
-                          Real64 const Operand1,
-                          Real64 const Operand2,
-                          Array2D_bool &TodayTomorrowWeatherSource,
-                          ErlValueType &ReturnVal)
-{
-    int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
-    int iTimeStep = Operand2;
-    if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
-        // For logicals return 1 or 0
-        if (TodayTomorrowWeatherSource(iTimeStep, iHour)) {
-            ReturnVal = SetErlValueNumber(1.0);
-        } else {
-            ReturnVal = SetErlValueNumber(0.0);
-        }
-    } else {
-        ReturnVal.Type = DataRuntimeLanguage::Value::Error;
-        ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
-                                 state.dataRuntimeLang->PossibleOperators(static_cast<int>(FunctionCode)).Symbol,
-                                 Operand1,
-                                 Operand2);
-    }
-}
-
-int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value)
-{
-    int iHour = hour + 1;
-    if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= state.dataGlobal->NumOfTimeStepInHour)) {
-        value = TodayTomorrowWeatherSource(timestep, iHour);
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
-int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value)
-{
-    int iHour = hour + 1;
-    if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= state.dataGlobal->NumOfTimeStepInHour)) {
-        if (TodayTomorrowWeatherSource(timestep, iHour)) {
-            value = 1.0;
-        } else {
-            value = 0.0;
-        }
-        return 0;
-    } else {
-        return 1;
-    }
 }
 
 void GetRuntimeLanguageUserInput(EnergyPlusData &state)
@@ -2825,11 +2727,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     int VariableNum(0); // temporary
     int RuntimeReportVarNum;
     bool Found;
-    OutputProcessor::SOVTimeStepType FreqString; // temporary
-    OutputProcessor::SOVStoreType VarTypeString; // temporary
-    std::string ResourceTypeString;
-    std::string GroupTypeString;
-    std::string EndUseTypeString;
+    OutputProcessor::TimeStepType sovTimeStepType; // temporary
+    OutputProcessor::StoreType sovStoreType;       // temporary
     std::string EndUseSubCatString;
 
     int TrendNum;
@@ -2852,7 +2751,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     std::string::size_type lbracket;
     std::string UnitsA;
     std::string UnitsB;
-    OutputProcessor::Unit curUnit(OutputProcessor::Unit::None);
+    Constant::Units curUnit(Constant::Units::None);
     std::string::size_type ptr;
 
     if (state.dataRuntimeLangProcessor->GetInput) { // GetInput check is redundant with the InitializeRuntimeLanguage routine
@@ -3157,7 +3056,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     continue;
                 }
 
-                ConstructNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
+                ConstructNum = Util::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
 
                 if (ConstructNum == 0) {
                     if (lAlphaFieldBlanks(2)) {
@@ -3270,7 +3169,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
@@ -3423,7 +3322,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         ShowContinueError(state, format("...Units entered in {} (deprecated use)=\"{}\"", cAlphaFieldNames(1), UnitsA));
                     }
                 }
-                curUnit = OutputProcessor::unitStringToEnum(UnitsB);
+                curUnit = static_cast<Constant::Units>(getEnumValue(Constant::unitNamesUC, Util::makeUPPER(UnitsB)));
 
                 state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Name = cAlphaArgs(1);
 
@@ -3469,61 +3368,53 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).VariableNum = VariableNum;
                 }
 
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(3);
-
-                    if (SELECT_CASE_var == "AVERAGED") {
-                        VarTypeString = OutputProcessor::SOVStoreType::Average;
-                    } else if (SELECT_CASE_var == "SUMMED") {
-                        VarTypeString = OutputProcessor::SOVStoreType::Summed;
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(3), cAlphaArgs(3)));
-                        ShowContinueError(state, "...valid values are Averaged or Summed.");
-                        ErrorsFound = true;
-                    }
+                if (cAlphaArgs(3) == "AVERAGED") {
+                    sovStoreType = OutputProcessor::StoreType::Average;
+                } else if (cAlphaArgs(3) == "SUMMED") {
+                    sovStoreType = OutputProcessor::StoreType::Sum;
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(3), cAlphaArgs(3)));
+                    ShowContinueError(state, "...valid values are Averaged or Summed.");
+                    ErrorsFound = true;
                 }
 
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(4);
-
-                    if (SELECT_CASE_var == "ZONETIMESTEP") {
-                        FreqString = OutputProcessor::SOVTimeStepType::Zone;
-                    } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
-                        FreqString = OutputProcessor::SOVTimeStepType::System;
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(4), cAlphaArgs(4)));
-                        ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
-                        ErrorsFound = true;
-                    }
+                if (cAlphaArgs(4) == "ZONETIMESTEP") {
+                    sovTimeStepType = OutputProcessor::TimeStepType::Zone;
+                } else if (cAlphaArgs(4) == "SYSTEMTIMESTEP") {
+                    sovTimeStepType = OutputProcessor::TimeStepType::System;
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(4), cAlphaArgs(4)));
+                    ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
+                    ErrorsFound = true;
                 }
 
-                if (curUnit != OutputProcessor::Unit::unknown) {
+                if (curUnit != Constant::Units::Invalid) {
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
                                         curUnit,
                                         state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Value,
-                                        FreqString,
-                                        VarTypeString,
+                                        sovTimeStepType,
+                                        sovStoreType,
                                         "EMS");
                 } else {
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
-                                        OutputProcessor::Unit::customEMS,
+                                        Constant::Units::customEMS,
                                         state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Value,
-                                        FreqString,
-                                        VarTypeString,
+                                        sovTimeStepType,
+                                        sovStoreType,
                                         "EMS",
-                                        {},
-                                        {},
-                                        {},
-                                        {},
-                                        {},
-                                        {},
-                                        1,
-                                        1,
-                                        -999,
+                                        Constant::eResource::Invalid,
+                                        OutputProcessor::Group::Invalid,
+                                        OutputProcessor::EndUseCat::Invalid,
+                                        "",   // EndUseSubCat
+                                        "",   // ZoneName
+                                        1,    // ZoneMult
+                                        1,    // ZoneListMult
+                                        "",   // SpaceType
+                                        -999, // indexGroupKey
                                         UnitsB);
                 }
                 // Last field is index key, no indexing here so mimic weather output data
@@ -3604,7 +3495,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         ShowContinueError(state, format("...Units entered in {} (deprecated use)=\"{}\"", cAlphaFieldNames(1), UnitsA));
                     }
                 }
-                curUnit = OutputProcessor::unitStringToEnum(UnitsB);
+                curUnit = static_cast<Constant::Units>(getEnumValue(Constant::unitNamesUC, Util::makeUPPER(UnitsB)));
 
                 state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Name = cAlphaArgs(1);
 
@@ -3649,162 +3540,108 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).VariableNum = VariableNum;
                 }
 
-                VarTypeString = OutputProcessor::SOVStoreType::Summed; // all metered vars are sum type
+                sovStoreType = OutputProcessor::StoreType::Sum; // all metered vars are sum type
 
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(3);
-
-                    if (SELECT_CASE_var == "ZONETIMESTEP") {
-                        FreqString = OutputProcessor::SOVTimeStepType::Zone;
-                    } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
-                        FreqString = OutputProcessor::SOVTimeStepType::System;
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(4), cAlphaArgs(4)));
-                        ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
-                        ErrorsFound = true;
-                    }
+                if (cAlphaArgs(3) == "ZONETIMESTEP") {
+                    sovTimeStepType = OutputProcessor::TimeStepType::Zone;
+                } else if (cAlphaArgs(3) == "SYSTEMTIMESTEP") {
+                    sovTimeStepType = OutputProcessor::TimeStepType::System;
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(4), cAlphaArgs(4)));
+                    ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
+                    ErrorsFound = true;
                 }
 
                 // Resource Type
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(5);
+                Constant::eResource resource =
+                    static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(cAlphaArgs(5))));
 
-                    if (SELECT_CASE_var == "ELECTRICITY") {
-                        ResourceTypeString = "Electricity";
-                    } else if (SELECT_CASE_var == "NATURALGAS") {
-                        ResourceTypeString = "NaturalGas";
-                    } else if (SELECT_CASE_var == "GASOLINE") {
-                        ResourceTypeString = "Gasoline";
-                    } else if (SELECT_CASE_var == "DIESEL") {
-                        ResourceTypeString = "Diesel";
-                    } else if (SELECT_CASE_var == "COAL") {
-                        ResourceTypeString = "Coal";
-                    } else if (SELECT_CASE_var == "FUELOILNO1") {
-                        ResourceTypeString = "FuelOilNo1";
-                    } else if (SELECT_CASE_var == "FUELOILNO2") {
-                        ResourceTypeString = "FuelOilNo2";
-                    } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                        ResourceTypeString = "OtherFuel1";
-                    } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                        ResourceTypeString = "OtherFuel2";
-                    } else if (SELECT_CASE_var == "PROPANE") {
-                        ResourceTypeString = "Propane";
-                    } else if (SELECT_CASE_var == "WATERUSE") {
-                        ResourceTypeString = "Water";
-                    } else if (SELECT_CASE_var == "ONSITEWATERPRODUCED") {
-                        ResourceTypeString = "OnSiteWater";
-                    } else if (SELECT_CASE_var == "MAINSWATERSUPPLY") {
-                        ResourceTypeString = "MainsWater";
-                    } else if (SELECT_CASE_var == "RAINWATERCOLLECTED") {
-                        ResourceTypeString = "RainWater";
-                    } else if (SELECT_CASE_var == "WELLWATERDRAWN") {
-                        ResourceTypeString = "WellWater";
-                    } else if (SELECT_CASE_var == "CONDENSATEWATERCOLLECTED") {
-                        ResourceTypeString = "Condensate";
-                    } else if (SELECT_CASE_var == "ENERGYTRANSFER") {
-                        ResourceTypeString = "EnergyTransfer";
-                    } else if (SELECT_CASE_var == "STEAM") {
-                        ResourceTypeString = "Steam";
-                    } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
-                        ResourceTypeString = "DistrictCooling";
-                    } else if (SELECT_CASE_var == "DISTRICTHEATING") {
-                        ResourceTypeString = "DistrictHeating";
-                    } else if (SELECT_CASE_var == "ELECTRICITYPRODUCEDONSITE") {
-                        ResourceTypeString = "ElectricityProduced";
-                    } else if (SELECT_CASE_var == "SOLARWATERHEATING") {
-                        ResourceTypeString = "SolarWater";
-                    } else if (SELECT_CASE_var == "SOLARAIRHEATING") {
-                        ResourceTypeString = "SolarAir";
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(5), cAlphaArgs(5)));
-                        ErrorsFound = true;
-                    }
+                if (resource == Constant::eResource::Invalid) {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(5), cAlphaArgs(5)));
+                    ErrorsFound = true;
                 }
 
                 // Group Type
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(6);
+                OutputProcessor::Group sovGroup;
 
-                    if (SELECT_CASE_var == "BUILDING") {
-                        GroupTypeString = "Building";
-                    } else if (SELECT_CASE_var == "HVAC") {
-                        GroupTypeString = "HVAC";
-                    } else if (SELECT_CASE_var == "PLANT") {
-                        GroupTypeString = "Plant";
-                    } else if (SELECT_CASE_var == "SYSTEM") {
-                        GroupTypeString = "System";
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(6), cAlphaArgs(6)));
-                        ErrorsFound = true;
-                    }
+                if (cAlphaArgs(6) == "BUILDING") {
+                    sovGroup = OutputProcessor::Group::Building;
+                } else if (cAlphaArgs(6) == "HVAC") {
+                    sovGroup = OutputProcessor::Group::HVAC;
+                } else if (cAlphaArgs(6) == "PLANT") {
+                    sovGroup = OutputProcessor::Group::Plant;
+                } else if (cAlphaArgs(6) == "SYSTEM") {
+                    sovGroup = OutputProcessor::Group::HVAC;
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(6), cAlphaArgs(6)));
+                    ErrorsFound = true;
                 }
 
                 // End Use Type
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(7);
+                OutputProcessor::EndUseCat sovEndUseCat;
 
-                    if (SELECT_CASE_var == "HEATING") {
-                        EndUseTypeString = "Heating";
-                    } else if (SELECT_CASE_var == "COOLING") {
-                        EndUseTypeString = "Cooling";
-                    } else if (SELECT_CASE_var == "INTERIORLIGHTS") {
-                        EndUseTypeString = "InteriorLights";
-                    } else if (SELECT_CASE_var == "EXTERIORLIGHTS") {
-                        EndUseTypeString = "ExteriorLights";
-                    } else if (SELECT_CASE_var == "INTERIOREQUIPMENT") {
-                        EndUseTypeString = "InteriorEquipment";
-                    } else if (SELECT_CASE_var == "EXTERIOREQUIPMENT") {
-                        EndUseTypeString = "ExteriorEquipment";
-                    } else if (SELECT_CASE_var == "FANS") {
-                        EndUseTypeString = "Fans";
-                    } else if (SELECT_CASE_var == "PUMPS") {
-                        EndUseTypeString = "Pumps";
-                    } else if (SELECT_CASE_var == "HEATREJECTION") {
-                        EndUseTypeString = "HeatRejection";
-                    } else if (SELECT_CASE_var == "HUMIDIFIER") {
-                        EndUseTypeString = "Humidifier";
-                    } else if (SELECT_CASE_var == "HEATRECOVERY") {
-                        EndUseTypeString = "HeatRecovery";
-                    } else if (SELECT_CASE_var == "WATERSYSTEMS") {
-                        EndUseTypeString = "WaterSystems";
-                    } else if (SELECT_CASE_var == "REFRIGERATION") {
-                        EndUseTypeString = "Refrigeration";
-                    } else if (SELECT_CASE_var == "ONSITEGENERATION") {
-                        EndUseTypeString = "Cogeneration";
-                    } else if (SELECT_CASE_var == "HEATINGCOILS") {
-                        EndUseTypeString = "HeatingCoils";
-                    } else if (SELECT_CASE_var == "COOLINGCOILS") {
-                        EndUseTypeString = "CoolingCoils";
-                    } else if (SELECT_CASE_var == "CHILLERS") {
-                        EndUseTypeString = "Chillers";
-                    } else if (SELECT_CASE_var == "BOILERS") {
-                        EndUseTypeString = "Boilers";
-                    } else if (SELECT_CASE_var == "BASEBOARD") {
-                        EndUseTypeString = "Baseboard";
-                    } else if (SELECT_CASE_var == "HEATRECOVERYFORCOOLING") {
-                        EndUseTypeString = "HeatRecoveryForCooling";
-                    } else if (SELECT_CASE_var == "HEATRECOVERYFORHEATING") {
-                        EndUseTypeString = "HeatRecoveryForHeating";
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(7), cAlphaArgs(7)));
-                        ErrorsFound = true;
-                    }
+                if (cAlphaArgs(7) == "HEATING") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::Heating;
+                } else if (cAlphaArgs(7) == "COOLING") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::Cooling;
+                } else if (cAlphaArgs(7) == "INTERIORLIGHTS") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::InteriorLights;
+                } else if (cAlphaArgs(7) == "EXTERIORLIGHTS") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::ExteriorLights;
+                } else if (cAlphaArgs(7) == "INTERIOREQUIPMENT") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::InteriorEquipment;
+                } else if (cAlphaArgs(7) == "EXTERIOREQUIPMENT") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::ExteriorEquipment;
+                } else if (cAlphaArgs(7) == "FANS") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::Fans;
+                } else if (cAlphaArgs(7) == "PUMPS") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::Pumps;
+                } else if (cAlphaArgs(7) == "HEATREJECTION") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::HeatRejection;
+                } else if (cAlphaArgs(7) == "HUMIDIFIER") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::Humidification;
+                } else if (cAlphaArgs(7) == "HEATRECOVERY") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::HeatRecovery;
+                } else if (cAlphaArgs(7) == "WATERSYSTEMS") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::WaterSystem;
+                } else if (cAlphaArgs(7) == "REFRIGERATION") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::Refrigeration;
+                } else if (cAlphaArgs(7) == "ONSITEGENERATION") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::Cogeneration;
+                } else if (cAlphaArgs(7) == "HEATINGCOILS") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::HeatingCoils;
+                } else if (cAlphaArgs(7) == "COOLINGCOILS") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::CoolingCoils;
+                } else if (cAlphaArgs(7) == "CHILLERS") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::Chillers;
+                } else if (cAlphaArgs(7) == "BOILERS") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::Boilers;
+                } else if (cAlphaArgs(7) == "BASEBOARD") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::Baseboard;
+                } else if (cAlphaArgs(7) == "HEATRECOVERYFORCOOLING") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::HeatRecoveryForCooling;
+                } else if (cAlphaArgs(7) == "HEATRECOVERYFORHEATING") {
+                    sovEndUseCat = OutputProcessor::EndUseCat::HeatRecoveryForHeating;
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(7), cAlphaArgs(7)));
+                    ErrorsFound = true;
                 }
 
                 // Additional End Use Types Only Used for EnergyTransfer
-                if ((ResourceTypeString != "EnergyTransfer") &&
-                    (EndUseTypeString == "HeatingCoils" || EndUseTypeString == "CoolingCoils" || EndUseTypeString == "Chillers" ||
-                     EndUseTypeString == "Boilers" || EndUseTypeString == "Baseboard" || EndUseTypeString == "HeatRecoveryForCooling" ||
-                     EndUseTypeString == "HeatRecoveryForHeating")) {
+                if ((resource != Constant::eResource::EnergyTransfer) &&
+                    (sovEndUseCat == OutputProcessor::EndUseCat::HeatingCoils || sovEndUseCat == OutputProcessor::EndUseCat::CoolingCoils ||
+                     sovEndUseCat == OutputProcessor::EndUseCat::Chillers || sovEndUseCat == OutputProcessor::EndUseCat::Boilers ||
+                     sovEndUseCat == OutputProcessor::EndUseCat::Baseboard || sovEndUseCat == OutputProcessor::EndUseCat::HeatRecoveryForCooling ||
+                     sovEndUseCat == OutputProcessor::EndUseCat::HeatRecoveryForHeating)) {
                     ShowWarningError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("Invalid {}={} for {}={}", cAlphaFieldNames(5), cAlphaArgs(5), cAlphaFieldNames(7), cAlphaArgs(7)));
                     ShowContinueError(state, format("Field {} is reset from {} to EnergyTransfer", cAlphaFieldNames(5), cAlphaArgs(5)));
-                    ResourceTypeString = "EnergyTransfer";
+                    resource = Constant::eResource::EnergyTransfer;
                 }
 
                 if (!lAlphaFieldBlanks(8)) {
@@ -3814,27 +3651,24 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         cAlphaArgs(1),
                                         curUnit,
                                         state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Value,
-                                        FreqString,
-                                        VarTypeString,
+                                        sovTimeStepType,
+                                        sovStoreType,
                                         "EMS",
-                                        {},
-                                        ResourceTypeString,
-                                        EndUseTypeString,
-                                        EndUseSubCatString,
-                                        GroupTypeString);
+                                        resource,
+                                        sovGroup,
+                                        sovEndUseCat,
+                                        EndUseSubCatString);
                 } else { // no subcat
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
                                         curUnit,
                                         state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Value,
-                                        FreqString,
-                                        VarTypeString,
+                                        sovTimeStepType,
+                                        sovStoreType,
                                         "EMS",
-                                        {},
-                                        ResourceTypeString,
-                                        EndUseTypeString,
-                                        {},
-                                        GroupTypeString);
+                                        resource,
+                                        sovGroup,
+                                        sovEndUseCat);
                 }
             }
         } // NumEMSMeteredOutputVariables > 0
@@ -3891,39 +3725,8 @@ ErlValueType SetErlValueNumber(Real64 const Number, ObjexxFCL::Optional<ErlValue
     // FUNCTION INFORMATION:
     //       AUTHOR         P. Ellis
     //       DATE WRITTEN   unknown
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS FUNCTION:
-    // <description>
-
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
     ErlValueType newValue;
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-    // na
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    // na
 
     if (present(OrigValue)) { // preserve other parts of structure and only updated Value%Number
         newValue = OrigValue;
@@ -4059,7 +3862,7 @@ int FindEMSVariable(EnergyPlusData &state,
     int TrendVarNum;
 
     Found = false;
-    std::string const UppercaseName = UtilityRoutines::MakeUPPERCase(VariableName);
+    std::string const UppercaseName = Util::makeUPPER(VariableName);
 
     // check in ErlVariables
     for (VariableNum = 1; VariableNum <= state.dataRuntimeLang->NumErlVariables; ++VariableNum) {
@@ -4113,445 +3916,17 @@ int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int c
 
         // Add the new variable
         VariableNum = state.dataRuntimeLang->NumErlVariables;
-        state.dataRuntimeLang->ErlVariable(VariableNum).Name = UtilityRoutines::MakeUPPERCase(VariableName);
-        state.dataRuntimeLang->ErlVariable(VariableNum).StackNum = StackNum;
-        state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type = Value::Number; // ErlVariable values are numbers
+        auto &thisErlVar = state.dataRuntimeLang->ErlVariable(VariableNum);
+        thisErlVar.Name = Util::makeUPPER(VariableName);
+        thisErlVar.StackNum = StackNum;
+        thisErlVar.Value.Type = Value::Number; // ErlVariable values are numbers
     }
 
-    if (present(Value)) state.dataRuntimeLang->ErlVariable(VariableNum).Value = Value;
+    if (present(Value)) {
+        state.dataRuntimeLang->ErlVariable(VariableNum).Value = Value;
+    }
 
     return VariableNum;
-}
-
-void SetupPossibleOperators(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   May 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    //  setup hard coded list of possible operands
-
-    // METHODOLOGY EMPLOYED:
-    // Allocate structure and fill basic info on opertors and operands
-    //  operators include built-in functions where operands are function arguments
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    if (state.dataRuntimeLangProcessor->AlreadyDidOnce) return;
-
-    state.dataRuntimeLang->PossibleOperators.allocate(NumPossibleOperators);
-
-    // Build operator table
-    // Order in this table is the order of precedence
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Literal)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Literal)).Code = ErlFunc::Literal;
-
-    // not sure how to distinguish from subtract in parsing of tokens, not yet available
-    //  PossibleOperators(OperatorNegative)%NumOperands = 1
-    //  PossibleOperators(OperatorNegative)%Code        = OperatorNegative
-    //  PossibleOperators(OperatorNegative)%Symbol      = '-'
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Divide)).Symbol = "/";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Divide)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Divide)).Code = ErlFunc::Divide;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Multiply)).Symbol = "*";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Multiply)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Multiply)).Code = ErlFunc::Multiply;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Subtract)).Symbol = "-";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Subtract)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Subtract)).Code = ErlFunc::Subtract;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Add)).Symbol = "+";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Add)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Add)).Code = ErlFunc::Add;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Equal)).Symbol = "==";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Equal)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Equal)).Code = ErlFunc::Equal;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::NotEqual)).Symbol = "<>";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::NotEqual)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::NotEqual)).Code = ErlFunc::NotEqual;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessOrEqual)).Symbol = "<=";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessOrEqual)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessOrEqual)).Code = ErlFunc::LessOrEqual;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterOrEqual)).Symbol = ">=";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterOrEqual)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterOrEqual)).Code = ErlFunc::GreaterOrEqual;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessThan)).Symbol = "<";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessThan)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessThan)).Code = ErlFunc::LessThan;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterThan)).Symbol = ">";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterThan)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterThan)).Code = ErlFunc::GreaterThan;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RaiseToPower)).Symbol = "^";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RaiseToPower)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RaiseToPower)).Code = ErlFunc::RaiseToPower;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalAND)).Symbol = "&&";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalAND)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalAND)).Code = ErlFunc::LogicalAND;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalOR)).Symbol = "||";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalOR)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalOR)).Code = ErlFunc::LogicalOR;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Round)).Symbol = "@ROUND";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Round)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Round)).Code = ErlFunc::Round;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Mod)).Symbol = "@MOD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Mod)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Mod)).Code = ErlFunc::Mod;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Sin)).Symbol = "@SIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Sin)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Sin)).Code = ErlFunc::Sin;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Cos)).Symbol = "@COS";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Cos)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Cos)).Code = ErlFunc::Cos;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcSin)).Symbol = "@ARCSIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcSin)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcSin)).Code = ErlFunc::ArcSin;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcCos)).Symbol = "@ARCCOS";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcCos)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcCos)).Code = ErlFunc::ArcCos;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::DegToRad)).Symbol = "@DEGTORAD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::DegToRad)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::DegToRad)).Code = ErlFunc::DegToRad;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RadToDeg)).Symbol = "@RADTODEG";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RadToDeg)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RadToDeg)).Code = ErlFunc::RadToDeg;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Exp)).Symbol = "@EXP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Exp)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Exp)).Code = ErlFunc::Exp;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Ln)).Symbol = "@LN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Ln)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Ln)).Code = ErlFunc::Ln;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Max)).Symbol = "@MAX";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Max)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Max)).Code = ErlFunc::Max;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Min)).Symbol = "@MIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Min)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Min)).Code = ErlFunc::Min;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ABS)).Symbol = "@ABS";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ABS)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ABS)).Code = ErlFunc::ABS;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandU)).Symbol = "@RANDOMUNIFORM";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandU)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandU)).Code = ErlFunc::RandU;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandG)).Symbol = "@RANDOMNORMAL";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandG)).NumOperands = 4;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandG)).Code = ErlFunc::RandG;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandSeed)).Symbol = "@SEEDRANDOM";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandSeed)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandSeed)).Code = ErlFunc::RandSeed;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoAirFnPbTdbW)).Symbol = "@RHOAIRFNPBTDBW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoAirFnPbTdbW)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoAirFnPbTdbW)).Code = ErlFunc::RhoAirFnPbTdbW;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpAirFnW)).Symbol = "@CPAIRFNW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpAirFnW)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpAirFnW)).Code = ErlFunc::CpAirFnW;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HfgAirFnWTdb)).Symbol = "@HFGAIRFNWTDB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HfgAirFnWTdb)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HfgAirFnWTdb)).Code = ErlFunc::HfgAirFnWTdb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HgAirFnWTdb)).Symbol = "@HGAIRFNWTDB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HgAirFnWTdb)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HgAirFnWTdb)).Code = ErlFunc::HgAirFnWTdb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnTdbTwbPb)).Symbol = "@TDPFNTDBTWBPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnTdbTwbPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnTdbTwbPb)).Code = ErlFunc::TdpFnTdbTwbPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnWPb)).Symbol = "@TDPFNWPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnWPb)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnWPb)).Code = ErlFunc::TdpFnWPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbW)).Symbol = "@HFNTDBW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbW)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbW)).Code = ErlFunc::HFnTdbW;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbRhPb)).Symbol = "@HFNTDBRHPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbRhPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbRhPb)).Code = ErlFunc::HFnTdbRhPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdbFnHW)).Symbol = "@TDBFNHW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdbFnHW)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdbFnHW)).Code = ErlFunc::TdbFnHW;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRh)).Symbol = "@RHOVFNTDBR";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRh)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRh)).Code = ErlFunc::RhovFnTdbRh;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRhLBnd0C)).Symbol = "@RhovFnTdbRhLBnd0C";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRhLBnd0C)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRhLBnd0C)).Code = ErlFunc::RhovFnTdbRhLBnd0C;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbWPb)).Symbol = "@RHOVFNTDBWPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbWPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbWPb)).Code = ErlFunc::RhovFnTdbWPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhov)).Symbol = "@RHFNTDBRHOV";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhov)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhov)).Code = ErlFunc::RhFnTdbRhov;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhovLBnd0C)).Symbol = "@RHFNTDBRHOVLBND0C";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhovLBnd0C)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhovLBnd0C)).Code = ErlFunc::RhFnTdbRhovLBnd0C;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbWPb)).Symbol = "@RHFNTDBWPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbWPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbWPb)).Code = ErlFunc::RhFnTdbWPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TwbFnTdbWPb)).Symbol = "@TWBFNTDBWPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TwbFnTdbWPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TwbFnTdbWPb)).Code = ErlFunc::TwbFnTdbWPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::VFnTdbWPb)).Symbol = "@VFNTDBWPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::VFnTdbWPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::VFnTdbWPb)).Code = ErlFunc::VFnTdbWPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdpPb)).Symbol = "@WFNTDPPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdpPb)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdpPb)).Code = ErlFunc::WFnTdpPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbH)).Symbol = "@WFNTDBH";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbH)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbH)).Code = ErlFunc::WFnTdbH;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbTwbPb)).Symbol = "@WFNTDBTWBPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbTwbPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbTwbPb)).Code = ErlFunc::WFnTdbTwbPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbRhPb)).Symbol = "@WFNTDBRHPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbRhPb)).NumOperands = 4;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbRhPb)).Code = ErlFunc::WFnTdbRhPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::PsatFnTemp)).Symbol = "@PSATFNTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::PsatFnTemp)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::PsatFnTemp)).Code = ErlFunc::PsatFnTemp;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnHPb)).Symbol = "@TSATFNHPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnHPb)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnHPb)).Code = ErlFunc::TsatFnHPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnPb)).Symbol = "@TSATFNPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnPb)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnPb)).Code = ErlFunc::TsatFnPb;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpCW)).Symbol = "@CPCW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpCW)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpCW)).Code = ErlFunc::CpCW;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpHW)).Symbol = "@CPHW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpHW)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpHW)).Code = ErlFunc::CpHW;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoH2O)).Symbol = "@RHOH2O";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoH2O)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoH2O)).Code = ErlFunc::RhoH2O;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::FatalHaltEp)).Symbol = "@FATALHALTEP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::FatalHaltEp)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::FatalHaltEp)).Code = ErlFunc::FatalHaltEp;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::SevereWarnEp)).Symbol = "@SEVEREWARNEP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::SevereWarnEp)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::SevereWarnEp)).Code = ErlFunc::SevereWarnEp;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WarnEp)).Symbol = "@WARNEP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WarnEp)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WarnEp)).Code = ErlFunc::WarnEp;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendValue)).Symbol = "@TRENDVALUE";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendValue)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendValue)).Code = ErlFunc::TrendValue;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendAverage)).Symbol = "@TRENDAVERAGE";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendAverage)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendAverage)).Code = ErlFunc::TrendAverage;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMax)).Symbol = "@TRENDMAX";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMax)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMax)).Code = ErlFunc::TrendMax;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMin)).Symbol = "@TRENDMIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMin)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMin)).Code = ErlFunc::TrendMin;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendDirection)).Symbol = "@TRENDDIRECTION";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendDirection)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendDirection)).Code = ErlFunc::TrendDirection;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendSum)).Symbol = "@TRENDSUM";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendSum)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendSum)).Code = ErlFunc::TrendSum;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CurveValue)).Symbol = "@CURVEVALUE";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CurveValue)).NumOperands = 6;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CurveValue)).Code = ErlFunc::CurveValue;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsRain)).Symbol = "@TODAYISRAIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsRain)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsRain)).Code = ErlFunc::TodayIsRain;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsSnow)).Symbol = "@TODAYISSNOW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsSnow)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsSnow)).Code = ErlFunc::TodayIsSnow;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDryBulbTemp)).Symbol = "@TODAYOUTDRYBULBTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDryBulbTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDryBulbTemp)).Code = ErlFunc::TodayOutDryBulbTemp;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDewPointTemp)).Symbol = "@TODAYOUTDEWPOINTTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDewPointTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDewPointTemp)).Code = ErlFunc::TodayOutDewPointTemp;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutBaroPress)).Symbol = "@TODAYOUTBAROPRESS";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutBaroPress)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutBaroPress)).Code = ErlFunc::TodayOutBaroPress;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutRelHum)).Symbol = "@TODAYOUTRELHUM";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutRelHum)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutRelHum)).Code = ErlFunc::TodayOutRelHum;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindSpeed)).Symbol = "@TODAYWINDSPEED";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindSpeed)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindSpeed)).Code = ErlFunc::TodayWindSpeed;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindDir)).Symbol = "@TODAYWINDDIR";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindDir)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindDir)).Code = ErlFunc::TodayWindDir;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodaySkyTemp)).Symbol = "@TODAYSKYTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodaySkyTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodaySkyTemp)).Code = ErlFunc::TodaySkyTemp;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayHorizIRSky)).Symbol = "@TODAYHORIZIRSKY";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayHorizIRSky)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayHorizIRSky)).Code = ErlFunc::TodayHorizIRSky;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayBeamSolarRad)).Symbol = "@TODAYBEAMSOLARRAD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayBeamSolarRad)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayBeamSolarRad)).Code = ErlFunc::TodayBeamSolarRad;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayDifSolarRad)).Symbol = "@TODAYDIFSOLARRAD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayDifSolarRad)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayDifSolarRad)).Code = ErlFunc::TodayDifSolarRad;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayAlbedo)).Symbol = "@TODAYALBEDO";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayAlbedo)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayAlbedo)).Code = ErlFunc::TodayAlbedo;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayLiquidPrecip)).Symbol = "@TODAYLIQUIDPRECIP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayLiquidPrecip)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayLiquidPrecip)).Code = ErlFunc::TodayLiquidPrecip;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsRain)).Symbol = "@TOMORROWISRAIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsRain)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsRain)).Code = ErlFunc::TomorrowIsRain;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsSnow)).Symbol = "@TOMORROWISSNOW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsSnow)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsSnow)).Code = ErlFunc::TomorrowIsSnow;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDryBulbTemp)).Symbol = "@TOMORROWOUTDRYBULBTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDryBulbTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDryBulbTemp)).Code = ErlFunc::TomorrowOutDryBulbTemp;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDewPointTemp)).Symbol = "@TOMORROWOUTDEWPOINTTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDewPointTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDewPointTemp)).Code = ErlFunc::TomorrowOutDewPointTemp;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutBaroPress)).Symbol = "@TOMORROWOUTBAROPRESS";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutBaroPress)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutBaroPress)).Code = ErlFunc::TomorrowOutBaroPress;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutRelHum)).Symbol = "@TOMORROWOUTRELHUM";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutRelHum)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutRelHum)).Code = ErlFunc::TomorrowOutRelHum;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindSpeed)).Symbol = "@TOMORROWWINDSPEED";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindSpeed)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindSpeed)).Code = ErlFunc::TomorrowWindSpeed;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindDir)).Symbol = "@TOMORROWWINDDIR";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindDir)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindDir)).Code = ErlFunc::TomorrowWindDir;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowSkyTemp)).Symbol = "@TOMORROWSKYTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowSkyTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowSkyTemp)).Code = ErlFunc::TomorrowSkyTemp;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowHorizIRSky)).Symbol = "@TOMORROWHORIZIRSKY";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowHorizIRSky)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowHorizIRSky)).Code = ErlFunc::TomorrowHorizIRSky;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowBeamSolarRad)).Symbol = "@TOMORROWBEAMSOLARRAD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowBeamSolarRad)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowBeamSolarRad)).Code = ErlFunc::TomorrowBeamSolarRad;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowDifSolarRad)).Symbol = "@TOMORROWDIFSOLARRAD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowDifSolarRad)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowDifSolarRad)).Code = ErlFunc::TomorrowDifSolarRad;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowAlbedo)).Symbol = "@TOMORROWALBEDO";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowAlbedo)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowAlbedo)).Code = ErlFunc::TomorrowAlbedo;
-
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowLiquidPrecip)).Symbol = "@TOMORROWLIQUIDPRECIP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowLiquidPrecip)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowLiquidPrecip)).Code = ErlFunc::TomorrowLiquidPrecip;
-
-    state.dataRuntimeLangProcessor->AlreadyDidOnce = true;
 }
 
 void ExternalInterfaceSetErlVariable(EnergyPlusData &state,

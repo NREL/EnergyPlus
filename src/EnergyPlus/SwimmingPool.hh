@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -130,14 +130,14 @@ namespace SwimmingPool {
         bool MyOneTimeFlag;
         bool MyEnvrnFlagGeneral;
         bool MyPlantScanFlagPool;
-        Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular radiant surface
-        Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
-        Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+        Real64 QPoolSrcAvg;              // Average source over the time step for a particular radiant surface
+        Real64 HeatTransCoefsAvg;        // Average denominator term over the time step for a particular pool
+        Real64 ZeroPoolSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
         // Record keeping variables used to calculate QRadSysSrcAvg locally
-        Array1D<Real64> LastQPoolSrc;       // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+        Real64 LastQPoolSrc;       // Need to keep the last value in case we are still iterating
+        Real64 LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
+        Real64 LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+        Real64 LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
         // Default Constructor
         SwimmingPoolData()
@@ -150,9 +150,12 @@ namespace SwimmingPool {
               PoolWaterTemp(23.0), WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterMassFlowRate(0.0), MakeUpWaterMassFlowRate(0.0),
               MakeUpWaterMass(0.0), MakeUpWaterVolFlowRate(0.0), MakeUpWaterVol(0.0), HeatPower(0.0), HeatEnergy(0.0), MiscEquipPower(0.0),
               MiscEquipEnergy(0.0), RadConvertToConvectRep(0.0), EvapHeatLossRate(0.0), EvapEnergyLoss(0.0), MyOneTimeFlag(true),
-              MyEnvrnFlagGeneral(true), MyPlantScanFlagPool(true)
+              MyEnvrnFlagGeneral(true), MyPlantScanFlagPool(true), QPoolSrcAvg(0.0), HeatTransCoefsAvg(0.0), ZeroPoolSourceSumHATsurf(0.0),
+              LastQPoolSrc(0.0), LastHeatTransCoefs(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0)
         {
         }
+
+        static SwimmingPoolData *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,
@@ -174,6 +177,12 @@ namespace SwimmingPool {
 
         void calculate(EnergyPlusData &state);
 
+        void calcMassFlowRate(EnergyPlusData &state,
+                              Real64 &massFlowRate, // Mass Flow Rate (to be calculated)
+                              Real64 TH22,          // Pool water temperature from previous time step
+                              Real64 TLoopInletTemp //
+        );
+
         void calcSwimmingPoolEvap(EnergyPlusData &state,
                                   Real64 &EvapRate, // Evaporation rate
                                   int SurfNum,      // Surface index
@@ -186,15 +195,13 @@ namespace SwimmingPool {
         void oneTimeInit(EnergyPlusData &state) override;
 
         void oneTimeInit_new(EnergyPlusData &state) override;
+
+        void report(EnergyPlusData &state);
     };
 
     void GetSwimmingPool(EnergyPlusData &state);
 
-    void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration);
-
     void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
-
-    void ReportSwimmingPool(EnergyPlusData &state);
 
     Real64 MakeUpWaterVolFlowFunct(Real64 MakeUpWaterMassFlowRate, Real64 Density);
 
@@ -210,6 +217,10 @@ struct SwimmingPoolsData : BaseGlobalStruct
     Array1D_bool CheckEquipName;
     bool getSwimmingPoolInput = true;
     Array1D<SwimmingPool::SwimmingPoolData> Pool;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

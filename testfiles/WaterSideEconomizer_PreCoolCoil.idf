@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,24.2;
 
   Building,
     Building,                !- Name
@@ -2740,6 +2740,7 @@
     ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     80;                      !- Maximum Supply Air Temperature {C}
 
   Coil:Heating:Fuel,
@@ -2851,6 +2852,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     DX Clg Coil Performance, !- Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}

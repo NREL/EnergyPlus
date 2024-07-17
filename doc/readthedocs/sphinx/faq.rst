@@ -6,7 +6,7 @@ This can become a living document features recent changes to the API or other th
 What is this `state` business?
 ------------------------------
 
-OK, so you may have seen `state` as an argument floating around the API functions (or inside the code if you looked close enough).
+OK, so you are using this API and may have seen `state` as an argument floating around the API functions (or inside the code if you looked close enough).
 Up until recently, it was standard practice in EnergyPlus to put all the data in the global state of the program.
 Because the program was always run one way - a single exe thread - this was not a problem because the data was deleted when the program ended.
 

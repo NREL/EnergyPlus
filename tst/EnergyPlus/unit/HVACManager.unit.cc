@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -103,10 +103,10 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 22.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.0011;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRatAvg = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRatAvg = 0.0011;
     state->dataEnvrn->StdRhoAir = 1.20;
 
     state->dataHeatBal->CrossMixing(1).ZonePtr = 1;
@@ -204,17 +204,26 @@ TEST_F(EnergyPlusFixture, InfiltrationObjectLevelReport)
     EXPECT_EQ(state->dataHeatBal->TotInfiltration, 4); // one per zone
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 21.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 22.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MAT = 23.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MAT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).airHumRat = 0.001;
+
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 21.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(2).MAT = 22.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(3).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(4).MAT = 24.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(2).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(3).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(4).airHumRat = 0.001;
 
     state->dataHeatBal->AirFlowFlag = true;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -389,10 +398,10 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataEnvrn->OutHumRat = 0.0005;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 22.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.0011;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRatAvg = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRatAvg = 0.0011;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 20.0;
     state->dataHeatBal->Zone(2).OutDryBulbTemp = 20.0;
@@ -423,12 +432,12 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
                     3600.0 *
                     (Psychrometrics::PsyHFnTdbW(state->dataHeatBal->Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
                      Psychrometrics::PsyHFnTdbW(state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT,
-                                                state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat));
+                                                state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat));
     EXPECT_NEAR(-deltah, state->dataHeatBal->ZnAirRpt(1).InfilTotalLoss, 0.0001);
     deltah = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
              (Psychrometrics::PsyHFnTdbW(state->dataHeatBal->Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
               Psychrometrics::PsyHFnTdbW(state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT,
-                                         state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat));
+                                         state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat));
     EXPECT_NEAR(-deltah, state->dataHeatBal->ZnAirRpt(1).VentilTotalLoss, 0.0001);
 }
 
@@ -453,10 +462,10 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataEnvrn->OutHumRat = 0.0005;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 22.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.0011;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRatAvg = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRatAvg = 0.0011;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 20.0;
     state->dataHeatBal->Zone(2).OutDryBulbTemp = 20.0;
@@ -470,13 +479,17 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
-    state->dataFans->Fan.allocate(1);
-    state->dataFans->NumFans = 1;
-    state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_ZoneExhaust;
-    state->dataFans->Fan(1).OutletAirMassFlowRate = 1.0;
-    state->dataFans->Fan(1).OutletAirTemp = 22.0;
-    state->dataFans->Fan(1).OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataFans->Fan(1).OutletAirTemp, 0.0005);
-    state->dataFans->Fan(1).InletNodeNum = 1;
+    auto *fan1 = new Fans::FanComponent;
+    fan1->Name = "EXHAUST FAN 1";
+
+    fan1->type = HVAC::FanType::Exhaust;
+    fan1->outletAirMassFlowRate = 1.0;
+    fan1->outletAirTemp = 22.0;
+    fan1->outletAirEnthalpy = Psychrometrics::PsyHFnTdbW(fan1->outletAirTemp, 0.0005);
+    fan1->inletNodeNum = 1;
+
+    state->dataFans->fans.push_back(fan1);
+    state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
 
     state->dataLoopNodes->Node.allocate(1);
     state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
@@ -572,4 +585,132 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
                           "   **   ~~~   **   Imbalance=1.000000E-002",
                           "   **   ~~~   **   This error will only be reported once per system."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, HVACConvergenceErrorTest)
+{
+    int i;
+    int AirSysNum = 1;
+    std::array<bool, 3> HVACNotConverged;
+    std::array<Real64, 10> DemandToSupply;
+    std::array<Real64, 10> SupplyDeck1ToDemand;
+    std::array<Real64, 10> SupplyDeck2ToDemand;
+
+    HVACNotConverged[0] = true;
+    HVACNotConverged[1] = false;
+    HVACNotConverged[2] = false;
+
+    state->dataAirLoop->AirToZoneNodeInfo.allocate(1);
+    state->dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName = "AirLoop1";
+
+    // mass flow rate
+    for (i = 0; i < 10; i++) {
+        DemandToSupply[i] = i * 1.0;
+        SupplyDeck1ToDemand[i] = 0.1 * i;
+        SupplyDeck2ToDemand[i] = 0.0;
+    }
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::MassFlow);
+
+    std::string const expectedErrString1 =
+        delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for mass flow rate",
+                          "   **   ~~~   ** Check values should be zero. Most Recent values listed first.",
+                          "   **   ~~~   ** Demand-to-Supply interface mass flow rate check value iteration history trace: "
+                          "0.000000,1.000000,2.000000,3.000000,4.000000,5.000000,6.000000,7.000000,8.000000,9.000000,",
+                          "   **   ~~~   ** Supply-to-demand interface deck 1 mass flow rate check value iteration history trace: "
+                          "0.000000,0.100000,0.200000,0.300000,0.400000,0.500000,0.600000,0.700000,0.800000,0.900000,"});
+    EXPECT_TRUE(compare_err_stream(expectedErrString1, true));
+
+    // humidity ratio
+    for (i = 0; i < 10; i++) {
+        DemandToSupply[i] = i * 1.0;
+        SupplyDeck1ToDemand[i] = 0.1 * i;
+        SupplyDeck2ToDemand[i] = 0.0;
+    }
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::HumidityRatio);
+
+    std::string const expectedErrString2 =
+        delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for humidity ratio",
+                          "   **   ~~~   ** Check values should be zero. Most Recent values listed first.",
+                          "   **   ~~~   ** Demand-to-Supply interface humidity ratio check value iteration history trace: "
+                          "0.000000,1.000000,2.000000,3.000000,4.000000,5.000000,6.000000,7.000000,8.000000,9.000000,",
+                          "   **   ~~~   ** Supply-to-demand interface deck 1 humidity ratio check value iteration history trace: "
+                          "0.000000,0.100000,0.200000,0.300000,0.400000,0.500000,0.600000,0.700000,0.800000,0.900000,"});
+    EXPECT_TRUE(compare_err_stream(expectedErrString2, true));
+
+    // temperature
+    for (i = 0; i < 10; i++) {
+        DemandToSupply[i] = i * 1.0;
+        SupplyDeck1ToDemand[i] = 0.1 * i;
+        SupplyDeck2ToDemand[i] = 0.0;
+    }
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::Temperature);
+
+    std::string const expectedErrString3 =
+        delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for temperature",
+                          "   **   ~~~   ** Check values should be zero. Most Recent values listed first.",
+                          "   **   ~~~   ** Demand-to-Supply interface temperature check value iteration history trace: "
+                          "0.000000,1.000000,2.000000,3.000000,4.000000,5.000000,6.000000,7.000000,8.000000,9.000000,",
+                          "   **   ~~~   ** Supply-to-demand interface deck 1 temperature check value iteration history trace: "
+                          "0.000000,0.100000,0.200000,0.300000,0.400000,0.500000,0.600000,0.700000,0.800000,0.900000,"});
+    EXPECT_TRUE(compare_err_stream(expectedErrString3, true));
+
+    // Energy
+    for (i = 0; i < 10; i++) {
+        DemandToSupply[i] = i * 1.0;
+        SupplyDeck1ToDemand[i] = 0.0;
+        SupplyDeck2ToDemand[i] = 0.0;
+    }
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::Energy);
+
+    std::string const expectedErrString4 =
+        delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for energy",
+                          "   **   ~~~   ** Check values should be zero. Most Recent values listed first.",
+                          "   **   ~~~   ** Demand-to-Supply interface energy check value iteration history trace: "
+                          "0.000000,1.000000,2.000000,3.000000,4.000000,5.000000,6.000000,7.000000,8.000000,9.000000,",
+                          "   **   ~~~   ** Supply-to-demand interface deck 1 energy check value iteration history trace: "
+                          "0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,"});
+    EXPECT_TRUE(compare_err_stream(expectedErrString4, true));
+
+    // CO2
+    for (i = 0; i < 10; i++) {
+        DemandToSupply[i] = i * 1.0;
+        SupplyDeck1ToDemand[i] = 0.1 * i;
+        SupplyDeck2ToDemand[i] = 0.0;
+    }
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::CO2);
+
+    std::string const expectedErrString5 =
+        delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for CO2",
+                          "   **   ~~~   ** Check values should be zero. Most Recent values listed first.",
+                          "   **   ~~~   ** Demand-to-Supply interface CO2 check value iteration history trace: "
+                          "0.000000,1.000000,2.000000,3.000000,4.000000,5.000000,6.000000,7.000000,8.000000,9.000000,",
+                          "   **   ~~~   ** Supply-to-demand interface deck 1 CO2 check value iteration history trace: "
+                          "0.000000,0.100000,0.200000,0.300000,0.400000,0.500000,0.600000,0.700000,0.800000,0.900000,"});
+    EXPECT_TRUE(compare_err_stream(expectedErrString5, true));
+
+    // generic contaminant
+    for (i = 0; i < 10; i++) {
+        DemandToSupply[i] = i * 1.0;
+        SupplyDeck1ToDemand[i] = 0.0;
+        SupplyDeck2ToDemand[i] = 0.1 * i;
+    }
+    state->dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes = 2;
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::Generic);
+
+    std::string const expectedErrString6 =
+        delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for generic contaminant",
+                          "   **   ~~~   ** Check values should be zero. Most Recent values listed first.",
+                          "   **   ~~~   ** Demand-to-Supply interface generic contaminant check value iteration history trace: "
+                          "0.000000,1.000000,2.000000,3.000000,4.000000,5.000000,6.000000,7.000000,8.000000,9.000000,",
+                          "   **   ~~~   ** Supply-to-demand interface deck 1 generic contaminant check value iteration history trace: "
+                          "0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,",
+                          "   **   ~~~   ** Supply-to-demand interface deck 2 generic contaminant check value iteration history trace: "
+                          "0.000000,0.100000,0.200000,0.300000,0.400000,0.500000,0.600000,0.700000,0.800000,0.900000,"});
+    EXPECT_TRUE(compare_err_stream(expectedErrString6, true));
 }

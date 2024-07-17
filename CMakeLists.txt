@@ -1,15 +1,28 @@
+cmake_minimum_required(VERSION 3.17)
+
 # Use ccache if available, has to be before "project()"
-find_program(CCACHE_PROGRAM ccache)
+find_program(CCACHE_PROGRAM NAMES ccache sccache)
 if(CCACHE_PROGRAM)
-  # Support both Unix Makefiles and Ninja
-  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+  # Support: Unix Makefiles and Ninja only
+  message(STATUS "Using CCACHE")
+  # RULE_LAUNCH_COMPILE is an internal variable and makes RC compilation fail on windows, hence why we use the C/CXX COMPILER_LAUNCHER instead
+  message(STATUS "${CCACHE_PROGRAM} found and enabled")
+  set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM} CACHE FILEPATH "CXX compiler cache used")
+  set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM} CACHE FILEPATH "C compiler cache used")
 endif()
 
 cmake_policy(SET CMP0048 NEW) # handling project_version_* variables
 
 project(EnergyPlus)
 
-cmake_minimum_required(VERSION 3.17)
+# Raise an error if attempting to compile on macOS older than 10.15 - it does not work
+if (APPLE)
+  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    message(FATAL_ERROR "CMAKE_OSX_DEPLOYMENT_TARGET not set. Please set CMAKE_OSX_DEPLOYMENT_TARGET to 10.15 or greater and try again.")
+  elseif (CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS "10.15")
+    message(FATAL_ERROR "The minimum required version for macOS is 10.15, however CMAKE_OSX_DEPLOYMENT_TARGET is set to ${CMAKE_OSX_DEPLOYMENT_TARGET}.")
+  endif()
+endif()
 
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
   cmake_policy(SET CMP0054 NEW) # CMake 3.1 added this policy
@@ -44,9 +57,13 @@ if(ENABLE_PCH)
     )
 endif()
 
+option(ENABLE_UNITY "Enable Unity Build" OFF)
+
 add_library(project_fp_options INTERFACE)
 
 add_library(project_warnings INTERFACE)
+
+add_library(turn_off_warnings INTERFACE)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads)
@@ -163,6 +180,7 @@ endif()
 
 # we are making *a Python 3.6 Interpreter* a required dependency, so find it here
 # If LINK_WITH_PYTHON, also request the Development (libs) at the same time, to ensure consistent version between interpreter and Development
+# and ask for at least 3.8 (for the PyConfig stuff).
 if(LINK_WITH_PYTHON)
   # find_package(Python) has the problem that on github actions in particular it'll pick up the most recent python (eg 3.9) from the tool cache
   # even if you have used the setup-python action and set it to 3.8, so we make the exact version required
@@ -173,7 +191,7 @@ if(LINK_WITH_PYTHON)
   if(Python_REQUIRED_VERSION)
     find_package(Python ${Python_REQUIRED_VERSION} EXACT COMPONENTS Interpreter Development REQUIRED)
   else()
-    find_package(Python 3.6 COMPONENTS Interpreter Development REQUIRED)
+    find_package(Python 3.12 COMPONENTS Interpreter Development REQUIRED)
   endif()
 else()
   find_package(Python 3.6 COMPONENTS Interpreter REQUIRED)
@@ -205,7 +223,7 @@ if(BUILD_TESTING)
         "${CMAKE_SYSTEM_NAME}-${CMAKE_CXX_COMPILER_ID}${ARCH_FLAG}"
         CACHE STRING "Identifier for this device configuration")
   endif()
-
+  set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)  # This avoids all the CTest Nightly, Continuous, etc. tests.
   enable_testing()
 endif()
 
@@ -253,7 +271,7 @@ add_subdirectory(third_party)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/fmt-8.0.1/include)
-target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/btwxt/src)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/btwxt/include)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/re2)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/doj)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/nlohmann)
@@ -283,9 +301,6 @@ target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third
 target_include_directories(project_options INTERFACE "${kiva_BINARY_DIR}/src/libkiva")
 target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/vendor/boost-1.61.0/")
 
-add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
-set_target_properties(generate_embeddable_epJSON_schema PROPERTIES FOLDER "Internal")
-
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP/include)
 
@@ -298,15 +313,6 @@ endif()
 # E+ required libraries
 add_subdirectory(idd)
 
-execute_process(
-  COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}"
-  TIMEOUT 30
-  RESULT_VARIABLE generate_epJSON_schema_result)
-if(${generate_epJSON_schema_result} MATCHES ".*timeout.*")
-  message(FATAL_ERROR "Generating epJSON Schema from IDD failed: ${generate_epJSON_schema_result}")
-endif()
-configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd")
-configure_file(idd/Energy+.schema.epJSON.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON")
 configure_file(idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd")
 configure_file(idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd")
 
@@ -322,7 +328,6 @@ configure_file("workflows/transition.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/work
 # of course E+ itself
 add_subdirectory(src/EnergyPlus)
 set_target_properties(airflownetworklib PROPERTIES FOLDER "Internal")
-set_target_properties(GenerateEmbeddedEpJSONSchema PROPERTIES FOLDER "Internal")
 set_target_properties(energyplusparser PROPERTIES FOLDER "Internal")
 
 if(BUILD_TESTING)
@@ -348,6 +353,8 @@ if(BUILD_TESTING)
   set_target_properties(TestAPI_Runtime_C PROPERTIES FOLDER Testing)
   set_target_properties(TestAPI_Functional_C PROPERTIES FOLDER Testing)
   set_target_properties(TestEnergyPlusCallbacks PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_RuntimeDeleteState_C PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_RuntimeResetState_C PROPERTIES FOLDER Testing)
 endif()
 
 add_subdirectory(src/ConvertInputFormat)
@@ -371,9 +378,9 @@ if(BUILD_FORTRAN)
     PROJECT Transition
     CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS}
     NO_EXTERNAL_INSTALL)
-  file(COPY "idd/V22-2-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V23-1-0-Energy+.idd")
-  file(COPY "src/Transition/SupportFiles/Report Variables 22-2-0 to 23-1-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  file(COPY "${PREVIOUS_IDD}" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd")
+  file(COPY "src/Transition/SupportFiles/Report Variables ${PREV_RELEASE_MAJOR}-${PREV_RELEASE_MINOR}-${PREV_RELEASE_PATCH} to ${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   cmake_add_fortran_subdirectory(
     src/Basement
     PROJECT Basement
@@ -430,6 +437,7 @@ mark_as_advanced(KIVA_EXE_BUILD)
 mark_as_advanced(KIVA_GROUND_PLOT)
 mark_as_advanced(KIVA_STATIC_LIB)
 mark_as_advanced(KIVA_TESTING)
+mark_as_advanced(KIVA_WERROR)
 mark_as_advanced(BTWXT_COVERAGE)
 mark_as_advanced(BUILD_BTWXT_TESTING)
 mark_as_advanced(BTWXT_STATIC_LIB)
@@ -481,3 +489,15 @@ mark_as_advanced(ENABLE_SANITIZER_LEAK)
 mark_as_advanced(ENABLE_SANITIZER_MEMORY)
 mark_as_advanced(ENABLE_SANITIZER_THREAD)
 mark_as_advanced(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR)
+mark_as_advanced(X11_xcb_xkb_INCLUDE_PATH)
+mark_as_advanced(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR)
+mark_as_advanced(JSONCPP_USE_SECURE_MEMORY)
+mark_as_advanced(JSONCPP_WITH_CMAKE_PACKAGE)
+mark_as_advanced(JSONCPP_WITH_PKGCONFIG_SUPPORT)
+mark_as_advanced(JSONCPP_WITH_POST_BUILD_UNITTE)
+mark_as_advanced(JSONCPP_WITH_STRICT_ISO)
+mark_as_advanced(JSONCPP_WITH_TESTS)
+mark_as_advanced(JSONCPP_WITH_WARNING_AS_ERROR)
+mark_as_advanced(CMAKE_CXX_COMPILER_LAUNCHER)
+mark_as_advanced(CMAKE_C_COMPILER_LAUNCHER)
+mark_as_advanced(DEBUG_LIBNAME_SUFFIX)

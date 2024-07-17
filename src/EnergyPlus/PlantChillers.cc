@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,6 +60,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -149,7 +150,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetElectricInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->ElectricChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (Util::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -203,7 +204,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
@@ -217,7 +218,7 @@ namespace PlantChillers {
             thisChiller.ChillerType = DataPlant::PlantEquipmentType::Chiller_Electric;
 
             thisChiller.CondenserType = static_cast<DataPlant::CondenserType>(
-                getEnumerationValue(DataPlant::CondenserTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+                getEnumValue(DataPlant::CondenserTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
             switch (thisChiller.CondenserType) {
             case DataPlant::CondenserType::AirCooled:
             case DataPlant::CondenserType::WaterCooled:
@@ -431,8 +432,7 @@ namespace PlantChillers {
             thisChiller.SizFac = state.dataIPShortCut->rNumericArgs(22);
             if (thisChiller.SizFac <= 0.0) thisChiller.SizFac = 1.0;
 
-            thisChiller.FlowMode =
-                static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
+            thisChiller.FlowMode = static_cast<DataPlant::FlowMode>(getEnumValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -619,136 +619,129 @@ namespace PlantChillers {
     {
         SetupOutputVariable(state,
                             "Chiller Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Power,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->Energy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ELECTRICITY",
-                            "Cooling",
-                            this->EndUseSubcategory,
-                            "Plant");
+                            Constant::eResource::Electricity,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Cooling,
+                            this->EndUseSubcategory);
 
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->QEvaporator,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->EvaporatorEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ENERGYTRANSFER",
-                            "CHILLERS",
-                            {},
-                            "Plant");
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Chillers);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->EvapInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->EvapOutletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->EvapMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->QCondenser,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->CondenserEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ENERGYTRANSFER",
-                            "HEATREJECTION",
-                            {},
-                            "Plant");
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::HeatRejection);
         SetupOutputVariable(state,
                             "Chiller COP",
-                            OutputProcessor::Unit::W_W,
+                            Constant::Units::W_W,
                             this->ActualCOP,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->CondInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         // Condenser mass flow and outlet temp are valid for water cooled
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             SetupOutputVariable(state,
                                 "Chiller Condenser Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->CondOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Condenser Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->CondMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AirCooled) {
         } else if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Chiller Basin Heater Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->BasinHeaterPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Chiller Basin Heater Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     this->BasinHeaterConsumption,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     this->Name,
-                                    {},
-                                    "Electricity",
-                                    "CHILLERS",
-                                    {},
-                                    "Plant");
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::Group::Plant,
+                                    OutputProcessor::EndUseCat::Chillers);
             }
         }
 
@@ -756,50 +749,48 @@ namespace PlantChillers {
         if (this->HeatRecActive) {
             SetupOutputVariable(state,
                                 "Chiller Total Recovered Heat Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->QHeatRecovery,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Total Recovered Heat Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->EnergyHeatRecovery,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "ENERGYTRANSFER",
-                                "HEATRECOVERY",
-                                {},
-                                "Plant");
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRecovery);
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Inlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->HeatRecInletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->HeatRecOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->HeatRecMdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Effective Heat Rejection Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->ChillerCondAvgTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -939,8 +930,7 @@ namespace PlantChillers {
                         } else {
                             // need call to EMS to check node
                             bool FatalError = false; // but not really fatal yet, but should be.
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(
-                                state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                             state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                             if (FatalError) {
                                 if (!this->HRSPErrDone) {
@@ -1039,7 +1029,7 @@ namespace PlantChillers {
 
         Real64 tmpNomCap = this->NomCap;
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                                Constant::CWInitConvTemp,
@@ -1101,7 +1091,7 @@ namespace PlantChillers {
 
         Real64 tmpEvapVolFlowRate = this->EvapVolFlowRate;
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
@@ -1161,7 +1151,7 @@ namespace PlantChillers {
 
         Real64 tmpCondVolFlowRate = this->CondVolFlowRate;
         if (PltSizCondNum > 0 && PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow && tmpNomCap > 0.0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                                this->TempDesCondIn,
@@ -1290,6 +1280,74 @@ namespace PlantChillers {
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "Chiller:Electric");
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->COP);
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->NomCap);
+
+            // std 229 new Chillers table
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerType, this->Name, "Chiller:Electric");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefCap, this->Name, this->NomCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEff, this->Name, this->COP); // Eff == COP?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedCap, this->Name, this->NomCap); // did not find rated cap
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedEff, this->Name, this->COP); // did not find rated eff or cop ; also Eff == COP?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerIPLVinSI, this->Name, "N/A"); // IPLVSI_rpt_std229);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerIPLVinIP, this->Name, "N/A"); // IPLVIP_rpt_std229);
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerPlantloopName,
+                                                     this->Name,
+                                                     this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+                                                     this->Name,
+                                                     this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
+                                                                                        .LoopSide(this->CWPlantLoc.loopSideNum)
+                                                                                        .Branch(this->CWPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerCondLoopName,
+                                                     this->Name,
+                                                     this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+                                                     this->Name,
+                                                     this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum)
+                                                                                        .LoopSide(this->CDPlantLoc.loopSideNum)
+                                                                                        .Branch(this->CDPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->MinPartLoadRat);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerFuelType, this->Name, "Electricity");
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedEntCondTemp, this->Name, this->TempDesCondIn); // Rated==Ref?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedLevEvapTemp, this->Name, this->TempDesEvapOut); // Rated==Ref?
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempDesCondIn);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, this->TempDesEvapOut);
+
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate,
+                                                     this->Name,
+                                                     this->EvapMassFlowRateMax); // flowrate Max==DesignSizeRef flowrate?
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate,
+                                                     this->Name,
+                                                     this->CondMassFlowRateMax); // Cond flowrate Max==DesignSizeRef Cond flowrate?
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName,
+                                                     this->Name,
+                                                     this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerHeatRecPlantloopBranchName,
+                                                     this->Name,
+                                                     this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum)
+                                                                                        .LoopSide(this->HRPlantLoc.loopSideNum)
+                                                                                        .Branch(this->HRPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, this->HeatRecCapacityFraction);
         }
     }
 
@@ -2033,8 +2091,7 @@ namespace PlantChillers {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -2071,7 +2128,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetEngineDrivenInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->EngineDrivenChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (Util::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -2160,7 +2217,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
@@ -2429,15 +2486,7 @@ namespace PlantChillers {
             thisChiller.DesignMinExitGasTemp = state.dataIPShortCut->rNumericArgs(24);
 
             // Validate fuel type input
-            bool FuelTypeError = false;
-            UtilityRoutines::ValidateFuelType(state, state.dataIPShortCut->cAlphaArgs(12), thisChiller.FuelType, FuelTypeError);
-            if (FuelTypeError) {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12)));
-                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(
-                    state, "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
-                ErrorsFound = true;
-            }
+            thisChiller.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(12)));
 
             thisChiller.FuelHeatingValue = state.dataIPShortCut->rNumericArgs(25);
 
@@ -2521,8 +2570,7 @@ namespace PlantChillers {
                 }
             }
 
-            thisChiller.FlowMode =
-                static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(15)));
+            thisChiller.FlowMode = static_cast<DataPlant::FlowMode>(getEnumValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(15)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -2593,265 +2641,252 @@ namespace PlantChillers {
     {
         SetupOutputVariable(state,
                             "Chiller Drive Shaft Power",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Power,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Drive Shaft Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->Energy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->QEvaporator,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->EvaporatorEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ENERGYTRANSFER",
-                            "CHILLERS",
-                            {},
-                            "Plant");
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Chillers);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->EvapInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->EvapOutletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->EvapMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->QCondenser,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->CondenserEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ENERGYTRANSFER",
-                            "HEATREJECTION",
-                            {},
-                            "Plant");
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::HeatRejection);
 
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->CondInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         // Condenser mass flow and outlet temp are valid for Water Cooled
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             SetupOutputVariable(state,
                                 "Chiller Condenser Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->CondOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Condenser Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->CondMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AirCooled) {
         } else if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Chiller Basin Heater Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->BasinHeaterPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Chiller Basin Heater Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     this->BasinHeaterConsumption,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     this->Name,
-                                    {},
-                                    "Electricity",
-                                    "CHILLERS",
-                                    {},
-                                    "Plant");
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::Group::Plant,
+                                    OutputProcessor::EndUseCat::Chillers);
             }
         }
 
+        std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Rate",
-                            OutputProcessor::Unit::W,
+                            format("Chiller {} Rate", sFuelType),
+                            Constant::Units::W,
                             this->FuelEnergyUseRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Energy",
-                            OutputProcessor::Unit::J,
+                            format("Chiller {} Energy", sFuelType),
+                            Constant::Units::J,
                             this->FuelEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            this->FuelType,
-                            "Cooling",
-                            {},
-                            "Plant");
+                            Constant::eFuel2eResource[(int)this->FuelType],
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Cooling);
 
         SetupOutputVariable(state,
                             "Chiller COP",
-                            OutputProcessor::Unit::W_W,
+                            Constant::Units::W_W,
                             this->FuelCOP,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            format("Chiller {} Mass Flow Rate", sFuelType),
+                            Constant::Units::kg_s,
                             this->FuelMdot,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Exhaust Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->ExhaustStackTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Heat Recovery Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->HeatRecMdot,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         if (this->HeatRecActive) {
             // need to only report if heat recovery active
             SetupOutputVariable(state,
                                 "Chiller Jacket Recovered Heat Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->QJacketRecovered,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Jacket Recovered Heat Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->JacketEnergyRec,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "ENERGYTRANSFER",
-                                "HEATRECOVERY",
-                                {},
-                                "Plant");
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRecovery);
 
             SetupOutputVariable(state,
                                 "Chiller Lube Recovered Heat Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->QLubeOilRecovered,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Lube Recovered Heat Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->LubeOilEnergyRec,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "ENERGYTRANSFER",
-                                "HEATRECOVERY",
-                                {},
-                                "Plant");
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRecovery);
 
             SetupOutputVariable(state,
                                 "Chiller Exhaust Recovered Heat Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->QExhaustRecovered,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Exhaust Recovered Heat Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ExhaustEnergyRec,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "ENERGYTRANSFER",
-                                "HEATRECOVERY",
-                                {},
-                                "Plant");
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRecovery);
 
             SetupOutputVariable(state,
                                 "Chiller Total Recovered Heat Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->QTotalHeatRecovered,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Total Recovered Heat Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->TotalHeatEnergyRec,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Inlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->HeatRecInletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->HeatRecOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -3015,7 +3050,7 @@ namespace PlantChillers {
         int PltSizNum = state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                                Constant::CWInitConvTemp,
@@ -3077,7 +3112,7 @@ namespace PlantChillers {
         }
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
@@ -3136,7 +3171,7 @@ namespace PlantChillers {
         PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow && tmpNomCap > 0.0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                                this->TempDesCondIn,
@@ -3279,6 +3314,75 @@ namespace PlantChillers {
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "Chiller:EngineDriven");
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->COP);
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->NomCap);
+
+            // std 229 new Chillers table
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerType, this->Name, "Chiller:EngineDriven");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefCap, this->Name, this->NomCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEff, this->Name, this->COP); // Eff == COP?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedCap, this->Name, this->NomCap); // did not find rated cap
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedEff, this->Name, this->COP); // did not find rated eff or cop ; also Eff == COP?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerIPLVinSI, this->Name, "N/A"); // IPLVSI_rpt_std229);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerIPLVinIP, this->Name, "N/A"); // IPLVIP_rpt_std229);
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerPlantloopName,
+                                                     this->Name,
+                                                     this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+                                                     this->Name,
+                                                     this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
+                                                                                        .LoopSide(this->CWPlantLoc.loopSideNum)
+                                                                                        .Branch(this->CWPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerCondLoopName,
+                                                     this->Name,
+                                                     this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+                                                     this->Name,
+                                                     this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum)
+                                                                                        .LoopSide(this->CDPlantLoc.loopSideNum)
+                                                                                        .Branch(this->CDPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->MinPartLoadRat);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerFuelType, this->Name, Constant::eResourceNames[static_cast<int>(this->FuelType)]);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedEntCondTemp, this->Name, this->TempDesCondIn); // Rated==Ref?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedLevEvapTemp, this->Name, this->TempDesEvapOut); // Rated==Ref?
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempDesCondIn);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, this->TempDesEvapOut);
+
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate,
+                                                     this->Name,
+                                                     this->EvapMassFlowRateMax); // flowrate Max==DesignSizeRef flowrate?
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate,
+                                                     this->Name,
+                                                     this->CondMassFlowRateMax); // Cond flowrate Max==DesignSizeRef Cond flowrate?
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName,
+                                                     this->Name,
+                                                     this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerHeatRecPlantloopBranchName,
+                                                     this->Name,
+                                                     this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum)
+                                                                                        .LoopSide(this->HRPlantLoc.loopSideNum)
+                                                                                        .Branch(this->HRPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, this->HeatRecCapacityFraction);
         }
 
         if (ErrorsFound) {
@@ -4046,8 +4150,7 @@ namespace PlantChillers {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -4081,7 +4184,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetGasTurbineInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->GTChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (Util::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -4171,7 +4274,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
@@ -4477,8 +4580,7 @@ namespace PlantChillers {
                 }
             }
 
-            thisChiller.FlowMode =
-                static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
+            thisChiller.FlowMode = static_cast<DataPlant::FlowMode>(getEnumValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -4489,9 +4591,8 @@ namespace PlantChillers {
             }
 
             // Fuel Type Case Statement
-            bool FuelTypeError = false;
-            UtilityRoutines::ValidateFuelType(state, state.dataIPShortCut->cAlphaArgs(10), thisChiller.FuelType, FuelTypeError);
-            if (FuelTypeError) {
+            thisChiller.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+            if (thisChiller.FuelType == Constant::eFuel::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
@@ -4571,216 +4672,207 @@ namespace PlantChillers {
     {
         SetupOutputVariable(state,
                             "Chiller Drive Shaft Power",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Power,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Drive Shaft Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->Energy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->QEvaporator,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->EvaporatorEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ENERGYTRANSFER",
-                            "CHILLERS",
-                            {},
-                            "Plant");
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Chillers);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->EvapInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->EvapOutletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->EvapMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->QCondenser,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->CondenserEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ENERGYTRANSFER",
-                            "HEATREJECTION",
-                            {},
-                            "Plant");
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::HeatRejection);
 
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->CondInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         // Condenser mass flow and outlet temp are valid for water cooled
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             SetupOutputVariable(state,
                                 "Chiller Condenser Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->CondOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Condenser Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->CondMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AirCooled) {
         } else if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Chiller Basin Heater Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->BasinHeaterPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Chiller Basin Heater Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     this->BasinHeaterConsumption,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     this->Name,
-                                    {},
-                                    "Electricity",
-                                    "CHILLERS",
-                                    {},
-                                    "Plant");
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::Group::Plant,
+                                    OutputProcessor::EndUseCat::Chillers);
             }
         }
 
         SetupOutputVariable(state,
                             "Chiller Lube Recovered Heat Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->HeatRecLubeRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Lube Recovered Heat Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->HeatRecLubeEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ENERGYTRANSFER",
-                            "HeatRecovery",
-                            {},
-                            "Plant");
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::HeatRecovery);
 
+        std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Rate",
-                            OutputProcessor::Unit::W,
+                            format("Chiller {} Rate", sFuelType),
+                            Constant::Units::W,
                             this->FuelEnergyUsedRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Energy",
-                            OutputProcessor::Unit::J,
+                            format("Chiller {} Energy", sFuelType),
+                            Constant::Units::J,
                             this->FuelEnergyUsed,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            this->FuelType,
-                            "Cooling",
-                            {},
-                            "Plant");
+                            Constant::eFuel2eResource[(int)this->FuelType],
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Cooling);
 
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            format("Chiller {} Mass Flow Rate", sFuelType),
+                            Constant::Units::kg_s,
                             this->FuelMassUsedRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Mass",
-                            OutputProcessor::Unit::kg,
+                            format("Chiller {} Mass", sFuelType),
+                            Constant::Units::kg,
                             this->FuelMassUsed,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Exhaust Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->ExhaustStackTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Heat Recovery Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->HeatRecInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Heat Recovery Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->HeatRecOutletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Heat Recovery Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->HeatRecMdot,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller COP",
-                            OutputProcessor::Unit::W_W,
+                            Constant::Units::W_W,
                             this->FuelCOP,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -4942,7 +5034,7 @@ namespace PlantChillers {
         int PltSizNum = state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                                Constant::CWInitConvTemp,
@@ -5005,7 +5097,7 @@ namespace PlantChillers {
         }
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
@@ -5067,7 +5159,7 @@ namespace PlantChillers {
         PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow && tmpNomCap > 0.0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                                this->TempDesCondIn,
@@ -5248,6 +5340,73 @@ namespace PlantChillers {
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "Chiller:CombustionTurbine");
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->COP);
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->NomCap);
+
+            // std 229 new Chillers table
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerType, this->Name, "Chiller:CombustionTurbine");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefCap, this->Name, this->NomCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEff, this->Name, this->COP); // Eff == COP?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedCap, this->Name, this->NomCap); // did not find rated cap
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedEff, this->Name, this->COP); // did not find rated eff or cop ; also Eff == COP?
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinSI, this->Name, "N/A");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinIP, this->Name, "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerPlantloopName,
+                                                     this->Name,
+                                                     this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+                                                     this->Name,
+                                                     this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
+                                                                                        .LoopSide(this->CWPlantLoc.loopSideNum)
+                                                                                        .Branch(this->CWPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerCondLoopName,
+                                                     this->Name,
+                                                     this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+                                                     this->Name,
+                                                     this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum)
+                                                                                        .LoopSide(this->CDPlantLoc.loopSideNum)
+                                                                                        .Branch(this->CDPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->MinPartLoadRat);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerFuelType, this->Name, Constant::eResourceNames[static_cast<int>(this->FuelType)]);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedEntCondTemp, this->Name, this->TempDesCondIn); // Rated==Ref?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedLevEvapTemp, this->Name, this->TempDesEvapOut); // Rated==Ref?
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempDesCondIn);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, this->TempDesEvapOut);
+
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate,
+                                                     this->Name,
+                                                     this->EvapMassFlowRateMax); // flowrate Max==DesignSizeRef flowrate?
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate,
+                                                     this->Name,
+                                                     this->CondMassFlowRateMax); // Cond flowrate Max==DesignSizeRef Cond flowrate?
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName,
+                                                     this->Name,
+                                                     this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerHeatRecPlantloopBranchName,
+                                                     this->Name,
+                                                     this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum)
+                                                                                        .LoopSide(this->HRPlantLoc.loopSideNum)
+                                                                                        .Branch(this->HRPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, this->HeatRecCapacityFraction);
         }
 
         if (ErrorsFound) {
@@ -5973,8 +6132,7 @@ namespace PlantChillers {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -6008,7 +6166,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetConstCOPInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->ConstCOPChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (Util::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -6090,7 +6248,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
@@ -6298,8 +6456,7 @@ namespace PlantChillers {
                 }
             }
 
-            thisChiller.FlowMode =
-                static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
+            thisChiller.FlowMode = static_cast<DataPlant::FlowMode>(getEnumValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -6345,6 +6502,19 @@ namespace PlantChillers {
                                             state.dataIPShortCut->cAlphaArgs(8)));
                 }
             }
+
+            // set default design condenser in and evaporator out temperatures
+            // Values from AHRI Standard 550/590 (2023, IP Version)
+            thisChiller.TempDesEvapOut = 6.67; // Degree Celsius, or 44 Degree Fahrenheit
+            if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
+                thisChiller.TempDesCondIn = 29.44; // Degree Celsius, or 85 Degree Fahrenheit
+            } else if (thisChiller.CondenserType == DataPlant::CondenserType::AirCooled) {
+                thisChiller.TempDesCondIn = 35.0; // Degree Celsius, or 95 Degree Fahrenheit
+            } else if (thisChiller.CondenserType == DataPlant::CondenserType::EvapCooled) {
+                thisChiller.TempDesCondIn = 35.0; // Degree Celsius, or 95 Degree Fahrenheit
+            } else {
+                thisChiller.TempDesCondIn = 35.0; // Degree Celsius, or 95 Degree Fahrenheit
+            }
         }
 
         if (ErrorsFound) {
@@ -6356,136 +6526,128 @@ namespace PlantChillers {
     {
         SetupOutputVariable(state,
                             "Chiller Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Power,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->Energy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ELECTRICITY",
-                            "Cooling",
-                            {},
-                            "Plant");
+                            Constant::eResource::Electricity,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Cooling);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->QEvaporator,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->EvaporatorEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ENERGYTRANSFER",
-                            "CHILLERS",
-                            {},
-                            "Plant");
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Chillers);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->EvapInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->EvapOutletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->EvapMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller COP",
-                            OutputProcessor::Unit::W_W,
+                            Constant::Units::W_W,
                             this->ActualCOP,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->QCondenser,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->CondenserEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ENERGYTRANSFER",
-                            "HEATREJECTION",
-                            {},
-                            "Plant");
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::HeatRejection);
 
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->CondInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         // Condenser mass flow and outlet temp are valid for water cooled
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             SetupOutputVariable(state,
                                 "Chiller Condenser Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->CondOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Chiller Condenser Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->CondMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AirCooled) {
         } else if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Chiller Basin Heater Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->BasinHeaterPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Chiller Basin Heater Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     this->BasinHeaterConsumption,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     this->Name,
-                                    {},
-                                    "Electricity",
-                                    "CHILLERS",
-                                    {},
-                                    "Plant");
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::Group::Plant,
+                                    OutputProcessor::EndUseCat::Chillers);
             }
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -6624,7 +6786,7 @@ namespace PlantChillers {
         int PltSizNum = state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                                Constant::CWInitConvTemp,
@@ -6687,7 +6849,7 @@ namespace PlantChillers {
         }
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
@@ -6752,7 +6914,7 @@ namespace PlantChillers {
 
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             if (PltSizCondNum > 0 && PltSizNum > 0) {
-                if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
+                if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow && tmpNomCap > 0.0) {
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                                    29.44,
@@ -6839,6 +7001,61 @@ namespace PlantChillers {
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "Chiller:ConstantCOP");
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->COP);
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->NomCap);
+
+            // std 229 new Chillers table
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerType, this->Name, "Chiller:ConstantCOP");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefCap, this->Name, this->NomCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEff, this->Name, this->COP); // Eff == COP?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedCap, this->Name, this->NomCap); // did not find rated cap
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedEff, this->Name, this->COP); // did not find rated eff or cop ; also Eff == COP?
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinSI, this->Name, "N/A"); // or just plain COP?
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinIP, this->Name, "N/A"); // or just plain COP?
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerPlantloopName,
+                                                     this->Name,
+                                                     this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+                                                     this->Name,
+                                                     this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
+                                                                                        .LoopSide(this->CWPlantLoc.loopSideNum)
+                                                                                        .Branch(this->CWPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerCondLoopName,
+                                                     this->Name,
+                                                     this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+                                                     this->Name,
+                                                     this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum)
+                                                                                        .LoopSide(this->CDPlantLoc.loopSideNum)
+                                                                                        .Branch(this->CDPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->MinPartLoadRat);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerFuelType, this->Name, "Electricity");
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedEntCondTemp, this->Name, this->TempDesCondIn); // Rated==Ref?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedLevEvapTemp, this->Name, this->TempDesEvapOut); // Rated==Ref?
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempDesCondIn);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, this->TempDesEvapOut);
+
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate,
+                                                     this->Name,
+                                                     this->EvapMassFlowRateMax); // flowrate Max==DesignSizeRef flowrate?
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate,
+                                                     this->Name,
+                                                     this->CondMassFlowRateMax); // Cond flowrate Max==DesignSizeRef Cond flowrate?
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName, this->Name, "N/A");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerHeatRecPlantloopBranchName, this->Name, "N/A");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, "N/A");
         }
     }
 
@@ -7353,8 +7570,7 @@ namespace PlantChillers {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {

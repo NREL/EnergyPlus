@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -222,7 +222,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                                      lAlphaFieldBlanks,
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).Name = cAlphaArgs(1);
 
@@ -292,19 +292,19 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRateWasAutoSized = true;
             }
 
-            if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowBothUnMixed")) {
+            if (Util::SameString(cAlphaArgs(7), "CrossFlowBothUnMixed")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::CrossFlowBothUnMixed;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowBothMixed")) {
+            } else if (Util::SameString(cAlphaArgs(7), "CrossFlowBothMixed")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::CrossFlowBothMixed;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowSupplyMixedDemandUnMixed")) {
+            } else if (Util::SameString(cAlphaArgs(7), "CrossFlowSupplyMixedDemandUnMixed")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::CrossFlowSupplyLoopMixedDemandLoopUnMixed;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowSupplyUnMixedDemandMixed")) {
+            } else if (Util::SameString(cAlphaArgs(7), "CrossFlowSupplyUnMixedDemandMixed")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::CrossFlowSupplyLoopUnMixedDemandLoopMixed;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CounterFlow")) {
+            } else if (Util::SameString(cAlphaArgs(7), "CounterFlow")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::CounterFlow;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "ParallelFlow")) {
+            } else if (Util::SameString(cAlphaArgs(7), "ParallelFlow")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::ParallelFlow;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "Ideal")) {
+            } else if (Util::SameString(cAlphaArgs(7), "Ideal")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::Ideal;
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid entry.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -325,29 +325,29 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                 }
             }
 
-            if (UtilityRoutines::SameString(cAlphaArgs(8), "UncontrolledOn")) {
+            if (Util::SameString(cAlphaArgs(8), "UncontrolledOn")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::UncontrolledOn;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "OperationSchemeModulated")) {
+            } else if (Util::SameString(cAlphaArgs(8), "OperationSchemeModulated")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::OperationSchemeModulated;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "OperationSchemeOnOff")) {
+            } else if (Util::SameString(cAlphaArgs(8), "OperationSchemeOnOff")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::OperationSchemeOnOff;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "HeatingSetpointModulated")) {
+            } else if (Util::SameString(cAlphaArgs(8), "HeatingSetpointModulated")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::HeatingSetPointModulated;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "HeatingSetpointOnOff")) {
+            } else if (Util::SameString(cAlphaArgs(8), "HeatingSetpointOnOff")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::HeatingSetPointOnOff;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingSetpointModulated")) {
+            } else if (Util::SameString(cAlphaArgs(8), "CoolingSetpointModulated")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::CoolingSetPointModulated;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingSetpointOnOff")) {
+            } else if (Util::SameString(cAlphaArgs(8), "CoolingSetpointOnOff")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::CoolingSetPointOnOff;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "DualDeadbandSetpointModulated")) {
+            } else if (Util::SameString(cAlphaArgs(8), "DualDeadbandSetpointModulated")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::DualDeadBandSetPointModulated;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "DualDeadbandSetpointOnOff")) {
+            } else if (Util::SameString(cAlphaArgs(8), "DualDeadbandSetpointOnOff")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::DualDeadBandSetPointOnOff;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingDifferentialOnOff")) {
+            } else if (Util::SameString(cAlphaArgs(8), "CoolingDifferentialOnOff")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::CoolingDifferentialOnOff;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingSetpointOnOffWithComponentOverride")) {
+            } else if (Util::SameString(cAlphaArgs(8), "CoolingSetpointOnOffWithComponentOverride")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::CoolingSetPointOnOffWithComponentOverride;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "TrackComponentOnOff")) {
+            } else if (Util::SameString(cAlphaArgs(8), "TrackComponentOnOff")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::TrackComponentOnOff;
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid entry.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -384,7 +384,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                             bool NodeEMSSetPointMissing = false;
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::TemperatureSetPoint,
+                                                                        HVAC::CtrlVarType::Temp,
                                                                         NodeEMSSetPointMissing);
                             if (NodeEMSSetPointMissing) {
                                 ShowSevereError(state, format("{} Missing temperature setpoint for node = {}", RoutineName, cAlphaArgs(9)));
@@ -410,11 +410,11 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                             bool NodeEMSSetPointMissing = false;
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::TemperatureMinSetPoint,
+                                                                        HVAC::CtrlVarType::Temp,
                                                                         NodeEMSSetPointMissing);
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::TemperatureMaxSetPoint,
+                                                                        HVAC::CtrlVarType::Temp,
                                                                         NodeEMSSetPointMissing);
                             if (NodeEMSSetPointMissing) {
                                 ShowSevereError(state, format("{} Missing temperature setpoint for node = {}", RoutineName, cAlphaArgs(9)));
@@ -447,7 +447,23 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).TempControlTol = 0.01;
             }
 
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = cAlphaArgs(10);
+            std::string endUseCat = Util::makeUPPER(cAlphaArgs(10));
+            if (endUseCat == "FREECOOLING")
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::EndUseCat::FreeCooling;
+            else if (endUseCat == "HEATREJECTION")
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::EndUseCat::HeatRejection;
+            else if (endUseCat == "HEATRECOVERYFORCOOLING")
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::EndUseCat::HeatRecoveryForCooling;
+            else if (endUseCat == "HEATRECOVERYFORCOOLING")
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::EndUseCat::HeatRecoveryForHeating;
+            else if (endUseCat == "LOOPTOLOOP")
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::EndUseCat::LoopToLoop;
+            else {
+                ShowWarningError(
+                    state,
+                    format("{} = {}, {} is an invalid value for {}", cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(10), cAlphaFieldNames(10)));
+                ErrorsFound = true;
+            }
 
             if (!lAlphaFieldBlanks(11)) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).OtherCompSupplySideLoop.inletNodeNum =
@@ -488,11 +504,11 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             }
 
             if (!lAlphaFieldBlanks(13)) {
-                if (UtilityRoutines::SameString(cAlphaArgs(13), "WetBulbTemperature")) {
+                if (Util::SameString(cAlphaArgs(13), "WetBulbTemperature")) {
                     state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlSignalTemp = CtrlTempType::WetBulbTemperature;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(13), "DryBulbTemperature")) {
+                } else if (Util::SameString(cAlphaArgs(13), "DryBulbTemperature")) {
                     state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlSignalTemp = CtrlTempType::DryBulbTemperature;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(13), "Loop")) {
+                } else if (Util::SameString(cAlphaArgs(13), "Loop")) {
                     state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlSignalTemp = CtrlTempType::LoopTemperature;
                 }
             } else {
@@ -532,87 +548,85 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
 {
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->HeatTransferRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Heat Transfer Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->HeatTransferEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
-                        {},
-                        "ENERGYTRANSFER",
-                        this->HeatTransferMeteringEndUse,
-                        {},
-                        "Plant");
+                        Constant::eResource::EnergyTransfer,
+                        OutputProcessor::Group::Plant,
+                        this->HeatTransferMeteringEndUse);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Supply Side Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->SupplySideLoop.InletMassFlowRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Supply Side Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->SupplySideLoop.InletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Supply Side Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->SupplySideLoop.OutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Demand Side Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->DemandSideLoop.InletMassFlowRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Demand Side Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->DemandSideLoop.InletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Demand Side Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->DemandSideLoop.OutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Operation Status",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->OperationStatus,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Effectiveness",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->Effectiveness,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 }
 
@@ -704,7 +718,7 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
     Real64 tmpSupSideDesignVolFlowRate = this->SupplySideLoop.DesignVolumeFlowRate;
     if (this->SupplySideLoop.DesignVolumeFlowRateWasAutoSized) {
         if (PltSizNumSupSide > 0) {
-            if (state.dataSize->PlantSizData(PltSizNumSupSide).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNumSupSide).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 tmpSupSideDesignVolFlowRate = state.dataSize->PlantSizData(PltSizNumSupSide).DesVolFlowRate * this->SizingFactor;
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
             } else {
@@ -737,7 +751,7 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
     // second deal with Loop Demand Side
     Real64 tmpDmdSideDesignVolFlowRate = this->DemandSideLoop.DesignVolumeFlowRate;
     if (this->DemandSideLoop.DesignVolumeFlowRateWasAutoSized) {
-        if (tmpSupSideDesignVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
+        if (tmpSupSideDesignVolFlowRate > HVAC::SmallWaterVolFlow) {
             tmpDmdSideDesignVolFlowRate = tmpSupSideDesignVolFlowRate;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
         } else {
@@ -791,7 +805,7 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
 
             tmpDeltaTloopToLoop = max(2.0, tmpDeltaTloopToLoop);
             Real64 tmpDeltaTSupLoop = state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT;
-            if (tmpSupSideDesignVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (tmpSupSideDesignVolFlowRate >= HVAC::SmallWaterVolFlow) {
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
@@ -973,8 +987,8 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
         }
         case ControlType::OperationSchemeModulated: {
 
-            if (std::abs(MyLoad) > DataHVACGlobals::SmallLoad) {
-                if (MyLoad < -1.0 * DataHVACGlobals::SmallLoad) { // requesting cooling
+            if (std::abs(MyLoad) > HVAC::SmallLoad) {
+                if (MyLoad < -1.0 * HVAC::SmallLoad) { // requesting cooling
                     Real64 DeltaTCooling = this->SupplySideLoop.InletTemp - this->DemandSideLoop.InletTemp;
                     if (DeltaTCooling > this->TempControlTol) { // can do cooling so turn on
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
@@ -1058,8 +1072,8 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
             break;
         }
         case ControlType::OperationSchemeOnOff: {
-            if (std::abs(MyLoad) > DataHVACGlobals::SmallLoad) {
-                if (MyLoad < DataHVACGlobals::SmallLoad) { // requesting cooling
+            if (std::abs(MyLoad) > HVAC::SmallLoad) {
+                if (MyLoad < HVAC::SmallLoad) { // requesting cooling
                     Real64 DeltaTCooling = this->SupplySideLoop.InletTemp - this->DemandSideLoop.InletTemp;
                     if (DeltaTCooling > this->TempControlTol) { // can do cooling so turn on
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
@@ -1696,7 +1710,7 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
 
     this->HeatTransferEnergy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSysSec;
 
-    if ((std::abs(this->HeatTransferRate) > DataHVACGlobals::SmallLoad) && (this->DemandSideLoop.InletMassFlowRate > 0.0) &&
+    if ((std::abs(this->HeatTransferRate) > HVAC::SmallLoad) && (this->DemandSideLoop.InletMassFlowRate > 0.0) &&
         (this->SupplySideLoop.InletMassFlowRate > 0.0)) {
         this->OperationStatus = 1.0;
     } else {

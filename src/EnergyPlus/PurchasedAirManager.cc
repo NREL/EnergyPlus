@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -112,7 +112,6 @@ namespace EnergyPlus::PurchasedAirManager {
 // humidity ratio are adjusted to meet the zone load.
 
 // Using/Aliasing
-using namespace DataHVACGlobals;
 using namespace ScheduleManager;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyHFnTdbW;
@@ -155,7 +154,7 @@ void SimPurchasedAir(EnergyPlusData &state,
 
     // Find the correct PurchasedAir Equipment
     if (CompIndex == 0) {
-        PurchAirNum = UtilityRoutines::FindItemInList(PurchAirName, state.dataPurchasedAirMgr->PurchAir);
+        PurchAirNum = Util::FindItemInList(PurchAirName, state.dataPurchasedAirMgr->PurchAir);
         if (PurchAirNum == 0) {
             ShowFatalError(state, format("SimPurchasedAir: Unit not found={}", PurchAirName));
         }
@@ -257,7 +256,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames.allocate(NumNums);
             state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames = "";
             state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             PurchAir(PurchAirNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             // get optional  availability schedule
@@ -338,21 +337,21 @@ void GetPurchasedAir(EnergyPlusData &state)
             PurchAir(PurchAirNum).MaxHeatSuppAirHumRat = state.dataIPShortCut->rNumericArgs(3);
             PurchAir(PurchAirNum).MinCoolSuppAirHumRat = state.dataIPShortCut->rNumericArgs(4);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "NoLimit")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "NoLimit")) {
                 PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitFlowRate")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitFlowRate")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(5)) {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitFlowRate;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitCapacity")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitCapacity")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(6)) {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitCapacity;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitFlowRateAndCapacity")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitFlowRateAndCapacity")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(5) && state.dataIPShortCut->lNumericFieldBlanks(6)) {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
                 } else if (state.dataIPShortCut->lNumericFieldBlanks(5)) {
@@ -372,21 +371,21 @@ void GetPurchasedAir(EnergyPlusData &state)
             PurchAir(PurchAirNum).MaxHeatVolFlowRate = state.dataIPShortCut->rNumericArgs(5);
             PurchAir(PurchAirNum).MaxHeatSensCap = state.dataIPShortCut->rNumericArgs(6);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "NoLimit")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "NoLimit")) {
                 PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitFlowRate")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitFlowRate")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(7)) {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::LimitFlowRate;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitCapacity")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitCapacity")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(8)) {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::LimitCapacity;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitFlowRateAndCapacity")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitFlowRateAndCapacity")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(7) && state.dataIPShortCut->lNumericFieldBlanks(8)) {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
                 } else if (state.dataIPShortCut->lNumericFieldBlanks(7)) {
@@ -435,13 +434,13 @@ void GetPurchasedAir(EnergyPlusData &state)
                 }
             }
             // get Dehumidification control type
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "None")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "None")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::None;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "ConstantSensibleHeatRatio")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "ConstantSensibleHeatRatio")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::ConstantSensibleHeatRatio;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "Humidistat")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "Humidistat")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::Humidistat;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "ConstantSupplyHumidityRatio")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "ConstantSupplyHumidityRatio")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::ConstantSupplyHumidityRatio;
             } else {
                 ShowSevereError(state, format("{}{}=\"{} invalid data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -453,11 +452,11 @@ void GetPurchasedAir(EnergyPlusData &state)
             PurchAir(PurchAirNum).CoolSHR = state.dataIPShortCut->rNumericArgs(9);
 
             // get Humidification control type
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "None")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(11), "None")) {
                 PurchAir(PurchAirNum).HumidCtrlType = HumControl::None;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "Humidistat")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(11), "Humidistat")) {
                 PurchAir(PurchAirNum).HumidCtrlType = HumControl::Humidistat;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "ConstantSupplyHumidityRatio")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(11), "ConstantSupplyHumidityRatio")) {
                 PurchAir(PurchAirNum).HumidCtrlType = HumControl::ConstantSupplyHumidityRatio;
             } else {
                 ShowSevereError(state, format("{}{}=\"{} invalid data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -469,8 +468,7 @@ void GetPurchasedAir(EnergyPlusData &state)
 
             // get Design specification outdoor air object
             if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                PurchAir(PurchAirNum).OARequirementsPtr =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataSize->OARequirements);
+                PurchAir(PurchAirNum).OARequirementsPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataSize->OARequirements);
                 if (PurchAir(PurchAirNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, format("{}{}=\"{} invalid data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(
@@ -528,11 +526,11 @@ void GetPurchasedAir(EnergyPlusData &state)
                 if (UniqueNodeError) ErrorsFound = true;
 
                 // get Demand controlled ventilation type
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "None")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(14), "None")) {
                     PurchAir(PurchAirNum).DCVType = DCV::None;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "OccupancySchedule")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(14), "OccupancySchedule")) {
                     PurchAir(PurchAirNum).DCVType = DCV::OccupancySchedule;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "CO2Setpoint")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(14), "CO2Setpoint")) {
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         PurchAir(PurchAirNum).DCVType = DCV::CO2SetPoint;
                     } else {
@@ -556,11 +554,11 @@ void GetPurchasedAir(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
                 // get Outdoor air economizer type
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "NoEconomizer")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(15), "NoEconomizer")) {
                     PurchAir(PurchAirNum).EconomizerType = Econ::NoEconomizer;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "DifferentialDryBulb")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(15), "DifferentialDryBulb")) {
                     PurchAir(PurchAirNum).EconomizerType = Econ::DifferentialDryBulb;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "DifferentialEnthalpy")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(15), "DifferentialEnthalpy")) {
                     PurchAir(PurchAirNum).EconomizerType = Econ::DifferentialEnthalpy;
                 } else {
                     ShowSevereError(state, format("{}{}=\"{} invalid data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -570,11 +568,11 @@ void GetPurchasedAir(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
                 // get Outdoor air heat recovery type and effectiveness
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "None")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "None")) {
                     PurchAir(PurchAirNum).HtRecType = HeatRecovery::None;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "Sensible")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "Sensible")) {
                     PurchAir(PurchAirNum).HtRecType = HeatRecovery::Sensible;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "Enthalpy")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "Enthalpy")) {
                     PurchAir(PurchAirNum).HtRecType = HeatRecovery::Enthalpy;
                 } else {
                     ShowSevereError(state, format("{}{}=\"{} invalid data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -603,8 +601,7 @@ void GetPurchasedAir(EnergyPlusData &state)
 
             PurchAir(PurchAirNum).HVACSizingIndex = 0;
             if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                PurchAir(PurchAirNum).HVACSizingIndex =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(17), state.dataSize->ZoneHVACSizing);
+                PurchAir(PurchAirNum).HVACSizingIndex = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(17), state.dataSize->ZoneHVACSizing);
                 if (PurchAir(PurchAirNum).HVACSizingIndex == 0) {
                     ShowSevereError(state,
                                     format("{} = {} not found.", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17)));
@@ -679,438 +676,434 @@ void GetPurchasedAir(EnergyPlusData &state)
         //    energy variables
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Sensible Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).SenHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Latent Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).LatHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Total Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).TotHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name,
-                            {},
-                            "DISTRICTHEATING",
-                            "Heating",
-                            {},
-                            "System");
+                            Constant::eResource::DistrictHeatingWater,
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::Heating);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Sensible Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).SenCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Latent Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).LatCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Total Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).TotCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name,
-                            {},
-                            "DISTRICTCOOLING",
-                            "Cooling",
-                            {},
-                            "System");
+                            Constant::eResource::DistrictCooling,
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::Cooling);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Sensible Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).ZoneSenHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Latent Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).ZoneLatHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Total Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).ZoneTotHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Sensible Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).ZoneSenCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Latent Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).ZoneLatCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Total Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).ZoneTotCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Sensible Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).OASenHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Latent Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).OALatHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Total Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).OATotHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Sensible Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).OASenCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Latent Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).OALatCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Total Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).OATotCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Sensible Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).HtRecSenHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Latent Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).HtRecLatHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Total Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).HtRecTotHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Sensible Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).HtRecSenCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Latent Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).HtRecLatCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Total Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             PurchAir(PurchAirNum).HtRecTotCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
 
         //    rate variables
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Sensible Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).SenHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Latent Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).LatHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Total Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).TotHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Sensible Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).SenCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Latent Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).LatCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Total Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).TotCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Sensible Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).ZoneSenHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Latent Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).ZoneLatHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Total Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).ZoneTotHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Sensible Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).ZoneSenCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Latent Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).ZoneLatCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Total Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).ZoneTotCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Sensible Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).OASenHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Latent Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).OALatHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Total Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).OATotHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Sensible Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).OASenCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Latent Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).OALatCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Total Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).OATotCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Sensible Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).HtRecSenHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Latent Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).HtRecLatHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Total Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).HtRecTotHeatRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Sensible Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).HtRecSenCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Latent Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).HtRecLatCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Total Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             PurchAir(PurchAirNum).HtRecTotCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
 
         SetupOutputVariable(state,
                             "Zone Ideal Loads Economizer Active Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             PurchAir(PurchAirNum).TimeEconoActive,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Heat Recovery Active Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             PurchAir(PurchAirNum).TimeHtRecActive,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             PurchAir(PurchAirNum).Name);
 
         SetupOutputVariable(state,
                             "Zone Ideal Loads Hybrid Ventilation Available Status",
-                            OutputProcessor::Unit::None,
-                            PurchAir(PurchAirNum).AvailStatus,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            Constant::Units::None,
+                            (int &)PurchAir(PurchAirNum).availStatus,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
 
         // air flows
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             PurchAir(PurchAirNum).OutdoorAirMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             PurchAir(PurchAirNum).OutdoorAirVolFlowRateStdRho,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             PurchAir(PurchAirNum).SupplyAirMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             PurchAir(PurchAirNum).SupplyAirVolFlowRateStdRho,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
 
         // Supply Air temperature
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             PurchAir(PurchAirNum).SupplyTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         // Supply Air Humidity Ratio
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Humidity Ratio",
-                            OutputProcessor::Unit::kgWater_kgDryAir,
+                            Constant::Units::kgWater_kgDryAir,
                             PurchAir(PurchAirNum).SupplyHumRat,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
 
         // Mixed Air temperature
         SetupOutputVariable(state,
                             "Zone Ideal Loads Mixed Air Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             PurchAir(PurchAirNum).MixedAirTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
         // Mixed Air Humidity Ratio
         SetupOutputVariable(state,
                             "Zone Ideal Loads Mixed Air Humidity Ratio",
-                            OutputProcessor::Unit::kgWater_kgDryAir,
+                            Constant::Units::kgWater_kgDryAir,
                             PurchAir(PurchAirNum).MixedAirHumRat,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -1442,9 +1435,9 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
 
     // Using/Aliasing
     using namespace DataSizing;
-    using DataHVACGlobals::CoolingCapacitySizing;
-    using DataHVACGlobals::HeatingAirflowSizing;
-    using DataHVACGlobals::HeatingCapacitySizing;
+    using HVAC::CoolingCapacitySizing;
+    using HVAC::HeatingAirflowSizing;
+    using HVAC::HeatingCapacitySizing;
     using Psychrometrics::CPCW;
     using Psychrometrics::CPHW;
     using Psychrometrics::PsyCpAirFnW;
@@ -1620,7 +1613,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 MaxHeatSensCapDes = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                 state.dataSize->ZoneHeatingOnlyFan = false;
-                if (MaxHeatSensCapDes < SmallLoad) {
+                if (MaxHeatSensCapDes < HVAC::SmallLoad) {
                     MaxHeatSensCapDes = 0.0;
                 }
                 if (IsAutoSize) {
@@ -1790,7 +1783,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 MaxCoolTotCapDes = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                 state.dataSize->ZoneCoolingOnlyFan = false;
-                if (MaxCoolTotCapDes < SmallLoad) {
+                if (MaxCoolTotCapDes < HVAC::SmallLoad) {
                     MaxCoolTotCapDes = 0.0;
                 }
                 if (IsAutoSize) {
@@ -1897,7 +1890,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                 MaxHeatSensCapDes = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                 state.dataSize->ZoneHeatingOnlyFan = false;
             }
-            if (MaxHeatSensCapDes < SmallLoad) {
+            if (MaxHeatSensCapDes < HVAC::SmallLoad) {
                 MaxHeatSensCapDes = 0.0;
             }
             if (IsAutoSize) {
@@ -2001,7 +1994,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                 MaxCoolTotCapDes = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                 state.dataSize->ZoneCoolingOnlyFan = false;
             }
-            if (MaxCoolTotCapDes < SmallLoad) {
+            if (MaxCoolTotCapDes < HVAC::SmallLoad) {
                 MaxCoolTotCapDes = 0.0;
             }
             if (IsAutoSize) {
@@ -2077,11 +2070,6 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     //                      July 2012, Chandan Sharma - FSEC: Added hybrid ventilation manager
     //       RE-ENGINEERED  na
 
-    // Using/Aliasing
-    using DataHVACGlobals::ForceOff;
-    using DataHVACGlobals::SmallLoad;
-    auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcPurchAirLoads");
 
@@ -2155,11 +2143,12 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     QZnHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToHeatSP;
     QZnCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToCoolSP;
 
-    if (allocated(ZoneComp)) {
-        ZoneComp(DataZoneEquipment::ZoneEquip::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum).ZoneNum = ControlledZoneNum;
-        PurchAir(PurchAirNum).AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum).AvailStatus;
+    if (allocated(state.dataAvail->ZoneComp)) {
+        auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum);
+        availMgr.ZoneNum = ControlledZoneNum;
+        PurchAir(PurchAirNum).availStatus = availMgr.availStatus;
         // Check if the hybrid ventilation availability manager is turning the unit off
-        if (PurchAir(PurchAirNum).AvailStatus == ForceOff) {
+        if (PurchAir(PurchAirNum).availStatus == Avail::Status::ForceOff) {
             UnitOn = false;
         }
     }
@@ -2208,8 +2197,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         // Check if cooling of the supply air stream is required
 
         // Cooling operation
-        if ((MinOASensOutput >= QZnCoolSP) &&
-            (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating)) {
+        if ((MinOASensOutput >= QZnCoolSP) && (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != HVAC::ThermostatType::SingleHeating)) {
             OperatingMode = OpMode::Cool;
             // Calculate supply mass flow, temp and humidity with the following constraints:
             //  Min cooling supply temp
@@ -2254,9 +2242,9 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                           state.dataLoopNodes->Node(PurchAir(PurchAirNum).ZoneRecircAirNodeNum).Enthalpy))) {
 
                         // Calculate supply MassFlowRate based on sensible load but limit to Max Cooling Supply Air Flow Rate if specified
-                        CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                        CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                         DeltaT = (state.dataLoopNodes->Node(OANodeNum).Temp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
-                        if (DeltaT < -SmallTempDiff) {
+                        if (DeltaT < -HVAC::SmallTempDiff) {
                             SupplyMassFlowRate = QZnCoolSP / CpAir / DeltaT;
                             if (((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRate) ||
                                  (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity)) &&
@@ -2277,9 +2265,9 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // Mass flow rate to meet sensible load, at Minimum Cooling Supply Air Temperature
             SupplyMassFlowRateForCool = 0.0;
             if (CoolOn) {
-                CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                 DeltaT = (PurchAir(PurchAirNum).MinCoolSuppAirTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
-                if (DeltaT < -SmallTempDiff) {
+                if (DeltaT < -HVAC::SmallTempDiff) {
                     SupplyMassFlowRateForCool = QZnCoolSP / CpAir / DeltaT;
                 }
             }
@@ -2335,7 +2323,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 SupplyMassFlowRate = min(SupplyMassFlowRate, PurchAir(PurchAirNum).MaxCoolMassFlowRate);
             }
 
-            if (SupplyMassFlowRate <= VerySmallMassFlow) SupplyMassFlowRate = 0.0;
+            if (SupplyMassFlowRate <= HVAC::VerySmallMassFlow) SupplyMassFlowRate = 0.0;
 
             // Calculate mixed air conditions
             CalcPurchAirMixedAir(state,
@@ -2352,7 +2340,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // In general, in the cooling section, don't let SupplyTemp be set to something that results in heating
             if (SupplyMassFlowRate > 0.0) {
                 // Calculate supply temp at SupplyMassFlowRate and recheck limit on Minimum Cooling Supply Air Temperature
-                CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                 PurchAir(PurchAirNum).SupplyTemp = QZnCoolSP / (CpAir * SupplyMassFlowRate) + state.dataLoopNodes->Node(ZoneNodeNum).Temp;
                 PurchAir(PurchAirNum).SupplyTemp = max(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MinCoolSuppAirTemp);
                 // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
@@ -2521,7 +2509,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // Heating or no-load operation
         } else { // Heating or no-load case
             if ((MinOASensOutput < QZnHeatSP) &&
-                (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
+                (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != HVAC::ThermostatType::SingleCooling)) {
                 OperatingMode = OpMode::Heat;
             } else { // DeadBand mode shuts off heat recovery and economizer
                 OperatingMode = OpMode::DeadBand;
@@ -2566,9 +2554,9 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // Mass flow rate to meet sensible load, at Minimum Cooling Supply Air Temperature
             SupplyMassFlowRateForHeat = 0.0;
             if ((HeatOn) && (OperatingMode == OpMode::Heat)) {
-                CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                 DeltaT = (PurchAir(PurchAirNum).MaxHeatSuppAirTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
-                if (DeltaT > SmallTempDiff) {
+                if (DeltaT > HVAC::SmallTempDiff) {
                     SupplyMassFlowRateForHeat = QZnHeatSP / CpAir / DeltaT;
                 }
             }
@@ -2625,7 +2613,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 SupplyMassFlowRate = min(SupplyMassFlowRate, PurchAir(PurchAirNum).MaxHeatMassFlowRate);
             }
 
-            if (SupplyMassFlowRate <= VerySmallMassFlow) SupplyMassFlowRate = 0.0;
+            if (SupplyMassFlowRate <= HVAC::VerySmallMassFlow) SupplyMassFlowRate = 0.0;
 
             // Calculate mixed air conditions
             CalcPurchAirMixedAir(state,
@@ -2642,7 +2630,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             if (SupplyMassFlowRate > 0.0) {
                 if ((HeatOn) && (OperatingMode == OpMode::Heat)) {
                     // Calculate supply temp at SupplyMassFlowRate and check limit on Maximum Heating Supply Air Temperature
-                    CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                    CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                     PurchAir(PurchAirNum).SupplyTemp = QZnHeatSP / (CpAir * SupplyMassFlowRate) + state.dataLoopNodes->Node(ZoneNodeNum).Temp;
                     PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MaxHeatSuppAirTemp);
                     // This is the heating mode, so SupplyTemp can't be less than MixedAirTemp
@@ -2830,7 +2818,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 
             SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
 
-            CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+            CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
             SysOutputProvided = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).SupplyTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
             MoistOutputProvided =
                 SupplyMassFlowRate * (PurchAir(PurchAirNum).SupplyHumRat - state.dataLoopNodes->Node(ZoneNodeNum).HumRat); // Latent rate, kg/s
@@ -2839,7 +2827,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             PurchAir(PurchAirNum).LatOutputToZone =
                 SupplyMassFlowRate * (SupplyEnthalpy - state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy) - PurchAir(PurchAirNum).SenOutputToZone;
 
-            CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+            CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
             if (PurchAir(PurchAirNum).OutdoorAir) {
                 PurchAir(PurchAirNum).OASenOutput =
                     OAMassFlowRate * CpAir * (state.dataLoopNodes->Node(OANodeNum).Temp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
@@ -2988,7 +2976,7 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
             OAMassFlowRate = max(OAMassFlowRate, state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP);
         }
 
-        if (OAMassFlowRate <= VerySmallMassFlow) OAMassFlowRate = 0.0;
+        if (OAMassFlowRate <= HVAC::VerySmallMassFlow) OAMassFlowRate = 0.0;
 
     } else { // No outdoor air
         OAMassFlowRate = 0.0;

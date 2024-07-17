@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,13 +65,13 @@ using namespace EnergyPlus::Humidifiers;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::Curve;
 
 namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
 {
+    state->init_state(*state);
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
     state->dataHumidifiers->NumElecSteamHums = 0;
@@ -107,6 +107,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
 
 TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
 {
+    state->init_state(*state);
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
     state->dataHumidifiers->NumElecSteamHums = 0;
@@ -147,6 +148,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
 
 TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
 {
+    state->init_state(*state);
     HumidifierData thisHum;
 
     state->dataHVACGlobal->TimeStepSys = 0.25;

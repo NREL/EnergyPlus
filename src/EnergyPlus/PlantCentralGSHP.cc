@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -230,7 +230,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
 
             // auto-size the Evaporator Flow Rate
             if (PltSizNum > 0) {
-                if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                     tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->ChillerHeater(NumChillerHeater).SizFac;
                     this->ChillerHeater(NumChillerHeater).tmpEvapVolFlowRate = tmpEvapVolFlowRate;
                     if (!this->ChillerHeater(NumChillerHeater).EvapVolFlowRateWasAutoSized)
@@ -312,7 +312,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
             // auto-size the Reference Cooling Capacity
             // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
             if (PltSizNum > 0) {
-                if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpEvapVolFlowRate > 0.0) {
+                if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow && tmpEvapVolFlowRate > 0.0) {
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                                        Constant::CWInitConvTemp,
@@ -413,7 +413,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
             // auto-size the condenser volume flow rate
             // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
             if (PltSizCondNum > 0) {
-                if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->GLHEPlantLoc.loopNum).FluidName,
                                                                    Constant::CWInitConvTemp,
@@ -589,7 +589,7 @@ void GetWrapperInput(EnergyPlusData &state)
 
         // initialize nth chiller heater index (including identical units) for current wrapper
         int NumChHtrPerWrapper = 0;
-        if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound)) {
+        if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound)) {
             continue;
         }
 
@@ -769,7 +769,7 @@ void GetWrapperInput(EnergyPlusData &state)
             if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType ==
                 "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
                 std::string CompName = state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperComponentName;
-                int CompIndex = UtilityRoutines::FindItemInList(CompName, state.dataPlantCentralGSHP->ChillerHeater);
+                int CompIndex = Util::FindItemInList(CompName, state.dataPlantCentralGSHP->ChillerHeater);
                 // User may enter invalid name rather than selecting one from the object list
                 if (CompIndex <= 0) {
                     ShowSevereError(state, format("GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name ={}", CompName));
@@ -802,179 +802,169 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 {
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Report.TotElecCooling,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
-                        {},
-                        "ELECTRICITY",
-                        "Cooling",
-                        {},
-                        "Plant");
+                        Constant::eResource::Electricity,
+                        OutputProcessor::Group::Plant,
+                        OutputProcessor::EndUseCat::Cooling);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Report.TotElecHeating,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
-                        {},
-                        "ELECTRICITY",
-                        "Heating",
-                        {},
-                        "Plant");
+                        Constant::eResource::Electricity,
+                        OutputProcessor::Group::Plant,
+                        OutputProcessor::EndUseCat::Heating);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Electricity Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Report.TotElecCoolingPwr,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Electricity Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Report.TotElecHeatingPwr,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Report.CoolingEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
-                        {},
-                        "ENERGYTRANSFER",
-                        "CHILLERS",
-                        {},
-                        "Plant");
+                        Constant::eResource::EnergyTransfer,
+                        OutputProcessor::Group::Plant,
+                        OutputProcessor::EndUseCat::Chillers);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Report.HeatingEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
-                        {},
-                        "ENERGYTRANSFER",
-                        "BOILER",
-                        {},
-                        "Plant");
+                        Constant::eResource::EnergyTransfer,
+                        OutputProcessor::Group::Plant,
+                        OutputProcessor::EndUseCat::Boilers);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Heat Transfer Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Report.GLHEEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
-                        {},
-                        "ENERGYTRANSFER",
-                        "HEATREJECTION",
-                        {},
-                        "Plant");
+                        Constant::eResource::EnergyTransfer,
+                        OutputProcessor::Group::Plant,
+                        OutputProcessor::EndUseCat::HeatRejection);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Report.CoolingRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Report.HeatingRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Report.GLHERate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->Report.CHWmdot,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->Report.HWmdot,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->Report.GLHEmdot,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.CHWInletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.HWInletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.GLHEInletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.CHWOutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.HWOutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.GLHEOutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     if (this->ChillerHeaterNums > 0) {
@@ -983,186 +973,186 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Operation Mode Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CurrentMode,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Part Load Ratio Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerPartLoadRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Cycling Ratio Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerCyclingRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Cooling Electricity Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CoolingPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Heating Electricity Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.HeatingPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Cooling Electricity Energy Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CoolingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Heating Electricity Energy Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ChillerHeater(ChillerHeaterNum).Report.HeatingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Cooling Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.QEvap,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Cooling Energy Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ChillerHeater(ChillerHeaterNum).Report.EvapEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater False Load Heat Transfer Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoadRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater False Load Heat Transfer Energy Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoad,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Evaporator Inlet Temperature Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->ChillerHeater(ChillerHeaterNum).Report.EvapInletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Evaporator Outlet Temperature Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->ChillerHeater(ChillerHeaterNum).Report.EvapOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Evaporator Mass Flow Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->ChillerHeater(ChillerHeaterNum).Report.Evapmdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Condenser Heat Transfer Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.QCond,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Condenser Heat Transfer Energy Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CondEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater COP Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W_W,
+                                Constant::Units::W_W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ActualCOP,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Capacity Temperature Modifier Multiplier Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerCapFT,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater EIR Temperature Modifier Multiplier Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerEIRFT,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater EIR Part Load Modifier Multiplier Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerEIRFPLR,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Condenser Inlet Temperature Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CondInletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Condenser Outlet Temperature Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CondOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Condenser Mass Flow Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->ChillerHeater(ChillerHeaterNum).Report.Condmdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->ChillerHeater(ChillerHeaterNum).Name);
         } // End of individual chiller heater count for current wrapper
 
@@ -1214,9 +1204,13 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, CHErrorsFound);
+        Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, CHErrorsFound);
 
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeCooling = state.dataIPShortCut->cAlphaArgs(4);
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(4), "LEAVINGCONDENSER")) {
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeCooling = CondenserModeTemperature::LeavingCondenser;
+        } else { // only other option and default value is EnteringCondenser
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeCooling = CondenserModeTemperature::EnteringCondenser;
+        }
 
         // Performance curves
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX =
@@ -1243,7 +1237,11 @@ void GetChillerHeaterInput(EnergyPlusData &state)
             CHErrorsFound = true;
         }
 
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeHeating = state.dataIPShortCut->cAlphaArgs(8);
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "LEAVINGCONDENSER")) {
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeHeating = CondenserModeTemperature::LeavingCondenser;
+        } else { // only other option and default value is EnteringCondenser
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeHeating = CondenserModeTemperature::EnteringCondenser;
+        }
 
         // Performance curves
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX =
@@ -1297,7 +1295,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
             }
         }
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "WaterCooled")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "WaterCooled")) {
             state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).condenserType = CondenserType::WaterCooled;
         } else {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -1626,8 +1624,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                 } else {
                     // need call to EMS to check node
                     bool FatalError = false; // but not really fatal yet, but should be.
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(
-                        state, this->CHWOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->CHWOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                     state.dataLoopNodes->NodeSetpointCheck(this->CHWOutletNodeNum).needsSetpointChecking = false;
                     if (FatalError) {
                         if (!this->CoolSetPointErrDone) {
@@ -1660,8 +1657,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                 } else {
                     // need call to EMS to check node
                     bool FatalError = false; // but not really fatal yet, but should be.
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(
-                        state, this->HWOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HWOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                     state.dataLoopNodes->NodeSetpointCheck(this->HWOutletNodeNum).needsSetpointChecking = false;
                     if (FatalError) {
                         if (!this->HeatSetPointErrDone) {
@@ -1987,57 +1983,16 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
 
             // Only used to read curve values
             CondOutletTemp = this->ChillerHeater(ChillerHeaterNum).TempRefCondOutCooling;
-            Real64 CondTempforCurve;
-            if (this->ChillerHeater(ChillerHeaterNum).CondMode == "ENTERINGCONDENSER") {
-                CondTempforCurve = CondInletTemp;
-            } else if (this->ChillerHeater(ChillerHeaterNum).CondMode == "LEAVINGCONDENSER") {
-                CondTempforCurve = CondOutletTemp;
-            } else {
-                ShowWarningError(state, format("ChillerHeaterPerformance:Electric:EIR \"{}\":", this->ChillerHeater(ChillerHeaterNum).Name));
-                ShowContinueError(state,
-                                  format("Chiller condenser temperature for curve fit are not decided, defalt value= cond_leaving ({:.3R}).",
-                                         state.dataPlantCentralGSHP->ChillerCapFT));
-                CondTempforCurve = CondOutletTemp;
-            }
-
-            // Bind local variables from the curve
-            Real64 MinPartLoadRat; // Min allowed operating fraction of full load
-            Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
-
-            Curve::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
+            Real64 CondTempforCurve = this->setChillerHeaterCondTemp(state, ChillerHeaterNum, CondInletTemp, CondOutletTemp);
 
             // Chiller reference capacity
             Real64 ChillerRefCap = this->ChillerHeater(ChillerHeaterNum).RefCap;
             Real64 ReferenceCOP = this->ChillerHeater(ChillerHeaterNum).RefCOP;
             Real64 TempLowLimitEout = this->ChillerHeater(ChillerHeaterNum).TempLowLimitEvapOut;
             Real64 EvapOutletTempSetPoint = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling;
-            state.dataPlantCentralGSHP->ChillerCapFT =
-                Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
-            if (state.dataPlantCentralGSHP->ChillerCapFT < 0) {
-                if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
-                    ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                    ShowWarningError(state, format("ChillerHeaterPerformance:Electric:EIR \"{}\":", this->ChillerHeater(ChillerHeaterNum).Name));
-                    ShowContinueError(state,
-                                      format(" ChillerHeater Capacity as a Function of Temperature curve output is negative ({:.3R}).",
-                                             state.dataPlantCentralGSHP->ChillerCapFT));
-                    ShowContinueError(state,
-                                      format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
-                                             EvapOutletTempSetPoint,
-                                             CondInletTemp));
-                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-                } else if (!state.dataGlobal->WarmupFlag) {
-                    ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                    ShowRecurringWarningErrorAtEnd(
-                        state,
-                        "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name +
-                            "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...",
-                        this->ChillerHeater(ChillerHeaterNum).ChillerCapFTErrorIndex,
-                        state.dataPlantCentralGSHP->ChillerCapFT,
-                        state.dataPlantCentralGSHP->ChillerCapFT);
-                }
-                state.dataPlantCentralGSHP->ChillerCapFT = 0.0;
-            }
+            // Calculate Chiller Capacity as a function of temperature and error check
+            state.dataPlantCentralGSHP->ChillerCapFT = this->calcChillerCapFT(state, ChillerHeaterNum, EvapOutletTempSetPoint, CondTempforCurve);
 
             // Calculate the specific heat of chilled water
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -2060,12 +2015,16 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
             // Chiller available capacity at current operating conditions [W]
             Real64 AvailChillerCap = ChillerRefCap * state.dataPlantCentralGSHP->ChillerCapFT;
 
+            Real64 PartLoadRat;    // Operating part load ratio
+            Real64 MinPartLoadRat; // Min allowed operating fraction of full load
+            Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
+
+            Curve::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
+
             // Set load this chiller heater should meet
             QEvaporator = min(CoolingLoadToMeet, (AvailChillerCap * MaxPartLoadRat));
             EvapOutletTemp = EvapOutletTempSetPoint;
             Real64 EvapDeltaTemp = EvapInletTemp - EvapOutletTemp;
-
-            Real64 PartLoadRat; // Operating part load ratio
 
             // Calculate temperatures for constant flow and mass flow rates for variable flow
             if (EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -2100,59 +2059,12 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
                 EvapOutletTemp = EvapInletTemp;
             }
 
-            // Check evaporator temperature low limit and adjust capacity if needed
-            if (EvapOutletTemp < TempLowLimitEout) {
-                if ((EvapInletTemp - TempLowLimitEout) > DataPlant::DeltaTempTol) {
-                    EvapOutletTemp = TempLowLimitEout;
-                    EvapDeltaTemp = EvapInletTemp - EvapOutletTemp;
-                    QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                } else {
-                    QEvaporator = 0.0;
-                    EvapOutletTemp = EvapInletTemp;
-                }
-            }
-
-            // Check if the outlet temperature exceeds the node minimum temperature and adjust capacity if needed
-            if (EvapOutletTemp < this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin) {
-                if ((this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp - this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin) >
-                    DataPlant::DeltaTempTol) {
-                    EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin;
-                    EvapDeltaTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin - EvapOutletTemp;
-                    QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                } else {
-                    QEvaporator = 0.0;
-                    EvapOutletTemp = EvapInletTemp;
-                }
-            }
+            // Run evaporator checks and adjust outlet temp and QEvaporator if necessary
+            WrapperSpecs::checkEvapOutletTemp(
+                state, ChillerHeaterNum, EvapOutletTemp, TempLowLimitEout, EvapInletTemp, QEvaporator, EvapMassFlowRate, Cp);
 
             // Calculate part load once more since evaporator capacity might be modified
-            if (AvailChillerCap > 0.0) {
-                PartLoadRat = max(0.0, min((QEvaporator / AvailChillerCap), MaxPartLoadRat));
-            } else {
-                PartLoadRat = 0.0;
-            }
-
-            // Chiller cycles below minimum part load ratio, FRAC = amount of time chiller is ON during this time step
-            if (PartLoadRat < MinPartLoadRat) FRAC = min(1.0, (PartLoadRat / MinPartLoadRat));
-
-            // set the module level variable used for reporting FRAC
-            state.dataPlantCentralGSHP->ChillerCyclingRatio = FRAC;
-
-            // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-            if (AvailChillerCap > 0.0) {
-                PartLoadRat = max(PartLoadRat, MinPartLoadRat);
-            } else {
-                PartLoadRat = 0.0;
-            }
-
-            // set the module level variable used for reporting PLR
-            state.dataPlantCentralGSHP->ChillerPartLoadRatio = PartLoadRat;
-
-            // calculate the load due to false loading on chiller over and above water side load
-            state.dataPlantCentralGSHP->ChillerFalseLoadRate = (AvailChillerCap * PartLoadRat * FRAC) - QEvaporator;
-            if (state.dataPlantCentralGSHP->ChillerFalseLoadRate < DataHVACGlobals::SmallLoad) {
-                state.dataPlantCentralGSHP->ChillerFalseLoadRate = 0.0;
-            }
+            WrapperSpecs::calcPLRAndCyclingRatio(state, AvailChillerCap, PartLoadRat, MinPartLoadRat, MaxPartLoadRat, QEvaporator, FRAC);
 
             // Determine chiller compressor power and transfer heat calculation
             state.dataPlantCentralGSHP->ChillerEIRFT =
@@ -2454,34 +2366,8 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
             // Mode 4 uses all data from the chilled water loop due to no heating demand
             if (this->SimulClgDominant || CurrentMode == 3) {
                 CurrentMode = 3;
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
-                                                                   CondInletTemp,
-                                                                   state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
-                                                                   RoutineName);
-
                 QCondenser = this->ChillerHeater(ChillerHeaterNum).Report.QCondSimul;
-
-                if (this->VariableFlowCH) { // Variable flow
-                    Real64 CondMassFlowRateCalc = QCondenser / CondDeltaTemp / Cp;
-                    if (CondMassFlowRateCalc > CondMassFlowRate) {
-                        CondMassFlowRateCalc = CondMassFlowRate;
-                        Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
-                        if (CondDeltaTempCalc > CondDeltaTemp) { // Load to meet should be adjusted
-                            QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
-                        }
-                    }
-                    CondMassFlowRate = CondMassFlowRateCalc;
-                } else { // Constant flow control
-                    Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
-                    Real64 CondOutletTempCalc = CondDeltaTempCalc + CondInletTemp;
-                    if (CondOutletTempCalc > CondOutletTemp) {
-                        CondOutletTempCalc = CondOutletTemp;
-                        QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
-                    }
-                    CondOutletTemp = CondOutletTempCalc;
-                }
-
+                this->adjustChillerHeaterFlowTemp(state, QCondenser, CondMassFlowRate, CondOutletTemp, CondInletTemp, CondDeltaTemp);
             } else { // Either Mode 2 or 3 or 5
                 if (this->SimulHtgDominant) {
                     CurrentMode = 5;
@@ -2504,63 +2390,27 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX = this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX;
                 this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX = this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX;
 
-                Real64 CondTempforCurve; // Reference condenser temperature for the performance curve reading
+                // Reference condenser temperature for the performance curve reading: set to entering or leaving condenser temperature based on user
+                // input
+                Real64 CondTempforCurve = this->setChillerHeaterCondTemp(
+                    state, ChillerHeaterNum, CondInletTemp, this->ChillerHeater(ChillerHeaterNum).TempRefCondOutClgHtg);
 
-                if (this->ChillerHeater(ChillerHeaterNum).CondMode == "ENTERINGCONDENSER") {
-                    CondTempforCurve = CondInletTemp;
-                } else if (this->ChillerHeater(ChillerHeaterNum).CondMode == "LEAVINGCONDENSER") {
-                    CondTempforCurve = this->ChillerHeater(ChillerHeaterNum).TempRefCondOutClgHtg; //! CondOutletTemp
-                } else {
-                    ShowWarningError(state, format("ChillerHeaterPerformance:Electric:EIR \"{}\":", this->ChillerHeater(ChillerHeaterNum).Name));
-                    ShowContinueError(state,
-                                      format("Chiller condenser temperature for curve fit are not decided, default value= cond_leaving ({:.3R}).",
-                                             state.dataPlantCentralGSHP->ChillerCapFT));
-                    CondTempforCurve =
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
-                }
-
-                Real64 MinPartLoadRat; // Min allowed operating fraction of full load
-                Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
-
-                Curve::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
                 Real64 ChillerRefCap = this->ChillerHeater(ChillerHeaterNum).RefCap;
                 Real64 ReferenceCOP = this->ChillerHeater(ChillerHeaterNum).RefCOP;
                 EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg;
                 Real64 TempLowLimitEout = this->ChillerHeater(ChillerHeaterNum).TempLowLimitEvapOut;
                 Real64 EvapOutletTempSetPoint = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg;
-                state.dataPlantCentralGSHP->ChillerCapFT =
-                    Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
-                if (state.dataPlantCentralGSHP->ChillerCapFT < 0) {
-                    if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
-                        ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                        ShowWarningError(state, format("ChillerHeaterPerformance:Electric:EIR \"{}\":", this->ChillerHeater(ChillerHeaterNum).Name));
-                        ShowContinueError(state,
-                                          format(" ChillerHeater Capacity as a Function of Temperature curve output is negative ({:.3R}).",
-                                                 state.dataPlantCentralGSHP->ChillerCapFT));
-                        ShowContinueError(
-                            state,
-                            format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
-                                   EvapOutletTempSetPoint,
-                                   CondInletTemp));
-                        ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-                    } else if (!state.dataGlobal->WarmupFlag) {
-                        ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                        ShowRecurringWarningErrorAtEnd(
-                            state,
-                            "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name +
-                                "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...",
-                            this->ChillerHeater(ChillerHeaterNum).ChillerCapFTErrorIndex,
-                            state.dataPlantCentralGSHP->ChillerCapFT,
-                            state.dataPlantCentralGSHP->ChillerCapFT);
-                    }
-                    state.dataPlantCentralGSHP->ChillerCapFT = 0.0;
-                }
+                // Calculate Chiller Capacity as a function of temperature and error check
+                state.dataPlantCentralGSHP->ChillerCapFT = this->calcChillerCapFT(state, ChillerHeaterNum, EvapOutletTempSetPoint, CondTempforCurve);
 
                 // Available chiller capacity as a function of temperature
                 Real64 AvailChillerCap = ChillerRefCap * state.dataPlantCentralGSHP->ChillerCapFT;
 
-                Real64 PartLoadRat; // Operating part load ratio
+                Real64 PartLoadRat;    // Operating part load ratio
+                Real64 MinPartLoadRat; // Min allowed operating fraction of full load
+                Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
+                Curve::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
 
                 // Part load ratio based on reference capacity and available chiller capacity
                 if (AvailChillerCap > 0) {
@@ -2582,58 +2432,17 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                     EvapOutletTemp = EvapInletTemp - EvapDeltaTemp;
                 }
 
-                // Check that the evaporator outlet temp honors both plant loop temp low limit and also the chiller low limit
-                if (EvapOutletTemp < TempLowLimitEout) {
-                    if ((this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp - TempLowLimitEout) > DataPlant::DeltaTempTol) {
-                        EvapOutletTemp = TempLowLimitEout;
-                        Real64 EvapDeltaTemp = this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp - EvapOutletTemp;
-                        QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                    } else {
-                        EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp;
-                        Real64 EvapDeltaTemp = this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp - EvapOutletTemp;
-                        QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                    }
-                }
+                // Run evaporator checks and adjust outlet temp and QEvaporator if necessary
+                WrapperSpecs::checkEvapOutletTemp(state,
+                                                  ChillerHeaterNum,
+                                                  EvapOutletTemp,
+                                                  TempLowLimitEout,
+                                                  this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp,
+                                                  QEvaporator,
+                                                  EvapMassFlowRate,
+                                                  Cp);
 
-                if (EvapOutletTemp < this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin) {
-                    if ((this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp - this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin) >
-                        DataPlant::DeltaTempTol) {
-                        EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin;
-                        Real64 EvapDeltaTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin - EvapOutletTemp;
-                        QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                    } else {
-                        EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin;
-                        Real64 EvapDeltaTemp = this->ChillerHeater(ChillerHeaterNum).EvapOutletNode.TempMin - EvapOutletTemp;
-                        QEvaporator = EvapMassFlowRate * Cp * EvapDeltaTemp;
-                    }
-                }
-
-                // Evaporator operates at full load
-                if (AvailChillerCap > 0.0) {
-                    PartLoadRat = max(0.0, min((QEvaporator / AvailChillerCap), MaxPartLoadRat));
-                } else {
-                    PartLoadRat = 0.0;
-                }
-
-                // Chiller cycles below minimum part load ratio, FRAC = amount of time chiller is ON during this time step
-                if (PartLoadRat < MinPartLoadRat) FRAC = min(1.0, (PartLoadRat / MinPartLoadRat));
-                if (FRAC <= 0.0) FRAC = 1.0; // CR 9303 COP reporting issue, it should be greater than zero in this routine
-                state.dataPlantCentralGSHP->ChillerCyclingRatio = FRAC;
-
-                // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-                if (AvailChillerCap > 0.0) {
-                    PartLoadRat = max(PartLoadRat, MinPartLoadRat);
-                } else {
-                    PartLoadRat = 0.0;
-                }
-                // Evaporator part load ratio
-                state.dataPlantCentralGSHP->ChillerPartLoadRatio = PartLoadRat;
-
-                // calculate the load due to false loading on chiller over and above water side load
-                state.dataPlantCentralGSHP->ChillerFalseLoadRate = (AvailChillerCap * PartLoadRat * FRAC) - QEvaporator;
-                if (state.dataPlantCentralGSHP->ChillerFalseLoadRate < DataHVACGlobals::SmallLoad) {
-                    state.dataPlantCentralGSHP->ChillerFalseLoadRate = 0.0;
-                }
+                WrapperSpecs::calcPLRAndCyclingRatio(state, AvailChillerCap, PartLoadRat, MinPartLoadRat, MaxPartLoadRat, QEvaporator, FRAC);
 
                 state.dataPlantCentralGSHP->ChillerEIRFT =
                     max(0.0, Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
@@ -2658,37 +2467,13 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 // Set load this chiller heater should meet and temperatures given
                 QCondenser = min(HeatingLoadToMeet, QCondenser);
 
-                Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
-                                                            CondInletTemp,
-                                                            state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
-                                                            RoutineNameElecEIRChiller);
-
-                // Calculate temperatures for constant flow and mass flow rate for variable flow
-                // Limit mass for this chiller heater to the available mass at given temperature conditions
-                // when mass calculated to meet the load is greater than the maximum available
+                // Calculate outlet temperature for constant flow and mass flow rate for variable flow
+                // Limit mass flow rate for this chiller heater to the available mass at given temperature conditions
+                // when mass flow rate calculated to meet the load is greater than the maximum available
                 // then recalculate heating load this chiller heater can meet
                 if (CurrentMode == 2 || this->SimulHtgDominant) {
                     if (CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance && CondDeltaTemp > 0.0) {
-                        if (this->VariableFlowCH) { // Variable flow
-                            Real64 CondMassFlowRateCalc = QCondenser / CondDeltaTemp / Cp;
-                            if (CondMassFlowRateCalc > CondMassFlowRate) {
-                                CondMassFlowRateCalc = CondMassFlowRate;
-                                Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
-                                if (CondDeltaTempCalc > CondDeltaTemp) { // Load to meet should be adjusted
-                                    QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
-                                }
-                            }
-                            CondMassFlowRate = CondMassFlowRateCalc;
-                        } else { // Constant Flow at a fixed flow rate and capacity
-                            Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
-                            Real64 CondOutletTempCalc = CondDeltaTempCalc + CondInletTemp;
-                            if (CondOutletTempCalc > CondOutletTemp) { // Load to meet should be adjusted
-                                CondOutletTempCalc = CondOutletTemp;
-                                QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
-                            }
-                            CondOutletTemp = CondOutletTempCalc;
-                        }
+                        this->adjustChillerHeaterFlowTemp(state, QCondenser, CondMassFlowRate, CondOutletTemp, CondInletTemp, CondDeltaTemp);
                     } else {
                         QCondenser = 0.0;
                         CondOutletTemp = CondInletTemp;
@@ -2766,6 +2551,157 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
             this->ChillerHeater(ChillerHeaterNum).Report.Condmdot = CondMassFlowRate;
             this->ChillerHeater(ChillerHeaterNum).Report.ActualCOP = ActualCOP;
         }
+    }
+}
+
+void WrapperSpecs::adjustChillerHeaterFlowTemp(EnergyPlusData &state,
+                                               Real64 &QCondenser,
+                                               Real64 &CondMassFlowRate,
+                                               Real64 &CondOutletTemp,
+                                               Real64 const CondInletTemp,
+                                               Real64 const CondDeltaTemp)
+{
+    // Based on whether this is variable or constant flow, adjust either flow or outlet temperature and also the load
+    static constexpr std::string_view RoutineName("adjustChillerHeaterFlow");
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                       state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
+                                                       CondInletTemp,
+                                                       state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
+                                                       RoutineName);
+
+    if (this->VariableFlowCH) { // Variable Flow (adjust flow and condenser load as needed)
+        Real64 CondMassFlowRateCalc = QCondenser / CondDeltaTemp / Cp;
+        if (CondMassFlowRateCalc > CondMassFlowRate) {
+            CondMassFlowRateCalc = CondMassFlowRate;
+            Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
+            if (CondDeltaTempCalc > CondDeltaTemp) { // Load to meet should be adjusted
+                QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
+            }
+        }
+        CondMassFlowRate = CondMassFlowRateCalc;
+    } else { // Constant Flow (adjust outlet temperature and condenser load as needed)
+        Real64 CondDeltaTempCalc = QCondenser / CondMassFlowRate / Cp;
+        Real64 CondOutletTempCalc = CondDeltaTempCalc + CondInletTemp;
+        if (CondOutletTempCalc > CondOutletTemp) { // Load to meet should be adjusted
+            CondOutletTempCalc = CondOutletTemp;
+            QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
+        }
+        CondOutletTemp = CondOutletTempCalc;
+    }
+}
+
+Real64
+WrapperSpecs::setChillerHeaterCondTemp(EnergyPlusData &state, int const numChillerHeater, Real64 const condEnteringTemp, Real64 const condLeavingTemp)
+{
+    Real64 setChillerHeaterCondTemp;
+    if (this->ChillerHeater(numChillerHeater).CondMode == CondenserModeTemperature::EnteringCondenser) {
+        setChillerHeaterCondTemp = condEnteringTemp;
+    } else { // by default, if not EnteringCondenser, then this can only be LeavingCondenser
+        setChillerHeaterCondTemp = condLeavingTemp;
+    }
+    return setChillerHeaterCondTemp;
+}
+
+Real64 WrapperSpecs::calcChillerCapFT(EnergyPlusData &state, int const numChillerHeater, Real64 const evapOutletTemp, Real64 const condTemp)
+{
+    // Calculate the chiller capacity as a function of temperature
+    Real64 chillCapFT = Curve::CurveValue(state, this->ChillerHeater(numChillerHeater).ChillerCapFTIDX, evapOutletTemp, condTemp);
+
+    // Tracks errors for when the capacity is calculated as less than zero
+    if (chillCapFT < 0) {
+        if (this->ChillerHeater(numChillerHeater).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
+            ++this->ChillerHeater(numChillerHeater).ChillerCapFTError;
+            ShowWarningError(state, format("ChillerHeaterPerformance:Electric:EIR \"{}\":", this->ChillerHeater(numChillerHeater).Name));
+            ShowContinueError(state, format(" ChillerHeater Capacity as a Function of Temperature curve output is negative ({:.3R}).", chillCapFT));
+            ShowContinueError(state,
+                              format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
+                                     evapOutletTemp,
+                                     condTemp));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        } else if (!state.dataGlobal->WarmupFlag) {
+            ++this->ChillerHeater(numChillerHeater).ChillerCapFTError;
+            ShowRecurringWarningErrorAtEnd(
+                state,
+                "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(numChillerHeater).Name +
+                    "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...",
+                this->ChillerHeater(numChillerHeater).ChillerCapFTErrorIndex,
+                chillCapFT,
+                chillCapFT);
+        }
+        chillCapFT = 0.0;
+    }
+    return chillCapFT;
+}
+
+void WrapperSpecs::checkEvapOutletTemp(EnergyPlusData &state,
+                                       int const numChillerHeater,
+                                       Real64 &evapOutletTemp,
+                                       Real64 const lowTempLimitEout,
+                                       Real64 const evapInletTemp,
+                                       Real64 &qEvaporator,
+                                       Real64 &evapMassFlowRate,
+                                       Real64 const Cp)
+{
+    // Check evaporator temperature low limit and adjust capacity if needed
+    if (evapOutletTemp < lowTempLimitEout) {
+        if ((evapInletTemp - lowTempLimitEout) > DataPlant::DeltaTempTol) {
+            evapOutletTemp = lowTempLimitEout;
+            Real64 evapDeltaTemp = evapInletTemp - evapOutletTemp;
+            qEvaporator = evapMassFlowRate * Cp * evapDeltaTemp;
+        } else {
+            qEvaporator = 0.0;
+            evapOutletTemp = evapInletTemp;
+        }
+    }
+
+    // Check if the outlet temperature exceeds the node minimum temperature and adjust capacity if needed
+    if (evapOutletTemp < this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin) {
+        if ((this->ChillerHeater(numChillerHeater).EvapInletNode.Temp - this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin) >
+            DataPlant::DeltaTempTol) {
+            evapOutletTemp = this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin;
+            Real64 evapDeltaTemp = this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin - evapOutletTemp;
+            qEvaporator = evapMassFlowRate * Cp * evapDeltaTemp;
+        } else {
+            qEvaporator = 0.0;
+            evapOutletTemp = evapInletTemp;
+        }
+    }
+}
+
+void WrapperSpecs::calcPLRAndCyclingRatio(EnergyPlusData &state,
+                                          Real64 const availChillerCap,
+                                          Real64 &actualPartLoadRatio,
+                                          Real64 const minPartLoadRatio,
+                                          Real64 const maxPartLoadRatio,
+                                          Real64 const qEvaporator,
+                                          Real64 &frac)
+{
+    // Calculate PLR (actualPartLoadRatio) based on evaporator load and available capacity, factoring in max PLR
+    if (availChillerCap > 0.0) {
+        actualPartLoadRatio = max(0.0, min((qEvaporator / availChillerCap), maxPartLoadRatio));
+    } else {
+        actualPartLoadRatio = 0.0;
+    }
+
+    // Chiller cycles below minimum part load ratio, frac = amount of time chiller is ON during this time step
+    if (actualPartLoadRatio < minPartLoadRatio) frac = min(1.0, (actualPartLoadRatio / minPartLoadRatio));
+    if (frac <= 0.0) frac = 1.0; // CR 9303 COP reporting issue, it should be greater than zero in this routine
+    state.dataPlantCentralGSHP->ChillerCyclingRatio = frac;
+
+    // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
+    if (availChillerCap > 0.0) {
+        actualPartLoadRatio = max(actualPartLoadRatio, minPartLoadRatio);
+    } else {
+        actualPartLoadRatio = 0.0;
+    }
+
+    // Evaporator part load ratio
+    state.dataPlantCentralGSHP->ChillerPartLoadRatio = actualPartLoadRatio;
+
+    // Calculate the load due to false loading on chiller over and above water side load
+    state.dataPlantCentralGSHP->ChillerFalseLoadRate = (availChillerCap * actualPartLoadRatio * frac) - qEvaporator;
+    if (state.dataPlantCentralGSHP->ChillerFalseLoadRate < HVAC::SmallLoad) {
+        state.dataPlantCentralGSHP->ChillerFalseLoadRate = 0.0;
     }
 }
 

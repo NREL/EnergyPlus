@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -339,9 +339,11 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
         ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
     }
 
-    if (!state.dataEnvrn->GroundTemp_DeepObjInput) {
+    if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::Deep]) {
         ShowWarningError(state, "GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input.");
-        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Deep));
+        ShowContinueError(state,
+                          format("Defaults, constant throughout the year of ({:.1R}) will be used.",
+                                 state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep]));
     }
 }
 
@@ -349,45 +351,45 @@ void PondGroundHeatExchangerData::setupOutputVars(EnergyPlusData &state)
 {
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->HeatTransferRate,
-                        OutputProcessor::SOVTimeStepType::Plant,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Heat Transfer Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Energy,
-                        OutputProcessor::SOVTimeStepType::Plant,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->MassFlowRate,
-                        OutputProcessor::SOVTimeStepType::Plant,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->InletTemp,
-                        OutputProcessor::SOVTimeStepType::Plant,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->OutletTemp,
-                        OutputProcessor::SOVTimeStepType::Plant,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Bulk Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->PondTemp,
-                        OutputProcessor::SOVTimeStepType::Plant,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 }
 
@@ -553,12 +555,11 @@ Real64 PondGroundHeatExchangerData::CalcTotalFLux(EnergyPlusData &state, Real64 
     }
 
     // absolute temperatures
-    Real64 SurfTempAbs = PondBulkTemp + Constant::KelvinConv;            // absolute value of surface temp
-    Real64 SkyTempAbs = state.dataEnvrn->SkyTemp + Constant::KelvinConv; // absolute value of sky temp
+    Real64 SurfTempAbs = PondBulkTemp + Constant::Kelvin;            // absolute value of surface temp
+    Real64 SkyTempAbs = state.dataEnvrn->SkyTemp + Constant::Kelvin; // absolute value of sky temp
 
     // ASHRAE simple convection coefficient model for external surfaces.
-    Real64 ConvCoef =
-        ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(Material::SurfaceRoughness::VeryRough, DataEnvironment::WindSpeedAt(state, PondHeight));
+    Real64 ConvCoef = Convect::CalcASHRAESimpExtConvCoeff(Material::SurfaceRoughness::VeryRough, DataEnvironment::WindSpeedAt(state, PondHeight));
 
     // convective flux
     Real64 FluxConvect = ConvCoef * (PondBulkTemp - ExternalTemp);
@@ -600,7 +601,7 @@ Real64 PondGroundHeatExchangerData::CalcTotalFLux(EnergyPlusData &state, Real64 
     Real64 UvalueGround = 0.999 * (this->GrndConductivity / this->Depth) + 1.37 * (this->GrndConductivity * Perimeter / this->Area);
 
     // ground heat transfer flux
-    Real64 FluxGround = UvalueGround * (PondBulkTemp - state.dataEnvrn->GroundTemp_Deep);
+    Real64 FluxGround = UvalueGround * (PondBulkTemp - state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep]);
 
     CalcTotalFLux = Qfluid + this->Area * (FluxSolAbsorbed - FluxConvect - FluxLongwave - FluxEvap - FluxGround);
 
@@ -884,7 +885,7 @@ void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
     if (this->OneTimeFlag || state.dataGlobal->WarmupFlag) {
         // initialize pond temps to mean of drybulb and ground temps.
         this->BulkTemperature = this->PastBulkTemperature =
-            0.5 * (DataEnvironment::OutDryBulbTempAt(state, PondHeight) + state.dataEnvrn->GroundTemp_Deep);
+            0.5 * (DataEnvironment::OutDryBulbTempAt(state, PondHeight) + state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep]);
         this->OneTimeFlag = false;
     }
 

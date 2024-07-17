@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -296,7 +296,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNumbers,
                                                                  IOStatus);
-        if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
+        if (!Util::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }
         found_it = true;
@@ -428,7 +428,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
                                                  const DataLoopNode::NodeData &inletNode,
                                                  DataLoopNode::NodeData &outletNode,
                                                  Real64 &_PLR,
-                                                 int const fanOpMode,
+                                                 HVAC::FanOp const fanOp,
                                                  const Real64 condInletTemp)
 {
 
@@ -534,7 +534,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
     if (indexPLRFPLF > 0) {
         PLF = Curve::CurveValue(state, indexPLRFPLF, _PLR); // Calculate part-load factor
     }
-    if (fanOpMode == DataHVACGlobals::CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
+    if (fanOp == HVAC::FanOp::Cycling) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
 
     Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
     if (indexEIRFT > 0) {
@@ -566,7 +566,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
 
     //  If constant fan with cycling compressor, call function to determine "effective SHR"
     //  which includes the part-load degradation on latent capacity
-    if (this->doLatentDegradation && (fanOpMode == DataHVACGlobals::ContFanCycCoil)) {
+    if (this->doLatentDegradation && (fanOp == HVAC::FanOp::Continuous)) {
         Real64 QLatActual = TotCap * (1.0 - SHR);
         // TODO: Figure out HeatingRTF for this
         Real64 HeatingRTF = 0.0;

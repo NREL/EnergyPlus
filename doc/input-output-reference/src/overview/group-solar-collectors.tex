@@ -4,7 +4,7 @@ Solar collectors are thermal devices that convert solar energy into thermal ener
 
 In EnergyPlus solar collectors are components that are connected to the plant loop. A solar heating system can be constructed with a combination of solar collectors, pumps, and hot water tanks.
 
-Flate plate solar collectors are defined using two objects: \hyperref[solarcollectorflatplatewater]{SolarCollector:FlatPlate:Water} and \hyperref[solarcollectorperformanceflatplate]{SolarCollectorPerformance:FlatPlate}. Similarly, Integral-Collector-Storage (ICS) solar collectors are defined using two objects: \hyperref[solarcollectorintegralcollectorstorage]{SolarCollector:IntegralCollectorStorage}, and \hyperref[solarcollectorperformanceintegralcollectorstorage]{SolarCollectorPerformance:IntegralCollectorStorage}. The \hyperref[solarcollectorflatplatewater]{SolarCollector:FlatPlate:Water} and \hyperref[solarcollectorintegralcollectorstorage]{SolarCollector:IntegralCollectorStorage} objects describe the plant component connections. These object also reference \hyperref[solarcollectorperformanceflatplate]{SolarCollectorPerformance:FlatPlate} and \hyperref[solarcollectorperformanceintegralcollectorstorage]{SolarCollectorPerformance:IntegralCollectorStorage} performance objects which contains the thermal and optical performance test data for a specific make and model of collector. Parameters are defined separately so that these values can be organized into a reference data set and need only be entered once if for an array of the same type of collectors.
+Flat plate solar collectors are defined using two objects: \hyperref[solarcollectorflatplatewater]{SolarCollector:FlatPlate:Water} and \hyperref[solarcollectorperformanceflatplate]{SolarCollectorPerformance:FlatPlate}. Similarly, Integral-Collector-Storage (ICS) solar collectors are defined using two objects: \hyperref[solarcollectorintegralcollectorstorage]{SolarCollector:IntegralCollectorStorage}, and \hyperref[solarcollectorperformanceintegralcollectorstorage]{SolarCollectorPerformance:IntegralCollectorStorage}. The \hyperref[solarcollectorflatplatewater]{SolarCollector:FlatPlate:Water} and \hyperref[solarcollectorintegralcollectorstorage]{SolarCollector:IntegralCollectorStorage} objects describe the plant component connections. These object also reference \hyperref[solarcollectorperformanceflatplate]{SolarCollectorPerformance:FlatPlate} and \hyperref[solarcollectorperformanceintegralcollectorstorage]{SolarCollectorPerformance:IntegralCollectorStorage} performance objects which contains the thermal and optical performance test data for a specific make and model of collector. Parameters are defined separately so that these values can be organized into a reference data set and need only be entered once if for an array of the same type of collectors.
 
 \subsection{SolarCollector:FlatPlate:Water}\label{solarcollectorflatplatewater}
 
@@ -453,7 +453,7 @@ This field is the name of Plant loop node that serves as the inlet to the PVT co
 
 \paragraph{Field: Water Outlet Node Name}\label{field-water-outlet-node-name-002}
 
-This field is the name of a plant loop node that seves as the outlet from the PVT collector. This field is only used if the Thermal Working Fluid Type is set to Plant/Water.
+This field is the name of a plant loop node that serves as the outlet from the PVT collector. This field is only used if the Thermal Working Fluid Type is set to Plant/Water.
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-006}
 

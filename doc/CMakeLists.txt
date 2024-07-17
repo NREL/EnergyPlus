@@ -63,7 +63,6 @@ if(EXISTS ${XELATEX})
   add_subdirectory(module-developer)
   add_subdirectory(output-details-and-examples)
   add_subdirectory(plant-application-guide)
-  add_subdirectory(tips-and-tricks-using-energyplus)
   add_subdirectory(using-energyplus-for-compliance)
 
 else()

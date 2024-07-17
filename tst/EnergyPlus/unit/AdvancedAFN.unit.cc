@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -103,9 +103,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataEnvrn->OutDryBulbTemp = 15.0;
     state->dataHeatBal->Zone.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 22.0;
-    state->dataHeatBal->ZoneMRT(1) = 22.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MRT = 22.0;
 
     TimeOpenElapsed = 5.0;
     TimeCloseElapsed = 0.0;
@@ -149,7 +148,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     EXPECT_EQ(1, CloseProbStatus);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 26.0;
-    state->dataHeatBal->ZoneMRT(1) = 26.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MRT = 26.0;
     state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(2, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
@@ -159,7 +158,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataHeatBal->ZoneIntGain.allocate(1);
     state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.5;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::Uncontrolled;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::Uncontrolled;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
 
@@ -167,7 +166,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     EXPECT_EQ(1, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.0;
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 28.0;
     state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);

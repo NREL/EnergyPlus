@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -267,14 +267,14 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     Real64 tCollector = 0.0;
 
     // Set up conditions
-    int InletNode = UtilityRoutines::FindItemInList("ZN_1_FLR_1_SEC_1:SYS_OAINLET NODE",
-                                                    state->dataLoopNodes->NodeID,
-                                                    state->dataLoopNodes->NumOfNodes); // HVAC node associated with inlet of BIPVT
-    state->dataLoopNodes->Node(InletNode).HumRat = 0.001;                              // inlet air humidity ratio (kgda/kg)
-    state->dataEnvrn->OutHumRat = 0.001;                                               // ambient humidity ratio (kg/kg)
-    state->dataEnvrn->SkyTemp = 0.0;                                                   // sky temperature (DegC)
-    state->dataEnvrn->WindSpeed = 5.0;                                                 // wind speed (m/s)
-    state->dataEnvrn->WindDir = 0.0;                                                   // wind direction (deg)
+    int InletNode = Util::FindItemInList("ZN_1_FLR_1_SEC_1:SYS_OAINLET NODE",
+                                         state->dataLoopNodes->NodeID,
+                                         state->dataLoopNodes->NumOfNodes); // HVAC node associated with inlet of BIPVT
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.001;                   // inlet air humidity ratio (kgda/kg)
+    state->dataEnvrn->OutHumRat = 0.001;                                    // ambient humidity ratio (kg/kg)
+    state->dataEnvrn->SkyTemp = 0.0;                                        // sky temperature (DegC)
+    state->dataEnvrn->WindSpeed = 5.0;                                      // wind speed (m/s)
+    state->dataEnvrn->WindDir = 0.0;                                        // wind direction (deg)
     state->dataPhotovoltaic->PVarray(thisBIPVT.PVnum).TRNSYSPVcalc.ArrayEfficiency = 0.5;
     state->dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(thisBIPVT.SurfNum) = 0.0; // Exterior ground diffuse solar incident on surface (W/m2)
     state->dataHeatBal->SurfCosIncidenceAngle(thisBIPVT.SurfNum) = 0.5;           // Cosine of beam solar incidence angle
@@ -419,8 +419,16 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     state->dataHeatBal->SurfQRadSWOutIncident(thisBIPVT.SurfNum) = 0.0;
     thisBIPVT.calculateBIPVTMaxHeatGain(*state, tempSetPoint, bypassFraction, potentialHeatGain, potentialOutletTemp, eff, tCollector);
 
+#if defined(__APPLE__) && defined __arm64__
+    // BIPVT uses solveLinSysBackSub to solve a system of linear equations using Gaussian elimination and back substitution method
+    // The iteration is slightly different on mac M1, leading to an extra iteration happening to satisfy the error tolerance of 1e-3 and leads to
+    // different results, cf https://github.com/NREL/EnergyPlus/issues/10122#issuecomment-2217405175
+    EXPECT_NEAR(bypassFraction, 0.249, 0.001);
+    EXPECT_NEAR(potentialHeatGain, -3021.77, 0.01);
+#else
     EXPECT_NEAR(bypassFraction, 0.248, 0.001);
     EXPECT_NEAR(potentialHeatGain, -3023.06, 0.01);
+#endif
     EXPECT_NEAR(potentialOutletTemp, 22.0, 0.01);
     EXPECT_NEAR(eff, 0.0, 0.0001);
     EXPECT_NEAR(tCollector, 20.38, 0.01);

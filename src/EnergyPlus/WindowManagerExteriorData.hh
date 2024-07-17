@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -101,7 +101,7 @@ class CMultiLayerScattered;
 
 namespace EnergyPlus {
 
-namespace WindowManager {
+namespace Window {
 
     // using IGU_BSDFLayers = std::vector< std::shared_ptr< SingleLayerOptics::CBSDFLayer > >;
     using IGU_Layers = std::vector<SingleLayerOptics::CScatteringLayer>;
@@ -160,11 +160,16 @@ namespace WindowManager {
         std::map<std::pair<FenestrationCommon::WavelengthRange, int>, std::shared_ptr<MultiLayerOptics::CMultiLayerScattered>> m_Equivalent;
     };
 
-} // namespace WindowManager
+} // namespace Window
 
 struct WindowManagerExteriorData : BaseGlobalStruct
 {
-    std::unique_ptr<WindowManager::CWindowConstructionsSimplified> p_inst;
+    std::unique_ptr<Window::CWindowConstructionsSimplified> p_inst;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) WindowManagerExteriorData();

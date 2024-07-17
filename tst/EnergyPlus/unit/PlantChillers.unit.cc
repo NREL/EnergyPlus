@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,6 +62,7 @@ using namespace PlantChillers;
 
 TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
 {
+    state->init_state(*state);
     // unit test for autosizing heat recovery in Chiller:CombustionTurbine
     state->dataPlantChillers->GTChiller.allocate(1);
 
@@ -99,6 +100,7 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
 
 TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
 {
+    state->init_state(*state);
     // unit test for autosizing heat recovery in Chiller:EngineDriven
     state->dataPlantChillers->EngineDrivenChiller.allocate(1);
 
@@ -226,7 +228,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
     EngineDrivenChillerSpecs::getInput(*state);
 
     EXPECT_EQ(1, state->dataPlantChillers->NumEngineDrivenChillers);
-    EXPECT_EQ(state->dataPlantChillers->EngineDrivenChiller(1).FuelType, "Diesel");
+    EXPECT_ENUM_EQ(state->dataPlantChillers->EngineDrivenChiller(1).FuelType, Constant::eFuel::Diesel);
 }
 
 TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
@@ -295,5 +297,5 @@ TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
     GTChillerSpecs::getInput(*state);
 
     EXPECT_EQ(1, state->dataPlantChillers->NumGTChillers);
-    EXPECT_EQ(state->dataPlantChillers->GTChiller(1).FuelType, "NaturalGas");
+    EXPECT_ENUM_EQ(state->dataPlantChillers->GTChiller(1).FuelType, Constant::eFuel::NaturalGas);
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -100,7 +100,7 @@ namespace Construction {
         std::array<Real64, MaxCTFTerms> CTFOutside{};   // Outside or X terms of the CTF equation
         std::array<Real64, MaxCTFTerms> CTFSourceIn{};  // Heat source/sink inside terms of CTF equation
         std::array<Real64, MaxCTFTerms> CTFSourceOut{}; // Heat source/sink outside terms of CTF equation
-        Real64 CTFTimeStep;                             // Time increment for stable simulation of construct (could be greater than TimeStep)
+        Real64 CTFTimeStep = 0.0;                       // Time increment for stable simulation of construct (could be greater than TimeStep)
         // The next three series of terms are used to calculate the temperature at the location of a source/sink
         // in the QTF formulation.  This calculation is necessary to allow the proper simulation of a
         // radiant system.
@@ -299,6 +299,8 @@ namespace Construction {
 
         void reportTransferFunction(EnergyPlusData &state, int cCounter);
 
+        void reportLayers(EnergyPlusData &state);
+
         bool isGlazingConstruction(EnergyPlusData &state) const;
 
         Real64 setThicknessPerpendicular(EnergyPlusData &state, Real64 userValue);
@@ -316,9 +318,13 @@ struct ConstructionData : BaseGlobalStruct
     Array1D<Construction::ConstructionProps> Construct;
     Array1D_int LayerPoint = Array1D<int>(Construction::MaxLayersInConstruct, 0);
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = ConstructionData();
+        new (this) ConstructionData();
     }
 };
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
     }
     auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(VBMatNum));
     EXPECT_EQ(1, state->dataHeatBal->TotBlindsEQL);
-    EXPECT_TRUE(compare_enums(thisMaterial->group, Material::Group::BlindEquivalentLayer));
+    EXPECT_ENUM_EQ(thisMaterial->group, Material::Group::BlindEquivalentLayer);
     EXPECT_EQ(static_cast<int>(thisMaterial->slatAngleType), state->dataWindowEquivalentLayer->lscVBNOBM);
 
     int ConstrNum = 1;
@@ -535,7 +535,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 12;
     state->dataGlobal->CurrentTime = 12.0;
-    WeatherManager::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
+    Weather::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
     // get window surface index
     for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
         if (state->dataSurface->SurfWinWindowModelType(iSurf) == DataSurfaces::WindowModel::EQL) {
@@ -558,7 +558,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     // check the slat angle
     EXPECT_NEAR(-71.0772, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for MaximizeSolar slat angle control, the slat angle = -ve vertical profile angle
-    DaylightingManager::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal, ProfAngVer);
+    ProfAngVer = Dayltg::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal);
     EXPECT_NEAR(-Constant::RadToDeg * ProfAngVer, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
 }
 
@@ -897,7 +897,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 12;
     state->dataGlobal->CurrentTime = 12.0;
-    WeatherManager::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
+    Weather::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
     // get equivalent layer window surface index
     for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
         if (state->dataSurface->SurfWinWindowModelType(iSurf) == DataSurfaces::WindowModel::EQL) {
@@ -920,7 +920,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     // check the VB slat angle
     EXPECT_NEAR(18.9228, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for BlockBeamSolar slat angle control, the slat angle = 90 - ProfAngVer
-    DaylightingManager::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal, ProfAngVer);
+    ProfAngVer = Dayltg::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal);
     EXPECT_NEAR(90.0 - Constant::RadToDeg * ProfAngVer, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // get the slat angle from profile angle
     Real64 SlateAngleBlockBeamSolar = VB_CriticalSlatAngle(Constant::RadToDeg * ProfAngVer);
@@ -949,7 +949,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
     Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, state->dataMaterial->TotMaterials);
-    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(1)->group, Material::Group::WindowSimpleGlazing));
+    EXPECT_ENUM_EQ(state->dataMaterial->Material(1)->group, Material::Group::WindowSimpleGlazing);
     // get construction returns error forund true due to invalid layer
     GetConstructData(*state, ErrorsFound);
     EXPECT_EQ(1, state->dataHeatBal->TotConstructs);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -116,7 +116,7 @@ TEST_F(EnergyPlusFixture, FileSystemGetFileType)
 {
     fs::path filePath0("/eplus/myfile.idf");
     auto ext = EnergyPlus::FileSystem::getFileType(filePath0);
-    EXPECT_TRUE(compare_enums(EnergyPlus::FileSystem::FileTypes::IDF, ext));
+    EXPECT_ENUM_EQ(EnergyPlus::FileSystem::FileTypes::IDF, ext);
 
     fs::path filePath1("./schedulefileA.CSV");
     ext = EnergyPlus::FileSystem::getFileType(filePath1);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+
+#include "../TestHelpers/CustomMatchers.hh"
 
 #include <memory>
 #include <ostream>
@@ -125,20 +127,6 @@ protected:
     // unit test names change.
     void show_message();
 
-    // This will compare two enums and convert them to their underlying_type. Without this function or operator<<
-    // overload, googletest will not properly link since it can't implicitly convert to underlying_type anymore
-    template <typename T, typename = typename std::enable_if_t<std::is_enum_v<T>, T>>
-    constexpr bool compare_enums(T const expected, T const actual, bool const expect_eq = true)
-    {
-        const bool is_valid = (expected == actual);
-        if (expect_eq) {
-            EXPECT_EQ(static_cast<typename std::underlying_type_t<T>>(expected), static_cast<typename std::underlying_type_t<T>>(actual));
-        } else {
-            EXPECT_NE(static_cast<typename std::underlying_type_t<T>>(expected), static_cast<typename std::underlying_type_t<T>>(actual));
-        }
-        return is_valid;
-    }
-
     // This will compare either a STL container or ObjexxFCL container
     // Pass a container you want to compare against an expected container. You can pass in an existing
     // container or use an initializer list like below.
@@ -183,6 +171,13 @@ protected:
     // Will return true if string matches the stream and false if it does not
     bool compare_eio_stream(std::string const &expected_string, bool reset_stream = true);
 
+    // Check if EIO string contains a substring. The default is to reset the EIO stream after every call.
+    // It is easier to test successive functions if the EIO stream is 'empty' before the next call.
+    // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
+    // if it makes sense for the unit test to continue after returning from function.
+    // Will return true if string matches the stream and false if it does not
+    bool compare_eio_stream_substring(std::string const &expected_string, bool reset_stream = true);
+
     // Compare an expected string against the MTR stream. The default is to reset the MTR stream after every call.
     // It is easier to test successive functions if the MTR stream is 'empty' before the next call.
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -196,6 +191,13 @@ protected:
     // if it makes sense for the unit test to continue after returning from function.
     // Will return true if string matches the stream and false if it does not
     bool compare_err_stream(std::string const &expected_string, bool reset_stream = true);
+
+    // Check if ERR stream contains a substring. The default is to reset the ERR stream after every call.
+    // It is easier to test successive functions if the ERR stream is 'empty' before the next call.
+    // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
+    // if it makes sense for the unit test to continue after returning from function.
+    // Will return true if string is found in the stream and false if it is not
+    bool compare_err_stream_substring(std::string const &search_string, bool reset_stream = true);
 
     // Compare an expected string against the COUT stream. The default is to reset the COUT stream after every call.
     // It is easier to test successive functions if the COUT stream is 'empty' before the next call.
@@ -260,11 +262,26 @@ protected:
     // if it makes sense for the unit test to continue after returning from function.
     // This will add the required objects if not specified: Version, Building, GlobalGeometryRules
     // Will return false if no errors found and true if errors found
-    bool process_idf(std::string const &idf_snippet, bool use_assertions = true);
     bool process_idf(std::string_view const idf_snippet, bool use_assertions = true);
 
     // Opens output files as stringstreams
     void openOutputFiles(EnergyPlusData &state);
+
+    // A worker function that keeps trailing spaces in multiline raw string literals
+    void replace_pipes_with_spaces(std::string &stringLiteral)
+    {
+        // C++ now allows nice raw multiline string literals
+        // These are very useful for unit tests that compare against a long chunk of text
+        // For example, if you have an EIO output to compare, you can just paste it right into a variable and compare
+        // However, if the raw literal has trailing spaces on any line, editors tend to remove them
+        // I tried disabling clang-format for sections of code, I tried using an .editorconfig file, and still
+        // the editor would remove them on saving the file.  And for my editor, I _can_ disable that, but only for all
+        // files, which is not preferred.  We do want trailing spaces stripped, just not inside raw string literals.
+        // Anyway, the solution I came up with is a small worker function here.  In the string literal, just put in
+        // pipe characters ( "|" ) where the trailing spaces would be.  Then pass your string literal into this
+        // function, and it will programmatically replace them with strings.  You can then do asserts as needed.
+        std::replace(stringLiteral.begin(), stringLiteral.end(), '|', ' '); // replace the trailing || with spaces
+    }
 
 public:
     EnergyPlusData *state;
@@ -277,7 +294,7 @@ private:
     // This function should be called by process_idf() so unit tests can take advantage of caching
     // To test this function use InputProcessorFixture
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
-    // if it makes sense for the unit test to continue after retrning from function.
+    // if it makes sense for the unit test to continue after returning from function.
     // Will return false if no errors found and true if errors found
 
     //    static bool process_idd(std::string const &idd, bool &errors_found);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,6 +69,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
@@ -219,6 +220,7 @@ TEST_F(EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning)
         "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
         "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -355,6 +357,7 @@ TEST_F(EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 }
 
@@ -410,6 +413,7 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
         idf_lines.push_back("    HPWH Air Inlet " + i_str + ",          !- Evaporator Air Inlet Node Name");
         idf_lines.push_back("    HPWH Coil Outlet Fan Inlet " + i_str + ",  !- Evaporator Air Outlet Node Name");
         idf_lines.push_back("    0,                       !- Crankcase Heater Capacity {W}");
+        idf_lines.push_back("    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name");
         idf_lines.push_back("    10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}");
         idf_lines.push_back("    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects");
         idf_lines.push_back("    HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name");
@@ -671,6 +675,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
         "    HPWH Air Inlet Node_1,   !- Evaporator Air Inlet Node Name",
         "    HPWH CoilAirOutlet FanAirInlet_1,  !- Evaporator Air Outlet Node Name",
         "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    0,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWH-Cap-fT,             !- Heating Capacity Function of Temperature Curve Name",
@@ -794,9 +799,9 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     // ValidateFuelType tests for WaterHeater:Stratified
     WaterThermalTanks::getWaterHeaterStratifiedInput(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_ENUM_EQ(Tank.FuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OffCycParaFuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OnCycParaFuelType, Constant::eFuel::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, HPWHSizing)
@@ -893,6 +898,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
         "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
         "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -1040,8 +1046,8 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
     WaterThermalTanks::SimHeatPumpWaterHeater(*state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
-    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
-    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));
+    EXPECT_EQ(state->dataFans->fans(1)->maxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
+    EXPECT_EQ(state->dataFans->fans(1)->maxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));
 }
 
 TEST_F(EnergyPlusFixture, WaterThermalTank_CalcTempIntegral)
@@ -1175,6 +1181,7 @@ TEST_F(EnergyPlusFixture, HPWHOutdoorAirMissingNodeNameWarning)
         "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
         "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -1341,6 +1348,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
         "    HPWHWaterInletNode,      !- Condenser Water Inlet Node Name",
         "    HPWHWaterOutletNode,     !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -1524,9 +1532,9 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     // ValidateFuelType tests for WaterHeater:Mixed
     WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_ENUM_EQ(Tank.FuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OffCycParaFuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OnCycParaFuelType, Constant::eFuel::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
@@ -1746,7 +1754,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     Tank.CalcWaterThermalTankStratified(*state);
 
     // check source inlet and outlet temperatures are different
-    EXPECT_EQ(Tank.SourceInletTemp, 5.0);
+    EXPECT_DOUBLE_EQ(Tank.SourceInletTemp, 5.0);
     EXPECT_NEAR(Tank.SourceOutletTemp, 10.34, 0.01);
 }
 
@@ -2283,8 +2291,9 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
         "  Autosize,                !- Evaporative Condenser Air Flow Rate {m3/s}",
         "  Autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}"
         "  50,                      !- Crankcase Heater Capacity {W}",
-        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         ",",
+        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ,                        !- Supply Water Storage Tank Name",
         "  ,                        !- Condensate Collection Water Storage Tank Name",
         "  0,                       !- Basin Heater Capacity {W/K}",
@@ -2561,6 +2570,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
         "    SensCoolCapCurve,        !- Sensible Cooling Name",
         "    CoolPowCurve,            !- Cooling Power Consumption Curve Name",
+        "    CoolPLFCurve,            !- Cooling Power Consumption Curve Name",
         "    1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
         "    1.5;                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 
@@ -2620,6 +2630,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "  100,                  ! Maximum Value of z",
         "  0.,                   ! Minimum Curve Output",
         "  38.;                  ! Maximum Curve Output",
+
+        "Curve:Quadratic, CoolPLFCurve, 0.85, 0.83, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless; ",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2647,7 +2660,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataPlnt->TotNumLoops = 1;
     int TankNum(1);
     int HPNum(1);
-    int CyclingScheme(1);
+    HVAC::FanOp fanOp = HVAC::FanOp::Cycling;
     int LoopNum(1);
     int BranchNum(1);
     int CompNum(1);
@@ -2678,13 +2691,13 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     CoilBranch.Comp(CompNum).Name = "GSHP_COIL1";
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(*state, HPNum, 10.0, 1.0, 0.0, 10.0, 10.0, CyclingScheme, 1.0, 1);
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
+    WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(*state, HPNum, 10.0, 10.0, fanOp, 1.0, 1);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, fanOp, 10.0, 10.0, HVAC::CompressorOp::On, PLR, 1.0);
     // Coil source side heat successfully passed to HeatReclaimSimple_WAHPCoil(1).AvailCapacity
     EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity, state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource);
     // Reclaimed heat successfully returned to reflect the plant impact
     state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).WaterHeatingDesuperheaterReclaimedHeat(1) = 100.0;
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, fanOp, 10.0, 10.0, HVAC::CompressorOp::On, PLR, 1.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource,
               state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity - 100.0);
 
@@ -2851,6 +2864,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
         "  No,                                     !- Apply Part Load Fraction to Speeds Greater than 1",
         "  No,                                     !- Apply Latent Degradation to Speeds Greater than 1",
         "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  12.7777777777778,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  0,                                      !- Basin Heater Capacity {W/K}",
         "  2,                                      !- Basin Heater Setpoint Temperature {C}",
@@ -3064,7 +3078,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
     // Calculate multispeed DX cooling coils
-    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, DataHVACGlobals::CompressorOperation::On, 1);
+    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, HVAC::FanOp::Cycling, HVAC::CompressorOp::On, 1);
 
     // Source availably heat successfully passed to DataHeatBalance::HeatReclaimDXCoil data struct
     EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(DXNum).AvailCapacity,
@@ -3112,7 +3126,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Desuperheater.SaveMode = WaterThermalTanks::TankOperatingMode::Floating;
     state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
     Tank.SourceMassFlowRate = 0.003;
-    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, DataHVACGlobals::CompressorOperation::On, 1);
+    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, HVAC::FanOp::Cycling, HVAC::CompressorOp::On, 1);
     Tank.CalcDesuperheaterWaterHeater(*state, false);
     EXPECT_TRUE(Desuperheater.Mode == WaterThermalTanks::TankOperatingMode::Floating);
     EXPECT_EQ(Desuperheater.HeaterRate, 0.0);
@@ -3600,8 +3614,9 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
         "  Autosize,                !- Evaporative Condenser Air Flow Rate {m3/s}",
         "  Autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}"
         "  50,                      !- Crankcase Heater Capacity {W}",
-        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         ",",
+        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ,                        !- Supply Water Storage Tank Name",
         "  ,                        !- Condensate Collection Water Storage Tank Name",
         "  0,                       !- Basin Heater Capacity {W/K}",
@@ -3806,14 +3821,14 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         "  ,                        !- Heater Minimum Capacity {W}",
         "  0,                       !- Heater Ignition Minimum Flow Rate {m3/s}",
         "  0,                       !- Heater Ignition Delay {s}",
-        "  Steam,              !- Heater Fuel Type",
+        "  DistrictHeatingSteam,              !- Heater Fuel Type",
         "  0.8,                     !- Heater Thermal Efficiency",
         "  ,                        !- Part Load Factor Curve Name",
         "  20,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}",
-        "  Steam,              !- Off Cycle Parasitic Fuel Type",
+        "  DistrictHeatingSteam,              !- Off Cycle Parasitic Fuel Type",
         "  0.8,                     !- Off Cycle Parasitic Heat Fraction to Tank",
         "  0,                       !- On Cycle Parasitic Fuel Consumption Rate {W}",
-        "  Steam,              !- On Cycle Parasitic Fuel Type",
+        "  DistrictHeatingSteam,              !- On Cycle Parasitic Fuel Type",
         "  0,                       !- On Cycle Parasitic Heat Fraction to Tank",
         "  Zone,                    !- Ambient Temperature Indicator",
         "  ,                        !- Ambient Temperature Schedule Name",
@@ -3861,6 +3876,7 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         "  HPWHPumped Tank Outlet - Condenser Inlet,  !- Condenser Water Inlet Node Name",
         "  HPWHPumped Condenser Outlet - Tank Inlet,  !- Condenser Water Outlet Node Name",
         "  100,                     !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  5,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHPumped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",
@@ -4100,6 +4116,7 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         "  HPWHWrapped Air Inlet Node,  !- Evaporator Air Inlet Node Name",
         "  HPWHWrapped Evap Outlet - Fan Inlet,  !- Evaporator Air Outlet Node Name",
         "  0,                       !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHWrapped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",
@@ -4208,9 +4225,9 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
         // ValidateFuelType tests for WaterHeater:Mixed
         WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, WaterThermalTanks::Fuel::Steam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, WaterThermalTanks::Fuel::Steam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, WaterThermalTanks::Fuel::Steam));
+        EXPECT_ENUM_EQ(HPWHTank.FuelType, Constant::eFuel::DistrictHeatingSteam);
+        EXPECT_ENUM_EQ(HPWHTank.OffCycParaFuelType, Constant::eFuel::DistrictHeatingSteam);
+        EXPECT_ENUM_EQ(HPWHTank.OnCycParaFuelType, Constant::eFuel::DistrictHeatingSteam);
     }
 
     ++HPWaterHeaterNum;
@@ -4327,6 +4344,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         "    HPWHWaterInletNode,      !- Condenser Water Inlet Node Name",
         "    HPWHWaterOutletNode,     !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -4618,6 +4636,7 @@ TEST_F(EnergyPlusFixture, HPWH_Wrapped_Stratified_Simultaneous)
         "  HPWHWrapped Air Inlet Node,  !- Evaporator Air Inlet Node Name",
         "  HPWHWrapped Evap Outlet - Fan Inlet,  !- Evaporator Air Outlet Node Name",
         "  0,                       !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHWrapped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",
@@ -4867,6 +4886,7 @@ TEST_F(EnergyPlusFixture, HPWH_Pumped_Stratified_Simultaneous)
         "  HPWHPumped Tank Outlet - Condenser Inlet,  !- Condenser Water Inlet Node Name",
         "  HPWHPumped Condenser Outlet - Tank Inlet,  !- Condenser Water Outlet Node Name",
         "  100,                     !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  5,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHPumped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",

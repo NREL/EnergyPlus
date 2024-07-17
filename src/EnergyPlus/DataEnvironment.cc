@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -159,14 +159,12 @@ Real64 OutWetBulbTempAt(EnergyPlusData &state, Real64 const Z) // Height above g
     return LocalOutWetBulbTemp;
 }
 
-Real64 WindSpeedAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
+Real64 WindSpeedAt(const EnergyPlusData &state, Real64 const Z) // Height above ground (m)
 {
 
     // FUNCTION INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   January 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Calculates local wind speed at a given altitude.
@@ -178,22 +176,17 @@ Real64 WindSpeedAt(EnergyPlusData &state, Real64 const Z) // Height above ground
     // 2005 ASHRAE Fundamentals, Chapter 16, Equation 4.  (Different depending on terrain).
     // Terrain variables are set in HeatBalanceManager or entered by the user.
 
-    // Return value
-    Real64 LocalWindSpeed; // Return result for function (m/s)
-
     if (Z <= 0.0) {
-        LocalWindSpeed = 0.0;
+        return 0.0;
     } else if (state.dataEnvrn->SiteWindExp == 0.0) {
-        LocalWindSpeed = state.dataEnvrn->WindSpeed;
+        return state.dataEnvrn->WindSpeed;
     } else {
         //  [Met] - at meterological Station, Height of measurement is usually 10m above ground
         //  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
         //                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-        LocalWindSpeed = state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff *
-                         std::pow(Z / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
+        return state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff *
+               std::pow(Z / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
     }
-
-    return LocalWindSpeed;
 }
 
 Real64 OutBaroPressAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
@@ -227,7 +220,7 @@ Real64 OutBaroPressAt(EnergyPlusData &state, Real64 const Z) // Height above gro
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 BaseTemp; // Base temperature at Z
 
-    BaseTemp = OutDryBulbTempAt(state, Z) + Constant::KelvinConv;
+    BaseTemp = OutDryBulbTempAt(state, Z) + Constant::Kelvin;
 
     if (Z <= 0.0) {
         LocalAirPressure = 0.0;

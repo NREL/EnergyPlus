@@ -65,7 +65,7 @@ This descriptive name allows the values of exterior equipment consumption to app
 
 \paragraph{Field: Fuel Use Type}\label{exteriorfuelequipment-field-fuel-use-type}
 
-This field designates the appropriate meter for the exterior fuel equipment. Valid fuel types are: Electricity, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, Steam, \hyperref[districtheating]{DistrictHeating}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters.
+This field designates the appropriate meter for the exterior fuel equipment. Valid fuel types are: Electricity, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, DistrictHeatingSteam, \hyperref[districtheating]{DistrictHeatingWater}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-1-000}
 
@@ -137,7 +137,7 @@ Output for exterior equipment consumption appears in three possible places. It w
 \item
   Zone,Sum, Exterior Equipment Electricity Energy {[}J{]}
 \item
-  Zone,Sum, Exterior Equipment Gas Energy {[}J{]}
+  Zone,Sum, Exterior Equipment NaturalGas Energy {[}J{]}
 \item
   Zone,Average, Exterior Equipment Water Volume Flow Rate {[}m3/s{]}
 \item

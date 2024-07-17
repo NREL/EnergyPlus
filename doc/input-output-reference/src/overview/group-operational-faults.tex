@@ -429,7 +429,7 @@ This field provides the name of a schedule that describes the pressure rise vari
 
 \paragraph{Field: Fan Curve Name}\label{field-fan-curve-name}
 
-This field provides the name of a fan curve for the fan associated with the fault. The curve describes the relationship between the fan pressure rise and air flow rate. This is used to estimate the variations of the fan air flow rate in the faulty cases, given the Pressure Rise Variation Schedule. For variable speed fans, the curve should be the one corresponding to the maximum fan speed. The fan curve should cover the design operational point specified in the corresponding fan object. It is also required that the faulty fan operatinal state point falls within the fan selection range that is monotonically decreasing.
+This field provides the name of a fan curve for the fan associated with the fault. The curve describes the relationship between the fan pressure rise and air flow rate. This is used to estimate the variations of the fan air flow rate in the faulty cases, given the Pressure Rise Variation Schedule. For variable speed fans, the curve should be the one corresponding to the maximum fan speed. The fan curve should cover the design operational point specified in the corresponding fan object. It is also required that the faulty fan operational state point falls within the fan selection range that is monotonically decreasing.
 
 \paragraph{IDF Examples}\label{an-example-of-idf-codes-for-the-fouling-air-filter-fault-models}
 
@@ -748,7 +748,7 @@ This field defines the fouling factor of the faulty boiler. The factor indicates
     HeatSys1 Supply Equipment Outlet Node,  !- Boiler Water Outlet Node Name
     95.0,                    !- Water Outlet Upper Temperature Limit {C}
     LeavingSetpointModulated,!- Boiler Flow Mode
-    0.0000,                  !- Parasitic Electric Load {W}
+    0.0000,                  !- On Cycle Parasitic Electric Load {W}
     1.0000;                  !- Sizing Factor
 
   FaultModel:Fouling:Boiler,

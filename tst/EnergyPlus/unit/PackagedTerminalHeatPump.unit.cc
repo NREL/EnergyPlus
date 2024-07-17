@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -85,6 +85,7 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
@@ -97,7 +98,6 @@ using namespace EnergyPlus::BranchInputManager;
 using namespace EnergyPlus::DataDefineEquip;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
@@ -153,10 +153,6 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
         "    Lobby_ZN_1_FLR_2 WSHP Heating Mode,                        !- Heating Coil Name",
         "    Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,  !- Cooling Coil Object Type",
         "    Lobby_ZN_1_FLR_2 WSHP Cooling Mode,                        !- Cooling Coil Name",
-        "    2.5,                  !- Maximum Cycling Rate {cycles/hr}",
-        "    60.0,                 !- Heat Pump Time Constant {s}",
-        "    0.01,                 !- Fraction of On-Cycle Power Use",
-        "    60,                   !- Heat Pump Fan Delay Time {s}",
         "    Coil:Heating:Electric,                    !- Supplemental Heating Coil Object Type",
         "    Lobby_ZN_1_FLR_2 WSHP Supp Heating Coil,  !- Supplemental Heating Coil Name",
         "    50.0,                 !- Maximum Supply Air Temperature from Supplemental Heater {C}",
@@ -180,6 +176,9 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
         "    Autosize,             !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0.0,                  !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0.0,                  !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    2.5,                  !- Maximum Cycling Rate {cycles/hr}",
+        "    60.0,                 !- Latent Capacity Time Constant {s}",
+        "    60,                   !- Fan Delay Time {s}",
         "    0,                    !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}",
         "    PLF Curve,            !- Energy Part Load Fraction Curve Name",
         "    4682.3964854,         !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}",
@@ -452,7 +451,7 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
     GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "Zone WSHP", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "Zone WSHP", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
     thisSys.getUnitarySystemInput(*state, "Zone WSHP", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
@@ -578,12 +577,12 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
     // this same ratio should also equal the internal flow per capacity variable used to back calculate operating air flow rate
     EXPECT_EQ(sizingAirflowCapacityRatio, state->dataVariableSpeedCoils->VarSpeedCoil(2).MSRatedAirVolFlowPerRatedTotCap(9));
 
-    SizeFan(*state, 1);
+    state->dataFans->fans(1)->set_size(*state);
     // the fan vol flow rate should equal the max of cooling and heating coil flow rates
     Real64 maxCoilAirFlow =
         max(state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedAirVolFlowRate, state->dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate);
-    EXPECT_NEAR(state->dataFans->Fan(1).MaxAirFlowRate, maxCoilAirFlow, 0.000001);
-    EXPECT_NEAR(state->dataFans->Fan(1).MaxAirFlowRate, max(thisSys.m_MaxCoolAirVolFlow, thisSys.m_MaxHeatAirVolFlow), 0.000001);
+    EXPECT_NEAR(state->dataFans->fans(1)->maxAirFlowRate, maxCoilAirFlow, 0.000001);
+    EXPECT_NEAR(state->dataFans->fans(1)->maxAirFlowRate, max(thisSys.m_MaxCoolAirVolFlow, thisSys.m_MaxHeatAirVolFlow), 0.000001);
 
     // Also set BeginEnvrnFlag so code is tested for coil initialization and does not crash
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -611,8 +610,8 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_FALSE(state->dataSize->ZoneEqSizing(1).HeatingAirFlow);
     EXPECT_EQ(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, thisSys.m_MaxCoolAirVolFlow);
     EXPECT_LT(state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow, thisSys.m_MaxHeatAirVolFlow);
-    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataSize->ZoneEqSizing(1).AirVolFlow);
-    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate,
+    EXPECT_EQ(state->dataFans->fans(1)->maxAirFlowRate, state->dataSize->ZoneEqSizing(1).AirVolFlow);
+    EXPECT_EQ(state->dataFans->fans(1)->maxAirFlowRate,
               max(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow));
 }
 
@@ -662,6 +661,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
         "    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
         "    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
         "    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0.200,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
@@ -850,16 +850,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     GetZoneAirLoopEquipment(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
 
     //// get input test for terminal air single duct mixer on inlet side of PTAC
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
-    EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", thisSys.UnitType);                       // zoneHVAC equipment type
-    EXPECT_EQ("COIL:HEATING:FUEL", thisSys.m_HeatingCoilTypeName);                                // PTAC heating coil type
-    EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(1).HCoilType_Num, Coil_HeatingGasOrOtherFuel); // gas heating coil type
+    EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", thisSys.UnitType);                             // zoneHVAC equipment type
+    EXPECT_EQ("COIL:HEATING:FUEL", thisSys.m_HeatingCoilTypeName);                                      // PTAC heating coil type
+    EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(1).HCoilType_Num, HVAC::Coil_HeatingGasOrOtherFuel); // gas heating coil type
 
     state->dataGlobal->BeginEnvrnFlag = false;
 
@@ -889,11 +889,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->maxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->inletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->outletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -915,7 +915,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     state->dataGlobal->SysSizingCalc = true;
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeating;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::SingleHeating;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
@@ -926,8 +926,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
 
     state->dataUnitarySystems->HeatingLoad = false;
     state->dataUnitarySystems->CoolingLoad = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     // supply fan is continuous flow
     thisSys.MaxHeatAirMassFlow = HVACInletMassFlowRate;
@@ -1009,6 +1009,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
         "    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
         "    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
         "    0.335,                   !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0.200,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
@@ -1201,7 +1202,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -1228,19 +1229,19 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
 
     state->dataUnitarySystems->HeatingLoad = false;
     state->dataUnitarySystems->CoolingLoad = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataScheduleMgr->Schedule(thisSys.m_FanOpModeSchedPtr).CurrentValue = 1.0; // unit is always on
     state->dataScheduleMgr->Schedule(thisSys.m_SysAvailSchedPtr).CurrentValue = 1.0;  // unit is always available
     state->dataScheduleMgr->Schedule(thisSys.m_FanAvailSchedPtr).CurrentValue = 1.0;  // fan is always available
 
     // set fan parameters
-    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->maxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->inletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->outletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -1261,7 +1262,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataGlobal->SysSizingCalc = false;
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeating;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::SingleHeating;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
@@ -1304,6 +1305,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     EXPECT_NEAR(QUnitOut, 1000.0, 0.01);
     ASSERT_NEAR(state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(thisSys.DesignMaxOutletTemp, state->dataHeatingCoils->HeatingCoil(1).OutletAirTemp);
+    EXPECT_TRUE(thisSys.m_useNoLoadLowSpeedAirFlow); // because input is blank, doesn't affect no load flow rate because coils are single sped
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // set heating load to just below lower boundary load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0;
@@ -3087,9 +3089,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE1-1 Supply Inlet,   !- Air Outlet Node Name",
         "    ,                        !- Outdoor Air Mixer Object Type",
         "    ,                        !- Outdoor Air Mixer Name",
-        "    0.27003,                !- Cooling Supply Air Flow Rate {m3/s}",
-        "    0.27003,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.27003,                 !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.27003,                 !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -3197,9 +3200,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE2-1 Supply Inlet,   !- Air Outlet Node Name",
         "    ,                        !- Outdoor Air Mixer Object Type",
         "    ,                        !- Outdoor Air Mixer Name",
-        "    0.20772,                !- Cooling Supply Air Flow Rate {m3/s}",
-        "    0.20772,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.20772,                 !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.20772,                 !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -3236,9 +3240,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE3-1 Supply Inlet,   !- Air Outlet Node Name",
         "    ,                        !- Outdoor Air Mixer Object Type",
         "    ,                        !- Outdoor Air Mixer Name",
-        "    0.25034,                !- Cooling Supply Air Flow Rate {m3/s}",
-        "    0.25034,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.25034,                 !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.25034,                 !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -3275,9 +3280,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE4-1 PTAC Outlet,    !- Air Outlet Node Name",
         "    ,                        !- Outdoor Air Mixer Object Type",
         "    ,                        !- Outdoor Air Mixer Name",
-        "    0.22037,                !- Cooling Supply Air Flow Rate {m3/s}",
-        "    0.22037,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.22037,                 !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.22037,                 !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -3314,9 +3320,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE5-1 PTAC Outlet,    !- Air Outlet Node Name",
         "    ,                        !- Outdoor Air Mixer Object Type",
         "    ,                        !- Outdoor Air Mixer Name",
-        "    0.26423,                !- Cooling Supply Air Flow Rate {m3/s}",
-        "    0.26423,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.26423,                 !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.26423,                 !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -3865,7 +3872,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(6);
     for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.MAT = 23.0;
-        thisZoneHB.ZoneAirHumRat = 0.001;
+        thisZoneHB.airHumRat = 0.001;
     }
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
@@ -3884,7 +3891,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp =
             state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat =
-            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZoneAirHumRat;
+            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).airHumRat;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Enthalpy =
             Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp,
                                        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat);
@@ -3904,7 +3911,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataEnvrn->StdRhoAir = 1.2;
     GetZoneAirSetPoints(*state);
     state->dataHeatBalFanSys->TempControlType.allocate(6);
-    state->dataHeatBalFanSys->TempControlType = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType = HVAC::ThermostatType::DualSetPointWithDeadBand;
     EnergyPlus::OutputReportPredefined::SetPredefinedTables(*state);
 
     for (int i = 1; i <= 14; ++i) {
@@ -3952,7 +3959,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp =
             state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat =
-            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZoneAirHumRat;
+            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).airHumRat;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Enthalpy =
             Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp,
                                        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat);
@@ -4103,6 +4110,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
         "    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
         "    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
         "    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0.200,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
@@ -4291,15 +4299,15 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     ZonePlenum::GetZonePlenumInput(*state);
     ASSERT_TRUE(has_err_output(true)); // clear schedule warnings from err stream
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
     bool isZoneEquipment = true;
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", isZoneEquipment, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
 
-    int zoneSupplyInlet = UtilityRoutines::FindItemInList("SPACE1-1 SUPPLY INLET", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    int zoneExhaustNode = UtilityRoutines::FindItemInList("SPACE1-1 HP INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    int zoneNum = UtilityRoutines::FindItemInList("SPACE1-1", state->dataHeatBal->Zone);
+    int zoneSupplyInlet = Util::FindItemInList("SPACE1-1 SUPPLY INLET", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneExhaustNode = Util::FindItemInList("SPACE1-1 HP INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneNum = Util::FindItemInList("SPACE1-1", state->dataHeatBal->Zone);
 
     // Test 1 - PTAC Inlet node is zone exhaust node
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
@@ -4321,8 +4329,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     thisSys.processInputSpec(*state, thisSys.input_specs, sysNum, errorsFound, isZoneEquipment, zoneOAUnit);
     ASSERT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(errorsFound);
-    int plenumInducedNode =
-        UtilityRoutines::FindItemInList("PLENUM INDUCED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int plenumInducedNode = Util::FindItemInList("PLENUM INDUCED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_EQ(plenumInducedNode, thisSys.AirInNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.m_ZoneInletNode);
@@ -4352,7 +4359,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
 
     ASSERT_TRUE(compare_err_stream(error_string, true));
     ASSERT_TRUE(errorsFound);
-    int someOtherNode = UtilityRoutines::FindItemInList("SOME OTHER NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int someOtherNode = Util::FindItemInList("SOME OTHER NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_EQ(someOtherNode, thisSys.AirInNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.m_ZoneInletNode);
@@ -4373,6 +4380,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
         "  1.00,                                   !- Cooling Supply Air Flow Rate {m3/s}",
         "  1.00,                                   !- Heating Supply Air Flow Rate {m3/s}",
         "  1.00,                                   !- No Load Supply Air Flow Rate {m3/s}",
+        "  ,                                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "  0.50,                                   !- Cooling Outdoor Air Flow Rate {m3/s}",
         "  0.50,                                   !- Heating Outdoor Air Flow Rate {m3/s}",
         "  0.50,                                   !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -4432,6 +4440,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
         "  ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "  5,                                      !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  Resistive,                              !- Defrost Strategy",
         "  Timed,                                  !- Defrost Control",
@@ -4465,6 +4474,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
         "  Autosize,                               !- Evaporative Condenser Air Flow Rate {m3/s}",
         "  Autosize,                               !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  0,                                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ,                                       !- Supply Water Storage Tank Name",
         "  ,                                       !- Condensate Collection Water Storage Tank Name",
@@ -4558,16 +4568,14 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     ASSERT_FALSE(has_err_output(false));
     HVACSystemData *mySys;
     std::string compName = "PTHP THERMAL ZONE ONE";
-    mySys = UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     auto &thisSys = state->dataUnitarySystems->unitarySys[0];
     thisSys.getUnitarySystemInput(*state, "PTHP THERMAL ZONE ONE", zoneEquipment, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
     EXPECT_FALSE(errorsFound);
 
-    int zoneSupplyInlet =
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    int zoneExhaustNode =
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneSupplyInlet = Util::FindItemInList("THERMAL ZONE ONE INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneExhaustNode = Util::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     // test PTHP node connections
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
     EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", thisSys.UnitType);
@@ -4583,20 +4591,20 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     state->dataEnvrn->StdRhoAir = 1.20;
 
     // set zone air conditions
-    auto &zoneAirNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    auto &zoneAirNode =
+        state->dataLoopNodes->Node(Util::FindItemInList("THERMAL ZONE ONE AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     zoneAirNode.Temp = 20.0;
     zoneAirNode.HumRat = 0.003;
     zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
     // set mixed air conditions
     auto &mixedAirNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PTHP THERMAL ZONE ONE MIXED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+        Util::FindItemInList("PTHP THERMAL ZONE ONE MIXED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     mixedAirNode.Temp = 10.0;
     mixedAirNode.HumRat = 0.003;
     mixedAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode.Temp, mixedAirNode.HumRat);
     // set zone exhaust node
     auto &zoneExhNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+        Util::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     zoneExhNode.Temp = 20.0;
     zoneExhNode.HumRat = 0.003;
     zoneExhNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneExhNode.Temp, zoneExhNode.HumRat);
@@ -4625,7 +4633,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     // set thermostat type
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempControlTypeRpt.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     // set the uni sys is always available
     state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_SysAvailSchedPtr).CurrentValue = 1.0;
     state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanAvailSchedPtr).CurrentValue = 1.0;
@@ -4640,7 +4648,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     Real64 latOut = 0.0;
     Real64 constexpr OAUCoilOutTemp = 0.0;
     // set local variables for convenience
-    auto &supplyFan = state->dataFans->Fan(1);
+    auto *supplyFan = state->dataFans->fans(1);
     auto &dxClgCoilMain = state->dataDXCoils->DXCoil(1);
     auto &dxHtgCoilMain = state->dataDXCoils->DXCoil(2);
     auto &elecHtgCoilSupp = state->dataHeatingCoils->HeatingCoil(1);
@@ -4662,13 +4670,14 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     EXPECT_TRUE(state->dataUnitarySystems->HeatingLoad);
     EXPECT_FALSE(state->dataUnitarySystems->CoolingLoad);
 
-    Real64 result_pthp_ElectricityRate = supplyFan.FanPower + state->dataHVACGlobal->DXElecCoolingPower + state->dataHVACGlobal->DXElecHeatingPower +
-                                         state->dataHVACGlobal->DefrostElecPower + state->dataHVACGlobal->ElecHeatingCoilPower +
-                                         state->dataHVACGlobal->SuppHeatingCoilPower + thisSys.m_TotalAuxElecPower;
+    Real64 result_pthp_ElectricityRate = supplyFan->totalPower + state->dataHVACGlobal->DXElecCoolingPower +
+                                         state->dataHVACGlobal->DXElecHeatingPower + state->dataHVACGlobal->DefrostElecPower +
+                                         state->dataHVACGlobal->ElecHeatingCoilPower + state->dataHVACGlobal->SuppHeatingCoilPower +
+                                         thisSys.m_TotalAuxElecPower;
     // test results
     EXPECT_NEAR(30636.88, thisSys.m_ElecPower, 0.01);
     EXPECT_NEAR(30636.88, result_pthp_ElectricityRate, 0.01);
-    EXPECT_NEAR(857.14, supplyFan.FanPower, 0.01);
+    EXPECT_NEAR(857.14, supplyFan->totalPower, 0.01);
     EXPECT_NEAR(0.0, dxClgCoilMain.ElecCoolingPower, 0.01);
     EXPECT_NEAR(0.0, state->dataHVACGlobal->DXElecCoolingPower, 0.01);
     EXPECT_NEAR(4327.88, dxHtgCoilMain.ElecHeatingPower, 0.01);
@@ -4679,6 +4688,384 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     EXPECT_NEAR(25118.52, elecHtgCoilSupp.ElecUseRate, 0.01);
     EXPECT_NEAR(25118.52, state->dataHVACGlobal->SuppHeatingCoilPower, 0.01);
     EXPECT_NEAR(0.0, thisSys.m_TotalAuxElecPower, 0.01);
+}
+
+TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
+{
+
+    bool ErrorsFound(false);
+    bool FirstHVACIteration(false);
+    Real64 HVACInletMassFlowRate(0.0);
+    Real64 PrimaryAirMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 QZnReq(0.0);
+    int PTUnitNum(0);
+
+    std::string_view constexpr idf_objects = R"IDF(
+        Schedule:Compact,
+            FanAvailSched,           !- Name
+            Fraction,                !- Schedule Type Limits Name
+            Through: 12/31,          !- Field 1
+            For: AllDays,            !- Field 2
+            Until: 24:00,            !- Field 16
+            1.0;                     !- Field 17
+
+        Schedule:Compact,
+            FanCycling,              !- Name
+            Fraction,                !- Schedule Type Limits Name
+            Through: 12/31,          !- Field 1
+            For: AllDays,            !- Field 2
+            Until: 24:00,            !- Field 3
+            0;                       !- Field 4
+
+        ZoneHVAC:EquipmentList,
+            SPACE1-1 Equipment,      !- Name
+            SequentialLoad,          !- Load Distribution Scheme
+            ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
+            SPACE1-1 PTAC,           !- Zone Equipment 1 Name
+            1,                       !- Zone Equipment 1 Cooling Sequence
+            1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+
+          ZoneHVAC:PackagedTerminalAirConditioner,
+            SPACE1-1 PTAC,           !- Name
+            FanAvailSched,           !- Availability Schedule Name
+            SPACE1-1 HP Inlet Node,  !- Air Inlet Node Name
+            SPACE1-1 Supply Inlet,   !- Air Outlet Node Name
+            OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
+            PTACOAMixer,             !- Outdoor Air Mixer Name
+            0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}
+            0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}
+            ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+            No,                      !- No Load Supply Air Flow Rate Control Set To Low Speed",
+            0.200,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
+            0.200,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}
+            0.200,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+            Fan:SystemModel,         !- Supply Air Fan Object Type
+            SPACE1-1 Supply Fan,     !- Supply Air Fan Name
+            Coil:Heating:Fuel,       !- Heating Coil Object Type
+            SPACE1-1 Heating Coil,   !- Heating Coil Name
+            Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+            SPACE1-1 PTAC CCoil,     !- Cooling Coil Name
+            BlowThrough,             !- Fan Placement
+            FanCycling,              !- Supply Air Fan Operating Mode Schedule Name
+		    PTAC-Avail Manager;      !- Availability Manager List Name
+
+          AvailabilityManagerAssignmentList,
+            PTAC-Avail Manager,
+            AvailabilityManager:NightCycle,
+            PTAC-FanCycling;
+
+          AvailabilityManager:NightCycle,
+            PTAC-FanCycling,         !- Name
+            FanAvailSched,           !- Applicability Schedule Name
+            FanCycling,              !- Fan Schedule Name
+            CycleOnControlZone,      !- Control Type
+            0.2,                     !- Thermostat Tolerance
+            ThermostatWithMinimumRuntime, !- Cycling Run Time Control Type
+            300,                     !- Cycling Run Time
+            SPACE1-1;                !- Control Zone or Zone List Name
+
+          OutdoorAir:Mixer,
+        	PTACOAMixer,             !- Name
+        	PTACOAMixerOutletNode,   !- Mixed Air Node Name
+            PTACOAInNode,            !- Outdoor Air Stream Node Name
+            ZoneExhausts,            !- Relief Air Stream Node Name
+            SPACE1-1 HP Inlet Node;  !- Return Air Stream Node Name
+
+		  Fan:SystemModel,
+			SPACE1-1 Supply Fan,     !- Name
+			FanAvailSched,           !- Availability Schedule Name
+            PTACOAMixerOutletNode,   !- Air Inlet Node Name
+            SPACE1-1 Fan Outlet Node,!- Air Outlet Node Name
+			0.5,                     !- Design Maximum Air Flow Rate {m3/s}
+			Discrete,                !- Speed Control Method
+			0.0,                     !- Electric Power Minimum Flow Rate Fraction
+			75.0,                    !- Design Pressure Rise {Pa}
+			0.9,                     !- Motor Efficiency
+			1.0,                     !- Motor In Air Stream Fraction
+			AUTOSIZE,                !- Design Electric Power Consumption {W}
+			TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+			,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+			,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+            0.7;                     !- Fan Total Efficiency
+
+        Coil:Heating:Fuel,
+            SPACE1-1 Heating Coil,   !- Name
+            FanAvailSched,           !- Availability Schedule Name
+            NaturalGas,              !- Fuel Type
+            0.8,                     !- Gas Burner Efficiency
+            10000.0,                 !- Nominal Capacity {W}
+            SPACE1-1 CCoil Outlet Node,  !- Air Inlet Node Name
+            SPACE1-1 Supply Inlet;   !- Air Outlet Node Name
+
+          Coil:Cooling:DX:SingleSpeed,
+            SPACE1-1 PTAC CCoil,     !- Name
+            FanAvailSched,           !- Availability Schedule Name
+            6680.0,                  !- Gross Rated Total Cooling Capacity {W}
+            0.75,                    !- Gross Rated Sensible Heat Ratio
+            3.0,                     !- Gross Rated Cooling COP {W/W}
+            0.500,                   !- Rated Air Flow Rate {m3/s}
+            ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+            ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+            SPACE1-1 Fan Outlet Node,!- Air Inlet Node Name
+            SPACE1-1 CCoil Outlet Node,  !- Air Outlet Node Name
+            BiQuadCurveFT,           !- Total Cooling Capacity Function of Temperature Curve Name
+            QuadCurveFFF,            !- Total Cooling Capacity Function of Flow Fraction Curve Name
+            BiQuadCurveFT,           !- Energy Input Ratio Function of Temperature Curve Name
+            QuadCurveFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
+            HPACPLFFPLR;             !- Part Load Fraction Correlation Curve Name
+
+          Curve:Biquadratic,
+            BiQuadCurveFT,           !- Name
+            1.0,                     !- Coefficient1 Constant
+            0.0,                     !- Coefficient2 x
+            0.0,                     !- Coefficient3 x**2
+            0.0,                     !- Coefficient4 y
+            0.0,                     !- Coefficient5 y**2
+            0.0,                     !- Coefficient6 x*y
+            0.0,                     !- Minimum Value of x
+            50.0,                    !- Maximum Value of x
+            0.0,                     !- Minimum Value of y
+            50.0,                    !- Maximum Value of y
+            ,                        !- Minimum Curve Output
+            ,                        !- Maximum Curve Output
+            Temperature,             !- Input Unit Type for X
+            Temperature,             !- Input Unit Type for Y
+            Dimensionless;           !- Output Unit Type
+
+          Curve:Quadratic,
+            QuadCurveFFF,            !- Name
+            1.0,                     !- Coefficient1 Constant
+            0.0,                     !- Coefficient2 x
+            0.0,                     !- Coefficient3 x**2
+            0.5,                     !- Minimum Value of x
+            1.5;                     !- Maximum Value of x
+
+          Curve:Quadratic,
+            HPACPLFFPLR,             !- Name
+            0.85,                    !- Coefficient1 Constant
+            0.15,                    !- Coefficient2 x
+            0.0,                     !- Coefficient3 x**2
+            0.0,                     !- Minimum Value of x
+            1.0;                     !- Maximum Value of x
+
+        Zone,
+            SPACE1-1,                !- Name
+            0,                       !- Direction of Relative North {deg}
+            0,                       !- X Origin {m}
+            0,                       !- Y Origin {m}
+            0,                       !- Z Origin {m}
+            1,                       !- Type
+            1,                       !- Multiplier
+            2.438400269,             !- Ceiling Height {m}
+            239.247360229;           !- Volume {m3}
+
+        ZoneHVAC:EquipmentConnections,
+            SPACE1-1,                !- Zone Name
+            SPACE1-1 Equipment,      !- Zone Conditioning Equipment List Name
+            SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
+            SPACE1-1 Exhausts,       !- Zone Air Exhaust Node or NodeList Name
+            SPACE1-1 Zone Air Node,  !- Zone Air Node Name
+            SPACE1-1 Return Outlet;  !- Zone Return Air Node Name
+
+        NodeList,
+            SPACE1-1 Inlets,         !- Name
+            SPACE1-1 Supply Inlet;   !- Node 1 Name
+
+        NodeList,
+            SPACE1-1 Exhausts,       !- Name
+            SPACE1-1 HP Inlet Node;  !- Node 1 Name
+
+        NodeList,
+            OutsideAirInletNodes,    !- Name
+            PTACOAInNode;            !- Node 1 Name
+
+        OutdoorAir:NodeList,
+            OutsideAirInletNodes;    !- Name
+)IDF";
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    ProcessScheduleInput(*state); // read schedules
+    InitializePsychRoutines(*state);
+    OutputReportPredefined::SetPredefinedTables(*state);
+    GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    GetZoneEquipmentData(*state);
+    GetZoneAirLoopEquipment(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    HVACSystemData *mySys;
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", true, 0);
+    state->dataUnitarySystems->getInputOnceFlag = false;
+    // get input test for terminal air single duct mixer on inlet side of PTAC
+    ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
+    EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", thisSys.UnitType);
+    EXPECT_EQ("COIL:HEATING:FUEL", thisSys.m_HeatingCoilTypeName);
+    EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(1).HCoilType_Num, HVAC::Coil_HeatingGasOrOtherFuel);
+    EXPECT_FALSE(thisSys.m_useNoLoadLowSpeedAirFlow);
+    // set input variables
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 10.0;
+    state->dataEnvrn->OutHumRat = 0.0075;
+    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    state->dataEnvrn->StdRhoAir = 1.20;
+    HVACInletMassFlowRate = 0.0;
+    PrimaryAirMassFlowRate = 0.0;
+    // set zoneNode air condition
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
+                                   state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
+    state->dataScheduleMgr->Schedule(thisSys.m_FanOpModeSchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(thisSys.m_SysAvailSchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(thisSys.m_FanAvailSchedPtr).CurrentValue = 1.0;
+    // initialize mass flow rates
+    state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRate = PrimaryAirMassFlowRate;
+    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+    // set fan parameters
+    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->inletNodeNum).MassFlowRateMax = 1.0;
+    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->inletNodeNum).MassFlowRate = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->outletNodeNum).MassFlowRate = HVACInletMassFlowRate;
+    // set DX coil rated performance parameters
+    state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
+    state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
+    // set oa mixer conditions
+    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).Enthalpy = state->dataEnvrn->OutEnthalpy;
+    // set secondary air conditions
+    state->dataLoopNodes->Node(thisSys.AirInNode).Temp = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
+    state->dataLoopNodes->Node(thisSys.AirInNode).HumRat = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
+    state->dataLoopNodes->Node(thisSys.AirInNode).Enthalpy = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
+    state->dataUnitarySystems->unitarySys[0].ControlZoneNum = 1;
+
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::SingleHeating;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;    // set heating load to zero
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0.0;    // set cooling load to zero
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 0.0;       // set cooling load to zero
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // zero zone heating load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneMassBalanceFlag.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->spaceIntGainDevices.allocate(1);
+    state->dataHeatBal->RefrigCaseCredit.allocate(1);
+    // set supply air flows
+    thisSys.MaxHeatAirMassFlow = HVACInletMassFlowRate;
+    thisSys.m_HeatingSpeedRatio = 1.0;
+    thisSys.m_HeatOutAirMassFlow = PrimaryAirMassFlowRate;
+    thisSys.MaxNoCoolHeatAirMassFlow = HVACInletMassFlowRate;
+    thisSys.m_NoHeatCoolSpeedRatio = 1.0;
+    thisSys.m_NoCoolHeatOutAirMassFlow = PrimaryAirMassFlowRate;
+    thisSys.m_AirFlowControl = UnitarySystems::UnitarySys::UseCompFlow::On;
+    thisSys.m_LastMode = UnitarySystems::HeatingMode;
+
+    state->dataSize->SysSizingRunDone = false;
+    state->dataSize->ZoneSizingRunDone = false;
+    state->dataGlobal->SysSizingCalc = true;
+    state->dataUnitarySystems->HeatingLoad = false;
+    state->dataUnitarySystems->CoolingLoad = false;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
+    // initialized to false
+    ASSERT_FALSE(state->dataUnitarySystems->HeatingLoad);
+    bool HeatActive = false;
+    bool CoolActive = false;
+    Real64 latOut = 0.0;
+    // test PTAC inputs
+    mySys->simulate(*state, thisSys.Name, FirstHVACIteration, 0, PTUnitNum, HeatActive, CoolActive, 0, 0.0, true, QUnitOut, latOut);
+    // PTAC is is off when there is no load
+    ASSERT_FALSE(state->dataUnitarySystems->HeatingLoad);
+    EXPECT_NEAR(QZnReq, 0.0, 0.01);
+    EXPECT_NEAR(QUnitOut, 0.0, 0.01);
+    // set nightcycle flags
+    int NumZones(1);
+    int SysAvailNum = 1;
+    int PriAirSysNum = 0;
+    Avail::Status availStatus = Avail::Status::NoAction;
+    constexpr DataZoneEquipment::ZoneEquipType zoneEquipType = DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner;
+    int constexpr CompNum = 1;
+    bool SimAir = false;
+    // set this as zone equipment
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEquipmentManager->PrioritySimOrder.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataHeatBalFanSys->TempControlType.allocate(NumZones);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(NumZones);
+    state->dataHeatBalFanSys->TempTstatAir.allocate(NumZones);
+    state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(NumZones);
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::SingleCooling;
+    state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 21.1;
+    state->dataHeatBalFanSys->TempTstatAir(1) = 21.1;
+    // get system availability schedule
+    Avail::GetSysAvailManagerListInputs(*state);
+    Avail::GetSysAvailManagerInputs(*state);
+    state->dataAvail->GetAvailListsInput = false;
+    auto &sysAvailMgr = state->dataAvail->NightCycleData(1);
+    // check the three cycling run time control types
+    EXPECT_EQ(1, state->dataAvail->NumNCycSysAvailMgrs);
+    EXPECT_ENUM_EQ(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, sysAvailMgr.cyclingRunTimeControl);
+    // test for initialization and does not crash
+    ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
+
+    // test 1: availability manager status to off
+    state->dataHVACGlobal->TurnFansOn = false;
+    state->dataHVACGlobal->TurnFansOff = true;
+    state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 21.10;
+    state->dataHeatBalFanSys->TempTstatAir(1) = 21.1;
+    sysAvailMgr.availStatus = Avail::Status::NoAction;
+    // run calc system availability requirement
+    availStatus = Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, zoneEquipType, CompNum);
+    // check that the fan is off
+    EXPECT_EQ((int)Avail::Status::NoAction, (int)sysAvailMgr.availStatus);
+    EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
+    EXPECT_TRUE(state->dataHVACGlobal->TurnFansOff);
+    // run to set zone night cycle manager
+    ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
+    Real64 OnOffAirFlowRatio = 0.0;
+    Real64 PartLoadRatio(1.0);
+    // now check if the global flag is reset correctly
+    thisSys.setAverageAirFlow(*state, PartLoadRatio, OnOffAirFlowRatio);
+    EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
+    EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
+
+    // test 2: availability manager status to on
+    state->dataAvail->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).StartTime = 0.0;
+    state->dataAvail->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).StopTime = 4.0;
+    state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 21.10;
+    state->dataHeatBalFanSys->TempTstatAir(1) = 21.5;
+    sysAvailMgr.availStatus = Avail::Status::NoAction;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 0;
+    // run calc system availability requirement
+    availStatus = Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, zoneEquipType, CompNum);
+    // check that the availability manager is cycling On
+    EXPECT_EQ((int)Avail::Status::CycleOn, (int)sysAvailMgr.availStatus);
+    EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
+    EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
+    state->dataAvail->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).availStatus = Avail::Status::CycleOn;
+    // run to set zone night cycle manager
+    ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
+    // test global zone fan control variables are turned on
+    EXPECT_TRUE(state->dataHVACGlobal->TurnFansOn);
+    EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
 }
 
 } // namespace EnergyPlus

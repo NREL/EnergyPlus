@@ -23,7 +23,7 @@ Every commit and every release of EnergyPlus undergoes rigorous testing.
 The testing consists of building EnergyPlus, of course, then there are unit tests, integration tests, API tests, and regression tests.
 Since 2014, most of the testing has been performed by our bots ([Tik-Tok](https://github.com/nrel-bot), [Gort](https://github.com/nrel-bot-2), and [Marvin](https://github.com/nrel-bot-3)), using a fork of the [Decent CI](https://github.com/lefticus/decent_ci) continuous integration system.
 We are now adapting our efforts to use the Github Actions system to handle more of our testing processes.
-In the meantime, while Decent CI is still handling the regression and bulkier testing, results from Decent CI are still available on the testing [dashboard](http://nrel.github.io/EnergyPlusBuildResults/).
+In the meantime, while Decent CI is still handling the regression and bulkier testing, results from Decent CI are still available on the testing [dashboard](https://myoldmopar.github.io/EnergyPlusBuildResults/).
 
 ## Releases
 
@@ -32,7 +32,7 @@ In the meantime, while Decent CI is still handling the regression and bulkier te
 [![](https://github.com/NREL/EnergyPlus/workflows/Linux%20Releases/badge.svg)](https://github.com/NREL/EnergyPlus/actions/workflows/linux_release.yml)
 
 EnergyPlus is released twice annually, usually in March and September.
-It is recommended all use of EnergyPlus is production workflows use these formal, public releases.
+It is recommended all use of EnergyPlus in production workflows use these formal, public releases.
 Iteration **(pre-)releases** may be created during a development cycle, however users should generally avoid these, as input syntax may change which won't be supported by the major release version transition tools, and could require manual intervention to remedy.
 If an interim release is intended for active use by users, such as a bug-fix-only or performance-only re-release, it will be clearly specified on the release notes and a public announcement will accompany this type of release.
 Our releases are now built by Github Actions.

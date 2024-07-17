@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -155,7 +156,7 @@ namespace ICEngineElectricGenerator {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             state.dataICEngElectGen->ICEngineGenerator(genNum).Name = AlphArray(1);
 
@@ -290,13 +291,12 @@ namespace ICEngineElectricGenerator {
             }
 
             // Validate fuel type input
-            bool FuelTypeError(false);
-            UtilityRoutines::ValidateFuelType(state, AlphArray(10), state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType, FuelTypeError);
-            if (FuelTypeError) {
+            state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType =
+                static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, AlphArray(10)));
+            if (state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType == Constant::eFuel::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), AlphArray(10)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
-                FuelTypeError = false;
             }
 
             state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecMaxTemp = NumArray(11);
@@ -309,183 +309,174 @@ namespace ICEngineElectricGenerator {
 
     void ICEngineGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
     {
+        std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->ElecPowerGenerated,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->ElecEnergyGenerated,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            "ElectricityProduced",
-                            "COGENERATION",
-                            {},
-                            "Plant");
+                            Constant::eResource::ElectricityProduced,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Cogeneration);
 
         SetupOutputVariable(state,
-                            "Generator " + this->FuelType + " Rate",
-                            OutputProcessor::Unit::W,
+                            format("Generator {} Rate", sFuelType),
+                            Constant::Units::W,
                             this->FuelEnergyUseRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
-                            "Generator " + this->FuelType + " Energy",
-                            OutputProcessor::Unit::J,
+                            format("Generator {} Energy", sFuelType),
+                            Constant::Units::J,
                             this->FuelEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
-                            {},
-                            this->FuelType,
-                            "COGENERATION",
-                            {},
-                            "Plant");
+                            Constant::eFuel2eResource[(int)this->FuelType],
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Cogeneration);
 
         //    general fuel use report to match other generators.
         SetupOutputVariable(state,
                             "Generator Fuel HHV Basis Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->FuelEnergyUseRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Generator Fuel HHV Basis Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->FuelEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
 
         SetupOutputVariable(state,
-                            "Generator " + this->FuelType + " Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            format("Generator {} Mass Flow Rate", sFuelType),
+                            Constant::Units::kg_s,
                             this->FuelMdot,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Generator Exhaust Air Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->ExhaustStackTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         if (this->HeatRecActive) {
             SetupOutputVariable(state,
                                 "Generator Heat Recovery Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->HeatRecMdotActual,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Jacket Heat Recovery Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->QJacketRecovered,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Jacket Heat Recovery Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->JacketEnergyRec,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "ENERGYTRANSFER",
-                                "HEATRECOVERY",
-                                {},
-                                "Plant");
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRecovery);
 
             SetupOutputVariable(state,
                                 "Generator Lube Heat Recovery Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->QLubeOilRecovered,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Lube Heat Recovery Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->LubeOilEnergyRec,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "ENERGYTRANSFER",
-                                "HEATRECOVERY",
-                                {},
-                                "Plant");
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRecovery);
 
             SetupOutputVariable(state,
                                 "Generator Exhaust Heat Recovery Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->QExhaustRecovered,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Exhaust Heat Recovery Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ExhaustEnergyRec,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "ENERGYTRANSFER",
-                                "HEATRECOVERY",
-                                {},
-                                "Plant");
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRecovery);
 
             SetupOutputVariable(state,
                                 "Generator Produced Thermal Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->QTotalHeatRecovered,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Produced Thermal Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->TotalHeatEnergyRec,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Heat Recovery Inlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->HeatRecInletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Heat Recovery Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->HeatRecOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         }
     }

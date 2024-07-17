@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,13 +65,12 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessing/DataStorage.hh>
-#include <EnergyPlus/InputProcessing/EmbeddedEpJSONSchema.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <embedded/EmbeddedEpJSONSchema.hh>
 
 #include <fmt/os.h>
 #include <milo/dtoa.h>
@@ -144,7 +143,7 @@ json const &InputProcessor::getFields(EnergyPlusData &state, std::string const &
     if (it2 == objs.end()) {
         // HACK: this is not ideal and should be removed once everything is case sensitive internally
         for (auto it3 = objs.begin(); it3 != objs.end(); ++it3) {
-            if (UtilityRoutines::MakeUPPERCase(it3.key()) == objectName) {
+            if (Util::makeUPPER(it3.key()) == objectName) {
                 return it3.value();
             }
         }
@@ -556,7 +555,7 @@ bool InputProcessor::findDefault(std::string &default_value, json const &schema_
             default_value = s;
         }
         if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
-            default_value = UtilityRoutines::MakeUPPERCase(default_value);
+            default_value = Util::makeUPPER(default_value);
         }
         return true;
     }
@@ -618,31 +617,32 @@ bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &o
     return defaultFound;
 }
 
-std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName, bool uc)
 {
     // Return the value of fieldName in ep_object as a string.
     // If the field is not present in ep_object then return its default if there is one, or return an empty string
-    auto const &schema_field_obj = schema_obj_props[fieldName];
-    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
-    bool isDefaulted = false;
-    std::string value;
+    auto const &fprops = schema_obj_props[fieldName];
+    assert(!fprops.empty()); // Check that field name exists in the schema for this object type
+
+    uc = (fprops.find("retaincase") == fprops.end());
+
     auto it = ep_object.find(fieldName);
     if (it != ep_object.end()) {
-        auto const &field_value = it.value();
-        if (field_value.is_string()) {
-            auto const valuePair = getObjectItemValue(field_value.get<std::string>(), schema_field_obj); // (AUTO_OK_OBJ)
-            value = valuePair.first;
-            isDefaulted = valuePair.second;
-        } else {
-            assert(false); // String value requested but field type is numeric
-        }
-    } else {
-        isDefaulted = findDefault(value, schema_field_obj);
-        if (!isDefaulted) {
-            value = "";
-        }
+        auto const &val = it.value();
+        assert(val.is_string());
+        if (!val.empty()) return uc ? Util::makeUPPER(val.get<std::string>()) : val.get<std::string>();
     }
-    return value;
+
+    auto const it2 = fprops.find("default");
+    return (it2 != fprops.end()) ? (uc ? Util::makeUPPER(it2.value().get<std::string>()) : it2.value().get<std::string>()) : std::string();
+
+#ifdef GET_OUT
+    if (default_val.is_number_integer()) {
+        i64toa(default_val.get<std::int64_t>(), s);
+    } else if (default_val.is_number()) {
+        dtoa(default_val.get<double>(), s);
+    }
+#endif // GET_OUT
 }
 
 Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
@@ -650,34 +650,32 @@ Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &sche
     // Return the value of fieldName in ep_object as a Real64.
     // If the field value is a string, then assum autosize and return Constant::AutoCalculate(-99999).
     // If the field is not present in ep_object then return its default if there is one, or return 0.0
-    auto const &schema_field_obj = schema_obj_props[fieldName];
-    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
-    bool isDefaulted = false;
-    Real64 value = 0.0;
     auto it = ep_object.find(fieldName);
     if (it != ep_object.end()) {
         auto const &field_value = it.value();
         if (field_value.is_number()) {
-            if (field_value.is_number_integer()) {
-                value = field_value.get<std::int64_t>();
-            } else {
-                value = field_value.get<double>();
-            }
-        } else {
-            bool is_empty = field_value.get<std::string>().empty();
-            if (is_empty) {
-                isDefaulted = findDefault(value, schema_field_obj);
-            } else {
-                value = Constant::AutoCalculate; // autosize and autocalculate
-            }
-        }
-    } else {
-        isDefaulted = findDefault(value, schema_field_obj);
-        if (!isDefaulted) {
-            value = 0.0;
+            return (field_value.is_number_integer()) ? field_value.get<std::int64_t>() : field_value.get<double>();
+        } else if (!field_value.get<std::string>().empty()) {
+            return Constant::AutoCalculate; // autosize and autocalculate
         }
     }
-    return value;
+
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+
+    auto const find_default = schema_field_obj.find("default");
+    if (find_default != schema_field_obj.end()) {
+        auto const &default_val = find_default.value();
+        if (default_val.is_string()) {
+            return (!default_val.get<std::string>().empty()) ? Constant::AutoCalculate : 0.0;
+        } else if (default_val.is_number_integer()) {
+            return default_val.get<std::int64_t>();
+        } else {
+            return default_val.get<double>();
+        }
+    } else {
+        return 0.0;
+    }
 }
 
 int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
@@ -736,7 +734,7 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
         output.second = false;
     }
     if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
-        output.first = UtilityRoutines::MakeUPPERCase(output.first);
+        output.first = Util::makeUPPER(output.first);
     }
     return output;
 }
@@ -863,16 +861,12 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
         }
     } else {
         if (field_type == "a") {
-            if (!(within_max_fields && findDefault(Alphas(alpha_index), schema_field_obj))) {
+            if (!(findDefault(Alphas(alpha_index), schema_field_obj))) {
                 Alphas(alpha_index) = "";
             }
             if (is_AlphaBlank) AlphaBlank()(alpha_index) = true;
         } else if (field_type == "n") {
-            if (within_max_fields) {
-                findDefault(Numbers(numeric_index), schema_field_obj);
-            } else {
-                Numbers(numeric_index) = 0;
-            }
+            findDefault(Numbers(numeric_index), schema_field_obj);
             if (is_NumBlank) NumBlank()(numeric_index) = true;
         }
     }
@@ -1041,7 +1035,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
             if (name_iter.find("retaincase") != name_iter.end()) {
                 Alphas(alpha_index) = objectInfo.objectName;
             } else {
-                Alphas(alpha_index) = UtilityRoutines::MakeUPPERCase(objectInfo.objectName);
+                Alphas(alpha_index) = Util::makeUPPER(objectInfo.objectName);
             }
             if (is_AlphaBlank) AlphaBlank()(alpha_index) = objectInfo.objectName.empty();
             if (is_AlphaFieldNames) {
@@ -1224,9 +1218,9 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
 
     int object_item_num = 1;
     bool found = false;
-    std::string const upperObjName = UtilityRoutines::MakeUPPERCase(ObjName);
+    std::string const upperObjName = Util::makeUPPER(ObjName);
     for (auto it = obj->begin(); it != obj->end(); ++it) {
-        if (UtilityRoutines::MakeUPPERCase(it.key()) == upperObjName) {
+        if (Util::makeUPPER(it.key()) == upperObjName) {
             found = true;
             break;
         }
@@ -1262,11 +1256,11 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
 
     int object_item_num = 1;
     bool found = false;
-    std::string const upperObjName = UtilityRoutines::MakeUPPERCase(ObjName);
+    std::string const upperObjName = Util::makeUPPER(ObjName);
     for (auto it = obj->begin(); it != obj->end(); ++it) {
         auto it2 = it.value().find(NameTypeVal);
 
-        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(it2.value().get<std::string>()) == upperObjName)) {
+        if ((it2 != it.value().end()) && (Util::makeUPPER(it2.value().get<std::string>()) == upperObjName)) {
             found = true;
             break;
         }
@@ -1277,153 +1271,6 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
         return 0; // indicates object field name or value not found
     }
     return getIDFObjNum(state, ObjType, object_item_num); // if incoming input is idf, then return idf object order
-}
-
-void InputProcessor::lowerRangeCheck(EnergyPlusData &state,
-                                     bool &ErrorsFound,                    // Set to true if error detected
-                                     std::string const &WhatFieldString,   // Descriptive field for string
-                                     std::string const &WhatObjectString,  // Descriptive field for object, Zone Name, etc.
-                                     std::string const &ErrorLevel,        // 'Warning','Severe','Fatal')
-                                     std::string const &LowerBoundString,  // String for error message, if applicable
-                                     bool const LowerBoundCondition,       // Condition for error condition, if applicable
-                                     std::string_view const ValueString,   // Value with digits if to be displayed with error
-                                     std::string_view const WhatObjectName // ObjectName -- used for error messages
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   July 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine is a general purpose "range check" routine for GetInput routines.
-    // Using the standard "ErrorsFound" logical, this routine can produce a reasonable
-    // error message to describe the situation in addition to setting the ErrorsFound variable
-    // to true. This function is an overload to handle the lower bound check only. It is only
-    // used in WeatherManager.
-
-    std::string ErrorString; // Uppercase representation of ErrorLevel
-    std::string Message1;
-    std::string Message2;
-
-    bool Error = false;
-    if (!LowerBoundCondition) Error = true;
-
-    if (Error) {
-        ConvertCaseToUpper(ErrorLevel, ErrorString);
-        Message1 = WhatObjectString;
-        if (!WhatObjectName.empty()) {
-            Message1 += fmt::format("=\"{}\", out of range data", WhatObjectName);
-        }
-        Message2 = "Out of range value field=" + WhatFieldString;
-        if (!ValueString.empty()) {
-            Message2 += fmt::format(", Value=[{}]", ValueString);
-        }
-        Message2 += fmt::format(", range={{{}}}", LowerBoundString);
-
-        {
-            char const errorCheck = ErrorString[0];
-
-            if ((errorCheck == 'W') || (errorCheck == 'w')) {
-                ShowWarningError(state, Message1);
-                ShowContinueError(state, Message2);
-
-            } else if ((errorCheck == 'S') || (errorCheck == 's')) {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ErrorsFound = true;
-
-            } else if ((errorCheck == 'F') || (errorCheck == 'f')) {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ShowFatalError(state, "Program terminates due to preceding condition(s).");
-
-            } else {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ErrorsFound = true;
-            }
-        }
-    }
-}
-
-void InputProcessor::rangeCheck(EnergyPlusData &state,
-                                bool &ErrorsFound,                    // Set to true if error detected
-                                std::string const &WhatFieldString,   // Descriptive field for string
-                                std::string const &WhatObjectString,  // Descriptive field for object, Zone Name, etc.
-                                std::string const &ErrorLevel,        // 'Warning','Severe','Fatal')
-                                std::string const &LowerBoundString,  // String for error message, if applicable
-                                bool const LowerBoundCondition,       // Condition for error condition, if applicable
-                                std::string const &UpperBoundString,  // String for error message, if applicable
-                                bool const UpperBoundCondition,       // Condition for error condition, if applicable
-                                std::string_view const ValueString,   // Value with digits if to be displayed with error
-                                std::string_view const WhatObjectName // ObjectName -- used for error messages
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   July 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine is a general purpose "range check" routine for GetInput routines.
-    // Using the standard "ErrorsFound" logical, this routine can produce a reasonable
-    // error message to describe the situation in addition to setting the ErrorsFound variable
-    // to true. This function originally could do just the upper bound, but it was not used
-    // that way so that option has been removed. It is only used in WeatherManager.
-
-    std::string ErrorString; // Uppercase representation of ErrorLevel
-    std::string Message1;
-    std::string Message2;
-
-    bool Error = false;
-    if (!UpperBoundCondition) {
-        Error = true;
-    }
-    if (!LowerBoundCondition) {
-        Error = true;
-    }
-
-    if (Error) {
-        ConvertCaseToUpper(ErrorLevel, ErrorString);
-        Message1 = WhatObjectString;
-        if (!WhatObjectName.empty()) {
-            Message1 += fmt::format("=\"{}\", out of range data", WhatObjectName);
-        }
-        Message2 = "Out of range value field=" + WhatFieldString;
-        if (!ValueString.empty()) {
-            Message2 += fmt::format(", Value=[{}]", ValueString);
-        }
-        Message2 += fmt::format(", range={{{} and {}}}", LowerBoundString, UpperBoundString);
-
-        {
-            char const errorCheck = ErrorString[0];
-
-            if ((errorCheck == 'W') || (errorCheck == 'w')) {
-                ShowWarningError(state, Message1);
-                ShowContinueError(state, Message2);
-
-            } else if ((errorCheck == 'S') || (errorCheck == 's')) {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ErrorsFound = true;
-
-            } else if ((errorCheck == 'F') || (errorCheck == 'f')) {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ShowFatalError(state, "Program terminates due to preceding condition(s).");
-
-            } else {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ErrorsFound = true;
-            }
-        }
-    }
 }
 
 void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric)
@@ -1496,20 +1343,23 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
     NumAlpha = 0;
     NumNumeric = 0;
     const json *object;
-    if (schema()["properties"].find(std::string(ObjectWord)) == schema()["properties"].end()) {
+
+    auto const &props = schema()["properties"];
+
+    if (auto found = props.find(std::string(ObjectWord)); found == props.end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             ShowSevereError(state, fmt::format(R"(getObjectDefMaxArgs: Did not find object="{}" in list of objects.)", ObjectWord));
             return;
         }
-        object = &schema()["properties"][tmp_umit->second];
+        object = &props[tmp_umit->second];
     } else {
-        object = &schema()["properties"][std::string(ObjectWord)];
+        object = &found.value();
     }
-    const json &legacy_idd = object->at("legacy_idd");
 
+    const json &legacy_idd = object->at("legacy_idd");
     json *objects;
-    if (epJSON.find(std::string(ObjectWord)) == epJSON.end()) {
+    if (auto found = epJSON.find(std::string(ObjectWord)); found == epJSON.end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             ShowSevereError(state, fmt::format(R"(getObjectDefMaxArgs: Did not find object="{}" in list of objects.)", ObjectWord));
@@ -1517,7 +1367,7 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
         }
         objects = &epJSON[tmp_umit->second];
     } else {
-        objects = &epJSON[std::string(ObjectWord)];
+        objects = &found.value();
     }
 
     size_t max_size = 0;
@@ -1529,28 +1379,28 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
     }
 
     for (auto const &obj : *objects) {
-        if (obj.find(extension_key) != obj.end()) {
-            size_t const size = obj[extension_key].size();
+        if (auto found = obj.find(extension_key); found != obj.end()) {
+            size_t const size = found.value().size();
             if (size > max_size) max_size = size;
         }
     }
 
-    if (legacy_idd.find("alphas") != legacy_idd.end()) {
-        json const alphas = legacy_idd["alphas"];
-        if (alphas.find("fields") != alphas.end()) {
-            NumAlpha += alphas["fields"].size();
+    if (auto found = legacy_idd.find("alphas"); found != legacy_idd.end()) {
+        json const &alphas = found.value();
+        if (auto found2 = alphas.find("fields"); found2 != alphas.end()) {
+            NumAlpha += found2.value().size();
         }
-        if (alphas.find("extensions") != alphas.end()) {
-            NumAlpha += alphas["extensions"].size() * max_size;
+        if (auto found2 = alphas.find("extensions"); found2 != alphas.end()) {
+            NumAlpha += found2.value().size() * max_size;
         }
     }
-    if (legacy_idd.find("numerics") != legacy_idd.end()) {
-        json const numerics = legacy_idd["numerics"];
-        if (numerics.find("fields") != numerics.end()) {
-            NumNumeric += numerics["fields"].size();
+    if (auto found = legacy_idd.find("numerics"); found != legacy_idd.end()) {
+        json const &numerics = found.value();
+        if (auto found2 = numerics.find("fields"); found2 != numerics.end()) {
+            NumNumeric += found2.value().size();
         }
-        if (numerics.find("extensions") != numerics.end()) {
-            NumNumeric += numerics["extensions"].size() * max_size;
+        if (auto found2 = numerics.find("extensions"); found2 != numerics.end()) {
+            NumNumeric += found2.value().size() * max_size;
         }
     }
     NumArgs = NumAlpha + NumNumeric;
@@ -2115,7 +1965,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    std::string const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name").get<std::string>());
+                    std::string const report_name = Util::makeUPPER(extensions.at("report_name").get<std::string>());
                     if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                         for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
                             addVariablesForMonthlyReport(state, DataOutputs::MonthlyNamedReports(i));
@@ -2279,20 +2129,20 @@ void InputProcessor::addVariablesForMonthlyReport(EnergyPlusData &state, std::st
     } else if (reportName == "WINDOWZONESUMMARYMONTHLY") {
         addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT GAIN RATE");
         addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT LOSS RATE");
-        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
 
     } else if (reportName == "WINDOWENERGYZONESUMMARYMONTHLY") {
         addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY");
         addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
 
     } else if (reportName == "AVERAGEOUTDOORCONDITIONSMONTHLY") {
         addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
@@ -2369,7 +2219,7 @@ void InputProcessor::addVariablesForMonthlyReport(EnergyPlusData &state, std::st
         addRecordToOutputVariableStructure(state, "*", "WATER HEATER HEAT LOSS ENERGY");
         addRecordToOutputVariableStructure(state, "*", "WATER HEATER TANK TEMPERATURE");
         addRecordToOutputVariableStructure(state, "*", "WATER HEATER HEAT RECOVERY SUPPLY ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "WATER HEATER SOURCE ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER SOURCE SIDE HEAT TRANSFER ENERGY");
 
     } else if (reportName == "GENERATORREPORTMONTHLY") {
         addRecordToOutputVariableStructure(state, "*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
@@ -2513,8 +2363,8 @@ void InputProcessor::addRecordToOutputVariableStructure(EnergyPlusData &state, s
     if (found == state.dataOutput->OutputVariablesForSimulation.end()) {
         std::map<std::string,
                  DataOutputs::OutputReportingVariables,
-                 // UtilityRoutines::case_insensitive_hasher,
-                 UtilityRoutines::case_insensitive_comparator>
+                 // Util::case_insensitive_hasher,
+                 Util::case_insensitive_comparator>
             data;
         // data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(state, KeyValue, VarName));

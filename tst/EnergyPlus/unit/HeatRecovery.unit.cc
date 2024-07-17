@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,7 +73,6 @@
 using namespace EnergyPlus;
 using namespace DataEnvironment;
 using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::Fans;
@@ -100,7 +99,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     bool FirstHVACIteration = false;
     bool EconomizerFlag = false;
     bool HighHumCtrlFlag = false;
-    int FanOpMode = 2; // 1 = cycling fan, 2 = constant fan
+    HVAC::FanOp fanOp = HVAC::FanOp::Continuous; // 1 = cycling fan, 2 = constant fan
     Real64 Toutlet = 0.0;
     Real64 Tnode = 0.0;
     Real64 SetPointTemp = 19.0;
@@ -119,17 +118,17 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode = 3;
     state->dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = 4;
     state->dataHeatRecovery->ExchCond(ExchNum).SchedPtr = -1;
-    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible75 = 0.75;
     state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible100 = 0.75;
-    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent75 = 0.0;
     state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent100 = 0.0;
-    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 = 0.75;
     state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 = 0.75;
-    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent75 = 0.0;
     state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent100 = 0.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensibleCurveIndex = 0;
+    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatentCurveIndex = 0;
+    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensibleCurveIndex = 0;
+    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatentCurveIndex = 0;
 
     state->dataHeatRecovery->ExchCond(ExchNum).Name = "Test Heat Recovery 1";
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HX_AIRTOAIR_GENERIC;
+    state->dataHeatRecovery->ExchCond(ExchNum).type = HVAC::HXType::AirToAir_Generic;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp = 24.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp = 15.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat = 0.01;
@@ -160,7 +159,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     auto &thisHX = state->dataHeatRecovery->ExchCond(ExchNum);
     // HXUnitOn is false so expect outlet = inlet
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     Toutlet = state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp;
     Tnode = state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
@@ -173,10 +172,10 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     HXUnitOn = true;
     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     Toutlet = (state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
-               (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+               (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 *
                 (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp)));
     Tnode = state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
@@ -184,10 +183,10 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     Toutlet = (state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
-               (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+               (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 *
                 (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp)));
     Tnode = state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
@@ -199,7 +198,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     HXUnitOn = true;
     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     Toutlet = SetPointTemp;
     Tnode = state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
@@ -208,14 +207,14 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     Toutlet = state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint;
     Tnode = state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
     state->dataHeatRecovery->ExchCond(ExchNum).Name = "Test Heat Recovery 2";
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HX_AIRTOAIR_GENERIC;
+    state->dataHeatRecovery->ExchCond(ExchNum).type = HVAC::HXType::AirToAir_Generic;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp = 15.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp = 24.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat = 0.01;
@@ -242,7 +241,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     // HXUnitOn is false so expect outlet = inlet
     HXUnitOn = false;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     EXPECT_DOUBLE_EQ(state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp,
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
@@ -254,20 +253,20 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     HXUnitOn = true;
     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     EXPECT_DOUBLE_EQ((state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
-                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 *
                        (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp))),
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     EXPECT_DOUBLE_EQ((state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
-                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 *
                        (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp))),
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
@@ -278,7 +277,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     HXUnitOn = true;
     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint,
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
@@ -286,23 +285,23 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint,
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
     // test cycling fan case
-    FanOpMode = DataHVACGlobals::CycFanCycCoil;
+    fanOp = HVAC::FanOp::Cycling;
     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode).MassFlowRate =
         state->dataHeatRecovery->ExchCond(ExchNum).SupInMassFlow / 4.0;
     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).MassFlowRate =
         state->dataHeatRecovery->ExchCond(ExchNum).SecInMassFlow / 4.0;
     state->dataHeatRecovery->ExchCond(ExchNum).ControlToTemperatureSetPoint = false;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, PartLoadRatio);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag, PartLoadRatio);
     thisHX.UpdateHeatRecovery(*state);
     EXPECT_DOUBLE_EQ((state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
-                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 *
                        (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp))),
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 }
@@ -387,12 +386,8 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
         "   4.71947443200001, !- Nominal Supply Air Flow Rate { m3 / s }",
         "   0,   !- Sensible Effectiveness at 100 % Heating Air Flow { dimensionless }",
         "   0.5, !- Latent Effectiveness at 100 % Heating Air Flow { dimensionless }",
-        "   0,   !- Sensible Effectiveness at 75 % Heating Air Flow { dimensionless }",
-        "   0.5, !- Latent Effectiveness at 75 % Heating Air Flow { dimensionless }",
         "   0,   !- Sensible Effectiveness at 100 % Cooling Air Flow { dimensionless }",
         "   0.5, !- Latent Effectiveness at 100 % Cooling Air Flow { dimensionless }",
-        "   0,   !- Sensible Effectiveness at 75 % Cooling Air Flow { dimensionless }",
-        "   0.5, !- Latent Effectiveness at 75 % Cooling Air Flow { dimensionless }",
         "   AHU Heating Coil Outlet, !- Supply Air Inlet Node Name",
         "   AHU Supply fan Inlet,    !- Supply Air Outlet Node Name",
         "   AHU relief air outlet,   !- Exhaust Air Inlet Node Name",
@@ -512,8 +507,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
 
     GetReturnAirPathInput(*state);
     GetAirPathData(*state);
-    ASSERT_TRUE(
-        compare_enums(SimAirServingZones::CompType::HeatXchngr, state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(4).CompType_Num));
+    ASSERT_ENUM_EQ(SimAirServingZones::CompType::HeatXchngr, state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(4).CompType_Num);
 }
 
 TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
@@ -3040,12 +3034,8 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
         "    0.7,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "    0.65,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
-        "    0.750000,                !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
-        "    0.700000,                !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
         "    0.7,                     !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
         "    0.65,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
-        "    0.750000,                !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
-        "    0.700000,                !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
         "    DOAS Mixed Air Outlet,   !- Supply Air Inlet Node Name",
         "    DOAS Heat Recovery Supply Outlet,  !- Supply Air Outlet Node Name",
         "    DOAS Relief Air Outlet,  !- Exhaust Air Inlet Node Name",
@@ -3057,7 +3047,57 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    1.7,                     !- Threshold Temperature {C}",
         "    0.083,                   !- Initial Defrost Time Fraction {dimensionless}",
         "    0.012,                   !- Rate of Defrost Time Fraction Increase {1/K}",
-        "    Yes;                     !- Economizer Lockout",
+        "    Yes,                     !- Economizer Lockout",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name",
+        "    LatEffectivenessTable,   !- Latent Effectiveness of Heating Air Flow Curve Name",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name",
+        "    LatEffectivenessTable;   !- Latent Effectiveness of Cooling Air Flow Curve Name",
+
+        "  Table:IndependentVariable,",
+        "    airFlowRatio,  !- Name",
+        "    Linear,                  !- Interpolation Method",
+        "    Linear,                  !- Extrapolation Method",
+        "    0.0,                     !- Minimum Value",
+        "    1.0,                     !- Maximum Value",
+        "    ,                        !- Normalization Reference Value",
+        "    Dimensionless,           !- Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Value 1",
+        "    1.0;                     !- Value 2",
+
+        "  Table:IndependentVariableList,",
+        "    effectiveness_IndependentVariableList,  !- Name",
+        "    airFlowRatio;     !- Independent Variable 1 Name",
+
+        "  Table:Lookup,",
+        "    SenEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.7,                     !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    1.0,                     !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Output Value 1",
+        "    0.70;                    !- Output Value 2",
+
+        "  Table:Lookup,",
+        "    LatEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.65,                    !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    1.0,                     !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.70,                    !- Output Value 1",
+        "    0.65;                    !- Output Value 2",
 
         "Controller:WaterCoil,",
         "    DOAS Cooling Coil Controller,  !- Name",
@@ -3329,7 +3369,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "Branch,",
         "    Main Boiler HW Branch,   !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    Purchased Heating,         !- Component 1 Name",
         "    Purchased Heat Inlet Node, !- Component 1 Inlet Node Name",
         "    Purchased Heat Outlet Node;   !- Component 1 Outlet Node Name",
@@ -3705,7 +3745,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    0,                       !- Fraction of Motor Inefficiencies to Fluid Stream",
         "    INTERMITTENT;            !- Pump Control Type",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    Purchased Heating,          !- Name",
         "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
         "    Purchased Heat Outlet Node, !- Hot Water Outlet Node Name",
@@ -3771,7 +3811,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
 
         "PlantEquipmentList,",
         "    Hot Water Loop All Equipment,           !- Name",
-        "    DistrictHeating,          !- Equipment 1 Object Type",
+        "    DistrictHeating:Water,          !- Equipment 1 Object Type",
         "    Purchased Heating;        !- Equipment 1 Name",
 
         "PlantEquipmentList,",
@@ -3891,7 +3931,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
     ASSERT_NEAR(-17.300, state->dataHeatRecovery->ExchCond(1).SupInTemp, 0.001); // Heat Recovery Exchanger Primary Air Inlet Temp
     ASSERT_GT(state->dataHeatRecovery->ExchCond(1).SupOutTemp,
               state->dataHeatRecovery->ExchCond(1).SupInTemp);                  // Heat Recovery Exchanger is On in heating mode
-    ASSERT_NEAR(23.000, state->dataHeatRecovery->ExchCond(1).SecInTemp, 0.001); // Heat Recovery Exchanger Secondary Air Inlet Temp
+    ASSERT_NEAR(22.947, state->dataHeatRecovery->ExchCond(1).SecInTemp, 0.001); // Heat Recovery Exchanger Secondary Air Inlet Temp
     ASSERT_LT(state->dataHeatRecovery->ExchCond(1).SecOutTemp,
               state->dataHeatRecovery->ExchCond(1).SecInTemp); // Heat Recovery Exchanger is On in heating mode
 
@@ -3921,7 +3961,7 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
 
     // initialize sizing required variables
     state->dataHeatRecovery->ExchCond.allocate(ExchNum);
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HX_DESICCANT_BALANCED;
+    state->dataHeatRecovery->ExchCond(ExchNum).type = HVAC::HXType::Desiccant_Balanced;
     state->dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = AutoSize;
     state->dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex = BalDesDehumPerfDataIndex;
 
@@ -3936,7 +3976,7 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomProcAirFaceVel = AutoSize;
 
     // initialize sizing variables
-    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
+    state->dataSize->CurDuctType = HVAC::AirDuctType::Main;
     state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
 
@@ -3971,12 +4011,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
         "    autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
         "    0.76,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "    0.68,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
-        "    0.81,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
-        "    0.73,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
         "    0.76,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
         "    0.68,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
-        "    0.81,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
-        "    0.73,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
         "    ERV OA Inlet Node,       !- Supply Air Inlet Node Name",
         "    HR Pri Air Outlet Node,  !- Supply Air Outlet Node Name",
         "    Zone 1 Exhaust Node,     !- Exhaust Air Inlet Node Name",
@@ -4081,12 +4117,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
         "      0.5,                     !- Nominal Supply Air Flow Rate {m3/s}",
         "      0.70,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "      0.60,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
-        "      0.70,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
-        "      0.60,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
         "      0.75,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
         "      0.60,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
-        "      0.75,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
-        "      0.60,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
         "      VAV WITH REHEAT_OAInlet Node,  !- Supply Air Inlet Node Name",
         "      VAV WITH REHEAT Heat Recovery Outlet Node,  !- Supply Air Outlet Node Name",
         "      VAV WITH REHEAT_OARelief Node,  !- Exhaust Air Inlet Node Name",
@@ -4137,9 +4169,9 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 1;
     // check user-inputs
-    EXPECT_TRUE(compare_enums(thisOAController.Econo, MixedAir::EconoOp::NoEconomizer));
-    EXPECT_TRUE(compare_enums(thisOAController.Lockout, MixedAir::LockoutType::NoLockoutPossible)); // no lockout
-    EXPECT_EQ(thisOAController.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
+    EXPECT_ENUM_EQ(thisOAController.Econo, MixedAir::EconoOp::NoEconomizer);
+    EXPECT_ENUM_EQ(thisOAController.Lockout, MixedAir::LockoutType::NoLockoutPossible); // no lockout
+    EXPECT_EQ(thisOAController.HeatRecoveryBypassControlType, HVAC::BypassWhenOAFlowGreaterThanMinimum);
     EXPECT_FALSE(thisOAController.EconBypass); // no bypass
 
     int CompanionCoilNum = 0;
@@ -4147,12 +4179,12 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     bool FirstHVACIteration = false;
     bool EconomizerFlag = false;
     bool HighHumCtrlFlag = false;
-    int FanOpMode = 2; // 2 = constant fan
+    HVAC::FanOp fanOp = HVAC::FanOp::Continuous; // 2 = constant fan
 
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
-    thisHX.ExchType = HX_AIRTOAIR_GENERIC;
+    thisHX.type = HVAC::HXType::AirToAir_Generic;
     thisHX.SupInTemp = 10.0;
     thisHX.SecInTemp = 20.0;
     thisHX.SupInHumRat = 0.01;
@@ -4172,7 +4204,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     state->dataLoopNodes->Node(thisHX.SecInletNode).MassFlowRate = thisHX.NomSecAirVolFlow * state->dataEnvrn->StdRhoAir;
     state->dataLoopNodes->Node(thisHX.SupOutletNode).TempSetPoint = 19.0;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     EXPECT_DOUBLE_EQ(10.0, thisHX.SupInTemp);
     EXPECT_DOUBLE_EQ(20.0, thisHX.SecInTemp);
@@ -4188,7 +4220,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     state->dataLoopNodes->Node(thisHX.SecInletNode).MassFlowRate = thisHX.NomSecAirVolFlow * state->dataEnvrn->StdRhoAir;
     state->dataLoopNodes->Node(thisHX.SupOutletNode).TempSetPoint = 19.0;
     thisHX.initialize(*state, CompanionCoilNum, 0);
-    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     EXPECT_DOUBLE_EQ(10.0, thisHX.SupInTemp);
     EXPECT_DOUBLE_EQ(20.0, thisHX.SecInTemp);
@@ -4209,12 +4241,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
         "    autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
         "    0.76,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "    0.0,                     !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
-        "    0.81,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
-        "    0.0,                     !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
         "    0.76,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
         "    0.0,                     !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
-        "    0.81,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
-        "    0.0,                     !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
         "    OA Inlet Node,           !- Supply Air Inlet Node Name",
         "    HX Pri Air Outlet Node,  !- Supply Air Outlet Node Name",
         "    Return Air Node,         !- Exhaust Air Inlet Node Name",
@@ -4249,7 +4277,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     state->dataMixedAir->OAController.allocate(OAContrllerNum);
     auto &thisOAController(state->dataMixedAir->OAController(OAContrllerNum));
     // initialize OA controller
-    thisOAController.ControllerType_Num = MixedAir::MixedAirControllerType::ControllerOutsideAir;
+    thisOAController.ControllerType = MixedAir::MixedAirControllerType::ControllerOutsideAir;
 
     int OASysNum = 1;
     state->dataAirLoop->OutsideAirSys.allocate(OASysNum);
@@ -4260,12 +4288,12 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     state->dataSize->CurOASysNum = 1;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.20;
-    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
+    state->dataSize->CurDuctType = HVAC::AirDuctType::Main;
 
     // test 1: the HX is in OA System, no economizer, no-bypass
     thisOAController.Econo = MixedAir::EconoOp::NoEconomizer;
     thisOAController.Lockout = MixedAir::LockoutType::NoLockoutPossible; // no lockout
-    thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum;
+    thisOAController.HeatRecoveryBypassControlType = HVAC::BypassWhenOAFlowGreaterThanMinimum;
     thisOAController.EconBypass = false; // economizer control action type, no bypass
     // run HX sizing calculation
     thisHX.size(*state);
@@ -4282,7 +4310,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
 
     // test 3: the HX is on OA system but with economizer, and no-bypass
     thisOAController.Econo = MixedAir::EconoOp::DifferentialDryBulb; // with economizer
-    thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenWithinEconomizerLimits;
+    thisOAController.HeatRecoveryBypassControlType = HVAC::BypassWhenWithinEconomizerLimits;
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation
     thisHX.size(*state);

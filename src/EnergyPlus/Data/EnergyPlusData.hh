@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -108,9 +108,8 @@ struct DataWaterData;
 struct DataZoneControlsData;
 struct DataZoneEnergyDemandsData;
 struct DataZoneEquipmentData;
-struct DaylightingData;
 struct DaylightingDevicesData;
-struct DaylightingManagerData;
+struct DaylightingData;
 struct DefineEquipData;
 struct DemandManagerData;
 struct DesiccantDehumidifiersData;
@@ -151,7 +150,6 @@ struct HVACCooledBeamData;
 struct HVACCtrlData;
 struct HVACDXHeatPumpSystemData;
 struct HVACDuctData;
-struct HVACFanData;
 struct HVACGlobalsData;
 struct HVACHXAssistedCoolingCoilData;
 struct HVACInterfaceManagerData;
@@ -186,6 +184,7 @@ struct HysteresisPhaseChangeData;
 struct ICEngineElectricGeneratorData;
 struct IPShortCutsData;
 struct IceThermalStorageData;
+struct IndoorGreenData;
 struct IntegratedHeatPumpGlobalData;
 struct InternalHeatGainsData;
 struct LoopNodeData;
@@ -228,7 +227,7 @@ struct PlantPressureSysData;
 struct PlantUtilitiesData;
 struct PlantValvesData;
 struct PluginManagerData;
-struct PollutionModuleData;
+struct PollutionData;
 struct PondGroundHeatExchangerData;
 struct PoweredInductionUnitsData;
 struct PsychrometricsData;
@@ -244,7 +243,6 @@ struct ExhaustAirSystemMgr;
 struct ExhaustControlSystemMgr;
 struct RoomAirModelAirflowNetworkData;
 struct RoomAirModelData;
-struct RoomAirModelManagerData;
 struct RoomAirModelUserTempPatternData;
 struct RootFindingData;
 struct RuntimeLanguageData;
@@ -283,7 +281,6 @@ struct TARCOGGasses90Data;
 struct TARCOGMainData;
 struct TarcogShadingData;
 struct TranspiredCollectorData;
-struct UCSDSharedData;
 struct UFADManagerData;
 struct UnitHeatersData;
 struct UnitVentilatorsData;
@@ -347,7 +344,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<CondenserLoopTowersData> dataCondenserLoopTowers;
     std::unique_ptr<ConstructionData> dataConstruction;
     std::unique_ptr<ContaminantBalanceData> dataContaminantBalance;
-    std::unique_ptr<ConvectionCoefficientsData> dataConvectionCoefficient;
+    std::unique_ptr<ConvectionCoefficientsData> dataConvect;
     std::unique_ptr<ConvergParamsData> dataConvergeParams;
     std::unique_ptr<CoolTowerData> dataCoolTower;
     std::unique_ptr<CostEstimateManagerData> dataCostEstimateManager;
@@ -367,9 +364,8 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<DataZoneControlsData> dataZoneCtrls;
     std::unique_ptr<DataZoneEnergyDemandsData> dataZoneEnergyDemand;
     std::unique_ptr<DataZoneEquipmentData> dataZoneEquip;
-    std::unique_ptr<DaylightingData> dataDaylightingData;
     std::unique_ptr<DaylightingDevicesData> dataDaylightingDevices;
-    std::unique_ptr<DaylightingManagerData> dataDaylightingManager;
+    std::unique_ptr<DaylightingData> dataDayltg;
     std::unique_ptr<DefineEquipData> dataDefineEquipment;
     std::unique_ptr<DemandManagerData> dataDemandManager;
     std::unique_ptr<DesiccantDehumidifiersData> dataDesiccantDehumidifiers;
@@ -410,7 +406,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<HVACCtrlData> dataHVACCtrl;
     std::unique_ptr<HVACDXHeatPumpSystemData> dataHVACDXHeatPumpSys;
     std::unique_ptr<HVACDuctData> dataHVACDuct;
-    std::unique_ptr<HVACFanData> dataHVACFan;
     std::unique_ptr<HVACGlobalsData> dataHVACGlobal;
     std::unique_ptr<HVACHXAssistedCoolingCoilData> dataHVACAssistedCC;
     std::unique_ptr<HVACInterfaceManagerData> dataHVACInterfaceMgr;
@@ -445,6 +440,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<ICEngineElectricGeneratorData> dataICEngElectGen;
     std::unique_ptr<IPShortCutsData> dataIPShortCut;
     std::unique_ptr<IceThermalStorageData> dataIceThermalStorage;
+    std::unique_ptr<IndoorGreenData> dataIndoorGreen;
     std::unique_ptr<IntegratedHeatPumpGlobalData> dataIntegratedHP;
     std::unique_ptr<InternalHeatGainsData> dataInternalHeatGains;
     std::unique_ptr<LoopNodeData> dataLoopNodes;
@@ -487,7 +483,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<PlantUtilitiesData> dataPlantUtilities;
     std::unique_ptr<PlantValvesData> dataPlantValves;
     std::unique_ptr<PluginManagerData> dataPluginManager;
-    std::unique_ptr<PollutionModuleData> dataPollutionModule;
+    std::unique_ptr<PollutionData> dataPollution;
     std::unique_ptr<PondGroundHeatExchangerData> dataPondGHE;
     std::unique_ptr<PoweredInductionUnitsData> dataPowerInductionUnits;
     std::unique_ptr<PsychrometricsData> dataPsychrometrics;
@@ -502,8 +498,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<ExhaustAirSystemMgr> dataExhAirSystemMrg;
     std::unique_ptr<ExhaustControlSystemMgr> dataExhCtrlSystemMrg;
     std::unique_ptr<RoomAirModelAirflowNetworkData> dataRoomAirflowNetModel;
-    std::unique_ptr<RoomAirModelData> dataRoomAirMod;
-    std::unique_ptr<RoomAirModelManagerData> dataRoomAirModelMgr;
+    std::unique_ptr<RoomAirModelData> dataRoomAir;
     std::unique_ptr<RoomAirModelUserTempPatternData> dataRoomAirModelTempPattern;
     std::unique_ptr<RootFindingData> dataRootFinder;
     std::unique_ptr<RuntimeLanguageData> dataRuntimeLang;
@@ -530,7 +525,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<SurfacesData> dataSurface;
     std::unique_ptr<SwimmingPoolsData> dataSwimmingPools;
     std::unique_ptr<SystemAirFlowSizerData> dataSysAirFlowSizer;
-    std::unique_ptr<SystemAvailabilityManagerData> dataSystemAvailabilityManager;
+    std::unique_ptr<SystemAvailabilityManagerData> dataAvail;
     std::unique_ptr<SystemReportsData> dataSysRpts;
     std::unique_ptr<SystemVarsData> dataSysVars;
     std::unique_ptr<TARCOGCommonData> dataTARCOGCommon;
@@ -542,7 +537,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<TARCOGMainData> dataTARCOGMain;
     std::unique_ptr<TarcogShadingData> dataTarcogShading;
     std::unique_ptr<TranspiredCollectorData> dataTranspiredCollector;
-    std::unique_ptr<UCSDSharedData> dataUCSDShared;
     std::unique_ptr<UFADManagerData> dataUFADManager;
     std::unique_ptr<UnitHeatersData> dataUnitHeaters;
     std::unique_ptr<UnitVentilatorsData> dataUnitVentilators;
@@ -559,7 +553,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<WaterToAirHeatPumpData> dataWaterToAirHeatPump;
     std::unique_ptr<WaterToAirHeatPumpSimpleData> dataWaterToAirHeatPumpSimple;
     std::unique_ptr<WaterUseData> dataWaterUse;
-    std::unique_ptr<WeatherManagerData> dataWeatherManager;
+    std::unique_ptr<WeatherManagerData> dataWeather;
     std::unique_ptr<WindTurbineData> dataWindTurbine;
     std::unique_ptr<WindowACData> dataWindowAC;
     std::unique_ptr<WindowComplexManagerData> dataWindowComplexManager;
@@ -581,6 +575,9 @@ struct EnergyPlusData : BaseGlobalStruct
     // calls to IOFiles::getSingleton and IOFiles::setSingleton
     EnergyPlusData(const EnergyPlusData &) = delete;
     EnergyPlusData(EnergyPlusData &&) = delete;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override;
+    bool init_state_called = false;
 
     void clear_state() override;
 };

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -178,7 +178,8 @@ namespace PlantUtilities {
                                  ObjexxFCL::Optional<Real64 const> HighLimitTemp = _,
                                  ObjexxFCL::Optional_int CountMatchPlantLoops = _,
                                  ObjexxFCL::Optional_int_const InletNodeNumber = _,
-                                 ObjexxFCL::Optional_int_const SingleLoopSearch = _);
+                                 ObjexxFCL::Optional_int_const SingleLoopSearch = _,
+                                 ObjexxFCL::Optional_bool_const suppressErrors = _);
 
     void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                                   std::string_view const CallerName, // really used for error messages
@@ -193,7 +194,7 @@ namespace PlantUtilities {
     void ShowBranchesOnLoop(EnergyPlusData &state, int LoopNum); // Loop number of loop
 
     int MyPlantSizingIndex(EnergyPlusData &state,
-                           std::string const &CompType,     // component description
+                           std::string_view CompType,       // component description
                            std::string_view CompName,       // user name of component
                            int NodeNumIn,                   // component water inlet node
                            int NodeNumOut,                  // component water outlet node
@@ -202,6 +203,9 @@ namespace PlantUtilities {
     );
 
     bool verifyTwoNodeNumsOnSamePlantLoop(EnergyPlusData &state, int nodeIndexA, int nodeIndexB);
+
+    Real64 MinFlowIfBranchHasVSPump(
+        EnergyPlusData &state, PlantLocation const &pLantLoc, bool &foundBranchPump, bool &foundLoopPump, bool const setFlowStatus);
 
     struct CriteriaData
     {
@@ -226,6 +230,10 @@ struct PlantUtilitiesData : BaseGlobalStruct
 {
 
     Array1D<PlantUtilities::CriteriaData> CriteriaChecks; // stores criteria information
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

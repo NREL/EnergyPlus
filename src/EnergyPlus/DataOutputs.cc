@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -160,14 +160,13 @@ OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::s
     }
 }
 
-bool FindItemInVariableList(EnergyPlusData &state, std::string_view const KeyedValue, std::string_view const VariableName)
+bool FindItemInVariableList(const EnergyPlusData &state, std::string_view const KeyedValue, std::string_view const VariableName)
 {
 
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   July 2010
     //       MODIFIED       December 2016
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up a key and variable name value and determines if they are

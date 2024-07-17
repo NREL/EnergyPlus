@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -148,10 +148,10 @@ namespace HeatBalanceIntRadExchange {
                   Array1D<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
     );
 
-    void CalcFp(int const N,            // Number of surfaces
-                Array1D<Real64> &EMISS, // VECTOR OF SURFACE EMISSIVITIES
-                Array1D<Real64> &FMRT,  // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
-                Array1D<Real64> &Fp     // VECTOR OF OPPENHEIM RESISTNACE VALUES
+    void CalcFp(int const N,                  // Number of surfaces
+                Array1D<Real64> const &EMISS, // VECTOR OF SURFACE EMISSIVITIES
+                Array1D<Real64> const &FMRT,  // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+                Array1D<Real64> &Fp           // VECTOR OF OPPENHEIM RESISTNACE VALUES
     );
 
     void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form
@@ -181,6 +181,10 @@ struct HeatBalanceIntRadExchgData : BaseGlobalStruct
     Array1D<Real64> SurfaceEmiss;
     bool ViewFactorReport = false; // Flag to output view factor report in eio file
     int LargestSurf = 0;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

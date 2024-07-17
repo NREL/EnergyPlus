@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,7 +77,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     this->evapRateRatio = input_data.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
     this->maxCyclingRate = input_data.maximum_cycling_rate;
     this->latentTimeConst = input_data.latent_capacity_time_constant;
-    if (UtilityRoutines::SameString(input_data.apply_latent_degradation_to_speeds_greater_than_1, "Yes")) {
+    if (Util::SameString(input_data.apply_latent_degradation_to_speeds_greater_than_1, "Yes")) {
         this->applyLatentDegradationAllSpeeds = true;
     } else {
         this->applyLatentDegradationAllSpeeds = false;
@@ -96,9 +96,9 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
         this->latentDegradationActive = true;
     }
 
-    if (UtilityRoutines::SameString(input_data.condenser_type, "AirCooled")) {
+    if (Util::SameString(input_data.condenser_type, "AirCooled")) {
         this->condenserType = CondenserType::AIRCOOLED;
-    } else if (UtilityRoutines::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
+    } else if (Util::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
         this->condenserType = CondenserType::EVAPCOOLED;
     } else {
         ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
@@ -138,7 +138,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNumbers,
                                                                  IOStatus);
-        if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
+        if (!Util::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }
         found_it = true;
@@ -281,7 +281,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
                                                            Real64 &PLR,
                                                            int &speedNum,
                                                            Real64 &speedRatio,
-                                                           int const fanOpMode,
+                                                           HVAC::FanOp const fanOp,
                                                            DataLoopNode::NodeData &condInletNode,
                                                            [[maybe_unused]] DataLoopNode::NodeData &condOutletNode,
                                                            [[maybe_unused]] bool const singleMode)
@@ -313,7 +313,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     }
     thisspeed.ambPressure = condInletNode.Press;
     thisspeed.AirMassFlow = inletNode.MassFlowRate;
-    if (fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1) {
+    if (fanOp == HVAC::FanOp::Cycling && speedNum == 1) {
         if (PLR > 0.0) {
             thisspeed.AirMassFlow = thisspeed.AirMassFlow / PLR;
         } else {
@@ -336,7 +336,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
         plr1 = speedRatio;
     }
 
-    thisspeed.CalcSpeedOutput(state, inletNode, outletNode, plr1, fanOpMode, this->condInletTemp);
+    thisspeed.CalcSpeedOutput(state, inletNode, outletNode, plr1, fanOp, this->condInletTemp);
 
     // the outlet node conditions are based on it running at the truncated flow, we need to merge the bypassed air back in and ramp up flow rate
     if (thisspeed.adjustForFaceArea) {
@@ -359,7 +359,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     Real64 outSpeed1HumRat = outletNode.HumRat;
     Real64 outSpeed1Enthalpy = outletNode.Enthalpy;
 
-    if (fanOpMode == DataHVACGlobals::ContFanCycCoil) {
+    if (fanOp == HVAC::FanOp::Continuous) {
         outletNode.HumRat = outletNode.HumRat * plr1 + (1.0 - plr1) * inletNode.HumRat;
         outletNode.Enthalpy = outletNode.Enthalpy * plr1 + (1.0 - plr1) * inletNode.Enthalpy;
         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
@@ -382,7 +382,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
         auto &lowerspeed(this->speeds[max(speedNum - 2, 0)]);
         lowerspeed.AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateLow * lowerspeed.active_fraction_of_face_coil_area;
 
-        lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
+        lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, PLR, fanOp, condInletTemp); // out
 
         if (lowerspeed.adjustForFaceArea) {
             lowerspeed.AirMassFlow /= lowerspeed.active_fraction_of_face_coil_area;

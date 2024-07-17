@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,24.2;
 
   Building,
     Building,                !- Name
@@ -2674,6 +2674,7 @@
     ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     80;                      !- Maximum Supply Air Temperature {C}
 
   Coil:Heating:Fuel,
@@ -2736,12 +2737,8 @@
     autosize,                !- Nominal Supply Air Flow Rate {m3/s}
     0.7,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0.65,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.70000,                 !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.650000,                !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.7,                     !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0.65,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.70000,                 !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0.650000,                !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     Main Cooling Coil 1 Inlet Node,  !- Supply Air Inlet Node Name
     Heat Recovery Supply Outlet,  !- Supply Air Outlet Node Name
     Heat Recovery Exhuast Inlet Node,  !- Exhaust Air Inlet Node Name
@@ -2753,7 +2750,11 @@
     1.7,                     !- Threshold Temperature {C}
     0.083,                   !- Initial Defrost Time Fraction {dimensionless}
     0.012,                   !- Rate of Defrost Time Fraction Increase {1/K}
-    Yes;                     !- Economizer Lockout
+    Yes,                     !- Economizer Lockout
+    ,                        !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   Coil:Cooling:DX:VariableSpeed,
     Main Cooling Coil 1,     !- Name
@@ -2765,11 +2766,15 @@
     AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate
+    ,                        !- Latent Capacity Time Constant
+    ,                        !- Fan Delay Time
     HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     0.0,                     !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
@@ -2781,6 +2786,8 @@
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPCoolingCAPFTemp4,      !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
