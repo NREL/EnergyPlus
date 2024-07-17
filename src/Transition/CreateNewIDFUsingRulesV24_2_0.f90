@@ -124,6 +124,40 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                                     I N S E R T    L O C A L    V A R I A B L E S    H E R E                                     !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  ! used in transition code for changing fan in ZoneHVAC:TerminalUnit:VariableRefrigerantFlow from VariableVolume to SystemModel
+  LOGICAL :: isVariableVolume
+  REAL :: fanTotalEff
+  REAL :: pressureRise
+  REAL :: maxAirFlow
+  REAL :: minAirFlowFrac
+  REAL :: fanPowerMinAirFlow
+  INTEGER :: NumFanVariableVolume = 0
+  INTEGER :: NumOldFanVO = 0
+  INTEGER :: Num3
+  CHARACTER(len=MaxNameLength) :: sysFanName
+  CHARACTER(len=MaxNameLength) :: vavFanName
+
+  TYPE FanVOTransitionInfo
+    CHARACTER(len=MaxNameLength) :: oldFanName
+    CHARACTER(len=MaxNameLength) :: availSchedule
+    CHARACTER(len=MaxNameLength) :: fanTotalEff_str
+    CHARACTER(len=MaxNameLength) :: pressureRise_str
+    CHARACTER(len=MaxNameLength) :: maxAirFlow_str
+    CHARACTER(len=MaxNameLength) :: minFlowInputMethod
+    CHARACTER(len=MaxNameLength) :: minAirFlowFrac_str
+    CHARACTER(len=MaxNameLength) :: fanPowerMinAirFlow_str
+    CHARACTER(len=MaxNameLength) :: motorEfficiency
+    CHARACTER(len=MaxNameLength) :: motorInAirStreamFrac
+    CHARACTER(len=MaxNameLength) :: coeff1             !- Coefficient1 Constant
+    CHARACTER(len=MaxNameLength) :: coeff2             !- Coefficient2 x
+    CHARACTER(len=MaxNameLength) :: coeff3             !- Coefficient3 x**2
+    CHARACTER(len=MaxNameLength) :: coeff4             !- Coefficient4 x**3
+    CHARACTER(len=MaxNameLength) :: coeff5             !- Coefficient5 x**4
+    CHARACTER(len=MaxNameLength) :: inletAirNodeName
+    CHARACTER(len=MaxNameLength) :: outletAirNodeName
+    CHARACTER(len=MaxNameLength) :: endUseSubCat
+  END TYPE FanVOTransitionInfo
+  TYPE(FanVOTransitionInfo), ALLOCATABLE, DIMENSION(:) :: OldFanVO
 
   INTEGER :: TotSPMs = 0
   INTEGER :: spmNum = 0
@@ -317,6 +351,37 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ENDDO
           ENDDO
 
+          ! accumulate info on VAV fans
+          NumFanVariableVolume = GetNumObjectsFound('FAN:VARIABLEVOLUME')
+          IF (ALLOCATED(OldFanVO)) DEALLOCATE(OldFanVO)
+          ALLOCATE(OldFanVO(NumFanVariableVolume))
+          NumOldFanVO = 0
+          DO Num = 1, NumIDFRecords
+            SELECT CASE (MakeUPPERCase(IDFRecords(Num)%Name))
+            CASE ('FAN:VARIABLEVOLUME')
+              NumOldFanVO = NumOldFanVO + 1
+              ! debug print
+              PRINT *, "Alphas", TRIM(IDFRecords(Num)%Alphas(1)), TRIM(IDFRecords(Num)%Alphas(6))
+              OldFanVO(NumOldFanVO)%oldFanName = TRIM(IDFRecords(Num)%Alphas(1))
+              OldFanVO(NumOldFanVO)%availSchedule = TRIM(IDFRecords(Num)%Alphas(2))
+              OldFanVO(NumOldFanVO)%fanTotalEff_str = TRIM(IDFRecords(Num)%Numbers(1))
+              OldFanVO(NumOldFanVO)%pressureRise_str = TRIM(IDFRecords(Num)%Numbers(2))
+              OldFanVO(NumOldFanVO)%maxAirFlow_str = TRIM(IDFRecords(Num)%Numbers(3))
+              OldFanVO(NumOldFanVO)%minFlowInputMethod = TRIM(IDFRecords(Num)%Alphas(3))
+              OldFanVO(NumOldFanVO)%minAirFlowFrac_str = TRIM(IDFRecords(Num)%Numbers(4))
+              OldFanVO(NumOldFanVO)%fanPowerMinAirFlow_str = TRIM(IDFRecords(Num)%Numbers(5))
+              OldFanVO(NumOldFanVO)%motorEfficiency = TRIM(IDFRecords(Num)%Numbers(6))
+              OldFanVO(NumOldFanVO)%motorInAirStreamFrac = TRIM(IDFRecords(Num)%Numbers(7))
+              OldFanVO(NumOldFanVO)%coeff1 = TRIM(IDFRecords(Num)%Numbers(8))              !- Coefficient1 Constant
+              OldFanVO(NumOldFanVO)%coeff2 = TRIM(IDFRecords(Num)%Numbers(9))              !- Coefficient2 x
+              OldFanVO(NumOldFanVO)%coeff3 = TRIM(IDFRecords(Num)%Numbers(10))             !- Coefficient3 x**2
+              OldFanVO(NumOldFanVO)%coeff4 = TRIM(IDFRecords(Num)%Numbers(11))             !- Coefficient4 x**3
+              OldFanVO(NumOldFanVO)%coeff5 = TRIM(IDFRecords(Num)%Numbers(12))             !- Coefficient5 x**4
+              OldFanVO(NumOldFanVO)%inletAirNodeName = TRIM(IDFRecords(Num)%Alphas(4))
+              OldFanVO(NumOldFanVO)%outletAirNodeName = TRIM(IDFRecords(Num)%Alphas(5))
+              OldFanVO(NumOldFanVO)%endUseSubCat = TRIM(IDFRecords(Num)%Alphas(6))
+            END SELECT
+          END DO
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                       P R O C E S S I N G                                                        !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -484,6 +549,97 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              CASE('ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW')
+                isVariableVolume = .FALSE.
+                CALL GetNewObjectDefInIDD(ObjectName, NwNumArgs, NwAorN, NwReqFld, NwObjMinFlds, NwFldNames, NwFldDefaults, NwFldUnits)
+                nodiff = .false.
+                OutArgs(1:13) = InArgs(1:13)
+                IF (SameString(InArgs(14), 'FAN:VARIABLEVOLUME')) THEN
+                  isVariableVolume = .TRUE.
+                  OutArgs(14) = 'FAN:SYSTEMMODEL'
+                  ! create a new fan object with a new name
+                  OutArgs(15) = TRIM(InArgs(15)) // '_sysModel'
+                  sysFanName = TRIM(InArgs(15)) // '_sysModel'
+                  vavFanName = TRIM(InArgs(15))
+                ELSE
+                  OutArgs(14:15) = InArgs(14:15)
+                ENDIF
+                OutArgs(16:CurArgs) = InArgs(16:CurArgs)
+                CALL WriteOutIDFLines(DifLfn, 'ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW', CurArgs, OutArgs, NwFldNames, NwFldUnits)
+
+                IF (isVariableVolume) THEN
+                  ! create fan system model object
+                  ObjectName = 'Fan:SystemModel'
+                  DO Num3 = 1, NumFanVariableVolume
+                    IF (SameString(OldFanVO(Num3)%oldFanName, vavFanName)) THEN
+                      CALL GetNewObjectDefInIDD(ObjectName, NwNumArgs, NwAorN, NwReqFld, NwObjMinFlds, NwFldNames, NwFldDefaults, NwFldUnits)
+                      OutArgs(1) = TRIM(sysFanName)
+                      OutArgs(2) = OldFanVO(Num3)%availSchedule
+                      OutArgs(3) = OldFanVO(Num3)%inletAirNodeName
+                      OutArgs(4) = OldFanVO(Num3)%outletAirNodeName
+                      OutArgs(5) = OldFanVO(Num3)%maxAirFlow_str
+                      OutArgs(6) = 'Continuous'                             !- Speed Control Method
+                      IF (SameString(OldFanVO(Num3)%minFlowInputMethod, "FixedFlowRate")) THEN
+                        OutArgs(7) = OldFanVO(Num3)%maxAirFlow_str
+                      ELSE ! input method is "Fraction"
+                        READ(OldFanVO(Num3)%minAirFlowFrac_str, '(F15.5)') minAirFlowFrac
+                        IF (minAirFlowFrac == 0.0) THEN
+                          OutArgs(7) = '0.0'
+                        ELSE
+                          IF (.NOT. SameString(OldFanVO(Num3)%maxAirFlow_str, "AUTOSIZE")) THEN
+                            READ(OldFanVO(Num3)%maxAirFlow_str, '(F15.5)') maxAirFlow
+                            WRITE(OutArgs(7), '(F15.5)') (maxAirFlow * minAirFlowFrac)
+                          ELSE ! don't know how to multiply fraction with autosize
+                            OutArgs(7) = ''
+                          ENDIF
+                        ENDIF
+                      ENDIF
+                      OutArgs(8) = OldFanVO(Num3)%pressureRise_str          !- Design Pressure Rise {Pa}
+                      OutArgs(9) = OldFanVO(Num3)%motorEfficiency           !- Motor Efficiency
+                      OutArgs(10) = OldFanVO(Num3)%motorInAirStreamFrac     !- Motor In Air Stream Fraction
+                      IF (.NOT. SameString(OldFanVO(Num3)%maxAirFlow_str, "AUTOSIZE")) THEN
+                        READ(OldFanVO(Num3)%maxAirFlow_str, '(F15.5)') maxAirFlow
+                        READ(OldFanVO(Num3)%pressureRise_str, '(F15.5)') pressureRise
+                        READ(OldFanVO(Num3)%fanTotalEff_str, '(F15.5)') fanTotalEff
+                        WRITE(OutArgs(11), '(F15.5)') (maxAirFlow * pressureRise / fanTotalEff) !- Design Electric Power Consumption {W}
+                      ELSE
+                        OutArgs(11) = 'autosize'
+                        OutArgs(12) = 'TotalEfficiencyAndPressure' ! chose this becuase power per flow or per pressure are unknown
+                      ENDIF
+                      OutArgs(13) = ''                       !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+                      OutArgs(14) = ''                       !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+                      OutArgs(15) = OldFanVO(Num3)%fanTotalEff_str          !- Fan Total Efficiency
+                      OutArgs(16) = TRIM(sysFanName) // '_curve'    !- Electric Power Function of Flow Fraction Curve Name
+                      OutArgs(17) = ''
+                      OutArgs(18) = ''
+                      OutArgs(19) = ''
+                      OutArgs(20) = ''
+                      OutArgs(21) = OldFanVO(Num3)%endUseSubCat !- End-Use Subcategory
+                      CurArgs = 21                           !- Design Electric Power Consumption {W}
+                      CALL WriteOutIDFLines(DifLfn, ObjectName, CurArgs, OutArgs, NwFldNames, NwFldUnits)
+
+                      ! create curve object
+                      ObjectName = 'Curve:Quartic'
+                      CALL GetNewObjectDefInIDD(ObjectName, NwNumArgs, NwAorN, NwReqFld, NwObjMinFlds, NwFldNames, NwFldDefaults, NwFldUnits)
+                      OutArgs(1) = TRIM(sysFanName) // '_curve'
+                      OutArgs(2) = OldFanVO(Num3)%coeff1             !- Coefficient1 Constant
+                      OutArgs(3) = OldFanVO(Num3)%coeff2             !- Coefficient2 x
+                      OutArgs(4) = OldFanVO(Num3)%coeff3             !- Coefficient3 x**2
+                      OutArgs(5) = OldFanVO(Num3)%coeff4             !- Coefficient4 x**3
+                      OutArgs(6) = OldFanVO(Num3)%coeff5             !- Coefficient5 x**4
+                      READ(OldFanVO(Num3)%fanPowerMinAirFlow_str, '(F15.5)') fanPowerMinAirFlow
+                      WRITE(OutArgs(7), '(F10.7)') (fanPowerMinAirFlow / maxAirFlow)  !- Minimum Value of x
+                      OutArgs(8) = '1.0'              !- Maximum Value of x
+                      OutArgs(9) = '0.0'              !- Minimum Curve Output
+                      OutArgs(10) = '5.0'             !- Maximum Curve Output
+                      OutArgs(11) = 'Dimensionless'   !- Input Unit Type for X
+                      OutArgs(12) = 'Dimensionless'   !- Output Unit Type
+                      CurArgs = 12
+                    ENDIF
+                  ENDDO
+                ENDIF
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !
