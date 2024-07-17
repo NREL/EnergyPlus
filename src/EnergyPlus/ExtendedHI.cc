@@ -266,16 +266,14 @@ namespace ExtendedHI {
     }
 
     // Convert the find_T function
-    std::pair<Real64, std::string> find_T(EnergyPlusData &state, std::string eqvar_name, Real64 eqvar)
+    Real64 find_T(EnergyPlusData &state, std::string eqvar_name, Real64 eqvar)
     {
         Real64 T;
-        std::string region;
         int SolFla;
 
         if (eqvar_name == "phi") {
             General::SolveRoot(
                 state, tol, maxIter, SolFla, T, [&](Real64 T) { return std::get<1>(find_eqvar(state, T, 1.0)) - eqvar; }, 0.0, 240.0);
-            region = "I";
         } else if (eqvar_name == "Rf") {
             General::SolveRoot(
                 state,
@@ -286,18 +284,15 @@ namespace ExtendedHI {
                 [&](Real64 T) { return std::get<2>(find_eqvar(state, T, std::min(1.0, Pa0 / pvstar(T)))) - eqvar; },
                 230.0,
                 300.0);
-            region = (Pa0 > pvstar(T)) ? "II" : "III";
         } else if (eqvar_name == "Rs" || eqvar_name == "Rs*") {
             General::SolveRoot(
                 state, tol, maxIter, SolFla, T, [&](Real64 T) { return std::get<3>(find_eqvar(state, T, Pa0 / pvstar(T))) - eqvar; }, 295.0, 350.0);
-            region = (eqvar_name == "Rs") ? "IV" : "V";
         } else {
             General::SolveRoot(
                 state, tol, maxIter, SolFla, T, [&](Real64 T) { return std::get<4>(find_eqvar(state, T, Pa0 / pvstar(T))) - eqvar; }, 340.0, 1000.0);
-            region = "VI";
         }
 
-        return std::make_pair(T, region);
+        return T;
     }
 
     Real64 heatindex(EnergyPlusData &state, Real64 Ta, Real64 RH)
@@ -324,9 +319,7 @@ namespace ExtendedHI {
             eqvar_value = std::get<4>(eqvars);
         }
 
-        auto result = find_T(state, eqvar_name, eqvar_value);
-        Real64 T = std::get<0>(result);
-        std::string region = std::get<1>(result);
+        Real64 T = find_T(state, eqvar_name, eqvar_value);
 
         if (Ta == 0.0) T = 0.0;
 

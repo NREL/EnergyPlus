@@ -395,17 +395,13 @@ TEST_F(EnergyPlusFixture, extendedHI_find_T)
     std::vector<Real64> Rf_values = {30, 32, 34, 36, 38};
     std::vector<Real64> result_0_rf = {240.06754042464308, 239.971123727737, 239.88581076147966, 239.8097881616559, 239.7416166716721};
     for (size_t i = 0; i < Rf_values.size(); ++i) {
-        auto const output = ExtendedHI::find_T(*state, "Rf", Rf_values[i]);
-        EXPECT_EQ(std::get<1>(output), "II");
-        EXPECT_NEAR(std::get<0>(output), result_0_rf[i], tol);
+        EXPECT_NEAR(ExtendedHI::find_T(*state, "Rf", Rf_values[i]), result_0_rf[i], tol);
     }
     std::vector<Real64> Rs_values = {0.01, 0.02, 0.03};
     std::vector<Real64> result_0_rs = {337.8696502133971, 329.7586998442421, 307.4815719091566};
     tol = 1e-4;
     for (size_t i = 0; i < Rs_values.size(); ++i) {
-        auto const output = ExtendedHI::find_T(*state, "Rs", Rs_values[i]);
-        EXPECT_EQ(std::get<1>(output), "IV");
-        EXPECT_NEAR(std::get<0>(output), result_0_rs[i], tol);
+        EXPECT_NEAR(ExtendedHI::find_T(*state, "Rs", Rs_values[i]), result_0_rs[i], tol);
     }
     // fixme: this one has large diff, 347 vs 350, because of the difference in the root solvers between EnergyPlus and the heatindex.py code by Lu
     // and Romps.
