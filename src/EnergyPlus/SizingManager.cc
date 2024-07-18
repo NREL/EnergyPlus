@@ -3291,7 +3291,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                     }
                 }
                 zoneSizingIndex.spaceConcurrence = static_cast<DataSizing::SizingConcurrence>(
-                    getEnumValue(DataSizing::SizingConcurrenceNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+                    getEnumValue(DataSizing::SizingConcurrenceNamesUC, state.dataIPShortCut->cAlphaArgs(15)));
                 zoneSizingIndex.zoneSizingMethod =
                     static_cast<DataSizing::ZoneSizing>(getEnumValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
                 if (zoneSizingIndex.zoneSizingMethod != ZoneSizing::SensibleOnly) {

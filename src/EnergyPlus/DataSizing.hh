@@ -130,7 +130,7 @@ namespace DataSizing {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SizingConcurrence::Num)> SizingConcurrenceNamesUC{"NonCoincident", "Coincident"};
+    constexpr std::array<std::string_view, static_cast<int>(SizingConcurrence::Num)> SizingConcurrenceNamesUC{"NONCOINCIDENT", "COINCIDENT"};
 
     // parameters for coil sizing concurrence method
     enum class CoilSizingConcurrence
