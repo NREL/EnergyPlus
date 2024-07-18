@@ -1869,7 +1869,7 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
     // Set or override finalzonesizing data for non-coincident sizing
     auto &zoneCFS = state.dataSize->CalcFinalZoneSizing(zoneNum);
     if (zoneCFS.spaceConcurrence == DataSizing::SizingConcurrence::Coincident) return;
-    // Zero out simple sums and averages
+    // Zero out simple sums
     zoneCFS.DesHeatVolFlow = 0.0;
     zoneCFS.DesHeatLoad = 0.0;
     zoneCFS.DesHeatMassFlow = 0.0;
@@ -1879,7 +1879,7 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
     zoneCFS.DesCoolMassFlow = 0.0;
     zoneCFS.DesCoolLoadNoDOAS = 0.0;
 
-    // Weighted averages
+    // Zero out weighted averages
     zoneCFS.DesHeatDens = 0.0;
     zoneCFS.ZoneTempAtHeatPeak = 0.0;
     zoneCFS.OutTempAtHeatPeak = 0.0;
@@ -1897,7 +1897,7 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
     zoneCFS.DesCoolCoilInTemp = 0.0;
     zoneCFS.DesCoolCoilInHumRat = 0.0;
 
-    // Zero out ime-series sums
+    // Zero out time-series sums and averages
     for (int ts = 1; ts <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++ts) {
         zoneCFS.HeatFlowSeq(ts) = 0.0;
         zoneCFS.HeatLoadSeq(ts) = 0.0;
@@ -1917,7 +1917,7 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
         zoneCFS.CoolLoadNoDOASSeq(ts) = 0.0;
     }
     if (zoneCFS.zoneLatentSizing) {
-        // Simple sums
+        // Zero out latent simple sums
         zoneCFS.DesLatentHeatVolFlow = 0.0;
         zoneCFS.DesLatentHeatMassFlow = 0.0;
         zoneCFS.DesLatentHeatLoad = 0.0;
@@ -1927,7 +1927,7 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
         zoneCFS.DesLatentCoolLoad = 0.0;
         zoneCFS.DesLatentCoolLoadNoDOAS = 0.0;
 
-        // Weighted averages
+        // Zero out latent weighted averages
         zoneCFS.ZoneTempAtLatentHeatPeak = 0.0;
         zoneCFS.ZoneHumRatAtLatentHeatPeak = 0.0;
         zoneCFS.ZoneRetTempAtLatentHeatPeak = 0.0;
@@ -1939,7 +1939,7 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
         zoneCFS.DesLatentCoolCoilInTemp = 0.0;
         zoneCFS.DesLatentCoolCoilInHumRat = 0.0;
 
-        // Time-series sums
+        // Zero out latent time-series sums
         for (int ts = 1; ts <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++ts) {
             zoneCFS.LatentHeatLoadSeq(ts) = 0.0;
             zoneCFS.LatentHeatFlowSeq(ts) = 0.0;
@@ -1953,7 +1953,6 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
     int numSpaces = 0; // Track this for averages later
     for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
         auto &spaceCFS = state.dataSize->CalcFinalSpaceSizing(spaceNum);
-        if (!state.dataZoneEquip->spaceEquipConfig(spaceNum).IsControlled) continue;
         ++numSpaces;
 
         // Simple sums
@@ -1967,41 +1966,43 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
         zoneCFS.DesCoolLoadNoDOAS += spaceCFS.DesCoolLoadNoDOAS;
 
         // Weighted averages
-        zoneCFS.DesHeatDens += spaceCFS.DesHeatDens;
-        zoneCFS.ZoneTempAtHeatPeak += spaceCFS.ZoneTempAtHeatPeak;
-        zoneCFS.OutTempAtHeatPeak += spaceCFS.OutTempAtHeatPeak;
-        zoneCFS.ZoneRetTempAtHeatPeak += spaceCFS.ZoneRetTempAtHeatPeak;
-        zoneCFS.ZoneHumRatAtHeatPeak += spaceCFS.ZoneHumRatAtHeatPeak;
-        zoneCFS.OutHumRatAtHeatPeak += spaceCFS.OutHumRatAtHeatPeak;
-        zoneCFS.DesHeatCoilInTemp += spaceCFS.DesHeatCoilInTemp;
-        zoneCFS.DesHeatCoilInHumRat += spaceCFS.DesHeatCoilInHumRat;
-        zoneCFS.DesCoolDens += spaceCFS.DesCoolDens;
-        zoneCFS.ZoneTempAtCoolPeak += spaceCFS.ZoneTempAtCoolPeak;
-        zoneCFS.OutTempAtCoolPeak += spaceCFS.OutTempAtCoolPeak;
-        zoneCFS.ZoneRetTempAtCoolPeak += spaceCFS.ZoneRetTempAtCoolPeak;
-        zoneCFS.ZoneHumRatAtCoolPeak += spaceCFS.ZoneHumRatAtCoolPeak;
-        zoneCFS.OutHumRatAtCoolPeak += spaceCFS.OutHumRatAtCoolPeak;
-        zoneCFS.DesCoolCoilInTemp += spaceCFS.DesCoolCoilInTemp;
-        zoneCFS.DesCoolCoilInHumRat += spaceCFS.DesCoolCoilInHumRat;
+        zoneCFS.DesHeatDens += spaceCFS.DesHeatDens * spaceCFS.DesHeatMassFlow;
+        zoneCFS.ZoneTempAtHeatPeak += spaceCFS.ZoneTempAtHeatPeak * spaceCFS.DesHeatMassFlow;
+        zoneCFS.OutTempAtHeatPeak += spaceCFS.OutTempAtHeatPeak * spaceCFS.DesHeatMassFlow;
+        zoneCFS.ZoneRetTempAtHeatPeak += spaceCFS.ZoneRetTempAtHeatPeak * spaceCFS.DesHeatMassFlow;
+        zoneCFS.ZoneHumRatAtHeatPeak += spaceCFS.ZoneHumRatAtHeatPeak * spaceCFS.DesHeatMassFlow;
+        zoneCFS.OutHumRatAtHeatPeak += spaceCFS.OutHumRatAtHeatPeak * spaceCFS.DesHeatMassFlow;
+        zoneCFS.DesHeatCoilInTemp += spaceCFS.DesHeatCoilInTemp * spaceCFS.DesHeatMassFlow;
+        zoneCFS.DesHeatCoilInHumRat += spaceCFS.DesHeatCoilInHumRat * spaceCFS.DesHeatMassFlow;
+        zoneCFS.DesCoolDens += spaceCFS.DesCoolDens * spaceCFS.DesCoolMassFlow;
+        zoneCFS.ZoneTempAtCoolPeak += spaceCFS.ZoneTempAtCoolPeak * spaceCFS.DesCoolMassFlow;
+        zoneCFS.OutTempAtCoolPeak += spaceCFS.OutTempAtCoolPeak * spaceCFS.DesCoolMassFlow;
+        zoneCFS.ZoneRetTempAtCoolPeak += spaceCFS.ZoneRetTempAtCoolPeak * spaceCFS.DesCoolMassFlow;
+        zoneCFS.ZoneHumRatAtCoolPeak += spaceCFS.ZoneHumRatAtCoolPeak * spaceCFS.DesCoolMassFlow;
+        zoneCFS.OutHumRatAtCoolPeak += spaceCFS.OutHumRatAtCoolPeak * spaceCFS.DesCoolMassFlow;
+        zoneCFS.DesCoolCoilInTemp += spaceCFS.DesCoolCoilInTemp * spaceCFS.DesCoolMassFlow;
+        zoneCFS.DesCoolCoilInHumRat += spaceCFS.DesCoolCoilInHumRat * spaceCFS.DesCoolMassFlow;
 
-        // Time-series sums
         for (int ts = 1; ts <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++ts) {
+            // Time-series sums
             zoneCFS.HeatFlowSeq(ts) += spaceCFS.HeatFlowSeq(ts);
             zoneCFS.HeatLoadSeq(ts) += spaceCFS.HeatLoadSeq(ts);
-            zoneCFS.HeatZoneTempSeq(ts) += spaceCFS.HeatZoneTempSeq(ts);
-            zoneCFS.HeatOutTempSeq(ts) += spaceCFS.HeatOutTempSeq(ts);
-            zoneCFS.HeatZoneRetTempSeq(ts) += spaceCFS.HeatZoneRetTempSeq(ts);
-            zoneCFS.HeatZoneHumRatSeq(ts) += spaceCFS.HeatZoneHumRatSeq(ts);
-            zoneCFS.HeatOutHumRatSeq(ts) += spaceCFS.HeatOutHumRatSeq(ts);
             zoneCFS.HeatLoadNoDOASSeq(ts) += spaceCFS.HeatLoadNoDOASSeq(ts);
             zoneCFS.CoolFlowSeq(ts) += spaceCFS.CoolFlowSeq(ts);
             zoneCFS.CoolLoadSeq(ts) += spaceCFS.CoolLoadSeq(ts);
-            zoneCFS.CoolZoneTempSeq(ts) += spaceCFS.CoolZoneTempSeq(ts);
-            zoneCFS.CoolOutTempSeq(ts) += spaceCFS.CoolOutTempSeq(ts);
-            zoneCFS.CoolZoneRetTempSeq(ts) += spaceCFS.CoolZoneRetTempSeq(ts);
-            zoneCFS.CoolZoneHumRatSeq(ts) += spaceCFS.CoolZoneHumRatSeq(ts);
-            zoneCFS.CoolOutHumRatSeq(ts) += spaceCFS.CoolOutHumRatSeq(ts);
             zoneCFS.CoolLoadNoDOASSeq(ts) += spaceCFS.CoolLoadNoDOASSeq(ts);
+
+            // Time-series weighted averages
+            zoneCFS.HeatZoneTempSeq(ts) += spaceCFS.HeatZoneTempSeq(ts) * spaceCFS.HeatFlowSeq(ts);
+            zoneCFS.HeatOutTempSeq(ts) += spaceCFS.HeatOutTempSeq(ts) * spaceCFS.HeatFlowSeq(ts);
+            zoneCFS.HeatZoneRetTempSeq(ts) += spaceCFS.HeatZoneRetTempSeq(ts) * spaceCFS.HeatFlowSeq(ts);
+            zoneCFS.HeatZoneHumRatSeq(ts) += spaceCFS.HeatZoneHumRatSeq(ts) * spaceCFS.HeatFlowSeq(ts);
+            zoneCFS.HeatOutHumRatSeq(ts) += spaceCFS.HeatOutHumRatSeq(ts) * spaceCFS.HeatFlowSeq(ts);
+            zoneCFS.CoolZoneTempSeq(ts) += spaceCFS.CoolZoneTempSeq(ts) * spaceCFS.CoolFlowSeq(ts);
+            zoneCFS.CoolOutTempSeq(ts) += spaceCFS.CoolOutTempSeq(ts) * spaceCFS.CoolFlowSeq(ts);
+            zoneCFS.CoolZoneRetTempSeq(ts) += spaceCFS.CoolZoneRetTempSeq(ts) * spaceCFS.CoolFlowSeq(ts);
+            zoneCFS.CoolZoneHumRatSeq(ts) += spaceCFS.CoolZoneHumRatSeq(ts) * spaceCFS.CoolFlowSeq(ts);
+            zoneCFS.CoolOutHumRatSeq(ts) += spaceCFS.CoolOutHumRatSeq(ts) * spaceCFS.CoolFlowSeq(ts);
         }
 
         // Other
@@ -2020,7 +2021,7 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
         // zoneCFS.cCoolDDDate = desDayWeath.DateString;
         // zoneCFS.TimeStepNumAtCoolMax = spaceCFS.TimeStepNumAtCoolMax;
 
-        if (spaceCFS.zoneLatentSizing) {
+        if (zoneCFS.zoneLatentSizing) {
             // Simple sums
             zoneCFS.DesLatentHeatVolFlow += spaceCFS.DesLatentHeatVolFlow;
             zoneCFS.DesLatentHeatMassFlow += spaceCFS.ZoneHeatLatentMassFlow;
@@ -2032,16 +2033,16 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
             zoneCFS.DesLatentCoolLoadNoDOAS += spaceCFS.DesLatentCoolLoadNoDOAS;
 
             // Weighted averages
-            zoneCFS.ZoneTempAtLatentHeatPeak += spaceCFS.ZoneTempAtLatentHeatPeak;
-            zoneCFS.ZoneHumRatAtLatentHeatPeak += spaceCFS.ZoneHumRatAtLatentHeatPeak;
-            zoneCFS.ZoneRetTempAtLatentHeatPeak += spaceCFS.ZoneRetTempAtLatentHeatPeak;
-            zoneCFS.DesLatentHeatCoilInTemp += spaceCFS.DesLatentHeatCoilInTemp;
-            zoneCFS.DesLatentHeatCoilInHumRat += spaceCFS.DesLatentHeatCoilInHumRat;
-            zoneCFS.ZoneTempAtLatentCoolPeak += spaceCFS.ZoneTempAtLatentCoolPeak;
-            zoneCFS.ZoneHumRatAtLatentCoolPeak += spaceCFS.ZoneHumRatAtLatentCoolPeak;
-            zoneCFS.ZoneRetTempAtLatentCoolPeak += spaceCFS.ZoneRetTempAtLatentCoolPeak;
-            zoneCFS.DesLatentCoolCoilInTemp += spaceCFS.DesLatentCoolCoilInTemp;
-            zoneCFS.DesLatentCoolCoilInHumRat += spaceCFS.DesLatentCoolCoilInHumRat;
+            zoneCFS.ZoneTempAtLatentHeatPeak += spaceCFS.ZoneTempAtLatentHeatPeak * spaceCFS.ZoneHeatLatentMassFlow;
+            zoneCFS.ZoneHumRatAtLatentHeatPeak += spaceCFS.ZoneHumRatAtLatentHeatPeak * spaceCFS.ZoneHeatLatentMassFlow;
+            zoneCFS.ZoneRetTempAtLatentHeatPeak += spaceCFS.ZoneRetTempAtLatentHeatPeak * spaceCFS.ZoneHeatLatentMassFlow;
+            zoneCFS.DesLatentHeatCoilInTemp += spaceCFS.DesLatentHeatCoilInTemp * spaceCFS.ZoneHeatLatentMassFlow;
+            zoneCFS.DesLatentHeatCoilInHumRat += spaceCFS.DesLatentHeatCoilInHumRat * spaceCFS.ZoneHeatLatentMassFlow;
+            zoneCFS.ZoneTempAtLatentCoolPeak += spaceCFS.ZoneTempAtLatentCoolPeak * spaceCFS.DesLatentCoolVolFlow;
+            zoneCFS.ZoneHumRatAtLatentCoolPeak += spaceCFS.ZoneHumRatAtLatentCoolPeak * spaceCFS.DesLatentCoolVolFlow;
+            zoneCFS.ZoneRetTempAtLatentCoolPeak += spaceCFS.ZoneRetTempAtLatentCoolPeak * spaceCFS.DesLatentCoolVolFlow;
+            zoneCFS.DesLatentCoolCoilInTemp += spaceCFS.DesLatentCoolCoilInTemp * spaceCFS.DesLatentCoolVolFlow;
+            zoneCFS.DesLatentCoolCoilInHumRat += spaceCFS.DesLatentCoolCoilInHumRat * spaceCFS.DesLatentCoolVolFlow;
 
             // Other
             // zoneCFS.LatHeatDesDay = spaceCFS.LatHeatDesDay;
@@ -2070,6 +2071,63 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
             }
         }
     }
+
+    // Compute weighted averages
+    if (zoneCFS.DesHeatMassFlow > 0) {
+        zoneCFS.DesHeatDens /= zoneCFS.DesHeatMassFlow;
+        zoneCFS.ZoneTempAtHeatPeak /= zoneCFS.DesHeatMassFlow;
+        zoneCFS.OutTempAtHeatPeak /= zoneCFS.DesHeatMassFlow;
+        zoneCFS.ZoneRetTempAtHeatPeak /= zoneCFS.DesHeatMassFlow;
+        zoneCFS.ZoneHumRatAtHeatPeak /= zoneCFS.DesHeatMassFlow;
+        zoneCFS.OutHumRatAtHeatPeak /= zoneCFS.DesHeatMassFlow;
+        zoneCFS.DesHeatCoilInTemp /= zoneCFS.DesHeatMassFlow;
+        zoneCFS.DesHeatCoilInHumRat /= zoneCFS.DesHeatMassFlow;
+    }
+    if (zoneCFS.DesCoolMassFlow > 0) {
+        zoneCFS.DesCoolDens /= zoneCFS.DesCoolMassFlow;
+        zoneCFS.ZoneTempAtCoolPeak /= zoneCFS.DesCoolMassFlow;
+        zoneCFS.OutTempAtCoolPeak /= zoneCFS.DesCoolMassFlow;
+        zoneCFS.ZoneRetTempAtCoolPeak /= zoneCFS.DesCoolMassFlow;
+        zoneCFS.ZoneHumRatAtCoolPeak /= zoneCFS.DesCoolMassFlow;
+        zoneCFS.OutHumRatAtCoolPeak /= zoneCFS.DesCoolMassFlow;
+        zoneCFS.DesCoolCoilInTemp /= zoneCFS.DesCoolMassFlow;
+        zoneCFS.DesCoolCoilInHumRat /= zoneCFS.DesCoolMassFlow;
+    }
+    for (int ts = 1; ts <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++ts) {
+        if (zoneCFS.HeatFlowSeq(ts) > 0) {
+            zoneCFS.HeatZoneTempSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
+            zoneCFS.HeatOutTempSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
+            zoneCFS.HeatZoneRetTempSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
+            zoneCFS.HeatZoneHumRatSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
+            zoneCFS.HeatOutHumRatSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
+            zoneCFS.HeatLoadNoDOASSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
+        }
+        if (zoneCFS.CoolFlowSeq(ts) > 0) {
+            zoneCFS.CoolZoneTempSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
+            zoneCFS.CoolOutTempSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
+            zoneCFS.CoolZoneRetTempSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
+            zoneCFS.CoolZoneHumRatSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
+            zoneCFS.CoolOutHumRatSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
+            zoneCFS.CoolLoadNoDOASSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
+        }
+    }
+    if (zoneCFS.zoneLatentSizing) {
+        if (zoneCFS.DesLatentHeatMassFlow > 0) {
+            zoneCFS.ZoneTempAtLatentHeatPeak /= zoneCFS.DesLatentHeatMassFlow;
+            zoneCFS.ZoneHumRatAtLatentHeatPeak /= zoneCFS.DesLatentHeatMassFlow;
+            zoneCFS.ZoneRetTempAtLatentHeatPeak /= zoneCFS.DesLatentHeatMassFlow;
+            zoneCFS.DesLatentHeatCoilInTemp /= zoneCFS.DesLatentHeatMassFlow;
+            zoneCFS.DesLatentHeatCoilInHumRat /= zoneCFS.DesLatentHeatMassFlow;
+        }
+        if (zoneCFS.DesLatentCoolMassFlow > 0) {
+            zoneCFS.ZoneTempAtLatentCoolPeak /= zoneCFS.DesLatentCoolMassFlow;
+            zoneCFS.ZoneHumRatAtLatentCoolPeak /= zoneCFS.DesLatentCoolMassFlow;
+            zoneCFS.ZoneRetTempAtLatentCoolPeak /= zoneCFS.DesLatentCoolMassFlow;
+            zoneCFS.DesLatentCoolCoilInTemp /= zoneCFS.DesLatentCoolMassFlow;
+            zoneCFS.DesLatentCoolCoilInHumRat /= zoneCFS.DesLatentCoolMassFlow;
+        }
+    }
+
     return;
 }
 
@@ -3129,10 +3187,11 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
 
         if (!state.dataGlobal->isPulseZoneSizing) {
 
-            // Apply non-coincident zone sizing - only if space sizing is active
+            // Apply non-coincident zone sizing - only if space sizing is active, and only if there is more than one space in the zone
             if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
                 for (int ctrlZoneNum = 1; ctrlZoneNum <= state.dataGlobal->NumOfZones; ++ctrlZoneNum) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).IsControlled) continue;
+                    if (state.dataHeatBal->Zone(ctrlZoneNum).numSpaces == 1) continue;
                     updateZoneSizingEndZoneSizingCalc1(state, ctrlZoneNum);
                 }
             }
