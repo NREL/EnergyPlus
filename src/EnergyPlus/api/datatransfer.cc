@@ -573,6 +573,50 @@ Real64 getInternalVariableValue(EnergyPlusState state, int handle)
     return 0;
 }
 
+int getEMSGlobalVariableHandle(EnergyPlusState state, const char *name)
+{
+    auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
+    int index = 0;
+    for (auto const &erlVar : thisState->dataRuntimeLang->ErlVariable) {
+        index++;
+        if (EnergyPlus::Util::SameString(name, erlVar.Name)) {
+            return index;
+        }
+    }
+    return 0;
+}
+
+Real64 getEMSGlobalVariableValue(EnergyPlusState state, int handle)
+{
+    auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (handle < 0 || handle > thisState->dataRuntimeLang->NumErlVariables) {
+        // need to fatal out once the process is done
+        // throw an error, set the fatal flag, and then return 0
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in getEMSGlobalVariableValue; received handle: {}", handle));
+        EnergyPlus::ShowContinueError(
+            *thisState, "The getEMSGlobalVariableValue function will return 0 for now to allow the process to finish, then EnergyPlus will abort");
+        thisState->dataPluginManager->apiErrorFlag = true;
+        return 0;
+    }
+    return thisState->dataRuntimeLang->ErlVariable(handle).Value.Number;
+}
+
+void setEMSGlobalVariableValue(EnergyPlusState state, int handle, Real64 value)
+{
+    auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (handle < 0 || handle > thisState->dataRuntimeLang->NumErlVariables) {
+        // need to fatal out once the plugin is done
+        // throw an error, set the fatal flag, and then return
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in setEMSGlobalVariableValue; received handle: {}", handle));
+        EnergyPlus::ShowContinueError(*thisState,
+                                      "The setEMSGlobalVariableValue function will return to allow the plugin to finish, then EnergyPlus will abort");
+        thisState->dataPluginManager->apiErrorFlag = true;
+    }
+    thisState->dataRuntimeLang->ErlVariable(handle).Value.Number = value;
+}
+
 int getPluginGlobalVariableHandle(EnergyPlusState state, const char *name)
 {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);

@@ -149,7 +149,7 @@ ENERGYPLUSLIB_API void freeAPIData(const struct APIDataEntry *data, unsigned int
 ENERGYPLUSLIB_API char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize);
 /// \brief Clears an object names array allocation
 /// \details This function frees an instance of the object names array, which is returned from getObjectNames
-/// \param[in] data An array (pointer) of const char * as returned from the getObjectNames function
+/// \param[in] objectNames An array (pointer) of char * as returned from the getObjectNames function
 /// \param[in] arraySize The size of the object name array, which is known after the call to getObjectNames.
 /// \return Nothing, this simply frees the memory
 ENERGYPLUSLIB_API void freeObjectNames(char **objectNames, unsigned int arraySize);
@@ -296,6 +296,40 @@ ENERGYPLUSLIB_API int getInternalVariableHandle(EnergyPlusState state, const cha
 ///         is returned, use the `apiErrorFlag` function to disambiguate the return value.
 /// \see getInternalVariableHandle
 ENERGYPLUSLIB_API Real64 getInternalVariableValue(EnergyPlusState state, int handle);
+
+// ----- FUNCTIONS RELATED TO EMS GLOBAL VARIABLES (FOR CORNER CASES WHERE PLUGIN/API BLENDS WITH EMS PROGRAMS)
+/// \brief Gets a handle to an EMS "Global" variable
+/// \details When using EMS, it is sometimes necessary to share data between programs.
+///          EMS global variables are declared in the input file and used in EMS programs.
+///          EMS global variables are identified by name only.  This function returns -1 if a match is not found.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] name The name of the EMS global variable, which is declared in the EnergyPlus input file
+/// \return The integer handle to an EMS global variable, or -1 if a match is not found.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \see apiDataFullyReady
+ENERGYPLUSLIB_API int getEMSGlobalVariableHandle(EnergyPlusState state, const char *name);
+/// \brief Gets the current value of an EMS "Global" variable
+/// \details When using EMS, the value of the shared "global" variables can change at any time.
+///          This function returns the current value of the variable.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] handle The handle id to an EMS "Global" variable, which can be retrieved using the `getEMSGlobalVariableHandle` function.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \return The current value of the variable, in floating point form, or zero if a handle problem is encountered.  If a zero
+///         is returned, use the `apiErrorFlag` function to disambiguate the return value.
+/// \see apiDataFullyReady
+/// \see getEMSGlobalVariableHandle
+ENERGYPLUSLIB_API Real64 getEMSGlobalVariableValue(EnergyPlusState state, int handle);
+/// \brief Sets the value of an EMS "Global" variable
+/// \details When using EMS, the value of the shared "global" variables can change at any time.
+///          This function sets the variable to a new value.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] handle The handle id to an EMS "Global" variable, which can be retrieved using the `getEMSGlobalVariableHandle` function.
+/// \param[in] value The floating point value to be assigned to the global variable
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark A handle index or other problem will return 0 and set a flag to cause EnergyPlus to terminate once Python completes.
+/// \see apiDataFullyReady
+/// \see getEMSGlobalVariableHandle
+ENERGYPLUSLIB_API void setEMSGlobalVariableValue(EnergyPlusState state, int handle, Real64 value);
 
 // ----- FUNCTIONS RELATED TO PYTHON PLUGIN GLOBAL VARIABLES (ONLY USED FOR PYTHON PLUGIN SYSTEM)
 

@@ -201,6 +201,12 @@ class DataExchange:
         self.api.currentEnvironmentNum.restype = c_int
         self.api.warmupFlag.argtypes = [c_void_p]
         self.api.warmupFlag.restype = c_int
+        self.api.getEMSGlobalVariableHandle.argtypes = [c_void_p, c_char_p]
+        self.api.getEMSGlobalVariableHandle.restype = c_int
+        self.api.getEMSGlobalVariableValue.argtypes = [c_void_p, c_int]
+        self.api.getEMSGlobalVariableValue.restype = RealEP
+        self.api.setEMSGlobalVariableValue.argtypes = [c_void_p, c_int, RealEP]
+        self.api.setEMSGlobalVariableValue.restype = c_void_p
         self.api.getPluginGlobalVariableHandle.argtypes = [c_void_p, c_char_p]
         self.api.getPluginGlobalVariableHandle.restype = c_int
         self.api.getPluginGlobalVariableValue.argtypes = [c_void_p, c_int]
@@ -698,6 +704,82 @@ class DataExchange:
                 "'{}'".format(var_name))
         return self.api.getConstructionHandle(state, var_name)
 
+    def get_ems_global_handle(self, state: c_void_p, var_name: Union[str, bytes]) -> int:
+        """
+        Get a handle to an EMS global variable in a running simulation.
+
+        EMS global variables are used as a way to share data between running EMS programs.  First a global variable must
+        be declared in the input file using the EnergyManagementSystem:GlobalVariable object.  Once a name has been
+        declared, it can be accessed by EMS programs by name, and through the Python API.  For API usage, the client
+        should get a handle to the variable using this get_global_handle function, then
+        using the get_ems_global_value and set_ems_global_value functions as needed.  Note all global variables are
+        floating point values.
+
+        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
+        automatically converts values to upper-case when finding matches to internal variables in the simulation.
+
+        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
+        as needed.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param var_name: The name of the EMS global variable to retrieve, this name must be listed in an IDF object:
+                         `EnergyManagementSystem:GlobalVariable`
+        :return: An integer ID for this EMS global variable, or -1 if one could not be found.
+        """
+        if isinstance(var_name, str):
+            var_name = var_name.encode('utf-8')
+        elif not isinstance(var_name, bytes):
+            raise EnergyPlusException(
+                "`get_ems_global_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(var_name))
+        return self.api.getEMSGlobalVariableHandle(state, var_name)
+
+    def get_ems_global_value(self, state: c_void_p, handle: int) -> float:
+        """
+        Get the current value of an EMS global variable in a running simulation.
+
+        EMS global variables are used as a way to share data between running EMS programs.  First a global variable must
+        be declared in the input file using the EnergyManagementSystem:GlobalVariable object.  Once a name has been
+        declared, it can be accessed by EMS programs by name, and through the Python API.  For API usage, the client
+        should get a handle to the variable using this get_global_handle function, then
+        using the get_ems_global_value and set_ems_global_value functions as needed.  Note all global variables are
+        floating point values.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param handle: An integer returned from the `get_ems_global_handle` function.
+        :return: Floating point representation of the EMS global variable value
+        """
+        if not is_number(handle):
+            raise EnergyPlusException(
+                "`get_ems_global_value` expects `handle` as an `int`, not "
+                "'{}'".format(handle))
+        return self.api.getEMSGlobalVariableValue(state, handle)
+
+    def set_ems_global_value(self, state: c_void_p, handle: int, value: float) -> None:
+        """
+        Set the current value of an EMS global variable in a running simulation.
+
+        EMS global variables are used as a way to share data between running EMS programs.  First a global variable must
+        be declared in the input file using the EnergyManagementSystem:GlobalVariable object.  Once a name has been
+        declared, it can be accessed by EMS programs by name, and through the Python API.  For API usage, the client
+        should get a handle to the variable using this get_global_handle function, then
+        using the get_ems_global_value and set_ems_global_value functions as needed.  Note all global variables are
+        floating point values.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param handle: An integer returned from the `get_ems_global_handle` function.
+        :param value: Floating point value to assign to the EMS global variable
+        """
+        if not is_number(handle):
+            raise EnergyPlusException(
+                "`set_ems_global_value` expects `variable_handle` as an `int`, not "
+                "'{}'".format(handle))
+        if not is_number(value):
+            raise EnergyPlusException(
+                "`set_ems_global_value` expects `value` as a `float`, not "
+                "'{}'".format(value))
+        self.api.setEMSGlobalVariableValue(state, handle, value)
+
     def get_global_handle(self, state: c_void_p, var_name: Union[str, bytes]) -> int:
         """
         Get a handle to a global variable in a running simulation.  This is only used for Python Plugin applications!
@@ -739,12 +821,6 @@ class DataExchange:
         can be accessed in the Plugin by getting a handle to the variable using the get_global_handle function, then
         using this get_global_value and the set_global_value functions as needed.  Note all global variables are
         floating point values.
-
-        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
-        automatically converts values to upper-case when finding matches to internal variables in the simulation.
-
-        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
-        as needed.
 
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :param handle: An integer returned from the `get_global_handle` function.
