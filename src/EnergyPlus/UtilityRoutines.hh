@@ -220,6 +220,12 @@ void SummarizeErrors(EnergyPlusData &state);
 
 void ShowRecurringErrors(EnergyPlusData &state);
 
+struct ErrorCountIndex
+{
+    int index = 0;
+    int count = 0;
+};
+        
 struct ErrorObjectHeader
 {
     std::string_view routineName;

@@ -99,11 +99,30 @@ namespace FluidProperties {
     std::uint64_t constexpr t_sh_cache_mask = (t_sh_cache_size - 1);
 #endif
 
-    struct RefrigerantData
+    enum class RefrigError
+    {
+        Invalid = -1,
+        SatTemp,
+        SatPress,
+        SatTempDensity,
+        SatSupEnthalpy,
+        SatSupEnthalpyTemp,
+        SatSupEnthalpyPress,
+        SatSupPress,
+        SatSupPressTemp,
+        SatSupPressEnthalpy,
+        SatSupDensity,
+        SatSupDensityTemp,
+        SatSupDensityPress,
+        Num
+    };
+        
+    struct RefrigProps
     {
         // Members
         std::string Name;            // Name of the refrigerant
         int Num = 0;
+        bool used = false;
 
         int NumPsPoints = 0;             // Number of saturation pressure
         Real64 PsLowTempValue = 0.0;       // Low Temperature Value for Ps (>0.0)
@@ -163,6 +182,8 @@ namespace FluidProperties {
         Array2D<Real64> HshValues;   // Enthalpy of superheated gas at HshTemps, HshPress
         Array2D<Real64> RhoshValues; // Density of superheated gas at HshTemps, HshPress
 
+        std::array<ErrorCountIndex, (int)RefrigError::Num> errors;
+
         Real64 getQuality(EnergyPlusData &state,
                           Real64 Temperature,             // actual temperature given as input
                           Real64 Enthalpy,                // actual enthalpy given as input
@@ -214,7 +235,21 @@ namespace FluidProperties {
                                  std::string_view CalledFrom);   // routine this function was called from (error messages)
     };
 
-    struct GlycolRawData
+    enum class GlycolError
+    {
+        Invalid = -1,
+        SpecHeatLow,
+        SpecHeatHigh,
+        DensityLow,
+        DensityHigh,
+        ConductivityLow,
+        ConductivityHigh,
+        ViscosityLow,
+        ViscosityHigh,
+        Num
+    };
+        
+    struct GlycolRawProps
     {
         // Members
         std::string Name;           // Name of the glycol
@@ -249,11 +284,12 @@ namespace FluidProperties {
         Array2D<Real64> ViscValues; // viscosity values
     };
 
-    struct GlycolData 
+    struct GlycolProps 
     {
         // Members
         std::string Name;       // Name of the glycol mixture (used by other parts of code)
         int Num = 0;
+        bool used = false;
             
         std::string GlycolName; // Name of non-water fluid that is part of this mixture
         // (refers to ethylene glycol, propylene glycol, or user fluid)
@@ -297,6 +333,8 @@ namespace FluidProperties {
         Array1D<Real64> ViscTemps;  // Temperatures for viscosity of glycol
         Array1D<Real64> ViscValues; // viscosity values (mPa-s)
 
+        std::array<ErrorCountIndex, (int)GlycolError::Num> errors;
+
 #ifdef EP_cache_GlycolSpecificHeat
         Real64 getSpecificHeat_raw(EnergyPlusData &state,
                                    Real64 Temperature,         // actual temperature given as input
@@ -318,58 +356,6 @@ namespace FluidProperties {
         Real64 getViscosity(EnergyPlusData &state,
                             Real64 Temperature,         // actual temperature given as input
                             std::string_view CalledFrom); // routine this function was called from (error messages)
-    };
-
-    struct RefrigErrors
-    {
-        // Members
-        std::string Name;
-        int SatTempErrIndex = 0;            // Index for Sat Temperature Error (Recurring errors)
-        int SatTempErrCount = 0;            // Count for Sat Temperature Error (Recurring errors)
-        int SatPressErrIndex = 0;           // Index for Sat Pressure Error (Recurring errors)
-        int SatPressErrCount = 0;           // Count for Sat Pressure Error (Recurring errors)
-        int SatTempDensityErrIndex = 0;     // Index for Sat Temperature (Density) Error (Recurring errors)
-        int SatTempDensityErrCount = 0;     // Count for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupEnthalpyErrIndex = 0;     // Index for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupEnthalpyErrCount = 0;     // Count for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupEnthalpyTempErrIndex = 0; // Index for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupEnthalpyTempErrCount = 0; // Count for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupEnthalpyPresErrIndex = 0; // Index for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupEnthalpyPresErrCount = 0; // Count for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupPressureErrIndex = 0;     // Index for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupPressureErrCount = 0;     // Count for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupPressureTempErrIndex = 0; // Index for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupPressureTempErrCount = 0; // Count for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupPressureEnthErrIndex = 0; // Index for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupPressureEnthErrCount = 0; // Count for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupDensityErrIndex = 0;      // Index for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupDensityErrCount = 0;      // Count for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupDensityTempErrIndex = 0;  // Index for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupDensityTempErrCount = 0;  // Count for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupDensityPresErrIndex = 0;  // Index for Sat Temperature (Density) Error (Recurring errors)
-        int SatSupDensityPresErrCount = 0;  // Count for Sat Temperature (Density) Error (Recurring errors)
-    };
-
-    struct GlycolErrors
-    {
-        // Members
-        std::string Name;             // Which glycol this error structure is for
-        int SpecHeatLowErrIndex = 0;      // Index for Specific Heat Low Error (Recurring errors)
-        int SpecHeatHighErrIndex = 0;     // Index for Specific Heat High Error (Recurring errors)
-        int SpecHeatLowErrCount = 0;      // Count for Specific Heat Low Error (Recurring errors)
-        int SpecHeatHighErrCount = 0;     // Count for Specific Heat High Error (Recurring errors)
-        int DensityHighErrCount = 0;      // Index for Density Low Error (Recurring errors)
-        int DensityLowErrIndex = 0;       // Index for Density High Error (Recurring errors)
-        int DensityHighErrIndex = 0;      // Count for Density Low Error (Recurring errors)
-        int DensityLowErrCount = 0;       // Count for Density High Error (Recurring errors)
-        int ConductivityLowErrIndex = 0;  // Index for Conductivity Low Error (Recurring errors)
-        int ConductivityHighErrIndex = 0; // Index for Conductivity High Error (Recurring errors)
-        int ConductivityLowErrCount = 0;  // Count for Conductivity Low Error (Recurring errors)
-        int ConductivityHighErrCount = 0; // Count for Conductivity High Error (Recurring errors)
-        int ViscosityLowErrIndex = 0;     // Index for Viscosity Low Error (Recurring errors)
-        int ViscosityHighErrIndex = 0;    // Index for Viscosity High Error (Recurring errors)
-        int ViscosityLowErrCount = 0;     // Count for Viscosity Low Error (Recurring errors)
-        int ViscosityHighErrCount = 0;    // Count for Viscosity High Error (Recurring errors)
     };
 
     struct cached_tsh
@@ -567,10 +553,10 @@ namespace FluidProperties {
     }
 
     int GetRefrigNum(EnergyPlusData &state, std::string_view name); 
-    RefrigerantData *GetRefrig(EnergyPlusData &state, std::string_view name);
+    RefrigProps *GetRefrig(EnergyPlusData &state, std::string_view name);
         
     int GetGlycolNum(EnergyPlusData &state, std::string_view name); 
-    GlycolData *GetGlycol(EnergyPlusData &state, std::string_view name);        
+    GlycolProps *GetGlycol(EnergyPlusData &state, std::string_view name);        
 
     std::string GetGlycolNameByIndex(EnergyPlusData &state, int Idx); // carries in substance index
 
@@ -599,26 +585,6 @@ namespace FluidProperties {
                                std::string const &NameToCheck); // Name from input(?) to be checked against valid FluidPropertyNames
 
     void ReportOrphanFluids(EnergyPlusData &state);
-
-    void ReportFatalGlycolErrors(EnergyPlusData &state,
-                                 int NumGlycols,               // Number of Glycols in input/data
-                                 int GlycolNum,                // Glycol Index
-                                 bool DataPresent,             // data is present for this fluid.
-                                 std::string_view GlycolName,  // Name being reported
-                                 std::string_view RoutineName, // Routine name to show
-                                 std::string_view Property,    // Property being requested
-                                 std::string_view CalledFrom   // original called from (external to fluid properties)
-    );
-
-    void ReportFatalRefrigerantErrors(EnergyPlusData &state,
-                                      int NumRefrigerants,              // Number of Refrigerants in input/data
-                                      int RefrigerantNum,               // Refrigerant Index
-                                      bool DataPresent,                 // data is present for this fluid.
-                                      std::string_view RefrigerantName, // Name being reported
-                                      std::string_view RoutineName,     // Routine name to show
-                                      std::string_view Property,        // Property being requested
-                                      std::string_view CalledFrom       // original called from (external to fluid properties)
-    );
 
     void GetFluidDensityTemperatureLimits(EnergyPlusData &state, int FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit);
 
@@ -664,26 +630,16 @@ struct FluidData : BaseGlobalStruct
     bool DebugReportGlycols = false;
     bool DebugReportRefrigerants = false;
     int GlycolErrorLimitTest = 1;      // how many times error is printed with details before recurring called
-    int RefrigerantErrorLimitTest = 1; // how many times error is printed with details before recurring called
-    Array1D_bool RefrigUsed;
-    Array1D_bool GlycolUsed;
+    int RefrigErrorLimitTest = 1; // how many times error is printed with details before recurring called
 
-    Array1D<FluidProperties::RefrigerantData> RefrigData;
-    Array1D<FluidProperties::RefrigErrors> RefrigErrorTracking;
-    Array1D<FluidProperties::GlycolRawData> GlyRawData;
-    Array1D<FluidProperties::GlycolData> GlycolData;
-    Array1D<FluidProperties::GlycolErrors> GlycolErrorTracking;
+    Array1D<FluidProperties::RefrigProps> RefrigData;
+    Array1D<FluidProperties::GlycolRawProps> GlyRawData;
+    Array1D<FluidProperties::GlycolProps> GlycolData;
 
+    std::array<int, (int)FluidProperties::GlycolError::Num> glycolErrorLimits = {0, 0, 0, 0, 0, 0, 0, 0};
+        
     int SatErrCountGetSupHeatEnthalpyRefrig = 0;
     int SatErrCountGetSupHeatDensityRefrig = 0;
-    int HighTempLimitErrGetSpecificHeatGlycol_raw = 0;
-    int LowTempLimitErrGetSpecificHeatGlycol_raw = 0;
-    int HighTempLimitErrGetDensityGlycol = 0;
-    int LowTempLimitErrGetDensityGlycol = 0;
-    int HighTempLimitErrGetConductivityGlycol = 0;
-    int LowTempLimitErrGetConductivityGlycol = 0;
-    int HighTempLimitErrGetViscosityGlycol = 0;
-    int LowTempLimitErrGetViscosityGlycol = 0;
     int TempLoRangeErrIndexGetQualityRefrig = 0;
     int TempHiRangeErrIndexGetQualityRefrig = 0;
     int TempRangeErrCountGetInterpolatedSatProp = 0;
