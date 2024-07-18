@@ -137,7 +137,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER :: Num3 = 1
   INTEGER :: VRFTU_i = 1
   CHARACTER(len=MaxNameLength) :: sysFanName
-  CHARACTER(len=MaxNameLength) :: vavFanName
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: vavFanNameToDelete
 
   TYPE FanVOTransitionInfo
@@ -580,10 +579,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 IF (SameString(InArgs(14), 'FAN:VARIABLEVOLUME')) THEN
                   isVariableVolume = .TRUE.
                   OutArgs(14) = 'FAN:SYSTEMMODEL'
-                  ! create a new fan object with a new name
-                  OutArgs(15) = TRIM(InArgs(15)) // '_sysModel'
-                  sysFanName = TRIM(InArgs(15)) // '_sysModel'
-                  vavFanName = TRIM(InArgs(15))
+                  OutArgs(15) = TRIM(InArgs(15))
+                  sysFanName = TRIM(InArgs(15))
                 ELSE
                   OutArgs(14:15) = InArgs(14:15)
                 ENDIF
@@ -594,7 +591,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ! create fan system model object
                   ObjectName = 'Fan:SystemModel'
                   DO Num3 = 1, NumFanVariableVolume
-                    IF (SameString(OldFanVO(Num3)%oldFanName, vavFanName)) THEN
+                    IF (SameString(OldFanVO(Num3)%oldFanName, sysFanName)) THEN
                       CALL GetNewObjectDefInIDD(ObjectName, NwNumArgs, NwAorN, NwReqFld, NwObjMinFlds, NwFldNames, NwFldDefaults, NwFldUnits)
                       OutArgs(1) = TRIM(sysFanName)
                       OutArgs(2) = OldFanVO(Num3)%availSchedule
