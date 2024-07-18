@@ -97,15 +97,14 @@ namespace Fans {
         virtual void init(EnergyPlusData &state) = 0;
         virtual void simulate(EnergyPlusData &state,
                               bool const FirstHVACIteration,
-                              ObjexxFCL::Optional<Real64 const> speedRatio = _,                 // Flow fraction in operating mode 1
-                              ObjexxFCL::Optional<Real64 const> pressureRise = _,               // Pressure difference to use for DeltaPress
-                              ObjexxFCL::Optional<Real64 const> flowFraction = _,               // Flow fraction in operating mode 1
-                              ObjexxFCL::Optional<Real64 const> onOffFanPartLoadFraction = 1.0, // to control for cycling in VAV fan in VRFFluidTCtrl
-                              ObjexxFCL::Optional<Real64 const> massFlowRate1 = _,              // Mass flow rate in operating mode 1 [kg/s]
-                              ObjexxFCL::Optional<Real64 const> runTimeFraction1 = _,           // Run time fraction in operating mode 1
-                              ObjexxFCL::Optional<Real64 const> massFlowRate2 = _,              // Mass flow rate in operating mode 2 [kg/s]
-                              ObjexxFCL::Optional<Real64 const> runTimeFraction2 = _,           // Run time fraction in operating mode 2
-                              ObjexxFCL::Optional<Real64 const> pressureRise2 = _               // Pressure difference to use for operating mode 2
+                              ObjexxFCL::Optional<Real64 const> speedRatio = _,       // Flow fraction in operating mode 1
+                              ObjexxFCL::Optional<Real64 const> pressureRise = _,     // Pressure difference to use for DeltaPress
+                              ObjexxFCL::Optional<Real64 const> flowFraction = _,     // Flow fraction in operating mode 1
+                              ObjexxFCL::Optional<Real64 const> massFlowRate1 = _,    // Mass flow rate in operating mode 1 [kg/s]
+                              ObjexxFCL::Optional<Real64 const> runTimeFraction1 = _, // Run time fraction in operating mode 1
+                              ObjexxFCL::Optional<Real64 const> massFlowRate2 = _,    // Mass flow rate in operating mode 2 [kg/s]
+                              ObjexxFCL::Optional<Real64 const> runTimeFraction2 = _, // Run time fraction in operating mode 2
+                              ObjexxFCL::Optional<Real64 const> pressureRise2 = _     // Pressure difference to use for operating mode 2
         );
 
         virtual void update(EnergyPlusData &state) = 0;
@@ -228,10 +227,7 @@ namespace Fans {
 
         void simulateConstant(EnergyPlusData &state);
 
-        void simulateVAV(EnergyPlusData &state,
-                         ObjexxFCL::Optional<Real64 const> PressureRise = _,
-                         // to control for cycling in VAV fan in VRFFluidTCtrl
-                         ObjexxFCL::Optional<Real64 const> OnOffFanPartLoadFraction = 1.0);
+        void simulateVAV(EnergyPlusData &state, ObjexxFCL::Optional<Real64 const> PressureRise = _);
 
         void simulateOnOff(EnergyPlusData &state, ObjexxFCL::Optional<Real64 const> SpeedRatio = _);
 
