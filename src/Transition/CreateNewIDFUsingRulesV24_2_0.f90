@@ -131,11 +131,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   REAL :: maxAirFlow
   REAL :: minAirFlowFrac
   REAL :: fanPowerMinAirFlow
-  INTEGER :: NumFanVariableVolume = 0
-  INTEGER :: NumOldFanVO = 0
-  INTEGER :: Num3
+  INTEGER :: NumFanVariableVolume
+  INTEGER :: NumOldFanVO = 1
+  INTEGER :: NumVRFTU = 1
+  INTEGER :: Num3 = 1
+  INTEGER :: VRFTU_i = 1
   CHARACTER(len=MaxNameLength) :: sysFanName
   CHARACTER(len=MaxNameLength) :: vavFanName
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: vavFanNameToDelete
 
   TYPE FanVOTransitionInfo
     CHARACTER(len=MaxNameLength) :: oldFanName
@@ -351,17 +354,30 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ENDDO
           ENDDO
 
+          ! collect old VAV fans to be deleted
+          NumVRFTU = GetNumObjectsFound('ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW')
+          IF(ALLOCATED(vavFanNameToDelete)) DEALLOCATE(vavFanNameToDelete)
+          ALLOCATE(vavFanNameToDelete(NumVRFTU))
+          DO Num = 1, NumIDFRecords
+            SELECT CASE (MakeUPPERCase(IDFRecords(Num)%Name))
+            CASE('ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW')
+              IF (SameString(TRIM(IDFRecords(Num)%Alphas(7)), 'FAN:VARIABLEVOLUME')) THEN
+                vavFanNameToDelete(VRFTU_i) =TRIM(IDFRecords(Num)%Alphas(8))
+              ELSE
+                vavFanNameToDelete(VRFTU_i) = ''
+              ENDIF
+              VRFTU_i = VRFTU_i + 1
+            END SELECT
+          END DO
+
           ! accumulate info on VAV fans
           NumFanVariableVolume = GetNumObjectsFound('FAN:VARIABLEVOLUME')
           IF (ALLOCATED(OldFanVO)) DEALLOCATE(OldFanVO)
           ALLOCATE(OldFanVO(NumFanVariableVolume))
-          NumOldFanVO = 0
+          NumOldFanVO = 1
           DO Num = 1, NumIDFRecords
             SELECT CASE (MakeUPPERCase(IDFRecords(Num)%Name))
             CASE ('FAN:VARIABLEVOLUME')
-              NumOldFanVO = NumOldFanVO + 1
-              ! debug print
-              PRINT *, "Alphas", TRIM(IDFRecords(Num)%Alphas(1)), TRIM(IDFRecords(Num)%Alphas(6))
               OldFanVO(NumOldFanVO)%oldFanName = TRIM(IDFRecords(Num)%Alphas(1))
               OldFanVO(NumOldFanVO)%availSchedule = TRIM(IDFRecords(Num)%Alphas(2))
               OldFanVO(NumOldFanVO)%fanTotalEff_str = TRIM(IDFRecords(Num)%Numbers(1))
@@ -380,8 +396,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               OldFanVO(NumOldFanVO)%inletAirNodeName = TRIM(IDFRecords(Num)%Alphas(4))
               OldFanVO(NumOldFanVO)%outletAirNodeName = TRIM(IDFRecords(Num)%Alphas(5))
               OldFanVO(NumOldFanVO)%endUseSubCat = TRIM(IDFRecords(Num)%Alphas(6))
+              IF (FindItemInList(TRIM(IDFRecords(Num)%Alphas(1)), vavFanNameToDelete, NumVRFTU) /= 0) THEN
+                DeleteThisRecord(Num) = .TRUE.
+              ENDIF
+              NumOldFanVO = NumOldFanVO + 1
             END SELECT
           END DO
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                       P R O C E S S I N G                                                        !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
