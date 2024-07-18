@@ -18163,9 +18163,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
     GetVRFInput(*state);
     state->dataHVACVarRefFlow->GetVRFInputFlag = false;
 
-    state->dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-    state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio = 1.0;
-
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
     VRFTUNum = zone_num_TU1;
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
