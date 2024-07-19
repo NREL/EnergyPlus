@@ -139,6 +139,8 @@ class DataExchange:
         self.api.apiErrorFlag.restype = c_int
         self.api.resetErrorFlag.argtypes = [c_void_p]
         self.api.resetErrorFlag.restype = c_void_p
+        self.api.inputFilePath.argtypes = [c_void_p]
+        self.api.inputFilePath.restype = c_char_p
         self.api.requestVariable.argtypes = [c_void_p, c_char_p, c_char_p]
         self.api.getNumNodesInCondFDSurfaceLayer.argtypes = [c_void_p, c_char_p, c_char_p]
         self.api.requestVariable.restype = c_void_p
@@ -358,6 +360,17 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         """
         self.api.resetErrorFlag(state)
+
+    def get_input_file_path(self, state: c_void_p) -> bytes:
+        """
+        Provides the input file path back to the client. In most circumstances the client will know the path to the
+        input file, but there are some cases where code is generalized in unexpected workflows.  Users have requested
+        a way to get the input file path back from the running instance.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: Returns a raw bytes representation of the input file path
+        """
+        return self.api.inputFilePath(state)
 
     def get_object_names(self, state: c_void_p, object_type_name: Union[str, bytes]) -> List[str]:
         """

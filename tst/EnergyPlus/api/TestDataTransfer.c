@@ -95,7 +95,7 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
         freeAPIData(data, arraySize);
         freeObjectNames(surfaceNames, arraySize);
 
-        printf("Got handles %d, %d, %d, %d, %d, %d",
+        printf("Got handles %d, %d, %d, %d, %d, %d\n",
                outdoorDewPointActuator,
                outdoorTempSensor,
                outdoorDewPointSensor,
@@ -106,6 +106,11 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
             wallConstruction == -1 || floorConstruction == -1) {
             exit(1);
         }
+
+        char * filePath = inputFilePath(state);
+        printf("Input file path accessed via API: %s\n", filePath);
+        free(filePath);
+
         handlesRetrieved = 1;
     }
     setActuatorValue(state, outdoorDewPointActuator, -25.0);

@@ -121,6 +121,12 @@ ENERGYPLUSLIB_API int apiErrorFlag(EnergyPlusState state);
 ///          a calculation to continue, this function can reset the flag.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 ENERGYPLUSLIB_API void resetErrorFlag(EnergyPlusState state);
+/// \brief Provides the input file path back to the user
+/// \details In most circumstances the client will know the path to the input file, but there are some cases where code
+///          is generalized in unexpected workflows.  Users have requested a way to get the input file path back from the running instance.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \return A char * of the input file path.  This allocates a new char *, and calling clients must free this when done with it!
+ENERGYPLUSLIB_API char *inputFilePath(EnergyPlusState state);
 
 // ----- DATA TRANSFER HELPER FUNCTIONS
 

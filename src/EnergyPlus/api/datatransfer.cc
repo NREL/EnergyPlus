@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -237,6 +238,14 @@ void resetErrorFlag(EnergyPlusState state)
 {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     thisState->dataPluginManager->apiErrorFlag = false;
+}
+
+char *inputFilePath(EnergyPlusState state)
+{
+    const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
+    char *p = new char[std::strlen(thisState->dataStrGlobals->inputFilePath.c_str()) + 1];
+    std::strcpy(p, thisState->dataStrGlobals->inputFilePath.c_str());
+    return p;
 }
 
 char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
