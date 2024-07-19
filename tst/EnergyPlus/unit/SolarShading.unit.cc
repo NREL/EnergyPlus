@@ -5984,7 +5984,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest1)
     EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
     EXPECT_FALSE(state->dataSysVars->SutherlandHodgman);
     EXPECT_FALSE(state->dataSysVars->SlaterBarsky);
-    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
+    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest2)
@@ -6017,7 +6017,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest2)
     EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
     EXPECT_TRUE(state->dataSysVars->SutherlandHodgman);
     EXPECT_FALSE(state->dataSysVars->SlaterBarsky);
-    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
+    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest3)
@@ -6050,7 +6050,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest3)
     EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
     EXPECT_TRUE(state->dataSysVars->SutherlandHodgman);
     EXPECT_TRUE(state->dataSysVars->SlaterBarsky);
-    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
+    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest4)
@@ -6083,7 +6083,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest4)
     EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
     EXPECT_FALSE(state->dataSysVars->SutherlandHodgman);
     EXPECT_FALSE(state->dataSysVars->SlaterBarsky);
-    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
+    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest5)
@@ -6116,7 +6116,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest5)
     EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
     EXPECT_TRUE(state->dataSysVars->SutherlandHodgman);
     EXPECT_FALSE(state->dataSysVars->SlaterBarsky);
-    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
+    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
@@ -6150,7 +6150,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
     EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
     EXPECT_TRUE(state->dataSysVars->SutherlandHodgman);
     EXPECT_TRUE(state->dataSysVars->SlaterBarsky);
-    EXPECT_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
+    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
     std::string const error_string = delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
                                                        "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
