@@ -2356,12 +2356,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Curve::GetCurveInput(*state); // read curves
     // test consecutive call to fluid properties getInput
     FluidProperties::GetFluidPropertiesData(*state); // read refrigerant properties
-    EXPECT_EQ(2, state->dataFluidProps->NumOfRefrigerants);
-    EXPECT_EQ(1, state->dataFluidProps->NumOfGlycols);
+    EXPECT_EQ(2, state->dataFluidProps->refrigs.isize());
+    EXPECT_EQ(1, state->dataFluidProps->glycols.isize());
 
     FluidProperties::GetFluidPropertiesData(*state); // should never happen but if it does it's safe
-    EXPECT_EQ(2, state->dataFluidProps->NumOfRefrigerants);
-    EXPECT_EQ(1, state->dataFluidProps->NumOfGlycols);
+    EXPECT_EQ(2, state->dataFluidProps->refrigs.isize());
+    EXPECT_EQ(1, state->dataFluidProps->glycols.isize());
 
     // set up ZoneEquipConfig data
     state->dataGlobal->NumOfZones = 1;

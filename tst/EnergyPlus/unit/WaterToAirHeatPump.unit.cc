@@ -137,63 +137,64 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataFluidProps->RefrigData.allocate(1);
-    auto &refrig = state->dataFluidProps->RefrigData(1);
-    refrig.Name = "R22";
-    refrig.Num = 1;
-    refrig.PsLowTempIndex = 1;
-    refrig.PsHighTempIndex = 2;
-    refrig.PsTemps.allocate(2);
-    refrig.PsTemps(1) = -157.42;
-    refrig.PsTemps(2) = 96.145;
-    refrig.PsValues.allocate(2);
-    refrig.PsValues(1) = 0.3795;
-    refrig.PsValues(2) = 4990000.0;
+    auto *refrig = new FluidProperties::RefrigProps;
+    refrig->Name = "R22";
+    state->dataFluidProps->refrigs.push_back(refrig);
+    refrig->Num = state->dataFluidProps->refrigs.isize();
 
-    refrig.HfLowTempIndex = 1;
-    refrig.HfHighTempIndex = 2;
-    refrig.PsLowPresIndex = 1;
-    refrig.PsHighPresIndex = 2;
-    refrig.HTemps.allocate(2);
-    refrig.HfValues.allocate(2);
-    refrig.HfgValues.allocate(2);
+    refrig->PsLowTempIndex = 1;
+    refrig->PsHighTempIndex = 2;
+    refrig->PsTemps.allocate(2);
+    refrig->PsTemps(1) = -157.42;
+    refrig->PsTemps(2) = 96.145;
+    refrig->PsValues.allocate(2);
+    refrig->PsValues(1) = 0.3795;
+    refrig->PsValues(2) = 4990000.0;
 
-    refrig.HTemps(1) = -157.42;
-    refrig.HTemps(2) = 96.145;
-    refrig.HfValues(1) = 29600.0;
-    refrig.HfValues(2) = 366900.0;
-    refrig.HfgValues(1) = 332700.0;
-    refrig.HfgValues(2) = 366900.0;
-    refrig.NumSuperTempPts = 2;
-    refrig.NumSuperPressPts = 2;
-    refrig.SHTemps.allocate(2);
-    refrig.SHPress.allocate(2);
-    refrig.SHTemps(1) = -157.15;
-    refrig.SHTemps(2) = 152.85;
-    refrig.SHPress(1) = 0.4043;
-    refrig.SHPress(2) = 16500000.0;
-    refrig.HshValues.allocate(2, 2);
-    refrig.HshValues(1, 1) = 332800.0;
-    refrig.HshValues(1, 2) = 537000.0;
-    refrig.HshValues(2, 1) = 332800.0;
-    refrig.HshValues(2, 2) = 537000.0;
-    refrig.RhoshValues.allocate(2, 2);
-    refrig.RhoshValues(1, 1) = 0.00003625;
-    refrig.RhoshValues(1, 2) = 0.0;
-    refrig.RhoshValues(2, 1) = 0.00003625;
-    refrig.RhoshValues(2, 2) = 0.0;
+    refrig->HfLowTempIndex = 1;
+    refrig->HfHighTempIndex = 2;
+    refrig->PsLowPresIndex = 1;
+    refrig->PsHighPresIndex = 2;
+    refrig->HTemps.allocate(2);
+    refrig->HfValues.allocate(2);
+    refrig->HfgValues.allocate(2);
 
-    refrig.RhofLowTempIndex = 1;
-    refrig.RhofHighTempIndex = 2;
-    refrig.RhoTemps.allocate(2);
-    refrig.RhoTemps(1) = -157.42;
-    refrig.RhoTemps(2) = 96.145;
-    refrig.RhofValues.allocate(2);
-    refrig.RhofValues(1) = 1721.0;
-    refrig.RhofValues(2) = 523.8;
-    refrig.RhofgValues.allocate(2);
-    refrig.RhofgValues(1) = 0.341;
-    refrig.RhofgValues(2) = 523.8;
+    refrig->HTemps(1) = -157.42;
+    refrig->HTemps(2) = 96.145;
+    refrig->HfValues(1) = 29600.0;
+    refrig->HfValues(2) = 366900.0;
+    refrig->HfgValues(1) = 332700.0;
+    refrig->HfgValues(2) = 366900.0;
+    refrig->NumSupTempPoints = 2;
+    refrig->NumSupPressPoints = 2;
+    refrig->SupTemps.allocate(2);
+    refrig->SupPress.allocate(2);
+    refrig->SupTemps(1) = -157.15;
+    refrig->SupTemps(2) = 152.85;
+    refrig->SupPress(1) = 0.4043;
+    refrig->SupPress(2) = 16500000.0;
+    refrig->HshValues.allocate(2, 2);
+    refrig->HshValues(1, 1) = 332800.0;
+    refrig->HshValues(1, 2) = 537000.0;
+    refrig->HshValues(2, 1) = 332800.0;
+    refrig->HshValues(2, 2) = 537000.0;
+    refrig->RhoshValues.allocate(2, 2);
+    refrig->RhoshValues(1, 1) = 0.00003625;
+    refrig->RhoshValues(1, 2) = 0.0;
+    refrig->RhoshValues(2, 1) = 0.00003625;
+    refrig->RhoshValues(2, 2) = 0.0;
+
+    refrig->RhofLowTempIndex = 1;
+    refrig->RhofHighTempIndex = 2;
+    refrig->RhoTemps.allocate(2);
+    refrig->RhoTemps(1) = -157.42;
+    refrig->RhoTemps(2) = 96.145;
+    refrig->RhofValues.allocate(2);
+    refrig->RhofValues(1) = 1721.0;
+    refrig->RhofValues(2) = 523.8;
+    refrig->RhofgValues.allocate(2);
+    refrig->RhofgValues(1) = 0.341;
+    refrig->RhofgValues(2) = 523.8;
 
     GetWatertoAirHPInput(*state);
 
@@ -308,5 +309,5 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     // clean up
     state->dataWaterToAirHeatPump->WatertoAirHP.deallocate();
-    state->dataFluidProps->RefrigData.deallocate();
+    delete state->dataFluidProps->refrigs(1); 
 }

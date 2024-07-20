@@ -1050,7 +1050,7 @@ namespace VentilatedSlab {
                     }
                     case HeatingCoilType::Steam: {
                         ventSlab.heatingCoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
-                        ventSlab.heatingCoil_FluidIndex = FluidProperties::GetRefrigNum(state, "Steam");
+                        ventSlab.heatingCoil_FluidIndex = FluidProperties::GetRefrigNum(state, "STEAM");
                         if (ventSlab.heatingCoil_FluidIndex == 0) {
                             ShowSevereError(state, format("{}=\"{}Steam Properties not found.", CurrentModuleObject, ventSlab.Name));
                             if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");

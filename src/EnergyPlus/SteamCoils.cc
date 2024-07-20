@@ -370,7 +370,7 @@ namespace SteamCoils {
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
 
             if (state.dataSteamCoils->SteamIndex == 0 && CoilNum == 1) {
-                state.dataSteamCoils->SteamIndex = FluidProperties::GetRefrigNum(state, "Steam");
+                state.dataSteamCoils->SteamIndex = FluidProperties::GetRefrigNum(state, "STEAM");
                 if (state.dataSteamCoils->SteamIndex == 0) {
                     ShowSevereError(state, format("{}Steam Properties for {} not found.", RoutineName, AlphArray(1)));
                     ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
