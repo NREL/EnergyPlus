@@ -616,8 +616,8 @@ struct FluidData : BaseGlobalStruct
     {
 
         for (int i = 1; i <= refrigs.isize(); ++i) delete refrigs(i);
-        for (int i = 1; i <= glycolsRaw.isize(); ++i) delete refrigs(i);
-        for (int i = 1; i <= glycols.isize(); ++i) delete refrigs(i);
+        for (int i = 1; i <= glycolsRaw.isize(); ++i) delete glycolsRaw(i);
+        for (int i = 1; i <= glycols.isize(); ++i) delete glycols(i);
         
         new (this) FluidData();
     }

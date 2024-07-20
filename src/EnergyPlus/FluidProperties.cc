@@ -673,11 +673,11 @@ namespace FluidProperties {
                     refrig->Num = df->refrigs.isize();
                 }
             } else if (Alphas(2) == "GLYCOL") {
-                if (GetGlycolNum(state, Alphas(1)) == 0) {
-                    auto *glycol = new GlycolProps;
-                    glycol->Name = Alphas(1);
-                    df->glycols.push_back(glycol);
-                    glycol->Num = df->glycols.isize();
+                if (GetGlycolRawNum(state, Alphas(1)) == 0) {
+                    auto *glycolRaw = new GlycolRawProps;
+                    glycolRaw->Name = Alphas(1);
+                    df->glycolsRaw.push_back(glycolRaw);
+                    glycolRaw->Num = df->glycolsRaw.isize();
                 }
             } else {
                 ShowSevereError(state, format("{}: {}=\"{}\", invalid type", routineName, CurrentModuleObject, Alphas(1)));
@@ -1044,8 +1044,10 @@ namespace FluidProperties {
                 continue;
             }
                 
-            refrig->SupPress.push_back(Numbers(1));
-            ++refrig->NumSupPressPoints;
+            if (std::find(refrig->SupPress.begin(), refrig->SupPress.end(), Numbers(1)) == refrig->SupPress.end()) {
+                refrig->SupPress.push_back(Numbers(1));
+                ++refrig->NumSupPressPoints;
+            }
         }
 
         // Sort and allocate pressure point arrays
@@ -1116,6 +1118,52 @@ namespace FluidProperties {
         // be produced.
 
         // Propylene and ethylene are available by default
+        auto *waterRaw = new GlycolRawProps;
+        waterRaw->Name = "WATER";
+
+        df->glycolsRaw.push_back(waterRaw);
+        waterRaw->Num = df->glycolsRaw.isize();
+
+        waterRaw->CpDataPresent = true;
+        waterRaw->NumCpConcPoints = 1;
+        waterRaw->NumCpTempPoints = DefaultNumGlyTemps;
+        waterRaw->CpTemps.allocate(waterRaw->NumCpTempPoints);
+        waterRaw->CpTemps = DefaultGlycolTemps;
+        waterRaw->CpConcs.allocate(waterRaw->NumCpConcPoints);
+        waterRaw->CpConcs = 0.0;
+        waterRaw->CpValues.allocate(waterRaw->NumCpConcPoints, waterRaw->NumCpTempPoints);
+        waterRaw->CpValues(1, {1, waterRaw->NumCpTempPoints}) = DefaultWaterCpData;
+
+        waterRaw->RhoDataPresent = true;
+        waterRaw->NumRhoConcPoints = 1;
+        waterRaw->NumRhoTempPoints = DefaultNumGlyTemps;
+        waterRaw->RhoTemps.allocate(waterRaw->NumRhoTempPoints);
+        waterRaw->RhoTemps = DefaultGlycolTemps;
+        waterRaw->RhoConcs.allocate(waterRaw->NumRhoConcPoints);
+        waterRaw->RhoConcs = 0.0;
+        waterRaw->RhoValues.allocate(waterRaw->NumRhoConcPoints, waterRaw->NumRhoTempPoints);
+        waterRaw->RhoValues(1, {1, waterRaw->NumRhoTempPoints}) = DefaultWaterRhoData;
+
+        waterRaw->CondDataPresent = true;
+        waterRaw->NumCondConcPoints = 1;
+        waterRaw->NumCondTempPoints = DefaultNumGlyTemps;
+        waterRaw->CondTemps.allocate(waterRaw->NumCondTempPoints);
+        waterRaw->CondTemps = DefaultGlycolTemps;
+        waterRaw->CondConcs.allocate(waterRaw->NumCondConcPoints);
+        waterRaw->CondConcs = 0.0;
+        waterRaw->CondValues.allocate(waterRaw->NumCondConcPoints, waterRaw->NumCondTempPoints);
+        waterRaw->CondValues(1, {1, waterRaw->NumCondTempPoints}) = DefaultWaterCondData;
+
+        waterRaw->ViscDataPresent = true;
+        waterRaw->NumViscConcPoints = 1;
+        waterRaw->NumViscTempPoints = DefaultNumGlyTemps;
+        waterRaw->ViscTemps.allocate(waterRaw->NumViscTempPoints);
+        waterRaw->ViscTemps = DefaultGlycolTemps;
+        waterRaw->ViscConcs.allocate(waterRaw->NumViscConcPoints);
+        waterRaw->ViscConcs = 0.0;
+        waterRaw->ViscValues.allocate(waterRaw->NumViscConcPoints, waterRaw->NumViscTempPoints);
+        waterRaw->ViscValues(1, {1, waterRaw->NumViscTempPoints}) = DefaultWaterViscData;
+
         auto *ethylene = new GlycolRawProps;
         ethylene->Name = "ETHYLENEGLYCOL";
         df->glycolsRaw.push_back(ethylene);
@@ -1126,19 +1174,15 @@ namespace FluidProperties {
         ethylene->NumCpTempPoints = DefaultNumGlyTemps;           // Number of temperature points for specific heat
         ethylene->NumCpConcPoints = DefaultNumGlyConcs;           // Number of concentration points for specific heat
 
-        // No ObjexxFCL templates for assigning std::array to Array1S, Probably want to covert these Array1D and 2D to std::vector eventually anyway
         ethylene->CpTemps.allocate(ethylene->NumCpTempPoints);    // Temperatures for specific heat of glycol
-        for (int i = 1; i <= ethylene->NumCpTempPoints; ++i)
-            ethylene->CpTemps(i) = DefaultGlycolTemps[i-1];
+        ethylene->CpTemps = DefaultGlycolTemps;
         
         ethylene->CpConcs.allocate(ethylene->NumCpConcPoints);    // Concentration for specific heat of glycol
-        for (int i = 1; i  <= ethylene->NumCpConcPoints; ++i)
-            ethylene->CpConcs(i) = DefaultGlycolConcs[i-1];
+        ethylene->CpConcs = DefaultGlycolConcs;
 
         ethylene->CpValues.allocate(ethylene->NumCpConcPoints, ethylene->NumCpTempPoints);   // Specific heat data values
         for (int i = 1; i <= ethylene->NumCpConcPoints; ++i)
-            for (int j = 1; j <= ethylene->NumCpTempPoints; ++j)
-                ethylene->CpValues(i, j) = DefaultEthGlyCpData[i-1][j-1]; 
+            ethylene->CpValues(i, {1, ethylene->NumCpTempPoints}) = DefaultEthGlyCpData[i-1]; 
 
         // Density
         ethylene->RhoDataPresent = true;    
@@ -1146,17 +1190,14 @@ namespace FluidProperties {
         ethylene->NumRhoConcPoints = DefaultNumGlyConcs;
 
         ethylene->RhoTemps.allocate(ethylene->NumRhoTempPoints);   // Temperatures for density of glycol
-        for (int i = 1; i <= ethylene->NumRhoTempPoints; ++i)
-            ethylene->RhoTemps(i) = DefaultGlycolTemps[i-1];
+        ethylene->RhoTemps = DefaultGlycolTemps;
 
         ethylene->RhoConcs.allocate(ethylene->NumRhoConcPoints);   // Concentration for density of glycol
-        for (int i = 1; i  <= ethylene->NumRhoConcPoints; ++i)
-            ethylene->RhoConcs(i) = DefaultGlycolConcs[i-1];
+        ethylene->RhoConcs = DefaultGlycolConcs;
                 
         ethylene->RhoValues.allocate(ethylene->NumRhoConcPoints, ethylene->NumRhoTempPoints);  // Density data values
         for (int i = 1; i <= ethylene->NumRhoConcPoints; ++i)
-            for (int j = 1; j <= ethylene->NumRhoTempPoints; ++j)
-                ethylene->RhoValues(i, j) = DefaultEthGlyRhoData[i-1][j-1]; 
+            ethylene->RhoValues(i, {1, ethylene->NumRhoTempPoints}) = DefaultEthGlyRhoData[i-1]; 
 
         // Conductivity
         ethylene->CondDataPresent = true;    
@@ -1164,17 +1205,14 @@ namespace FluidProperties {
         ethylene->NumCondConcPoints = DefaultNumGlyConcs;
 
         ethylene->CondTemps.allocate(ethylene->NumCondTempPoints);   // Temperatures for density of glycol
-        for (int i = 1; i <= ethylene->NumCondTempPoints; ++i)
-            ethylene->CondTemps(i) = DefaultGlycolTemps[i-1];
+        ethylene->CondTemps = DefaultGlycolTemps;
 
         ethylene->CondConcs.allocate(ethylene->NumCondConcPoints);   // Concentration for density of glycol
-        for (int i = 1; i  <= ethylene->NumCondConcPoints; ++i)
-            ethylene->CondConcs(i) = DefaultGlycolConcs[i-1];
+        ethylene->CondConcs = DefaultGlycolConcs;
                 
         ethylene->CondValues.allocate(ethylene->NumCondConcPoints, ethylene->NumCondTempPoints);  // Density data values
         for (int i = 1; i <= ethylene->NumCondConcPoints; ++i)
-            for (int j = 1; j <= ethylene->NumCondTempPoints; ++j)
-                ethylene->CondValues(i, j) = DefaultEthGlyCondData[i-1][j-1]; 
+            ethylene->CondValues(i, {1, ethylene->NumCondTempPoints}) = DefaultEthGlyCondData[i-1]; 
 
         // Viscosity
         ethylene->ViscDataPresent = true;    
@@ -1182,17 +1220,14 @@ namespace FluidProperties {
         ethylene->NumViscConcPoints = DefaultNumGlyConcs;
 
         ethylene->ViscTemps.allocate(ethylene->NumViscTempPoints);   // Temperatures for density of glycol
-        for (int i = 1; i <= ethylene->NumViscTempPoints; ++i)
-            ethylene->ViscTemps(i) = DefaultGlycolTemps[i-1];
+        ethylene->ViscTemps = DefaultGlycolTemps;
 
         ethylene->ViscConcs.allocate(ethylene->NumViscConcPoints);   // Concentration for density of glycol
-        for (int i = 1; i  <= ethylene->NumViscConcPoints; ++i)
-            ethylene->ViscConcs(i) = DefaultGlycolConcs[i-1];
+        ethylene->ViscConcs = DefaultGlycolConcs;
                 
         ethylene->ViscValues.allocate(ethylene->NumViscConcPoints, ethylene->NumViscTempPoints);  // Density data values
         for (int i = 1; i <= ethylene->NumViscConcPoints; ++i)
-            for (int j = 1; j <= ethylene->NumViscTempPoints; ++j)
-                ethylene->ViscValues(i, j) = DefaultEthGlyViscData[i-1][j-1]; 
+            ethylene->ViscValues(i, {1, ethylene->NumViscTempPoints}) = DefaultEthGlyViscData[i-1]; 
 
         // Propylene
         auto *propylene = new GlycolRawProps;
@@ -1207,17 +1242,14 @@ namespace FluidProperties {
 
         // No ObjexxFCL templates for assigning std::array to Array1S, Probably want to covert these Array1D and 2D to std::vector eventually anyway
         propylene->CpTemps.allocate(propylene->NumCpTempPoints);    // Temperatures for specific heat of glycol
-        for (int i = 1; i <= propylene->NumCpTempPoints; ++i)
-            propylene->CpTemps(i) = DefaultGlycolTemps[i-1];
+        propylene->CpTemps = DefaultGlycolTemps;
         
         propylene->CpConcs.allocate(propylene->NumCpConcPoints);    // Concentration for specific heat of glycol
-        for (int i = 1; i  <= propylene->NumCpConcPoints; ++i)
-            propylene->CpConcs(i) = DefaultGlycolConcs[i-1];
+        propylene->CpConcs = DefaultGlycolConcs;
 
         propylene->CpValues.allocate(propylene->NumCpConcPoints, propylene->NumCpTempPoints);   // Specific heat data values
         for (int i = 1; i <= propylene->NumCpConcPoints; ++i)
-            for (int j = 1; j <= propylene->NumCpTempPoints; ++j)
-                propylene->CpValues(i, j) = DefaultPropGlyCpData[i-1][j-1]; 
+            propylene->CpValues(i, {1, propylene->NumCpTempPoints}) = DefaultPropGlyCpData[i-1]; 
 
         // Density
         propylene->RhoDataPresent = true;    
@@ -1225,17 +1257,14 @@ namespace FluidProperties {
         propylene->NumRhoConcPoints = DefaultNumGlyConcs;
 
         propylene->RhoTemps.allocate(propylene->NumRhoTempPoints);   // Temperatures for density of glycol
-        for (int i = 1; i <= propylene->NumRhoTempPoints; ++i)
-            propylene->RhoTemps(i) = DefaultGlycolTemps[i-1];
+        propylene->RhoTemps = DefaultGlycolTemps;
 
         propylene->RhoConcs.allocate(propylene->NumRhoConcPoints);   // Concentration for density of glycol
-        for (int i = 1; i  <= propylene->NumRhoConcPoints; ++i)
-            propylene->RhoConcs(i) = DefaultGlycolConcs[i-1];
+        propylene->RhoConcs = DefaultGlycolConcs;
                 
         propylene->RhoValues.allocate(propylene->NumRhoConcPoints, propylene->NumRhoTempPoints);  // Density data values
         for (int i = 1; i <= propylene->NumRhoConcPoints; ++i)
-            for (int j = 1; j <= propylene->NumRhoTempPoints; ++j)
-                propylene->RhoValues(i, j) = DefaultPropGlyRhoData[i-1][j-1]; 
+            propylene->RhoValues(i, {1, propylene->NumRhoTempPoints}) = DefaultPropGlyRhoData[i-1]; 
 
         // Conductivity
         propylene->CondDataPresent = true;    
@@ -1243,17 +1272,14 @@ namespace FluidProperties {
         propylene->NumCondConcPoints = DefaultNumGlyConcs;
 
         propylene->CondTemps.allocate(propylene->NumCondTempPoints);   // Temperatures for density of glycol
-        for (int i = 1; i <= propylene->NumCondTempPoints; ++i)
-            propylene->CondTemps(i) = DefaultGlycolTemps[i-1];
+        propylene->CondTemps = DefaultGlycolTemps;
 
         propylene->CondConcs.allocate(propylene->NumCondConcPoints);   // Concentration for density of glycol
-        for (int i = 1; i  <= propylene->NumCondConcPoints; ++i)
-            propylene->CondConcs(i) = DefaultGlycolConcs[i-1];
+        propylene->CondConcs = DefaultGlycolConcs;
                 
         propylene->CondValues.allocate(propylene->NumCondConcPoints, propylene->NumCondTempPoints);  // Density data values
         for (int i = 1; i <= propylene->NumCondConcPoints; ++i)
-            for (int j = 1; j <= propylene->NumCondTempPoints; ++j)
-                propylene->CondValues(i, j) = DefaultPropGlyCondData[i-1][j-1]; 
+            propylene->CondValues(i, {1, propylene->NumCondTempPoints}) = DefaultPropGlyCondData[i-1]; 
 
         // Viscosity
         propylene->ViscDataPresent = true;    
@@ -1261,17 +1287,14 @@ namespace FluidProperties {
         propylene->NumViscConcPoints = DefaultNumGlyConcs;
 
         propylene->ViscTemps.allocate(propylene->NumViscTempPoints);   // Temperatures for density of glycol
-        for (int i = 1; i <= propylene->NumViscTempPoints; ++i)
-            propylene->ViscTemps(i) = DefaultGlycolTemps[i-1];
+        propylene->ViscTemps = DefaultGlycolTemps;
 
         propylene->ViscConcs.allocate(propylene->NumViscConcPoints);   // Concentration for density of glycol
-        for (int i = 1; i  <= propylene->NumViscConcPoints; ++i)
-            propylene->ViscConcs(i) = DefaultGlycolConcs[i-1];
+        propylene->ViscConcs = DefaultGlycolConcs;
                 
         propylene->ViscValues.allocate(propylene->NumViscConcPoints, propylene->NumViscTempPoints);  // Density data values
         for (int i = 1; i <= propylene->NumViscConcPoints; ++i)
-            for (int j = 1; j <= propylene->NumViscTempPoints; ++j)
-                propylene->ViscValues(i, j) = DefaultPropGlyViscData[i-1][j-1]; 
+            propylene->ViscValues(i, {1, propylene->NumViscTempPoints}) = DefaultPropGlyViscData[i-1]; 
 
         
         CurrentModuleObject = "FluidProperties:Concentration";
@@ -1322,9 +1345,12 @@ namespace FluidProperties {
                     continue;
                 }
                 glycolRaw->CpTempArrayName = Alphas(3);
-                
-                glycolRaw->CpConcs.push_back(Numbers(1));
-                ++glycolRaw->NumCpConcPoints;
+
+                if (std::find(glycolRaw->CpConcs.begin(), glycolRaw->CpConcs.end(), Numbers(1)) == glycolRaw->CpConcs.end()) {
+                    glycolRaw->CpConcs.push_back(Numbers(1));
+                    ++glycolRaw->NumCpConcPoints;
+                }
+                glycolRaw->CpDataPresent = true;
 
             } else if (Alphas(2) == "DENSITY") {
                 if (glycolRaw->RhoTempArrayName != "" && glycolRaw->RhoTempArrayName != Alphas(3)) {
@@ -1334,10 +1360,13 @@ namespace FluidProperties {
                     ErrorsFound = true;
                     continue;
                 }
-                glycolRaw->CpTempArrayName = Alphas(3);
+                glycolRaw->RhoTempArrayName = Alphas(3);
                 
-                glycolRaw->RhoConcs.push_back(Numbers(1));
-                ++glycolRaw->NumRhoConcPoints;
+                if (std::find(glycolRaw->RhoConcs.begin(), glycolRaw->RhoConcs.end(), Numbers(1)) == glycolRaw->RhoConcs.end()) {
+                    glycolRaw->RhoConcs.push_back(Numbers(1));
+                    ++glycolRaw->NumRhoConcPoints;
+                }
+                glycolRaw->RhoDataPresent = true;
 
             } else if (Alphas(2) == "CONDUCTIVITY") {
                 if (glycolRaw->CondTempArrayName != "" && glycolRaw->CondTempArrayName != Alphas(3)) {
@@ -1349,8 +1378,11 @@ namespace FluidProperties {
                 }
                 glycolRaw->CondTempArrayName = Alphas(3);
                 
-                glycolRaw->CondConcs.push_back(Numbers(1));
-                ++glycolRaw->NumCondConcPoints;
+                if (std::find(glycolRaw->CondConcs.begin(), glycolRaw->CondConcs.end(), Numbers(1)) == glycolRaw->CondConcs.end()) {
+                    glycolRaw->CondConcs.push_back(Numbers(1));
+                    ++glycolRaw->NumCondConcPoints;
+                }
+                glycolRaw->CondDataPresent = true;
 
             } else if (Alphas(2) == "VISCOSITY") {
                 if (glycolRaw->ViscTempArrayName != "" && glycolRaw->ViscTempArrayName != Alphas(3)) {
@@ -1362,8 +1394,11 @@ namespace FluidProperties {
                 }
                 glycolRaw->ViscTempArrayName = Alphas(3);
                 
-                glycolRaw->ViscConcs.push_back(Numbers(1));
-                ++glycolRaw->NumViscConcPoints;
+                if (std::find(glycolRaw->ViscConcs.begin(), glycolRaw->ViscConcs.end(), Numbers(1)) == glycolRaw->ViscConcs.end()) {
+                    glycolRaw->ViscConcs.push_back(Numbers(1));
+                    ++glycolRaw->NumViscConcPoints;
+                }
+                glycolRaw->ViscDataPresent = true;
 
             } else {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(2), Alphas(2),
@@ -1375,43 +1410,49 @@ namespace FluidProperties {
         // Allocate and sort temp point/conc point arrays
         for (auto *glycolRaw : df->glycolsRaw) {
 
-            if (glycolRaw->Name == "ETHYLENEGLYCOL" || glycolRaw->Name == "PROPYLENEGLYCOL") continue;
+            if (!glycolRaw->CpTempArrayName.empty()) {
+                int cpTempArrayNum = Util::FindItemInList(glycolRaw->CpTempArrayName, FluidTemps);
+                auto &cpTempArray = FluidTemps(cpTempArrayNum);
+                glycolRaw->NumCpTempPoints = cpTempArray.NumOfTemps;
+                glycolRaw->CpTemps.allocate(glycolRaw->NumCpTempPoints);
+                glycolRaw->CpTemps = cpTempArray.Temps;
                 
-            int cpTempArrayNum = Util::FindItemInList(glycolRaw->CpTempArrayName, FluidTemps);
-            auto &cpTempArray = FluidTemps(cpTempArrayNum);
-            glycolRaw->NumCpTempPoints = cpTempArray.NumOfTemps;
-            glycolRaw->CpTemps.allocate(glycolRaw->NumCpTempPoints);
-            glycolRaw->CpTemps = cpTempArray.Temps;
+                glycolRaw->CpValues.allocate(glycolRaw->NumCpConcPoints, glycolRaw->NumCpTempPoints);
+                std::sort(glycolRaw->CpConcs.begin(), glycolRaw->CpConcs.end());
+            }
             
-            glycolRaw->CpValues.allocate(glycolRaw->NumCpConcPoints, glycolRaw->NumCpTempPoints);
-            std::sort(glycolRaw->CpConcs.begin(), glycolRaw->CpConcs.end());
+            if (!glycolRaw->RhoTempArrayName.empty()) {
+                int rhoTempArrayNum = Util::FindItemInList(glycolRaw->RhoTempArrayName, FluidTemps);
+                auto &rhoTempArray = FluidTemps(rhoTempArrayNum);
+                glycolRaw->NumRhoTempPoints = rhoTempArray.NumOfTemps;
+                glycolRaw->RhoTemps.allocate(glycolRaw->NumRhoTempPoints);
+                glycolRaw->RhoTemps = rhoTempArray.Temps;
+                
+                glycolRaw->RhoValues.allocate(glycolRaw->NumRhoConcPoints, glycolRaw->NumRhoTempPoints);
+                std::sort(glycolRaw->RhoConcs.begin(), glycolRaw->RhoConcs.end());
+            }
 
-            int rhoTempArrayNum = Util::FindItemInList(glycolRaw->RhoTempArrayName, FluidTemps);
-            auto &rhoTempArray = FluidTemps(rhoTempArrayNum);
-            glycolRaw->NumRhoTempPoints = rhoTempArray.NumOfTemps;
-            glycolRaw->RhoTemps.allocate(glycolRaw->NumRhoTempPoints);
-            glycolRaw->RhoTemps = rhoTempArray.Temps;
-            
-            glycolRaw->RhoValues.allocate(glycolRaw->NumRhoConcPoints, glycolRaw->NumRhoTempPoints);
-            std::sort(glycolRaw->RhoConcs.begin(), glycolRaw->RhoConcs.end());
+            if (!glycolRaw->CondTempArrayName.empty()) {
+                int condTempArrayNum = Util::FindItemInList(glycolRaw->CondTempArrayName, FluidTemps);
+                auto &condTempArray = FluidTemps(condTempArrayNum);
+                glycolRaw->NumCondTempPoints = condTempArray.NumOfTemps;
+                glycolRaw->CondTemps.allocate(glycolRaw->NumCondTempPoints);
+                glycolRaw->CondTemps = condTempArray.Temps;
+                
+                glycolRaw->CondValues.allocate(glycolRaw->NumCondConcPoints, glycolRaw->NumCondTempPoints);
+                std::sort(glycolRaw->CondConcs.begin(), glycolRaw->CondConcs.end());
+            }
 
-            int condTempArrayNum = Util::FindItemInList(glycolRaw->CondTempArrayName, FluidTemps);
-            auto &condTempArray = FluidTemps(condTempArrayNum);
-            glycolRaw->NumCondTempPoints = condTempArray.NumOfTemps;
-            glycolRaw->CondTemps.allocate(glycolRaw->NumCondTempPoints);
-            glycolRaw->CondTemps = condTempArray.Temps;
-            
-            glycolRaw->CondValues.allocate(glycolRaw->NumCondConcPoints, glycolRaw->NumCondTempPoints);
-            std::sort(glycolRaw->CondConcs.begin(), glycolRaw->CondConcs.end());
-            
-            int viscTempArrayNum = Util::FindItemInList(glycolRaw->ViscTempArrayName, FluidTemps);
-            auto &viscTempArray = FluidTemps(viscTempArrayNum);
-            glycolRaw->NumViscTempPoints = viscTempArray.NumOfTemps;
-            glycolRaw->ViscTemps.allocate(glycolRaw->NumViscTempPoints);
-            glycolRaw->ViscTemps = viscTempArray.Temps;
-            
-            glycolRaw->ViscValues.allocate(glycolRaw->NumViscConcPoints, glycolRaw->NumViscTempPoints);
-            std::sort(glycolRaw->ViscConcs.begin(), glycolRaw->ViscConcs.end());
+            if (!glycolRaw->ViscTempArrayName.empty()) {
+                int viscTempArrayNum = Util::FindItemInList(glycolRaw->ViscTempArrayName, FluidTemps);
+                auto &viscTempArray = FluidTemps(viscTempArrayNum);
+                glycolRaw->NumViscTempPoints = viscTempArray.NumOfTemps;
+                glycolRaw->ViscTemps.allocate(glycolRaw->NumViscTempPoints);
+                glycolRaw->ViscTemps = viscTempArray.Temps;
+                
+                glycolRaw->ViscValues.allocate(glycolRaw->NumViscConcPoints, glycolRaw->NumViscTempPoints);
+                std::sort(glycolRaw->ViscConcs.begin(), glycolRaw->ViscConcs.end());
+            }
         }
         
         // Finally, get the specific heat and concentration values from the user input
@@ -1523,7 +1564,7 @@ namespace FluidProperties {
 
         auto *water = new GlycolProps;
         water->Name = "WATER";
-        water->GlycolName = "";
+        water->GlycolName = "WATER";
         water->used = true; // mark Water as always used
 
         df->glycols.push_back(water);
@@ -1544,7 +1585,6 @@ namespace FluidProperties {
         water->RhoValues.allocate(water->NumRhoTempPoints);
         water->CondTemps.allocate(water->NumCondTempPoints);
         water->CondValues.allocate(water->NumCondTempPoints);
-        water->CondTempRatios.allocate(water->NumCondTempPoints);
         water->ViscTemps.allocate(water->NumViscTempPoints);
         water->ViscValues.allocate(water->NumViscTempPoints);
         water->CpTemps = DefaultGlycolTemps;
@@ -2695,9 +2735,6 @@ namespace FluidProperties {
                                                  routineName, this->Name),
                                           this->errors[(int)RefrigError::SatTemp].index,
                                           Temperature,
-                                          Temperature,
-                                          _,
-                                          "{C}",
                                           "{C}");
         }
 
@@ -2711,17 +2748,7 @@ namespace FluidProperties {
                                 std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Simon Rees
-        //       DATE WRITTEN   24 May 2002
-
-        // PURPOSE OF THIS FUNCTION:
-        // This finds the saturation pressure for given temperature.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls FindArrayIndex to find indices either side of requested temperature
-        // and linearly interpolates the corresponding saturation pressure values.
+        // Wrapper for RefrigProps::getSatPressure()
         auto &df = state.dataFluidProps;
 
         if (RefrigIndex == 0) {
@@ -2804,9 +2831,6 @@ namespace FluidProperties {
                                           format("{}: Saturation pressure is out of range for refrigerant [{}] supplied data: **", routineName, this->Name),
                                           this->errors[(int)RefrigError::SatPress].index,
                                           Pressure,
-                                          Pressure,
-                                          _,
-                                          "{Pa}",
                                           "{Pa}");
         }
         return ReturnValue;
@@ -2819,17 +2843,7 @@ namespace FluidProperties {
                                    std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Simon Rees
-        //       DATE WRITTEN   24 May 2002
-
-        // PURPOSE OF THIS FUNCTION:
-        // This finds the saturation temperature for given pressure.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls FindArrayIndex to find indices either side of requested pressure
-        // and linearly interpolates the corresponding saturation temperature values.
+        // Wrapper for RefrigProps::getSatTemperature()
         auto &df = state.dataFluidProps;
 
         if (RefrigIndex == 0) {
@@ -2879,22 +2893,7 @@ namespace FluidProperties {
                                 std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Mike Turner
-        //       DATE WRITTEN   10 December 99
-        //       MODIFIED       Rick Strand (April 2000, May 2000)
-        //                      Simon Rees (May 2002)
-
-        // PURPOSE OF THIS FUNCTION:
-        // This finds enthalpy for given temperature and a quality under the vapor dome.
-        // This fucntion is only called with a valid refrigerant and quality between 0 and 1.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls GetInterpolatedSatProp to linearly interpolate between the saturated
-        // liquid  and vapour enthalpies according to the given quality.
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // Wrapper for RefrigProps::getSatEnthalpy()
         auto &df = state.dataFluidProps;
         
         if (RefrigIndex == 0) {
@@ -3005,9 +3004,6 @@ namespace FluidProperties {
                                           format("{}: Saturation temperature is out of range for refrigerant [{}] supplied data: **", routineName, this->Name),
                                           this->errors[(int)RefrigError::SatTempDensity].index,
                                           Temperature,
-                                          Temperature,
-                                          _,
-                                          "{C}",
                                           "{C}");
         }
         return ReturnValue;
@@ -3021,21 +3017,7 @@ namespace FluidProperties {
                                std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Mike Turner
-        //       DATE WRITTEN   10 December 99
-        //       MODIFIED       Rick Strand (April 2000, May 2000)
-        //                      Simon Rees (May 2002); Kenneth Tang (Jan 2004)
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This finds density for given temperature and a quality under the vapor dome.
-        // This function is only called with a valid refrigerant and quality between 0 and 1.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls GetInterpolatedSatProp to linearly interpolate between the saturated
-        // liquid  and vapour densities according to the given quality.
-
+        // Wrapper for RefrigProps::getSatDensity()
         auto &df = state.dataFluidProps;
         
         if (RefrigIndex == 0) {
@@ -3103,20 +3085,7 @@ namespace FluidProperties {
     )
     {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Mike Turner
-        //       DATE WRITTEN   10 December 99
-        //       MODIFIED       Rick Strand (April 2000, May 2000)
-        //                      Simon Rees (May 2002)
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This finds specific heat for given temperature and a quality under the vapor dome.
-        // This fucntion is only called with a valid refrigerant and quality between 0 and 1.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls GetInterpolatedSatProp to linearly interpolate between the saturated
-        // liquid  and vapour specific heats according to the given quality.
-
+        // Wrapper for RefrigProps::getSpecificHeat()
         auto &df = state.dataFluidProps;
         
         if (RefrigIndex == 0) {
@@ -3277,9 +3246,6 @@ namespace FluidProperties {
                                                format("{}: Refrigerant [{}] saturated at the given conditions **", routineName, this->Name),
                                                this->errors[(int)RefrigError::SatSupEnthalpy].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
             return ReturnValue;
@@ -3301,9 +3267,6 @@ namespace FluidProperties {
                                                       routineName, this->Name),
                                                this->errors[(int)RefrigError::SatSupEnthalpyTemp].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
 
@@ -3322,9 +3285,6 @@ namespace FluidProperties {
                                                       routineName, this->Name),
                                                this->errors[(int)RefrigError::SatSupEnthalpyPress].index,
                                                Pressure,
-                                               Pressure,
-                                               _,
-                                               "{Pa}",
                                                "{Pa}");
             }
         } // end error checking
@@ -3340,30 +3300,7 @@ namespace FluidProperties {
                                     std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Mike Turner
-        //       DATE WRITTEN   10 December 99
-        //       MODIFIED       Rick Strand (April 2000, May 2000)
-        //       MODIFIED       Simon Rees (May 2002)
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Performs linear interpolation between pressures and temperatures and
-        // returns enthalpy values.  Works only in superheated region.
-
-        // METHODOLOGY EMPLOYED:
-        // Double linear interpolation is used with enthalpy values at four
-        // pressure/temperature input points surrounding the given temperature
-        // and pressure argument values.
-        // With enthalpy data it is assumed that zero values in the data are in
-        // the saturated region. Hence, values near the saturation line are
-        // approximated using the saturation value instead of the zero data value.
-        // points completely in the saturation region are given the saturation value
-        // at the given temperature. Points at the upper limits of pressure/temperature
-        // have the pressure/temperature capped. Warnings are given if the point
-        // is not clearly in the bounds of the superheated data.
-
-        // FUNCTION PARAMETER DEFINITIONS:
+        // Wrapper for RefrigProps::getSupHeatEnthalpy()
         auto &df = state.dataFluidProps;
         
         if (RefrigIndex == 0) {
@@ -3412,7 +3349,7 @@ namespace FluidProperties {
 
         // FUNCTION PARAMETERS:
         // the enthalpy calculated from the pressure found
-        static constexpr std::string_view routineName = "GetSupHeatPressureRefrig";
+        static constexpr std::string_view routineName = "RefrigProps::getSupHeatPressure";
  
         auto &df = state.dataFluidProps;
         
@@ -3571,9 +3508,6 @@ namespace FluidProperties {
                                               format("{}: Refrigerant [{}] saturated at the given enthalpy and temperature **", routineName, this->Name),
                                               this->errors[(int)RefrigError::SatSupPress].index,
                                               ReturnValue,
-                                              ReturnValue,
-                                              _,
-                                              "{Pa}",
                                               "{Pa}");
             }
 
@@ -3592,9 +3526,6 @@ namespace FluidProperties {
                                                       routineName, this->Name),
                                                this->errors[(int)RefrigError::SatSupPressTemp].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
 
@@ -3613,9 +3544,6 @@ namespace FluidProperties {
                                                       routineName, this->Name),
                                                this->errors[(int)RefrigError::SatSupPressEnthalpy].index,
                                                Enthalpy,
-                                               Enthalpy,
-                                               _,
-                                               "{J}",
                                                "{J}");
             }
         } // end error checking
@@ -3632,27 +3560,7 @@ namespace FluidProperties {
                                     std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Rick Strand
-        //       DATE WRITTEN   May 2000
-        //       MODIFIED       Simon Rees (May 2002)
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Performs linear interpolation between enthalpy and temperatures and
-        // returns pressure values.  Works only in superheated region.
-
-        // METHODOLOGY EMPLOYED:
-        // Double linear interpolation is used with pressure values at four
-        // enthalpy/temperature input points surrounding the given temperature
-        // and enthalpy argument values.
-        // All enthalpies have to be calculated at the given temperature before a
-        // search is made for the data adjacent to the given enthalpy. Linear interpolation
-        // using the enthalpy data is used to interpolate the correspondng pressures.
-        // Temperatures and enthalpies outside the bounds of the available data are capped
-        // and warnings given. For enthlpys lower than the saturated vapour value at the
-        // given temperature result in the saturation pressure being returned (calls to
-        // GetSatEnthalpy and GetSatPressure are made.)
+        // Wrapper for RefrigProps::getSupHeatPressure()
         auto &df = state.dataFluidProps;
 
         if (RefrigIndex == 0) {
@@ -3692,7 +3600,7 @@ namespace FluidProperties {
 
         // FUNCTION PARAMETERS:
         // the enthalpy calculated from the pressure found
-        static constexpr std::string_view routineName = "GetSupHeatTempRefrig";
+        static constexpr std::string_view routineName = "RefrigProps::getSupHeatTemp";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 EnthalpyHigh; // Enthalpy value at interpolated pressure and high temperature
@@ -3777,16 +3685,7 @@ namespace FluidProperties {
                                 std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Rongpeng Zhang
-        //       DATE WRITTEN   Jan 2016
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Performs iterations to calculate the refrigerant temperature corresponding to the given
-        // enthalpy and pressure.  Works only in superheated region.
-
-        // METHODOLOGY EMPLOYED:
-        // Perform iterations to identify the temperature by calling GetSupHeatEnthalpyRefrig
+        // Wrapper for RefrigProps::getSupHeatTemp()
         auto &df = state.dataFluidProps;
             
         if (RefrigIndex == 0) {
@@ -3951,9 +3850,6 @@ namespace FluidProperties {
                                                format("{}: Refrigerant [{}] saturated at the given conditions **", routineName, this->Name),
                                                this->errors[(int)RefrigError::SatSupEnthalpy].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
             return saturated_density;
@@ -3974,9 +3870,6 @@ namespace FluidProperties {
                                                       routineName, this->Name),
                                                this->errors[(int)RefrigError::SatSupDensityTemp].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
 
@@ -3996,9 +3889,6 @@ namespace FluidProperties {
                                                       routineName, this->Name),
                                                this->errors[(int)RefrigError::SatSupDensityPress].index,
                                                Pressure,
-                                               Pressure,
-                                               _,
-                                               "{Pa}",
                                                "{Pa}");
             } // end error checking
         }
@@ -4014,29 +3904,7 @@ namespace FluidProperties {
                                    std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Mike Turner
-        //       DATE WRITTEN   10 December 99
-        //       MODIFIED       Rick Strand (April 2000, May 2000)
-        //       MODIFIED       Simon Rees (May 2002)
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Performs linear interpolation between pressures and temperatures and
-        // returns Density values.  Works only in superheated region.
-
-        // METHODOLOGY EMPLOYED:
-        // Double linear interpolation is used with Density values at four
-        // pressure/temperature input points surrounding the given temperature
-        // and pressure arguments.
-        // With Density data it is assumed that zero values in the data are in
-        // the saturated region. Hence, values near the saturation line are
-        // approximated using the saturation value instead of the zero data value.
-        // points completely in the saturation region are given the saturation value
-        // at the given temperature. Points at the upper limits of pressure/temperature
-        // have the pressure/temperature capped. Warnings are given if the point
-        // is not clearly in the bounds of the superheated data.
-
+        // Wrapper for RefrigProps::getSupHeatDensity()
         auto &df = state.dataFluidProps;
         if (RefrigIndex == 0) {
             if ((RefrigIndex = GetRefrigNum(state, refrigName)) == 0) {
@@ -4139,9 +4007,6 @@ namespace FluidProperties {
                                                format("{}: Temperature out of range (too low) for fluid [{}] specific heat **", routineName, this->Name),
                                                this->errors[(int)GlycolError::SpecHeatLow].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
             return this->CpValues(this->CpLowTempIndex);
@@ -4164,9 +4029,6 @@ namespace FluidProperties {
                                                format("{}: Temperature out of range (too high) for fluid [{}] specific heat **", routineName, this->Name),
                                                this->errors[(int)GlycolError::SpecHeatHigh].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
             return this->CpValues(this->CpHighTempIndex);
@@ -4189,7 +4051,7 @@ namespace FluidProperties {
             } // Invariant: glycol_CpTemps[beg] <= Temperature <= glycol_CpTemps[end]
 
             // Is this faster than Interp?
-            return this->CpValues(end) - (this->CpTemps(end) - Temperature) * this->CpTempRatios(beg);
+            return GetInterpValue(Temperature, this->CpTemps(beg), this->CpTemps(end), this->CpValues(beg), this->CpValues(end));
         }
     }
 
@@ -4200,7 +4062,7 @@ namespace FluidProperties {
                                  std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
-        // This is now just a wrapper for the GlycolProps::getSpecificHeat method
+        // Wrapper for GlycolProps::getSpecificHeat()
         auto &df = state.dataFluidProps;
             
         if (GlycolIndex == 0) {
@@ -4287,9 +4149,6 @@ namespace FluidProperties {
                                                format("{}: Temperature out of range (too low) for fluid [{}] density **", routineName, this->Name),
                                                this->errors[(int)GlycolError::DensityLow].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
                 
             } else { // error == GlycolError::DensityHigh
@@ -4307,9 +4166,6 @@ namespace FluidProperties {
                                                format("{}: Temperature out of range (too high) for fluid [{}] density **", routineName, this->Name),
                                                this->errors[(int)GlycolError::DensityHigh].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
         }
@@ -4324,7 +4180,7 @@ namespace FluidProperties {
                             std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
-        // This is now just a wrapper for the GlycolProps::getDensity method
+        // Wrapper for GlycolProps::getDensity()
         auto &df = state.dataFluidProps;
             
         if (GlycolIndex == 0) {
@@ -4415,9 +4271,6 @@ namespace FluidProperties {
                                                format("{}: Temperature out of range (too low) for fluid [{}] conductivity **", routineName, this->Name),
                                                this->errors[(int)error].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
 
@@ -4437,9 +4290,6 @@ namespace FluidProperties {
                                                format("{}: Temperature out of range (too high) for fluid [{}] conductivity **", routineName, this->Name),
                                                this->errors[(int)error].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
         }
@@ -4454,7 +4304,7 @@ namespace FluidProperties {
                                  std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
-        // This is now just a wrapper for the GlycolProps::getConductivity method
+        // Wrapper for GlycolProps::getConductivity()
         auto &df = state.dataFluidProps;
             
         if (GlycolIndex == 0) {
@@ -4546,9 +4396,6 @@ namespace FluidProperties {
                                                format("{}: Temperature out of range (too low) for fluid [{}] viscosity **", routineName, this->Name),
                                                this->errors[(int)GlycolError::ViscosityLow].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
             
@@ -4568,9 +4415,6 @@ namespace FluidProperties {
                                                format("{}: Temperature out of range (too high) for fluid [{}] viscosity **", routineName, this->Name),
                                                this->errors[(int)GlycolError::ViscosityHigh].index,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
         }
@@ -4585,8 +4429,7 @@ namespace FluidProperties {
                               std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
-        // This is now just a wrapper for the GlycolProps::getViscosity method
-
+        // Wrapper for GlycolProps::getViscosity()
         auto &df = state.dataFluidProps;
             
         if (GlycolIndex == 0) {
@@ -4891,9 +4734,6 @@ namespace FluidProperties {
                                                "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error",
                                                df->TempRangeErrIndexGetInterpolatedSatProp,
                                                Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
                                                "{C}");
             }
         }
