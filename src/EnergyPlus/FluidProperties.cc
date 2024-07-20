@@ -1118,11 +1118,15 @@ namespace FluidProperties {
         // be produced.
 
         // Propylene and ethylene are available by default
-        auto *waterRaw = new GlycolRawProps;
-        waterRaw->Name = "WATER";
-
-        df->glycolsRaw.push_back(waterRaw);
-        waterRaw->Num = df->glycolsRaw.isize();
+        
+        auto *waterRaw = GetGlycolRaw(state, "WATER");
+        if (waterRaw == nullptr) {
+            waterRaw = new GlycolRawProps;
+            waterRaw->Name = "WATER";
+            
+            df->glycolsRaw.push_back(waterRaw);
+            waterRaw->Num = df->glycolsRaw.isize();
+        }
 
         waterRaw->CpDataPresent = true;
         waterRaw->NumCpConcPoints = 1;
@@ -1164,11 +1168,14 @@ namespace FluidProperties {
         waterRaw->ViscValues.allocate(waterRaw->NumViscConcPoints, waterRaw->NumViscTempPoints);
         waterRaw->ViscValues(1, {1, waterRaw->NumViscTempPoints}) = DefaultWaterViscData;
 
-        auto *ethylene = new GlycolRawProps;
-        ethylene->Name = "ETHYLENEGLYCOL";
-        df->glycolsRaw.push_back(ethylene);
-        ethylene->Num = df->glycolsRaw.isize();
-
+        auto *ethylene = GetGlycolRaw(state, "ETHYLENEGLYCOL");
+        if (ethylene == nullptr) {
+            ethylene = new GlycolRawProps;
+            ethylene->Name = "ETHYLENEGLYCOL";
+            df->glycolsRaw.push_back(ethylene);
+            ethylene->Num = df->glycolsRaw.isize();
+        }
+        
         // Specific Heat
         ethylene->CpDataPresent = true;         // Flag set when specific heat data is available
         ethylene->NumCpTempPoints = DefaultNumGlyTemps;           // Number of temperature points for specific heat
@@ -1230,11 +1237,14 @@ namespace FluidProperties {
             ethylene->ViscValues(i, {1, ethylene->NumViscTempPoints}) = DefaultEthGlyViscData[i-1]; 
 
         // Propylene
-        auto *propylene = new GlycolRawProps;
-        propylene->Name = "PROPYLENEGLYCOL";
-        df->glycolsRaw.push_back(propylene);
-        propylene->Num = df->glycolsRaw.isize();
-
+        auto *propylene = GetGlycolRaw(state, "PROPYLENEGLYCOL");
+        if (propylene == nullptr) {
+            propylene = new GlycolRawProps;
+            propylene->Name = "PROPYLENEGLYCOL";
+            df->glycolsRaw.push_back(propylene);
+            propylene->Num = df->glycolsRaw.isize();
+        }
+        
         // Specific Heat
         propylene->CpDataPresent = true;         // Flag set when specific heat data is available
         propylene->NumCpTempPoints = DefaultNumGlyTemps;           // Number of temperature points for specific heat
@@ -1562,14 +1572,16 @@ namespace FluidProperties {
         CurrentModuleObject = "FluidProperties:GlycolConcentration";
         NumOfOptionalInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
-        auto *water = new GlycolProps;
-        water->Name = "WATER";
-        water->GlycolName = "WATER";
-        water->used = true; // mark Water as always used
-
-        df->glycols.push_back(water);
-        water->Num = df->glycols.isize();
-
+        auto *water = GetGlycol(state, "WATER");
+        if (water == nullptr) {
+            water = new GlycolProps;
+            water->Name = "WATER";
+            water->GlycolName = "WATER";
+            water->used = true; // mark Water as always used
+            
+            df->glycols.push_back(water);
+            water->Num = df->glycols.isize();
+        }
         water->Concentration = 1.0;
         water->CpDataPresent = true;
         water->NumCpTempPoints = DefaultNumGlyTemps;
@@ -1596,6 +1608,7 @@ namespace FluidProperties {
         water->ViscTemps = DefaultGlycolTemps;
         water->ViscValues = DefaultWaterViscData;
 
+#ifdef PERFORMANCE_OPT            
         // This is a speed optimization.  Maybe.
         water->CpTempRatios.allocate(water->NumCpTempPoints);
         for (int i = 1; i < water->NumCpTempPoints; ++i)
@@ -1609,6 +1622,7 @@ namespace FluidProperties {
         water->ViscTempRatios.allocate(water->NumViscTempPoints);
         for (int i = 1; i < water->NumCondTempPoints; ++i)
             water->ViscTempRatios(i) = (water->ViscValues(i+1) - water->ViscValues(i)) / (water->ViscTemps(i+1) - water->ViscTemps(i));
+#endif // PERFORMANCE_OPT            
 
         for (int Loop = 1; Loop <= NumOfOptionalInput; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -1725,6 +1739,7 @@ namespace FluidProperties {
             InterpValuesForGlycolConc(state, glycolRaw->NumViscConcPoints, glycolRaw->NumViscTempPoints, glycolRaw->ViscConcs, glycolRaw->ViscValues,
                                       glycol->Concentration, glycol->ViscValues);
 
+#ifdef PERFORMANCE_OPT            
             // This is a speed optimization.  Maybe.
             glycol->CpTempRatios.allocate(glycol->NumCpTempPoints);
             for (int i = 1; i < glycol->NumCpTempPoints; ++i)
@@ -1738,6 +1753,7 @@ namespace FluidProperties {
             glycol->ViscTempRatios.allocate(glycol->NumViscTempPoints);
             for (int i = 1; i < glycol->NumCondTempPoints; ++i)
                 glycol->ViscTempRatios(i) = (glycol->ViscValues(i+1) - glycol->ViscValues(i)) / (glycol->ViscTemps(i+1) - glycol->ViscTemps(i));
+#endif // PERFORMANCE_OPT            
         } // for (Loop)
         
         if (!ErrorsFound) InitializeGlycolTempLimits(state, ErrorsFound); // Initialize the Temp limits for the glycols
@@ -3948,12 +3964,12 @@ namespace FluidProperties {
     }
 
     Real64 GlycolProps::getSpecificHeat_raw(EnergyPlusData &state,
-                                           Real64 const Temperature,         // actual temperature given as input
+                                           Real64 const Temp,         // actual temperature given as input
                                            std::string_view const CalledFrom // routine this function was called from (error messages)
     )
 #else
     Real64 GlycolProps::getSpecificHeat(EnergyPlusData &state,
-                                       Real64 const Temperature,         // actual temperature given as input
+                                       Real64 const Temp,         // actual temperature given as input
                                        std::string_view const CalledFrom // routine this function was called from (error messages)
     )
 #endif
@@ -3986,7 +4002,7 @@ namespace FluidProperties {
         assert(this->CpDataPresent);
 
         // Now determine the value of specific heat using interpolation
-        if (Temperature < this->CpLowTempValue) { // Temperature too low
+        if (Temp < this->CpLowTempValue) { // Temperature too low
                 
             if (!state.dataGlobal->WarmupFlag) {
                 df->glycolErrorLimits[(int)GlycolError::SpecHeatLow] = ++this->errors[(int)GlycolError::SpecHeatLow].count;
@@ -3998,7 +4014,7 @@ namespace FluidProperties {
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
-                                             Temperature,
+                                             Temp,
                                              this->CpLowTempValue,
                                              this->CpHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
@@ -4006,12 +4022,12 @@ namespace FluidProperties {
                 ShowRecurringWarningErrorAtEnd(state,
                                                format("{}: Temperature out of range (too low) for fluid [{}] specific heat **", routineName, this->Name),
                                                this->errors[(int)GlycolError::SpecHeatLow].index,
-                                               Temperature,
+                                               Temp,
                                                "{C}");
             }
             return this->CpValues(this->CpLowTempIndex);
 
-        } else if (Temperature > this->CpHighTempValue) { // Temperature too high
+        } else if (Temp > this->CpHighTempValue) { // Temperature too high
             if (!state.dataGlobal->WarmupFlag) {
                 df->glycolErrorLimits[(int)GlycolError::SpecHeatHigh] = ++this->errors[(int)GlycolError::SpecHeatHigh].count;
                 if (df->glycolErrorLimits[(int)GlycolError::SpecHeatHigh] <= df->GlycolErrorLimitTest) {
@@ -4020,7 +4036,7 @@ namespace FluidProperties {
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
-                                             Temperature,
+                                             Temp,
                                              this->CpLowTempValue,
                                              this->CpHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
@@ -4028,30 +4044,27 @@ namespace FluidProperties {
                 ShowRecurringWarningErrorAtEnd(state,
                                                format("{}: Temperature out of range (too high) for fluid [{}] specific heat **", routineName, this->Name),
                                                this->errors[(int)GlycolError::SpecHeatHigh].index,
-                                               Temperature,
+                                               Temp,
                                                "{C}");
             }
             return this->CpValues(this->CpHighTempIndex);
 
         } else { // Temperature somewhere between the lowest and highest value
-            // bracket is temp > low, <= high (for interpolation
-            // for ( int Loop = glycol_data.CpLowTempIndex + 1; Loop <= glycol_data.CpHighTempIndex; ++Loop ) { //Tuned Replaced by binary search
-            // below     if ( Temperature > glycol_data.CpTemps( Loop ) ) continue;     return GetInterpValue( Temperature, glycol_CpTemps( Loop - 1
-            //), glycol_CpTemps( Loop ), glycol_CpValues( Loop - 1 ), glycol_CpValues( Loop ) );     break; // DO loop
-            //}
-            // assert( std::is_sorted( glycol_CpTemps.begin(), glycol_CpTemps.end() ) ); // Sorted temperature array is assumed: Enable if/when arrays
-            // have begin()/end()
-            assert(this->CpTemps.size() <=
-                   static_cast<std::size_t>(std::numeric_limits<int>::max())); // Array indexes are int now so this is future protection
+#ifdef PERFORMANCE_OPT
+            if (Temp < this->CpTemps(this->LoCpTempIdxLast) || Temp > this->CpTemps(this->LoCpTempIdxLast+1)) {
+                this->LoCpTempIdxLast = FindArrayIndex(Temp, this->CpTemps, 1, this->NumCpTempPoints);
+            }
+            return this->CpValues(this->LoCpTempIdxLast) + (Temp - this->CpTemps(this->LoCpTempIdxLast)) * this->CpTempRatios(this->LoCpTempIdxLast);
+#else // !PERFORMANCE_OPT            
+            assert(this->CpTemps.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max())); 
             int beg(1), end(this->CpTemps.isize());                           // 1-based indexing
             assert(end > 0);
             while (beg + 1 < end) {
                 int mid = ((beg + end) >> 1); // bit shifting is faster than /2
                 (Temperature > this->CpTemps(mid) ? beg : end) = mid;
             } // Invariant: glycol_CpTemps[beg] <= Temperature <= glycol_CpTemps[end]
-
-            // Is this faster than Interp?
             return GetInterpValue(Temperature, this->CpTemps(beg), this->CpTemps(end), this->CpValues(beg), this->CpValues(end));
+#endif // PERFORMANCE_OPT            
         }
     }
 
@@ -4079,7 +4092,7 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GlycolProps::getDensity(EnergyPlusData &state,
-                                  Real64 const Temperature,         // actual temperature given as input
+                                  Real64 const Temp,         // actual temperature given as input
                                   std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
@@ -4103,7 +4116,7 @@ namespace FluidProperties {
         // all temperature lists are entered in ascending order.
 
         // Return value
-        Real64 ReturnValue;
+        Real64 Rho;
 
         // FUNCTION PARAMETERS:
         static constexpr std::string_view routineName = "GlycolProps::getDensity";
@@ -4117,16 +4130,23 @@ namespace FluidProperties {
         assert(this->RhoDataPresent);
 
         // Now determine the value of specific heat using interpolation
-        if (Temperature < this->RhoLowTempValue) { // Temperature too low
+        if (Temp < this->RhoLowTempValue) { // Temperature too low
             error = GlycolError::DensityLow; 
-            ReturnValue = this->RhoValues(this->RhoLowTempIndex);
-        } else if (Temperature > this->RhoHighTempValue) { // Temperature too high
+            Rho = this->RhoValues(this->RhoLowTempIndex);
+        } else if (Temp > this->RhoHighTempValue) { // Temperature too high
             error = GlycolError::DensityHigh;
-            ReturnValue = this->RhoValues(this->RhoHighTempIndex);
+            Rho = this->RhoValues(this->RhoHighTempIndex);
         } else { // Temperature somewhere between the lowest and highest value
+#ifdef PERFORMANCE_OPT
+            if (Temp < this->RhoTemps(this->LoRhoTempIdxLast) || Temp > this->RhoTemps(this->LoRhoTempIdxLast+1)) {
+                this->LoRhoTempIdxLast = FindArrayIndex(Temp, this->RhoTemps, 1, this->NumRhoTempPoints);
+            }
+            Rho = this->RhoValues(this->LoRhoTempIdxLast) + (Temp - this->RhoTemps(this->LoRhoTempIdxLast)) * this->RhoTempRatios(this->LoRhoTempIdxLast);
+#else // !PERFORMANCE_OPT            
             int LoTempIndex = FindArrayIndex(Temperature, this->RhoTemps, 1, this->NumRhoTempPoints);
             Real64 TempInterpRatio = (Temperature - this->RhoTemps(LoTempIndex)) / (this->RhoTemps(LoTempIndex+1) - this->RhoTemps(LoTempIndex));
             ReturnValue = this->RhoValues(LoTempIndex) + TempInterpRatio * (this->RhoValues(LoTempIndex+1) - this->RhoValues(LoTempIndex));
+#endif // PERFORMANCE_OPT            
         }
 
         // Error handling
@@ -4139,7 +4159,7 @@ namespace FluidProperties {
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
-                                             Temperature,
+                                             Temp,
                                              this->RhoLowTempValue,
                                              this->RhoHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
@@ -4148,7 +4168,7 @@ namespace FluidProperties {
                 ShowRecurringWarningErrorAtEnd(state,
                                                format("{}: Temperature out of range (too low) for fluid [{}] density **", routineName, this->Name),
                                                this->errors[(int)GlycolError::DensityLow].index,
-                                               Temperature,
+                                               Temp,
                                                "{C}");
                 
             } else { // error == GlycolError::DensityHigh
@@ -4157,7 +4177,7 @@ namespace FluidProperties {
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
-                                             Temperature,
+                                             Temp,
                                              this->RhoLowTempValue,
                                              this->RhoHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
@@ -4165,12 +4185,12 @@ namespace FluidProperties {
                 ShowRecurringWarningErrorAtEnd(state,
                                                format("{}: Temperature out of range (too high) for fluid [{}] density **", routineName, this->Name),
                                                this->errors[(int)GlycolError::DensityHigh].index,
-                                               Temperature,
+                                               Temp,
                                                "{C}");
             }
         }
 
-        return ReturnValue;
+        return Rho;
     }
 
     Real64 GetDensityGlycol(EnergyPlusData &state,
@@ -4197,7 +4217,7 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GlycolProps::getConductivity(EnergyPlusData &state,
-                                       Real64 const Temperature,         // actual temperature given as input
+                                       Real64 const Temp,         // actual temperature given as input
                                        std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
@@ -4221,7 +4241,7 @@ namespace FluidProperties {
         // all temperature lists are entered in ascending order.
 
         // Return value
-        Real64 ReturnValue;
+        Real64 Cond;
 
         // FUNCTION PARAMETERS:
         static constexpr std::string_view routineName = "GlycolProps::getConductivity";
@@ -4239,16 +4259,23 @@ namespace FluidProperties {
         }
 
         // Now determine the value of specific heat using interpolation
-        if (Temperature < this->CondLowTempValue) { // Temperature too low
+        if (Temp < this->CondLowTempValue) { // Temperature too low
             error = GlycolError::ConductivityLow;
-            ReturnValue = this->CondValues(this->CondLowTempIndex);
-        } else if (Temperature > this->CondHighTempValue) { // Temperature too high
+            Cond = this->CondValues(this->CondLowTempIndex);
+        } else if (Temp > this->CondHighTempValue) { // Temperature too high
             error = GlycolError::ConductivityHigh;
-            ReturnValue = this->CondValues(this->CondHighTempIndex);
+            Cond = this->CondValues(this->CondHighTempIndex);
         } else { // Temperature somewhere between the lowest and highest value
+#ifdef PERFORMANCE_OPT
+            if (Temp < this->CondTemps(this->LoCondTempIdxLast) || Temp > this->CondTemps(this->LoCondTempIdxLast+1)) {
+                this->LoCondTempIdxLast = FindArrayIndex(Temp, this->CondTemps, 1, this->NumCondTempPoints);
+            }
+            Cond = this->CondValues(this->LoCondTempIdxLast) + (Temp - this->CondTemps(this->LoCondTempIdxLast)) * this->CondTempRatios(this->LoCondTempIdxLast);
+#else // !PERFORMANCE_OPT
             int LoTempIndex = FindArrayIndex(Temperature, this->CondTemps, 1, this->NumCondTempPoints);
             Real64 TempInterpRatio = (Temperature - this->CondTemps(LoTempIndex)) / (this->CondTemps(LoTempIndex+1) - this->CondTemps(LoTempIndex));
             ReturnValue = this->CondValues(LoTempIndex) + TempInterpRatio * (this->CondValues(LoTempIndex+1) - this->CondValues(LoTempIndex));
+#endif // PERFORMANCE_OPT
         }
 
         // Error handling
@@ -4261,7 +4288,7 @@ namespace FluidProperties {
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
-                                             Temperature,
+                                             Temp,
                                              this->CondLowTempValue,
                                              this->CondHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
@@ -4270,7 +4297,7 @@ namespace FluidProperties {
                 ShowRecurringWarningErrorAtEnd(state,
                                                format("{}: Temperature out of range (too low) for fluid [{}] conductivity **", routineName, this->Name),
                                                this->errors[(int)error].index,
-                                               Temperature,
+                                               Temp,
                                                "{C}");
             }
 
@@ -4280,7 +4307,7 @@ namespace FluidProperties {
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
-                                             Temperature,
+                                             Temp,
                                              this->CondLowTempValue,
                                              this->CondHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
@@ -4289,12 +4316,12 @@ namespace FluidProperties {
                 ShowRecurringWarningErrorAtEnd(state,
                                                format("{}: Temperature out of range (too high) for fluid [{}] conductivity **", routineName, this->Name),
                                                this->errors[(int)error].index,
-                                               Temperature,
+                                               Temp,
                                                "{C}");
             }
         }
 
-        return ReturnValue;
+        return Cond;
     } // GlycolProps::getConductivity()
 
     Real64 GetConductivityGlycol(EnergyPlusData &state,
@@ -4322,7 +4349,7 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GlycolProps::getViscosity(EnergyPlusData &state,
-                                    Real64 const Temperature,         // actual temperature given as input
+                                    Real64 const Temp,         // actual temperature given as input
                                     std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
@@ -4346,7 +4373,7 @@ namespace FluidProperties {
         // all temperature lists are entered in ascending order.
 
         // Return value
-        Real64 ReturnValue; // Value for function
+        Real64 Visc; // Value for function
 
         // FUNCTION PARAMETERS:
         static constexpr std::string_view routineName = "GlycolProps::getViscosity";
@@ -4364,16 +4391,23 @@ namespace FluidProperties {
         }
 
         // Now determine the value of specific heat using interpolation
-        if (Temperature < this->ViscLowTempValue) { // Temperature too low
+        if (Temp < this->ViscLowTempValue) { // Temperature too low
             error = GlycolError::ViscosityLow;
-            ReturnValue = this->ViscValues(this->ViscLowTempIndex);
-        } else if (Temperature > this->ViscHighTempValue) { // Temperature too high
+            Visc = this->ViscValues(this->ViscLowTempIndex);
+        } else if (Temp > this->ViscHighTempValue) { // Temperature too high
             error = GlycolError::ViscosityHigh;
-            ReturnValue = this->ViscValues(this->ViscHighTempIndex);
+            Visc = this->ViscValues(this->ViscHighTempIndex);
         } else { // Temperature somewhere between the lowest and highest value
-            int LoTempIndex = FindArrayIndex(Temperature, this->ViscTemps, 1, this->NumViscTempPoints);
+#ifdef PERFORMANCE_OPT
+            if (Temp < this->ViscTemps(this->LoViscTempIdxLast) || Temp > this->ViscTemps(this->LoViscTempIdxLast+1)) {
+                this->LoViscTempIdxLast = FindArrayIndex(Temp, this->ViscTemps, 1, this->NumViscTempPoints);
+            }
+            Visc = this->ViscValues(this->LoViscTempIdxLast) + (Temp - this->ViscTemps(this->LoViscTempIdxLast)) * this->ViscTempRatios(this->LoViscTempIdxLast);
+#else // !PERFORMANCE_OPT
+            int LoTempIndex = FindArrayIndex(Temp, this->ViscTemps, 1, this->NumViscTempPoints);
             Real64 TempInterpRatio = (Temperature - this->ViscTemps(LoTempIndex)) / (this->ViscTemps(LoTempIndex+1) - this->ViscTemps(LoTempIndex));
             ReturnValue = this->ViscValues(LoTempIndex) + TempInterpRatio * (this->ViscValues(LoTempIndex+1) - this->ViscValues(LoTempIndex));
+#endif // PERFORMANCE_OPT            
         }
 
         // Error handling
@@ -4386,7 +4420,7 @@ namespace FluidProperties {
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
-                                             Temperature,
+                                             Temp,
                                              this->ViscLowTempValue,
                                              this->ViscHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
@@ -4395,7 +4429,7 @@ namespace FluidProperties {
                 ShowRecurringWarningErrorAtEnd(state,
                                                format("{}: Temperature out of range (too low) for fluid [{}] viscosity **", routineName, this->Name),
                                                this->errors[(int)GlycolError::ViscosityLow].index,
-                                               Temperature,
+                                               Temp,
                                                "{C}");
             }
             
@@ -4405,7 +4439,7 @@ namespace FluidProperties {
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
-                                             Temperature,
+                                             Temp,
                                              this->ViscLowTempValue,
                                              this->ViscHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
@@ -4414,12 +4448,12 @@ namespace FluidProperties {
                 ShowRecurringWarningErrorAtEnd(state,
                                                format("{}: Temperature out of range (too high) for fluid [{}] viscosity **", routineName, this->Name),
                                                this->errors[(int)GlycolError::ViscosityHigh].index,
-                                               Temperature,
+                                               Temp,
                                                "{C}");
             }
         }
 
-        return ReturnValue;
+        return Visc;
     } // GlycolProps::getViscosity()
 
     Real64 GetViscosityGlycol(EnergyPlusData &state,

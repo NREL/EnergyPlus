@@ -69,6 +69,8 @@ struct EnergyPlusData;
 
 namespace FluidProperties {
 
+#define PERFORMANCE_OPT
+        
 #ifdef EP_cache_GlycolSpecificHeat
     int constexpr t_sh_cache_size = 1024 * 1024;
     int constexpr t_sh_precision_bits = 24;
@@ -114,7 +116,9 @@ namespace FluidProperties {
         int PsHighPresIndex = 0;         // High Pressure Max Index for Ps (>0.0)
         Array1D<Real64> PsTemps;     // Temperatures for saturation pressures
         Array1D<Real64> PsValues;    // Saturation pressures at PsTemps
+#ifdef PERFORMANCE_OPT            
         Array1D<Real64> PsTempRatios; // PsTempRatios(i) = (PsValues(i+1) - PsValues(i)) / (PsTemps(i+1) - PsTemps(i)).  Speed optimization.
+#endif // PERFORMANCE_OPT            
             
         int NumHPoints = 0;              // Number of enthalpy points
         Real64 HfLowTempValue = 0.0;       // Low Temperature Value for Hf (>0.0)
@@ -128,8 +132,10 @@ namespace FluidProperties {
         Array1D<Real64> HTemps;      // Temperatures for enthalpy points
         Array1D<Real64> HfValues;    // Enthalpy of saturated fluid at HTemps
         Array1D<Real64> HfgValues;   // Enthalpy of saturated fluid/gas at HTemps
+#ifdef PERFORMANCE_OPT            
         Array1D<Real64> HfTempRatios;
         Array1D<Real64> HfgTempRatios;
+#endif // PERFORMANCE_OPT            
             
         int NumCpPoints = 0;             // Number of specific heat of fluid points
         Real64 CpfLowTempValue = 0.0;      // Low Temperature Value for Cpf (>0.0)
@@ -143,8 +149,10 @@ namespace FluidProperties {
         Array1D<Real64> CpTemps;     // Temperatures for specific heat points
         Array1D<Real64> CpfValues;   // Specific heat of saturated fluid at CpTemps
         Array1D<Real64> CpfgValues;  // Specific heat of saturated fluid/gas at CpTemps
+#ifdef PERFORMANCE_OPT            
         Array1D<Real64> CpfTempRatios;
         Array1D<Real64> CpfgTempRatios;
+#endif // PERFORMANCE_OPT            
             
         int NumRhoPoints = 0;            // Number of density of fluid points
         Real64 RhofLowTempValue = 0.0;     // Low Temperature Value for Rhof (>0.0)
@@ -158,8 +166,10 @@ namespace FluidProperties {
         Array1D<Real64> RhoTemps;    // Temperatures for density of fluid points
         Array1D<Real64> RhofValues;  // Density of saturated fluid at RhoTemps
         Array1D<Real64> RhofgValues; // Density of saturated fluid/gas at RhoTemps
+#ifdef PERFORMANCE_OPT            
         Array1D<Real64> RhofTempRatios;
         Array1D<Real64> RhofgTempRatios;
+#endif // PERFORMANCE_OPT            
             
         int NumSupTempPoints = 0;         // Number of temperature points for superheated enthalpy
         int NumSupPressPoints = 0;        // Number of pressure points for superheated enthalpy
@@ -295,7 +305,10 @@ namespace FluidProperties {
         int NumCpTempPoints = 0;           // Number of temperature points for specific heat
         Array1D<Real64> CpTemps;    // Temperatures for specific heat of glycol
         Array1D<Real64> CpValues;   // Specific heat data values (J/kg-K)
+#ifdef PERFORMANCE_OPT
+        int LoCpTempIdxLast = 1;
         Array1D<Real64> CpTempRatios; // Speed optimization
+#endif // PERFORMANCE_OPT            
             
         bool RhoDataPresent = false;        // Flag set when density data is available
         int NumRhoTempPoints = 0.0;          // Number of temperature points for density
@@ -305,7 +318,10 @@ namespace FluidProperties {
         int RhoHighTempIndex = 0;       // High Temperature Max Index for Rho (>0.0)
         Array1D<Real64> RhoTemps;   // Temperatures for density of glycol
         Array1D<Real64> RhoValues;  // Density data values (kg/m3)
+#ifdef PERFORMANCE_OPT
+        int LoRhoTempIdxLast = 1;
         Array1D<Real64> RhoTempRatios; // Speed optimization
+#endif // PERFORMANCE_OPT            
             
         bool CondDataPresent = false;       // Flag set when conductivity data is available
         int NumCondTempPoints = 0;         // Number of temperature points for conductivity
@@ -315,7 +331,10 @@ namespace FluidProperties {
         int CondHighTempIndex = 0;      // High Temperature Max Index for Cond (>0.0)
         Array1D<Real64> CondTemps;  // Temperatures for conductivity of glycol
         Array1D<Real64> CondValues; // conductivity values (W/m-K)
+#ifdef PERFORMANCE_OPT
+        int LoCondTempIdxLast = 1;
         Array1D<Real64> CondTempRatios; // Speed optimization
+#endif // PERFORMANCE_OPT            
             
         bool ViscDataPresent = false;       // Flag set when viscosity data is available
         int NumViscTempPoints = 0;         // Number of temperature points for viscosity
@@ -325,7 +344,10 @@ namespace FluidProperties {
         int ViscHighTempIndex = 0;      // High Temperature Max Index for Visc (>0.0)
         Array1D<Real64> ViscTemps;  // Temperatures for viscosity of glycol
         Array1D<Real64> ViscValues; // viscosity values (mPa-s)
+#ifdef PERFORMANCE_OPT
+        int LoViscTempIdxLast = 1;
         Array1D<Real64> ViscTempRatios;
+#endif // PERFORMANCE_OPT            
             
         std::array<ErrorCountIndex, (int)GlycolError::Num> errors;
 
