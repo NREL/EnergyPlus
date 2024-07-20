@@ -69,7 +69,7 @@ struct EnergyPlusData;
 
 namespace FluidProperties {
 
-#define PERFORMANCE_OPT
+#undef PERFORMANCE_OPT
         
 #ifdef EP_cache_GlycolSpecificHeat
     int constexpr t_sh_cache_size = 1024 * 1024;

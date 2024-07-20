@@ -4061,9 +4061,9 @@ namespace FluidProperties {
             assert(end > 0);
             while (beg + 1 < end) {
                 int mid = ((beg + end) >> 1); // bit shifting is faster than /2
-                (Temperature > this->CpTemps(mid) ? beg : end) = mid;
+                (Temp > this->CpTemps(mid) ? beg : end) = mid;
             } // Invariant: glycol_CpTemps[beg] <= Temperature <= glycol_CpTemps[end]
-            return GetInterpValue(Temperature, this->CpTemps(beg), this->CpTemps(end), this->CpValues(beg), this->CpValues(end));
+            return GetInterpValue(Temp, this->CpTemps(beg), this->CpTemps(end), this->CpValues(beg), this->CpValues(end));
 #endif // PERFORMANCE_OPT            
         }
     }
@@ -4143,9 +4143,9 @@ namespace FluidProperties {
             }
             Rho = this->RhoValues(this->LoRhoTempIdxLast) + (Temp - this->RhoTemps(this->LoRhoTempIdxLast)) * this->RhoTempRatios(this->LoRhoTempIdxLast);
 #else // !PERFORMANCE_OPT            
-            int LoTempIndex = FindArrayIndex(Temperature, this->RhoTemps, 1, this->NumRhoTempPoints);
-            Real64 TempInterpRatio = (Temperature - this->RhoTemps(LoTempIndex)) / (this->RhoTemps(LoTempIndex+1) - this->RhoTemps(LoTempIndex));
-            ReturnValue = this->RhoValues(LoTempIndex) + TempInterpRatio * (this->RhoValues(LoTempIndex+1) - this->RhoValues(LoTempIndex));
+            int LoTempIndex = FindArrayIndex(Temp, this->RhoTemps, 1, this->NumRhoTempPoints);
+            Real64 TempInterpRatio = (Temp - this->RhoTemps(LoTempIndex)) / (this->RhoTemps(LoTempIndex+1) - this->RhoTemps(LoTempIndex));
+            Rho = this->RhoValues(LoTempIndex) + TempInterpRatio * (this->RhoValues(LoTempIndex+1) - this->RhoValues(LoTempIndex));
 #endif // PERFORMANCE_OPT            
         }
 
@@ -4272,9 +4272,9 @@ namespace FluidProperties {
             }
             Cond = this->CondValues(this->LoCondTempIdxLast) + (Temp - this->CondTemps(this->LoCondTempIdxLast)) * this->CondTempRatios(this->LoCondTempIdxLast);
 #else // !PERFORMANCE_OPT
-            int LoTempIndex = FindArrayIndex(Temperature, this->CondTemps, 1, this->NumCondTempPoints);
-            Real64 TempInterpRatio = (Temperature - this->CondTemps(LoTempIndex)) / (this->CondTemps(LoTempIndex+1) - this->CondTemps(LoTempIndex));
-            ReturnValue = this->CondValues(LoTempIndex) + TempInterpRatio * (this->CondValues(LoTempIndex+1) - this->CondValues(LoTempIndex));
+            int LoTempIndex = FindArrayIndex(Temp, this->CondTemps, 1, this->NumCondTempPoints);
+            Real64 TempInterpRatio = (Temp - this->CondTemps(LoTempIndex)) / (this->CondTemps(LoTempIndex+1) - this->CondTemps(LoTempIndex));
+            Cond = this->CondValues(LoTempIndex) + TempInterpRatio * (this->CondValues(LoTempIndex+1) - this->CondValues(LoTempIndex));
 #endif // PERFORMANCE_OPT
         }
 
@@ -4405,8 +4405,8 @@ namespace FluidProperties {
             Visc = this->ViscValues(this->LoViscTempIdxLast) + (Temp - this->ViscTemps(this->LoViscTempIdxLast)) * this->ViscTempRatios(this->LoViscTempIdxLast);
 #else // !PERFORMANCE_OPT
             int LoTempIndex = FindArrayIndex(Temp, this->ViscTemps, 1, this->NumViscTempPoints);
-            Real64 TempInterpRatio = (Temperature - this->ViscTemps(LoTempIndex)) / (this->ViscTemps(LoTempIndex+1) - this->ViscTemps(LoTempIndex));
-            ReturnValue = this->ViscValues(LoTempIndex) + TempInterpRatio * (this->ViscValues(LoTempIndex+1) - this->ViscValues(LoTempIndex));
+            Real64 TempInterpRatio = (Temp - this->ViscTemps(LoTempIndex)) / (this->ViscTemps(LoTempIndex+1) - this->ViscTemps(LoTempIndex));
+            Visc = this->ViscValues(LoTempIndex) + TempInterpRatio * (this->ViscValues(LoTempIndex+1) - this->ViscValues(LoTempIndex));
 #endif // PERFORMANCE_OPT            
         }
 
