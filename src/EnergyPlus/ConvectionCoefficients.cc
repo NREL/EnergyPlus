@@ -226,7 +226,7 @@ void InitIntConvCoeff(EnergyPlusData &state,
             // What is happening here exactly and why?
             if (state.dataLoopNodes->nodes.isize() > 0) {
                 for (auto *node : state.dataLoopNodes->nodes) {
-                    new (node) Node::NodeData(); // restore default values
+                    node->restoreDefaultValues();
                 }
             }
         }

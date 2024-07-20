@@ -10954,7 +10954,7 @@ void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
     if (state.dataRefrigCase->TotalRackDeliveredCapacity > 0.0 && this->CondenserType != DataHeatBalance::RefrigCondenserType::Water) {
         if (this->TotCondFTempPtr != 0) {
             if (this->HeatRejectionLocation == HeatRejLocation::Zone) {
-                auto *heatRejectZoneNode = dln->nodes(this->HeatRejectionZoneNodeNum);
+                auto *heatRejectZoneNode = dln->nodes(HeatRejectZoneNodeNum);
                 CondenserFrac = max(0.0, min(1.0, Curve::CurveValue(state, this->TotCondFTempPtr, heatRejectZoneNode->Temp)));
                 state.dataRefrigCase->TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
                 state.dataHeatBal->RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += this->CondenserFanPower * CondenserFrac;

@@ -509,6 +509,34 @@ namespace Node {
             TempSetPointHi = node2.TempSetPointHi;
             TempSetPointLo = node2.TempSetPointLo;
         }
+
+        void restoreDefaultValues() {
+            Temp = 0.0;
+            TempMin = 0.0;
+            TempMax = 0.0;
+            TempSetPoint = SensedNodeFlagValue;
+            MassFlowRate = 0.0;
+            MassFlowRateMin = 0.0;
+            MassFlowRateMax = SensedNodeFlagValue;
+            MassFlowRateMinAvail = 0.0;
+            MassFlowRateMaxAvail = 0.0;
+            MassFlowRateSetPoint = 0.0;
+            Quality = 0.0;
+            Press = DataEnvironment::StdPressureSeaLevel;
+            Enthalpy = 0.0; 
+            HumRat = 0.0;
+            HumRatMin = SensedNodeFlagValue;
+            HumRatMax = SensedNodeFlagValue;
+            HumRatSetPoint = SensedNodeFlagValue;
+            TempSetPointHi = SensedNodeFlagValue;
+            TempSetPointLo = SensedNodeFlagValue;
+            WetBulbTemp = SensedNodeFlagValue;
+            RelHumidity = 0.0;
+            ReportEnthalpy = SensedNodeFlagValue;
+            VolFlowRateStdRho = 0.0;
+            VolFlowRateCrntRho = 0.0;
+            Density = 0.0;
+        }
             
 #ifdef GET_OUT            
         // Member Constructor
