@@ -234,7 +234,8 @@ void ShowSevereEmptyField(EnergyPlusData &state,
                           std::string_view depFieldName = {},
                           std::string_view depFieldValue = {});
 void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
-void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
+void ShowSevereInvalidKey(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view msg = {});
 void ShowSevereInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
 
 void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
@@ -247,8 +248,12 @@ void ShowWarningEmptyField(EnergyPlusData &state,
                            std::string_view depFieldValue = {});
 void ShowWarningItemNotFound(
     EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
-void ShowWarningInvalidKey(
-    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
+void ShowWarningInvalidKey(EnergyPlusData &state,
+                           ErrorObjectHeader const &eoh,
+                           std::string_view fieldName,
+                           std::string_view fieldValue,
+                           std::string_view defaultValue,
+                           std::string_view msg = {});
 void ShowWarningInvalidBool(
     EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
 void ShowWarningCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
@@ -267,8 +272,6 @@ namespace Util {
     template <class T> struct is_shared_ptr<std::shared_ptr<T>> : std::true_type
     {
     };
-
-    Real64 epElapsedTime();
 
     Real64 ProcessNumber(std::string_view String, bool &ErrorFlag);
 
@@ -690,10 +693,16 @@ constexpr int getEnumValue(const gsl::span<const std::string_view> sList, const 
     return -1;
 }
 
+constexpr std::array<std::string_view, 2> yesNoNamesUC = {"NO", "YES"};
+
 constexpr BooleanSwitch getYesNoValue(const std::string_view s)
 {
-    constexpr std::array<std::string_view, 2> yesNo = {"NO", "YES"};
-    return static_cast<BooleanSwitch>(getEnumValue(yesNo, s));
+    return static_cast<BooleanSwitch>(getEnumValue(yesNoNamesUC, s));
+}
+
+constexpr Real64 fclamp(Real64 v, Real64 min, Real64 max)
+{
+    return (v < min) ? min : ((v > max) ? max : v);
 }
 
 struct UtilityRoutinesData : BaseGlobalStruct
@@ -703,6 +712,10 @@ struct UtilityRoutinesData : BaseGlobalStruct
     std::string appendPerfLog_headerRow;
     std::string appendPerfLog_valuesRow;
     bool GetMatrixInputFlag = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

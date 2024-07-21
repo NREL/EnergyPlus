@@ -71,6 +71,7 @@
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -445,8 +446,8 @@ namespace HVACSingleDuctInduc {
                                 "Zone Air Terminal Outdoor Air Volume Flow Rate",
                                 Constant::Units::m3_s,
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutdoorAirFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
         }
 
@@ -760,7 +761,7 @@ namespace HVACSingleDuctInduc {
                 } else {
                     MaxTotAirVolFlowDes = 0.0;
                 }
-                if (MaxTotAirVolFlowDes < DataHVACGlobals::SmallAirVolFlow) {
+                if (MaxTotAirVolFlowDes < HVAC::SmallAirVolFlow) {
                     MaxTotAirVolFlowDes = 0.0;
                 }
                 if (IsAutoSize) {
@@ -831,7 +832,7 @@ namespace HVACSingleDuctInduc {
                         if (PltSizHeatNum > 0) {
 
                             if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatMassFlow >=
-                                DataHVACGlobals::SmallAirVolFlow) {
+                                HVAC::SmallAirVolFlow) {
                                 DesPriVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow /
                                                 (1.0 + state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio);
                                 CpAir = Psychrometrics::PsyCpAirFnW(
@@ -966,7 +967,7 @@ namespace HVACSingleDuctInduc {
                         if (PltSizCoolNum > 0) {
 
                             if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolMassFlow >=
-                                DataHVACGlobals::SmallAirVolFlow) {
+                                HVAC::SmallAirVolFlow) {
                                 DesPriVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow /
                                                 (1.0 + state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio);
                                 CpAir = Psychrometrics::PsyCpAirFnW(
@@ -1151,7 +1152,7 @@ namespace HVACSingleDuctInduc {
             state, MinColdWaterFlow, ColdControlNode, CWOutletNode, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc);
 
         if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) <= 0.0) UnitOn = false;
-        if (PriAirMassFlow <= DataHVACGlobals::SmallMassFlow) UnitOn = false;
+        if (PriAirMassFlow <= HVAC::SmallMassFlow) UnitOn = false;
 
         // Set the unit's air inlet nodes mass flow rates
         state.dataLoopNodes->Node(PriNode).MassFlowRate = PriAirMassFlow;
@@ -1164,11 +1165,11 @@ namespace HVACSingleDuctInduc {
         if (UnitOn) {
 
             int SolFlag = 0;
-            if (QToHeatSetPt - QPriOnly > DataHVACGlobals::SmallLoad) {
+            if (QToHeatSetPt - QPriOnly > HVAC::SmallLoad) {
                 // heating coil
                 // check that it can meet the load
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MaxHotWaterFlow, MinColdWaterFlow, PowerMet);
-                if (PowerMet > QToHeatSetPt + DataHVACGlobals::SmallLoad) {
+                if (PowerMet > QToHeatSetPt + HVAC::SmallLoad) {
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).HotControlOffset;
                     auto f = // (AUTO_OK_LAMBDA)
                         [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinColdWaterFlow, QToHeatSetPt, QPriOnly, PowerMet](Real64 const HWFlow) {
@@ -1216,11 +1217,11 @@ namespace HVACSingleDuctInduc {
                                                        "[kg/s]");
                     }
                 }
-            } else if (QToCoolSetPt - QPriOnly < -DataHVACGlobals::SmallLoad) {
+            } else if (QToCoolSetPt - QPriOnly < -HVAC::SmallLoad) {
                 // cooling coil
                 // check that it can meet the load
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MaxColdWaterFlow, PowerMet);
-                if (PowerMet < QToCoolSetPt - DataHVACGlobals::SmallLoad) {
+                if (PowerMet < QToCoolSetPt - HVAC::SmallLoad) {
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).ColdControlOffset;
                     auto f = // (AUTO_OK_LAMBDA)
                         [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, QToCoolSetPt, QPriOnly, PowerMet](Real64 const CWFlow) {
@@ -1388,6 +1389,32 @@ namespace HVACSingleDuctInduc {
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }
+    }
+
+    void IndUnitData::reportTerminalUnit(EnergyPlusData &state)
+    {
+        // populate the predefined equipment summary report related to air terminals
+        auto &orp = state.dataOutRptPredefined;
+        auto &adu = state.dataDefineEquipment->AirDistUnit(this->ADUNum);
+        if (!state.dataSize->TermUnitFinalZoneSizing.empty()) {
+            auto &sizing = state.dataSize->TermUnitFinalZoneSizing(adu.TermUnitSizingNum);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinFlow, adu.Name, sizing.DesCoolVolFlowMin);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinOutdoorFlow, adu.Name, sizing.MinOA);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSupCoolingSP, adu.Name, sizing.CoolDesTemp);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSupHeatingSP, adu.Name, sizing.HeatDesTemp);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatingCap, adu.Name, sizing.DesHeatLoad);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolingCap, adu.Name, sizing.DesCoolLoad);
+        }
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermTypeInp, adu.Name, this->UnitType);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermPrimFlow, adu.Name, this->MaxPriAirMassFlow);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSecdFlow, adu.Name, this->MaxSecAirMassFlow);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinFlowSch, adu.Name, "n/a");
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMaxFlowReh, adu.Name, "n/a");
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinOAflowSch, adu.Name, "n/a");
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatCoilType, adu.Name, this->HCoilType);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolCoilType, adu.Name, this->CCoilType);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanType, adu.Name, "n/a");
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanName, adu.Name, "n/a");
     }
 
 } // namespace HVACSingleDuctInduc

@@ -56,6 +56,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Timer.hh>
 
 namespace EnergyPlus {
 
@@ -125,9 +126,7 @@ struct SystemVarsData : BaseGlobalStruct
     bool UpdateDataDuringWarmupExternalInterface = false; // variable sets in the external interface.
 
     // This update the value during the warmup added for FMI
-    Real64 Elapsed_Time = 0.0;      // For showing elapsed time at end of run
-    Real64 Time_Start = 0.0;        // Call to CPU_Time for start time of simulation
-    Real64 Time_Finish = 0.0;       // Call to CPU_Time for end time of simulation
+    Timer runtimeTimer;
     std::string MinReportFrequency; // String for minimum reporting frequency
     bool SortedIDD = true;          // after processing, use sorted IDD to obtain Defs, etc.
     bool lMinimalShadowing = false; // TRUE if Minimal is to override Solar Distribution flag
@@ -146,6 +145,10 @@ struct SystemVarsData : BaseGlobalStruct
     int NumberIntRadThreads = 1;
     int iNominalTotSurfaces = 0;
     bool Threading = false;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {
@@ -177,9 +180,7 @@ struct SystemVarsData : BaseGlobalStruct
         ReportDetailedWarmupConvergence = false;
         UpdateDataDuringWarmupExternalInterface = false;
 
-        Elapsed_Time = 0.0;
-        Time_Start = 0.0;
-        Time_Finish = 0.0;
+        runtimeTimer = Timer{};
         SortedIDD = true;
         lMinimalShadowing = false;
         TestAllPaths = false;

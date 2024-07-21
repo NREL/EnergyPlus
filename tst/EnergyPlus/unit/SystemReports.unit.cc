@@ -340,4 +340,35 @@ TEST_F(EnergyPlusFixture, ReportVentilationLoads_ZoneEquip)
     EXPECT_NEAR(state->dataSysRpts->ZoneVentRepVars(1).TargetVentilationFlowVoz, expectedVoz, 0.001);
     EXPECT_NEAR(state->dataSysRpts->ZoneVentRepVars(1).OAMassFlow, 98765432.1, 0.001);
 }
+
+TEST_F(EnergyPlusFixture, ReportVentilationLoads_MechVent)
+{
+    // Test the correction of mechenical ventilation flow rate calculation
+    // Should be volume = mass / density
+    state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataSysRpts->SysVentRepVars.allocate(1);
+    state->dataSysRpts->SysPreDefRep.allocate(1);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->ZonePreDefRep.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
+    state->dataAirLoop->AirLoopFlow.allocate(1);
+    state->dataAirLoop->AirLoopFlow(1).OAFlow = 1.6;
+    state->dataEnvrn->StdRhoAir = 0.8;
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    SystemReports::AllocateAndSetUpVentReports(*state);
+    ZoneTempPredictorCorrector::InitZoneAirSetPoints(*state);
+    state->dataSysRpts->VentReportStructureCreated = true;
+    state->dataSysRpts->VentLoadsReportEnabled = true;
+    state->dataAirLoop->AirLoopControlInfo.allocate(1);
+    state->dataAirLoop->AirLoopControlInfo(1).OACtrlNum = 0;
+    SystemReports::ReportVentilationLoads(*state);
+    EXPECT_NEAR(state->dataSysRpts->SysVentRepVars(1).MechVentFlow, 2.0, 1e-6);
+}
+
 } // namespace EnergyPlus

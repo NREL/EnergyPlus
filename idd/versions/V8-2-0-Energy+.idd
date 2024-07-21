@@ -652,7 +652,7 @@ ZoneAirContaminantBalance,
        \object-list ScheduleNames
 
 ZoneAirMassFlowConservation,
-       \memo Enforces the zone air mass flow balance by adjusting zone mixing object flow rates. 
+       \memo Enforces the zone air mass flow balance by adjusting zone mixing object flow rates.
        \memo The infiltration object mass flow rate may also be adjusted or may add infiltration
        \memo air flow to the base infiltration air flow for source zones only.
        \unique-object
@@ -664,36 +664,36 @@ ZoneAirMassFlowConservation,
        \key Yes
        \key No
        \default No
-       \note This optional choice input field allows users triggering the zone air mass flow 
-       \note balance calculation when desired. This global object has two choice KEYs: “Yes” and 
-       \note “No”. If this input field is specified as “Yes”, then EnergyPlus attempts to enforce        
-       \note the zone air mass flow conservation, or else if it is specified as “No”, then EnergyPlus      
+       \note This optional choice input field allows users triggering the zone air mass flow
+       \note balance calculation when desired. This global object has two choice KEYs: â€œYesâ€ and
+       \note â€œNoâ€. If this input field is specified as â€œYesâ€, then EnergyPlus attempts to enforce
+       \note the zone air mass flow conservation, or else if it is specified as â€œNoâ€, then EnergyPlus
        \note calculation defaults to zone air mass flow balance that does not include zone mixing
-       \note objects and that assumes self-balanced simple flow objects per the default procedure, 
-       \note which may not necessarily enforce zone mass conservation unless the user specified  
+       \note objects and that assumes self-balanced simple flow objects per the default procedure,
+       \note which may not necessarily enforce zone mass conservation unless the user specified
        \note a balanced flow to begin with. Mass conservation is enforced both for the receiving
-       \note and source zones if there is at least one mixing object defined. The default input 
-       \note is “No”. (Note that “No” input may also results in balanced flow depending on the 
+       \note and source zones if there is at least one mixing object defined. The default input
+       \note is â€œNoâ€. (Note that â€œNoâ€ input may also results in balanced flow depending on the
        \note system specified).
   A2;  \field Source Zone Infiltration Treatment
-       \note This input field allows user to choose how zone infiltration flow is treated during 
-       \note the zone air mass flow balance calculation. 
+       \note This input field allows user to choose how zone infiltration flow is treated during
+       \note the zone air mass flow balance calculation.
        \type choice
        \key AddInfiltrationFlow
        \key AdjustInfiltrationFlow
        \default AddInfiltrationFlow
-       \note It has two choice KEYs: “AddInfiltrationFlow” and “AdjustInfiltrationFlow”.  If this
-       \note input is specified as “AddInfiltrationFlow”, then energy plus adds infiltration air 
+       \note It has two choice KEYs: â€œAddInfiltrationFlowâ€ and â€œAdjustInfiltrationFlowâ€.  If this
+       \note input is specified as â€œAddInfiltrationFlowâ€, then energy plus adds infiltration air
        \note mass flow on top of the base flow, which is calculated using the infiltration object
-       \note user inputs, in order to balance the zone air mass flow.  The additional infiltration 
-       \note air mass flow is not self-balanced.  If this input is specified as 
-       \note “AdjustInfiltrationFlow”, then energy plus may adjust the base flow calculated using 
+       \note user inputs, in order to balance the zone air mass flow.  The additional infiltration
+       \note air mass flow is not self-balanced.  If this input is specified as
+       \note â€œAdjustInfiltrationFlowâ€, then energy plus may adjust the base flow calculated using
        \note the infiltration object user inputs in order to balance the zone air mass flow. If it
        \note is not required to adjust the base infiltration air flow calculated from the user
-       \note specified infiltration object inputs, then the base infiltration air mass flow 
+       \note specified infiltration object inputs, then the base infiltration air mass flow
        \note is assumed self-balanced. If the above input field specified as "No", then this input
        \note field has no impact on the simulation.
-   
+
 ZoneCapacitanceMultiplier:ResearchSpecial,
        \unique-object
        \format singleLine
@@ -1828,7 +1828,7 @@ Site:GroundDomain,
         \key Full
         \key Perimeter
         \default Full
-        \note This field specifies whether the horizontal insulation fully insulates 
+        \note This field specifies whether the horizontal insulation fully insulates
         \note the surface or is perimeter only insulation
    N13, \field Perimeter Insulation Width
         \type real
@@ -1844,7 +1844,7 @@ Site:GroundDomain,
         \note This field specifies the presence of vertical insulation at the slab edge.
    A9,  \field Vertical Insulation Material Name
         \type object-list
-        \object-list MaterialName  
+        \object-list MaterialName
         \note This field specifies the vertical insulation material.
    N14, \field Vertical Insulation Depth
         \type real
@@ -4630,14 +4630,14 @@ WindowMaterial:Glazing,
        \key No
        \key Yes
        \default No
-  N13, \field Young’s modulus
+  N13, \field Youngâ€™s modulus
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \units Pa
        \type real
        \minimum> 0.0
        \default 7.2e10
-  N14; \field Poisson’s ratio
+  N14; \field Poissonâ€™s ratio
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \type real
@@ -6002,7 +6002,7 @@ WindowMaterial:Blind:EquivalentLayer,
   N3 , \field Slat Crown
        \note Perpendicular length between the cord and the curve.
        \note Slat is assumed to be rectangular in cross section
-       \note and flat. Crown=0.0625x“Slat width”
+       \note and flat. Crown=0.0625xâ€œSlat widthâ€
        \type real
        \units m
        \minimum 0
@@ -6549,7 +6549,7 @@ WindowMaterial:Gap:EquivalentLayer,
        \note Sealed means the gap is enclosed and gas tight, i.e., no venting to indoor or
        \note outdoor environment.  VentedIndoor means the gap is vented to indoor environment, and
        \note VentedOutdoor means the gap is vented to the outdoor environment. The gap types
-       \note VentedIndoor and VentedOutdoor are used with gas type “Air” only.
+       \note VentedIndoor and VentedOutdoor are used with gas type â€œAirâ€ only.
   N2 , \field Conductivity Coefficient A
        \units W/m-K
        \type real
@@ -30213,13 +30213,13 @@ Sizing:Zone,
 DesignSpecification:ZoneHVAC:Sizing,
   \min-fields 1
   \memo This object is used to describe general scalable zone HVAC equipment sizing which
-  \memo are referenced by other objects. 
+  \memo are referenced by other objects.
   A1, \field Name
       \required-field
       \type alpha
       \reference DesignSpecificationZoneHVACSizingName
   A2, \field Cooling Design Air Flow Method
-      \type choice 
+      \type choice
       \key None
       \key SupplyAirFlowRate
       \key FlowPerFloorArea
@@ -30227,14 +30227,14 @@ DesignSpecification:ZoneHVAC:Sizing,
       \key FlowPerCoolingCapacity
       \default SupplyAirFlowRate
       \note Enter the method used to determine the cooling supply air volume flow rate.
-      \note None is used when a cooling coil is not included in the Zone HVAC Equip or this field 
-      \note may be blank. SupplyAirFlowRate => selected when the magnitude of the supply air volume 
+      \note None is used when a cooling coil is not included in the Zone HVAC Equip or this field
+      \note may be blank. SupplyAirFlowRate => selected when the magnitude of the supply air volume
       \note flow rate is specified. FlowPerFloorArea => selected when the supply air volume flow rate
-      \note is determined from total floor area served by the Zone HVAC unit and Flow Per Floor Area 
+      \note is determined from total floor area served by the Zone HVAC unit and Flow Per Floor Area
       \note value specified. FractionOfAutosizedCoolingAirflow => is selected when the supply air volume
-      \note is determined from a user specified fraction and the autosized cooling supply air flow rate 
-      \note value determined by the simulation. FlowPerCoolingCapacity => is selected when the supply 
-      \note air volume is determined from user specified flow per Cooling Capacity and Cooling Capacity 
+      \note is determined from a user specified fraction and the autosized cooling supply air flow rate
+      \note value determined by the simulation. FlowPerCoolingCapacity => is selected when the supply
+      \note air volume is determined from user specified flow per Cooling Capacity and Cooling Capacity
       \note determined by the simulation.
   N1, \field Cooling Design Supply Air Flow Rate
       \type real
@@ -30255,19 +30255,19 @@ DesignSpecification:ZoneHVAC:Sizing,
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is 
+      \note Required field when Supply air Flow Rate Method During Cooling Operation is
       \note FractionOfAutosizedCoolingAirflow.
-      \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.  
+      \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.
   N4, \field Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the cooling supply air volume flow rate unit cooling capacity.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is 
-      \note FlowPerCoolingCapacity. This field may be blank if a cooling coil is not 
+      \note Required field when Supply air Flow Rate Method During Cooling Operation is
+      \note FlowPerCoolingCapacity. This field may be blank if a cooling coil is not
       \note included in the Zone HVAC equipment.
   A3, \field Supply Air Flow Rate Method When No Cooling or Heating is Required
-      \type choice 
+      \type choice
       \key None
       \key SupplyAirFlowRate
       \key FlowPerFloorArea
@@ -30275,44 +30275,44 @@ DesignSpecification:ZoneHVAC:Sizing,
       \key FractionOfAutosizedHeatingAirflow
       \default SupplyAirFlowRate
       \note Enter the method used to determine the supply air volume flow rate When No Cooling or Heating
-      \note is Required. None is used when a cooling or heating coils is not included in the Zone HVAC   
+      \note is Required. None is used when a cooling or heating coils is not included in the Zone HVAC
       \note Equipment or this field may be blank. SupplyAirFlowRate => selected when the magnitude of the
-      \note supply air volume flow rate is specified. FlowPerFloorArea => selected when the supply air 
-      \note volume flow rate is determined from total floor area served by the Zone HVAC unit and Flow Per 
-      \note Floor Area is specified. FractionOfAutosizedCoolingAirflow => is selected when the supply 
+      \note supply air volume flow rate is specified. FlowPerFloorArea => selected when the supply air
+      \note volume flow rate is determined from total floor area served by the Zone HVAC unit and Flow Per
+      \note Floor Area is specified. FractionOfAutosizedCoolingAirflow => is selected when the supply
       \note air volume is determined from a user specified fraction and the Autosized cooling supply
-      \note air flow rate value determined by the simulation. FractionOfAutosizedHeatingAirflow => is 
-      \note selected when the supply air volume is determined from a user specified fraction and the 
+      \note air flow rate value determined by the simulation. FractionOfAutosizedHeatingAirflow => is
+      \note selected when the supply air volume is determined from a user specified fraction and the
       \note Autosized heating supply air flow rate value determined by the simulation.
   N5, \field Supply Air Flow Rate When No Cooling or Heating is Required
       \type real
       \units m3/s
       \minimum 0.0
-      \autosizable  
-      \note Enter the magnitude of the supply air volume flow rate during when no cooling or heating 
+      \autosizable
+      \note Enter the magnitude of the supply air volume flow rate during when no cooling or heating
       \note is required. Required field when Supply air Flow Rate Method When No Cooling or Heating
-      \note is Required is SupplyAirFlowRate.   
+      \note is Required is SupplyAirFlowRate.
   N6, \field Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the supply air volume flow rate per total floor area.
-      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required 
-      \note is FlowPerFloorArea.   
+      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required
+      \note is FlowPerFloorArea.
   N7, \field Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required 
-      \note is FractionOfAutosizedCoolingAirflow.   
+      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required
+      \note is FractionOfAutosizedCoolingAirflow.
   N8, \field Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required 
-      \note is FractionOfAutosizedHeatingAirflow.    
+      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required
+      \note is FractionOfAutosizedHeatingAirflow.
   A4, \field Heating Design Air Flow Method
-      \type choice 
+      \type choice
       \key None
       \key SupplyAirFlowRate
       \key FlowPerFloorArea
@@ -30322,12 +30322,12 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note Enter the method used to determine the heating supply air volume flow rate.
       \note None is used when a heating coil is not included in the Zone HVAC Equipment or this field may
       \note be blank. SupplyAirFlowRate => selected when the magnitude of the heating supply air volume
-      \note flow rate is specified.  FlowPerFloorArea => selected when the supply air volume flow rate is 
-      \note determined from total floor area served by a Zone HVAC unit and user specified value of Flow 
-      \note Per Floor Area. FractionOfAutosizedHeatingAirflow => is selected when the supply air volume 
-      \note is determined from a user specified fraction and the Autosized heating supply air flow rate 
-      \note value determined by the simulation. FlowPerHeatingCapacity => is selected when the supply 
-      \note air volume is determined from user specified flow per Heating Capacity and Heating Capacity 
+      \note flow rate is specified.  FlowPerFloorArea => selected when the supply air volume flow rate is
+      \note determined from total floor area served by a Zone HVAC unit and user specified value of Flow
+      \note Per Floor Area. FractionOfAutosizedHeatingAirflow => is selected when the supply air volume
+      \note is determined from a user specified fraction and the Autosized heating supply air flow rate
+      \note value determined by the simulation. FlowPerHeatingCapacity => is selected when the supply
+      \note air volume is determined from user specified flow per Heating Capacity and Heating Capacity
       \note determined by the simulation.
   N9, \field Heating Design Supply Air Flow Rate
       \type real
@@ -30336,43 +30336,43 @@ DesignSpecification:ZoneHVAC:Sizing,
       \autosizable
       \note Enter the magnitude of the supply air volume flow rate during heating operation.
       \note Required field when Supply air Flow Rate Method During Heating Operation is SupplyAirFlowRate.
-      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.  
+      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
  N10, \field Heating Design Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the heating supply air volume flow rate per total conditioned floor area.
       \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerFloorArea.
-      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment. 
+      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
  N11, \field Fraction of Heating Design Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-      \note Required field when Supply air Flow Rate Method During Heating Operation is 
+      \note Required field when Supply air Flow Rate Method During Heating Operation is
       \note FractionOfAutosizedHeatingAirflow.
-      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.  
+      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
  N12, \field Heating Design Supply Air Flow Rate Per Unit Heating Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the supply air volume flow rate per unit heating capacity.
-      \note Required field when Supply air Flow Rate Method During Heating Operation is 
+      \note Required field when Supply air Flow Rate Method During Heating Operation is
       \note FlowPerHeatingCapacity.
-      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.   
+      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
   A5, \field Cooling Design Capacity Method
-      \type choice 
+      \type choice
       \key None
       \key CoolingDesignCapacity
       \key CapacityPerFloorArea
       \key FractionOfAutosizedCoolingCapacity
       \default None
       \note Enter the method used to determine the cooling design capacity for scalable sizing.
-      \note None is used when a cooling coils is not included in the Zone HVAC Equipment or 
-      \note this field may be blank. If this input field is left blank, then the design cooling 
-      \note capacity is set to zero. CoolingDesignCapacity => selected when the design cooling capacity 
-      \note value is specified or auto-sized. CapacityPerFloorArea => selected when the design cooling 
+      \note None is used when a cooling coils is not included in the Zone HVAC Equipment or
+      \note this field may be blank. If this input field is left blank, then the design cooling
+      \note capacity is set to zero. CoolingDesignCapacity => selected when the design cooling capacity
+      \note value is specified or auto-sized. CapacityPerFloorArea => selected when the design cooling
       \note capacity is determine from user specified cooling capacity per floor area and zone floor area.
-      \note FractionOfAutosizedCoolingCapacity => is selected when the design cooling capacity is 
+      \note FractionOfAutosizedCoolingCapacity => is selected when the design cooling capacity is
       \note determined from a user specified fraction and the auto-sized design cooling capacity.
  N13, \field Cooling Design Capacity
       \type real
@@ -30385,27 +30385,27 @@ DesignSpecification:ZoneHVAC:Sizing,
       \type real
       \units W/m2
       \minimum 0.0
-      \note Enter the cooling design capacity per zone floor area. Required field when the cooling design 
-      \note capacity method field is CapacityPerFloorArea. 
+      \note Enter the cooling design capacity per zone floor area. Required field when the cooling design
+      \note capacity method field is CapacityPerFloorArea.
  N15, \field Fraction of Autosized Cooling Design Capacity
       \type real
       \minimum 0.0
-      \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling 
-      \note design capacity method field is FractionOfAutosizedCoolingCapacity. 
+      \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling
+      \note design capacity method field is FractionOfAutosizedCoolingCapacity.
   A6, \field Heating Design Capacity Method
-      \type choice 
+      \type choice
       \key None
       \key HeatingDesignCapacity
       \key CapacityPerFloorArea
       \key FractionOfAutosizedHeatingCapacity
       \default None
       \note Enter the method used to determine the heating design capacity for scalable sizing.
-      \note None is used when a heating coil is not included in the Zone HVAC Equipment or 
+      \note None is used when a heating coil is not included in the Zone HVAC Equipment or
       \note this field may be blank. If this input field is left blank, then the design heating
-      \note capacity is set to zero. HeatingDesignCapacity => selected when the design heating capacity 
-      \note value is specified or auto-sized. CapacityPerFloorArea => selected when the design cooling 
+      \note capacity is set to zero. HeatingDesignCapacity => selected when the design heating capacity
+      \note value is specified or auto-sized. CapacityPerFloorArea => selected when the design cooling
       \note capacity is determine from user specified heating capacity per flow area and zone floor area.
-      \note FractionOfAutosizedHeatingCapacity => is selected when the design heating capacity is 
+      \note FractionOfAutosizedHeatingCapacity => is selected when the design heating capacity is
       \note determined from a user specified fraction and the auto-sized design heating capacity
  N16, \field Heating Design Capacity
       \type real
@@ -30418,14 +30418,14 @@ DesignSpecification:ZoneHVAC:Sizing,
       \type real
       \units W/m2
       \minimum 0.0
-      \note Enter the heating design capacity per zone floor area. Required field when the heating design 
-      \note capacity method field is CapacityPerFloorArea. 
+      \note Enter the heating design capacity per zone floor area. Required field when the heating design
+      \note capacity method field is CapacityPerFloorArea.
  N18; \field Fraction of Autosized Heating Design Capacity
       \type real
       \minimum 0.0
-      \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the 
+      \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the
       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
-  
+
 Sizing:System,
       \memo Specifies the input needed to perform sizing calculations for a central forced air
       \memo system design air flow, heating capacity, and cooling capacity.
@@ -30532,14 +30532,14 @@ Sizing:System,
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method during cooling operation is 
+      \note Required field when Supply air Flow Rate Method during cooling operation is
       \note FractionOfAutosizedCoolingAirflow.
  N14, \field Design Supply Air Flow Rate Per Unit Cooling Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the supply air volume flow rate per unit cooling capacity.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is 
+      \note Required field when Supply air Flow Rate Method During Cooling Operation is
       \note FlowPerCoolingCapacity.
   A7, \field Heating Design Air Flow Method
       \type choice
@@ -30568,20 +30568,20 @@ Sizing:System,
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-      \note Required field when Supply air Flow Rate Method during heating operation is 
+      \note Required field when Supply air Flow Rate Method during heating operation is
       \note FractionOfAutosizedHeatingAirflow.
  N18, \field Fraction of Autosized Design Cooling Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method during heating operation is 
+      \note Required field when Supply air Flow Rate Method during heating operation is
       \note FractionOfAutosizedCoolingAirflow.
  N19, \field Design Supply Air Flow Rate Per Unit Heating Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the heating supply air volume flow rate per unit heating capacity.
-      \note Required field when Supply air Flow Rate Method during heating operation is 
+      \note Required field when Supply air Flow Rate Method during heating operation is
       \note FlowPerHeatingCapacity.
   A8, \field System Outdoor Air Method
       \type choice
@@ -30594,7 +30594,7 @@ Sizing:System,
       \minimum> 0.0
       \units dimensionless
   A9, \field Cooling Design Capacity Method
-      \type choice 
+      \type choice
       \key None
       \key CoolingDesignCapacity
       \key CapacityPerFloorArea
@@ -30602,12 +30602,12 @@ Sizing:System,
       \default CoolingDesignCapacity
       \note Enter the method used to determine the system cooling design capacity for scalable sizing.
       \note None is used when a cooling coils is not included in an airloop or this field may be blank.
-      \note If this input field is left blank, then the design cooling capacity is set to zero.  
-      \note CoolingDesignCapacity => selected when the design cooling capacity value is specified or 
+      \note If this input field is left blank, then the design cooling capacity is set to zero.
+      \note CoolingDesignCapacity => selected when the design cooling capacity value is specified or
       \note auto-sized. CapacityPerFloorArea => selected when the design cooling capacity is determined
-      \note from user specified cooling capacity per floor area and total floor area of cooled zones 
-      \note served by an airloop. FractionOfAutosizedCoolingCapacity => is selected when the design 
-      \note cooling capacity is determined from a user specified fraction and the auto-sized design 
+      \note from user specified cooling capacity per floor area and total floor area of cooled zones
+      \note served by an airloop. FractionOfAutosizedCoolingCapacity => is selected when the design
+      \note cooling capacity is determined from a user specified fraction and the auto-sized design
       \note cooling capacity of the system.
  N21, \field Cooling Design Capacity
       \type real
@@ -30622,27 +30622,27 @@ Sizing:System,
       \units W/m2
       \minimum 0.0
       \note Enter the cooling design capacity per total floor area of cooled zones served by an airloop.
-      \note Required field when the cooling design capacity method field is CapacityPerFloorArea. 
+      \note Required field when the cooling design capacity method field is CapacityPerFloorArea.
  N23, \field Fraction of Autosized Cooling Design Capacity
       \type real
       \minimum 0.0
-      \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling 
-      \note design capacity method field is FractionOfAutosizedCoolingCapacity. 
+      \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling
+      \note design capacity method field is FractionOfAutosizedCoolingCapacity.
  A10, \field Heating Design Capacity Method
-      \type choice 
+      \type choice
       \key None
       \key HeatingDesignCapacity
       \key CapacityPerFloorArea
       \key FractionOfAutosizedHeatingCapacity
       \default HeatingDesignCapacity
       \note Enter the method used to determine the heating design capacity for scalable sizing.
-      \note None is used when a heating coil not included in an airloop or this field may be blank. 
+      \note None is used when a heating coil not included in an airloop or this field may be blank.
       \note If this input field is left blank, then the design heating capacity is set to zero.
       \note HeatingDesignCapacity => selected when the design heating capacity value is specified or
-      \note auto-sized. CapacityPerFloorArea => selected when the design heating capacity is determined 
+      \note auto-sized. CapacityPerFloorArea => selected when the design heating capacity is determined
       \note from user specified heating capacity per flow area and total floor area of heated zones
-      \note served by an airloop. FractionOfAutosizedHeatingCapacity => is selected when the design 
-      \note heating capacity is determined from a user specified fraction and the auto-sized design 
+      \note served by an airloop. FractionOfAutosizedHeatingCapacity => is selected when the design
+      \note heating capacity is determined from a user specified fraction and the auto-sized design
       \note heating capacity of the system.
  N24, \field Heating Design Capacity
       \type real
@@ -30656,12 +30656,12 @@ Sizing:System,
       \type real
       \units W/m2
       \minimum 0.0
-      \note Enter the heating design capacity per zone floor area. Required field when the heating design 
-      \note capacity method field is CapacityPerFloorArea. 
+      \note Enter the heating design capacity per zone floor area. Required field when the heating design
+      \note capacity method field is CapacityPerFloorArea.
  N26; \field Fraction of Autosized Heating Design Capacity
       \type real
       \minimum 0.0
-      \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the 
+      \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the
       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
 
 Sizing:Plant,
@@ -31408,7 +31408,7 @@ ZoneHVAC:IdealLoadsAirSystem,
   A16; \field Design Specification ZoneHVAC Sizing Object Name
        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
        \type object-list
-       \object-list DesignSpecificationZoneHVACSizingName   
+       \object-list DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:FourPipeFanCoil,
         \memo Four pipe fan coil system. Forced-convection hydronic heating-cooling unit with
@@ -31474,7 +31474,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note For ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid.
         \note For CyclingFan, a Fan:OnOff is valid.
         \note For VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid.
-        \note The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
+        \note The fanâ€™s inlet node should be the same as the outdoor air mixerâ€™s mixed air node.
    A10, \field Supply Air Fan Name
         \required-field
         \type object-list
@@ -31618,7 +31618,7 @@ ZoneHVAC:WindowAirConditioner,
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
 
-   
+
 ZoneHVAC:PackagedTerminalAirConditioner,
         \memo Packaged terminal air conditioner (PTAC).  Forced-convection heating-cooling unit
         \memo with supply fan, direct expansion (DX) cooling coil, heating coil (gas, electric, hot
@@ -31948,7 +31948,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
-   
+
 ZoneHVAC:WaterToAirHeatPump,
         \memo Water-to-air heat pump. Forced-convection heating-cooling unit with supply fan,
         \memo water-to-air cooling and heating coils, supplemental heating coil (gas, electric, hot
@@ -32471,8 +32471,8 @@ ZoneHVAC:UnitVentilator,
         \note Enter the name of a schedule that controls fan operation. Schedule
         \note name values of 0 denote cycling fan operation (fan cycles with
         \note cooling/heating coil). Schedule values greater than 0 denote
-        \note constant fan operation (fan runs continually regardless of coil 
-        \note operation). The fan operating mode defaults to cycling fan operation 
+        \note constant fan operation (fan runs continually regardless of coil
+        \note operation). The fan operating mode defaults to cycling fan operation
         \note if this input field is left blank.
    A15, \field Heating Coil Object Type
         \type choice
@@ -32555,20 +32555,20 @@ ZoneHVAC:UnitHeater,
         \note Enter the name of a schedule that controls fan operation. Schedule
         \note name values of 0 denote cycling fan operation (fan cycles with the
         \note heating coil). Schedule values greater than 0 denote constant fan
-        \note operation (fan runs continually regardless of coil operation). 
-        \note The fan operating mode defaults to cycling fan operation if this 
+        \note operation (fan runs continually regardless of coil operation).
+        \note The fan operating mode defaults to cycling fan operation if this
         \note input field is left blank.
    A10, \field Supply Air Fan Operation During No Heating
         \required-field
         \type choice
         \key Yes
         \key No
-        \note This choice field allows the user to define how the unit heater will operate 
-        \note under “no heating load” or cooling conditions. If the “No” is selected, then 
-        \note the fan will not run unless there is a heating load. If the fan does not run, 
-        \note this effectively shuts the unit heater system off when there is no heating load. 
-        \note If the “Yes” is selected, the unit heater is available and has a ConstantVolume 
-        \note fan, or has an OnOff fan with “Supply Air Fan Operating Mode Schedule” value 
+        \note This choice field allows the user to define how the unit heater will operate
+        \note under â€œno heating loadâ€ or cooling conditions. If the â€œNoâ€ is selected, then
+        \note the fan will not run unless there is a heating load. If the fan does not run,
+        \note this effectively shuts the unit heater system off when there is no heating load.
+        \note If the â€œYesâ€ is selected, the unit heater is available and has a ConstantVolume
+        \note fan, or has an OnOff fan with â€œSupply Air Fan Operating Mode Scheduleâ€ value
         \note greater than zero, then the fan will always run regardless of the zone load.
    N2 , \field Maximum Hot Water or Steam Flow Rate
         \note Not used when heating coil is gas or electric
@@ -33085,7 +33085,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \key CapacityPerFloorArea
        \key FractionOfAutosizedHeatingCapacity
        \default HeatingDesignCapacity
-       \note Enter the method used to determine the heating design capacity. 
+       \note Enter the method used to determine the heating design capacity.
        \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
        \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
        \note determine from user specified heating capacity per floor area and zone floor area.
@@ -33099,8 +33099,8 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \ip-units W
        \default autosize
        \note Enter the design heating capacity. Required field when the heating design capacity method
-       \note HeatingDesignCapacity. This input field is rated heating capacity. Users must multiply the 
-       \note actual finned length published in the literature to determine the rated capacity. Rated 
+       \note HeatingDesignCapacity. This input field is rated heating capacity. Users must multiply the
+       \note actual finned length published in the literature to determine the rated capacity. Rated
        \note Capacity is for an inlet air dry-bulb temperature of 18.0C, the Rated Water Mass Flow Rate
        \note of 0.063kg/s or 0.252kg/s, and the Rated Average Water Temperature between 32.2C and 115.6C.
   N4 , \field Heating Design Capacity Per Floor Area
@@ -33861,7 +33861,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
        \key CapacityPerFloorArea
        \key FractionOfAutosizedHeatingCapacity
        \default HeatingDesignCapacity
-       \note Enter the method used to determine the heating design capacity. 
+       \note Enter the method used to determine the heating design capacity.
        \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
        \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
        \note determine from user specified heating capacity per floor area and zone floor area.
@@ -34634,7 +34634,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
        \key CapacityPerFloorArea
        \key FractionOfAutosizedHeatingCapacity
        \default HeatingDesignCapacity
-       \note Enter the method used to determine the heating design capacity. 
+       \note Enter the method used to determine the heating design capacity.
        \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
        \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
        \note determine from user specified heating capacity per floor area and zone floor area.
@@ -35400,7 +35400,7 @@ ZoneHVAC:Baseboard:Convective:Water,
        \key CapacityPerFloorArea
        \key FractionOfAutosizedHeatingCapacity
        \default HeatingDesignCapacity
-       \note Enter the method used to determine the heating design capacity. 
+       \note Enter the method used to determine the heating design capacity.
        \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
        \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
        \note determine from user specified heating capacity per floor area and zone floor area.
@@ -35457,7 +35457,7 @@ ZoneHVAC:Baseboard:Convective:Electric,
         \key CapacityPerFloorArea
         \key FractionOfAutosizedHeatingCapacity
         \default HeatingDesignCapacity
-        \note Enter the method used to determine the heating design capacity. 
+        \note Enter the method used to determine the heating design capacity.
         \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
         \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
         \note determine from user specified heating capacity per floor area and zone floor area.
@@ -35538,7 +35538,7 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \key CapacityPerFloorArea
         \key FractionOfAutosizedHeatingCapacity
         \default HeatingDesignCapacity
-        \note Enter the method used to determine the heating design capacity. 
+        \note Enter the method used to determine the heating design capacity.
         \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
         \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
         \note determine from user specified heating capacity per floor area and zone floor area.
@@ -35582,18 +35582,18 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \type object-list
         \object-list ScheduleNames
   A10,  \field Cooling Design Capacity Method
-        \type choice 
+        \type choice
         \key None
         \key CoolingDesignCapacity
         \key CapacityPerFloorArea
         \key FractionOfAutosizedCoolingCapacity
         \default CoolingDesignCapacity
         \note Enter the method used to determine the cooling design capacity for scalable sizing.
-        \note CoolingDesignCapacity => selected when the design cooling capacity value is specified or 
+        \note CoolingDesignCapacity => selected when the design cooling capacity value is specified or
         \note auto-sized. CapacityPerFloorArea => selected when the design cooling capacity is determined
-        \note from user specified cooling capacity per floor area and total floor area of cooled zone 
-        \note served by the hydrolic unit. FractionOfAutosizedCoolingCapacity => is selected when the  
-        \note design cooling capacity is determined from a user specified fraction and the auto-sized  
+        \note from user specified cooling capacity per floor area and total floor area of cooled zone
+        \note served by the hydrolic unit. FractionOfAutosizedCoolingCapacity => is selected when the
+        \note design cooling capacity is determined from a user specified fraction and the auto-sized
         \note design cooling capacity of the system.
    N8 , \field Cooling Design Capacity
         \type real
@@ -35607,12 +35607,12 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \units W/m2
         \minimum 0.0
         \note Enter the cooling design capacity per total floor area of cooled zones served by the unit.
-        \note Required field when the cooling design capacity method field is CapacityPerFloorArea. 
+        \note Required field when the cooling design capacity method field is CapacityPerFloorArea.
    N10, \field Fraction of Autosized Cooling Design Capacity
         \type real
         \minimum 0.0
-        \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling 
-        \note design capacity method field is FractionOfAutosizedCoolingCapacity. 
+        \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling
+        \note design capacity method field is FractionOfAutosizedCoolingCapacity.
    N11, \field Maximum Cold Water Flow
         \units m3/s
         \minimum 0
@@ -35800,7 +35800,7 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \key CapacityPerFloorArea
         \key FractionOfAutosizedHeatingCapacity
         \default HeatingDesignCapacity
-        \note Enter the method used to determine the maximum electrical heating design capacity. 
+        \note Enter the method used to determine the maximum electrical heating design capacity.
         \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
         \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
         \note determine from user specified heating capacity per floor area and zone floor area.
@@ -36381,7 +36381,7 @@ ZoneHVAC:HighTemperatureRadiant,
         \key CapacityPerFloorArea
         \key FractionOfAutosizedHeatingCapacity
         \default HeatingDesignCapacity
-        \note Enter the method used to determine the maximum heating power input capacity. 
+        \note Enter the method used to determine the maximum heating power input capacity.
         \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
         \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
         \note determine from user specified heating capacity per floor area and zone floor area.
@@ -49568,7 +49568,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note Must be less than or equal to the fan’s maximum flow rate.
+        \note Must be less than or equal to the fanâ€™s maximum flow rate.
         \note Only used when fan operating mode is continuous (disregarded for cycling fan mode).
         \note This air flow rate is used when no heating or cooling is required (i.e., the DX coil
         \note compressor and supplemental heating coil are off). If this field is left blank or zero,
@@ -60690,7 +60690,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \default 0.008
        \units percent
        \note Rate of drift loss as a percentage of circulating spray water flow rate
-       \note Default value for this field in under investigation. For now Cooling tower’s drift loss
+       \note Default value for this field in under investigation. For now Cooling towerâ€™s drift loss
        \note percent default value is taken here.
   A8 , \field Blowdown Calculation Mode
        \type choice
@@ -60705,7 +60705,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \note Blowdown is water intentionally drained from the basin in order to offset the build
        \note up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
-       \note Default value for this field in under investigation. For now Cooling tower’s
+       \note Default value for this field in under investigation. For now Cooling towerâ€™s
        \note Blowdown Concentration Ratio percent default value is taken here.
   A9 , \field Blowdown Makeup Water Usage Schedule Name
        \type object-list
@@ -60931,7 +60931,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \type real
        \units percent
        \default 0.008
-       \note Default value is under investigation. For now cooling tower’s default value is taken.
+       \note Default value is under investigation. For now cooling towerâ€™s default value is taken.
   A7 , \field Blowdown Calculation Mode
        \type choice
        \key ConcentrationRatio
@@ -60945,7 +60945,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \note Blowdown is water intentionally drained from the Evaporative Fluid Cooler in order to offset the
        \note build up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
-       \note Default value is under investigation. For now cooling tower’s default value is taken.
+       \note Default value is under investigation. For now cooling towerâ€™s default value is taken.
   A8 , \field Blowdown Makeup Water Usage Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -69939,14 +69939,14 @@ Refrigeration:AirChiller,
         \minimum 0.0
         \maximum 20.
         \note The rated difference between the air entering the refrigeration chiller and the
-        \note cooling source temperature in °C.
+        \note cooling source temperature in degC.
   N6 ,  \field Maximum Temperature Difference Between Inlet Air and Evaporating Temperature
         \type real
         \units deltaC
         \minimum 0.0
         \maximum 25.
         \note The maximum difference between the air entering the refrigeration chiller and the
-        \note cooling source temperature in °C used to limit capacity during pull-down.
+        \note cooling source temperature in degC used to limit capacity during pull-down.
         \note defaults to 1.3 times the Rated Temperature Difference DT1
   N7 ,  \field Coil Material Correction Factor
         \type real
@@ -71952,7 +71952,7 @@ Generator:FuelCell:Inverter,
 
 Generator:MicroCHP,
       \memo Small-scale combined heat and power (micro CHP) electric generator using the model
-      \memo developed by IEA/ECBCS Annex 42 Ð see www.cogen-sim.net. The model was developed
+      \memo developed by IEA/ECBCS Annex 42 see www.cogen-sim.net. The model was developed
       \memo for both internal combustion and Stirling cycle
       \memo engines, but might be used for other types of residential CHP devices.
   A1, \field Name
@@ -73298,7 +73298,7 @@ ElectricLoadCenter:Storage:Battery,
         \minimum 0
         \units Ah
         \note The capacity is for each module.
-        \note A model parameter from manufacture’s data or test data.
+        \note A model parameter from manufacturerâ€™s data or test data.
    N5,  \field Initial Fractional State of Charge
         \type real
         \minimum 0
@@ -74069,7 +74069,7 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \maximum< 20000
        \default 0.0
        \units J/kg
-   
+
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
    A1, \field Name
@@ -74094,32 +74094,32 @@ FaultModel:Fouling:Coil,
        \note Fouling coil UA value under rating conditions
        \note For Fouling Input Method: FouledUARated
        \units W/K
-       \type real       
+       \type real
        \minimum> 0.0
-   N2, \field Water Side Fouling Factor       
+   N2, \field Water Side Fouling Factor
        \note For Fouling Input Method: FoulingFactor
-       \units m2-K/W  
-       \type real  
+       \units m2-K/W
+       \type real
        \minimum 0.0
        \default 0.0
-   N3, \field Air Side Fouling Factor       
+   N3, \field Air Side Fouling Factor
        \note For Fouling Input Method: FoulingFactor
-       \units m2-K/W 
+       \units m2-K/W
        \type real
-       \minimum 0.0   
+       \minimum 0.0
        \default 0.0
-   N4, \field Outside Coil Surface Area       
+   N4, \field Outside Coil Surface Area
        \note For Fouling Input Method: FoulingFactor
-       \units m2 
-       \type real   
-       \minimum> 0.0   
-   N5; \field Inside to Outside Coil Surface Area Ratio      
+       \units m2
+       \type real
+       \minimum> 0.0
+   N5; \field Inside to Outside Coil Surface Area Ratio
        \note For Fouling Input Method: FoulingFactor
        \units dimensionless
-       \type real       
+       \type real
        \minimum> 0.0
        \default 0.07
-       
+
 \group General Data Entry
 
 

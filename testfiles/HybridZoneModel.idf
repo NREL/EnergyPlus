@@ -76,7 +76,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,24.1;
+  Version,24.2;
 
   Timestep,6;
 
@@ -188,7 +188,7 @@
   HybridModel:Zone,
     ZONE 1 HybridModel,      !- Name
     ZONE 1,                  !- Zone Name
-    NO,                      !- Calculate Zone Internal Thermal Mass
+    YES,                     !- Calculate Zone Internal Thermal Mass
     NO,                      !- Calculate Zone Air Infiltration Rate
     NO,                      !- Calculate Zone People Count
     ZONE 1_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
@@ -324,6 +324,8 @@
     ;                        !- Adjust Schedule for Daylight Savings
 
   Output:VariableDictionary,regular;
+
+  Output:Table:SummaryReports,InputVerificationandResultsSummary;
 
   Output:Variable,ZONE 2,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
 

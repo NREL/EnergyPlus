@@ -86,7 +86,7 @@ namespace FaultsManager {
     };
 
     // FaultTypeEnum
-    enum class Fault
+    enum class FaultType
     {
         Invalid = -1,
         TemperatureSensorOffset_OutdoorAir,
@@ -148,21 +148,11 @@ namespace FaultsManager {
     {
         // Members
         std::string Name;
-        std::string FaultType;        // Fault type
-        std::string AvaiSchedule;     // Availability schedule
-        std::string SeveritySchedule; // Severity schedule, multipliers to the Offset
-        Fault FaultTypeEnum;
-        int AvaiSchedPtr;
-        int SeveritySchedPtr;
-        Real64 Offset; // offset, + means sensor reading is higher than actual value
-        bool Status;   // for future use
-
-        // Default Constructor
-        FaultProperties()
-            : Name(""), FaultType(""), AvaiSchedule(""), SeveritySchedule(""), FaultTypeEnum(Fault::Invalid), AvaiSchedPtr(0), SeveritySchedPtr(0),
-              Offset(0.0), Status(false)
-        {
-        }
+        FaultType type = FaultType::Invalid;
+        int availSchedNum = 0;
+        int severitySchedNum = 0;
+        Real64 Offset = 0.0; // offset, + means sensor reading is higher than actual value
+        bool Status = false; // for future use
 
         // Virtual Destructor
         virtual ~FaultProperties() = default;
@@ -252,21 +242,13 @@ namespace FaultsManager {
     struct FaultPropertiesAirFilter : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
     {
         // Members
-        std::string FaultyAirFilterFanName;       // The name of the fan corresponding to the fouled air filter
-        std::string FaultyAirFilterFanType;       // The type of the fan corresponding to the fouled air filter
-        std::string FaultyAirFilterFanCurve;      // The name of the fan curve
-        std::string FaultyAirFilterPressFracSche; // Schedule describing variations of the fan pressure rise
-        int FaultyAirFilterFanCurvePtr;           // The index to the curve
-        int FaultyAirFilterPressFracSchePtr;      // The pointer to the schedule
-        Real64 FaultyAirFilterFanPressInc;        // The increase of the fan pressure due to fouled air filter
-        Real64 FaultyAirFilterFanFlowDec;         // The decrease of the fan airflow rate due to fouled air filter
-
-        // Default Constructor
-        FaultPropertiesAirFilter()
-            : FaultyAirFilterFanName(""), FaultyAirFilterFanType(""), FaultyAirFilterFanCurve(""), FaultyAirFilterPressFracSche(""),
-              FaultyAirFilterFanCurvePtr(0), FaultyAirFilterPressFracSchePtr(0), FaultyAirFilterFanPressInc(0.0), FaultyAirFilterFanFlowDec(0.0)
-        {
-        }
+        std::string fanName; // The name of the fan corresponding to the fouled air filter
+        int fanNum = 0;
+        HVAC::FanType fanType = HVAC::FanType::Invalid; // The type of the fan corresponding to the fouled air filter
+        int fanCurveNum = 0;                            // The index to the curve
+        int pressFracSchedNum = 0;                      // The pointer to the schedule
+        Real64 fanPressInc = 0.0;                       // The increase of the fan pressure due to fouled air filter
+        Real64 fanFlowDec = 0.0;                        // The decrease of the fan airflow rate due to fouled air filter
 
         // Destructor
         virtual ~FaultPropertiesAirFilter() = default;
@@ -434,6 +416,10 @@ struct FaultsManagerData : BaseGlobalStruct
     Array1D<FaultsManager::FaultPropertiesBoilerFouling> FaultsBoilerFouling;
     Array1D<FaultsManager::FaultPropertiesChillerFouling> FaultsChillerFouling;
     Array1D<FaultsManager::FaultPropertiesEvapCoolerFouling> FaultsEvapCoolerFouling;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

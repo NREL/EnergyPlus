@@ -356,7 +356,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     thisUnitary.InitializeModelParams();
     thisUnitary.SecInletTemp = Tosa;
     thisUnitary.SecInletHumRat = Wosa;
-    thisUnitary.AvailStatus = 1;
+    thisUnitary.availStatus = Avail::Status::ForceOff;
     thisUnitary.doStep(*state, RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
     // output results
@@ -431,30 +431,29 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     // Check the meters associated with the ZoneHVAC:HybridUnitaryHVAC outputs
     EXPECT_EQ(14, NumFound);
-    EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Cooling
-    EXPECT_TRUE(compare_enums(meteredVars(1).sovEndUseCat, OutputProcessor::SOVEndUseCat::CoolingCoils));
-    EXPECT_TRUE(compare_enums(meteredVars(1).sovGroup, OutputProcessor::SOVGroup::HVAC));
-    EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Heating
-    EXPECT_TRUE(compare_enums(meteredVars(2).sovEndUseCat, OutputProcessor::SOVEndUseCat::HeatingCoils));
-    EXPECT_TRUE(compare_enums(meteredVars(2).sovGroup, OutputProcessor::SOVGroup::HVAC));
-    EXPECT_TRUE(compare_enums(meteredVars(3).resource, Constant::eResource::Electricity)); // ELECTRIC - Cooling Energy
-    EXPECT_TRUE(compare_enums(meteredVars(3).sovEndUseCat, OutputProcessor::SOVEndUseCat::Cooling));
-    EXPECT_TRUE(compare_enums(meteredVars(3).sovGroup, OutputProcessor::SOVGroup::HVAC));
-    EXPECT_TRUE(compare_enums(meteredVars(4).resource, Constant::eResource::Electricity)); // ELECTRIC - Fan Energy
-    EXPECT_TRUE(compare_enums(meteredVars(4).sovEndUseCat, OutputProcessor::SOVEndUseCat::Fans));
-    EXPECT_TRUE(compare_enums(meteredVars(4).sovGroup, OutputProcessor::SOVGroup::HVAC));
-    EXPECT_TRUE(compare_enums(meteredVars(5).resource,
-                              Constant::eResource::NaturalGas)); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
-    EXPECT_TRUE(compare_enums(meteredVars(5).sovEndUseCat, OutputProcessor::SOVEndUseCat::Cooling));
-    EXPECT_TRUE(compare_enums(meteredVars(5).sovGroup, OutputProcessor::SOVGroup::HVAC));
-    EXPECT_TRUE(
-        compare_enums(meteredVars(6).resource,
-                      Constant::eResource::DistrictCooling)); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
-    EXPECT_TRUE(compare_enums(meteredVars(6).sovEndUseCat, OutputProcessor::SOVEndUseCat::Cooling));
-    EXPECT_TRUE(compare_enums(meteredVars(6).sovGroup, OutputProcessor::SOVGroup::HVAC));
-    EXPECT_TRUE(compare_enums(meteredVars(7).resource, Constant::eResource::Water)); // WATER - Cooling Water Use
-    EXPECT_TRUE(compare_enums(meteredVars(7).sovEndUseCat, OutputProcessor::SOVEndUseCat::Cooling));
-    EXPECT_TRUE(compare_enums(meteredVars(7).sovGroup, OutputProcessor::SOVGroup::HVAC));
+    EXPECT_ENUM_EQ(meteredVars(1).resource, Constant::eResource::EnergyTransfer); // ENERGYTRANSFER - Cooling
+    EXPECT_ENUM_EQ(meteredVars(1).endUseCat, OutputProcessor::EndUseCat::CoolingCoils);
+    EXPECT_ENUM_EQ(meteredVars(1).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(2).resource, Constant::eResource::EnergyTransfer); // ENERGYTRANSFER - Heating
+    EXPECT_ENUM_EQ(meteredVars(2).endUseCat, OutputProcessor::EndUseCat::HeatingCoils);
+    EXPECT_ENUM_EQ(meteredVars(2).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(3).resource, Constant::eResource::Electricity); // ELECTRIC - Cooling Energy
+    EXPECT_ENUM_EQ(meteredVars(3).endUseCat, OutputProcessor::EndUseCat::Cooling);
+    EXPECT_ENUM_EQ(meteredVars(3).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(4).resource, Constant::eResource::Electricity); // ELECTRIC - Fan Energy
+    EXPECT_ENUM_EQ(meteredVars(4).endUseCat, OutputProcessor::EndUseCat::Fans);
+    EXPECT_ENUM_EQ(meteredVars(4).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(5).resource,
+                   Constant::eResource::NaturalGas); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
+    EXPECT_ENUM_EQ(meteredVars(5).endUseCat, OutputProcessor::EndUseCat::Cooling);
+    EXPECT_ENUM_EQ(meteredVars(5).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(6).resource,
+                   Constant::eResource::DistrictCooling); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
+    EXPECT_ENUM_EQ(meteredVars(6).endUseCat, OutputProcessor::EndUseCat::Cooling);
+    EXPECT_ENUM_EQ(meteredVars(6).group, OutputProcessor::Group::HVAC);
+    EXPECT_ENUM_EQ(meteredVars(7).resource, Constant::eResource::Water); // WATER - Cooling Water Use
+    EXPECT_ENUM_EQ(meteredVars(7).endUseCat, OutputProcessor::EndUseCat::Cooling);
+    EXPECT_ENUM_EQ(meteredVars(7).group, OutputProcessor::Group::HVAC);
 
     // Check that unit is included in Component Sizing Summary Report
     EXPECT_EQ("ZoneHVAC:HybridUnitaryHVAC", state->dataOutRptPredefined->CompSizeTableEntry(1).typeField);

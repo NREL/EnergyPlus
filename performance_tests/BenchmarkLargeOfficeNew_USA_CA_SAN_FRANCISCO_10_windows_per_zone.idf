@@ -66,7 +66,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,24.1;
+  Version,24.2;
 
 !
 !- Run Controls sections
@@ -7497,7 +7497,7 @@
     VAV WITH REHEAT Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
   SetpointManager:MixedAir,
-    VAV WITH REHEAT_HeatC SAT Manager,  !- Name
+    VAV WITH REHEAT_HeatC SAT Manager MA,  !- Name
     Temperature,             !- Control Variable
     VAV WITH REHEAT Supply Equipment Outlet Node,  !- Reference Setpoint Node Name
     VAV WITH REHEAT_HeatC-VAV WITH REHEAT FanNode,  !- Fan Inlet Node Name

@@ -93,9 +93,13 @@ struct ZoneAirLoopEquipmentManagerData : BaseGlobalStruct
     bool InitAirDistUnitsFlag = true; // If TRUE, not all Air Distribution Units have been initialized
     int numADUInitialized = 0;        // Count of ADUs that have been initialized
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = ZoneAirLoopEquipmentManagerData();
+        new (this) ZoneAirLoopEquipmentManagerData();
     }
 };
 

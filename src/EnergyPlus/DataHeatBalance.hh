@@ -277,6 +277,7 @@ namespace DataHeatBalance {
         SecHeatingDXCoilMultiSpeed,
         ElectricLoadCenterConverter,
         FanSystemModel,
+        IndoorGreen,
         Num
     };
 
@@ -357,7 +358,8 @@ namespace DataHeatBalance {
         "COIL:COOLING:DX:MULTISPEED",
         "COIL:HEATING:DX:MULTISPEED",
         "ELECTRICLOADCENTER:STORAGE:CONVERTER",
-        "FAN:SYSTEMMODEL"};
+        "FAN:SYSTEMMODEL",
+        "INDOORGREEN"};
 
     static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::Num)> IntGainTypeNamesCC = {
         "People",
@@ -413,7 +415,8 @@ namespace DataHeatBalance {
         "Coil:Cooling:DX:MultiSpeed",
         "Coil:Heating:DX:MultiSpeed",
         "ElectricLoadCenter:Storage:Converter",
-        "Fan:SystemModel"};
+        "Fan:SystemModel",
+        "IndoorGreen"};
 
     // Parameters for checking surface heat transfer models
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
@@ -1301,7 +1304,6 @@ namespace DataHeatBalance {
     struct GenericComponentZoneIntGainStruct
     {
         // Members
-        std::string CompObjectType;                   // device object class name
         std::string CompObjectName;                   // device user unique name
         IntGainType CompType = IntGainType::Invalid;  // type of internal gain device identifier
         Real64 spaceGainFrac = 1.0;                   // Fraction of gain value assigned to this Space (because gain rate might be for an entire zone)
@@ -1392,6 +1394,7 @@ namespace DataHeatBalance {
         // Members
         Real64 MeanAirTemp = 0.0;            // Mean Air Temperature {C}
         Real64 OperativeTemp = 0.0;          // Average of Mean Air Temperature {C} and Mean Radiant Temperature {C}
+        Real64 WetbulbGlobeTemp = 0.0;       // Wet-bulb Globe Temperature
         Real64 MeanAirHumRat = 0.0;          // Mean Air Humidity Ratio {kg/kg} (averaged over zone time step)
         Real64 MeanAirDewPointTemp = 0.0;    // Mean Air Dewpoint Temperature {C}
         Real64 ThermOperativeTemp = 0.0;     // Mix of MRT and MAT for Zone Control:Thermostatic:Operative Temperature {C}
@@ -1473,6 +1476,8 @@ namespace DataHeatBalance {
         Real64 OABalanceFanElec = 0.0;       // Fan Electricity {W} due to OA air balance
         Real64 SumEnthalpyM = 0.0;           // Zone sum of EnthalpyM
         Real64 SumEnthalpyH = 0.0;           // Zone sum of EnthalpyH
+        // reporting flags
+        bool ReportWBGT = false; // whether the wetbulb globe temperature is reqeusted as an output variable or used as an EMS sensor
 
         void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string const &name);
     };
@@ -2064,9 +2069,13 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<std::string> spaceTypes;
     EPVector<DataHeatBalance::ExtVentedCavityStruct> ExtVentedCavity;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = HeatBalanceData();
+        new (this) HeatBalanceData();
     }
 };
 

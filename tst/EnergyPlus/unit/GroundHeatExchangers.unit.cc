@@ -178,6 +178,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_GetGFunc)
 
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance)
 {
+    state->init_state(*state);
     // Initializations
     GLHESlinky thisGLHE;
 

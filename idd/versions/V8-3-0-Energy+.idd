@@ -430,7 +430,7 @@ SimulationControl,
       \type integer
       \minimum 1
       \default 1
-      
+
 
 Building,
        \memo Describes parameters that are used during the simulation
@@ -678,15 +678,15 @@ ZoneAirMassFlowConservation,
        \key No
        \default No
        \note This optional choice input field allows users triggering the zone air mass flow
-       \note balance calculation when desired. This global object has two choice KEYs: ìYesî and
-       \note ìNoî. If this input field is specified as ìYesî, then EnergyPlus attempts to enforce
-       \note the zone air mass flow conservation, or else if it is specified as ìNoî, then EnergyPlus
+       \note balance calculation when desired. This global object has two choice KEYs: ‚ÄúYes‚Äù and
+       \note ‚ÄúNo‚Äù. If this input field is specified as ‚ÄúYes‚Äù, then EnergyPlus attempts to enforce
+       \note the zone air mass flow conservation, or else if it is specified as ‚ÄúNo‚Äù, then EnergyPlus
        \note calculation defaults to zone air mass flow balance that does not include zone mixing
        \note objects and that assumes self-balanced simple flow objects per the default procedure,
        \note which may not necessarily enforce zone mass conservation unless the user specified
        \note a balanced flow to begin with. Mass conservation is enforced both for the receiving
        \note and source zones if there is at least one mixing object defined. The default input
-       \note is ìNoî. (Note that ìNoî input may also results in balanced flow depending on the
+       \note is ‚ÄúNo‚Äù. (Note that ‚ÄúNo‚Äù input may also results in balanced flow depending on the
        \note system specified).
   A2;  \field Source Zone Infiltration Treatment
        \note This input field allows user to choose how zone infiltration flow is treated during
@@ -695,12 +695,12 @@ ZoneAirMassFlowConservation,
        \key AddInfiltrationFlow
        \key AdjustInfiltrationFlow
        \default AddInfiltrationFlow
-       \note It has two choice KEYs: ìAddInfiltrationFlowî and ìAdjustInfiltrationFlowî.  If this
-       \note input is specified as ìAddInfiltrationFlowî, then energy plus adds infiltration air
+       \note It has two choice KEYs: ‚ÄúAddInfiltrationFlow‚Äù and ‚ÄúAdjustInfiltrationFlow‚Äù.  If this
+       \note input is specified as ‚ÄúAddInfiltrationFlow‚Äù, then energy plus adds infiltration air
        \note mass flow on top of the base flow, which is calculated using the infiltration object
        \note user inputs, in order to balance the zone air mass flow.  The additional infiltration
        \note air mass flow is not self-balanced.  If this input is specified as
-       \note ìAdjustInfiltrationFlowî, then energy plus may adjust the base flow calculated using
+       \note ‚ÄúAdjustInfiltrationFlow‚Äù, then energy plus may adjust the base flow calculated using
        \note the infiltration object user inputs in order to balance the zone air mass flow. If it
        \note is not required to adjust the base infiltration air flow calculated from the user
        \note specified infiltration object inputs, then the base infiltration air mass flow
@@ -1964,7 +1964,7 @@ Site:GroundDomain:Basement,
         \key Perimeter
         \key Full
         \default Full
-        \note This field specifies whether the horizontal insulation fully insulates 
+        \note This field specifies whether the horizontal insulation fully insulates
         \note the surface or is perimeter only insulation
    N13, \field Perimeter Horizontal Insulation Width
         \type real
@@ -4776,14 +4776,14 @@ WindowMaterial:Glazing,
        \key No
        \key Yes
        \default No
-  N13, \field Youngís modulus
+  N13, \field Young‚Äôs modulus
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \units Pa
        \type real
        \minimum> 0.0
        \default 7.2e10
-  N14; \field Poissonís ratio
+  N14; \field Poisson‚Äôs ratio
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \type real
@@ -6148,7 +6148,7 @@ WindowMaterial:Blind:EquivalentLayer,
   N3 , \field Slat Crown
        \note Perpendicular length between the cord and the curve.
        \note Slat is assumed to be rectangular in cross section
-       \note and flat. Crown=0.0625xìSlat widthî
+       \note and flat. Crown=0.0625x‚ÄúSlat width‚Äù
        \type real
        \units m
        \minimum 0
@@ -6651,7 +6651,7 @@ WindowMaterial:Gap:EquivalentLayer,
        \note Sealed means the gap is enclosed and gas tight, i.e., no venting to indoor or
        \note outdoor environment.  VentedIndoor means the gap is vented to indoor environment, and
        \note VentedOutdoor means the gap is vented to the outdoor environment. The gap types
-       \note VentedIndoor and VentedOutdoor are used with gas type ìAirî only.
+       \note VentedIndoor and VentedOutdoor are used with gas type ‚ÄúAir‚Äù only.
   N2 , \field Conductivity Coefficient A
        \units W/m-K
        \type real
@@ -19931,7 +19931,7 @@ OtherEquipment,
        \default 0
 
 ElectricEquipment:ITE:AirCooled,
-   \memo This object describes air-cooled electric information technology equipment (ITE) which has 
+   \memo This object describes air-cooled electric information technology equipment (ITE) which has
    \memo variable power consumption as a function of loading and temperature.
        \min-fields 27
   A1 , \field Name
@@ -19982,8 +19982,8 @@ ElectricEquipment:ITE:AirCooled,
        \object-list BiVariateCurves
        \object-list BiVariateTables
        \note The name of a two-variable curve or table lookup object which modifies the CPU power
-       \note input as a function of CPU loading (x) and air inlet node temperature (y). 
-       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
+       \note input as a function of CPU loading (x) and air inlet node temperature (y).
+       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and
        \note Design Entering Air Temperature).
   N4 , \field Design Fan Power Input Fraction
        \note The fraction of the total power input at design conditions which is for the cooling fan(s)
@@ -20003,8 +20003,8 @@ ElectricEquipment:ITE:AirCooled,
        \object-list BiVariateCurves
        \object-list BiVariateTables
        \note The name of a two-variable curve or table lookup object which modifies the cooling
-       \note air flow rate as a function of CPU loading (x) and air inlet node temperature (y). 
-       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
+       \note air flow rate as a function of CPU loading (x) and air inlet node temperature (y).
+       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and
        \note Design Entering Air Temperature).
   A8 , \field Fan Power Input Function of Flow Curve Name
        \required-field
@@ -20012,8 +20012,8 @@ ElectricEquipment:ITE:AirCooled,
        \object-list UniVariateCurves
        \object-list UniVariateTables
        \note The name of a single-variable curve or table lookup object which modifies the cooling
-       \note fan power as a function of flow fraction (x). 
-       \note This curve (table) should equal 1.0 at a flow fraction of 1.0. 
+       \note fan power as a function of flow fraction (x).
+       \note This curve (table) should equal 1.0 at a flow fraction of 1.0.
   N6,  \field Design Entering Air Temperature
        \note The entering air temperature at design conditions.
        \type real
@@ -20022,7 +20022,7 @@ ElectricEquipment:ITE:AirCooled,
   A9,  \field Environmental Class
        \note Specifies the allowable operating conditions for the air inlet conditions.
        \note Used for reporting time outside allowable conditions.
-       \type choice 
+       \type choice
        \key None
        \key A1
        \key A2
@@ -20034,12 +20034,12 @@ ElectricEquipment:ITE:AirCooled,
   A10, \field Air Inlet Connection Type
        \note Specifies the type of connection between the zone and the ITE air inlet node.
        \note AdjustedSupply = ITE inlet temperature will be the current Supply Air Node temperature
-       \note adjusted by the current recirculation fraction. 
+       \note adjusted by the current recirculation fraction.
        \note All heat output is added to the zone air heat balance as a convective gain.
-       \note ZoneAirNode = ITE air inlet condition is  the average zone condition. 
-       \note All heat output is added to the zone air heat balance as a convective gain. 
-       \note RoomAirModel = ITE air inlet and outlet are connected to room air model nodes. 
-       \type choice 
+       \note ZoneAirNode = ITE air inlet condition is  the average zone condition.
+       \note All heat output is added to the zone air heat balance as a convective gain.
+       \note RoomAirModel = ITE air inlet and outlet are connected to room air model nodes.
+       \type choice
        \key AdjustedSupply
        \key ZoneAirNode
        \key RoomAirModel
@@ -20053,12 +20053,12 @@ ElectricEquipment:ITE:AirCooled,
        \type object-list
        \object-list RoomAirNodes
   A13, \field Supply Air Node Name
-       \note Name of the supply air inlet node serving this ITE. Required if the 
-       \note Air Node Connection Type = AdjustedSupply. Also required if reporting of 
+       \note Name of the supply air inlet node serving this ITE. Required if the
+       \note Air Node Connection Type = AdjustedSupply. Also required if reporting of
        \note Supply Heat Index is desired.
        \type node
   N7,  \field Design Recirculation Fraction
-       \note The recirculation fraction for this equipment at design conditions. This field is used only 
+       \note The recirculation fraction for this equipment at design conditions. This field is used only
        \note if the Air Node Connection Type = AdjustedSupply. The default is 0.0 (no recirculation).
        \type real
        \minimum 0.0
@@ -20069,10 +20069,10 @@ ElectricEquipment:ITE:AirCooled,
        \object-list BiVariateCurves
        \object-list BiVariateTables
        \note The name of a two-variable curve or table lookup object which modifies the recirculation
-       \note fractionas a function of CPU loading (x) and supply air node temperature (y). 
-       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
-       \note Design Entering Air Temperature).This field is used only if the 
-       \note Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve 
+       \note fractionas a function of CPU loading (x) and supply air node temperature (y).
+       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and
+       \note Design Entering Air Temperature).This field is used only if the
+       \note Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve
        \note is assumed to always equal 1.0.
   N8 , \field Design Electric Power Supply Efficiency
        \note The efficiency of the power supply system serving this ITE
@@ -20085,11 +20085,11 @@ ElectricEquipment:ITE:AirCooled,
        \object-list UniVariateCurves
        \object-list UniVariateTables
        \note The name of a single-variable curve or table lookup object which modifies the electric
-       \note power supply efficiency as a function of part-load ratio (x). 
+       \note power supply efficiency as a function of part-load ratio (x).
        \note This curve (table) should equal 1.0 at full load (PLR = 1.0).
        \note If this curve is left blank, then the curve is assumed to always equal 1.0.
   N9 , \field Fraction of Electric Power Supply Losses to Zone
-       \note Fraction of the electric power supply losses which are a heat gain to the zone 
+       \note Fraction of the electric power supply losses which are a heat gain to the zone
        \note If this field is <1.0, the remainder of the losses are assumed to be lost to the outdoors.
        \type real
        \minimum 0.0
@@ -20181,7 +20181,7 @@ SwimmingPool:Indoor,
   A4,  \field Make-up Water Supply Schedule Name
        \required-field
        \type object-list
-       \object-list ScheduleNames  
+       \object-list ScheduleNames
   A5,  \field Cover Schedule Name
        \required-field
        \type object-list
@@ -23591,7 +23591,7 @@ AirflowNetwork:Distribution:Linkage,
       \note conduction loss is ignored.
 
 AirflowNetwork:OccupantVentilationControl,
-      \memo This object is used to provide advanced thermal comfort control of window opening and closing 
+      \memo This object is used to provide advanced thermal comfort control of window opening and closing
       \memo for both exterior and interior windows.
   A1, \field Name
       \required-field
@@ -23614,7 +23614,7 @@ AirflowNetwork:OccupantVentilationControl,
       \object-list QuadraticCurves
       \object-list UniVariateTables
       \note Enter a curve name that represents thermal comfort temperature as a
-      \note function of outdoor dry-bulb temperature. Up to two curves are allowed if the 
+      \note function of outdoor dry-bulb temperature. Up to two curves are allowed if the
       \note performance cannot be represented by a single curve.
       \note The following two fields are used if two curves are required.
   N3, \field Thermal Comfort Temperature Boundary Point
@@ -23630,7 +23630,7 @@ AirflowNetwork:OccupantVentilationControl,
       \object-list QuadraticCurves
       \object-list UniVariateTables
       \note Enter a curve name that represents thermal comfort temperature as a
-      \note function of outdoor dry-bulb temperature. Up to two curves are allowed if the 
+      \note function of outdoor dry-bulb temperature. Up to two curves are allowed if the
       \note performance cannot be represented by a single curve.
       \note If a single performance curve is used, leave this field blank.
   N4, \field Maximum Threshold for Persons Dissatisfied PPD
@@ -31123,14 +31123,14 @@ Sizing:Plant,
       \units deltaC
       \minimum> 0.0
   A3, \field Sizing Option
-      \note if Coincident is chosen, then sizing is based on HVAC Sizing Simulations and 
+      \note if Coincident is chosen, then sizing is based on HVAC Sizing Simulations and
       \note the input field called Do HVAC Sizing Simulation for Sizing Periods in SimulationControl must be set to Yes
       \type choice
       \key Coincident
       \key NonCoincident
       \default NonCoincident
   N3, \field Zone Timesteps in Averaging Window
-      \note this is used in the coincident sizing algorithm to apply a running average to peak flow rates 
+      \note this is used in the coincident sizing algorithm to apply a running average to peak flow rates
       \note that occur during HVAC Sizing Simulations
       \type integer
       \minimum 1
@@ -31925,7 +31925,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note For ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid.
         \note For CyclingFan, a Fan:OnOff is valid.
         \note For VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid.
-        \note The fanís inlet node should be the same as the outdoor air mixerís mixed air node.
+        \note The fan‚Äôs inlet node should be the same as the outdoor air mixer‚Äôs mixed air node.
    A10, \field Supply Air Fan Name
         \required-field
         \type object-list
@@ -33015,11 +33015,11 @@ ZoneHVAC:UnitHeater,
         \key Yes
         \key No
         \note This choice field allows the user to define how the unit heater will operate
-        \note under ìno heating loadî or cooling conditions. If the ìNoî is selected, then
+        \note under ‚Äúno heating load‚Äù or cooling conditions. If the ‚ÄúNo‚Äù is selected, then
         \note the fan will not run unless there is a heating load. If the fan does not run,
         \note this effectively shuts the unit heater system off when there is no heating load.
-        \note If the ìYesî is selected, the unit heater is available and has a ConstantVolume
-        \note fan, or has an OnOff fan with ìSupply Air Fan Operating Mode Scheduleî value
+        \note If the ‚ÄúYes‚Äù is selected, the unit heater is available and has a ConstantVolume
+        \note fan, or has an OnOff fan with ‚ÄúSupply Air Fan Operating Mode Schedule‚Äù value
         \note greater than zero, then the fan will always run regardless of the zone load.
    N2 , \field Maximum Hot Water or Steam Flow Rate
         \note Not used when heating coil is gas or electric
@@ -40634,9 +40634,9 @@ Coil:Cooling:DX:SingleSpeed,
        \key Yes
        \key No
        \default No
-       \note when this input field is specified as Yes then the program calculates the net cooling 
+       \note when this input field is specified as Yes then the program calculates the net cooling
        \note capacity and total electric power input of DX cooling coils per ANSI/ASHRAE 127.
-   
+
 Coil:Cooling:DX:TwoSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
        \memo and condenser fan), two-speed (or variable-speed). Requires two sets of performance
@@ -48070,7 +48070,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
   N1 , \field Cooler Wetbulb Design Effectiveness
        \type real
        \note wet operation effectiveness with respect to wetbulb depression
-       \note this is the nominal design wetbulb effectiveness at design air flow rates and water rate 
+       \note this is the nominal design wetbulb effectiveness at design air flow rates and water rate
        \minimum 0.0
        \maximum 2.0
   A3 , \field Wetbulb Effectiveness Flow Ratio Modifier Curve Name
@@ -48112,7 +48112,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note this field is used when the previous field is set to autosize. The pump power is scaled with Secondary Design Air Flow Rate
   A5 , \field Water Pump Power Modifier Curve Name
        \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
-       \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Design Air Flow Rate 
+       \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Design Air Flow Rate
        \type object-list
        \object-list AllCurves
        \note Any curve or table with one independent variable can be used:
@@ -48120,7 +48120,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1,
        \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
        \note Table:OneIndependentVariable
-  N5 , \field Secondary Air Design Flow Rate  
+  N5 , \field Secondary Air Design Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
@@ -48129,12 +48129,12 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \type real
        \units dimensionless
        \note This field is used when the previous field is set to autoize.  The Primary Design Air Flow Rate is scaled using this factor
-       \note to calculate the secondary design air flow rate.  
+       \note to calculate the secondary design air flow rate.
   N7 , \field Secondary Air Fan Design Power
        \type real
        \units W
        \note This is the fan power at Secondary Design Air Flow Rate
-       \note this is the nominal design power at full speed. 
+       \note this is the nominal design power at full speed.
        \autosizable
   N8 , \field Secondary Air Fan Sizing Specific Power
        \type real
@@ -48142,8 +48142,8 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note this field is used when the previous field is set to autosize. The fan power is scaled with Secondary Design Air Flow Rate
   A6 , \field Secondary Air Fan Power Modifier Curve Name
        \note this curve modifies the design fan power in the previous field by multiplying the value by the result
-       \note of this curve.  It should have a value of 1.0 at a x = 1.0. 
-       \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Design Air Flow Rate 
+       \note of this curve.  It should have a value of 1.0 at a x = 1.0.
+       \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Design Air Flow Rate
        \type object-list
        \object-list AllCurves
        \note Any curve or table with one independent variable can be used:
@@ -48155,7 +48155,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \type node
   A8 , \field Primary Air Outlet Node Name
        \type node
-  N9 , \field Primary Design Air Flow Rate  
+  N9 , \field Primary Design Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
@@ -48184,38 +48184,38 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
        \note A typical value is 3.  If left blank then there is no blowdown.
-  N13, \field Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature 
+  N13, \field Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature
        \type real
-       \note This input field value defines the secondary air inlet node drybulb temperature 
-       \note limits in degreeCelsius. When the secondary side entering air dry bulb temperature 
-       \note drops below this limit, then the evaporative cooler operation mode changes to dry 
-       \note heat exchanger. Users specify their own limits. If this field is left blank, then 
-       \note there is no drybulb temperature lower limit for evaporative cooler operation. If 
-       \note operating range control is desired then this input field and the next two input 
-       \note fields should be specified or all the three should be left blank or left out. If 
+       \note This input field value defines the secondary air inlet node drybulb temperature
+       \note limits in degreeCelsius. When the secondary side entering air dry bulb temperature
+       \note drops below this limit, then the evaporative cooler operation mode changes to dry
+       \note heat exchanger. Users specify their own limits. If this field is left blank, then
+       \note there is no drybulb temperature lower limit for evaporative cooler operation. If
+       \note operating range control is desired then this input field and the next two input
+       \note fields should be specified or all the three should be left blank or left out. If
        \note no minimum drybulb temperature limit is desired while there are maximum drybulb
-       \note and wetbulb temperature limits then specify very low minimum temperature limit 
+       \note and wetbulb temperature limits then specify very low minimum temperature limit
        \note value (e.g. -99.0C).
   N14, \field Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature
        \type real
-       \note This input field value defines the secondary air inlet node wetbulb temperature 
+       \note This input field value defines the secondary air inlet node wetbulb temperature
        \note limits in degree Celsius. When the secondary side entering air wet bulb temperature
        \note exceeds this limit, then the evaporative cooler urns off and does not attempt to do
-       \note any cooling. If this field is left blank, then there is no wetbulb temperature 
+       \note any cooling. If this field is left blank, then there is no wetbulb temperature
        \note upper limit for evaporative cooler wet operation mode. If this input field is left
        \note blank then, the previous and the next input fields should also be left blank. If no
-       \note maximum wetbulb temperature limits is desired while there are minimum drybulb and 
-       \note maximum drybulb upper temperature limits then specify very high maximum wetbulb 
+       \note maximum wetbulb temperature limits is desired while there are minimum drybulb and
+       \note maximum drybulb upper temperature limits then specify very high maximum wetbulb
        \note temperature limit value (e.g. 99.0 C).
   N15; \field Dry Operation Maximum Limit Outdoor Drybulb Temperature
        \type real
-       \note This input field value defines the secondary air inlet node drybulb temperature 
+       \note This input field value defines the secondary air inlet node drybulb temperature
        \note limits in degree Celsius. When the secondary side entering air drybulb temperature
        \note exceeds this limit, then the evaporative cooler will not run in dry operation mode
        \note or may be turned off depending on its wetbulb temperature. If this field is left
        \note blank, then there is no drybulb temperature maximum limit for evaporative cooler
        \note operation. If this input field is left blank then, the previous and the next input
-       \note fields should also be left blank. If no maximum drybulb temperature limit is 
+       \note fields should also be left blank. If no maximum drybulb temperature limit is
        \note desired while there are minimum drybulb and maximum wetbulb upper temperature
        \note limits then specify very high maximum drybulb temperature limit value (e.g. 99.0 C).
 
@@ -48238,22 +48238,22 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \minimum 0.0
        \maximum 1.0
   A3 , \field Effectiveness Flow Ratio Modifier Curve Name
-       \note this curve modifies the design effectiveness in the previous field 
-       \note by multiplying the value by the result of this curve.  The effectiveness flow modifier curve 
-       \note is a function of flow fraction. Flow fraction is the ratio of current primary air flow rate to 
-       \note the primary air design flow rate. If this input field is left blank then, the effectiveness 
-       \note is assumed to be constant.   
+       \note this curve modifies the design effectiveness in the previous field
+       \note by multiplying the value by the result of this curve.  The effectiveness flow modifier curve
+       \note is a function of flow fraction. Flow fraction is the ratio of current primary air flow rate to
+       \note the primary air design flow rate. If this input field is left blank then, the effectiveness
+       \note is assumed to be constant.
        \type object-list
        \object-list AllCurves
        \note Any curve or table with one independent variable can be used:
        \note Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent,
        \note Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1,
        \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
-       \note Table:OneIndependentVariable   
+       \note Table:OneIndependentVariable
   N2 , \field Recirculating Water Pump Design Power
        \units W
        \ip-units W
-       \minimum 0.0  
+       \minimum 0.0
        \note This is the design water pump or spray for evaporation at the primary air design air flow rates
        \note and cooler design effectiveness
        \autosizable
@@ -48296,24 +48296,24 @@ EvaporativeCooler:Direct:ResearchSpecial,
   N6 , \field Evaporative Operation Minimum Drybulb Temperature
        \type real
        \minimum -99.0
-       \note This numeric field defines the evaporative cooler air inlet node drybulb temperature minimum  
-       \note limit in degrees Celsius. The evaporative cooler will be turned off when the evaporator cooler 
-       \note air inlet node dry-bulb temperature falls below this limit. The typical minimum value is 16∞C. Users 
+       \note This numeric field defines the evaporative cooler air inlet node drybulb temperature minimum
+       \note limit in degrees Celsius. The evaporative cooler will be turned off when the evaporator cooler
+       \note air inlet node dry-bulb temperature falls below this limit. The typical minimum value is 16degC. Users
        \note are allowed to specify their own limits. If this field is left blank, then there is no drybulb lower
        \note temperature limit for evaporative cooler operation.
   N7 , \field Evaporative Operation Maximum Limit Wetbulb Temperature
        \type real
        \note when outdoor wetbulb temperature rises above this limit the cooler shuts down.
-       \note This numeric field defines the evaporative cooler air inlet node wet-bulb temperature maximum 
-       \note limit in degrees Celsius. The evaporative cooler will be turned off when the evaporative cooler 
-       \note air inlet node wet-bulb temperature exceeds this limit. The typical maximum value is 24∞C. Users 
-       \note are allowed to specify their own limits. If this field is left blank, then there is no upper 
+       \note This numeric field defines the evaporative cooler air inlet node wet-bulb temperature maximum
+       \note limit in degrees Celsius. The evaporative cooler will be turned off when the evaporative cooler
+       \note air inlet node wet-bulb temperature exceeds this limit. The typical maximum value is 24degC. Users
+       \note are allowed to specify their own limits. If this field is left blank, then there is no upper
        \note wetbulb temperature limit for evaporative cooler operation.
   N8 ; \field Evaporative Operation Maximum Limit Drybulb Temperature
        \type real
-       \note This numeric field defines the evaporative cooler air inlet node dry-bulb temperature maximum 
-       \note limit in degrees Celsius. The evaporative cooler will be turned off when its air inlet node 
-       \note drybulb temperature exceeds this limit. The typical maximum value is 26∞C. Users 
+       \note This numeric field defines the evaporative cooler air inlet node dry-bulb temperature maximum
+       \note limit in degrees Celsius. The evaporative cooler will be turned off when its air inlet node
+       \note drybulb temperature exceeds this limit. The typical maximum value is 26degC. Users
        \note are allowed to specify their own limits. If this field is left blank, then there is no upper
        \note temperature limit for evaporative cooler operation.
 
@@ -48385,27 +48385,27 @@ Humidifier:Steam:Gas,
       \minimum 0.0
       \ip-units W
       \autosizable
-      \note if auto-sized, the rated gas use rate is calculated from the rated 
+      \note if auto-sized, the rated gas use rate is calculated from the rated
       \note capacity and enthalpy rise of water from 20.0C to 100.0C steam and user
-      \note input thermal efficiency value specified in the next input field. If this 
-      \note input field is hard-sized and Inlet Water Temperature Option input field is 
-      \note selected as FixedInletWaterTemperature, then the thermal efficiency input       
-      \note field will not be used or else if the Inlet Water Temperature Option input 
-      \note field is selected as VariableInletWaterTemperature, then the thermal efficiency 
-      \note input value is overridden by a value calculated from the capacity, rated gas use 
+      \note input thermal efficiency value specified in the next input field. If this
+      \note input field is hard-sized and Inlet Water Temperature Option input field is
+      \note selected as FixedInletWaterTemperature, then the thermal efficiency input
+      \note field will not be used or else if the Inlet Water Temperature Option input
+      \note field is selected as VariableInletWaterTemperature, then the thermal efficiency
+      \note input value is overridden by a value calculated from the capacity, rated gas use
       \note rate and design condition.
   N3, \field Thermal Efficiency
       \type real
       \units dimensionless
       \minimum> 0.0
       \maximum 1.0
-      \default 0.80   
+      \default 0.80
       \note Based on the higher heating value of fuel.
-      \note If "Rated Gas Use Rate" in the field above is not auto-sized and the Inlet Water 
-      \note Temperature Option input field is specified as FixedInletWaterTemperature, then the 
-      \note thermal efficiency specified will not be used in the calculation, or else if the 
-      \note Inlet Water Temperature Option input field is selected as VariableInletWaterTemperature, 
-      \note then the thermal efficiency value is overridden by a value calculated from the capacity, 
+      \note If "Rated Gas Use Rate" in the field above is not auto-sized and the Inlet Water
+      \note Temperature Option input field is specified as FixedInletWaterTemperature, then the
+      \note thermal efficiency specified will not be used in the calculation, or else if the
+      \note Inlet Water Temperature Option input field is selected as VariableInletWaterTemperature,
+      \note then the thermal efficiency value is overridden by a value calculated from the capacity,
       \note rated gas use rate and design condition.
   A3, \field Thermal Efficiency Modifier Curve Name
       \type object-list
@@ -48415,23 +48415,23 @@ Humidifier:Steam:Gas,
       \note Quadratic = C1 + C2*PLR + C3*PLR^2
       \note Cubic = C1 + C2*PLR + C3*PLR^2 + C4*PLR^3
       \note This is thermal efficiency modifier curve name of gas fired steam humidifier.
-      \note This curve is normalized, i.e., curve output value at rated condition is 1.0. 
+      \note This curve is normalized, i.e., curve output value at rated condition is 1.0.
   N4, \field Rated Fan Power
       \type real
       \units W
       \minimum 0.0
       \ip-units W
-      \note The nominal full capacity electric power input to the blower fan in Watts. If no 
-      \note blower fan is required to inject the dry steam to the supply air stream, then 
+      \note The nominal full capacity electric power input to the blower fan in Watts. If no
+      \note blower fan is required to inject the dry steam to the supply air stream, then
       \note this input field is set to zero.
   N5, \field Auxiliary Electric Power
       \type real
       \units W
       \minimum 0.0
       \ip-units W
-      \default 0.0   
+      \default 0.0
       \note The auxiliary electric power input in watts. This amount of power will be consumed
-      \note whenever the unit is available (as defined by the availability schedule). This 
+      \note whenever the unit is available (as defined by the availability schedule). This
       \note electric power is used for control purpose only.
   A4, \field Air Inlet Node Name
       \type node
@@ -48439,20 +48439,20 @@ Humidifier:Steam:Gas,
       \type node
   A6, \field Water Storage Tank Name
       \type object-list
-      \object-list WaterStorageTankNames  
+      \object-list WaterStorageTankNames
   A7; \field Inlet Water Temperature Option
-      \note The inlet water temperature can be fixed at 20C as it is done for electric steam 
-      \note humidifier or it can be allowed to vary with temperature of the water source.  
-      \note Currently allowed water sources are main water or water storage tank in water use objects.  
-      \note if FixedInletWaterTemperature is specified, then a fixed 20C water temperature will be 
+      \note The inlet water temperature can be fixed at 20C as it is done for electric steam
+      \note humidifier or it can be allowed to vary with temperature of the water source.
+      \note Currently allowed water sources are main water or water storage tank in water use objects.
+      \note if FixedInletWaterTemperature is specified, then a fixed 20C water temperature will be
       \note used, or else if VariableInletWaterTemperature is specified, then inlet water will vary
-      \note depending the source water temperature. If this input field is left blank, then fixed 
-      \note inlet water temperature of 20C will be assumed.  
+      \note depending the source water temperature. If this input field is left blank, then fixed
+      \note inlet water temperature of 20C will be assumed.
       \type choice
       \key FixedInletWaterTemperature
-      \key VariableInletWaterTemperature 
-      \default FixedInletWaterTemperature  
-  
+      \key VariableInletWaterTemperature
+      \default FixedInletWaterTemperature
+
 Dehumidifier:Desiccant:NoFans,
        \memo This object models a solid desiccant dehumidifier. The process
        \memo air stream is the air which is dehumidified. The regeneration air
@@ -50213,7 +50213,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note Must be less than or equal to the fanís maximum flow rate.
+        \note Must be less than or equal to the fan‚Äôs maximum flow rate.
         \note Only used when fan operating mode is continuous (disregarded for cycling fan mode).
         \note This air flow rate is used when no heating or cooling is required (i.e., the DX coil
         \note compressor and supplemental heating coil are off). If this field is left blank or zero,
@@ -57597,10 +57597,10 @@ Chiller:Electric:ReformulatedEIR,
        \note CWS = supply (leaving) chilled water temperature(C)
        \note LCT = leaving condenser fluid temperature(C)
   A4 , \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
-       \note Two curve types are available: 
+       \note Two curve types are available:
        \note Type LeavingCondenserWaterTemperature: based on the leaving condenser water temperature.
        \note Type Lift: based on the normalized lift, which is the temperature difference between the
-       \note leaving condenser water temperature and the leaving evaporator water temperature. 
+       \note leaving condenser water temperature and the leaving evaporator water temperature.
        \required-field
        \type choice
        \key LeavingCondenserWaterTemperature
@@ -57615,15 +57615,15 @@ Chiller:Electric:ReformulatedEIR,
        \object-list BiVariateTables
        \object-list ChillerPartLoadWithLiftCurves
        \object-list MultiVariateTables
-       \note The form of this curve is based on the input for 
+       \note The form of this curve is based on the input for
        \note Electric Input to Cooling Output RatioFunction of Part Load Ratio Curve Type
        \note Type=LeavingCondenserWaterTemperature: Calculated based on LCT and PLR
-       \note Curve object type should be Curve:Bicubic or Table:TwoIndependentVariables 
+       \note Curve object type should be Curve:Bicubic or Table:TwoIndependentVariables
        \note Bicubic curve = a + b*LCT + c*LCT**2 + d*PLR + e*PLR**2 + f*LCT*PLR + g*0 + h*PLR**3
        \note + i*0 + j*0
        \note PLR = part load ratio (cooling load/steady state capacity)
        \note LCT = leaving condenser fluid temperature(C)
-       \note Type=Lift: Calculated based on dT*, Tdev* and PLR 
+       \note Type=Lift: Calculated based on dT*, Tdev* and PLR
        \note Curve object type should be Curve:ChillerPartLoadWithLiftCurves or Table:MultiVariableLookup
        \note ChillerPartLoadWithLiftCurves curve = a + b*(dT*) + c*(dT*)**2 + d*PLR + e*PLR**2 + f*(dT*)*PLR + g*(dT*)**3
        \note + h*PLR**3 + i*(dT*)**2*PLR + j*(dT*)*PLR**2 + k*(dT*)**2*PLR**2 + l*(Tdev*)*PLR**3
@@ -61352,7 +61352,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \default 0.008
        \units percent
        \note Rate of drift loss as a percentage of circulating spray water flow rate
-       \note Default value for this field in under investigation. For now Cooling towerís drift loss
+       \note Default value for this field in under investigation. For now Cooling tower‚Äôs drift loss
        \note percent default value is taken here.
   A8 , \field Blowdown Calculation Mode
        \type choice
@@ -61367,7 +61367,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \note Blowdown is water intentionally drained from the basin in order to offset the build
        \note up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
-       \note Default value for this field in under investigation. For now Cooling towerís
+       \note Default value for this field in under investigation. For now Cooling tower‚Äôs
        \note Blowdown Concentration Ratio percent default value is taken here.
   A9 , \field Blowdown Makeup Water Usage Schedule Name
        \type object-list
@@ -61593,7 +61593,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \type real
        \units percent
        \default 0.008
-       \note Default value is under investigation. For now cooling towerís default value is taken.
+       \note Default value is under investigation. For now cooling tower‚Äôs default value is taken.
   A7 , \field Blowdown Calculation Mode
        \type choice
        \key ConcentrationRatio
@@ -61607,7 +61607,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \note Blowdown is water intentionally drained from the Evaporative Fluid Cooler in order to offset the
        \note build up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
-       \note Default value is under investigation. For now cooling towerís default value is taken.
+       \note Default value is under investigation. For now cooling tower‚Äôs default value is taken.
   A8 , \field Blowdown Makeup Water Usage Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -62538,9 +62538,9 @@ GroundHeatExchanger:HorizontalTrench,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-        
+
 GroundHeatExchanger:Slinky,
-        \memo This models a slinky horizontal heat exchanger 
+        \memo This models a slinky horizontal heat exchanger
         \memo placed in a series of trenches
         \memo The model uses the model developed by:
         \memo Xiong, Z., D.E. Fisher, and J.D. Spitler. 2015.
@@ -62563,7 +62563,7 @@ GroundHeatExchanger:Slinky,
         \type real
         \units W/m-K
         \minimum> 0
-        \default 1.08        
+        \default 1.08
    N2 , \field Soil Density
         \type real
         \units kg/m3
@@ -62595,7 +62595,7 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units in
-        \default 0.02667        
+        \default 0.02667
    N9 , \field Pipe Thickness
         \type real
         \units m
@@ -62613,14 +62613,14 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units ft
-        \default 1.0       
+        \default 1.0
    N7 , \field Coil Pitch
         \note This is the center-to-center distance between coils
         \type real
         \units m
         \minimum> 0
         \ip-units ft
-        \default 0.20   
+        \default 0.20
    N7 , \field Trench Depth
         \note This is the distance from the ground surface to the
         \note trench bottom
@@ -62628,24 +62628,24 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units ft
-        \default 1.8     
+        \default 1.8
    N2 , \field Trench Length
         \note This is the total length of a single trench
-        \note This assumes the heat exchanger runs the full length 
+        \note This assumes the heat exchanger runs the full length
         \note of the trench
         \type real
         \units m
         \minimum> 0
         \ip-units ft
-        \default 10 
+        \default 10
    N3 , \field Number of Trenches
-        \note This is the number of parallel trenches that 
+        \note This is the number of parallel trenches that
         \note has a heat exchanger, one per trench
         \type integer
         \minimum 1
         \default 1
    N4 , \field Horizontal Spacing Between Pipes
-        \note This represents the average horizontal spacing 
+        \note This represents the average horizontal spacing
         \note between any two
         \note trenches for heat exchangers that have multiple trenches
         \type real
@@ -62657,29 +62657,29 @@ GroundHeatExchanger:Slinky,
         \note This is the parameter for average annual surface
         \note temperature
         \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
+        \note Site:GroundTemperature:Shallow object must be found
         \note in the input
-        \note The undisturbed ground temperature will be 
+        \note The undisturbed ground temperature will be
         \note approximated from this object
         \type real
         \units C
-   N17, \field Kusuda-Achenbach Average Amplitude of Surface 
+   N17, \field Kusuda-Achenbach Average Amplitude of Surface
         \note Temperature
         \note This is the parameter for annual average amplitude from
         \note average surface temperature
         \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
+        \note Site:GroundTemperature:Shallow object must be found
         \note in the input
         \note The undisturbed ground temperature will be approximated
         \note from this object
         \type real
         \units deltaC
-   N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface 
+   N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface
         \note Temperature
         \note This is the parameter for phase shift from minimum
         \note surface temperature
         \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
+        \note Site:GroundTemperature:Shallow object must be found
         \note in the input
         \note The undisturbed ground temperature will be approximated
         \note from this object
@@ -70707,14 +70707,14 @@ Refrigeration:AirChiller,
         \minimum 0.0
         \maximum 20.
         \note The rated difference between the air entering the refrigeration chiller and the
-        \note cooling source temperature in ∞C.
+        \note cooling source temperature in degC.
   N6 ,  \field Maximum Temperature Difference Between Inlet Air and Evaporating Temperature
         \type real
         \units deltaC
         \minimum 0.0
         \maximum 25.
         \note The maximum difference between the air entering the refrigeration chiller and the
-        \note cooling source temperature in ∞C used to limit capacity during pull-down.
+        \note cooling source temperature in degC used to limit capacity during pull-down.
         \note defaults to 1.3 times the Rated Temperature Difference DT1
   N7 ,  \field Coil Material Correction Factor
         \type real
@@ -72699,7 +72699,7 @@ Generator:FuelCell:Inverter,
 
 Generator:MicroCHP,
       \memo Small-scale combined heat and power (micro CHP) electric generator using the model
-      \memo developed by IEA/ECBCS Annex 42 – see www.cogen-sim.net. The model was developed
+      \memo developed by IEA/ECBCS Annex 42 see www.cogen-sim.net. The model was developed
       \memo for both internal combustion and Stirling cycle
       \memo engines, but might be used for other types of residential CHP devices.
   A1, \field Name
@@ -74790,7 +74790,7 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
        \maximum< 10
        \default 0.0
        \units deltaC
-	   
+
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
    A1, \field Name
@@ -74842,7 +74842,7 @@ FaultModel:ThermostatOffset,
        \default 2
        \units deltaC
 
-FaultModel:HumidistatOffset, 
+FaultModel:HumidistatOffset,
    \memo This object describes fault of humidistat offset
    A1, \field Name
        \required-field
@@ -74852,8 +74852,8 @@ FaultModel:HumidistatOffset,
        \required-field
        \type object-list
        \object-list ZoneControlHumidistatNames
-   A3, \field Humidistat Offset Type 
-       \note Two types are available: 
+   A3, \field Humidistat Offset Type
+       \note Two types are available:
        \note Type ThermostatOffsetIndependent
        \note Type ThermostatOffsetDependent
        \type choice
@@ -74867,8 +74867,8 @@ FaultModel:HumidistatOffset,
    A5, \field Severity Schedule Name
        \note This field is applicable for Type ThermostatOffsetIndependent
        \type object-list
-       \object-list ScheduleNames 
-   N1, \field Reference Humidistat Offset       
+       \object-list ScheduleNames
+   N1, \field Reference Humidistat Offset
        \note Required field for Type ThermostatOffsetIndependent
        \type real
        \minimum> -20
@@ -74879,7 +74879,7 @@ FaultModel:HumidistatOffset,
        \note Enter the name of a FaultModel:ThermostatOffset object
        \note Required field for Type ThermostatOffsetDependent
        \type object-list
-       \object-list ThermostatOffsetFaults   
+       \object-list ThermostatOffsetFaults
 
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils

@@ -69,6 +69,7 @@ struct EnergyPlusData;
 namespace ScheduleManager {
 
     constexpr int ScheduleAlwaysOn = -1;
+    constexpr int ScheduleAlwaysOff = 0;
 
     enum class DayType
     {
@@ -92,6 +93,16 @@ namespace ScheduleManager {
     int constexpr maxDayTypes = static_cast<int>(DayType::Num) - 1;
     extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNames;
     extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNamesUC;
+
+    enum class DayTypeGroup
+    {
+        Invalid = -1,
+        Weekday = 1,
+        WeekEndHoliday,
+        SummerDesignDay,
+        WinterDesignDay,
+        Num
+    };
 
     enum class SchedType : int
     {
@@ -186,10 +197,14 @@ namespace ScheduleManager {
         bool MaxMinSet;                         // Max/min values have been stored for this schedule
         Real64 MaxValue;                        // Maximum value for this schedule
         Real64 MinValue;                        // Minimum value for this schedule
-        Real64 CurrentValue;                    // For Reporting
-        bool EMSActuatedOn;                     // indicates if EMS computed
-        Real64 EMSValue;                        // EMS value
-        bool UseDaylightSaving;                 // Toggles between daylight saving option to be inclused as "No" or "Yes" (default)
+        std::array<bool, static_cast<int>(DayType::Num)> MaxMinByDayTypeSet{
+            false}; // minimum and maximum values by daytype have been stored for this schedule
+        std::array<Real64, static_cast<int>(DayType::Num)> MinByDayType{0.0}; // minimum values by daytype for this schedule
+        std::array<Real64, static_cast<int>(DayType::Num)> MaxByDayType{0.0}; // maximum values by daytype for this schedule
+        Real64 CurrentValue;                                                  // For Reporting
+        bool EMSActuatedOn;                                                   // indicates if EMS computed
+        Real64 EMSValue;                                                      // EMS value
+        bool UseDaylightSaving; // Toggles between daylight saving option to be inclused as "No" or "Yes" (default)
 
         // Default Constructor
         ScheduleData()
@@ -339,6 +354,8 @@ namespace ScheduleManager {
 
     Real64 GetScheduleMaxValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
 
+    std::pair<Real64, Real64> getScheduleMinMaxByDayType(EnergyPlusData &state, int const ScheduleIndex, DayTypeGroup const days);
+
     std::string GetScheduleName(EnergyPlusData &state, int const ScheduleIndex);
 
     void ReportScheduleValues(EnergyPlusData &state);
@@ -391,6 +408,10 @@ struct ScheduleManagerData : BaseGlobalStruct
     Array1D<ScheduleManager::DayScheduleData> DaySchedule;   // Day Schedule Storage
     Array1D<ScheduleManager::WeekScheduleData> WeekSchedule; // Week Schedule Storage
     Array1D<ScheduleManager::ScheduleData> Schedule;         // Schedule Storage
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

@@ -280,7 +280,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
                                                            DataLoopNode::NodeData &outletNode,
                                                            int const speedNum,
                                                            Real64 const speedRatio,
-                                                           int const fanOpMode,
+                                                           HVAC::FanOp const fanOp,
                                                            DataLoopNode::NodeData &condInletNode,
                                                            [[maybe_unused]] DataLoopNode::NodeData &condOutletNode,
                                                            [[maybe_unused]] bool const singleMode)
@@ -312,7 +312,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     }
     thisspeed.ambPressure = condInletNode.Press;
     thisspeed.AirMassFlow = inletNode.MassFlowRate;
-    if (fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1) {
+   if (fanOp == HVAC::FanOp::Cycling && speedNum == 1) {
         if (speedRatio > 0.0) {
             thisspeed.AirMassFlow = thisspeed.AirMassFlow / speedRatio;
         } else {
@@ -335,7 +335,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     //    plr1 = speedRatio;
     //}
 
-    thisspeed.CalcSpeedOutput(state, inletNode, outletNode, speedRatio, fanOpMode, this->condInletTemp);
+    thisspeed.CalcSpeedOutput(state, inletNode, outletNode, speedRatio, fanOp, this->condInletTemp);
 
     // the outlet node conditions are based on it running at the truncated flow, we need to merge the bypassed air back in and ramp up flow rate
     if (thisspeed.adjustForFaceArea) {
@@ -358,7 +358,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     Real64 outSpeed1HumRat = outletNode.HumRat;
     Real64 outSpeed1Enthalpy = outletNode.Enthalpy;
 
-    if (fanOpMode == DataHVACGlobals::ContFanCycCoil) {
+    if (fanOp == HVAC::FanOp::Continuous) {
         outletNode.HumRat = outletNode.HumRat * speedRatio + (1.0 - speedRatio) * inletNode.HumRat;
         outletNode.Enthalpy = outletNode.Enthalpy * speedRatio + (1.0 - speedRatio) * inletNode.Enthalpy;
         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
@@ -381,7 +381,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
         auto &lowerspeed(this->speeds[max(speedNum - 2, 0)]);
         lowerspeed.AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateLow * lowerspeed.active_fraction_of_face_coil_area;
 
-        lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, 1.0, fanOpMode, condInletTemp); // out
+        lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, 1.0, fanOp, condInletTemp); // out
 
         if (lowerspeed.adjustForFaceArea) {
             lowerspeed.AirMassFlow /= lowerspeed.active_fraction_of_face_coil_area;

@@ -84,7 +84,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,24.1;
+  Version,24.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -559,7 +559,7 @@
 
   Output:Variable,*,Surface Inside Face Absorbed Shortwave Radiation Rate,Timestep,ReportSch;
 
-  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,Timestep,ReportSch;
+  Output:Variable,*,Enclosure Windows Total Transmitted Solar Radiation Rate,Timestep,ReportSch;
 
   Output:Variable,*,Surface Outside Face Incident Solar Radiation Rate per Area,Timestep,ReportSch;
 

@@ -124,6 +124,10 @@ struct RoomAirModelUserTempPatternData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag;     // flag for init once at start of environment
     Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         MyOneTimeFlag = true;

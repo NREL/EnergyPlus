@@ -93,7 +93,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,24.1;
+  Version,24.2;
 
   Timestep,6;
 
@@ -1310,9 +1310,9 @@
 
   Output:Variable,Zn001:Wall001:Win001,Surface Window Transmitted Beam To Diffuse Solar Radiation Energy,timestep,ReportSch;
 
-  Output:Variable,WEST ZONE,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,timestep,ReportSch;
+  Output:Variable,WEST ZONE,Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,timestep,ReportSch;
 
-  Output:Variable,WEST ZONE,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,timestep,ReportSch;
+  Output:Variable,WEST ZONE,Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,timestep,ReportSch;
 
   Output:Variable,WEST ZONE,Zone Air System Sensible Cooling Rate,timestep,ReportSch;
 

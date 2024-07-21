@@ -99,10 +99,16 @@ struct HeatBalanceAirMgrData : BaseGlobalStruct
     std::unordered_set<std::string> UniqueZoneNames;
     std::unordered_map<std::string, std::string> UniqueInfiltrationNames;
     bool ManageAirHeatBalanceGetInputFlag = true;
+    bool CalcExtraReportVarMyOneTimeFlag = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {
         this->ManageAirHeatBalanceGetInputFlag = true;
+        this->CalcExtraReportVarMyOneTimeFlag = true;
         this->UniqueZoneNames.clear();
         this->UniqueInfiltrationNames.clear();
     }
