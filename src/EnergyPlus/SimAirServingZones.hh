@@ -278,6 +278,10 @@ struct SimAirServingZonesData : BaseGlobalStruct
     std::string ErrEnvironmentName;
     std::string ErrEnvironmentNameSolveWaterCoilController;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->GetAirLoopInputFlag = true;

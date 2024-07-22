@@ -417,6 +417,7 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    state->dataGlobal->CurrentTime = 0.25;
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
@@ -1264,4 +1265,32 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test2)
     EXPECT_NEAR(thisWaterEquipment.HotMassFlowRate, 0.0, 1e-5);
 
     EXPECT_NEAR(thisWaterEquipment.ColdMassFlowRate + thisWaterEquipment.HotMassFlowRate, thisWaterEquipment.TotalMassFlowRate, 1e-8);
+}
+
+TEST_F(EnergyPlusFixture, WaterUse_calcH2ODensity_Test)
+{
+    Real64 functionResult;
+    Real64 expectedResult;
+    Real64 allowedTolerance = 0.001;
+
+    state->init_state(*state);
+    // Test 1: Set the flag to false means don't recalculate.  This means it wasn't set so this should be the default value.
+    state->dataWaterUse->calcRhoH2O = false;
+    expectedResult = 1000.0;
+    functionResult = calcH2ODensity(*state);
+    EXPECT_NEAR(functionResult, expectedResult, allowedTolerance);
+    EXPECT_FALSE(state->dataWaterUse->calcRhoH2O);
+
+    // Test 2: Now set the flag to true so that an actual value is calculated and flag should come back false.
+    state->dataWaterUse->calcRhoH2O = true;
+    expectedResult = 999.898;
+    functionResult = calcH2ODensity(*state);
+    EXPECT_NEAR(functionResult, expectedResult, allowedTolerance);
+    EXPECT_FALSE(state->dataWaterUse->calcRhoH2O);
+
+    // Test 2: Now the flag is still false.  The actual value should have been preserved and returned; flag should come back false.
+    expectedResult = 999.898;
+    functionResult = calcH2ODensity(*state);
+    EXPECT_NEAR(functionResult, expectedResult, allowedTolerance);
+    EXPECT_FALSE(state->dataWaterUse->calcRhoH2O);
 }

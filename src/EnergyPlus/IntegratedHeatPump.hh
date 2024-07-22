@@ -182,7 +182,7 @@ namespace IntegratedHeatPump {
         // IHP indoor fan name
         int IDFanID;
         // IHP indoor fan index
-        int IDFanPlace; // indoor fan placement
+        HVAC::FanPlace fanPlace; // indoor fan placement
 
         int ODAirInletNodeNum;  // oudoor coil inlet Nod
         int ODAirOutletNodeNum; // oudoor coil outlet Nod
@@ -228,7 +228,7 @@ namespace IntegratedHeatPump {
               WHtankType(DataPlant::PlantEquipmentType::Invalid), WHtankID(0), LoopNum(0), LoopSideNum(0), IsWHCallAvail(false), CheckWHCall(false),
               CurMode(IHPOperationMode::Idle), ControlledZoneTemp(0), WaterFlowAccumVol(0), SHDWHRunTime(0), CoolVolFlowScale(0), HeatVolFlowScale(0),
               MaxHeatAirMassFlow(0), MaxHeatAirVolFlow(0), MaxCoolAirMassFlow(0), MaxCoolAirVolFlow(0), IHPCoilsSized(false), IDFanID(0),
-              IDFanPlace(0), ODAirInletNodeNum(0),                                                                    // oudoor coil inlet Nod
+              fanPlace(HVAC::FanPlace::Invalid), ODAirInletNodeNum(0),                                                // oudoor coil inlet Nod
               ODAirOutletNodeNum(0),                                                                                  // oudoor coil outlet Nod
               TankSourceWaterMassFlowRate(0), AirFlowSavInWaterLoop(0), AirFlowSavInAirLoop(0), AirLoopFlowRate(0.0), // air loop mass flow rate
               TotalCoolingRate(0.0),                                                                                  // total cooling rate [w]
@@ -249,10 +249,10 @@ namespace IntegratedHeatPump {
     };
 
     void SimIHP(EnergyPlusData &state,
-                std::string_view CompName,                         // Coil Name
-                int &CompIndex,                                    // Index for Component name
-                int const CyclingScheme,                           // Continuous fan OR cycling compressor
-                DataHVACGlobals::CompressorOperation CompressorOp, // compressor on/off. 0 = off; 1= on
+                std::string_view CompName,       // Coil Name
+                int &CompIndex,                  // Index for Component name
+                HVAC::FanOp const fanOp,         // Continuous fan OR cycling compressor
+                HVAC::CompressorOp compressorOp, // compressor on/off. 0 = off; 1= on
                 Real64 const PartLoadFrac,
                 int const SpeedNum,            // compressor speed number
                 Real64 const SpeedRatio,       // compressor speed ratio
@@ -349,6 +349,10 @@ struct IntegratedHeatPumpGlobalData : BaseGlobalStruct
 
     bool GetCoilsInputFlag = true;
     EPVector<IntegratedHeatPump::IntegratedHeatPumpData> IntegratedHeatPumps;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

@@ -69,7 +69,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::DataHeatBalance;
@@ -233,8 +232,10 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).allocateMemberArrays(96);
     state->dataSize->NumAirTerminalSizingSpec = 1;
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing(1).allocateMemberArrays(96);
     state->dataSize->CalcFinalZoneSizing.allocate(1);
     state->dataSize->TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
@@ -425,7 +426,9 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).allocateMemberArrays(96);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing(1).allocateMemberArrays(96);
     state->dataSize->NumAirTerminalSizingSpec = 1;
     state->dataSize->CalcFinalZoneSizing.allocate(1);
     state->dataSize->TermUnitSizing.allocate(1);
@@ -617,7 +620,9 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).allocateMemberArrays(96);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing(1).allocateMemberArrays(96);
     state->dataSize->CalcFinalZoneSizing.allocate(1);
     state->dataSize->TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
@@ -810,7 +815,9 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).allocateMemberArrays(96);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing(1).allocateMemberArrays(96);
     state->dataSize->CalcFinalZoneSizing.allocate(1);
     state->dataSize->TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
@@ -959,8 +966,10 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).allocateMemberArrays(96);
     state->dataSize->NumAirTerminalSizingSpec = 1;
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing(1).allocateMemberArrays(96);
     state->dataSize->CalcFinalZoneSizing.allocate(1);
     state->dataSize->TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);

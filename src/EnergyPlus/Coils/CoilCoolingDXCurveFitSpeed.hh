@@ -60,141 +60,143 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct EnergyPlusData;
+    struct EnergyPlusData;
 
-struct CoilCoolingDXCurveFitSpeedInputSpecification
-{
-    std::string name;
-    Real64 gross_rated_total_cooling_capacity_ratio_to_nominal;
-    Real64 gross_rated_sensible_heat_ratio;
-    Real64 gross_rated_cooling_COP;
-    Real64 evaporator_air_flow_fraction;
-    Real64 condenser_air_flow_fraction;
-    Real64 active_fraction_of_coil_face_area;
-    Real64 rated_evaporative_condenser_pump_power_fraction;
-    Real64 rated_evaporator_fan_power_per_volume_flow_rate;
-    Real64 rated_evaporator_fan_power_per_volume_flow_rate_2023;
-    Real64 evaporative_condenser_effectiveness;
-    std::string total_cooling_capacity_function_of_temperature_curve_name;
-    std::string total_cooling_capacity_function_of_air_flow_fraction_curve_name;
-    std::string energy_input_ratio_function_of_temperature_curve_name;
-    std::string energy_input_ratio_function_of_air_flow_fraction_curve_name;
-    std::string part_load_fraction_correlation_curve_name;
-    Real64 rated_waste_heat_fraction_of_power_input;
-    std::string waste_heat_function_of_temperature_curve_name;
-    std::string sensible_heat_ratio_modifier_function_of_temperature_curve_name;
-    std::string sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name;
-};
+    struct CoilCoolingDXCurveFitSpeedInputSpecification {
+        std::string name;
+        Real64 gross_rated_total_cooling_capacity_ratio_to_nominal;
+        Real64 gross_rated_sensible_heat_ratio;
+        Real64 gross_rated_cooling_COP;
+        Real64 evaporator_air_flow_fraction;
+        Real64 condenser_air_flow_fraction;
+        Real64 active_fraction_of_coil_face_area;
+        Real64 rated_evaporative_condenser_pump_power_fraction;
+        Real64 rated_evaporator_fan_power_per_volume_flow_rate;
+        Real64 rated_evaporator_fan_power_per_volume_flow_rate_2023;
+        Real64 evaporative_condenser_effectiveness;
+        std::string total_cooling_capacity_function_of_temperature_curve_name;
+        std::string total_cooling_capacity_function_of_air_flow_fraction_curve_name;
+        std::string energy_input_ratio_function_of_temperature_curve_name;
+        std::string energy_input_ratio_function_of_air_flow_fraction_curve_name;
+        std::string part_load_fraction_correlation_curve_name;
+        Real64 rated_waste_heat_fraction_of_power_input;
+        std::string waste_heat_function_of_temperature_curve_name;
+        std::string sensible_heat_ratio_modifier_function_of_temperature_curve_name;
+        std::string sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name;
+    };
 
-struct CoilCoolingDXCurveFitSpeed
-{
-    std::string const object_name = "Coil:Cooling:DX:CurveFit:Speed";
-    std::string parentName;
+    struct CoilCoolingDXCurveFitSpeed {
+        std::string const object_name = "Coil:Cooling:DX:CurveFit:Speed";
+        std::string parentName;
 
-    CoilCoolingDXCurveFitSpeed() = default;
-    explicit CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, const std::string &name);
-    void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification &input_data);
+        CoilCoolingDXCurveFitSpeed() = default;
 
-    CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
+        explicit CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, const std::string &name);
 
-    // curve IDs
-    int indexCapFT = 0;
-    int indexCapFFF = 0;
-    int indexEIRFT = 0;
-    int indexEIRFFF = 0;
-    int indexPLRFPLF = 0;
-    int indexWHFT = 0;
-    int indexSHRFT = 0;
-    int indexSHRFFF = 0;
+        void
+        instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification &input_data);
 
-    // fixed values
-    std::string name;
-    Real64 RatedAirMassFlowRate = 0.0;     // rated air mass flow rate at speed {kg/s}
-    Real64 RatedCondAirMassFlowRate = 0.0; // rated condenser air mass flow rate at speed {kg/s}
-    Real64 grossRatedSHR = 0.0;            // rated sensible heat ratio at speed
-    bool ratedGrossTotalCapIsAutosized = false;
-    bool ratedEvapAirFlowRateIsAutosized = false;
-    Real64 RatedCBF = 0.0; // rated coil bypass factor at speed
-    Real64 RatedEIR = 0.0; // rated energy input ratio at speed {W/W}
-    Real64 ratedCOP = 0.0;
-    Real64 rated_total_capacity = 0.0;
-    Real64 rated_evap_fan_power_per_volume_flow_rate = 0.0;
-    Real64 rated_evap_fan_power_per_volume_flow_rate_2023 = 0.0;
-    Real64 ratedWasteHeatFractionOfPowerInput = 0.0; // rated waste heat fraction of power input
-    Real64 evap_condenser_pump_power_fraction = 0.0;
-    Real64 evap_condenser_effectiveness = 0.0;
+        CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
 
-    // stuff getting assigned by the parent mode
-    Real64 parentModeRatedGrossTotalCap = 0.0;   // [W]
-    Real64 parentModeRatedEvapAirFlowRate = 0.0; // [m3/s]
-    Real64 parentModeRatedCondAirFlowRate = 0.0; // [m3/s]
-    int parentOperatingMode = 0;
-    Real64 parentModeTimeForCondensateRemoval = 0.0;
-    Real64 parentModeEvapRateRatio = 0.0;
-    Real64 parentModeMaxCyclingRate = 0.0;
-    Real64 parentModeLatentTimeConst = 0.0;
-    bool doLatentDegradation = false; // True if latent degradation is enabled for this speed
+        // curve IDs
+        int indexCapFT = 0;
+        int indexCapFFF = 0;
+        int indexEIRFT = 0;
+        int indexEIRFFF = 0;
+        int indexPLRFPLF = 0;
+        int indexWHFT = 0;
+        int indexSHRFT = 0;
+        int indexSHRFFF = 0;
 
-    // speed class objects
-    Real64 ambPressure = 0.0; // outdoor pressure {Pa]
-    Real64 PLR = 0.0;
-    Real64 AirFF = 0.0;                   // ratio of air mass flow rate to rated air mass flow rate
-    Real64 fullLoadPower = 0.0;           // full load power at speed {W}
-    Real64 fullLoadWasteHeat = 0.0;       // full load waste heat at speed {W}
-    Real64 RTF = 0.0;                     // coil runtime fraction at speed
-    Real64 AirMassFlow = 0.0;             // coil inlet air mass flow rate {kg/s}
-    Real64 evap_air_flow_rate = 0.0;      // evaporator air volume flow rate [m3/s]
-    Real64 condenser_air_flow_rate = 0.0; // condenser air volume flow rate [m3/s]
-    Real64 active_fraction_of_face_coil_area = 0.0;
-    bool adjustForFaceArea = false;
-    Real64 ratedLatentCapacity = 0.0; // Latent capacity at rated conditions {W}
+        // fixed values
+        std::string name;
+        Real64 RatedAirMassFlowRate = 0.0;     // rated air mass flow rate at speed {kg/s}
+        Real64 RatedCondAirMassFlowRate = 0.0; // rated condenser air mass flow rate at speed {kg/s}
+        Real64 grossRatedSHR = 0.0;            // rated sensible heat ratio at speed
+        bool ratedGrossTotalCapIsAutosized = false;
+        bool ratedEvapAirFlowRateIsAutosized = false;
+        Real64 RatedCBF = 0.0; // rated coil bypass factor at speed
+        Real64 RatedEIR = 0.0; // rated energy input ratio at speed {W/W}
+        Real64 ratedCOP = 0.0;
+        Real64 rated_total_capacity = 0.0;
+        Real64 rated_evap_fan_power_per_volume_flow_rate = 0.0;
+        Real64 rated_evap_fan_power_per_volume_flow_rate_2023 = 0.0;
+        Real64 ratedWasteHeatFractionOfPowerInput = 0.0; // rated waste heat fraction of power input
+        Real64 evap_condenser_pump_power_fraction = 0.0;
+        Real64 evap_condenser_effectiveness = 0.0;
 
-    // rating data
-    Real64 RatedInletAirTemp = 26.6667;        // 26.6667C or 80F
-    Real64 RatedInletWetBulbTemp = 19.4444;    // 19.44 or 67F
-    Real64 RatedInletAirHumRat = 0.0111847;    // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    Real64 RatedOutdoorAirTemp = 35.0;         // 35 C or 95F
-    Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
+        // stuff getting assigned by the parent mode
+        Real64 parentModeRatedGrossTotalCap = 0.0;   // [W]
+        Real64 parentModeRatedEvapAirFlowRate = 0.0; // [m3/s]
+        Real64 parentModeRatedCondAirFlowRate = 0.0; // [m3/s]
+        int parentOperatingMode = 0;
+        Real64 parentModeTimeForCondensateRemoval = 0.0;
+        Real64 parentModeEvapRateRatio = 0.0;
+        Real64 parentModeMaxCyclingRate = 0.0;
+        Real64 parentModeLatentTimeConst = 0.0;
+        bool doLatentDegradation = false; // True if latent degradation is enabled for this speed
 
-    // flow per capacity values, they will be overridden with alternate values later if it is 100% OA coil
-    Real64 minRatedVolFlowPerRatedTotCap = DataHVACGlobals::MinRatedVolFlowPerRatedTotCap1;
-    Real64 maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1;
+        // speed class objects
+        Real64 ambPressure = 0.0; // outdoor pressure {Pa]
+        Real64 PLR = 0.0;
+        Real64 AirFF = 0.0;                   // ratio of air mass flow rate to rated air mass flow rate
+        Real64 fullLoadPower = 0.0;           // full load power at speed {W}
+        Real64 fullLoadWasteHeat = 0.0;       // full load waste heat at speed {W}
+        Real64 RTF = 0.0;                     // coil runtime fraction at speed
+        Real64 AirMassFlow = 0.0;             // coil inlet air mass flow rate {kg/s}
+        Real64 evap_air_flow_rate = 0.0;      // evaporator air volume flow rate [m3/s]
+        Real64 condenser_air_flow_rate = 0.0; // condenser air volume flow rate [m3/s]
+        Real64 active_fraction_of_face_coil_area = 0.0;
+        bool adjustForFaceArea = false;
+        Real64 ratedLatentCapacity = 0.0; // Latent capacity at rated conditions {W}
 
-    void CalcSpeedOutput(EnergyPlusData &state,
-                         const DataLoopNode::NodeData &inletNode,
-                         DataLoopNode::NodeData &outletNode,
-                         Real64 PLR,
-                         int const fanOpMode,
-                         Real64 condInletTemp);
-    void size(EnergyPlusData &state);
+        // rating data
+        Real64 RatedInletAirTemp = 26.6667;        // 26.6667C or 80F
+        Real64 RatedInletWetBulbTemp = 19.4444;    // 19.44 or 67F
+        Real64 RatedInletAirHumRat = 0.0111847;    // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+        Real64 RatedOutdoorAirTemp = 35.0;         // 35 C or 95F
+        Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
-    Real64 CalcBypassFactor(EnergyPlusData &state,
-                            Real64 const tdb, // Inlet dry-bulb temperature {C}
-                            Real64 const w,   // Inlet humidity ratio {kg-H2O/kg-dryair}
-                            Real64 const q,   // Total capacity {W}
-                            Real64 const shr, // SHR
-                            Real64 const h,   // Inlet enthalpy {J/kg-dryair}
-                            Real64 const p);  // Outlet node pressure {Pa}
+        // flow per capacity values, they will be overridden with alternate values later if it is 100% OA coil
+        Real64 minRatedVolFlowPerRatedTotCap = HVAC::MinRatedVolFlowPerRatedTotCap1;
+        Real64 maxRatedVolFlowPerRatedTotCap = HVAC::MaxRatedVolFlowPerRatedTotCap1;
 
-    Real64 calcEffectiveSHR(const DataLoopNode::NodeData &inletNode,
-                            Real64 const inletWetBulb,
-                            Real64 const SHRss,      // Steady-state sensible heat ratio
-                            Real64 const RTF,        // Compressor run-time fraction
-                            Real64 const QLatRated,  // Rated latent capacity
-                            Real64 const QLatActual, // Actual latent capacity
-                            Real64 const HeatingRTF  // Used to recalculate Toff for cycling fan systems
-    );
+        void CalcSpeedOutput(EnergyPlusData &state,
+                             const DataLoopNode::NodeData &inletNode,
+                             DataLoopNode::NodeData &outletNode,
+                             Real64 const _PLR,
+                             HVAC::FanOp const fanOp,
+                             Real64 condInletTemp);
 
-private:
-    bool processCurve(EnergyPlusData &state,
-                      const std::string &curveName,
-                      int &curveIndex,
-                      std::vector<int> validDims,
-                      std::string_view const routineName,
-                      const std::string &fieldName,
-                      Real64 Var1,                                 // required 1st independent variable
-                      ObjexxFCL::Optional<Real64 const> Var2 = _); // 2nd independent variable
-};
+        void size(EnergyPlusData &state);
+
+        Real64 CalcBypassFactor(EnergyPlusData &state,
+                                Real64 const tdb, // Inlet dry-bulb temperature {C}
+                                Real64 const w,   // Inlet humidity ratio {kg-H2O/kg-dryair}
+                                Real64 const q,   // Total capacity {W}
+                                Real64 const shr, // SHR
+                                Real64 const h,   // Inlet enthalpy {J/kg-dryair}
+                                Real64 const p);  // Outlet node pressure {Pa}
+
+        Real64 calcEffectiveSHR(const DataLoopNode::NodeData &inletNode,
+                                Real64 const inletWetBulb,
+                                Real64 const SHRss,      // Steady-state sensible heat ratio
+                                Real64 const RTF,        // Compressor run-time fraction
+                                Real64 const QLatRated,  // Rated latent capacity
+                                Real64 const QLatActual, // Actual latent capacity
+                                Real64 const HeatingRTF  // Used to recalculate Toff for cycling fan systems
+        );
+
+    private:
+        bool processCurve(EnergyPlusData &state,
+                          const std::string &curveName,
+                          int &curveIndex,
+                          std::vector<int> validDims,
+                          std::string_view const routineName,
+                          const std::string &fieldName,
+                          Real64 Var1,                                 // required 1st independent variable
+                          ObjexxFCL::Optional<Real64 const> Var2 = _); // 2nd independent variable
+    };
 } // namespace EnergyPlus
 
 #endif // ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITSPEED

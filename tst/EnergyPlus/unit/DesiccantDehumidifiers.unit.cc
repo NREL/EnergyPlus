@@ -2897,7 +2897,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     int coolPeakDD = 2;
     auto &finalSysSizing = state->dataSize->FinalSysSizing(1);
     auto &sysSizPeakDDNum = state->dataSize->SysSizPeakDDNum(1);
-    EXPECT_TRUE(compare_enums(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::SensibleCooling));
+    EXPECT_ENUM_EQ(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::SensibleCooling);
     EXPECT_EQ(finalSysSizing.SizingOption, DataSizing::NonCoincident);
     EXPECT_EQ(sysSizPeakDDNum.SensCoolPeakDD, coolPeakDD);
     int timeStepIndexAtPeakCoolLoad = sysSizPeakDDNum.TimeStepAtSensCoolPk(coolPeakDD);
@@ -6755,9 +6755,9 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     EXPECT_EQ("DESICCANT 1", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name);
     EXPECT_EQ("DESICCANT REGEN COIL", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName);
 
-    EXPECT_EQ(state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).coolingCoil_TypeNum, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).coolingCoil_TypeNum, HVAC::Coil_CoolingAirToAirVariableSpeed);
 
-    EXPECT_TRUE(compare_enums(state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide, Selection::Yes));
+    EXPECT_ENUM_EQ(state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide, Selection::Yes);
 
     CompName = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name;
     CompIndex = state->dataDesiccantDehumidifiers->NumGenericDesicDehums;

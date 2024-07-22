@@ -207,16 +207,16 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                 EnergyPlus::ShowFatalError(state, "Python Plugin Output Variable problem causes program termination");
             }
             bool isMetered = false;
-            OutputProcessor::SOVStoreType sAvgOrSum = OutputProcessor::SOVStoreType::Average;
+            OutputProcessor::StoreType sAvgOrSum = OutputProcessor::StoreType::Average;
             if (avgOrSum == "SUMMED") {
-                sAvgOrSum = OutputProcessor::SOVStoreType::Summed;
+                sAvgOrSum = OutputProcessor::StoreType::Sum;
             } else if (avgOrSum == "METERED") {
-                sAvgOrSum = OutputProcessor::SOVStoreType::Summed;
+                sAvgOrSum = OutputProcessor::StoreType::Sum;
                 isMetered = true;
             }
-            OutputProcessor::SOVTimeStepType sUpdateFreq = OutputProcessor::SOVTimeStepType::Zone;
+            OutputProcessor::TimeStepType sUpdateFreq = OutputProcessor::TimeStepType::Zone;
             if (updateFreq == "SYSTEMTIMESTEP") {
-                sUpdateFreq = OutputProcessor::SOVTimeStepType::System;
+                sUpdateFreq = OutputProcessor::TimeStepType::System;
             }
             Constant::Units thisUnit = Constant::Units::None;
             if (!units.empty()) {
@@ -244,12 +244,13 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                         sAvgOrSum,
                                         thisObjectName,
                                         Constant::eResource::Invalid,
-                                        OutputProcessor::SOVEndUseCat::Invalid,
-                                        {}, // EndUseSub
-                                        OutputProcessor::SOVGroup::Invalid,
-                                        {}, // Zone
+                                        OutputProcessor::Group::Invalid,
+                                        OutputProcessor::EndUseCat::Invalid,
+                                        "", // EndUseSub
+                                        "", // Zone
                                         1,
                                         1,
+                                        "", // SpaceType
                                         -999,
                                         units);
                 }
@@ -298,9 +299,8 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                     EnergyPlus::ShowFatalError(state, "Input error on PythonPlugin:OutputVariable causes program termination");
                 }
                 std::string const groupType = EnergyPlus::Util::makeUPPER(fields.at("group_type").get<std::string>());
-                OutputProcessor::SOVGroup sovGroup =
-                    static_cast<OutputProcessor::SOVGroup>(getEnumValue(OutputProcessor::sovGroupNamesUC, groupType));
-                if (sovGroup == OutputProcessor::SOVGroup::Invalid) {
+                OutputProcessor::Group group = static_cast<OutputProcessor::Group>(getEnumValue(OutputProcessor::groupNamesUC, groupType));
+                if (group == OutputProcessor::Group::Invalid) {
                     ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected Group Type = {}", groupType));
                     ShowFatalError(state, "Python plugin output variable input problem causes program termination");
                 }
@@ -314,21 +314,20 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                     EnergyPlus::ShowFatalError(state, "Input error on PythonPlugin:OutputVariable causes program termination");
                 }
                 std::string const endUse = EnergyPlus::Util::makeUPPER(fields.at("end_use_category").get<std::string>());
-                OutputProcessor::SOVEndUseCat sovEndUseCat =
-                    static_cast<OutputProcessor::SOVEndUseCat>(getEnumValue(OutputProcessor::sovEndUseCatNamesUC, endUse));
+                OutputProcessor::EndUseCat endUseCat =
+                    static_cast<OutputProcessor::EndUseCat>(getEnumValue(OutputProcessor::endUseCatNamesUC, endUse));
 
-                if (sovEndUseCat == OutputProcessor::SOVEndUseCat::Invalid) {
+                if (endUseCat == OutputProcessor::EndUseCat::Invalid) {
                     ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected End-use Subcategory = {}", endUse));
                     ShowFatalError(state, "Python plugin output variable input problem causes program termination");
                 }
 
                 // Additional End Use Types Only Used for EnergyTransfer
                 if ((resource != Constant::eResource::EnergyTransfer) &&
-                    (sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils || sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Chillers || sovEndUseCat == OutputProcessor::SOVEndUseCat::Boilers ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Baseboard ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating)) {
+                    (endUseCat == OutputProcessor::EndUseCat::HeatingCoils || endUseCat == OutputProcessor::EndUseCat::CoolingCoils ||
+                     endUseCat == OutputProcessor::EndUseCat::Chillers || endUseCat == OutputProcessor::EndUseCat::Boilers ||
+                     endUseCat == OutputProcessor::EndUseCat::Baseboard || endUseCat == OutputProcessor::EndUseCat::HeatRecoveryForCooling ||
+                     endUseCat == OutputProcessor::EndUseCat::HeatRecoveryForHeating)) {
                     ShowWarningError(state, format("Inconsistent resource type input for PythonPlugin:OutputVariable = {}", thisObjectName));
                     ShowContinueError(state, format("For end use subcategory = {}, resource type must be EnergyTransfer", endUse));
                     ShowContinueError(state, "Resource type is being reset to EnergyTransfer and the simulation continues...");
@@ -349,9 +348,8 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                         sAvgOrSum,
                                         thisObjectName,
                                         resource,
-                                        sovEndUseCat,
-                                        {},
-                                        sovGroup);
+                                        group,
+                                        endUseCat);
                 } else { // has subcategory
                     SetupOutputVariable(state,
                                         sOutputVariable,
@@ -361,9 +359,9 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                         sAvgOrSum,
                                         thisObjectName,
                                         resource,
-                                        sovEndUseCat,
-                                        sEndUseSubcategory,
-                                        sovGroup);
+                                        group,
+                                        endUseCat,
+                                        sEndUseSubcategory);
                 }
             }
         } // for (instance)
@@ -378,7 +376,10 @@ void initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
 
     // first pre-config Python so that it can speak UTF-8
     PyPreConfig preConfig;
+    // This is the other related line that caused Decent CI to start having trouble.  I'm putting it back to
+    // PyPreConfig_InitPythonConfig, even though I think it should be isolated.  Will deal with this after IO freeze.
     PyPreConfig_InitPythonConfig(&preConfig);
+    // PyPreConfig_InitIsolatedConfig(&preConfig);
     preConfig.utf8_mode = 1;
     status = Py_PreInitialize(&preConfig);
     if (PyStatus_Exception(status)) {
@@ -443,6 +444,15 @@ void initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
         PyMem_RawFree(wcharPath);
     }
 
+    // This was Py_InitializeFromConfig(&config), but was giving a seg fault when running inside
+    // another Python instance, for example as part of an API run.  Per the example here:
+    // https://docs.python.org/3/c-api/init_config.html#preinitialize-python-with-pypreconfig
+    // It looks like we don't need to initialize from config again, it should be all set up with
+    // the init calls above, so just initialize and move on.
+    // UPDATE: This worked happily for me on Linux, and also when I build locally on Windows, but not on Decent CI
+    // I suspect a difference in behavior for Python versions.  I'm going to temporarily revert this back to initialize
+    // with config and get IO freeze going, then get back to solving it.
+    // Py_Initialize();
     Py_InitializeFromConfig(&config);
 }
 #endif // LINK_WITH_PYTHON
@@ -1471,7 +1481,7 @@ void PluginManager::runSingleUserDefinedPlugin([[maybe_unused]] EnergyPlusData &
 
 int PluginManager::getUserDefinedCallbackIndex(EnergyPlusData &state, const std::string &callbackProgramName)
 {
-    for (int i = 0; i < state.dataPluginManager->userDefinedCallbackNames.size(); i++) {
+    for (int i = 0; i < (int)state.dataPluginManager->userDefinedCallbackNames.size(); i++) {
         if (state.dataPluginManager->userDefinedCallbackNames[i] == callbackProgramName) {
             return i;
         }

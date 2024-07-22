@@ -65,13 +65,13 @@ using namespace EnergyPlus::Humidifiers;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::Curve;
 
 namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
 {
+    state->init_state(*state);
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
     state->dataHumidifiers->NumElecSteamHums = 0;
@@ -107,6 +107,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
 
 TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
 {
+    state->init_state(*state);
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
     state->dataHumidifiers->NumElecSteamHums = 0;
@@ -147,6 +148,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
 
 TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
 {
+    state->init_state(*state);
     HumidifierData thisHum;
 
     state->dataHVACGlobal->TimeStepSys = 0.25;

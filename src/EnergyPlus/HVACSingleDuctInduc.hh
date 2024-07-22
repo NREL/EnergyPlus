@@ -139,6 +139,7 @@ namespace HVACSingleDuctInduc {
         }
         void ReportIndUnit(EnergyPlusData &state);
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void reportTerminalUnit(EnergyPlusData &state);
     };
 
     void SimIndUnit(EnergyPlusData &state,
@@ -191,6 +192,10 @@ struct HVACSingleDuctInducData : BaseGlobalStruct
     Array1D_bool MyAirDistInitFlag;
     Array1D<HVACSingleDuctInduc::IndUnitData> IndUnit;
     bool ZoneEquipmentListChecked = false;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

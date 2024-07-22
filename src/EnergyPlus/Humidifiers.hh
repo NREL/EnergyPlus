@@ -82,6 +82,8 @@ namespace Humidifiers {
         Variable,
         Num
     };
+    static constexpr std::array<std::string_view, static_cast<int>(InletWaterTemp::Num)> inletWaterTempsUC = {"FIXEDINLETWATERTEMPERATURE",
+                                                                                                              "VARIABLEINLETWATERTEMPERATURE"};
 
     class HumidifierData
     {
@@ -194,6 +196,10 @@ struct HumidifiersData : BaseGlobalStruct
     // Object Data
     Array1D<Humidifiers::HumidifierData> Humidifier;
     std::unordered_map<std::string, std::string> HumidifierUniqueNames;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

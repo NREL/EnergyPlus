@@ -559,58 +559,55 @@ namespace HighTempRadiantSystem {
                                 "Zone Radiant HVAC Heating Rate",
                                 Constant::Units::W,
                                 highTempRadSys.HeatPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 highTempRadSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Energy",
                                 Constant::Units::J,
                                 highTempRadSys.HeatEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 highTempRadSys.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::HeatingCoils);
             if (highTempRadSys.HeaterType == Constant::eResource::NaturalGas) {
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC NaturalGas Rate",
                                     Constant::Units::W,
                                     highTempRadSys.GasPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     highTempRadSys.Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC NaturalGas Energy",
                                     Constant::Units::J,
                                     highTempRadSys.GasEnergy,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     highTempRadSys.Name,
                                     Constant::eResource::NaturalGas,
-                                    OutputProcessor::SOVEndUseCat::Heating,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::Heating);
             } else if (highTempRadSys.HeaterType == Constant::eResource::Electricity) {
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Electricity Rate",
                                     Constant::Units::W,
                                     highTempRadSys.ElecPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     highTempRadSys.Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Electricity Energy",
                                     Constant::Units::J,
                                     highTempRadSys.ElecEnergy,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     highTempRadSys.Name,
                                     Constant::eResource::Electricity,
-                                    OutputProcessor::SOVEndUseCat::Heating,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::Heating);
             }
         }
     }
@@ -716,7 +713,7 @@ namespace HighTempRadiantSystem {
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = thisHTR.ZonePtr;
             // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
-            int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+            int SizingMethod = HVAC::HeatingCapacitySizing;
             int FieldNum = 1;
             std::string const SizingString = format("{} [W]", state.dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames(FieldNum));
             // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and

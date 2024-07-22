@@ -164,7 +164,6 @@
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
@@ -195,6 +194,7 @@
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
+#include <EnergyPlus/IndoorGreen.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>

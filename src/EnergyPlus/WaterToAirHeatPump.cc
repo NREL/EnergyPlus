@@ -102,12 +102,12 @@ namespace WaterToAirHeatPump {
                          std::string_view CompName,     // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
-                         int const CyclingScheme,       // cycling scheme--either continuous fan/cycling compressor or
+                         HVAC::FanOp const fanOp,       // cycling scheme--either continuous fan/cycling compressor or
                          bool const FirstHVACIteration, // first iteration flag
                          bool const InitFlag,           // initialization flag used to suppress property routine errors
                          Real64 const SensLoad,         // sensible load
                          Real64 const LatentLoad,       // latent load
-                         DataHVACGlobals::CompressorOperation const CompressorOp,
+                         HVAC::CompressorOp const compressorOp,
                          Real64 const PartLoadRatio)
     {
 
@@ -167,13 +167,13 @@ namespace WaterToAirHeatPump {
 
         if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) {
             InitWatertoAirHP(state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
-            CalcWatertoAirHPCooling(state, HPNum, CyclingScheme, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+            CalcWatertoAirHPCooling(state, HPNum, fanOp, FirstHVACIteration, InitFlag, SensLoad, compressorOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
         } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
             InitWatertoAirHP(state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
-            CalcWatertoAirHPHeating(state, HPNum, CyclingScheme, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+            CalcWatertoAirHPHeating(state, HPNum, fanOp, FirstHVACIteration, InitFlag, SensLoad, compressorOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
@@ -461,49 +461,46 @@ namespace WaterToAirHeatPump {
                                 "Cooling Coil Electricity Energy",
                                 Constant::Units::J,
                                 heatPump.Energy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 heatPump.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Cooling);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 Constant::Units::J,
                                 heatPump.EnergyLoadTotal,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 heatPump.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::CoolingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::CoolingCoils);
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
                                 Constant::Units::J,
                                 heatPump.EnergySensible,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 heatPump.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Latent Cooling Energy",
                                 Constant::Units::J,
                                 heatPump.EnergyLatent,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 heatPump.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Source Side Heat Transfer Energy",
                                 Constant::Units::J,
                                 heatPump.EnergySource,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 heatPump.Name,
                                 Constant::eResource::PlantLoopCoolingDemand,
-                                OutputProcessor::SOVEndUseCat::CoolingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::CoolingCoils);
 
             // save the design source side flow rate for use by plant loop sizing algorithms
             RegisterPlantCompDesignFlow(state, heatPump.WaterInletNodeNum, 0.5 * heatPump.DesignWaterVolFlowRate);
@@ -701,35 +698,32 @@ namespace WaterToAirHeatPump {
                                 "Heating Coil Electricity Energy",
                                 Constant::Units::J,
                                 heatPump.Energy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 heatPump.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
                                 Constant::Units::J,
                                 heatPump.EnergyLoadTotal,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 heatPump.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
                                 Constant::Units::J,
                                 heatPump.EnergySource,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 heatPump.Name,
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::HeatingCoils);
 
             // save the design source side flow rate for use by plant loop sizing algorithms
             RegisterPlantCompDesignFlow(state, heatPump.WaterInletNodeNum, 0.5 * heatPump.DesignWaterVolFlowRate);
@@ -760,113 +754,113 @@ namespace WaterToAirHeatPump {
                                     "Cooling Coil Electricity Rate",
                                     Constant::Units::W,
                                     heatPump.Power,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Cooling Coil Total Cooling Rate",
                                     Constant::Units::W,
                                     heatPump.QLoadTotal,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Cooling Coil Sensible Cooling Rate",
                                     Constant::Units::W,
                                     heatPump.QSensible,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Cooling Coil Latent Cooling Rate",
                                     Constant::Units::W,
                                     heatPump.QLatent,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Heat Transfer Rate",
                                     Constant::Units::W,
                                     heatPump.QSource,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Cooling Coil Part Load Ratio",
                                     Constant::Units::None,
                                     heatPump.PartLoadRatio,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Runtime Fraction",
                                     Constant::Units::None,
                                     heatPump.RunFrac,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Mass Flow Rate",
                                     Constant::Units::kg_s,
                                     heatPump.OutletAirMassFlowRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Inlet Temperature",
                                     Constant::Units::C,
                                     heatPump.InletAirDBTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Inlet Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
                                     heatPump.InletAirHumRat,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Outlet Temperature",
                                     Constant::Units::C,
                                     heatPump.OutletAirDBTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Outlet Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
                                     heatPump.OutletAirHumRat,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Mass Flow Rate",
                                     Constant::Units::kg_s,
                                     heatPump.OutletWaterMassFlowRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Inlet Temperature",
                                     Constant::Units::C,
                                     heatPump.InletWaterTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Outlet Temperature",
                                     Constant::Units::C,
                                     heatPump.OutletWaterTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
             } else if (heatPump.WAHPType == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
                 // HEATING COIL Setup Report variables for the Heat Pump
@@ -874,105 +868,105 @@ namespace WaterToAirHeatPump {
                                     "Heating Coil Electricity Rate",
                                     Constant::Units::W,
                                     heatPump.Power,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Heating Coil Heating Rate",
                                     Constant::Units::W,
                                     heatPump.QLoadTotal,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Heating Coil Sensible Heating Rate",
                                     Constant::Units::W,
                                     heatPump.QSensible,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Heat Transfer Rate",
                                     Constant::Units::W,
                                     heatPump.QSource,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Heating Coil Part Load Ratio",
                                     Constant::Units::None,
                                     heatPump.PartLoadRatio,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Runtime Fraction",
                                     Constant::Units::None,
                                     heatPump.RunFrac,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Heating Coil Air Mass Flow Rate",
                                     Constant::Units::kg_s,
                                     heatPump.OutletAirMassFlowRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Inlet Temperature",
                                     Constant::Units::C,
                                     heatPump.InletAirDBTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Inlet Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
                                     heatPump.InletAirHumRat,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Outlet Temperature",
                                     Constant::Units::C,
                                     heatPump.OutletAirDBTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Outlet Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
                                     heatPump.OutletAirHumRat,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
 
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Mass Flow Rate",
                                     Constant::Units::kg_s,
                                     heatPump.OutletWaterMassFlowRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Inlet Temperature",
                                     Constant::Units::C,
                                     heatPump.InletWaterTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Outlet Temperature",
                                     Constant::Units::C,
                                     heatPump.OutletWaterTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     heatPump.Name);
             }
         }
@@ -1213,11 +1207,11 @@ namespace WaterToAirHeatPump {
 
     void CalcWatertoAirHPCooling(EnergyPlusData &state,
                                  int const HPNum,                      // heat pump number
-                                 int const CyclingScheme,              // fan/compressor cycling scheme indicator
+                                 HVAC::FanOp const fanOp,              // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration,        // first iteration flag
                                  [[maybe_unused]] bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
-                                 DataHVACGlobals::CompressorOperation const CompressorOp,
+                                 HVAC::CompressorOp const compressorOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1350,7 +1344,7 @@ namespace WaterToAirHeatPump {
             heatPump.SimFlag = true;
         }
 
-        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
+        if (compressorOp == HVAC::CompressorOp::Off) {
             heatPump.SimFlag = false;
             return;
         }
@@ -1373,7 +1367,7 @@ namespace WaterToAirHeatPump {
         if (heatPump.PLFCurveIndex > 0) {
             PLF = Curve::CurveValue(state, heatPump.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
         }
-        if (CyclingScheme == DataHVACGlobals::CycFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Cycling) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
         }
         heatPump.RunFrac = PartLoadRatio / PLF;
@@ -1382,8 +1376,7 @@ namespace WaterToAirHeatPump {
         QLatActual = 0.0;
         // IF((RuntimeFrac .GE. 1.0) .OR. (Twet_rated .LE. 0.0) .OR. (Gamma_rated .LE. 0.0)) THEN
         // Cycling fan does not required latent degradation model, only the constant fan case
-        if ((heatPump.RunFrac >= 1.0) || (heatPump.Twet_Rated <= 0.0) || (heatPump.Gamma_Rated <= 0.0) ||
-            (CyclingScheme == DataHVACGlobals::CycFanCycCoil)) {
+        if ((heatPump.RunFrac >= 1.0) || (heatPump.Twet_Rated <= 0.0) || (heatPump.Gamma_Rated <= 0.0) || (fanOp == HVAC::FanOp::Cycling)) {
             LatDegradModelSimFlag = false;
             // Set NumIteration4=1 so that latent model would quit after 1 simulation with the actual condition
             NumIteration4 = 1;
@@ -1692,7 +1685,7 @@ namespace WaterToAirHeatPump {
                     SHRss = QSensible / QLoadTotal;
                     LoadSideInletWBTemp = PsyTwbFnTdbWPb(state, LoadSideInletDBTemp, LoadSideInletHumRat, PB);
                     SHReff = CalcEffectiveSHR(
-                        state, HPNum, SHRss, CyclingScheme, heatPump.RunFrac, QLatRated, QLatActual, LoadSideInletDBTemp, LoadSideInletWBTemp);
+                        state, HPNum, SHRss, fanOp, heatPump.RunFrac, QLatRated, QLatActual, LoadSideInletDBTemp, LoadSideInletWBTemp);
                     //   Update sensible capacity based on effective SHR
                     QSensible = QLoadTotal * SHReff;
                     goto LOOPLatentDegradationModel_exit;
@@ -1712,7 +1705,7 @@ namespace WaterToAirHeatPump {
         SourceSideOutletTemp = heatPump.InletWaterTemp + QSource / (heatPump.InletWaterMassFlowRate * CpWater);
 
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == DataHVACGlobals::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             // continuous fan, cycling compressor
             heatPump.OutletAirEnthalpy = PartLoadRatio * LoadSideAirOutletEnth + (1.0 - PartLoadRatio) * LoadSideAirInletEnth;
             heatPump.OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + (1.0 - PartLoadRatio) * LoadSideInletHumRat;
@@ -1748,11 +1741,11 @@ namespace WaterToAirHeatPump {
 
     void CalcWatertoAirHPHeating(EnergyPlusData &state,
                                  int const HPNum,                      // heat pump number
-                                 int const CyclingScheme,              // fan/compressor cycling scheme indicator
+                                 HVAC::FanOp const fanOp,              // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration,        // first iteration flag
                                  [[maybe_unused]] bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
-                                 DataHVACGlobals::CompressorOperation const CompressorOp,
+                                 HVAC::CompressorOp const compressorOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1865,7 +1858,7 @@ namespace WaterToAirHeatPump {
             heatPump.SimFlag = true;
         }
 
-        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
+        if (compressorOp == HVAC::CompressorOp::Off) {
             heatPump.SimFlag = false;
             return;
         }
@@ -2148,7 +2141,7 @@ namespace WaterToAirHeatPump {
 
         // Calculate actual outlet conditions for the run time fraction
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == DataHVACGlobals::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             // continuous fan, cycling compressor
             heatPump.OutletAirEnthalpy = PartLoadRatio * LoadSideAirOutletEnth + (1.0 - PartLoadRatio) * heatPump.InletAirEnthalpy;
             heatPump.OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + (1.0 - PartLoadRatio) * heatPump.InletAirHumRat;
@@ -2165,7 +2158,7 @@ namespace WaterToAirHeatPump {
         if (heatPump.PLFCurveIndex > 0) {
             PLF = Curve::CurveValue(state, heatPump.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
         }
-        if (CyclingScheme == DataHVACGlobals::CycFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Cycling) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
         }
         heatPump.RunFrac = PartLoadRatio / PLF;
@@ -2294,7 +2287,7 @@ namespace WaterToAirHeatPump {
     Real64 CalcEffectiveSHR(EnergyPlusData &state,
                             int const HPNum,         // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
-                            int const CyclingScheme, // fan/compressor cycling scheme indicator
+                            HVAC::FanOp const fanOp, // fan/compressor cycling scheme indicator
                             Real64 const RTF,        // Compressor run-time fraction
                             Real64 const QLatRated,  // Rated latent capacity
                             Real64 const QLatActual, // Actual latent capacity
@@ -2306,7 +2299,7 @@ namespace WaterToAirHeatPump {
         // FUNCTION INFORMATION:
         //    AUTHOR         Richard Raustad, FSEC
         //    DATE WRITTEN   September 2003
-        //    MODIFIED       Kenneth Tang (Aug 2004) Added capability for simulating CycFanCycCoil
+        //    MODIFIED       Kenneth Tang (Aug 2004) Added capability for simulating FanOp::Cycling
         //    RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
@@ -2368,12 +2361,12 @@ namespace WaterToAirHeatPump {
         //  Calculate the compressor on and off times using a conventional thermostat curve
         Ton = 3600.0 / (4.0 * heatPump.MaxONOFFCyclesperHour * (1.0 - RTF)); // duration of cooling coil on-cycle (sec)
 
-        if ((CyclingScheme == DataHVACGlobals::CycFanCycCoil) && (heatPump.FanDelayTime != 0.0)) {
-            //  For CycFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
+        if ((fanOp == HVAC::FanOp::Cycling) && (heatPump.FanDelayTime != 0.0)) {
+            //  For FanOp::Cycling, moisture is evaporated from the cooling coil back to the air stream
             //  until the fan cycle off. Assume no evaporation from the coil after the fan shuts off.
             Toff = heatPump.FanDelayTime;
         } else {
-            //  For ContFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
+            //  For FanOp::Continuous, moisture is evaporated from the cooling coil back to the air stream
             //  for the entire heat pump off-cycle.
             Toff = 3600.0 / (4.0 * heatPump.MaxONOFFCyclesperHour * RTF); // duration of cooling coil off-cycle (sec)
         }

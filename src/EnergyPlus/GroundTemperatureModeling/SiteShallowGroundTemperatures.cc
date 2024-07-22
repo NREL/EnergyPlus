@@ -108,7 +108,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
             thisModel->surfaceGroundTemps(i) = state.dataIPShortCut->rNumericArgs(i);
         }
 
-        state.dataEnvrn->GroundTemp_SurfaceObjInput = true;
+        state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::Shallow] = true;
 
     } else if (numCurrObjects > 1) {
         ShowSevereError(state,

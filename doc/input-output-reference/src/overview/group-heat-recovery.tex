@@ -264,12 +264,6 @@ The sensible heat exchange effectiveness at the \emph{heating} condition defined
 
 The latent heat exchange effectiveness at the \emph{heating} condition defined in Table~\ref{table:operating-conditions-for-defining-heat} with both the supply and exhaust air volume flow rates equal to 100\% of the nominal supply air flow rate. Specify this value as 0.0 if the heat exchanger does not transfer latent energy. The default value for this field is 0.
 
-\paragraph{Field: Sensible Effectiveness at 75\% Heating Air Flow}\label{field-sensible-effectiveness-at-75-heating-air-flow}
-
-The sensible heat exchange effectiveness at the \emph{heating} condition defined in Table~\ref{table:operating-conditions-for-defining-heat} with both the supply and exhaust air volume flow rates equal to 75\% of the nominal supply air flow rate. The default value for this field is 0.
-
-\paragraph{Field: Latent Effectiveness at 75\% Heating Air Flow}\label{field-latent-effectiveness-at-75-heating-air-flow}
-
 The latent heat exchange effectiveness at the \emph{heating} condition defined in Table~\ref{table:operating-conditions-for-defining-heat} with both the supply and exhaust air volume flow rates equal to 75\% of the nominal supply air flow rate. Specify this value as 0.0 if the heat exchanger does not transfer latent energy. The default value for this field is 0.
 
 \paragraph{Field: Sensible Effectiveness at 100\% Cooling Air Flow}\label{field-sensible-effectiveness-at-100-cooling-air-flow}
@@ -279,14 +273,6 @@ The sensible heat exchange effectiveness at the \emph{cooling} condition defined
 \paragraph{Field: Latent Effectiveness at 100\% Cooling Air Flow}\label{field-latent-effectiveness-at-100-cooling-air-flow}
 
 The latent heat exchange effectiveness at the \emph{cooling} condition defined in Table~\ref{table:operating-conditions-for-defining-heat} with both the supply and exhaust air volume flow rates equal to 100\% of the nominal supply air flow rate. Specify this value as 0.0 if the heat exchanger does not transfer latent energy. The default value for this field is 0.
-
-\paragraph{Field: Sensible Effectiveness at 75\% Cooling Air Flow}\label{field-sensible-effectiveness-at-75-cooling-air-flow}
-
-The sensible heat exchange effectiveness at the \emph{cooling} condition defined in Table~\ref{table:operating-conditions-for-defining-heat} with both the supply and exhaust air volume flow rates equal to 75\% of the nominal supply air flow rate. The default value for this field is 0.
-
-\paragraph{Field: Latent Effectiveness at 75\% Cooling Air Flow}\label{field-latent-effectiveness-at-75-cooling-air-flow}
-
-The latent heat exchange effectiveness at the \emph{cooling} condition defined in Table~\ref{table:operating-conditions-for-defining-heat} with both the supply and exhaust air volume flow rates equal to 75\% of the nominal supply air flow rate. Specify this value as 0.0 if the heat exchanger does not transfer latent energy. The default value for this field is 0.
 
 \paragraph{Field: Supply Air Inlet Node Name}\label{field-supply-air-inlet-node-name-1-000}
 
@@ -391,6 +377,22 @@ The model does not allow the total defrost time fraction to exceed 1.0 or be les
 \paragraph{Field: Economizer Lockout}\label{field-economizer-lockout-1}
 
 This input denotes whether the heat exchanger unit is locked out (bypassed for plate type heat exchangers or the rotation is suspended for rotary type heat exchangers) when the air-side economizer is operating. Both the economizer and high humidity control (Ref. \hyperref[controlleroutdoorair]{Controller:OutdoorAir}) activate the heat exchanger lockout as specified by this input. The input choices are \emph{Yes} (meaning locked out) or \emph{No}. The default input for this field is Yes.
+
+\paragraph{Field: Sensible Effectiveness of Heating Air Flow Curve Name}\label{field-sensible-effectiveness-of-heating-air-flow-curve-name-1}
+
+This optional input allows the user to specify a curve that determines the value of the sensible effectiveness for heating.  The result of the curve is multipled by the sensible effectiveness at 100\% heating (see field: \hyperref[field-sensible-effectiveness-at-100-heating-air-flow]{Sensible Effectiveness at 100\% Heating Air Flow} above).
+
+\paragraph{Field: Latent Effectiveness of Heating Air Flow Curve Name}\label{field-latent-effectiveness-of-heating-air-flow-curve-name-1}
+
+This optional input allows the user to specify a curve that determines the value of the latent effectiveness for heating.  The result of the curve is multipled by the latent effectiveness at 100\% heating (see field: \hyperref[field-latent-effectiveness-at-100-heating-air-flow]{Latent Effectiveness at 100\% Heating Air Flow} above).
+
+\paragraph{Field: Sensible Effectiveness of Cooling Air Flow Curve Name}\label{field-sensible-effectiveness-of-cooling-air-flow-curve-name-1}
+
+This optional input allows the user to specify a curve that determines the value of the sensible effectiveness for cooling.  The result of the curve is multipled by the sensible effectiveness at 100\% cooling (see field: \hyperref[field-sensible-effectiveness-at-100-cooling-air-flow]{Sensible Effectiveness at 100\% Cooling Air Flow} above).
+
+\paragraph{Field: Latent Effectiveness of Cooling Air Flow Curve Name}\label{field-latent-effectiveness-of-cooling-air-flow-curve-name-1}
+
+This optional input allows the user to specify a curve that determines the value of the latent effectiveness for cooling.  The result of the curve is multipled by the latent effectiveness at 100\% cooling (see field: \hyperref[field-latent-effectiveness-at-100-cooling-air-flow]{Latent Effectiveness at 100\% Cooling Air Flow} above).
 
 Following is an example input for this heat exchanger object:
 

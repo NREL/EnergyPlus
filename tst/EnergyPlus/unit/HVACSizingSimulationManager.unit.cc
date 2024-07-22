@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -69,7 +70,6 @@ using namespace DataSizing;
 using namespace OutputReportPredefined;
 using namespace DataLoopNode;
 using namespace OutputProcessor;
-using namespace DataHVACGlobals;
 
 class HVACSizingSimulationManagerTest : public EnergyPlusFixture
 {
@@ -116,9 +116,8 @@ protected:
         state->dataLoopNodes->Node.allocate(1);
         // OutputProcessor::TimeValue.allocate(2);
         // set up time related
-        SetupTimePointers(
-            *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+        SetupTimePointers(*state, OutputProcessor::TimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        SetupTimePointers(*state, OutputProcessor::TimeStepType::System, state->dataHVACGlobal->TimeStepSys);
 
         state->dataGlobal->NumOfTimeStepInHour = 4;
         state->dataWeather->TimeStepFraction = 1.0 / double(state->dataGlobal->NumOfTimeStepInHour);
@@ -137,6 +136,8 @@ protected:
 
 TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 {
+
+    FluidProperties::GetFluidPropertiesData(*state);
 
     // this test emulates two design days and two sizing weather file days periods
     // calls code related to coincident plant sizing with HVAC sizing simulation
@@ -372,6 +373,8 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 
 TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
+
     // this test emulates two design days and calls nearly all the OO code related
     // to coincident plant sizing with HVAC sizing simulation
     // this test runs 3 system timesteps for each zone timestep
@@ -517,6 +520,9 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 
 TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
 {
+
+    FluidProperties::GetFluidPropertiesData(*state);
+
     // this test emulates two design days and calls nearly all the OO code related
     // to coincident plant sizing with HVAC sizing simulation
     // this test runs 1 system timestep for each zone timestep
@@ -605,6 +611,9 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
 
 TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
 {
+
+    FluidProperties::GetFluidPropertiesData(*state);
+
     // this test emulates two design days and calls nearly all the OO code related
     // to coincident plant sizing with HVAC sizing simulation
     // this test run varies the system timestep some to test irregular

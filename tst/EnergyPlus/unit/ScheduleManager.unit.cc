@@ -59,6 +59,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -1457,9 +1458,50 @@ TEST_F(EnergyPlusFixture, ScheduleFileDSTtoggleOptionTest)
     EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch4idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1.0);
 }
 
-TEST_F(EnergyPlusFixture, ShadowCalculation_CSV_extra_parenthesis)
+TEST_F(EnergyPlusFixture, ScheduleFile_Blanks)
 {
 
+    // On the third line (second data record after header), there is a blank in the second column
+    fs::path scheduleFile = FileSystem::makeNativePath(configured_source_directory() / "tst/EnergyPlus/unit/Resources/schedule_file_with_blank.csv");
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:File,",
+        "  Test1,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  " + scheduleFile.string() + ",              !- File Name",
+        "  2,                       !- Column Number",
+        "  1,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Comma,                   !- Column Separator",
+        "  No,                      !- Interpolate to Timestep",
+        "  60,                      !- Minutes per item",
+        "  Yes;                     !- Adjust Schedule for Daylight Savings",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * Constant::SecInHour;
+    state->dataEnvrn->CurrentYearIsLeapYear = false;
+
+    ASSERT_THROW(ScheduleManager::ProcessScheduleInput(*state), EnergyPlus::FatalError); // read schedules
+
+    const std::string expected_error = delimited_string({
+        "   ** Severe  ** CsvParser - Line 3 - Expected 3 columns, got 2. Error in following line.",
+        "   **   ~~~   ** 1,,0.33",
+        "   **   ~~~   ** Error Occurred in " + scheduleFile.string(),
+        "   **  Fatal  ** Program terminates due to previous condition.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=CsvParser - Line 3 - Expected 3 columns, got 2. Error in following line.",
+    });
+
+    compare_err_stream(expected_error);
+}
+
+TEST_F(EnergyPlusFixture, ShadowCalculation_CSV_extra_parenthesis)
+{
     // 9753 - Test backward compat:
     // a CSV exported with the extra '()' at the end (22.2.0 and below) should still be importable in E+ without crashing
     const fs::path scheduleFile = configured_source_directory() / "tst/EnergyPlus/unit/Resources/shading_data_2220.csv";
@@ -1562,4 +1604,122 @@ TEST_F(EnergyPlusFixture, ShadowCalculation_CSV_extra_parenthesis)
     TS = 4;
     iHour = 24;
     EXPECT_EQ(0.00000000, state->dataScheduleMgr->DaySchedule(iDay).TSValue(TS, iHour));
+}
+
+TEST_F(EnergyPlusFixture, getScheduleMinMaxByDayType_test)
+{
+    // J.Glazer - March 2024
+
+    std::string const idf_objects = delimited_string({
+        "ScheduleTypeLimits,",
+        "  Any Number;              !- Name",
+        " ",
+        "Schedule:Compact,",
+        "  HighLow01,",
+        "  Any Number,",
+        "  Through: 12/31,",
+        "  For: WeekDays CustomDay1 CustomDay2,",
+        "  Until: 8:00,0.42,",
+        "  Until: 11:00,0.75,",
+        "  Until: 12:00,0.80,",
+        "  Until: 13:00,0.40,",
+        "  Until: 14:00,0.87,",
+        "  Until: 18:00,0.75,",
+        "  Until: 19:00,0.50,",
+        "  Until: 24:00,0.40,",
+        "  For: Weekends Holiday,",
+        "  Until: 8:00,0.30,",
+        "  Until: 24:00,0.83,",
+        "  For: SummerDesignDay,",
+        "  Until: 8:00,0.85,",
+        "  Until: 24:00,0.95,",
+        "  For: WinterDesignDay,",
+        "  Until: 8:00,0.17,",
+        "  Until: 24:00,0.15;",
+        " ",
+        "Schedule:Compact,",
+        "  HighLow02,",
+        "  Any Number,",
+        "  Through: 4/30,",
+        "  For: WeekDays CustomDay1 CustomDay2,",
+        "  Until: 24:00,0.21,",
+        "  For: Weekends Holiday,",
+        "  Until: 24:00,0.65,",
+        "  For: SummerDesignDay,",
+        "  Until: 24:00,0.76,",
+        "  Until: 24:00,0.79,",
+        "  For: WinterDesignDay,",
+        "  Until: 24:00,0.16,",
+        "  Until: 24:00,0.18,",
+        "  Through: 12/31,",
+        "  For: WeekDays CustomDay1 CustomDay2,",
+        "  Until: 24:00,0.73,",
+        "  For: Weekends Holiday,",
+        "  Until: 24:00,0.27,",
+        "  For: SummerDesignDay,",
+        "  Until: 8:00,0.77,",
+        "  Until: 24:00,0.85,",
+        "  For: WinterDesignDay,",
+        "  Until: 8:00,0.19,",
+        "  Until: 24:00,0.25;",
+        " ",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataGlobal->MinutesPerTimeStep = 15;
+    state->dataGlobal->TimeStepZone = 0.25;
+
+    Real64 schMin;
+    Real64 schMax;
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, -1, DayTypeGroup::Weekday);
+    EXPECT_EQ(1.0, schMin);
+    EXPECT_EQ(1.0, schMax);
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, 0, DayTypeGroup::Weekday);
+    EXPECT_EQ(0.0, schMin);
+    EXPECT_EQ(0.0, schMax);
+
+    int index = GetScheduleIndex(*state, "HIGHLOW01");
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::Weekday);
+    EXPECT_EQ(0.40, schMin);
+    EXPECT_EQ(0.87, schMax);
+
+    // repeat test to see if using cached values
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::Weekday);
+    EXPECT_EQ(0.40, schMin);
+    EXPECT_EQ(0.87, schMax);
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::WeekEndHoliday);
+    EXPECT_EQ(0.30, schMin);
+    EXPECT_EQ(0.83, schMax);
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::SummerDesignDay);
+    EXPECT_EQ(0.85, schMin);
+    EXPECT_EQ(0.95, schMax);
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::WinterDesignDay);
+    EXPECT_EQ(0.15, schMin);
+    EXPECT_EQ(0.17, schMax);
+
+    index = GetScheduleIndex(*state, "HIGHLOW02");
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::Weekday);
+    EXPECT_EQ(0.21, schMin);
+    EXPECT_EQ(0.73, schMax);
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::WeekEndHoliday);
+    EXPECT_EQ(0.27, schMin);
+    EXPECT_EQ(0.65, schMax);
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::SummerDesignDay);
+    EXPECT_EQ(0.76, schMin);
+    EXPECT_EQ(0.85, schMax);
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::WinterDesignDay);
+    EXPECT_EQ(0.16, schMin);
+    EXPECT_EQ(0.25, schMax);
 }

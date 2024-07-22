@@ -94,7 +94,7 @@ struct CoilCoolingDXCurveFitOperatingMode
                            DataLoopNode::NodeData &outletNode,
                            int speedNum,
                            Real64 speedRatio,
-                           int fanOpMode,
+                           HVAC::FanOp const fanOp,
                            DataLoopNode::NodeData &condInletNode,
                            DataLoopNode::NodeData &condOutletNode,
                            bool singleMode);
