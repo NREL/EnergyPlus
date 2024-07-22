@@ -3401,14 +3401,13 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
 
             if (thisVrfTU.VRFSysNum > 0) {
-                // VRFTU Supply Air Fan Object Type must be Fan:SystemModel if VRF Algorithm Type is AlgorithmTypeFluidTCtrl
+                // VRFTU Supply Air Fan Object Type must be Fan:VariableVolume if VRF Algorithm Type is AlgorithmTypeFluidTCtrl
                 if (state.dataHVACVarRefFlow->VRF(thisVrfTU.VRFSysNum).VRFAlgorithmType == AlgorithmType::FluidTCtrl &&
-                    !(thisVrfTU.fanType == HVAC::FanType::SystemModel)) {
+                    !(thisVrfTU.fanType == HVAC::FanType::VAV || thisVrfTU.fanType == HVAC::FanType::SystemModel)) {
                     ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfTU.Name);
                     ShowContinueError(state, "Fan type specified = " + cAlphaArgs(7));
                     ShowContinueError(
-                        state,
-                        "Fan Object Type must be Fan:VariableSystemModel if VRF AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl");
+                        state, "Fan Object Type must be Fan:VariableVolume if VRF AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl");
                     ShowContinueError(state, "is used to model VRF outdoor unit.");
                     ErrorsFound = true;
                 }
