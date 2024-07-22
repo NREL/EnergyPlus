@@ -939,10 +939,11 @@ namespace FluidProperties {
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumHPoints) {
                                 ShowSevereError(
                                     state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
-                                ShowSevereError(state,
-                                                format("Temperature Name={}, Temperature array and saturated fluid enthalpy array must have the same "
-                                                       "number of points",
-                                                       TempsName));
+                                ShowContinueError(
+                                    state,
+                                    format("Temperature Name={}, Temperature array and saturated fluid enthalpy array must have the same "
+                                           "number of points",
+                                           TempsName));
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # points={}",
                                                          NumNumbers,
@@ -1105,7 +1106,7 @@ namespace FluidProperties {
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumCpPoints) {
                                 ShowSevereError(
                                     state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
-                                ShowSevereError(
+                                ShowContinueError(
                                     state,
                                     format("Temperature Name={}, Temperature array and saturated fluid Cp array must have the same number of points",
                                            TempsName));
@@ -1395,7 +1396,7 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g density data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
-                    ShowSevereError(
+                    ShowContinueError(
                         state,
                         format(R"(No Saturated Gas/Fluid Density found. Need properties to be entered with {}="Density" and {}="FluidGas".)",
                                cAlphaFieldNames(2),
@@ -1767,12 +1768,12 @@ namespace FluidProperties {
 
             if (NumOfPressPts == 0) {
                 ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
-                ShowSevereError(state, "No pressure data found for superheated density");
+                ShowContinueError(state, "No pressure data found for superheated density");
                 ErrorsFound = true;
             }
             if (NumOfPressPts != state.dataFluidProps->RefrigData(Loop).NumSuperPressPts) {
                 ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
-                ShowSevereError(state, "Number of pressure points for superheated data different for enthalpy and density");
+                ShowContinueError(state, "Number of pressure points for superheated data different for enthalpy and density");
                 ErrorsFound = true;
             }
 

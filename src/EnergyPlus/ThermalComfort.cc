@@ -2013,7 +2013,7 @@ namespace ThermalComfort {
             int WhichAFList = thisPeople.AngleFactorListPtr;
             if (WhichAFList == 0 && (thisPeople.Fanger || thisPeople.Pierce || thisPeople.KSU)) {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid", routineName, cCurrentModuleObject, thisPeople.AngleFactorListName));
-                ShowSevereError(state, format("... Angle Factor List Name not found for PEOPLE=\"{}\"", thisPeople.Name));
+                ShowContinueError(state, format("... Angle Factor List Name not found for PEOPLE=\"{}\"", thisPeople.Name));
                 ErrorsFound = true;
             } else {
                 auto &thisAngFacList = state.dataThermalComforts->AngleFactorList(WhichAFList);

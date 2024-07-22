@@ -774,8 +774,8 @@ namespace DesiccantDehumidifiers {
                                                                             DataLoopNode::ObjectIsNotParent);
 
             if (desicDehum.ControlNodeNum == 0) {
-                ShowContinueError(state, format("{} = \"{}\"", desicDehum.DehumType, desicDehum.Name));
-                ShowSevereError(state, format("{} must be specified.", cAlphaFields(5)));
+                ShowSevereError(state, format("{} = \"{}\"", desicDehum.DehumType, desicDehum.Name));
+                ShowContinueError(state, format("{} must be specified.", cAlphaFields(5)));
                 ErrorsFoundGeneric = true;
             }
 

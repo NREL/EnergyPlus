@@ -496,7 +496,7 @@ namespace PlantChillers {
                     if (thisChiller.CondVolFlowRate <= 0.0) {
                         ShowSevereError(
                             state, format("Invalid {}={:.6R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
-                        ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
+                        ShowContinueError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
                         ShowContinueError(
                             state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
@@ -2543,7 +2543,7 @@ namespace PlantChillers {
                     if (thisChiller.CondVolFlowRate <= 0.0) {
                         ShowSevereError(
                             state, format("Invalid {}={:.6R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
-                        ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
+                        ShowContinueError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
                         ShowContinueError(
                             state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
@@ -4555,7 +4555,7 @@ namespace PlantChillers {
                     if (thisChiller.CondVolFlowRate <= 0.0) {
                         ShowSevereError(
                             state, format("Invalid {}={:.6R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
-                        ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
+                        ShowContinueError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
                         ShowContinueError(
                             state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;

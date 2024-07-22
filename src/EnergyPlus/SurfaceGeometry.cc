@@ -10644,7 +10644,7 @@ namespace SurfaceGeometry {
                 auto const &surf = state.dataSurface->Surface(SurfNum);
                 if (surf.Class != SurfaceClass::Window || surf.ExtBoundCond != 0) {
                     ShowSevereError(state, format("{}=\"{}\"", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                    ShowSevereError(state, format("cannot be used with surface={}", surf.Name));
+                    ShowContinueError(state, format("cannot be used with surface={}", surf.Name));
                     ShowContinueError(state, "because that surface is not an exterior window.");
                     ErrorsFound = true;
                 }
@@ -12172,10 +12172,10 @@ namespace SurfaceGeometry {
                         (MaterialLayerGroup == Material::Group::ScreenEquivalentLayer) ||
                         (MaterialLayerGroup == Material::Group::GapEquivalentLayer)) {
                         ShowSevereError(state, format("Invalid movable insulation material for {}:", cCurrentModuleObject));
-                        ShowSevereError(
+                        ShowContinueError(
                             state,
                             format("...Movable insulation material type specified = {}", cMaterialGroupType(static_cast<int>(MaterialLayerGroup))));
-                        ShowSevereError(state, format("...Movable insulation material name specified = {}", state.dataIPShortCut->cAlphaArgs(3)));
+                        ShowContinueError(state, format("...Movable insulation material name specified = {}", state.dataIPShortCut->cAlphaArgs(3)));
                         ErrorsFound = true;
                     }
                     if (SchNum == 0) {

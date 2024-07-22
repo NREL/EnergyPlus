@@ -218,8 +218,8 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
             if (material->ROnly) {
                 //        CALL ShowSevereError('EMPD base material = "'//TRIM(dataMaterial.Material(MaterNum)%Name)//  &
                 //                             '" was Material:NoMass. It cannot be used for EMPD calculations.')
-                ShowContinueError(state, "..Only Material base materials are allowed to have EMPD properties.");
-                ShowSevereError(
+                ShowSevereError(state, "..Only Material base materials are allowed to have EMPD properties.");
+                ShowContinueError(
                     state,
                     format("{}: Reference Material is not appropriate type for EMPD properties, material={}, must have regular properties (L,Cp,K,D)",
                            cCurrentModuleObject,
