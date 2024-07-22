@@ -64,7 +64,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
-#include <EnergyPlus/extendedHI.hh>
+#include <EnergyPlus/ExtendedHI.hh>
 
 namespace EnergyPlus {
 
@@ -384,12 +384,12 @@ namespace ExtendedHI {
         Real64 Rf;
 
         if (flux1 <= 0.0) {
-            eqvar_name = static_cast<int>(eqvarName::phi);
+            eqvar_name = static_cast<int>(EqvarName::Phi);
             phi = 1.0 - (Q - Qv(Ta, Pa)) * Rs / (Tc - Ts);
             Rf = std::numeric_limits<Real64>::infinity();
             return {eqvar_name, phi};
         } else if (flux2 <= 0.0) {
-            eqvar_name = static_cast<int>(eqvarName::Rf);
+            eqvar_name = static_cast<int>(EqvarName::Rf);
             Real64 Ts_bar = Tc - (Q - Qv(Ta, Pa)) * Rs / phi + (1.0 / phi - 1.0) * (Tc - Ts);
             General::SolveRoot(
                 state,
@@ -419,7 +419,7 @@ namespace ExtendedHI {
                     0.0,
                     Tc);
                 Rs = (Tc - Ts) / (Q - Qv(Ta, Pa));
-                eqvar_name = static_cast<int>(eqvarName::Rs);
+                eqvar_name = static_cast<int>(EqvarName::Rs);
                 Real64 Ps = Pc - (Pc - Pa) * Zs(Rs) / (Zs(Rs) + Za_un);
                 if (Ps > phi_salt * pvstar(Ts)) {
                     General::SolveRoot(
@@ -436,7 +436,7 @@ namespace ExtendedHI {
                 return {eqvar_name, Rs};
             } else {
                 Rs = 0.0;
-                eqvar_name = static_cast<int>(eqvarName::dTcdt);
+                eqvar_name = static_cast<int>(EqvarName::DTcdt);
                 dTcdt = (1.0 / C) * flux3;
                 return {eqvar_name, dTcdt};
             }
@@ -449,10 +449,10 @@ namespace ExtendedHI {
         Real64 T;
         int SolFla;
 
-        if (eqvar_name == static_cast<int>(eqvarName::phi)) {
+        if (eqvar_name == static_cast<int>(EqvarName::Phi)) {
             General::SolveRoot(
                 state, tol, maxIter, SolFla, T, [&](Real64 T) { return find_eqvar_phi(state, T, 1.0) - eqvar; }, 0.0, 240.0);
-        } else if (eqvar_name == static_cast<int>(eqvarName::Rf)) {
+        } else if (eqvar_name == static_cast<int>(EqvarName::Rf)) {
             General::SolveRoot(
                 state,
                 tol,
@@ -462,7 +462,7 @@ namespace ExtendedHI {
                 [&](Real64 T) { return (find_eqvar_Rf(state, T, std::min(1.0, Pa0 / pvstar(T)))) - eqvar; },
                 230.0,
                 300.0);
-        } else if (eqvar_name == static_cast<int>(eqvarName::Rs)) {
+        } else if (eqvar_name == static_cast<int>(EqvarName::Rs)) {
             General::SolveRoot(
                 state, tol, maxIter, SolFla, T, [&](Real64 T) { return find_eqvar_rs(state, T, Pa0 / pvstar(T)) - eqvar; }, 295.0, 350.0);
         } else {

@@ -119,7 +119,7 @@
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <EnergyPlus/WindowManagerExteriorThermal.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <EnergyPlus/extendedHI.hh>
+#include <EnergyPlus/ExtendedHI.hh>
 #include <WCECommon.hpp>
 #include <WCEMultiLayerOptics.hpp>
 #include <WCESingleLayerOptics.hpp>
@@ -5623,8 +5623,7 @@ void CalcThermalResilience(EnergyPlusData &state)
             Real64 const ZoneRH = Psychrometrics::PsyRhFnTdbWPb(state, ZoneT, ZoneW, state.dataEnvrn->OutBaroPress);
             Real64 const ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
             // calculate extended heat index
-            state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex =
-                ExtendedHI::heatindex(state, ZoneT + Constant::Kelvin, ZoneRH) - Constant::Kelvin;
+            state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex = ExtendedHI::heatindex(state, ZoneT + Constant::Kelvin, ZoneRH) - Constant::Kelvin;
         }
     }
     if (state.dataHeatBalSurfMgr->reportVarHumidex || state.dataOutRptTab->displayThermalResilienceSummary) {

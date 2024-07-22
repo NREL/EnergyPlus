@@ -60,13 +60,13 @@ struct EnergyPlusData;
 
 namespace ExtendedHI {
 
-    enum class eqvarName
+    enum class EqvarName
     {
         Invalid = -1,
-        phi = 1,
+        Phi = 1,
         Rf = 2,
         Rs = 3,
-        dTcdt = 4,
+        DTcdt = 4,
         Num
     };
 

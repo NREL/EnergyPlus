@@ -57,7 +57,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
-#include <EnergyPlus/extendedHI.hh>
+#include <EnergyPlus/ExtendedHI.hh>
 
 using namespace EnergyPlus;
 using namespace ExtendedHI;
@@ -220,48 +220,48 @@ TEST_F(EnergyPlusFixture, extendedHI_find_eqvar)
     Real64 tol = 1e-5;
     std::vector<Real64> Ta_values = {240, 260, 280, 300, 320, 340, 360};
     std::vector<Real64> RH_values = {0, 0.2, 0.4, 0.6, 0.8, 1.0};
-    std::vector<std::vector<int>> result_0 = {{static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf)},
-                                              {static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf)},
-                                              {static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rf)},
-                                              {static_cast<int>(eqvarName::Rf),
-                                               static_cast<int>(eqvarName::Rs),
-                                               static_cast<int>(eqvarName::Rs),
-                                               static_cast<int>(eqvarName::Rs),
-                                               static_cast<int>(eqvarName::Rs),
-                                               static_cast<int>(eqvarName::Rs)},
-                                              {static_cast<int>(eqvarName::Rs),
-                                               static_cast<int>(eqvarName::Rs),
-                                               static_cast<int>(eqvarName::dTcdt),
-                                               static_cast<int>(eqvarName::dTcdt),
-                                               static_cast<int>(eqvarName::dTcdt),
-                                               static_cast<int>(eqvarName::dTcdt)},
-                                              {static_cast<int>(eqvarName::Rs),
-                                               static_cast<int>(eqvarName::dTcdt),
-                                               static_cast<int>(eqvarName::dTcdt),
-                                               static_cast<int>(eqvarName::dTcdt),
-                                               static_cast<int>(eqvarName::dTcdt),
-                                               static_cast<int>(eqvarName::dTcdt)},
-                                              {static_cast<int>(eqvarName::Rs),
-                                               static_cast<int>(eqvarName::dTcdt),
-                                               static_cast<int>(eqvarName::dTcdt),
-                                               static_cast<int>(eqvarName::dTcdt),
-                                               static_cast<int>(eqvarName::dTcdt),
-                                               static_cast<int>(eqvarName::dTcdt)}};
+    std::vector<std::vector<int>> result_0 = {{static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf)},
+                                              {static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf)},
+                                              {static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rf)},
+                                              {static_cast<int>(EqvarName::Rf),
+                                               static_cast<int>(EqvarName::Rs),
+                                               static_cast<int>(EqvarName::Rs),
+                                               static_cast<int>(EqvarName::Rs),
+                                               static_cast<int>(EqvarName::Rs),
+                                               static_cast<int>(EqvarName::Rs)},
+                                              {static_cast<int>(EqvarName::Rs),
+                                               static_cast<int>(EqvarName::Rs),
+                                               static_cast<int>(EqvarName::DTcdt),
+                                               static_cast<int>(EqvarName::DTcdt),
+                                               static_cast<int>(EqvarName::DTcdt),
+                                               static_cast<int>(EqvarName::DTcdt)},
+                                              {static_cast<int>(EqvarName::Rs),
+                                               static_cast<int>(EqvarName::DTcdt),
+                                               static_cast<int>(EqvarName::DTcdt),
+                                               static_cast<int>(EqvarName::DTcdt),
+                                               static_cast<int>(EqvarName::DTcdt),
+                                               static_cast<int>(EqvarName::DTcdt)},
+                                              {static_cast<int>(EqvarName::Rs),
+                                               static_cast<int>(EqvarName::DTcdt),
+                                               static_cast<int>(EqvarName::DTcdt),
+                                               static_cast<int>(EqvarName::DTcdt),
+                                               static_cast<int>(EqvarName::DTcdt),
+                                               static_cast<int>(EqvarName::DTcdt)}};
 
     std::vector<std::vector<Real64>> result_1 = {{33.04275, 32.69563, 32.35542, 32.02191, 31.69491, 31.37423},
                                                  {1.56043, 1.54633, 1.53238, 1.51858, 1.50491, 1.49139},
@@ -287,23 +287,23 @@ TEST_F(EnergyPlusFixture, extendedHI_find_T)
     std::vector<Real64> Rf_values = {30, 32, 34, 36, 38};
     std::vector<Real64> result_0_rf = {240.0675404, 239.9711237, 239.8858108, 239.8097882, 239.7416167};
     for (size_t i = 0; i < Rf_values.size(); ++i) {
-        EXPECT_NEAR(ExtendedHI::find_T(*state, static_cast<int>(EnergyPlus::ExtendedHI::eqvarName::Rf), Rf_values[i]), result_0_rf[i], tol);
+        EXPECT_NEAR(ExtendedHI::find_T(*state, static_cast<int>(EnergyPlus::ExtendedHI::EqvarName::Rf), Rf_values[i]), result_0_rf[i], tol);
     }
     std::vector<Real64> Rs_values = {0.01, 0.02, 0.03};
     std::vector<Real64> result_0_rs = {337.8697, 329.7587, 307.4816};
     tol = 1e-4;
     for (size_t i = 0; i < Rs_values.size(); ++i) {
-        EXPECT_NEAR(ExtendedHI::find_T(*state, static_cast<int>(EnergyPlus::ExtendedHI::eqvarName::Rs), Rs_values[i]), result_0_rs[i], tol);
+        EXPECT_NEAR(ExtendedHI::find_T(*state, static_cast<int>(EnergyPlus::ExtendedHI::EqvarName::Rs), Rs_values[i]), result_0_rs[i], tol);
     }
     std::vector<Real64> phi_values = {0.86, 0.88, 0.90, 0.92, 0.94, 0.96};
     std::vector<Real64> result_0_phi = {228.6900, 215.9994, 199.0012, 175.1865, 139.7124, 82.0478};
     for (size_t i = 0; i < phi_values.size(); ++i) {
-        EXPECT_NEAR(ExtendedHI::find_T(*state, static_cast<int>(EnergyPlus::ExtendedHI::eqvarName::phi), phi_values[i]), result_0_phi[i], tol);
+        EXPECT_NEAR(ExtendedHI::find_T(*state, static_cast<int>(EnergyPlus::ExtendedHI::EqvarName::Phi), phi_values[i]), result_0_phi[i], tol);
     }
     std::vector<Real64> dTcdt_values = {0.01, 0.03, 0.05, 0.07, 0.09};
     std::vector<Real64> result_0_dTcdt = {412.5272, 512.3596, 584.547, 641.1988, 688.0423};
     for (size_t i = 0; i < dTcdt_values.size(); ++i) {
-        EXPECT_NEAR(ExtendedHI::find_T(*state, static_cast<int>(EnergyPlus::ExtendedHI::eqvarName::dTcdt), dTcdt_values[i]), result_0_dTcdt[i], tol);
+        EXPECT_NEAR(ExtendedHI::find_T(*state, static_cast<int>(EnergyPlus::ExtendedHI::EqvarName::DTcdt), dTcdt_values[i]), result_0_dTcdt[i], tol);
     }
 }
 
