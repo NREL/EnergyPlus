@@ -263,13 +263,11 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         state.dataZoneEquip->ReturnAirPath.allocate(state.dataZoneEquip->NumReturnAirPaths);
     }
 
-    state.dataZoneEquip->ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones); // Allocate the array containing the configuration
+    state.dataZoneEquip->ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones); // Allocate the array containing the configuration data for each zone
     if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
-        state.dataZoneEquip->spaceEquipConfig.allocate(state.dataGlobal->numSpaces); // Allocate the array containing the configuration
+        state.dataZoneEquip->spaceEquipConfig.allocate(
+            state.dataGlobal->numSpaces); // Allocate the array containing the configuration data for each space
     }
-    // data for each zone to the number of controlled zones
-    // found in the input file.  This may or may not
-    // be the same as the number of zones in the building
     state.dataZoneEquip->ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
     state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, Avail::Status::NoAction);
     state.dataZoneEquip->UniqueZoneEquipListNames.reserve(state.dataGlobal->NumOfZones);
@@ -1102,14 +1100,18 @@ void processZoneEquipmentInput(EnergyPlusData &state,
 
         thisEquipConfig.ReturnNode.allocate(NumNodes);
         thisEquipConfig.ReturnNodeAirLoopNum.allocate(NumNodes);
+        thisEquipConfig.ReturnNodeRetPathNum.allocate(NumNodes);
+        thisEquipConfig.ReturnNodeRetPathCompNum.allocate(NumNodes);
         thisEquipConfig.ReturnNodeInletNum.allocate(NumNodes);
         thisEquipConfig.FixedReturnFlow.allocate(NumNodes);
         thisEquipConfig.ReturnNodePlenumNum.allocate(NumNodes);
         thisEquipConfig.ReturnNodeExhaustNodeNum.allocate(NumNodes);
         thisEquipConfig.SharedExhaustNode.allocate(NumNodes);
-        thisEquipConfig.ReturnNode = 0;                                         // initialize to zero here
-        thisEquipConfig.ReturnNodeAirLoopNum = 0;                               // initialize to zero here
-        thisEquipConfig.ReturnNodeInletNum = 0;                                 // initialize to zero here
+        thisEquipConfig.ReturnNode = 0;           // initialize to zero here
+        thisEquipConfig.ReturnNodeAirLoopNum = 0; // initialize to zero here
+        thisEquipConfig.ReturnNodeInletNum = 0;   // initialize to zero here
+        thisEquipConfig.ReturnNodeRetPathNum = 0;
+        thisEquipConfig.ReturnNodeRetPathCompNum = 0;
         thisEquipConfig.FixedReturnFlow = false;                                // initialize to false here
         thisEquipConfig.ReturnNodePlenumNum = 0;                                // initialize to zero here
         thisEquipConfig.ReturnNodeExhaustNodeNum = 0;                           // initialize to zero here

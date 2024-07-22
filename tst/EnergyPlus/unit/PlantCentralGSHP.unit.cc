@@ -62,6 +62,7 @@ using namespace EnergyPlus;
 
 TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 {
+    state->init_state(*state);
     // Allocate One Wrapper with One module (=distinct ChillerHeaterPerformance:Electric:EIR)
     // but with a number of identical number module of 2 in CentralHeatPumpSystem
     int NumWrappers = 1;

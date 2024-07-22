@@ -7136,6 +7136,112 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ZeroRatedCoolingCapacity_Test)
               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy);
 }
 
+TEST_F(EnergyPlusFixture, VariableSpeedCoolingCoils_AutosizePumpPower)
+{
+    std::string const idf_objects = delimited_string(
+        {"Coil:Cooling:DX:VariableSpeed,",
+         "Main Cooling Coil 1,     !- Name",
+         "    Heat Recovery Supply Outlet,  !- Indoor Air Inlet Node Name",
+         "    Heat Recovery Exhuast Inlet Node,  !- Indoor Air Outlet Node Name",
+         "    1.0,                     !- Number of Speeds {dimensionless}",
+         "    1.0,                     !- Nominal Speed Level {dimensionless}",
+         "    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}",
+         "    AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+         "    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
+         "    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+         "    ,                        !- Maximum Cycling Rate",
+         "    ,                        !- Latent Capacity Time Constant",
+         "    ,                        !- Fan Delay Time",
+         "    HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name",
+         "    ,                        !- Condenser Air Inlet Node Name",
+         "    EvaporativelyCooled,     !- Condenser Type",
+         "    Autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}",
+         "    0.0,                     !- Crankcase Heater Capacity {W}",
+         "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
+         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+         "    ,                        !- Supply Water Storage Tank Name",
+         "    ,                        !- Condensate Collection Water Storage Tank Name",
+         "    ,                        !- Basin Heater Capacity {W/K}",
+         "    ,                        !- Basin Heater Setpoint Temperature {C}",
+         "    ,                        !- Basin Heater Operating Schedule Name",
+         "    36991.44197,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}",
+         "    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
+         "    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}",
+         "    3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+         "    ,                        !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+         "    ,                        !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+         "    10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}",
+         "    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}",
+         "    HPCoolingCAPFTemp4,      !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+         "    HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+         "    HPCoolingEIRFTemp4,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+         "    HPACFFF;                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+         " Curve:Quadratic,",
+         "    HPACCOOLPLFFPLR,         !- Name",
+         "    1.0,                     !- Coefficient1 Constant",
+         "    0.0,                     !- Coefficient2 x",
+         "    0.0,                     !- Coefficient3 x**2",
+         "    0.5,                     !- Minimum Value of x",
+         "    1.5;                     !- Maximum Value of x",
+
+         " Curve:Cubic,",
+         "    HPACFFF,                 !- Name",
+         "    1.0,                     !- Coefficient1 Constant",
+         "    0.0,                     !- Coefficient2 x",
+         "    0.0,                     !- Coefficient3 x**2",
+         "    0.0,                     !- Coefficient4 x**3",
+         "    0.5,                     !- Minimum Value of x",
+         "    1.5;                     !- Maximum Value of x",
+
+         " Curve:Biquadratic,",
+         "    HPCoolingEIRFTemp4,      !- Name",
+         "    0.0001514017,            !- Coefficient1 Constant",
+         "    0.0655062896,            !- Coefficient2 x",
+         "    -0.0020370821,           !- Coefficient3 x**2",
+         "    0.0067823041,            !- Coefficient4 y",
+         "    0.0004087196,            !- Coefficient5 y**2",
+         "    -0.0003552302,           !- Coefficient6 x*y",
+         "    13.89,                   !- Minimum Value of x",
+         "    22.22,                   !- Maximum Value of x",
+         "    12.78,                   !- Minimum Value of y",
+         "    51.67,                   !- Maximum Value of y",
+         "    0.5141,                  !- Minimum Curve Output",
+         "    1.7044,                  !- Maximum Curve Output",
+         "    Temperature,             !- Input Unit Type for X",
+         "    Temperature,             !- Input Unit Type for Y",
+         "    Dimensionless;           !- Output Unit Type",
+
+         "  Curve:Biquadratic,",
+         "    HPCoolingCAPFTemp4,      !- Name",
+         "    1.3544202152,            !- Coefficient1 Constant",
+         "    -0.0493402773,           !- Coefficient2 x",
+         "    0.0022649843,            !- Coefficient3 x**2",
+         "    0.0008517727,            !- Coefficient4 y",
+         "    -0.0000426316,           !- Coefficient5 y**2",
+         "    -0.0003364517,           !- Coefficient6 x*y",
+         "    13.89,                   !- Minimum Value of x",
+         "    22.22,                   !- Maximum Value of x",
+         "    12.78,                   !- Minimum Value of y",
+         "    51.67,                   !- Maximum Value of y",
+         "    0.7923,                  !- Minimum Curve Output",
+         "    1.2736,                  !- Maximum Curve Output",
+         "    Temperature,             !- Input Unit Type for X",
+         "    Temperature,             !- Input Unit Type for Y",
+         "    Dimensionless;           !- Output Unit Type",
+         ""});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Get coil inputs
+    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
+
+    auto DXCoilNum = 1;
+
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower, DataSizing::AutoSize);
+}
+
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_UpdateVarSpeedCoil_Test)
 {
     int coilNum = 1;
