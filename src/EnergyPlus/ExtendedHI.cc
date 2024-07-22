@@ -62,9 +62,9 @@
 #include <cmath>
 
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/ExtendedHI.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
-#include <EnergyPlus/ExtendedHI.hh>
 
 namespace EnergyPlus {
 
