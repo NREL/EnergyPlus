@@ -3407,7 +3407,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfTU.Name);
                     ShowContinueError(state, "Fan type specified = " + cAlphaArgs(7));
                     ShowContinueError(
-                        state, "Fan Object Type must be Fan:VariableSystemModel if VRF AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl");
+                        state,
+                        "Fan Object Type must be Fan:VariableSystemModel if VRF AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl");
                     ShowContinueError(state, "is used to model VRF outdoor unit.");
                     ErrorsFound = true;
                 }
