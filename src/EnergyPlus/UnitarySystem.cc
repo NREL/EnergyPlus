@@ -11537,24 +11537,25 @@ namespace UnitarySystems {
         } break;
         case HVAC::CoilDX_Cooling: { // CoilCoolingDX
             bool const singleMode = (this->m_SingleMode == 1);
+            CoilPLR = 0.0;
             if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
                 if (CompressorOn == HVAC::CompressorOp::On) {
                     CoilPLR = (this->m_CoolingSpeedNum > 1) ? 1.0 : PartLoadRatio;
-                } else
-                    CoilPLR = 0.0;
+                }
             } else {
                 if (this->m_EMSOverrideCoilSpeedNumOn) {
                     CoilPLR = this->m_CoolingSpeedRatio;
                 } else {
-                    if (CompressorOn == HVAC::CompressorOp::Off) {
-                        this->m_CoolingSpeedNum = 1; // Bypass mixed-speed calculations in called functions
-                        CoilPLR = 0.0;
-                    } else {
-                        if (singleMode) {
-                            CoilPLR = (m_CoolingSpeedNum == 1) ? PartLoadRatio
-                                                               : 0.0; // singleMode allows cycling, but not part load operation at higher speeds
+                    if (state.dataUnitarySystems->CoolingLoad) {
+                        if (CompressorOn == HVAC::CompressorOp::Off) {
+                            this->m_CoolingSpeedNum = 1; // Bypass mixed-speed calculations in called functions
                         } else {
-                            CoilPLR = PartLoadRatio;
+                            if (singleMode) {
+                                CoilPLR = (m_CoolingSpeedNum == 1) ? PartLoadRatio
+                                                                   : 0.0; // singleMode allows cycling, but not part load operation at higher speeds
+                            } else {
+                                CoilPLR = PartLoadRatio;
+                            }
                         }
                     }
                 }
