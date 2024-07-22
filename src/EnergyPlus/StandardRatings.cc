@@ -6469,18 +6469,30 @@ namespace StandardRatings {
                 } else if (bl >= q_full) {
                     // CASE 3 : 11.2.2.3.3 AHRI-2023
                     // Building Load is greater than the capacity of the unit at the Full Compressor Speed, q_full <= bl or (bl >= q_full:)
-                    if (t > (-15) || t <= (-8.33)) {
-                        Real64 t_ratio = (t - (-15)) / ((-8.33) - (-15));
-                        // Equation 11.203 AHRI-2023
-                        q_full = q_H4_full + (q_H3_full - q_H4_full) * t_ratio;
-                        // Equation 11.204 AHRI-2023
-                        p_full = p_H4_full + (p_H3_full - p_H4_full) * t_ratio;
-                    } else if (t < (-15)) {
-                        Real64 t_ratio = (t - (-15)) / (8.33 - (-8.33));
+                    if (t <= -15.0) {
+                        Real64 t_ratio = (t - (-15.0)) / ((8.33) - (-8.33));
                         // Equation 11.205 AHRI-2023
                         q_full = q_H4_full + (q_H1_full - q_H3_full) * t_ratio;
                         // Equation 11.206 AHRI-2023
                         p_full = p_H4_full + (p_H1_full - p_H3_full) * t_ratio;
+                    } else if (t > (-15.0) && t < (-8.33)) {
+                        Real64 t_ratio = (t - (-15.0)) / (-8.33 - (-15.0));
+                        // Equation 11.203 AHRI-2023
+                        q_full = q_H4_full + (q_H3_full - q_H4_full) * t_ratio;
+                        // Equation 11.204 AHRI-2023
+                        p_full = p_H4_full + (p_H3_full - p_H4_full) * t_ratio;
+                    } else if (t > (-8.33) && t < t_ob) {
+                        Real64 t_ratio = (t - (-8.33)) / (1.67 - (-8.33));
+                        // Equation 11.201 AHRI-2023
+                        q_full = q_H3_full + (q_H2_full - q_H3_full) * t_ratio;
+                        // Equation 11.202 AHRI-2023
+                        p_full = p_H3_full + (p_H2_full - p_H3_full) * t_ratio;
+                    } else if (t >= t_ob || t == (-8.33)) {
+                        Real64 t_ratio = (t - (-8.33)) / (8.33 - (-8.33));
+                        // Equation 11.199 AHRI-2023
+                        q_full = q_H3_full + (q_H1_full - q_H3_full) * t_ratio;
+                        // Equation 11.200 AHRI-2023
+                        p_full = p_H3_full + (p_H1_full - p_H3_full) * t_ratio;
                     }
 
                     // if not conducting H4 Test then use this block
