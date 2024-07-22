@@ -519,18 +519,6 @@ void GetShadowingInput(EnergyPlusData &state)
         state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
     }
 
-    if ((state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) &&
-        state.dataSolarShading->anyScheduledShadingSurface) {
-        ShowSevereError(state, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
-        ShowContinueError(state, "and there is at least one shading surface of type ");
-        ShowContinueError(state, "Shading:Site:Detailed, Shading:Building:Detailed, or Shading:Zone:Detailed, ");
-        ShowContinueError(state, "that has an active transmittance schedule value greater than zero or may vary.");
-        ShowContinueError(state, "With \"PixelCounting\" Shading Calculation Method, the shading surfaces will be treated as ");
-        ShowContinueError(state, "completely opaque (transmittance = 0) during the shading calculation, ");
-        ShowContinueError(state, "which may result in inaccurate or unexpected results.");
-        ShowContinueError(state, "It is suggested switching to another Shading Calculation Method, such as \"PolygonClipping\".");
-    }
-
     aNum++;
     if (NumAlphas >= aNum) {
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Periodic")) {
@@ -737,6 +725,18 @@ void GetShadowingInput(EnergyPlusData &state)
 void processShadowingInput(EnergyPlusData &state)
 {
     // all shadow input processing that needed zones and surfaces to already be read into data (part of fix for Defect #10299)
+
+    if ((state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) &&
+        state.dataSolarShading->anyScheduledShadingSurface) {
+        ShowSevereError(state, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
+        ShowContinueError(state, "and there is at least one shading surface of type ");
+        ShowContinueError(state, "Shading:Site:Detailed, Shading:Building:Detailed, or Shading:Zone:Detailed, ");
+        ShowContinueError(state, "that has an active transmittance schedule value greater than zero or may vary.");
+        ShowContinueError(state, "With \"PixelCounting\" Shading Calculation Method, the shading surfaces will be treated as ");
+        ShowContinueError(state, "completely opaque (transmittance = 0) during the shading calculation, ");
+        ShowContinueError(state, "which may result in inaccurate or unexpected results.");
+        ShowContinueError(state, "It is suggested switching to another Shading Calculation Method, such as \"PolygonClipping\".");
+    }
 
     if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::Imported) {
         int ExtShadingSchedNum;
