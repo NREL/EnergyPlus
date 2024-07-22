@@ -3900,18 +3900,18 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     SolarShading::processShadowingInput(*state);
 
 #ifdef EP_NO_OPENGL
-    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
-    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0;
     EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
 #else
     if (!Penumbra::Penumbra::is_valid_context()) {
         EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
-        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
-        EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
+        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
+        EXPECT_EQ(state->dataErrTracking->LastSevereError, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
     } else {
         EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
-        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
-        EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
+        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
+        EXPECT_EQ(state->dataErrTracking->LastSevereError, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
     }
 #endif
 }
@@ -6151,7 +6151,22 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
     EXPECT_TRUE(state->dataSysVars->SutherlandHodgman);
     EXPECT_TRUE(state->dataSysVars->SlaterBarsky);
     EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
+
+#ifdef EP_NO_OPENGL
     std::string const error_string = delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
-                                                       "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate."});
+                                                       "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate.",
+                                                       "   ** Warning ** No GPU found (required for PixelCounting)",
+                                                       "   **   ~~~   ** PolygonClipping will be used instead"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
+#else
+    if (!Penumbra::Penumbra::is_valid_context()) {
+        std::string const error_string = delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
+                                                           "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate."});
+        EXPECT_TRUE(compare_err_stream(error_string, true));
+    } else {
+        std::string const error_string = delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
+                                                           "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate."});
+        EXPECT_TRUE(compare_err_stream(error_string, true));
+    }
+#endif
 }
