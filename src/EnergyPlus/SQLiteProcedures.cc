@@ -2607,20 +2607,10 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
                                    fs::path const &errorFilePath)
     : m_writeOutputToSQLite(writeOutputToSQLite), m_errorStream(errorStream)
 {
-    constexpr bool debug = true;
-
     sqlite3 *m_connection = nullptr;
     if (m_writeOutputToSQLite) {
         int rc = -1;
         bool ok = true;
-
-        if constexpr (debug) {
-            // std::cout << "errorStream=" << errorStream << ", dbName=" << dbName << std::endl;
-            // std::cout << "dbName.string()=" << dbName.string() << std::endl;
-            // std::cout << "dbName.generic_string()=" << dbName.generic_string() << std::endl;
-            std::wcout << "dbName.generic_wstring()=" << dbName.generic_wstring() << std::endl;
-            std::cout << "narrow(dbName.generic_wstring())=" << FileSystem::toGenericString(dbName) << std::endl;
-        }
 
         std::string const dbName_utf8 = FileSystem::toGenericString(dbName);
 
@@ -2630,9 +2620,6 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
             *m_errorStream << "SQLite3 message, " << FileSystem::toGenericString(errorFilePath) << " open for processing!" << std::endl;
         } else {
             ok = false;
-        }
-        if constexpr (debug) {
-            std::cout << "m_errorStream: " << std::boolalpha << ok << std::endl;
         }
 
         // Test if we can create a new file named dbName
@@ -2644,9 +2631,6 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
                 ok = false;
             }
         }
-        if constexpr (debug) {
-            std::cout << "ofstream dbName: " << std::boolalpha << ok << std::endl;
-        }
 
         // Test if we can write to the database
         // If we can't then there are probably locks on the database
@@ -2656,13 +2640,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
             if (rc) {
                 *m_errorStream << "SQLite3 message, can't get exclusive lock to open database: " << sqlite3_errmsg(m_connection) << std::endl;
                 ok = false;
-                if constexpr (debug) {
-                    std::cout << "sqlite3_open_v2: " << std::boolalpha << ok << ' ' << sqlite3_errmsg(m_connection) << std::endl;
-                }
             }
-        }
-        if constexpr (debug) {
-            std::cout << "sqlite3_open_v2: " << std::boolalpha << ok << std::endl;
         }
 
         if (ok) {
