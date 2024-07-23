@@ -413,7 +413,7 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
-        EnergyPlus::ShowSevereError(state, e.what());
+        ShowSevereError(state, e.what());
         return EnergyPlus::AbortEnergyPlus(state);
     }
     return wrapUpEnergyPlus(state);
@@ -459,7 +459,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, const std::vector<
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
-        EnergyPlus::ShowSevereError(state, e.what());
+        ShowSevereError(state, e.what());
         return EnergyPlus::AbortEnergyPlus(state);
     }
     return wrapUpEnergyPlus(state);
