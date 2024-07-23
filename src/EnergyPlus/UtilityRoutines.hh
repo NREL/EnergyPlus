@@ -154,7 +154,11 @@ enum class ErrorMessageCategory
     Num
 };
 void emitErrorMessage(EnergyPlusData &state, ErrorMessageCategory category, std::string const &msg, bool shouldFatal);
-void emitErrorMessages(EnergyPlusData &state, ErrorMessageCategory category, std::initializer_list<std::string> const &msgs, bool shouldFatal);
+void emitErrorMessages(EnergyPlusData &state,
+                       ErrorMessageCategory category,
+                       std::initializer_list<std::string> const &msgs,
+                       bool shouldFatal,
+                       int zeroBasedTimeStampIndex = -1);
 void emitWarningMessage(EnergyPlusData &state, ErrorMessageCategory category, std::string const &msg, bool countAsError = false);
 void emitWarningMessages(EnergyPlusData &state,
                          ErrorMessageCategory category,

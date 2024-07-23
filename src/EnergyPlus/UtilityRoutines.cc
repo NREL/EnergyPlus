@@ -877,9 +877,14 @@ void emitErrorMessage(EnergyPlusData &state, [[maybe_unused]] ErrorMessageCatego
 void emitErrorMessages(EnergyPlusData &state,
                        [[maybe_unused]] ErrorMessageCategory category,
                        std::initializer_list<std::string> const &msgs,
-                       bool shouldFatal)
+                       bool const shouldFatal,
+                       int const zeroBasedTimeStampIndex)
 {
     for (auto msg = msgs.begin(); msg != msgs.end(); ++msg) {
+        if (msg - msgs.begin() == zeroBasedTimeStampIndex) {
+            ShowContinueErrorTimeStamp(state, *msg);
+            continue;
+        }
         if (msg == msgs.begin()) {
             ShowSevereError(state, *msg);
         } else if (std::next(msg) == msgs.end() && shouldFatal) {
