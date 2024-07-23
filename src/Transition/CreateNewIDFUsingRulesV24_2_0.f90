@@ -578,14 +578,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1:13) = InArgs(1:13)
                 IF (SameString(InArgs(14), 'FAN:VARIABLEVOLUME')) THEN
                   isVariableVolume = .TRUE.
-                  OutArgs(14) = 'FAN:SYSTEMMODEL'
+                  OutArgs(14) = 'Fan:SystemModel'
                   OutArgs(15) = TRIM(InArgs(15))
                   sysFanName = TRIM(InArgs(15))
                 ELSE
                   OutArgs(14:15) = InArgs(14:15)
                 ENDIF
                 OutArgs(16:CurArgs) = InArgs(16:CurArgs)
-                CALL WriteOutIDFLines(DifLfn, 'ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW', CurArgs, OutArgs, NwFldNames, NwFldUnits)
+                CALL WriteOutIDFLines(DifLfn, 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow', CurArgs, OutArgs, NwFldNames, NwFldUnits)
 
                 IF (isVariableVolume) THEN
                   ! create fan system model object
