@@ -107,7 +107,7 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
             exit(1);
         }
 
-        char * filePath = inputFilePath(state);
+        char *filePath = inputFilePath(state);
         printf("Input file path accessed via API: %s\n", filePath);
         free(filePath);
 

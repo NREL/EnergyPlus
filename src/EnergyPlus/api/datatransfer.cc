@@ -243,7 +243,7 @@ void resetErrorFlag(EnergyPlusState state)
 char *inputFilePath(EnergyPlusState state)
 {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    char *p = new char[std::strlen(thisState->dataStrGlobals->inputFilePath.c_str()) + 1];
+    char *p = new char[std::strlen(thisState->dataStrGlobals->inputFilePath.string().c_str()) + 1];
     std::strcpy(p, thisState->dataStrGlobals->inputFilePath.c_str());
     return p;
 }
