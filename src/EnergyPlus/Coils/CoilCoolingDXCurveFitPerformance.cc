@@ -271,16 +271,8 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                 SysSubSHR = sensSubRate / totalCoolingRate;
                 if (LoadSHR < SysSubSHR) {
                     outletNode.MassFlowRate = inletNode.MassFlowRate;
-                    this->calculate(state,
-                                    this->alternateMode2,
-                                    inletNode,
-                                    outletNode,
-                                    speedNum,
-                                    speedRatio,
-                                    fanOp,
-                                    condInletNode,
-                                    condOutletNode,
-                                    singleMode);
+                    this->calculate(
+                        state, this->alternateMode2, inletNode, outletNode, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode);
                     CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
                                                       inletNode.Temp,
                                                       inletNode.HumRat,
@@ -334,8 +326,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
             }
         }
     } else if (currentCoilMode == HVAC::CoilMode::Enhanced) {
-        this->calculate(
-            state, this->alternateMode, inletNode, outletNode, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode);
+        this->calculate(state, this->alternateMode, inletNode, outletNode, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode);
         this->OperatingMode = 2;
         this->powerUse = this->alternateMode.OpModePower;
         this->RTF = this->alternateMode.OpModeRTF;

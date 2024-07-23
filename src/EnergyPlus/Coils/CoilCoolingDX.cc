@@ -657,10 +657,10 @@ void CoilCoolingDX::size(EnergyPlusData &state)
 }
 
 void CoilCoolingDX::simulate(EnergyPlusData &state,
-                                HVAC::CoilMode coilMode,
+                             HVAC::CoilMode coilMode,
                              int const speedNum,
                              Real64 const speedRatio,
-                            HVAC::FanOp const fanOp,
+                             HVAC::FanOp const fanOp,
                              bool const singleMode,
                              Real64 const LoadSHR)
 {

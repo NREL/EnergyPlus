@@ -312,7 +312,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     }
     thisspeed.ambPressure = condInletNode.Press;
     thisspeed.AirMassFlow = inletNode.MassFlowRate;
-   if (fanOp == HVAC::FanOp::Cycling && speedNum == 1) {
+    if (fanOp == HVAC::FanOp::Cycling && speedNum == 1) {
         if (speedRatio > 0.0) {
             thisspeed.AirMassFlow = thisspeed.AirMassFlow / speedRatio;
         } else {
