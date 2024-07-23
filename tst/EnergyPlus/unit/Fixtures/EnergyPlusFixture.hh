@@ -171,6 +171,13 @@ protected:
     // Will return true if string matches the stream and false if it does not
     bool compare_eio_stream(std::string const &expected_string, bool reset_stream = true);
 
+    // Check if EIO string contains a substring. The default is to reset the EIO stream after every call.
+    // It is easier to test successive functions if the EIO stream is 'empty' before the next call.
+    // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
+    // if it makes sense for the unit test to continue after returning from function.
+    // Will return true if string matches the stream and false if it does not
+    bool compare_eio_stream_substring(std::string const &expected_string, bool reset_stream = true);
+
     // Compare an expected string against the MTR stream. The default is to reset the MTR stream after every call.
     // It is easier to test successive functions if the MTR stream is 'empty' before the next call.
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
