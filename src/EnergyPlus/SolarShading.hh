@@ -437,7 +437,6 @@ struct SolarShadingData : BaseGlobalStruct
 #endif
 
     bool GetInputFlag = true;
-    bool getShadowingCalculationInput = true;
     bool anyScheduledShadingSurface = false;
     bool firstTime = true;
     bool debugging = false;

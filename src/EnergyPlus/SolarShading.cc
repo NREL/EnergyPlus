@@ -411,11 +411,6 @@ void GetShadowingInput(EnergyPlusData &state)
     using DataSystemVariables::ShadingMethod;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    if (state.dataSolarShading->getShadowingCalculationInput) {
-        state.dataSolarShading->getShadowingCalculationInput = false;
-    } else {
-        return;
-    }
     int NumItems;
     int NumNumbers;
     int NumAlphas;
