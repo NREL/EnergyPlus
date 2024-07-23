@@ -3892,22 +3892,33 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
 
     EXPECT_EQ(state->dataSolarShading->anyScheduledShadingSurface, true);
 
+#ifdef EP_NO_OPENGL
     EXPECT_EQ(state->dataErrTracking->AskForSurfacesReport, true);
-    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
-    // Expect no severe errors at this point
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+#else
+    if (!Penumbra::Penumbra::is_valid_context()) {
+        EXPECT_EQ(state->dataErrTracking->AskForSurfacesReport, true);
+        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
+        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+    } else {
+        EXPECT_EQ(state->dataErrTracking->AskForSurfacesReport, true);
+        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+    }
+#endif
 
     SolarShading::processShadowingInput(*state);
 
 #ifdef EP_NO_OPENGL
-    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0;
     EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
 #else
     if (!Penumbra::Penumbra::is_valid_context()) {
         EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
-        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
-        EXPECT_EQ(state->dataErrTracking->LastSevereError, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
+        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+        EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
     } else {
         EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
         EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
@@ -6083,7 +6094,16 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest4)
     EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
     EXPECT_FALSE(state->dataSysVars->SutherlandHodgman);
     EXPECT_FALSE(state->dataSysVars->SlaterBarsky);
-    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
+
+#ifdef EP_NO_OPENGL
+    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
+#else
+    if (!Penumbra::Penumbra::is_valid_context()) {
+        EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
+    } else {
+        EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
+    }
+#endif
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest5)
@@ -6116,7 +6136,16 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest5)
     EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
     EXPECT_TRUE(state->dataSysVars->SutherlandHodgman);
     EXPECT_FALSE(state->dataSysVars->SlaterBarsky);
-    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
+
+#ifdef EP_NO_OPENGL
+    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
+#else
+    if (!Penumbra::Penumbra::is_valid_context()) {
+        EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
+    } else {
+        EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
+    }
+#endif
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
@@ -6150,7 +6179,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
     EXPECT_EQ(expectedOverlaps, state->dataSolarShading->MaxHCS);
     EXPECT_TRUE(state->dataSysVars->SutherlandHodgman);
     EXPECT_TRUE(state->dataSysVars->SlaterBarsky);
-    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
 
 #ifdef EP_NO_OPENGL
     std::string const error_string = delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
@@ -6158,15 +6186,21 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
                                                        "   ** Warning ** No GPU found (required for PixelCounting)",
                                                        "   **   ~~~   ** PolygonClipping will be used instead"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
+    EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
+
 #else
     if (!Penumbra::Penumbra::is_valid_context()) {
         std::string const error_string = delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
-                                                           "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate."});
+                                                           "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate.",
+                                                           "   ** Warning ** No GPU found (required for PixelCounting)",
+                                                           "   **   ~~~   ** PolygonClipping will be used instead"});
         EXPECT_TRUE(compare_err_stream(error_string, true));
+        EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
     } else {
         std::string const error_string = delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
                                                            "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate."});
         EXPECT_TRUE(compare_err_stream(error_string, true));
+        EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PixelCounting);
     }
 #endif
 }
