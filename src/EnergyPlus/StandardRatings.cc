@@ -6332,10 +6332,10 @@ namespace StandardRatings {
                 Real64 q_H0_low = Q_H0_Low(spnum);
                 Real64 q_H1_low = Q_H1_Low(spnum);
                 Real64 q_H2_int = Q_H2_Int(spnum);
-                Real64 q_H1_full = Q_H1_Full(spnum);
-                Real64 q_H2_full = Q_H2_Full(spnum);
-                Real64 q_H3_full = Q_H3_Full(spnum);
-                Real64 q_H4_full = Q_H4_Full(spnum);
+                Real64 q_H1_full = Q_H1_Full(spnum + 1);
+                Real64 q_H2_full = Q_H2_Full(spnum + 1);
+                Real64 q_H3_full = Q_H3_Full(spnum + 1);
+                Real64 q_H4_full = Q_H4_Full(spnum + 1);
                 // Equation 11.177 AHRI-2023
                 //?? (replaced 62 with 35) in Ratio expression // (t=>35-47/62-47)
                 Real64 q_35_low = // q_H1_low + (q_H0_low - q_H1_low) * ((t - (8.33)) / (1.66 - (8.33)));
@@ -6351,10 +6351,10 @@ namespace StandardRatings {
                 Real64 p_H0_low = P_H0_Low(spnum);
                 Real64 p_H1_low = P_H1_Low(spnum);
                 Real64 p_H2_int = P_H2_Int(spnum);
-                Real64 p_H1_full = P_H1_Full(spnum);
-                Real64 p_H2_full = P_H2_Full(spnum);
-                Real64 p_H3_full = P_H3_Full(spnum);
-                Real64 p_H4_full = P_H4_Full(spnum);
+                Real64 p_H1_full = P_H1_Full(spnum + 1);
+                Real64 p_H2_full = P_H2_Full(spnum + 1);
+                Real64 p_H3_full = P_H3_Full(spnum + 1);
+                Real64 p_H4_full = P_H4_Full(spnum + 1);
                 // Equation 11.178 AHRI - 2023
                 //?? (replaced 62 with 35) in Ratio expression (t=>35 F-47/35-47)
                 Real64 p_35_low = // p_H1_low + (p_H0_low - p_H1_low) * ((t - (8.33)) / (1.66 - (8.33)));
