@@ -162,7 +162,7 @@ std::string pythonStringForUsage(const EnergyPlusData &state)
     return "Linked to Python Version: \"" + sVersion + "\"";
 }
 #else
-std::string pythonStringForUsage([[maybe_unused]] EnergyPlusData &state)
+std::string pythonStringForUsage([[maybe_unused]] const EnergyPlusData &state)
 {
     return "This version of EnergyPlus not linked to Python library.";
 }
@@ -1213,7 +1213,7 @@ void PluginManager::addGlobalVariable(const EnergyPlusData &state, const std::st
     this->maxGlobalVariableIndex++;
 }
 #else
-void PluginManager::addGlobalVariable([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const std::string &name)
+void PluginManager::addGlobalVariable([[maybe_unused]] const EnergyPlusData &state, [[maybe_unused]] const std::string &name)
 {
 }
 #endif
@@ -1260,7 +1260,7 @@ int PluginManager::getTrendVariableHandle(const EnergyPlusData &state, const std
     return -1;
 }
 #else
-int PluginManager::getTrendVariableHandle([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const std::string &name)
+int PluginManager::getTrendVariableHandle([[maybe_unused]] const EnergyPlusData &state, [[maybe_unused]] const std::string &name)
 {
     return -1;
 }
@@ -1272,7 +1272,7 @@ Real64 PluginManager::getTrendVariableValue(const EnergyPlusData &state, int han
     return state.dataPluginManager->trends[handle].values[timeIndex];
 }
 #else
-Real64 PluginManager::getTrendVariableValue([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int timeIndex)
+Real64 PluginManager::getTrendVariableValue([[maybe_unused]] const EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int timeIndex)
 {
     return 0.0;
 }
@@ -1288,7 +1288,7 @@ Real64 PluginManager::getTrendVariableAverage(const EnergyPlusData &state, int h
     return sum / count;
 }
 #else
-Real64 PluginManager::getTrendVariableAverage([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
+Real64 PluginManager::getTrendVariableAverage([[maybe_unused]] const EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
 {
     return 0.0;
 }
@@ -1306,7 +1306,7 @@ Real64 PluginManager::getTrendVariableMin(const EnergyPlusData &state, int handl
     return minimumValue;
 }
 #else
-Real64 PluginManager::getTrendVariableMin([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
+Real64 PluginManager::getTrendVariableMin([[maybe_unused]] const EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
 {
     return 0.0;
 }
@@ -1324,7 +1324,7 @@ Real64 PluginManager::getTrendVariableMax(const EnergyPlusData &state, int handl
     return maximumValue;
 }
 #else
-Real64 PluginManager::getTrendVariableMax([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
+Real64 PluginManager::getTrendVariableMax([[maybe_unused]] const EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
 {
     return 0.0;
 }
@@ -1340,7 +1340,7 @@ Real64 PluginManager::getTrendVariableSum(const EnergyPlusData &state, int handl
     return sum;
 }
 #else
-Real64 PluginManager::getTrendVariableSum([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
+Real64 PluginManager::getTrendVariableSum([[maybe_unused]] const EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
 {
     return 0.0;
 }
@@ -1365,7 +1365,7 @@ Real64 PluginManager::getTrendVariableDirection(const EnergyPlusData &state, int
     return numerator / denominator;
 }
 #else
-Real64 PluginManager::getTrendVariableDirection([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
+Real64 PluginManager::getTrendVariableDirection([[maybe_unused]] const EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
 {
     return 0.0;
 }
@@ -1377,7 +1377,7 @@ size_t PluginManager::getTrendVariableHistorySize(const EnergyPlusData &state, i
     return state.dataPluginManager->trends[handle].values.size();
 }
 #else
-size_t PluginManager::getTrendVariableHistorySize([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle)
+size_t PluginManager::getTrendVariableHistorySize([[maybe_unused]] const EnergyPlusData &state, [[maybe_unused]] int handle)
 {
     return 0;
 }
@@ -1452,7 +1452,7 @@ int PluginManager::getLocationOfUserDefinedPlugin(const EnergyPlusData &state, s
     return -1;
 }
 #else
-int PluginManager::getLocationOfUserDefinedPlugin([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] std::string const &_programName)
+int PluginManager::getLocationOfUserDefinedPlugin([[maybe_unused]] const EnergyPlusData &state, [[maybe_unused]] std::string const &_programName)
 {
     return -1;
 }
