@@ -6375,22 +6375,23 @@ namespace StandardRatings {
                 Real64 q_hs(0.0);
                 Real64 p_hs(0.0);
                 // Low Speed
-                if (t < -8.33) {
-                    q_low = Q_H3_Full(spnum) + ((Q_H1_Low(spnum) - Q_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
-
-                    p_low = P_H3_Full(spnum) + ((P_H1_Low(spnum) - P_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
-                } else if (t >= 4.44) {
-                    q_low = Q_H1_Low(spnum) + ((Q_H0_Low(spnum) - Q_H1_Low(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempRated) /
-                                               (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated));
-                    p_low = P_H1_Low(spnum) + ((P_H0_Low(spnum) - P_H1_Low(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempRated) /
-                                               (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated));
-                } else {
-                    q_low = Q_H3_Full(spnum) + ((Q_H2_Full(spnum) - Q_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
-                    p_low = P_H3_Full(spnum) + ((P_H2_Full(spnum) - P_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
+                if (t > 8.33) {
+                    // equation 11.179
+                    Real64 ratio = // (t - 8.33) / (16.67 - 8.33)
+                        (t - HeatingOutdoorCoilInletAirDBTempRated) / (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated);
+                    q_low = Q_H1_Low(spnum) + ((Q_H1_Low(spnum) - Q_H3_Full(spnum)) * ratio);
+                    p_low = P_H1_Low(spnum) + ((P_H1_Low(spnum) - P_H3_Full(spnum)) * ratio);
+                } else if (t >= 1.67 && t < 8.33) {
+                    // equation 11.180
+                    Real64 ratio = // (t - 1.67) / (8.33 - 1.67)
+                        (t - HeatingOutdoorCoilInletAirDBTempH2Test) / (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH2Test);
+                    q_low = Q_H2_Int(spnum) + ((Q_H0_Low(spnum) - Q_H1_Low(spnum)) * ratio);
+                    p_low = P_H2_Int(spnum) + ((P_H0_Low(spnum) - P_H1_Low(spnum)) * ratio);
+                } else if (t < 1.67) {
+                    // equation 11.181
+                    // Q_H2_Int replaced Q_H_Int, no equation for the later
+                    q_low = Q_H2_Int(spnum);
+                    p_low = P_H2_Int(spnum);
                 }
 
                 // High Speed

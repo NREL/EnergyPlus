@@ -4656,7 +4656,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
 ! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number
  DX Heating Coil Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 34415.4, 20666.4, 6.56, 4
 ! <DX Heating Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF2 {Btu/W-h}, Region Number
- DX Heating Coil AHRI 2023 Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 34697.2, 20948.1, 5.77, 4
+ DX Heating Coil AHRI 2023 Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 34697.2, 20948.1, 5.76, 4
 )EIO";
     EXPECT_TRUE(compare_eio_stream(htg_coil_eio_output, true));
 }
@@ -7129,7 +7129,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXHeatingCoilsHSPF2Test)
 ! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number
  DX Heating Coil Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 14996.6, 8946.7, 8.12, 4
 ! <DX Heating Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF2 {Btu/W-h}, Region Number
- DX Heating Coil AHRI 2023 Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 15032.0, 8982.1, 7.30, 4
+ DX Heating Coil AHRI 2023 Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 15032.0, 8982.1, 7.29, 4
 )EIO";
 
     EXPECT_TRUE(compare_eio_stream(htg_coil_eio_output, true));
@@ -7386,7 +7386,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXHeatingCoilsHSPF2Test1)
 ! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number
  DX Heating Coil Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 14996.6, 8946.7, 8.12, 4
 ! <DX Heating Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF2 {Btu/W-h}, Region Number
- DX Heating Coil AHRI 2023 Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 14996.6, 8946.7, 7.34, 4
+ DX Heating Coil AHRI 2023 Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 14996.6, 8946.7, 7.32, 4
 )EIO";
 
     EXPECT_TRUE(compare_eio_stream(htg_coil_eio_output, true));
@@ -7643,7 +7643,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXHeatingCoilsHSPF2Test2)
 ! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number
  DX Heating Coil Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 14996.6, 8946.7, 8.57, 4
 ! <DX Heating Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF2 {Btu/W-h}, Region Number
- DX Heating Coil AHRI 2023 Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 14996.6, 8946.7, 7.68, 4
+ DX Heating Coil AHRI 2023 Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 14996.6, 8946.7, 7.66, 4
 )EIO";
 
     EXPECT_TRUE(compare_eio_stream(htg_coil_eio_output, true));
