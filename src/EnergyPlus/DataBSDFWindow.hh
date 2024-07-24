@@ -74,6 +74,8 @@ namespace DataBSDFWindow {
         Num
     };
 
+    static constexpr std::array<std::string_view, (int)Basis::Num> basisNamesUC = {"LBNLWINDOW", "USERDEFINED"};
+
     enum class BasisSymmetry
     {
         Invalid = -1,
@@ -82,6 +84,8 @@ namespace DataBSDFWindow {
         Num
     };
 
+    static constexpr std::array<std::string_view, (int)BasisSymmetry::Num> basisSymmetryNamesUC = {"AXISSYMMETRIC", "NONE"};
+        
     // Thermal calculations for complex fenestration can be used to generate reports for standard cases
     // noCondition is used when performing timestep calculations
     // 'Summer' will override certain parameters so that produced results are matching standard summer WINDOW  = software results

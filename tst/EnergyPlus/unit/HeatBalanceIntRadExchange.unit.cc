@@ -394,7 +394,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
 
     state->dataConstruction->Construct.allocate(1);
     Material::MaterialBase *mat = new Material::MaterialChild;
-    state->dataMaterial->Material.push_back(mat);
+    state->dataMaterial->materials.push_back(mat);
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->SurfMaterialMovInsulInt.allocate(1);
     state->dataHeatBalSurf->SurfMovInsulIntPresent.allocate(1);
@@ -408,7 +408,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     state->dataSurface->SurfMaterialMovInsulInt(1) = 1;
 
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
-    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(1));
     thisMaterial_1->AbsorpThermal = 0.5;
     thisMaterial_1->Resistance = 1.25;
     thisMaterial_1->AbsorpSolar = 0.25;

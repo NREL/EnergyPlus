@@ -56,6 +56,7 @@
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGParams.hh>
+#include <EnergyPlus/WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -184,11 +185,23 @@ namespace Material {
 
     extern const std::array<std::string_view, (int)SurfaceRoughness::Num> surfaceRoughnessNames;
 
+    enum EcoRoofCalcMethod
+    {
+        Invalid = -1,
+        Simple,
+        SchaapGenuchten,
+        Num
+    };
+
+    extern const std::array<std::string_view, (int)EcoRoofCalcMethod::Num> ecoRoofCalcMethodNamesUC;
+        
     struct MaterialBase
     {
         // Members
         std::string Name = "";        // Name of material layer
+        int Num = 0;                  // Index in material array, comes in handy sometimes
         Group group = Group::Invalid; // Material group type (see Material Parameters above.  Currently
+            
         // active: RegularMaterial, Shade, Air, WindowGlass,
         // WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,
         // IRTMaterial, WindowSimpleGlazing, ComplexWindowShade, ComplexWindowGap)
@@ -238,16 +251,11 @@ namespace Material {
         Real64 ThermGradCoef = 0.0; // Thermal-gradient coefficient for moisture capacity based on the water vapor density (kg/kgK)
         Real64 VaporDiffus = 0.0;   // Layer vapor diffusivity
 
-        virtual bool dummy()
-        {
-            return true;
-        } // Need at least one virtual function (vtable) for dynamic casting to work (duh)
         virtual ~MaterialBase() = default;
     };
 
     struct MaterialChild : public MaterialBase
     {
-        int GlassSpectralDataPtr = 0; // Number of a spectral data set associated with a window glass material
         // Radiation parameters
         bool AbsorpSolarEMSOverrideOn = false;   // if true, then EMS calling to override value for solar absorptance
         Real64 AbsorpSolarEMSOverride = false;   // value to use when EMS calling to override value for solar absorptance
@@ -275,7 +283,6 @@ namespace Material {
         Real64 ReflectVisDiffFront = 0.0;  // Visible front diffuse reflectance
         Real64 TransSolBeam = 0.0;         // Solar transmittance (beam to everything)
         Real64 TransVisBeam = 0.0;         // Visible transmittance (beam to everything)
-        int BlindDataPtr = 0;              // Pointer to window blind data
         // Complex fenestration parameters
         Real64 YoungModulus = 0.0;       // Young's modulus (Pa) - used in window deflection calculations
         Real64 PoissonsRatio = 0.0;      // Poisson's ratio - used in window deflection calculations
@@ -284,7 +291,7 @@ namespace Material {
         int SupportPillarPtr = 0;        // Pointer to support pillar data
         int DeflectionStatePtr = 0;      // Pointer to deflection state
         int ComplexShadePtr = 0;         // Pointer to complex shade data
-        int GasPointer = 0;              // Pointer to gas or gas mixture used in the gap
+        int GasPointer = 0;              // Pointer to gas or gas mixture used in the gap // What the what?
         // Window-shade thermal model parameters
         Real64 WinShadeToGlassDist = 0.0;    // Distance between window shade and adjacent glass (m)
         Real64 WinShadeTopOpeningMult = 0.0; // Area of air-flow opening at top of shade, expressed as a fraction
@@ -309,7 +316,7 @@ namespace Material {
         Real64 EMPDmuCoating = 0.0;        // Coating Layer water vapor diffusion resistance factor (dimensionless)
         // EcoRoof-Related properties, essentially for the plant layer,
         //    the soil layer uses the same resource as a regular material
-        int EcoRoofCalculationMethod = 0; // 1-Simple, 2-SchaapGenuchten
+        EcoRoofCalcMethod ecoRoofCalcMethod = EcoRoofCalcMethod::Invalid; // 1-Simple, 2-SchaapGenuchten
         Real64 HeightOfPlants = 0.0;      // plants' height
         Real64 LAI = 0.0;                 // LeafAreaIndex (Dimensionless???)
         Real64 Lreflectivity = 0.0;       // LeafReflectivity
@@ -384,7 +391,9 @@ namespace Material {
         SlatAngleType slatAngleType = SlatAngleType::FixedSlatAngle; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
         DataWindowEquivalentLayer::Orientation SlatOrientation = DataWindowEquivalentLayer::Orientation::Invalid; // horizontal or vertical
         HysteresisPhaseChange::HysteresisPhaseChange *phaseChange = nullptr;
-        bool GlassSpectralAndAngle = false; // if SpectralAndAngle is an entered choice
+
+        Window::OpticalDataModel windowOpticalData = Window::OpticalDataModel::SpectralAverage;
+        int GlassSpectralDataPtr = 0; // Number of a spectral data set associated with a window glass material
         int GlassSpecAngTransDataPtr =
             0; // Data set index of transmittance as a function of spectral and angle associated with a window glass material
         int GlassSpecAngFRefleDataPtr = 0; // Data set index of front reflectance as a function of spectral and angle associated with a window glass
@@ -392,18 +401,30 @@ namespace Material {
         int GlassSpecAngBRefleDataPtr = 0; // Data set index of back reflectance as a function of spectral and angle associated with a window glass
         // material
 
-        virtual bool dummy()
-        {
-            return true;
-        }
-        virtual ~MaterialChild() = default;
+        virtual ~MaterialChild() override = default;
     };
 
-    struct WindowBlindProperties
+    struct BlindBmTransAbsRef
     {
-        // Members
-        std::string Name;
-        int MaterialNumber = 0; // Material pointer for the blind
+        Array2D<Real64> SolFrontBeamBeamTrans; // Blind solar front beam-beam transmittance vs.
+        // profile angle, slat angle
+        Array2D<Real64> SolFrontBeamBeamRefl; // Blind solar front beam-beam reflectance vs. profile angle,
+        // slat angle (zero)
+        Array2D<Real64> SolBackBeamBeamTrans; // Blind solar back beam-beam transmittance vs. profile angle,
+        // slat angle
+        Array2D<Real64> SolBackBeamBeamRefl; // Blind solar back beam-beam reflectance vs. profile angle,
+        // slat angle (zero)
+        Array2D<Real64> SolFrontBeamDiffTrans; // Blind solar front beam-diffuse transmittance
+        // vs. profile angle, slat angle
+        Array2D<Real64> SolFrontBeamDiffRefl; // Blind solar front beam-diffuse reflectance
+        // vs. profile angle, slat angle
+        Array2D<Real64> SolBackBeamDiffTrans; // Blind solar back beam-diffuse transmittance
+        // vs. profile angle, slat angle
+        Array2D<Real64> SolBackBeamDiffRefl; // Blind solar back beam-diffuse reflectance
+    };
+        
+    struct MaterialBlind : public MaterialBase 
+    {
         // Input properties
         DataWindowEquivalentLayer::Orientation SlatOrientation = DataWindowEquivalentLayer::Orientation::Invalid; // HORIZONTAL or VERTICAL
         DataWindowEquivalentLayer::AngleType SlatAngleType = DataWindowEquivalentLayer::AngleType::Fixed;         // FIXED or VARIABLE
@@ -434,14 +455,14 @@ namespace Material {
         Real64 SlatFrontEmissIR = 0.0; // Slat front emissivity
         Real64 SlatBackEmissIR = 0.0;  // Slat back emissivity
         // Some characteristics for blind thermal calculation
-        Real64 BlindToGlassDist = 0.0;    // Distance between window shade and adjacent glass (m)
-        Real64 BlindTopOpeningMult = 0.0; // Area of air-flow opening at top of blind, expressed as a fraction
+        Real64 toGlassDist = 0.0;    // Distance between window shade and adjacent glass (m)
+        Real64 topOpeningMult = 0.0; // Area of air-flow opening at top of blind, expressed as a fraction
         //  of the blind-to-glass opening area at the top of the blind
-        Real64 BlindBottomOpeningMult = 0.0; // Area of air-flow opening at bottom of blind, expressed as a fraction
+        Real64 bottomOpeningMult = 0.0; // Area of air-flow opening at bottom of blind, expressed as a fraction
         //  of the blind-to-glass opening area at the bottom of the blind
-        Real64 BlindLeftOpeningMult = 0.0; // Area of air-flow opening at left side of blind, expressed as a fraction
+        Real64 leftOpeningMult = 0.0; // Area of air-flow opening at left side of blind, expressed as a fraction
         //  of the blind-to-glass opening area at the left side of the blind
-        Real64 BlindRightOpeningMult = 0.0; // Area of air-flow opening at right side of blind, expressed as a fraction
+        Real64 rightOpeningMult = 0.0; // Area of air-flow opening at right side of blind, expressed as a fraction
         //  of the blind-to-glass opening area at the right side of the blind
         // Calculated blind properties
         // Blind solar properties
@@ -515,7 +536,7 @@ namespace Material {
         Array1D<Real64> IRBackEmiss;  // Blind IR back emissivity vs. slat angle
 
         // Default Constructor
-        WindowBlindProperties()
+        MaterialBlind()
             : SolFrontBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0),
               SolBackBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolBackBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0),
               SolFrontBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0),
@@ -532,6 +553,7 @@ namespace Material {
               VisBackDiffDiffTrans(MaxSlatAngs, 0.0), VisBackDiffDiffRefl(MaxSlatAngs, 0.0), IRFrontTrans(MaxSlatAngs, 0.0),
               IRFrontEmiss(MaxSlatAngs, 0.0), IRBackTrans(MaxSlatAngs, 0.0), IRBackEmiss(MaxSlatAngs, 0.0)
         {
+            group = Group::WindowBlind;
         }
     };
 
@@ -677,17 +699,17 @@ namespace Material {
         Real64 airFlowPermeability = 0.0; // The effective area of openings in the shade itself, expressed as a
         //  fraction of the shade area
 
-        virtual bool dummy()
-        {
-            return true;
-        }
-
         MaterialScreen() : MaterialBase()
         {
             group = Group::Screen;
         }
+
+        virtual ~MaterialScreen() override = default;
     };
 
+    int GetMaterialNum(EnergyPlusData &state, std::string const &matName);
+    MaterialBase *GetMaterial(EnergyPlusData &state, std::string const &matName);
+        
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
     void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
 
@@ -706,13 +728,14 @@ namespace Material {
 
 struct MaterialData : BaseGlobalStruct
 {
-    EPVector<Material::MaterialBase *> Material;
+    Array1D<Material::MaterialBase *> materials;
+    std::map<std::string, int> materialMap;
+        
     int TotMaterials = 0;     // Total number of unique materials (layers) in this simulation
     int TotComplexShades = 0; // Total number of shading materials for complex fenestrations
 
-    EPVector<Material::WindowBlindProperties> Blind;
-    EPVector<Material::WindowComplexShade> ComplexShade;
-    EPVector<Material::WindowThermalModelParams> WindowThermalModel;
+    Array1D<Material::WindowComplexShade> ComplexShade;
+    Array1D<Material::WindowThermalModelParams> WindowThermalModel;
 
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
@@ -721,9 +744,9 @@ struct MaterialData : BaseGlobalStruct
     void clear_state() override
     {
         for (int i = 0; i < TotMaterials; ++i) {
-            delete Material[i]; //
+            delete materials[i]; //
         }
-        Material.deallocate();
+        materials.deallocate();
     }
 };
 

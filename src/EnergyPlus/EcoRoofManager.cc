@@ -192,7 +192,7 @@ namespace EcoRoofManager {
         }
 
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(1)));
+        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->materials(thisConstruct.LayerPoint(1)));
         assert(thisMaterial != nullptr);
         RoughSurf = thisMaterial->Roughness;
         Real64 AbsThermSurf = thisMaterial->AbsorpThermal; // Thermal absoptance of the exterior surface
@@ -508,7 +508,7 @@ namespace EcoRoofManager {
     void initEcoRoofFirstTime(EnergyPlusData &state, int const SurfNum, int const ConstrNum)
     {
         auto const *thisMat =
-            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
+            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
         assert(thisMat != nullptr);
         auto &thisEcoRoof = state.dataEcoRoofMgr;
 
@@ -669,7 +669,7 @@ namespace EcoRoofManager {
     void initEcoRoof(EnergyPlusData &state, int const SurfNum, int const ConstrNum)
     {
         auto const *thisMat =
-            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
+            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
         assert(thisMat != nullptr);
         auto &thisSurf = state.dataSurface->Surface(SurfNum);
 
@@ -775,9 +775,7 @@ namespace EcoRoofManager {
         RatioMax = 1.0 + 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
         RatioMin = 1.0 - 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
 
-        auto *thisMaterial =
-            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
-        assert(thisMaterial != nullptr);
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild*>(state.dataMaterial->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
         if (state.dataEcoRoofMgr->UpdatebeginFlag) {
 
             // SET dry values that NEVER CHANGE
@@ -794,7 +792,7 @@ namespace EcoRoofManager {
             }
             // This loop outputs the minimum number of time steps needed to keep the solution stable
             // The equation is minimum timestep in seconds=161240*((number of layers)**(-2.3))*(Total thickness of the soil)**2.07
-            if (thisMaterial->EcoRoofCalculationMethod == 2) {
+            if (thisMaterial->ecoRoofCalcMethod == Material::EcoRoofCalcMethod::SchaapGenuchten) {
                 int index1;
                 Real64 const depth_limit(depth_fac * std::pow(state.dataEcoRoofMgr->TopDepth + state.dataEcoRoofMgr->RootDepth, 2.07));
                 for (index1 = 1; index1 <= 20; ++index1) {
@@ -908,7 +906,7 @@ namespace EcoRoofManager {
             Moisture = MoistureMax;
         }
 
-        if (thisMaterial->EcoRoofCalculationMethod == 1) {
+        if (thisMaterial->ecoRoofCalcMethod == Material::EcoRoofCalcMethod::Simple) {
 
             // THE SECTION BELOW WAS THE INITIAL MOISTURE DISTRIBUTION MODEL.
             // Any line with "!-" was code.  A line with "!" was just a comment.  This is done in case this code needs to be resurected in the future.

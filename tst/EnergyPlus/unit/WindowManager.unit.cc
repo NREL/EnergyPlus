@@ -3051,7 +3051,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     Real64 NominalConductanceSummer;
 
     MaterNum = state->dataConstruction->Construct(ConstrNum).LayerPoint(1);
-    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(MaterNum));
+    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(MaterNum));
     // summer, adj ratio should stay the same, only change for winter
     state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.5;
     CalcNominalWindowCond(*state, ConstrNum, 2, NominalConductanceSummer, SHGC, TransSolNorm, TransVisNorm, errFlag);

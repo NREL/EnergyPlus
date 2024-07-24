@@ -905,7 +905,7 @@ namespace DataSurfaces {
         Real64 edgeGlassCorrFac = 1.0; // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging
                                        // effects near frame and divider
 
-        int screenNum = 0;         // Screen number for a window with a screen (do not confuse with material number)
+        int screenNum = 0;         // Screen material number for a window with a screen
         Real64 lightWellEff = 1.0; // Light well efficiency (multiplier on exterior window vis trans due to light well losses)
 
         // What is 10 here?
@@ -929,6 +929,24 @@ namespace DataSurfaces {
         // floor/wall/ceiling (m2)
         std::array<Real64, (int)FWC::Num> EnclAreaReflProdMinusThisSurf = {0.0, 0.0, 0.0};
 
+        // Just a way to group these fields together within the larger object
+        struct {
+            int matNum = 0;
+            bool movableSlats = false;     // True if window has a blind with movable slats
+            Real64 slatAngThisTS = 0.0;  // Slat angle this time step for window with blind on (radians)
+            Real64 slatAngThisTSDeg = 0.0;         // Slat angle this time step for window with blind on (deg)
+            bool slatAngThisTSDegEMSon = false;      // flag that indicate EMS system is actuating SlatAngThisTSDeg
+            Real64 slatAngThisTSDegEMSValue = 0.0; // value that EMS sets for slat angle in degrees
+            bool slatBlockBeam = false;             // True if blind slats block incident beam solar
+            int slatAngIndex = 0;
+            Real64 slatAngInterpFac = 0.0;
+            Real64 profAng = 0.0;
+            int profAngIndex = 0;
+            Real64 profAngInterpFac = 0.0;
+            Real64 bmBmTrans = 0.0;
+            Real64 airFlowPermeability = 0.0; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
+        } blind;
+            
         BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
     };
 
@@ -1735,22 +1753,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinConvCoeffWithShade; // Convection coefficient from glass or shade to gap air when interior
                                                // or exterior shade is present (W/m2-K)
     Array1D<Real64> SurfWinOtherConvHeatGain;  // other convective = total conv - standard model prediction for EQL window model (W)
-    Array1D<int> SurfWinBlindNumber;           // Blind number for a window with a blind
     Array1D<Real64> SurfWinEffInsSurfTemp; // Effective inside surface temperature for window with interior blind or shade; combination of shade/blind
                                            // and glass temperatures (C)
-    Array1D<bool> SurfWinMovableSlats;     // True if window has a blind with movable slats
-    Array1D<Real64> SurfWinSlatAngThisTS;  // Slat angle this time step for window with blind on (radians)
-    Array1D<Real64> SurfWinSlatAngThisTSDeg;         // Slat angle this time step for window with blind on (deg)
-    Array1D<bool> SurfWinSlatAngThisTSDegEMSon;      // flag that indicate EMS system is actuating SlatAngThisTSDeg
-    Array1D<Real64> SurfWinSlatAngThisTSDegEMSValue; // value that EMS sets for slat angle in degrees
-    Array1D<bool> SurfWinSlatsBlockBeam;             // True if blind slats block incident beam solar
-    Array1D<int> SurfWinSlatsAngIndex;
-    Array1D<Real64> SurfWinSlatsAngInterpFac;
-    Array1D<Real64> SurfWinProfileAng;
-    Array1D<int> SurfWinProfAngIndex;
-    Array1D<Real64> SurfWinProfAngInterpFac;
-    Array1D<Real64> SurfWinBlindBmBmTrans;
-    Array1D<Real64> SurfWinBlindAirFlowPermeability; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
     Array1D<Real64> SurfWinTotGlazingThickness;      // Total glazing thickness from outside of outer glass to inside of inner glass (m)
     Array1D<Real64> SurfWinTanProfileAngHor;         // Tangent of horizontal profile angle
     Array1D<Real64> SurfWinTanProfileAngVert;        // Tangent of vertical profile angle

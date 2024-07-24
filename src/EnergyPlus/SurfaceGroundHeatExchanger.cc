@@ -475,6 +475,8 @@ namespace SurfaceGroundHeatExchanger {
         int LayerNum;      // material layer number for bottom
         Real64 OutDryBulb; // Height Dependent dry bulb.
 
+        auto &s_mat = state.dataMaterial;
+        
         // get QTF data - only once
         if (this->InitQTF) {
             for (Cons = 1; Cons <= state.dataHeatBal->TotConstructs; ++Cons) {
@@ -498,12 +500,12 @@ namespace SurfaceGroundHeatExchanger {
                     this->ConstructionNum = Cons;
                     // surface properties
                     auto const *thisMaterialLayer = dynamic_cast<Material::MaterialChild *>(
-                        state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum)));
+                        s_mat->materials(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum)));
                     assert(thisMaterialLayer != nullptr);
                     this->BtmRoughness = thisMaterialLayer->Roughness;
                     this->TopThermAbs = thisMaterialLayer->AbsorpThermal;
                     auto const *thisMaterial1 =
-                        dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1)));
+                        dynamic_cast<Material::MaterialChild *>(s_mat->materials(state.dataConstruction->Construct(Cons).LayerPoint(1)));
                     assert(thisMaterial1 != nullptr);
                     this->TopRoughness = thisMaterial1->Roughness;
                     this->TopThermAbs = thisMaterial1->AbsorpThermal;

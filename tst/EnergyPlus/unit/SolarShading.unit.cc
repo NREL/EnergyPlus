@@ -5189,13 +5189,15 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     construct1.TotGlassLayers = 1;
     construct1.TransSolBeamCoef(1) = 0.9;
 
-    state->dataMaterial->TotMaterials = 1;
-    for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
-        Material::MaterialChild *p = new Material::MaterialChild;
-        state->dataMaterial->Material.push_back(p);
-    }
-    state->dataMaterial->Material(1)->Name = "GLASS";
-    state->dataMaterial->Material(1)->group = Material::Group::WindowGlass;
+    auto &s_mat = state->dataMaterial;
+    
+    s_mat->TotMaterials = 1;
+    auto *mat1 = new Material::MaterialChild;
+    mat1->Name = "GLASS";
+    mat1->group = Material::Group::WindowGlass;
+    s_mat->materials.push_back(mat1);
+    mat1->Num = s_mat->materials.isize();
+    s_mat->materialMap.insert_or_assign(mat1->Name, mat1->Num);
 
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(1);

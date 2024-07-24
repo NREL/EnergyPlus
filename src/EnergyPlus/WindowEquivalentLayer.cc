@@ -122,6 +122,9 @@ namespace EnergyPlus::WindowEquivalentLayer {
 // Using/Aliasing
 using namespace DataHeatBalance;
 using namespace DataSurfaces;
+
+constexpr std::array<std::string_view, (int)Orientation::Num> orientationNamesUC = {"HORIZONTAL", "VERTICAL"};
+        
 void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
 {
 
@@ -187,6 +190,8 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
     int NumSLayers;                           // number of glazing and shade layers (non-gas layers)
     Array2D<Real64> SysAbs1(2, CFSMAXNL + 1); // layers absorptance and system transmittance
 
+    auto &s_mat = state.dataMaterial;
+    
     if (!allocated(state.dataWindowEquivLayer->CFSLayers))
         state.dataWindowEquivLayer->CFSLayers.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
 
@@ -200,14 +205,14 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
 
     for (Layer = 1; Layer <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Layer) {
 
-        Material::Group group1 = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->group;
+        Material::Group group1 = s_mat->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->group;
         if (group1 != Material::Group::GlassEquivalentLayer && group1 != Material::Group::ShadeEquivalentLayer &&
             group1 != Material::Group::DrapeEquivalentLayer && group1 != Material::Group::ScreenEquivalentLayer &&
             group1 != Material::Group::BlindEquivalentLayer && group1 != Material::Group::GapEquivalentLayer)
             continue;
 
         MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
-        auto const *mat = state.dataMaterial->Material(MaterNum);
+        auto const *mat = s_mat->materials(MaterNum);
 
         if (mat->group == Material::Group::GapEquivalentLayer) {
             // Gap or Gas Layer
@@ -8136,14 +8141,17 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
     int EQLNum;    // equivalent layer window construction index
     int ConstrNum; // construction index
 
+    auto &surf = state.dataSurface->Surface(SurfNum);
+    auto &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
+    
     auto &CFS = state.dataWindowEquivLayer->CFS;
 
     IncAng = 0.0; // Autodesk:Init Added to elim use uninitialized
     CFSAbs = 0.0;
     ProfAngHor = 0.0;
     ProfAngVer = 0.0;
-    ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-    EQLNum = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).EQLConsPtr;
+    ConstrNum = surf.Construction;
+    EQLNum = state.dataConstruction->Construct(surf.Construction).EQLConsPtr;
     if (BeamDIffFlag != SolarArrays::DIFF) {
         if (state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) <= 0.0) return;
 
@@ -8190,7 +8198,7 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
         }
     }
     if (CFS(EQLNum).VBLayerPtr > 0) {
-        state.dataSurface->SurfWinSlatAngThisTSDeg(SurfNum) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
+        surfWin.blind.slatAngThisTSDeg = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
     }
 }
 

@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     state->dataConstruction->Construct.allocate(1);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Material::GetMaterialNum(*state, "CONCRETE");
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -184,7 +184,7 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
     MoistureBalanceEMPDManager::GetMoistureBalanceEMPDInput(*state);
 
-    auto const *material = dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->Material(1));
+    auto const *material = dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->materials(1));
     ASSERT_NEAR(material->EMPDSurfaceDepth, 0.014143, 0.000001);
     ASSERT_NEAR(material->EMPDDeepDepth, 0.064810, 0.000001);
 }
@@ -241,7 +241,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     state->dataConstruction->Construct.allocate(1);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Material::GetMaterialNum(*state, "CONCRETE");
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     state->dataConstruction->Construct.allocate(constNum);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(constNum);
     construction.TotLayers = constNum;
-    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("WOOD", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Material::GetMaterialNum(*state, "WOOD");
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -346,7 +346,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
 
     using Psychrometrics::PsyRhFnTdbRhov;
 
-    auto const *material(dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->Material(1)));
+    auto const *material(dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->materials(1)));
 
     Real64 Tsat(0.0);
     state->dataHeatBalSurf->SurfTempIn.allocate(surfNum);

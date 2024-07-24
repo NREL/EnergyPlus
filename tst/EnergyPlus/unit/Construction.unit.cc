@@ -73,17 +73,17 @@ TEST_F(EnergyPlusFixture, Construction_reportLayers)
     m->TotMaterials = 8;
     for (int i = 1; i <= m->TotMaterials; i++) {
         Material::MaterialChild *p = new Material::MaterialChild;
-        m->Material.push_back(p);
+        m->materials.push_back(p);
     }
 
-    m->Material(1)->Name = "mat a";
-    m->Material(2)->Name = "mat b";
-    m->Material(3)->Name = "mat c";
-    m->Material(4)->Name = "mat d";
-    m->Material(5)->Name = "mat e";
-    m->Material(6)->Name = "mat f";
-    m->Material(7)->Name = "mat g";
-    m->Material(8)->Name = "mat h";
+    m->materials(1)->Name = "mat a";
+    m->materials(2)->Name = "mat b";
+    m->materials(3)->Name = "mat c";
+    m->materials(4)->Name = "mat d";
+    m->materials(5)->Name = "mat e";
+    m->materials(6)->Name = "mat f";
+    m->materials(7)->Name = "mat g";
+    m->materials(8)->Name = "mat h";
 
     c->Construct.allocate(3);
 

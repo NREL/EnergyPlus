@@ -236,11 +236,11 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofFirstTimeTest)
 
     state->dataConstruction->Construct.allocate(constrNum);
     Material::MaterialChild *mat = new Material::MaterialChild;
-    state->dataMaterial->Material.push_back(mat);
+    state->dataMaterial->materials.push_back(mat);
     state->dataSurface->Surface.allocate(surfNum);
 
     auto &thisConstruct = state->dataConstruction->Construct(constrNum);
-    auto *thisMat = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    auto *thisMat = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(1));
     auto &thisEcoRoof = state->dataEcoRoofMgr;
 
     thisConstruct.LayerPoint.allocate(1);
@@ -273,11 +273,11 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofTest)
 
     state->dataConstruction->Construct.allocate(constrNum);
     Material::MaterialChild *mat = new Material::MaterialChild;
-    state->dataMaterial->Material.push_back(mat);
+    state->dataMaterial->materials.push_back(mat);
     state->dataSurface->Surface.allocate(surfNum);
 
     auto &thisConstruct = state->dataConstruction->Construct(constrNum);
-    auto *thisMat = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    auto *thisMat = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(1));
     auto &thisEcoRoof = state->dataEcoRoofMgr;
 
     thisConstruct.LayerPoint.allocate(1);

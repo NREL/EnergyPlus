@@ -87,8 +87,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
     Material::MaterialBase *mat = new Material::MaterialChild;
-    state->dataMaterial->Material.push_back(mat);
-    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    state->dataMaterial->materials.push_back(mat);
+    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(1));
     thisMaterial_1->Resistance = 1.25;
     thisMaterial_1->Roughness = Material::SurfaceRoughness::VeryRough;
     thisMaterial_1->group = Material::Group::Regular;
@@ -140,8 +140,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
     Material::MaterialBase *mat = new Material::MaterialChild;
-    state->dataMaterial->Material.push_back(mat);
-    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    state->dataMaterial->materials.push_back(mat);
+    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(1));
     thisMaterial_1->Resistance = 1.25;
     thisMaterial_1->Roughness = Material::SurfaceRoughness::VeryRough;
     thisMaterial_1->group = Material::Group::Regular;
@@ -274,7 +274,7 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(4, state->dataMaterial->TotMaterials);
-    EXPECT_ENUM_EQ(state->dataMaterial->Material(4)->group, Material::Group::WindowSimpleGlazing);
+    EXPECT_ENUM_EQ(state->dataMaterial->materials(4)->group, Material::Group::WindowSimpleGlazing);
     // get construction data
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
@@ -312,8 +312,8 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     // check movable insulation material
     EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");            // base surface name
     EXPECT_EQ(state->dataSurface->SurfMaterialMovInsulExt(1), 4);                                  // index to movable insulation material
-    EXPECT_EQ(state->dataMaterial->Material(4)->Name, "SIMPLEGLAZINGSYSTEM");                      // name of movable insulation material
-    EXPECT_ENUM_EQ(state->dataMaterial->Material(4)->group, Material::Group::WindowSimpleGlazing); // invalid material group type
+    EXPECT_EQ(state->dataMaterial->materials(4)->Name, "SIMPLEGLAZINGSYSTEM");                      // name of movable insulation material
+    EXPECT_ENUM_EQ(state->dataMaterial->materials(4)->group, Material::Group::WindowSimpleGlazing); // invalid material group type
     EXPECT_TRUE(ErrorsFound);                                                                      // error found due to invalid material
 }
 } // namespace EnergyPlus

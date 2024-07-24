@@ -3861,7 +3861,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
 {
     state->dataMaterial->TotMaterials = 0;
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    auto *thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
+    auto *thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->materials(state->dataMaterial->TotMaterials));
     EXPECT_EQ(state->dataMaterial->TotMaterials, 1);
     EXPECT_EQ(thisMaterial->Name, "test_air_8MM");
     EXPECT_EQ(thisMaterial->Thickness, 0.008);
@@ -3869,7 +3869,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
     EXPECT_EQ(thisMaterial->gases[0].con.c1, 7.760e-5);
 
     createAirMaterialFromDistance(*state, 0.012, "test_air_");
-    thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
+    thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->materials(state->dataMaterial->TotMaterials));
     EXPECT_EQ(state->dataMaterial->TotMaterials, 2);
     EXPECT_EQ(thisMaterial->Name, "test_air_12MM");
     EXPECT_EQ(thisMaterial->Thickness, 0.012);
@@ -3885,9 +3885,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_createConstructionWithStorm_Test)
 
     for (int i = 1; i <= 60; i++) {
         Material::MaterialBase *p = new Material::MaterialChild;
-        state->dataMaterial->Material.push_back(p);
+        state->dataMaterial->materials.push_back(p);
     }
-    dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(47))->AbsorpThermalFront = 0.11;
+    dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(47))->AbsorpThermalFront = 0.11;
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
     state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).TotLayers = 3;
@@ -5106,7 +5106,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataConstruction->Construct.allocate(6);
     for (int i = 1; i <= 60; i++) {
         Material::MaterialChild *p = new Material::MaterialChild;
-        state->dataMaterial->Material.push_back(p);
+        state->dataMaterial->materials.push_back(p);
     }
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
@@ -5126,9 +5126,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     // Case 1a: Constructs with regular materials are not reverse of each other--material layers do not match in reverse (should get a "true" answer)
     state->dataConstruction->Construct(2).LayerPoint(1) = 1;
     state->dataConstruction->Construct(2).LayerPoint(3) = 3;
-    state->dataMaterial->Material(1)->group = Material::Group::Regular;
-    state->dataMaterial->Material(2)->group = Material::Group::Regular;
-    state->dataMaterial->Material(3)->group = Material::Group::Regular;
+    state->dataMaterial->materials(1)->group = Material::Group::Regular;
+    state->dataMaterial->materials(2)->group = Material::Group::Regular;
+    state->dataMaterial->materials(3)->group = Material::Group::Regular;
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 1, 2, 3);
@@ -5143,7 +5143,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataConstruction->Construct(4).LayerPoint(1) = 4;
     state->dataConstruction->Construct(4).LayerPoint(2) = 2;
     state->dataConstruction->Construct(4).LayerPoint(3) = 5;
-    auto *thisMaterial_4 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(4));
+    auto *thisMaterial_4 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(4));
     thisMaterial_4->group = Material::Group::WindowGlass;
     thisMaterial_4->Thickness = 0.15;
     thisMaterial_4->ReflectSolBeamFront = 0.35;
@@ -5159,7 +5159,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     thisMaterial_4->SolarDiffusing = true;
     thisMaterial_4->YoungModulus = 0.89;
     thisMaterial_4->PoissonsRatio = 1.11;
-    auto *thisMaterial_5 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(5));
+    auto *thisMaterial_5 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(5));
     thisMaterial_5->group = Material::Group::WindowGlass;
     thisMaterial_5->Thickness = 0.15;
     thisMaterial_5->ReflectSolBeamFront = 0.25;
@@ -5193,7 +5193,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataConstruction->Construct(5).LayerPoint(1) = 6;
     state->dataConstruction->Construct(6).TotLayers = 1;
     state->dataConstruction->Construct(6).LayerPoint(1) = 7;
-    auto *thisMaterial_6 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(6));
+    auto *thisMaterial_6 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(6));
     thisMaterial_6->group = Material::Group::GlassEquivalentLayer;
     thisMaterial_6->TausFrontBeamBeam = 0.39;
     thisMaterial_6->TausBackBeamBeam = 0.29;
@@ -5221,7 +5221,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     thisMaterial_6->EmissThermalFront = 0.888;
     thisMaterial_6->EmissThermalBack = 0.777;
     thisMaterial_6->Resistance = 1.234;
-    auto *thisMaterial_7 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(7));
+    auto *thisMaterial_7 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(7));
     thisMaterial_7->group = Material::Group::GlassEquivalentLayer;
     thisMaterial_7->TausFrontBeamBeam = 0.29;
     thisMaterial_7->TausBackBeamBeam = 0.39;

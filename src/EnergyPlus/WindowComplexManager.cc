@@ -2716,6 +2716,7 @@ namespace WindowComplexManager {
         Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
         Real64 OutSrdIR;
 
+        auto &s_mat = state.dataMaterial;
         // fill local vars
 
         CalcDeflection = TARCOGParams::DeflectionCalculation::NONE;
@@ -2865,7 +2866,7 @@ namespace WindowComplexManager {
         IGap = 0;
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
-            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(s_mat->materials(LayPtr));
             assert(thisMaterial != nullptr);
 
             if ((thisMaterial->group == Material::Group::WindowGlass) || (thisMaterial->group == Material::Group::WindowSimpleGlazing)) {
@@ -2926,7 +2927,7 @@ namespace WindowComplexManager {
 
                 GasPointer = thisMaterial->GasPointer;
 
-                auto const *thisMaterialGas = dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(GasPointer));
+                auto const *thisMaterialGas = dynamic_cast<Material::MaterialGasMix const *>(s_mat->materials(GasPointer));
                 assert(thisMaterialGas != nullptr);
                 nmix(IGap + 1) = thisMaterialGas->numGases;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
