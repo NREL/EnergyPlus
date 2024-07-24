@@ -82,8 +82,7 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
 
 struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
 {
-    static constexpr std::string_view object_name =
-        "Coil:Cooling:DX:CurveFit:Performance";
+    static constexpr std::string_view object_name = "Coil:Cooling:DX:CurveFit:Performance";
     std::string parentName;
 
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
@@ -120,7 +119,6 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
     explicit CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name);
 
     void size(EnergyPlusData &state) override;
-
 
     void setOperMode(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 
@@ -245,7 +243,6 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
         return normalMode.speeds.front().original_input_specs.evaporator_air_flow_fraction;
     }
 
-
     Real64 maxOutdoorDrybulbForBasin = 0.0;
     bool mySizeFlag = true;
 
@@ -255,8 +252,8 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
     Real64 wasteHeatRate = 0.0;
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
-    CoilCoolingDXCurveFitOperatingMode alternateMode;         // enhanced dehumidifcation or Subcool mode
-    CoilCoolingDXCurveFitOperatingMode alternateMode2;        // Reheat mode
+    CoilCoolingDXCurveFitOperatingMode alternateMode;  // enhanced dehumidifcation or Subcool mode
+    CoilCoolingDXCurveFitOperatingMode alternateMode2; // Reheat mode
 };
 
 } // namespace EnergyPlus

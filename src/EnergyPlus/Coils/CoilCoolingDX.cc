@@ -732,9 +732,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
             this->evaporativeCondSupplyTankConsump = this->evaporativeCondSupplyTankVolumeFlow * reportingConstant;
             if (coilMode == HVAC::CoilMode::Normal) {
-              this->evapCondPumpElecPower =
-                  this->performance->CurrentEvapCondPumpPowerAtSpeed(
-                      speedNum - 1);
+                this->evapCondPumpElecPower = this->performance->CurrentEvapCondPumpPowerAtSpeed(speedNum - 1);
             }
             state.dataWaterData->WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
                 this->evaporativeCondSupplyTankVolumeFlow;
@@ -865,15 +863,15 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                 Psychrometrics::PsyWFnTdbTwbPb(state, RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
             this->performance->simulate(state,
-                                       dummyEvapInlet,
-                                       dummyEvapOutlet,
-                                       HVAC::CoilMode::Normal,
-                                       dummySpeedNum,
-                                       dummySpeedRatio,
-                                       dummyFanOp,
-                                       dummyCondInlet,
-                                       dummyCondOutlet,
-                                       dummySingleMode);
+                                        dummyEvapInlet,
+                                        dummyEvapOutlet,
+                                        HVAC::CoilMode::Normal,
+                                        dummySpeedNum,
+                                        dummySpeedRatio,
+                                        dummyFanOp,
+                                        dummyCondInlet,
+                                        dummyCondOutlet,
+                                        dummySingleMode);
 
             // reset outdoor conditions back to previous state
             state.dataEnvrn->OutDryBulbTemp = holdOutDryBulbTemp;

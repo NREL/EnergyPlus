@@ -97,7 +97,7 @@ struct CoilCoolingDXPerformanceBase
     Real64 basinHeaterPower = 0.0;
     Real64 basinHeaterElectricityConsumption = 0.0;
     Real64 minOutdoorDrybulb = 0.0;
-    //int hasAlternateMode = 0; // 0 Normal, 1 Enhanced, 2 SubcoolReheat
+    // int hasAlternateMode = 0; // 0 Normal, 1 Enhanced, 2 SubcoolReheat
     int OperatingMode = 0;
     Real64 ModeRatio = 0.0;
     Real64 NormalSHR = 0.0;
@@ -118,7 +118,7 @@ struct CoilCoolingDXPerformanceBase
                           const DataLoopNode::NodeData &,
                           DataLoopNode::NodeData &,
                           HVAC::CoilMode,
-                          //Real64 &,
+                          // Real64 &,
                           int,
                           Real64,
                           HVAC::FanOp const,
@@ -221,7 +221,7 @@ struct CoilCoolingDXPerformanceBase
     {
         return 0.0;
     }
-    
+
     virtual Real64 EvapAirFlowFraction()
     {
         return 0.0;
