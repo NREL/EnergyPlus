@@ -189,10 +189,10 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterChWSetPointManager_Fl
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_EQ(2, state->dataFluidProps->NumOfGlycols);
-    const auto &thisGlycol = state->dataFluidProps->GlycolData(2);
-    EXPECT_EQ("ETHYLENEGLYCOL40PERCENT", thisGlycol.Name);
-    EXPECT_EQ("ETHYLENEGLYCOL", thisGlycol.GlycolName);
+    EXPECT_EQ(2, state->dataFluidProps->glycols.isize());
+    const auto *glycol = state->dataFluidProps->glycols(2);
+    EXPECT_EQ("ETHYLENEGLYCOL40PERCENT", glycol->Name);
+    EXPECT_EQ("ETHYLENEGLYCOL", glycol->GlycolName);
 
     // Set up the required plant loop data
     state->dataPlnt->TotNumLoops = 1;
