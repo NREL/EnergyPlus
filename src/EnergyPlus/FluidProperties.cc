@@ -1102,7 +1102,7 @@ namespace FluidProperties {
                                       cAlphaFields(2),
                                       Alphas(2),
                                       "",
-                                      format("Valid options are (\"Enthalpy\", \"Density\"). Fluid will not be available for simulation."));
+                                      R"(Valid options are ("Enthalpy", "Density"). Fluid will not be available for simulation.)");
                 ErrorsFound = true;
                 continue;
             }
