@@ -127,7 +127,7 @@ namespace WaterToAirHeatPump {
         int HPNum; // The WatertoAirHP that you are currently loading input into
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
-        if (state.dataWaterToAirHeatPump->GetCoilsInputFlag) {                            // First time subroutine has been entered
+        if (state.dataWaterToAirHeatPump->GetCoilsInputFlag) {                                               // First time subroutine has been entered
             state.dataWaterToAirHeatPump->WaterIndex = FluidProperties::GetGlycolNum(state, fluidNameWater); // Initialize the WaterIndex once
             GetWatertoAirHPInput(state);
             state.dataWaterToAirHeatPump->GetCoilsInputFlag = false;
@@ -1325,9 +1325,9 @@ namespace WaterToAirHeatPump {
         LoadSideAirInletEnth_Unit = PsyHFnTdbW(heatPump.InletAirDBTemp, heatPump.InletAirHumRat);
         SourceSideFluidName = state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidName;
         SourceSideFluidIndex = state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidIndex;
-        SourceSideVolFlowRate =
-            heatPump.InletWaterMassFlowRate /
-                FluidProperties::GetDensityGlycol(state, SourceSideFluidName, heatPump.InletWaterTemp, SourceSideFluidIndex, RoutineNameSourceSideInletTemp);
+        SourceSideVolFlowRate = heatPump.InletWaterMassFlowRate /
+                                FluidProperties::GetDensityGlycol(
+                                    state, SourceSideFluidName, heatPump.InletWaterTemp, SourceSideFluidIndex, RoutineNameSourceSideInletTemp);
 
         StillSimulatingFlag = true;
 
@@ -1554,11 +1554,11 @@ namespace WaterToAirHeatPump {
 
                     // Determine the Enthalpy of the Superheated Fluid at Load Side Outlet/Compressor Inlet
                     SuperHeatEnth = FluidProperties::GetSupHeatEnthalpyRefrig(state,
-                                                             heatPump.Refrigerant,
-                                                             CompressInletTemp,
-                                                             LoadSidePressure,
-                                                             state.dataWaterToAirHeatPump->RefrigIndex,
-                                                             RoutineNameCompressInletTemp);
+                                                                              heatPump.Refrigerant,
+                                                                              CompressInletTemp,
+                                                                              LoadSidePressure,
+                                                                              state.dataWaterToAirHeatPump->RefrigIndex,
+                                                                              RoutineNameCompressInletTemp);
 
                     // Determining the suction state of the fluid from inlet state involves interation
                     // Method employed...
@@ -1577,7 +1577,8 @@ namespace WaterToAirHeatPump {
                         static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
                         std::string Refrigerant; // Name of refrigerant
                         int refrigIndex = state.dataWaterToAirHeatPump->RefrigIndex;
-                        Real64 compSuctionEnth = FluidProperties::GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, refrigIndex, RoutineName);
+                        Real64 compSuctionEnth =
+                            FluidProperties::GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, refrigIndex, RoutineName);
                         return (compSuctionEnth - SuperHeatEnth) / SuperHeatEnth;
                     };
 
@@ -1588,17 +1589,17 @@ namespace WaterToAirHeatPump {
                         return;
                     }
                     CompSuctionEnth = FluidProperties::GetSupHeatEnthalpyRefrig(state,
-                                                               heatPump.Refrigerant,
-                                                               state.dataWaterToAirHeatPump->CompSuctionTemp,
-                                                               SuctionPr,
-                                                               state.dataWaterToAirHeatPump->RefrigIndex,
-                                                               RoutineNameCompSuctionTemp);
+                                                                                heatPump.Refrigerant,
+                                                                                state.dataWaterToAirHeatPump->CompSuctionTemp,
+                                                                                SuctionPr,
+                                                                                state.dataWaterToAirHeatPump->RefrigIndex,
+                                                                                RoutineNameCompSuctionTemp);
                     CompSuctionDensity = FluidProperties::GetSupHeatDensityRefrig(state,
-                                                                 heatPump.Refrigerant,
-                                                                 state.dataWaterToAirHeatPump->CompSuctionTemp,
-                                                                 SuctionPr,
-                                                                 state.dataWaterToAirHeatPump->RefrigIndex,
-                                                                 RoutineNameCompSuctionTemp);
+                                                                                  heatPump.Refrigerant,
+                                                                                  state.dataWaterToAirHeatPump->CompSuctionTemp,
+                                                                                  SuctionPr,
+                                                                                  state.dataWaterToAirHeatPump->RefrigIndex,
+                                                                                  RoutineNameCompSuctionTemp);
 
                     // Find Refrigerant Flow Rate
                     switch (heatPump.compressorType) {
@@ -1840,9 +1841,9 @@ namespace WaterToAirHeatPump {
         CpAir = PsyCpAirFnW(heatPump.InletAirHumRat);
         SourceSideFluidName = state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidName;
         SourceSideFluidIndex = state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidIndex;
-        SourceSideVolFlowRate =
-            heatPump.InletWaterMassFlowRate /
-                FluidProperties::GetDensityGlycol(state, SourceSideFluidName, heatPump.InletWaterTemp, SourceSideFluidIndex, RoutineNameSourceSideInletTemp);
+        SourceSideVolFlowRate = heatPump.InletWaterMassFlowRate /
+                                FluidProperties::GetDensityGlycol(
+                                    state, SourceSideFluidName, heatPump.InletWaterTemp, SourceSideFluidIndex, RoutineNameSourceSideInletTemp);
 
         // If heat pump is not operating, return
         if (SensDemand == 0.0 || heatPump.InletAirMassFlowRate <= 0.0 || heatPump.InletWaterMassFlowRate <= 0.0) {
@@ -1901,8 +1902,8 @@ namespace WaterToAirHeatPump {
                 }
 
                 // Determine Effectiveness of Source Side
-                CpFluid =
-                    FluidProperties::GetSpecificHeatGlycol(state, SourceSideFluidName, heatPump.InletWaterTemp, SourceSideFluidIndex, RoutineNameSourceSideInletTemp);
+                CpFluid = FluidProperties::GetSpecificHeatGlycol(
+                    state, SourceSideFluidName, heatPump.InletWaterTemp, SourceSideFluidIndex, RoutineNameSourceSideInletTemp);
 
                 //      IF (SourceSideFluidName=='WATER') THEN
                 if (SourceSideFluidIndex == state.dataWaterToAirHeatPump->WaterIndex) {
@@ -2001,11 +2002,11 @@ namespace WaterToAirHeatPump {
 
                 // Determine the Enathalpy of the Superheated Fluid at Source Side Outlet/Compressor Inlet
                 SuperHeatEnth = FluidProperties::GetSupHeatEnthalpyRefrig(state,
-                                                         heatPump.Refrigerant,
-                                                         CompressInletTemp,
-                                                         SourceSidePressure,
-                                                         state.dataWaterToAirHeatPump->RefrigIndex,
-                                                         RoutineNameCompressInletTemp);
+                                                                          heatPump.Refrigerant,
+                                                                          CompressInletTemp,
+                                                                          SourceSidePressure,
+                                                                          state.dataWaterToAirHeatPump->RefrigIndex,
+                                                                          RoutineNameCompressInletTemp);
 
                 // Determining the suction state of the fluid from inlet state involves interation
                 // Method employed...
@@ -2013,7 +2014,7 @@ namespace WaterToAirHeatPump {
                 // check that with the inlet enthalpy ( as suction loss is isenthalpic). Iterate till desired accuracy is reached
 
                 if (!Converged) {
-                        CompSuctionSatTemp = FluidProperties::GetSatTemperatureRefrig(
+                    CompSuctionSatTemp = FluidProperties::GetSatTemperatureRefrig(
                         state, heatPump.Refrigerant, SuctionPr, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameSuctionPr);
                     CompSuctionTemp1 = CompSuctionSatTemp;
 
@@ -2048,7 +2049,8 @@ namespace WaterToAirHeatPump {
                     static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
                     std::string Refrigerant; // Name of refrigerant
                     int refrigIndex = state.dataWaterToAirHeatPump->RefrigIndex;
-                    Real64 compSuctionEnth = FluidProperties::GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, refrigIndex, RoutineName);
+                    Real64 compSuctionEnth =
+                        FluidProperties::GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, refrigIndex, RoutineName);
                     return (compSuctionEnth - SuperHeatEnth) / SuperHeatEnth;
                 };
 
@@ -2516,7 +2518,7 @@ namespace WaterToAirHeatPump {
         int WhichCoil;
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
-        if (state.dataWaterToAirHeatPump->GetCoilsInputFlag) {                            // First time subroutine has been entered
+        if (state.dataWaterToAirHeatPump->GetCoilsInputFlag) {                                               // First time subroutine has been entered
             state.dataWaterToAirHeatPump->WaterIndex = FluidProperties::GetGlycolNum(state, fluidNameWater); // Initialize the WaterIndex once
             GetWatertoAirHPInput(state);
             state.dataWaterToAirHeatPump->GetCoilsInputFlag = false;

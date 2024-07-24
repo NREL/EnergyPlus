@@ -1999,10 +1999,10 @@ namespace DataPlant {
         Real64 const OutletTemp(state.dataLoopNodes->Node(OutletNode).Temp);
         Real64 const AverageTemp((InletTemp + OutletTemp) / 2.0);
         Real64 const ComponentCp(FluidProperties::GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                       AverageTemp,
-                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                                       RoutineName));
+                                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                        AverageTemp,
+                                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                        RoutineName));
 
         // Calculate the load altered by this component
         Real64 const LoadAlteration(ComponentMassFlowRate * ComponentCp * (OutletTemp - InletTemp));

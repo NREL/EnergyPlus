@@ -2566,10 +2566,10 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
 
         if (this->HWplantLoc.loopNum > 0 && this->ReheatComp_Num != HeatingCoilType::SteamAirHeating) { // protect early calls before plant is setup
             rho = FluidProperties::GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidName,
-                                   Constant::HWInitConvTemp,
-                                   state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidIndex,
-                                   RoutineName);
+                                                    state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidName,
+                                                    Constant::HWInitConvTemp,
+                                                    state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidIndex,
+                                                    RoutineName);
         } else {
             rho = 1000.0;
         }
@@ -3638,10 +3638,13 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                                                           (state.dataSingleDuct->ZoneDesTempSS - state.dataSingleDuct->CoilInTempSS);
                         if (state.dataSingleDuct->DesCoilLoadSS >= SmallLoad) {
                             TempSteamIn = 100.00;
-                            EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, this->FluidIndex, RoutineNameFull);
-                            EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, this->FluidIndex, RoutineNameFull);
+                            EnthSteamInDry =
+                                FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, this->FluidIndex, RoutineNameFull);
+                            EnthSteamOutWet =
+                                FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, this->FluidIndex, RoutineNameFull);
                             LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-                            SteamDensity = FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, this->FluidIndex, RoutineNameFull);
+                            SteamDensity =
+                                FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, this->FluidIndex, RoutineNameFull);
 
                             Cp = GetSpecificHeatGlycol(state,
                                                        fluidNameWater,

@@ -1115,10 +1115,10 @@ namespace SteamCoils {
                 // Steam heat exchangers would not have effectivness, since all of the steam is
                 // converted to water and only then the steam trap allows it to leave the heat
                 // exchanger, subsequently heat exchange is latent heat + subcooling.
-                EnthSteamInDry =
-                    FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
-                EnthSteamOutWet =
-                    FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(
+                    state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(
+                    state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
@@ -1186,9 +1186,9 @@ namespace SteamCoils {
                 TempLoopOutToPump = TempWaterAtmPress - state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
 
                 // Actual Steam Coil Outlet Enthalpy
-                EnthCoilOutlet =
-                    FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
-                    CpWater * SubcoolDeltaTemp;
+                EnthCoilOutlet = FluidProperties::GetSatEnthalpyRefrig(
+                                     state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
+                                 CpWater * SubcoolDeltaTemp;
 
                 // Enthalpy at Point 4
                 EnthAtAtmPress = FluidProperties::GetSatEnthalpyRefrig(
@@ -1230,10 +1230,10 @@ namespace SteamCoils {
                 // Steam heat exchangers would not have effectivness, since all of the steam is
                 // converted to water and only then the steam trap allows it to leave the heat
                 // exchanger, subsequently heat exchange is latent heat + subcooling.
-                EnthSteamInDry =
-                    FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
-                EnthSteamOutWet =
-                        FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(
+                    state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(
+                    state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
                 //          CpWater = GetSpecificHeatGlycol('WATER',  &

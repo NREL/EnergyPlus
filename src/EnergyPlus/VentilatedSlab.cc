@@ -1707,7 +1707,8 @@ namespace VentilatedSlab {
                 if (ventSlab.heatingCoilType == DataPlant::PlantEquipmentType::CoilSteamAirHeating &&
                     !state.dataVentilatedSlab->MyPlantScanFlag(Item)) {
                     TempSteamIn = 100.00;
-                    SteamDensity = FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                    SteamDensity =
+                        FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                     ventSlab.MaxHotSteamFlow = SteamDensity * ventSlab.MaxVolHotSteamFlow;
                     ventSlab.MinHotSteamFlow = SteamDensity * ventSlab.MinVolHotSteamFlow;
 
@@ -2344,13 +2345,13 @@ namespace VentilatedSlab {
                                     DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                 }
                                 TempSteamIn = 100.00;
-                                EnthSteamInDry =
-                                    FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
-                                EnthSteamOutWet =
-                                    FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                                EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(
+                                    state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                                EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(
+                                    state, fluidNameSteam, TempSteamIn, 0.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-                                SteamDensity =
-                                    FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                                SteamDensity = FluidProperties::GetSatDensityRefrig(
+                                    state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                                 Cp = GetSpecificHeatGlycol(state, fluidNameWater, Constant::HWInitConvTemp, DummyWaterIndex, RoutineName);
                                 rho = GetDensityGlycol(state, fluidNameWater, Constant::HWInitConvTemp, DummyWaterIndex, RoutineName);
                                 MaxVolHotSteamFlowDes =
