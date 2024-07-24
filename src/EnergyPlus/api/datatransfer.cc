@@ -65,6 +65,8 @@
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/api/runtime.h>
 
+using namespace EnergyPlus;
+
 APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize)
 {
     struct LocalAPIDataEntry
