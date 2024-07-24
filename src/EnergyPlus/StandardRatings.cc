@@ -6342,7 +6342,7 @@ namespace StandardRatings {
                     q_H1_low + (q_H0_low - q_H1_low) * ((1.67 - (8.33)) / (16.67 - (8.33)));
 
                 // Equation 11.191 AHRI-2023
-                Real64 N_Hq = min(1.0, (q_H2_int - q_35_low) / (q_H2_full - q_35_low));
+                Real64 N_Hq = (q_H2_full != q_35_low) ? min(1.0, (q_H2_int - q_35_low) / (q_H2_full - q_35_low)) : 0.0;
                 N_Hq = max(0.0, N_Hq);
                 // Equation 11.190 AHRI-2023
                 Real64 M_Hq = (q_H0_low - q_H1_low) / (16.66 - 8.33) * (1.0 - N_Hq) + (q_H2_full - q_H3_full) / (1.66 - (-8.33)) * N_Hq;
@@ -6361,7 +6361,7 @@ namespace StandardRatings {
                     p_H1_low + (p_H0_low - p_H1_low) * ((1.67 - (8.33)) / (16.67 - (8.33)));
 
                 // Equation 11.194 AHRI-2023
-                Real64 N_HE = min(1.0, (p_H2_int - p_35_low) / (p_H2_full - p_35_low));
+                Real64 N_HE = (p_H2_int != p_35_low) ? min(1.0, (p_H2_int - p_35_low) / (p_H2_full - p_35_low)) : 0.0;
                 N_HE = max(0.0, N_HE);
 
                 // Equation 11.193 AHRI-2023
@@ -6375,24 +6375,27 @@ namespace StandardRatings {
                 Real64 q_hs(0.0);
                 Real64 p_hs(0.0);
                 // Low Speed
-                if (t > 8.33) {
-                    // equation 11.179
+                if (t >= 8.33) {
                     Real64 ratio = // (t - 8.33) / (16.67 - 8.33)
                         (t - HeatingOutdoorCoilInletAirDBTempRated) /
                         (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated);
+                    // equation 11.179
                     q_low = Q_H1_Low(spnum) + ((Q_H1_Low(spnum) - Q_H3_Full(spnum)) * ratio);
+                    // equation 11.182
                     p_low = P_H1_Low(spnum) + ((P_H1_Low(spnum) - P_H3_Full(spnum)) * ratio);
                 } else if (t >= 1.67 && t < 8.33) {
-                    // equation 11.180
                     Real64 ratio = // (t - 1.67) / (8.33 - 1.67)
                         (t - HeatingOutdoorCoilInletAirDBTempH2Test) /
                         (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH2Test);
+                    // equation 11.180
                     q_low = Q_H2_Int(spnum) + ((Q_H0_Low(spnum) - Q_H1_Low(spnum)) * ratio);
+                    // equation 11.183
                     p_low = P_H2_Int(spnum) + ((P_H0_Low(spnum) - P_H1_Low(spnum)) * ratio);
                 } else if (t < 1.67) {
+                    // for now Q_H2_Int is replaced with Q_H_Int, no equation for the later
                     // equation 11.181
-                    // Q_H2_Int replaced Q_H_Int, no equation for the later
                     q_low = Q_H2_Int(spnum);
+                    // equation 11.184
                     p_low = P_H2_Int(spnum);
                 }
 
