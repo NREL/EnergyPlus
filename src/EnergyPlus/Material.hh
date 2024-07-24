@@ -746,7 +746,8 @@ struct MaterialData : BaseGlobalStruct
         for (int i = 0; i < TotMaterials; ++i) {
             delete materials[i]; //
         }
-        materials.deallocate();
+        materials.clear();
+        materialMap.clear();
     }
 };
 

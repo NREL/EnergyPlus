@@ -4708,7 +4708,7 @@ namespace HeatBalanceManager {
 
         auto &s_mat = state.dataMaterial;
         // First get the concrete layer
-        iFCConcreteLayer = Material::GetMaterialNum(state, "~FC_Concrete");
+        iFCConcreteLayer = Material::GetMaterialNum(state, "~FC_CONCRETE");
         Rcon = s_mat->materials(iFCConcreteLayer)->Resistance;
 
         // Count number of constructions defined with Ffactor or Cfactor method
@@ -4802,7 +4802,7 @@ namespace HeatBalanceManager {
             thisConstruct.LayerPoint(2) = iFCConcreteLayer;
 
             // The fictitious insulation is the outside layer
-            thisConstruct.LayerPoint(1) = Material::GetMaterialNum(state, format("~FC_Insulation_{}", Loop));
+            thisConstruct.LayerPoint(1) = Material::GetMaterialNum(state, format("~FC_INSULATION_{}", Loop));
 
             // Calculate the thermal resistance of the fictitious insulation layer
             // effective thermal resistance excludes inside and outside air films
@@ -4895,7 +4895,7 @@ namespace HeatBalanceManager {
             thisConstruct.LayerPoint(2) = iFCConcreteLayer;
 
             // The fictitious insulation is the outside layer
-            thisConstruct.LayerPoint(1) = Material::GetMaterialNum(state, format("~FC_Insulation_{}", Loop + TotFfactorConstructs));
+            thisConstruct.LayerPoint(1) = Material::GetMaterialNum(state, format("~FC_INSULATION_{}", Loop + TotFfactorConstructs));
 
             // CR 8886 Rsoil should be in SI unit. From ASHRAE 90.1-2010 SI
             if (Height <= 0.25) {
