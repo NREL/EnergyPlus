@@ -89,6 +89,8 @@ Lists the All Summary tables, the Monthly tables as well as the Zone Component L
 \item
   System Summary
 \item
+  HVAC Topology
+\item
   Component Sizing Summary
 \item
   Outdoor Air Summary
@@ -930,6 +932,234 @@ None & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
 \bottomrule
 \end{longtable}
 
+Chillers
+
+The columns for this report are shown below as a list:
+
+\begin{itemize}
+\item
+  Type
+\item
+  Reference Capacity[W]
+\item
+  Reference Efficiency [W/W]
+\item
+  Rated Capacity [W]
+\item
+  Rated Efficiency [W/W]
+\item
+  IPLV in SI Units [W/W]
+\item
+  IPLV in IP Units [Btu/W-h]
+\item
+  Minimum Part Load Ratio
+\item
+  Fuel Type
+\item
+  Rated Entering Condenser Temperature [C]
+\item
+  Rated Leaving Evaporator Temperature [C]
+\item
+  Reference Entering Condenser Temperature [C]
+\item
+  Reference Leaving Evaporator Temperature [C]
+\item
+  Design Size Reference Chilled Water Flow Rate [kg/s]
+\item
+  Design Size Reference Condenser Fluid Flow Rate [kg/s]
+\item
+  Plantloop Name
+\item
+  Plantloop Branch Name
+\item
+  Condenser Loop Name
+\item
+  Condenser Loop Branch Name
+\item
+  Heat Recovery Plantloop Name
+\item
+  Heat Recovery Plantloop Branch Name
+\item
+  Recovery Relative Capacity Fraction
+\end{itemize}
+
+An example of the report is shown here
+
+\begin{figure}[htb]
+\centering
+\includegraphics{media/chiller-table-example.PNG}
+\caption{}
+\end{figure}
+
+Boilers
+
+The columns for this report are shown below as a list:
+
+\begin{itemize}
+\item
+	Type
+\item
+	Reference Capacity [W]
+\item
+	Reference Efficiency[W/W]
+\item
+	Rated Capacity [W]
+\item
+	Rated Efficiency [W/W]
+\item
+	Minimum Part Load Ratio
+\item
+	Fuel Type
+\item
+	Parasitic Electric Load [W]
+\item
+	Plantloop Name
+\item
+	Plantloop Branch Name
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\includegraphics{media/boiler-table-example.PNG}
+\caption{}
+\end{figure}
+
+Cooling Towers and Fluid Coolers
+
+The columns for this report are shown below as a list:
+
+\begin{itemize}
+\item
+	Type
+\item
+	Fluid Type
+\item
+	Range [C]
+\item
+	Approach [C]
+\item
+	Design Fan Power [W]
+\item
+	Design Inlet Air Wet-Bulb Temperature [C]
+\item
+	Design Water Flow Rate [m3/s]
+\item
+	Leaving Water Setpoint Temperature [C]
+\item
+	Condenser Loop Name
+\item
+	Condenser Loop Branch Name
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\includegraphics{media/cooling-tower-table-example.PNG}
+\caption{}
+\end{figure}
+
+PlantLoop or CondenserLoop
+
+The columns for this report are shown below as a list:
+
+\begin{itemize}
+\item
+	Type
+\item
+	Provides Heating
+\item
+	Provides Cooling
+\item
+	Maximum Loop Flow Rate [m3/s]
+\item
+	Minimum Loop Flow Rate [m3/s]
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\includegraphics{media/plantloop-table-example.PNG}
+\caption{}
+\end{figure}
+
+Air Terminals
+
+The columns for this report are shown below as a list:
+
+\begin{itemize}
+\item
+	Zone Name
+\item
+	Minimum Flow [m3/s]
+\item
+	Minimum Outdoor Flow [m3/s]
+\item
+	Supply Cooling Setpoint [C]
+\item
+	Supply Heating Setpoint [C]
+\item
+	Heating Capacity [W]
+\item
+	Cooling Capacity [W]
+\item
+	Type of Input Object
+\item
+	Heat/Reheat Coil Object Type
+\item
+	Chilled Water Coil Object Type
+\item
+	Fan Object Type
+\item
+	Fan Name
+\item
+	Primary Air Flow Rate [m3/s]
+\item
+	Secondary Air Flow Rate [m3/s]
+\item
+	Minimum Flow Schedule Name
+\item
+	Maximum Flow During Reheat [m3/s]
+\item
+	Minimum Outdoor Flow Schedule Name
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\includegraphics{media/air-terminal-table-example.PNG}
+\caption{}
+\end{figure}
+
+Air Heat Recovery
+
+The columns for this report are shown below as a list:
+
+\begin{itemize}
+\item
+	Name
+\item
+	Input object type
+\item
+	Plate/Rotary
+\item
+	Sensible Effectiveness at 100% Heating Air Flow
+\item
+	Sensible Effectiveness at 100% Cooling Air Flow
+\item
+	Latent Effectiveness at 100% Heating Air Flow
+\item
+	Latent Effectiveness at 100% Cooling Air Flow
+\item
+	Exhaust Airflow [kg/s]
+\item
+	Outdoor Airflow [kg/s]
+\end{itemize}
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics{media/air-heat-recovery-table-example.PNG}
+\caption{}
+\end{figure}
+
+
 \subsection{Envelope Summary}\label{envelope-summary}
 
 The Envelope Summary report provides a summary of the elements of the envelope of the building. The first table describes the exterior opaque elements and the second table describes the fenestration elements. Reflectance is defined as one minus the thermal absorptance. Directly following is an example of the report. The key used to obtain this report is EnvelopeSummary.
@@ -1065,6 +1295,18 @@ ELECTRO-CON-DARK & 2.560 & 0.710 & 0.113 & 2.742 & 0.207 & 0.108 \tabularnewline
 
 \bottomrule
 \end{longtable}}
+
+Opaque Construction Layers
+
+The columns for this report are shown as the ten possible layers of the construction, in order. An example of the report is shown.
+
+\begin{figure}[h!]
+\centering
+\includegraphics{media/layers-table-example.PNG}
+\caption{}
+\end{figure}
+
+
 
 
 \subsection{Surface Shadowing Summary}\label{surface-shadowing-summary}
@@ -1621,6 +1863,170 @@ PLENUM-1 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
 Facility & 333.50 & 117.00 & 37.25 & 56.75 \tabularnewline
 \bottomrule
 \end{longtable}
+
+Thermostat Schedules
+
+The columns for this report are shown below as a list:
+
+\begin{itemize}
+\item
+  Thermostat Name 1
+\item
+  Control Type Schedule
+\item
+  Control Type
+\item
+  Control Type Name
+\item
+  Heating Schedule
+\item
+  Cooling Schedule
+\end{itemize}
+
+An example of the report is shown here
+
+\begin{figure}[h!]
+\centering
+\includegraphics{media/thermostat-schedule-table-example.PNG}
+\caption{}
+\end{figure}
+
+
+\subsection{HVAC Topology}\label{hvac-topology}
+
+The HVAC Topology report provides information about the arrangement of HVAC components in the supply and demand side of the airloop, zone equipment, and plant loop. Each row shows the additional component, sub-component, or sub-sub-component being added to the arrangement. 
+
+
+Air Loop Supply Side Component Arrangement
+
+The columns for this report are shown below as a list:
+
+\begin{itemize}
+\item
+  Airloop Name
+\item
+  Upstream Splitter or Mixer Name
+\item
+  Branch Name
+\item
+  Component Type
+\item
+  Component Name
+\item
+  Sub-Component Type
+\item
+  Sub-Component Name
+\item
+  Sub-Sub-Component Type
+\item
+  Sub-Sub-Component Name
+\item
+  Downstream Splitter or Mixer Name
+\end{itemize}
+
+An example of the report is shown here
+
+\begin{figure}[h!]
+\centering
+\includegraphics{media/air-supply-side-table-example.PNG}
+\caption{}
+\end{figure}
+
+
+Air Loop Demand Side Component Arrangement
+
+The columns for this report are shown below as a list:
+
+\begin{itemize}
+\item
+  Airloop Name
+\item
+  Supply Branch Name
+\item
+  Supply Branch Type
+\item
+  Supply Path Component Type
+\item
+  Supply Path Component Name
+\item
+  Zone Name
+\item
+  Terminal Unit Type
+\item
+  Terminal Unit Name
+\item
+  Return Path Component Type
+\item
+  Return Path Component Name
+\end{itemize}
+
+An example of the report is shown here
+
+\begin{figure}[h!]
+\centering
+\includegraphics{media/air-demand-side-table-example.PNG}
+\caption{}
+\end{figure}
+
+
+Zone Equipment Component Arrangement
+
+The columns for this report are shown below as a list:
+
+\begin{itemize}
+\item
+  Zone Name
+\item
+  Component Type
+\item
+  Component Name
+\item
+  Sub-Component Type
+\item
+  Sub-Component Name
+\item
+  Sub-Sub-Component Type
+\item
+  Sub-Sub-Component Name
+\end{itemize}
+
+An example of the report is shown here
+
+\begin{figure}[h!]
+\centering
+\includegraphics{media/zone-equipment-table-example.png}
+\caption{}
+\end{figure}
+
+
+Plant Loop Component Arrangement
+
+The columns for this report are shown below as a list:
+
+\begin{itemize}
+\item
+  Loop Type
+\item
+  Loop Name
+\item
+  Side
+\item
+  Splitter/Mixer Name
+\item
+  Branch Name
+\item
+  Component Type
+\item
+  Component Name
+\end{itemize}
+
+An example of the report is shown here
+
+\begin{figure}[h!]
+\centering
+\includegraphics{media/plant-loop-table-example.png}
+\caption{}
+\end{figure}
 
 \subsection{Component Sizing Summary}\label{component-sizing-summary}
 

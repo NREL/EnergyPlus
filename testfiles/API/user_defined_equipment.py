@@ -462,6 +462,7 @@ class Zone1WinACModel:
             self.get_handles(state)
             if not self.handles_gotten_properly(state):
                 return 1
+            # x = api_.exchange.get_api_data(state)  #  use this to inspect api data
         self.initialize(state)
         self.simulate(state)
         self.report(state)

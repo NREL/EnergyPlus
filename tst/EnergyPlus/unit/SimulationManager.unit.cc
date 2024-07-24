@@ -112,8 +112,6 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Mess
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    SimulationManager::GetProjectData(*state);
-
     std::string const error_string = delimited_string({
         "   ** Warning ** PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.",
     });
@@ -172,7 +170,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(*state);
         EXPECT_FALSE(state->dataReportFlag->DebugOutput);
         EXPECT_FALSE(state->dataReportFlag->EvenDuringWarmup);
 
@@ -187,9 +184,9 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
             "    ;                        !- Report During Warmup",
         });
 
+        state->init_state_called = false;
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(*state);
         EXPECT_TRUE(state->dataReportFlag->DebugOutput);
         EXPECT_FALSE(state->dataReportFlag->EvenDuringWarmup);
 
@@ -204,9 +201,9 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
             "    Yes;                     !- Report During Warmup",
         });
 
+        state->init_state_called = false;
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(*state);
         EXPECT_FALSE(state->dataReportFlag->DebugOutput);
         EXPECT_TRUE(state->dataReportFlag->EvenDuringWarmup);
 
@@ -226,26 +223,21 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
             "    No;                      !- Report During Warmup",
         });
 
+        state->init_state_called = false;
+        compare_err_stream_substring("", true);
         // Input processor with throw a severe, so do not use assertions
         EXPECT_FALSE(process_idf(idf_objects, false));
         // Instead do it here, making sure to reset the stream
         {
             std::string const expectedError = delimited_string({
                 "   ** Severe  ** <root>[Output:DebuggingData] - Object should have no more than 1 properties.",
-            });
-            EXPECT_TRUE(compare_err_stream(expectedError, true));
-        }
-
-        SimulationManager::GetProjectData(*state);
-        EXPECT_FALSE(state->dataReportFlag->DebugOutput);
-        EXPECT_TRUE(state->dataReportFlag->EvenDuringWarmup);
-
-        {
-            std::string const expectedError = delimited_string({
                 "   ** Warning ** Output:DebuggingData: More than 1 occurrence of this object found, only first will be used.",
             });
             EXPECT_TRUE(compare_err_stream(expectedError, true));
         }
+
+        EXPECT_FALSE(state->dataReportFlag->DebugOutput);
+        EXPECT_TRUE(state->dataReportFlag->EvenDuringWarmup);
     }
 }
 
@@ -256,8 +248,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
     });
 
     EXPECT_TRUE(process_idf(idf_objects));
-
-    SimulationManager::GetProjectData(*state);
 
     EXPECT_FALSE(state->dataGlobal->DisplayAllWarnings);
     EXPECT_FALSE(state->dataGlobal->DisplayExtraWarnings);
@@ -292,8 +282,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_SimpleCase)
     });
 
     EXPECT_TRUE(process_idf(idf_objects));
-
-    SimulationManager::GetProjectData(*state);
 
     EXPECT_TRUE(state->dataGlobal->DisplayAllWarnings);
     EXPECT_TRUE(state->dataGlobal->DisplayExtraWarnings);
@@ -333,8 +321,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_AllKeys)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(*state);
-
     EXPECT_TRUE(state->dataGlobal->DisplayAllWarnings);
     EXPECT_TRUE(state->dataGlobal->DisplayExtraWarnings);
     EXPECT_TRUE(state->dataGlobal->DisplayUnusedObjects);
@@ -362,16 +348,17 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
         "    DisplayAllWarnings;      !- Key 1",
     });
 
+    compare_err_stream_substring("", true);
     // Input processor will throw a severe, so do not use assertions
     EXPECT_FALSE(process_idf(idf_objects, false));
     // Instead do it here, making sure to reset the stream
     {
         std::string const expectedError = delimited_string({
             "   ** Severe  ** <root>[Output:Diagnostics] - Object should have no more than 1 properties.",
+            "   ** Warning ** Output:Diagnostics: More than 1 occurrence of this object found, only first will be used.",
         });
         EXPECT_TRUE(compare_err_stream(expectedError, true));
     }
-    SimulationManager::GetProjectData(*state);
 
     EXPECT_FALSE(state->dataGlobal->DisplayAllWarnings);
     EXPECT_FALSE(state->dataGlobal->DisplayExtraWarnings);
@@ -385,13 +372,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
     EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
     EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
     EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
-
-    {
-        std::string const expectedError = delimited_string({
-            "   ** Warning ** Output:Diagnostics: More than 1 occurrence of this object found, only first will be used.",
-        });
-        EXPECT_TRUE(compare_err_stream(expectedError, true));
-    }
 }
 
 TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
@@ -420,8 +400,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
         "values.",
     });
     EXPECT_TRUE(compare_err_stream(expected_warning, true));
-
-    SimulationManager::GetProjectData(*state);
 
     EXPECT_FALSE(state->dataGlobal->DisplayAllWarnings);
     EXPECT_FALSE(state->dataGlobal->DisplayExtraWarnings);
@@ -457,8 +435,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
     });
 
     EXPECT_TRUE(process_idf(idf_objects));
-
-    ASSERT_NO_THROW(SimulationManager::GetProjectData(*state));
 
     EXPECT_FALSE(state->dataGlobal->DisplayAllWarnings);
     EXPECT_FALSE(state->dataGlobal->DisplayExtraWarnings);
@@ -496,8 +472,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_HVACSizingSimulationChoiceTest)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(*state);
-
     EXPECT_TRUE(state->dataGlobal->DoHVACSizingSimulation);
     // get a default value
     EXPECT_EQ(state->dataGlobal->HVACSizingSimMaxIterations, 1);
@@ -518,8 +492,6 @@ TEST_F(EnergyPlusFixture, Test_SimulationControl_ZeroSimulation)
     });
 
     EXPECT_TRUE(process_idf(idf_objects));
-
-    SimulationManager::GetProjectData(*state);
 
     ASSERT_THROW(SimulationManager::CheckForMisMatchedEnvironmentSpecifications(*state), std::runtime_error);
     // no error message from PerformancePrecisionTradeoffs objects
@@ -550,8 +522,6 @@ TEST_F(EnergyPlusFixture, Test_SimulationControl_PureLoadCalc)
     });
 
     EXPECT_TRUE(process_idf(idf_objects));
-
-    SimulationManager::GetProjectData(*state);
 
     EXPECT_NO_THROW(SimulationManager::CheckForMisMatchedEnvironmentSpecifications(*state));
     // no error message from PerformancePrecisionTradeoffs objects

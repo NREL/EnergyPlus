@@ -61,8 +61,7 @@ void initializeFunctionalAPI(EnergyPlusState state)
     if (!thisState->dataInputProcessing->inputProcessor) {
         thisState->dataInputProcessing->inputProcessor = EnergyPlus::InputProcessor::factory();
     }
-    EnergyPlus::Psychrometrics::InitializePsychRoutines(*thisState);
-    EnergyPlus::FluidProperties::InitializeGlycRoutines();
+    thisState->init_state(*thisState);
 }
 
 const char *apiVersionFromEPlus(EnergyPlusState)

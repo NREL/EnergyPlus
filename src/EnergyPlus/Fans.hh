@@ -135,6 +135,7 @@ namespace Fans {
         int outletNodeNum = 0;
         int airLoopNum = 0;
         bool airPathFlag = false; // Yes, this fan is a part of airpath
+        bool isAFNFan = false;    // Is fan part of and AirFlowNetwork distribution system
 
         Real64 maxAirFlowRate = 0.0; // Max Specified Volume Flow Rate of Fan [m3/sec]
         Real64 minAirFlowRate = 0.0; // Max Specified Volume Flow Rate of Fan [m3/sec]

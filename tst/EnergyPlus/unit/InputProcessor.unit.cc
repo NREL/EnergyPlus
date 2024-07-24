@@ -223,6 +223,9 @@ TEST_F(InputProcessorFixture, decode_encode_1)
                                        "  Relative,",
                                        "  Relative;",
                                        "",
+                                       "Timestep,",
+                                       "  4;",
+                                       "",
                                        "Version,",
                                        "  " + DataStringGlobals::MatchVersion + ";",
                                        ""});
@@ -267,6 +270,9 @@ TEST_F(InputProcessorFixture, decode_encode_2)
                                           "  Relative,",
                                           "  Relative,",
                                           "  Relative;",
+                                          "",
+                                          "Timestep,",
+                                          "  4;",
                                           "",
                                           "Version,",
                                           "  " + DataStringGlobals::MatchVersion + ";",
@@ -335,6 +341,9 @@ TEST_F(InputProcessorFixture, decode_encode_3)
                                           "  ,",
                                           "  10;",
                                           "",
+                                          "Timestep,",
+                                          "  4;",
+                                          "",
                                           "Version,",
                                           "  " + DataStringGlobals::MatchVersion + ";",
                                           ""}));
@@ -366,6 +375,9 @@ TEST_F(InputProcessorFixture, byte_order_mark)
                                           "  Relative,",
                                           "  Relative,",
                                           "  Relative;",
+                                          "",
+                                          "Timestep,",
+                                          "  4;",
                                           "",
                                           "Version,",
                                           "  " + DataStringGlobals::MatchVersion + ";",
@@ -548,6 +560,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_2)
                                "\"vertex_entry_direction\":\"Counterclockwise\""
                                "}"
                                "},"
+                               "\"Timestep\":{\"\":{\"idf_order\":0,\"number_of_timesteps_per_hour\":4}},"
                                "\"Version\":{"
                                "\"\":{"
                                "\"idf_order\":0,"
@@ -596,6 +609,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
                                "\"vertex_entry_direction\":\"Counterclockwise\""
                                "}"
                                "},"
+                               "\"Timestep\":{\"\":{\"idf_order\":0,\"number_of_timesteps_per_hour\":4}},"
                                "\"Version\":{"
                                "\"\":{"
                                "\"idf_order\":0,"
@@ -927,6 +941,9 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                                               "  Relative,",
                                               "  Relative,",
                                               "  Relative;",
+                                              "",
+                                              "Timestep,",
+                                              "  4;",
                                               "",
                                               "Version,",
                                               "  " + DataStringGlobals::MatchVersion + ";",
@@ -4203,6 +4220,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
 
         // 1 fields with default, 0 Autosizable, 0 Autocalculatable
         // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Timestep,",
+        "  4;", // Has a default
+
+        // 1 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
         "Version,",
         "  9.4;", // Has a default
 
@@ -4283,11 +4305,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
     state->dataInputProcessing->inputProcessor->reportIDFRecordsStats(*state);
 
     // TOTAL:
-    // 36 fields with defaults, 6 Autosizable, 3 Autocalculatable
+    // 37 fields with defaults, 6 Autosizable, 3 Autocalculatable
     // 11 fields defaulted    , 4 Autosized  , 2 Autocalculated
 
-    EXPECT_EQ(4, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
-    EXPECT_EQ(36, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
+    EXPECT_EQ(5, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
+    EXPECT_EQ(37, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
     EXPECT_EQ(6, state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
     EXPECT_EQ(3, state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
     EXPECT_EQ(11, state->dataOutput->iNumberOfDefaultedFields);    // Number of defaulted fields in IDF
@@ -4299,6 +4321,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
 {
 
     std::string const idf_objects = delimited_string({
+
+        // 1 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Timestep,",
+        "  4;", // Has a default
 
         // 1 fields with default, 0 Autosizable, 0 Autocalculatable
         // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
@@ -4356,11 +4383,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
     state->dataInputProcessing->inputProcessor->reportIDFRecordsStats(*state);
 
     // TOTAL:
-    // 15 fields with defaults, 0 Autosizable, 0 Autocalculatable
+    // 16 fields with defaults, 0 Autosizable, 0 Autocalculatable
     // 2  fields defaulted    , 0 Autosized  , 0 Autocalculated
 
-    EXPECT_EQ(4, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
-    EXPECT_EQ(15, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
+    EXPECT_EQ(5, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
+    EXPECT_EQ(16, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
     EXPECT_EQ(0, state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
     EXPECT_EQ(0, state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
     EXPECT_EQ(2, state->dataOutput->iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
