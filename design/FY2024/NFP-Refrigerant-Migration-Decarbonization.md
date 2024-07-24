@@ -9,6 +9,7 @@ New Feature for Plant Decarbonization
  - Original Date: Feb 27, 2024
  - Final NFP - updated Apr 9, 2024
  - Add Refrigerant Migration model 7/10/2024
+ - Add HeatExchanger:FluidToFluid plant configuration schematics 7/17/2024
 
 ## Justification for Feature Update
 
