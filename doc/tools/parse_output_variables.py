@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -213,13 +213,13 @@ def main():
             file_contents = f.read()
 
             # first warn about commented lines
-            p = re.compile('//\s*SetupOutputVariable')
+            p = re.compile(r'//\s*SetupOutputVariable')
             matches = p.findall(file_contents)
 
             if len(matches) > 0:
                 print("File %s contains commented SetupOutputVariable calls; output may be flawed" % file_name)
 
-            p = re.compile('SetupOutputVariable\([^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^;]*;')
+            p = re.compile(r'SetupOutputVariable\([^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^;]*;')
             matches = p.findall(file_contents)
 
             for match in matches:

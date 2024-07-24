@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,6 +72,9 @@ namespace DualDuct {
         OutdoorAir,
         Num
     };
+
+    static constexpr std::array<std::string_view, static_cast<int>(DualDuctDamper::Num)> dualDuctDamperNames = {
+        "ConstantVolume", "VariableVolume", "OutdoorAir"};
 
     enum class PerPersonMode
     {
@@ -163,6 +166,8 @@ namespace DualDuct {
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
         void UpdateDualDuct(EnergyPlusData &state);
+
+        void reportTerminalUnit(EnergyPlusData &state);
     };
 
     void SimulateDualDuct(EnergyPlusData &state, std::string_view CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
@@ -187,9 +192,13 @@ struct DualDuctData : BaseGlobalStruct
     Array1D_bool RecircIsUsedARR;
     Array1D_string DamperNamesARR;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = DualDuctData();
+        new (this) DualDuctData();
     }
 };
 

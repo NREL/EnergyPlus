@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -436,10 +436,11 @@ std::vector<fs::path> parse_input_paths(fs::path const &inputFilePath)
     return input_paths;
 }
 
-int main(/** [[maybe_unused]] int argc, [[maybe_unused]] const char *argv[] */)
+int main(int argc, char **argv)
 {
 
     CLI::App app{"ConvertInputFormat"};
+    argv = app.ensure_utf8(argv);
     app.description("Run input file conversion tool");
     app.set_version_flag("-v,--version", EnergyPlus::DataStringGlobals::VerString);
 
@@ -502,7 +503,7 @@ Select one (case insensitive):
 
     // We are not modifying argc/argv, so we defer to CLI11 to find the argc/argv instead. It'll use GetCommandLineW & CommandLineToArgvW on windows
     try {
-        app.parse();
+        app.parse(argc, argv);
     } catch (const CLI::ParseError &e) {
         return app.exit(e);
     }

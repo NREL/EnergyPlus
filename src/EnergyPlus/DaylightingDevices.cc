@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -300,60 +300,60 @@ namespace Dayltg {
                 // Setup report variables: CurrentModuleObject='DaylightingDevice:Tubular'
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Transmitted Solar Radiation Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransmittedSolar,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeAbsorbedSolar,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Heat Gain Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatGain,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Heat Loss Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatLoss,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
 
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Beam Solar Transmittance",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolBeam,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Beam Visible Transmittance",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisBeam,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Diffuse Solar Transmittance",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolDiff,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Diffuse Visible Transmittance",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisDiff,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
 
             } // PipeNum
@@ -434,7 +434,8 @@ namespace Dayltg {
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus methodology.
 
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        auto &ipsc = state.dataIPShortCut;
+        auto &cCurrentModuleObject = ipsc->cCurrentModuleObject;
 
         cCurrentModuleObject = "DaylightingDevice:Tubular";
         int NumOfTDDPipes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -449,35 +450,31 @@ namespace Dayltg {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          PipeNum,
-                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         ipsc->cAlphaArgs,
                                                                          NumAlphas,
-                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         ipsc->rNumericArgs,
                                                                          NumNumbers,
                                                                          IOStatus,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                         ipsc->lNumericFieldBlanks,
+                                                                         ipsc->lAlphaFieldBlanks,
+                                                                         ipsc->cAlphaFieldNames,
+                                                                         ipsc->cNumericFieldNames);
                 // Pipe name
-                state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+                state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name = ipsc->cAlphaArgs(1);
 
                 // Get TDD:DOME object
-                int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+                int SurfNum = Util::FindItemInList(ipsc->cAlphaArgs(2), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
-                    ShowSevereError(state,
-                                    format("{} = {}:  Dome {} not found.",
-                                           cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaArgs(2)));
+                    ShowSevereError(state, format("{} = {}:  Dome {} not found.", cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaArgs(2)));
                     state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                 } else {
                     if (FindTDDPipe(state, SurfNum) > 0) {
                         ShowSevereError(state,
                                         format("{} = {}:  Dome {} is referenced by more than one TDD.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
 
@@ -485,8 +482,8 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Dome {} is not of surface type TubularDaylightDome.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
 
@@ -494,8 +491,8 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Dome {} construction ({}) must have only 1 glass layer.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2),
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(2),
                                                state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).Name));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
@@ -504,17 +501,16 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Dome {} must not have a shading control.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
 
                     if (state.dataSurface->Surface(SurfNum).FrameDivider > 0) {
-                        ShowSevereError(state,
-                                        format("{} = {}:  Dome {} must not have a frame/divider.",
-                                               cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                        ShowSevereError(
+                            state,
+                            format(
+                                "{} = {}:  Dome {} must not have a frame/divider.", cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
 
@@ -522,8 +518,8 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Dome {} Equivalent Layer Window is not supported.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
                     // Window multiplier is already handled in SurfaceGeometry.cc
@@ -532,8 +528,8 @@ namespace Dayltg {
                         ShowWarningError(state,
                                          format("{} = {}:  Dome {} is not exposed to exterior radiation.",
                                                 cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                state.dataIPShortCut->cAlphaArgs(2)));
+                                                ipsc->cAlphaArgs(1),
+                                                ipsc->cAlphaArgs(2)));
                     }
 
                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome = SurfNum;
@@ -541,31 +537,28 @@ namespace Dayltg {
                 }
 
                 // Get TDD:DIFFUSER object
-                SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
+                SurfNum = Util::FindItemInList(ipsc->cAlphaArgs(3), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
-                                    format("{} = {}:  Diffuser {} not found.",
-                                           cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaArgs(3)));
+                                    format("{} = {}:  Diffuser {} not found.", cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaArgs(3)));
                     state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                 } else {
                     if (FindTDDPipe(state, SurfNum) > 0) {
                         ShowSevereError(state,
                                         format("{} = {}:  Diffuser {} is referenced by more than one TDD.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(3)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(3)));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
 
-                    if (state.dataSurface->SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) {
+                    if (state.dataSurface->Surface(SurfNum).OriginalClass != SurfaceClass::TDD_Diffuser) {
                         ShowSevereError(state,
                                         format("{} = {}:  Diffuser {} is not of surface type TubularDaylightDiffuser.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(3)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(3)));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
 
@@ -573,8 +566,8 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Diffuser {} construction ({}) must have only 1 glass layer.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(3),
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(3),
                                                state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).Name));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
@@ -583,8 +576,8 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Diffuser {} construction ({}) invalid value.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(3),
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(3),
                                                state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).Name));
                         ShowContinueError(state,
                                           format("Diffuse solar transmittance of construction [{:.4R}] too small for calculations.",
@@ -602,17 +595,15 @@ namespace Dayltg {
                             ShowSevereError(state,
                                             format("{} = {}:  Dome and diffuser areas are significantly different (>10%).",
                                                    cCurrentModuleObject,
-                                                   state.dataIPShortCut->cAlphaArgs(1)));
+                                                   ipsc->cAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("...Diffuser Area=[{:.4R}]; Dome Area=[{:.4R}].",
                                                      state.dataSurface->Surface(SurfNum).Area,
                                                      state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area));
                             state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                         } else {
-                            ShowWarningError(state,
-                                             format("{} = {}:  Dome and diffuser areas differ by > .1 m2.",
-                                                    cCurrentModuleObject,
-                                                    state.dataIPShortCut->cAlphaArgs(1)));
+                            ShowWarningError(
+                                state, format("{} = {}:  Dome and diffuser areas differ by > .1 m2.", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("...Diffuser Area=[{:.4R}]; Dome Area=[{:.4R}].",
                                                      state.dataSurface->Surface(SurfNum).Area,
@@ -624,8 +615,8 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Diffuser {} must not have a shading control.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(3)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(3)));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
 
@@ -633,8 +624,8 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Diffuser {} must not have a frame/divider.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(3)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(3)));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
 
@@ -642,8 +633,8 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Diffuser {} Equivalent Layer Window is not supported.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
 
@@ -655,25 +646,20 @@ namespace Dayltg {
 
                 // Construction
                 state.dataDaylightingDevicesData->TDDPipe(PipeNum).Construction =
-                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct);
+                    Util::FindItemInList(ipsc->cAlphaArgs(4), state.dataConstruction->Construct);
 
                 if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).Construction == 0) {
-                    ShowSevereError(state,
-                                    format("{} = {}:  Pipe construction {} not found.",
-                                           cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaArgs(4)));
+                    ShowSevereError(
+                        state, format("{} = {}:  Pipe construction {} not found.", cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaArgs(4)));
                     state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                 } else {
                     state.dataConstruction->Construct(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Construction).IsUsed = true;
                 }
 
-                if (state.dataIPShortCut->rNumericArgs(1) > 0) {
-                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diameter = state.dataIPShortCut->rNumericArgs(1);
+                if (ipsc->rNumericArgs(1) > 0) {
+                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diameter = ipsc->rNumericArgs(1);
                 } else {
-                    ShowSevereError(
-                        state,
-                        format("{} = {}:  Pipe diameter must be greater than zero.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowSevereError(state, format("{} = {}:  Pipe diameter must be greater than zero.", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                     state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                 }
 
@@ -686,17 +672,15 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Pipe and dome/diffuser areas are significantly different (>10%).",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1)));
+                                               ipsc->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("...Pipe Area=[{:.4R}]; Dome/Diffuser Area=[{:.4R}].",
                                                  PipeArea,
                                                  state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     } else {
-                        ShowWarningError(state,
-                                         format("{} = {}:  Pipe and dome/diffuser areas differ by > .1 m2.",
-                                                cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowWarningError(
+                            state, format("{} = {}:  Pipe and dome/diffuser areas differ by > .1 m2.", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("...Pipe Area=[{:.4R}]; Dome/Diffuser Area=[{:.4R}].",
                                                  PipeArea,
@@ -704,21 +688,20 @@ namespace Dayltg {
                     }
                 }
 
-                if (state.dataIPShortCut->rNumericArgs(2) > 0) {
-                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TotLength = state.dataIPShortCut->rNumericArgs(2);
+                if (ipsc->rNumericArgs(2) > 0) {
+                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TotLength = ipsc->rNumericArgs(2);
                 } else {
-                    ShowSevereError(
-                        state, format("{} = {}:  Pipe length must be greater than zero.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowSevereError(state, format("{} = {}:  Pipe length must be greater than zero.", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                     state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                 }
 
-                if (state.dataIPShortCut->rNumericArgs(3) > 0) {
-                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Reff = state.dataIPShortCut->rNumericArgs(3);
+                if (ipsc->rNumericArgs(3) > 0) {
+                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Reff = ipsc->rNumericArgs(3);
                 } else {
                     ShowSevereError(state,
                                     format("{} = {}:  Effective thermal resistance (R value) must be greater than zero.",
                                            cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaArgs(1)));
+                                           ipsc->cAlphaArgs(1)));
                     state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                 }
 
@@ -729,11 +712,10 @@ namespace Dayltg {
                     ShowWarningError(state,
                                      format("{} = {}:  No transition zones specified.  All pipe absorbed solar goes to exterior.",
                                             cCurrentModuleObject,
-                                            state.dataIPShortCut->cAlphaArgs(1)));
+                                            ipsc->cAlphaArgs(1)));
                 } else if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones > MaxTZones) {
-                    ShowSevereError(
-                        state,
-                        format("{} = {}:  Maximum number of transition zones exceeded.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowSevereError(state,
+                                    format("{} = {}:  Maximum number of transition zones exceeded.", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                     state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                 } else {
                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone.allocate(state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones);
@@ -747,22 +729,20 @@ namespace Dayltg {
                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneHeatGain = 0.0;
 
                     for (int TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
-                        std::string const TZoneName = state.dataIPShortCut->cAlphaArgs(TZoneNum + 4);
+                        std::string const TZoneName = ipsc->cAlphaArgs(TZoneNum + 4);
                         state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) = Util::FindItemInList(TZoneName, state.dataHeatBal->Zone);
                         if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) == 0) {
-                            ShowSevereError(
-                                state,
-                                format(
-                                    "{} = {}:  Transition zone {} not found.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), TZoneName));
+                            ShowSevereError(state,
+                                            format("{} = {}:  Transition zone {} not found.", cCurrentModuleObject, ipsc->cAlphaArgs(1), TZoneName));
                             state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                         }
 
-                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneLength(TZoneNum) = state.dataIPShortCut->rNumericArgs(TZoneNum + 3);
+                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneLength(TZoneNum) = ipsc->rNumericArgs(TZoneNum + 3);
                         if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneLength(TZoneNum) < 0) {
                             ShowSevereError(state,
                                             format("{} = {}:  Transition zone length for {} must be zero or greater.",
                                                    cCurrentModuleObject,
-                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   ipsc->cAlphaArgs(1),
                                                    TZoneName));
                             state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                         }
@@ -772,14 +752,14 @@ namespace Dayltg {
             } // PipeNum
 
             if (state.dataDaylightingDevices->GetTDDInputErrorsFound) ShowFatalError(state, "Errors in DaylightingDevice:Tubular input.");
-            state.dataDaylightingManager->TDDTransVisBeam.allocate(Constant::HoursInDay, NumOfTDDPipes);
-            state.dataDaylightingManager->TDDFluxInc.allocate(Constant::HoursInDay, NumOfTDDPipes);
-            state.dataDaylightingManager->TDDFluxTrans.allocate(Constant::HoursInDay, NumOfTDDPipes);
+            state.dataDayltg->TDDTransVisBeam.allocate(Constant::HoursInDay, NumOfTDDPipes);
+            state.dataDayltg->TDDFluxInc.allocate(Constant::HoursInDay, NumOfTDDPipes);
+            state.dataDayltg->TDDFluxTrans.allocate(Constant::HoursInDay, NumOfTDDPipes);
             for (int hr = 1; hr <= Constant::HoursInDay; ++hr) {
                 for (int tddNum = 1; tddNum <= NumOfTDDPipes; ++tddNum) {
-                    state.dataDaylightingManager->TDDTransVisBeam(hr, tddNum) = 0.0;
-                    state.dataDaylightingManager->TDDFluxInc(hr, tddNum) = Illums();
-                    state.dataDaylightingManager->TDDFluxTrans(hr, tddNum) = Illums();
+                    state.dataDayltg->TDDTransVisBeam(hr, tddNum) = 0.0;
+                    state.dataDayltg->TDDFluxInc(hr, tddNum) = Illums();
+                    state.dataDayltg->TDDFluxTrans(hr, tddNum) = Illums();
                 } // for (tddNum)
             }     // for (hr)
         }
@@ -798,7 +778,8 @@ namespace Dayltg {
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus methodology.
 
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        auto &ipsc = state.dataIPShortCut;
+        auto &cCurrentModuleObject = ipsc->cCurrentModuleObject;
 
         cCurrentModuleObject = "DaylightingDevice:Shelf";
         int NumOfShelf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -813,35 +794,31 @@ namespace Dayltg {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          ShelfNum,
-                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         ipsc->cAlphaArgs,
                                                                          NumAlphas,
-                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         ipsc->rNumericArgs,
                                                                          NumNumbers,
                                                                          IOStatus,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                         ipsc->lNumericFieldBlanks,
+                                                                         ipsc->lAlphaFieldBlanks,
+                                                                         ipsc->cAlphaFieldNames,
+                                                                         ipsc->cNumericFieldNames);
                 // Shelf name
-                state.dataDaylightingDevicesData->Shelf(ShelfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+                state.dataDaylightingDevicesData->Shelf(ShelfNum).Name = ipsc->cAlphaArgs(1);
 
                 // Get window object
-                int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+                int SurfNum = Util::FindItemInList(ipsc->cAlphaArgs(2), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
-                    ShowSevereError(state,
-                                    format("{} = {}:  Window {} not found.",
-                                           cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaArgs(2)));
+                    ShowSevereError(state, format("{} = {}:  Window {} not found.", cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaArgs(2)));
                     state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                 } else {
                     if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window) {
                         ShowSevereError(state,
                                         format("{} = {}:  Window {} is not of surface type WINDOW.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     }
 
@@ -849,8 +826,8 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Window {} is referenced by more than one shelf.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     }
 
@@ -858,8 +835,8 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Window {} must not have a shading control.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     }
 
@@ -867,25 +844,22 @@ namespace Dayltg {
                         ShowSevereError(state,
                                         format("{} = {}:  Window {} must not have a frame/divider.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     }
 
                     if (state.dataSurface->Surface(SurfNum).Sides != 4) {
-                        ShowSevereError(state,
-                                        format("{} = {}:  Window {} must have 4 sides.",
-                                               cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                        ShowSevereError(
+                            state, format("{} = {}:  Window {} must have 4 sides.", cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     }
                     if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
                         ShowSevereError(state,
                                         format("{} = {}:  Window {} Equivalent Layer Window is not supported.",
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2)));
+                                               ipsc->cAlphaArgs(1),
+                                               ipsc->cAlphaArgs(2)));
                         state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     }
 
@@ -894,15 +868,12 @@ namespace Dayltg {
                 }
 
                 // Get inside shelf heat transfer surface (optional)
-                if (state.dataIPShortCut->cAlphaArgs(3) != "") {
-                    SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
+                if (ipsc->cAlphaArgs(3) != "") {
+                    SurfNum = Util::FindItemInList(ipsc->cAlphaArgs(3), state.dataSurface->Surface);
 
                     if (SurfNum == 0) {
-                        ShowSevereError(state,
-                                        format("{} = {}:  Inside shelf {} not found.",
-                                               cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(3)));
+                        ShowSevereError(
+                            state, format("{} = {}:  Inside shelf {} not found.", cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaArgs(3)));
                         state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     } else {
                         // No error if shelf belongs to more than one window, e.g. concave corners
@@ -911,17 +882,16 @@ namespace Dayltg {
                             ShowSevereError(state,
                                             format("{} = {}:  Inside shelf {} must be its own Outside Boundary Condition Object.",
                                                    cCurrentModuleObject,
-                                                   state.dataIPShortCut->cAlphaArgs(1),
-                                                   state.dataIPShortCut->cAlphaArgs(3)));
+                                                   ipsc->cAlphaArgs(1),
+                                                   ipsc->cAlphaArgs(3)));
                             state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                         }
 
                         if (state.dataSurface->Surface(SurfNum).Sides != 4) {
-                            ShowSevereError(state,
-                                            format("{} = {}:  Inside shelf {} must have 4 sides.",
-                                                   cCurrentModuleObject,
-                                                   state.dataIPShortCut->cAlphaArgs(1),
-                                                   state.dataIPShortCut->cAlphaArgs(3)));
+                            ShowSevereError(
+                                state,
+                                format(
+                                    "{} = {}:  Inside shelf {} must have 4 sides.", cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaArgs(3)));
                             state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                         }
 
@@ -930,15 +900,12 @@ namespace Dayltg {
                 }
 
                 // Get outside shelf attached shading surface (optional)
-                if (state.dataIPShortCut->cAlphaArgs(4) != "") {
-                    SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->Surface);
+                if (ipsc->cAlphaArgs(4) != "") {
+                    SurfNum = Util::FindItemInList(ipsc->cAlphaArgs(4), state.dataSurface->Surface);
 
                     if (SurfNum == 0) {
-                        ShowSevereError(state,
-                                        format("{} = {}:  Outside shelf {} not found.",
-                                               cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(4)));
+                        ShowSevereError(
+                            state, format("{} = {}:  Outside shelf {} not found.", cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaArgs(4)));
                         state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     } else {
                         // No error if shelf belongs to more than one window, e.g. concave corners
@@ -947,8 +914,8 @@ namespace Dayltg {
                             ShowSevereError(state,
                                             format("{} = {}:  Outside shelf {} is not a Shading:Zone:Detailed object.",
                                                    cCurrentModuleObject,
-                                                   state.dataIPShortCut->cAlphaArgs(1),
-                                                   state.dataIPShortCut->cAlphaArgs(4)));
+                                                   ipsc->cAlphaArgs(1),
+                                                   ipsc->cAlphaArgs(4)));
                             state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                         }
 
@@ -956,38 +923,37 @@ namespace Dayltg {
                             ShowSevereError(state,
                                             format("{} = {}:  Outside shelf {} must not have a transmittance schedule.",
                                                    cCurrentModuleObject,
-                                                   state.dataIPShortCut->cAlphaArgs(1),
-                                                   state.dataIPShortCut->cAlphaArgs(4)));
+                                                   ipsc->cAlphaArgs(1),
+                                                   ipsc->cAlphaArgs(4)));
                             state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                         }
 
                         if (state.dataSurface->Surface(SurfNum).Sides != 4) {
-                            ShowSevereError(state,
-                                            format("{} = {}:  Outside shelf {} must have 4 sides.",
-                                                   cCurrentModuleObject,
-                                                   state.dataIPShortCut->cAlphaArgs(1),
-                                                   state.dataIPShortCut->cAlphaArgs(4)));
+                            ShowSevereError(
+                                state,
+                                format(
+                                    "{} = {}:  Outside shelf {} must have 4 sides.", cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaArgs(4)));
                             state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                         }
 
                         int ConstrNum = 0;
                         // Get outside shelf construction (required if outside shelf is specified)
-                        if (state.dataIPShortCut->cAlphaArgs(5) != "") {
-                            ConstrNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataConstruction->Construct);
+                        if (ipsc->cAlphaArgs(5) != "") {
+                            ConstrNum = Util::FindItemInList(ipsc->cAlphaArgs(5), state.dataConstruction->Construct);
 
                             if (ConstrNum == 0) {
                                 ShowSevereError(state,
                                                 format("{} = {}:  Outside shelf construction {} not found.",
                                                        cCurrentModuleObject,
-                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                       state.dataIPShortCut->cAlphaArgs(5)));
+                                                       ipsc->cAlphaArgs(1),
+                                                       ipsc->cAlphaArgs(5)));
                                 state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                             } else if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) {
                                 ShowSevereError(state,
                                                 format("{} = {}:  Outside shelf construction {} must not have WindowMaterial:Glazing.",
                                                        cCurrentModuleObject,
-                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                       state.dataIPShortCut->cAlphaArgs(5)));
+                                                       ipsc->cAlphaArgs(1),
+                                                       ipsc->cAlphaArgs(5)));
                                 state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                             } else {
                                 state.dataDaylightingDevicesData->Shelf(ShelfNum).Construction = ConstrNum;
@@ -997,19 +963,19 @@ namespace Dayltg {
                             ShowSevereError(state,
                                             format("{} = {}:  Outside shelf requires an outside shelf construction to be specified.",
                                                    cCurrentModuleObject,
-                                                   state.dataIPShortCut->cAlphaArgs(1)));
+                                                   ipsc->cAlphaArgs(1)));
                             state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                         }
 
                         // Get view factor to outside shelf (optional)
                         if (NumNumbers > 0) {
-                            state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = state.dataIPShortCut->rNumericArgs(1);
+                            state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = ipsc->rNumericArgs(1);
 
-                            if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
+                            if (ipsc->rNumericArgs(1) == 0.0) {
                                 ShowWarningError(state,
                                                  format("{} = {}:  View factor to outside shelf is zero.  Shelf does not reflect on window.",
                                                         cCurrentModuleObject,
-                                                        state.dataIPShortCut->cAlphaArgs(1)));
+                                                        ipsc->cAlphaArgs(1)));
                             }
                         } else {
                             state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor =
@@ -1032,9 +998,7 @@ namespace Dayltg {
 
                 if (state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf == 0 && state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf == 0)
                     ShowWarningError(state,
-                                     format("{} = {}:  No inside shelf or outside shelf was specified.",
-                                            cCurrentModuleObject,
-                                            state.dataIPShortCut->cAlphaArgs(1)));
+                                     format("{} = {}:  No inside shelf or outside shelf was specified.", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
 
             } // ShelfNum
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -196,8 +196,9 @@ CHECKED_AND_OKED = {
         ]
     },
     "Fans.cc": {
-        "FanInputsForDesHeatGain": [
-            "fanCompModel"
+        # This is a method but it just uses the function name
+        "getInputsForDesignHeatGain": [
+            "_fanCompModel"
         ]
     },
     "FaultsManager.cc": {
@@ -814,7 +815,7 @@ def get_all_errors(source_files):
                               'messagetype': 'warning',
                               'message': msg
                               }
-                    print(json.dumps(ci_msg))
+                    print(json.dumps(ci_msg), file=sys.stderr)
                 else:
                     warnings.warn(msg)
             continue
@@ -830,7 +831,7 @@ def get_all_errors(source_files):
                         'messagetype': 'warning',
                         'message': str(e)
                     }
-                    print(json.dumps(ci_msg))
+                    print(json.dumps(ci_msg), file=sys.stderr)
                 else:
                     warnings.warn(str(e))
             continue
@@ -857,9 +858,9 @@ def output_errors_to_console(all_errors):
                       'messagetype': 'error',
                       'message': error['msg']
                       }
-            print(json.dumps(ci_msg))
+            print(json.dumps(ci_msg), file=sys.stderr)
         else:
-            print(error['msg'])
+            print(error['msg'], file=sys.stderr)
 
 
 if __name__ == '__main__':

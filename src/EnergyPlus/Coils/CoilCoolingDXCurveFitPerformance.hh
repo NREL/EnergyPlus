@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -82,18 +82,19 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
 
 struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
 {
-    static constexpr std::string_view object_name = "Coil:Cooling:DX:CurveFit:Performance";
+    static constexpr std::string_view object_name =
+        "Coil:Cooling:DX:CurveFit:Performance";
+    std::string parentName;
 
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
 
     void simulate(EnergyPlusData &state,
                   const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
-                  int useAlternateMode,
-                  Real64 &PLR,
-                  int &speedNum,
-                  Real64 &speedRatio,
-                  int const fanOpMode,
+                  HVAC::CoilMode currentCoilMode,
+                  int speedNum,
+                  Real64 speedRatio,
+                  HVAC::FanOp const fanOp,
                   DataLoopNode::NodeData &condInletNode,
                   DataLoopNode::NodeData &condOutletNode,
                   bool const singleMode,
@@ -103,10 +104,9 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
                    CoilCoolingDXCurveFitOperatingMode &currentMode,
                    const DataLoopNode::NodeData &inletNode,
                    DataLoopNode::NodeData &outletNode,
-                   Real64 &PLR,
-                   int &speedNum,
-                   Real64 &speedRatio,
-                   int const fanOpMode,
+                   int speedNum,
+                   Real64 speedRatio,
+                   HVAC::FanOp const fanOp,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode,
                    bool const singleMode);
@@ -120,6 +120,7 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
     explicit CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name);
 
     void size(EnergyPlusData &state) override;
+
 
     void setOperMode(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 
@@ -143,27 +144,27 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
         return normalMode.speeds[speed].name;
     }
 
-    Real64 RatedAirMassFlowRateMaxSpeed(bool useAlternateMode) override
+    Real64 RatedAirMassFlowRateMaxSpeed(HVAC::CoilMode const mode) override
     {
-        if (useAlternateMode) {
+        if (mode != HVAC::CoilMode::Normal) {
             return alternateMode.speeds.back().RatedAirMassFlowRate;
         } else {
             return normalMode.speeds.back().RatedAirMassFlowRate;
         }
     }
 
-    Real64 RatedAirMassFlowRateMinSpeed(bool useAlternateMode) override
+    Real64 RatedAirMassFlowRateMinSpeed(HVAC::CoilMode const mode) override
     {
-        if (useAlternateMode) {
+        if (mode != HVAC::CoilMode::Normal) {
             return alternateMode.speeds.front().RatedAirMassFlowRate;
         } else {
             return normalMode.speeds.front().RatedAirMassFlowRate;
         }
     }
 
-    Real64 RatedCondAirMassFlowRateNomSpeed(bool useAlternateMode) override
+    Real64 RatedCondAirMassFlowRateNomSpeed(HVAC::CoilMode const mode) override
     {
-        if (useAlternateMode) {
+        if (mode != HVAC::CoilMode::Normal) {
             return alternateMode.speeds[alternateMode.nominalSpeedIndex].RatedCondAirMassFlowRate;
         } else {
             return normalMode.speeds[normalMode.nominalSpeedIndex].RatedCondAirMassFlowRate;
@@ -185,9 +186,9 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
         return normalMode.ratedGrossTotalCap;
     }
 
-    int IndexCapFT(bool useAlternateMode) override
+    int IndexCapFT(HVAC::CoilMode const mode) override
     {
-        if (useAlternateMode) {
+        if (mode != HVAC::CoilMode::Normal) {
             return alternateMode.speeds[alternateMode.nominalSpeedIndex].indexCapFT;
         } else {
             return normalMode.speeds[normalMode.nominalSpeedIndex].indexCapFT;
@@ -207,14 +208,14 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
 
     virtual void setToHundredPercentDOAS() override
     {
-        for (auto &speed : this->normalMode.speeds) {
-            speed.minRatedVolFlowPerRatedTotCap = DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2;
-            speed.maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2;
+        for (auto &speed : normalMode.speeds) {
+            speed.minRatedVolFlowPerRatedTotCap = HVAC::MinRatedVolFlowPerRatedTotCap2;
+            speed.maxRatedVolFlowPerRatedTotCap = HVAC::MaxRatedVolFlowPerRatedTotCap2;
         }
-        if (this->hasAlternateMode) {
-            for (auto &speed : this->alternateMode.speeds) {
-                speed.minRatedVolFlowPerRatedTotCap = DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2;
-                speed.maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2;
+        if (maxAvailCoilMode != HVAC::CoilMode::Normal) {
+            for (auto &speed : alternateMode.speeds) {
+                speed.minRatedVolFlowPerRatedTotCap = HVAC::MinRatedVolFlowPerRatedTotCap2;
+                speed.maxRatedVolFlowPerRatedTotCap = HVAC::MaxRatedVolFlowPerRatedTotCap2;
             }
         }
     }
@@ -239,6 +240,12 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
         return normalMode.speeds[speed].evap_condenser_effectiveness;
     }
 
+    Real64 EvapAirFlowFraction() override
+    {
+        return normalMode.speeds.front().original_input_specs.evaporator_air_flow_fraction;
+    }
+
+
     Real64 maxOutdoorDrybulbForBasin = 0.0;
     bool mySizeFlag = true;
 
@@ -248,8 +255,8 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
     Real64 wasteHeatRate = 0.0;
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
-    CoilCoolingDXCurveFitOperatingMode alternateMode;  // enhanced dehumidifcation or Subcool mode
-    CoilCoolingDXCurveFitOperatingMode alternateMode2; // Reheat mode
+    CoilCoolingDXCurveFitOperatingMode alternateMode;         // enhanced dehumidifcation or Subcool mode
+    CoilCoolingDXCurveFitOperatingMode alternateMode2;        // Reheat mode
 };
 
 } // namespace EnergyPlus

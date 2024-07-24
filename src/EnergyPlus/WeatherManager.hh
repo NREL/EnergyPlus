@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -782,13 +782,15 @@ struct WeatherManagerData : BaseGlobalStruct
     bool PrintEnvrnStamp = false;          // Set to true when the environment header should be printed
     bool PrintDDHeader = true;
 
-    int YearOfSim = 1;                     // The Present year of Simulation.
-    int NumDaysInYear = 365;               // TODO: removed const from this until leap year behavior is reviewed
-    int EnvironmentReportNbr = 0;          // Report number for the environment stamp
-    std::string EnvironmentReportChr = ""; // Report number for the environment stamp (character -- for printing)
-    bool WeatherFileExists = false;        // Set to true if a weather file exists
-    std::string LocationTitle = "";        // Location Title from input File
-    bool LocationGathered = false;         // flag to show if Location exists on Input File (we assume one is there and correct on weather file)
+    int YearOfSim = 1;                           // The Present year of Simulation.
+    int NumDaysInYear = 365;                     // TODO: removed const from this until leap year behavior is reviewed
+    int EnvironmentReportNbr = 0;                // Report number for the environment stamp
+    std::string EnvironmentReportChr = "";       // Report number for the environment stamp (character -- for printing)
+    bool WeatherFileExists = false;              // Set to true if a weather file exists
+    std::string LocationTitle = "";              // Location Title from input File
+    bool LocationGathered = false;               // flag to show if Location exists on Input File (we assume one is there and correct on weather file)
+    bool keepUserSiteLocationDefinition = false; // flag based on user input to set whether to keep the user site location definition (true)
+                                                 // or override with the site information given on weather file (false/default)
 
     Real64 WeatherFileLatitude = 0.0;
     Real64 WeatherFileLongitude = 0.0;
@@ -928,6 +930,10 @@ struct WeatherManagerData : BaseGlobalStruct
 
     // ProcessEPWHeader static vars
     std::string EPWHeaderTitle = "";
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -207,21 +207,6 @@ namespace ReturnAirPathManager {
         if (ErrorsFound) {
             ShowFatalError(state, "Errors found getting AirLoopHVAC:ReturnPath.  Preceding condition(s) causes termination.");
         }
-    }
-
-    void InitReturnAirPath([[maybe_unused]] int &ReturnAirPathNum) // unused1208
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          Russ Taylor
-        //       DATE WRITTEN:    Nov 1997
-
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
     }
 
     void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum)

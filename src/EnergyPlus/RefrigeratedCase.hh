@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1625,6 +1625,10 @@ struct RefrigeratedCaseData : BaseGlobalStruct
     Real64 MyCurrentTimeSaved = 0.0;   // Used to determine whether the zone time step is a repetition
     Real64 MyStepStartTimeSaved = 0.0; // Used to determine whether the system time step is a repetition
     Real64 TimeStepFraction = 0.0;     // Used to calculate my current time
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

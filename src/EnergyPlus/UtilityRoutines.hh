@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -227,36 +227,36 @@ struct ErrorObjectHeader
     std::string_view objectName;
 };
 
-// Wrappers for common errors
 void ShowSevereDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
-
 void ShowSevereEmptyField(EnergyPlusData &state,
                           ErrorObjectHeader const &eoh,
                           std::string_view fieldName,
                           std::string_view depFieldName = {},
                           std::string_view depFieldValue = {});
-
 void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
-
-void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
-
+void ShowSevereInvalidKey(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view msg = {});
 void ShowSevereInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
 
+void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
+void ShowWarningDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
 void ShowWarningEmptyField(EnergyPlusData &state,
                            ErrorObjectHeader const &eoh,
                            std::string_view fieldName,
                            std::string_view defaultValue,
                            std::string_view depFieldName = {},
                            std::string_view depFieldValue = {});
-
 void ShowWarningItemNotFound(
     EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
-
+void ShowWarningInvalidKey(EnergyPlusData &state,
+                           ErrorObjectHeader const &eoh,
+                           std::string_view fieldName,
+                           std::string_view fieldValue,
+                           std::string_view defaultValue,
+                           std::string_view msg = {});
 void ShowWarningInvalidBool(
     EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
-
-void ShowWarningInvalidKey(
-    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
+void ShowWarningCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
 
 namespace Util {
 
@@ -272,8 +272,6 @@ namespace Util {
     template <class T> struct is_shared_ptr<std::shared_ptr<T>> : std::true_type
     {
     };
-
-    Real64 epElapsedTime();
 
     Real64 ProcessNumber(std::string_view String, bool &ErrorFlag);
 
@@ -695,10 +693,16 @@ constexpr int getEnumValue(const gsl::span<const std::string_view> sList, const 
     return -1;
 }
 
+constexpr std::array<std::string_view, 2> yesNoNamesUC = {"NO", "YES"};
+
 constexpr BooleanSwitch getYesNoValue(const std::string_view s)
 {
-    constexpr std::array<std::string_view, 2> yesNo = {"NO", "YES"};
-    return static_cast<BooleanSwitch>(getEnumValue(yesNo, s));
+    return static_cast<BooleanSwitch>(getEnumValue(yesNoNamesUC, s));
+}
+
+constexpr Real64 fclamp(Real64 v, Real64 min, Real64 max)
+{
+    return (v < min) ? min : ((v > max) ? max : v);
 }
 
 struct UtilityRoutinesData : BaseGlobalStruct
@@ -708,6 +712,10 @@ struct UtilityRoutinesData : BaseGlobalStruct
     std::string appendPerfLog_headerRow;
     std::string appendPerfLog_valuesRow;
     bool GetMatrixInputFlag = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -234,7 +234,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
 
     EXPECT_EQ(1u, state->dataWaterData->WaterStorage.size());
     int TankNum = 1;
-    EXPECT_TRUE(compare_enums(DataWater::ControlSupplyType::WellFloatMainsBackup, state->dataWaterData->WaterStorage(TankNum).ControlSupply));
+    EXPECT_ENUM_EQ(DataWater::ControlSupplyType::WellFloatMainsBackup, state->dataWaterData->WaterStorage(TankNum).ControlSupply);
     EXPECT_EQ(0u, state->dataWaterData->WaterStorage(TankNum).NumWaterDemands);
     EXPECT_EQ(0.003, state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate);
     EXPECT_EQ(0.20, state->dataWaterData->WaterStorage(TankNum).ValveOnCapacity);
@@ -368,11 +368,11 @@ TEST_F(EnergyPlusFixture, WaterManager_MainsWater_Meter_Test)
 
     EXPECT_EQ(state->dataWaterData->WaterStorage.size(), 1u);
 
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters.size(), 11u);
+    EXPECT_EQ(state->dataOutputProcessor->meters.size(), 11u);
 
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(4).Name, "General:WaterSystems:MainsWater");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(4).ResourceType, "MainsWater");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(4).EndUse, "WaterSystems");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(4).EndUseSub, "General");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(4).Group, "");
+    EXPECT_EQ(state->dataOutputProcessor->meters[3]->Name, "General:WaterSystems:MainsWater");
+    EXPECT_ENUM_EQ(state->dataOutputProcessor->meters[3]->resource, Constant::eResource::MainsWater);
+    EXPECT_ENUM_EQ(state->dataOutputProcessor->meters[3]->endUseCat, OutputProcessor::EndUseCat::WaterSystem);
+    EXPECT_EQ(state->dataOutputProcessor->meters[3]->EndUseSub, "General");
+    EXPECT_ENUM_EQ(state->dataOutputProcessor->meters[3]->group, OutputProcessor::Group::Invalid);
 }

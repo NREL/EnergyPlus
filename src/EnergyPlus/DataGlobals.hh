@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -112,8 +112,8 @@ struct DataGlobal : BaseGlobalStruct
     int TimeStep = 0;                // Counter for time steps (fractional hours)
     Real64 TimeStepZone = 0.0;       // Zone time step in fractional hours
     bool WarmupFlag = false;         // True during the warmup portion of a simulation
-    int StdOutputRecordCount = 0;    // Count of Standard output records
-    int StdMeterRecordCount = 0;     // Count of Meter output records
+    Int64 StdOutputRecordCount = 0;  // Count of Standard output records
+    Int64 StdMeterRecordCount = 0;   // Count of Meter output records
     bool ZoneSizingCalc = false;     // TRUE if zone sizing calculation
     bool SysSizingCalc = false;      // TRUE if system sizing calculation
     bool DoZoneSizing = false;       // User input in SimulationControl object
@@ -177,9 +177,13 @@ struct DataGlobal : BaseGlobalStruct
     int numThread = 1;
     bool AirLoopHVACDOASUsedInSim = false;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = DataGlobal();
+        new (this) DataGlobal();
     }
 };
 

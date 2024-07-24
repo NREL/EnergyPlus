@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,24.1;
+  Version,24.2;
 
   Building,
     Building,                !- Name
@@ -3560,4 +3560,40 @@
     ZoneComponentLoadSummary;!- Report 2 Name
 
   Output:Surfaces:List,Details;
+
+  UtilityCost:Tariff,
+    ExampleC,                !- Name
+    Electricity:Facility,    !- Output Meter Name
+    KWh;                     !- Conversion Factor Choice
+
+  UtilityCost:Charge:Block,
+    BlockEnergyCharge,       !- Utility Cost Charge Block Name
+    ExampleC,                !- Tariff Name
+    totalEnergy,             !- Source Variable
+    Annual,                  !- Season
+    EnergyCharges,           !- Category Variable Name
+    ,                        !- Remaining Into Variable
+    ,                        !- Block Size Multiplier Value or Variable Name
+    20000,                   !- Block Size 1 Value or Variable Name
+    0.0474,                  !- Block 1 Cost per Unit Value or Variable Name
+    180000,                  !- Block Size 2 Value or Variable Name
+    0.0424,                  !- Block 2 Cost per Unit Value or Variable Name
+    remaining,               !- Block Size 3 Value or Variable Name
+    0.0383;                  !- Block 3 Cost per Unit Value or Variable Name
+
+  UtilityCost:Charge:Block,
+    BlockDemandCharge,       !- Utility Cost Charge Block Name
+    ExampleC,                !- Tariff Name
+    totalDemand,             !- Source Variable
+    Annual,                  !- Season
+    DemandCharges,           !- Category Variable Name
+    ,                        !- Remaining Into Variable
+    ,                        !- Block Size Multiplier Value or Variable Name
+    20,                      !- Block Size 1 Value or Variable Name
+    5.38,                    !- Block 1 Cost per Unit Value or Variable Name
+    80,                      !- Block Size 2 Value or Variable Name
+    4.23,                    !- Block 2 Cost per Unit Value or Variable Name
+    remaining,               !- Block Size 3 Value or Variable Name
+    3.60;                    !- Block 3 Cost per Unit Value or Variable Name
+
 

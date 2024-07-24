@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2494,6 +2494,11 @@ namespace Curve {
 
                 if (normalizeMethod != NM_NONE && fields.count("normalization_divisor")) {
                     normalizationDivisor = fields.at("normalization_divisor").get<Real64>();
+                    if (std::abs(normalizationDivisor) < std::numeric_limits<Real64>::min()) {
+                        ShowSevereError(
+                            state, format("Table:Lookup named \"{}\": Normalization divisor entered as zero, which is invalid", thisCurve->Name));
+                        ErrorsFound = true;
+                    }
                 }
 
                 std::vector<double> lookupValues;
@@ -2721,50 +2726,50 @@ namespace Curve {
                 std::string numStr = fmt::to_string(dim);
                 SetupOutputVariable(state,
                                     format("Performance Curve Input Variable {} Value", numStr),
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     thisCurve->inputs[dim - 1],
-                                    OutputProcessor::SOVTimeStepType::HVAC,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     thisCurve->Name);
             }
             // set the output up last so it shows up after the input in the csv file
             SetupOutputVariable(state,
                                 "Performance Curve Output Value",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisCurve->output,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisCurve->Name);
         }
 
         for (auto &thisPressCurve : state.dataBranchAirLoopPlant->PressureCurve) {
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 1 Value",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisPressCurve.CurveInput1,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPressCurve.Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 2 Value",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisPressCurve.CurveInput2,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPressCurve.Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 3 Value",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisPressCurve.CurveInput3,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPressCurve.Name);
             SetupOutputVariable(state,
                                 "Performance Curve Output Value",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisPressCurve.CurveOutput,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPressCurve.Name);
         }
 

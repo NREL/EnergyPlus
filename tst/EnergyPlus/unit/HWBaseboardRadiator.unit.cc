@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,6 +77,7 @@ using namespace DataPlant;
 
 TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 {
+    state->init_state(*state);
     Real64 LoadMet;
     int BBNum;
 
@@ -319,6 +320,11 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterInputTest)
     ZoneEquipmentManager::GetZoneEquipment(*state);
 
     GetHWBaseboardInput(*state);
+
+    int surfNumTheFloor = Util::FindItemInList("THEFLOOR", state->dataSurface->Surface);
+
+    EXPECT_EQ(state->dataSurface->allGetsRadiantHeatSurfaceList[0], surfNumTheFloor);
+    EXPECT_TRUE(state->dataSurface->surfIntConv(surfNumTheFloor).getsRadiantHeat);
 
     ASSERT_NEAR(state->dataHWBaseboardRad->HWBaseboard(1).FracDistribToSurf(1), 0.8, absTol);
     ASSERT_NEAR(state->dataHWBaseboardRad->HWBaseboardDesignObject(1).FracRadiant, 0.4, absTol);

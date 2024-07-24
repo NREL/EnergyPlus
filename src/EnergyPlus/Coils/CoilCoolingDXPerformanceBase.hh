@@ -68,6 +68,7 @@ struct CoilCoolingDXPerformanceBase
     // standard rating stuff -- for now just 210/240
     Real64 standardRatingCoolingCapacity = 0.0; // net cooling capacity of single speed DX cooling coil
     Real64 standardRatingSEER = 0.0;            // seasonal energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingSEER_Standard = 0.0;   // seasonal energy efficiency ratio
     Real64 standardRatingEER = 0.0;             // energy efficiency ratio of single speed DX cooling coil
     Real64 standardRatingIEER = 0.0;            // Integrated energy efficiency ratio of single speed DX cooling coil
 
@@ -96,10 +97,11 @@ struct CoilCoolingDXPerformanceBase
     Real64 basinHeaterPower = 0.0;
     Real64 basinHeaterElectricityConsumption = 0.0;
     Real64 minOutdoorDrybulb = 0.0;
-    int hasAlternateMode = 0; // 0 Normal, 1 Enhanced, 2 SubcoolReheat
+    //int hasAlternateMode = 0; // 0 Normal, 1 Enhanced, 2 SubcoolReheat
     int OperatingMode = 0;
     Real64 ModeRatio = 0.0;
     Real64 NormalSHR = 0.0;
+    HVAC::CoilMode maxAvailCoilMode = HVAC::CoilMode::Normal; // max available coil mode, 0 Normal, 1 Enhanced, 2 SubcoolReheat
 
     enum CapControlMethod
     {
@@ -115,11 +117,11 @@ struct CoilCoolingDXPerformanceBase
     virtual void simulate(EnergyPlusData &,
                           const DataLoopNode::NodeData &,
                           DataLoopNode::NodeData &,
+                          HVAC::CoilMode,
+                          //Real64 &,
                           int,
-                          Real64 &,
-                          int &,
-                          Real64 &,
-                          int const,
+                          Real64,
+                          HVAC::FanOp const,
                           DataLoopNode::NodeData &,
                           DataLoopNode::NodeData &,
                           bool const,
@@ -147,17 +149,17 @@ struct CoilCoolingDXPerformanceBase
         return "";
     }
 
-    virtual Real64 RatedAirMassFlowRateMaxSpeed(bool = false)
+    virtual Real64 RatedAirMassFlowRateMaxSpeed(HVAC::CoilMode const mode = HVAC::CoilMode::Normal)
     {
         return 0.0;
     }
 
-    virtual Real64 RatedAirMassFlowRateMinSpeed(bool = false)
+    virtual Real64 RatedAirMassFlowRateMinSpeed(HVAC::CoilMode const mode = HVAC::CoilMode::Normal)
     {
         return 0.0;
     }
 
-    virtual Real64 RatedCondAirMassFlowRateNomSpeed(bool) // rated condenser air mass flow rate at speed {kg/s}
+    virtual Real64 RatedCondAirMassFlowRateNomSpeed(HVAC::CoilMode const mode) // rated condenser air mass flow rate at speed {kg/s}
     {
         return 0.0;
     }
@@ -177,7 +179,7 @@ struct CoilCoolingDXPerformanceBase
         return 0.0;
     }
 
-    virtual int IndexCapFT(bool)
+    virtual int IndexCapFT(HVAC::CoilMode const mode)
     {
         return 0;
     }
@@ -216,6 +218,11 @@ struct CoilCoolingDXPerformanceBase
     }
 
     virtual Real64 EvapCondenserEffectivenessAtSpeed(int)
+    {
+        return 0.0;
+    }
+    
+    virtual Real64 EvapAirFlowFraction()
     {
         return 0.0;
     }

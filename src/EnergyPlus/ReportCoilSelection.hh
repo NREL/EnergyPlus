@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -195,15 +195,14 @@ public:                                  // data
     Real64 ratedCoilOadbRef;   // rated DX coil outside air dry bulb reference [C]
     Real64 ratedCoilOawbRef;   // rated DX coil outside air wet bulb reference [C]
 
-    std::string fanAssociatedWithCoilName;        // name of fan found to be associated with this coil
-    std::string fanTypeName;                      // type of fan found to be associated with this coil
-    DataAirSystems::FanModelType supFanModelType; // indicates which type of fan model for supply fan, legacy or new OO
-    int supFanNum;                                // index pointing to this fan in legacy fan data structure, 1-based struct array
-    int supFanVecIndex;                           // index pointing to this fan in new OO fan object array, 0-based
-    Real64 fanSizeMaxAirVolumeFlow;               // the size of the fan in terms of volume flow rate [m3/s]
-    Real64 fanSizeMaxAirMassFlow;                 // the size of the fan in terms of mass flow rate [kg/s]
-    Real64 fanHeatGainIdealPeak;                  // Fan heat gain to air during Ideal loads peak sizing [W]
-    Real64 coilAndFanNetTotalCapacityIdealPeak;   // coil net total capacity including fan heat gain for ideal loads peak sizing [W]
+    std::string fanAssociatedWithCoilName;      // name of fan found to be associated with this coil
+    std::string fanTypeName;                    // type of fan found to be associated with this coil
+    HVAC::FanType supFanType;                   // indicates which type of fan model for supply fan, legacy or new OO
+    int supFanNum = 0;                          // index pointing to this fan in legacy fan data structure, 1-based struct array
+    Real64 fanSizeMaxAirVolumeFlow;             // the size of the fan in terms of volume flow rate [m3/s]
+    Real64 fanSizeMaxAirMassFlow;               // the size of the fan in terms of mass flow rate [kg/s]
+    Real64 fanHeatGainIdealPeak;                // Fan heat gain to air during Ideal loads peak sizing [W]
+    Real64 coilAndFanNetTotalCapacityIdealPeak; // coil net total capacity including fan heat gain for ideal loads peak sizing [W]
 
     // static plant info
     Real64 plantDesMaxMassFlowRate; // this coil's plant loop overall design flow rate [kg/s]
@@ -402,8 +401,15 @@ public: // methods
                               std::string const &coilName, // user-defined name of the coil
                               std::string const &coilType, // idf input object class name of coil
                               std::string const &fanName,
-                              DataAirSystems::FanModelType fanEnumType,
+                              HVAC::FanType fanType,
                               int fanIndex);
+
+    void setCoilEqNum(EnergyPlusData &state,
+                      std::string const &coilName,
+                      std::string const &coilType,
+                      int const curSysNum,
+                      int const curOASysNum,
+                      int const curZoneEqNum);
 
     static std::string getTimeText(EnergyPlusData &state, int const timeStepAtPeak);
 
@@ -433,6 +439,8 @@ private: // methods
                                                std::string const &coilType  // idf input object class name of coil
     );
 
+    void associateZoneCoilWithParent(EnergyPlusData &state, std::unique_ptr<CoilSelectionData> &c);
+
 public: // data
     int numCoilsReported_;
     std::vector<std::unique_ptr<CoilSelectionData>> coilSelectionDataObjs;
@@ -445,6 +453,10 @@ struct ReportCoilSelectionData : BaseGlobalStruct
 {
 
     std::unique_ptr<ReportCoilSelection> coilSelectionReportObj;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

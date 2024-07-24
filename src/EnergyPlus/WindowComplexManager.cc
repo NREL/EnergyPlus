@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -627,7 +627,7 @@ namespace WindowComplexManager {
                             // skip surfaces that face away from the ground point
                             if (dot(SunDir, state.dataSurface->Surface(JSurf).NewellSurfaceNormalVector) >= 0.0) continue;
                             // Looking for surfaces between GndPt and sun
-                            PierceSurface(state, JSurf, gndPt, SunDir, HitPt, hit);
+                            hit = PierceSurface(state, JSurf, gndPt, SunDir, HitPt);
                             if (hit) {
                                 // Are not going into the details of whether a hit surface is transparent
                                 // Since this is ultimately simply weighting the transmittance, so great
@@ -680,7 +680,7 @@ namespace WindowComplexManager {
                     // skip surfaces that face away from the ground point
                     if (dot(SunDir, state.dataSurface->Surface(JSurf).NewellSurfaceNormalVector) >= 0.0) continue;
                     // Looking for surfaces between GndPt and sun
-                    PierceSurface(state, JSurf, gndPt, SunDir, HitPt, hit);
+                    hit = PierceSurface(state, JSurf, gndPt, SunDir, HitPt);
                     if (hit) {
                         // Are not going into the details of whether a hit surface is transparent
                         // Since this is ultimately simply weighting the transmittance, so great
@@ -1375,7 +1375,7 @@ namespace WindowComplexManager {
                 //  skip surfaces that face away from the window
                 DotProd = dot(Geom.sInc(IRay), state.dataSurface->Surface(JSurf).NewellSurfaceNormalVector);
                 if (DotProd >= 0.0) continue;
-                PierceSurface(state, JSurf, state.dataSurface->Surface(ISurf).Centroid, Geom.sInc(IRay), HitPt, hit);
+                hit = PierceSurface(state, JSurf, state.dataSurface->Surface(ISurf).Centroid, Geom.sInc(IRay), HitPt);
                 if (!hit) continue; // Miss: Try next surface
                 if (TotHits == 0) {
                     //  First hit for this ray
@@ -1559,7 +1559,7 @@ namespace WindowComplexManager {
             for (KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf) {                        // back surf loop
                 BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf;                // ShadowComb is organized by base surface
                 JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf); // these are all proper back surfaces
-                PierceSurface(state, JSurf, state.dataSurface->Surface(ISurf).Centroid, Geom.sTrn(IRay), HitPt, hit);
+                hit = PierceSurface(state, JSurf, state.dataSurface->Surface(ISurf).Centroid, Geom.sTrn(IRay), HitPt);
                 if (!hit) continue; // Miss: Try next surface
                 if (TotHits == 0) {
                     //  First hit for this ray
@@ -2846,13 +2846,19 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        wght(iprop(1, 1)) = Material::GasWght[static_cast<int>(Material::GasType::Air)];
-        gama(iprop(1, 1)) = Material::GasSpecificHeatRatio[static_cast<int>(Material::GasType::Air)];
-        for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-            gcon(ICoeff, iprop(1, 1)) = Material::GasCoeffsCon[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
-            gvis(ICoeff, iprop(1, 1)) = Material::GasCoeffsVis[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
-            gcp(ICoeff, iprop(1, 1)) = Material::GasCoeffsCp[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
-        }
+        auto const &gasAir = Material::gases[(int)Material::GasType::Air];
+        wght(iprop(1, 1)) = gasAir.wght;
+        gama(iprop(1, 1)) = gasAir.specHeatRatio;
+
+        gcon(1, iprop(1, 1)) = gasAir.con.c0;
+        gcon(2, iprop(1, 1)) = gasAir.con.c1;
+        gcon(3, iprop(1, 1)) = gasAir.con.c2;
+        gvis(1, iprop(1, 1)) = gasAir.vis.c0;
+        gvis(2, iprop(1, 1)) = gasAir.vis.c1;
+        gvis(3, iprop(1, 1)) = gasAir.vis.c2;
+        gcp(1, iprop(1, 1)) = gasAir.cp.c0;
+        gcp(2, iprop(1, 1)) = gasAir.cp.c1;
+        gcp(3, iprop(1, 1)) = gasAir.cp.c2;
 
         // Fill window layer properties needed for window layer heat balance calculation
         IGlass = 0;
@@ -2920,26 +2926,34 @@ namespace WindowComplexManager {
 
                 GasPointer = thisMaterial->GasPointer;
 
-                auto const *thisMaterialGas = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(GasPointer));
+                auto const *thisMaterialGas = dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(GasPointer));
                 assert(thisMaterialGas != nullptr);
-                nmix(IGap + 1) = thisMaterialGas->NumberOfGasesInMixture;
+                nmix(IGap + 1) = thisMaterialGas->numGases;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    frct(IMix, IGap + 1) = thisMaterialGas->GasFract(IMix);
+                    auto const &gas = thisMaterialGas->gases[IMix - 1];
+                    frct(IMix, IGap + 1) = thisMaterialGas->gasFracts[IMix - 1];
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
                     // to be correctly referenced by gap arrays
 
                     // First check if gas coefficients are already part of array.  Duplicates are not necessary
                     bool feedData(false);
-                    CheckGasCoefs(thisMaterialGas->GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
+                    CheckGasCoefs(gas.wght, iprop(IMix, IGap + 1), wght, feedData);
                     if (feedData) {
-                        wght(iprop(IMix, IGap + 1)) = thisMaterialGas->GasWght(IMix);
-                        gama(iprop(IMix, IGap + 1)) = thisMaterialGas->GasSpecHeatRatio(IMix);
-                        for (i = 1; i <= 3; ++i) {
-                            gcon(i, iprop(IMix, IGap + 1)) = thisMaterialGas->GasCon(i, IMix);
-                            gvis(i, iprop(IMix, IGap + 1)) = thisMaterialGas->GasVis(i, IMix);
-                            gcp(i, iprop(IMix, IGap + 1)) = thisMaterialGas->GasCp(i, IMix);
-                        }
+                        wght(iprop(IMix, IGap + 1)) = gas.wght;
+                        gama(iprop(IMix, IGap + 1)) = gas.specHeatRatio;
+
+                        gcon(1, iprop(IMix, IGap + 1)) = gas.con.c0;
+                        gcon(2, iprop(IMix, IGap + 1)) = gas.con.c1;
+                        gcon(3, iprop(IMix, IGap + 1)) = gas.con.c2;
+
+                        gvis(1, iprop(IMix, IGap + 1)) = gas.vis.c0;
+                        gvis(2, iprop(IMix, IGap + 1)) = gas.vis.c1;
+                        gvis(3, iprop(IMix, IGap + 1)) = gas.vis.c2;
+
+                        gcp(1, iprop(IMix, IGap + 1)) = gas.cp.c0;
+                        gcp(2, iprop(IMix, IGap + 1)) = gas.cp.c1;
+                        gcp(3, iprop(IMix, IGap + 1)) = gas.cp.c2;
                     } // IF feedData THEN
                 }
             } else {
@@ -3006,7 +3020,7 @@ namespace WindowComplexManager {
 
             // Instead of doing temperature guess get solution from previous iteration.  That should be much better than guess
             for (k = 1; k <= 2 * nlayer; ++k) {
-                theta(k) = state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(k);
+                theta(k) = state.dataSurface->SurfaceWindow(SurfNum).thetaFace[k];
             }
         }
 
@@ -3047,10 +3061,7 @@ namespace WindowComplexManager {
             theta = 273.15;
         }
 
-        if (SurfNum != 0)
-            edgeGlCorrFac = state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum);
-        else
-            edgeGlCorrFac = 1;
+        edgeGlCorrFac = (SurfNum != 0) ? state.dataSurface->SurfaceWindow(SurfNum).edgeGlassCorrFac : 1;
 
         //  call TARCOG
         int constexpr Debug_mode = 0;
@@ -3329,7 +3340,7 @@ namespace WindowComplexManager {
             // IF(ShadeFlag <= 0) THEN
             // TransDiff = Construct(ConstrNum).TransDiff;
             int IState = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.NumStates;
-            Real64 TransDiff = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(IState).WinDiffTrans;
+            Real64 ReflDiff = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(IState).WinBkHemRefl;
             // ELSE IF(ShadeFlag==WinShadingType::IntShade .OR. ShadeFlag==WinShadingType::ExtShade) THEN
             //  TransDiff = Construct(ConstrNum)%TransDiff
             // ELSE IF(ShadeFlag==WinShadingType::IntBlind .OR. ShadeFlag==WinShadingType::ExtBlind .OR.ShadeFlag==WinShadingType::BGBlind) THEN
@@ -3341,8 +3352,11 @@ namespace WindowComplexManager {
             // END IF
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
                 state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area *
-                TransDiff;
-            state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
+                    (1 - ReflDiff) +
+                state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(SurfNum);
+            state.dataSurface->SurfWinHeatGain(SurfNum) -=
+                (state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) +
+                 state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * state.dataSurface->Surface(SurfNum).Area);
 
             if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade) {
                 state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) =
@@ -3378,8 +3392,8 @@ namespace WindowComplexManager {
 
                 // // Get properties of inside shading layer
 
-                Real64 EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[0];
-                Real64 EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[0];
+                Real64 EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1];
+                Real64 EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[1];
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                     (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - Constant::Kelvin)) / (EffShBlEmiss + EffGlEmiss);
 
@@ -3388,8 +3402,8 @@ namespace WindowComplexManager {
             }
 
             for (k = 1; k <= nlayer; ++k) {
-                state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = theta(2 * k - 1);
-                state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = theta(2 * k);
+                state.dataSurface->SurfaceWindow(SurfNum).thetaFace[2 * k - 1] = theta(2 * k - 1);
+                state.dataSurface->SurfaceWindow(SurfNum).thetaFace[2 * k] = theta(2 * k);
 
                 // temperatures for reporting
                 state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = theta(2 * k - 1) - Constant::Kelvin;

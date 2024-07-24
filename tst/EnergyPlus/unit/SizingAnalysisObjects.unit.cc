@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -109,8 +109,8 @@ protected:
         state->dataWeather->Environment(4).DesignDayNum = 2;
         state->dataWeather->Environment(4).SeedEnvrnNum = 2;
 
-        OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone);
-        OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+        OutputProcessor::SetupTimePointers(*state, OutputProcessor::TimeStepType::Zone, state->dataGlobal->TimeStepZone);
+        OutputProcessor::SetupTimePointers(*state, OutputProcessor::TimeStepType::System, state->dataHVACGlobal->TimeStepSys);
 
         state->dataSize->PlantSizData.allocate(1);
 
@@ -455,14 +455,14 @@ TEST_F(SizingAnalysisObjectsTest, DISABLED_LoggingSubStep4stepPerHour)
                 SystemTimestepObject tmpSysStepStamp;
                 tmpSysStepStamp.CurMinuteEnd =
                     (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
-                    (subTimeStp) * (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * minutesPerHour;
+                    (subTimeStp) * (*state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep) * minutesPerHour;
                 if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
                     tmpSysStepStamp.CurMinuteEnd = minutesPerHour;
                 }
                 tmpSysStepStamp.CurMinuteStart =
                     tmpSysStepStamp.CurMinuteEnd -
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * minutesPerHour;
-                tmpSysStepStamp.TimeStepDuration = *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep;
+                    (*state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep) * minutesPerHour;
+                tmpSysStepStamp.TimeStepDuration = *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep;
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 
@@ -494,14 +494,14 @@ TEST_F(SizingAnalysisObjectsTest, DISABLED_LoggingSubStep4stepPerHour)
                 SystemTimestepObject tmpSysStepStamp;
                 tmpSysStepStamp.CurMinuteEnd =
                     (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
-                    (subTimeStp) * (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * minutesPerHour;
+                    (subTimeStp) * (*state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep) * minutesPerHour;
                 if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
                     tmpSysStepStamp.CurMinuteEnd = minutesPerHour;
                 }
                 tmpSysStepStamp.CurMinuteStart =
                     tmpSysStepStamp.CurMinuteEnd -
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * minutesPerHour;
-                tmpSysStepStamp.TimeStepDuration = *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep;
+                    (*state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep) * minutesPerHour;
+                tmpSysStepStamp.TimeStepDuration = *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep;
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -299,6 +299,8 @@ namespace Construction {
 
         void reportTransferFunction(EnergyPlusData &state, int cCounter);
 
+        void reportLayers(EnergyPlusData &state);
+
         bool isGlazingConstruction(EnergyPlusData &state) const;
 
         Real64 setThicknessPerpendicular(EnergyPlusData &state, Real64 userValue);
@@ -316,9 +318,13 @@ struct ConstructionData : BaseGlobalStruct
     Array1D<Construction::ConstructionProps> Construct;
     Array1D_int LayerPoint = Array1D<int>(Construction::MaxLayersInConstruct, 0);
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = ConstructionData();
+        new (this) ConstructionData();
     }
 };
 

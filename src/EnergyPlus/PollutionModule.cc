@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -172,11 +172,17 @@ void SetupPollutionCalculations(EnergyPlusData &state)
         // Call this routine in the Output Processor to setup the correct Facility energy meters that are
         //  necessary to make sure that the Meter file is opened and written to by the OP so that time stamps
         //  and the like are happening as expected.
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
-            InitPollutionMeterReporting(state, state.dataIPShortCut->cAlphaArgs(1));
-        } else {
-            InitPollutionMeterReporting(state, "RunPeriod");
+        OutputProcessor::ReportFreq freq = OutputProcessor::ReportFreq::Simulation;
+
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(1) &&
+            (freq = static_cast<OutputProcessor::ReportFreq>(
+                 getEnumValue(OutputProcessor::reportFreqNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))))) ==
+                OutputProcessor::ReportFreq::Invalid) {
+            ShowSevereError(state, format("Invalid reporting frequency {}", state.dataIPShortCut->cAlphaArgs(1)));
+            continue;
         }
+
+        InitPollutionMeterReporting(state, freq);
     }
 }
 
@@ -338,10 +344,6 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
     } // End of the NumEnergyTypes Do Loop
 
-    for (int iMeter = 0; iMeter < (int)PollFacilityMeter::Num; ++iMeter) {
-        pm->facilityMeterNums[iMeter] = GetMeterIndex(state, pollFacilityMeterNames[iMeter]);
-    }
-
     if (pm->PollutionReportSetup) { // only do this if reporting on the pollution
         // Need to go through all of the Fuel Types and make sure a Fuel Factor was found for each type of energy being simulated
         // Check for Electricity
@@ -442,33 +444,47 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
 
         Constant::eFuel fuel = pollFuel2fuel[(int)pollFuel];
 
+        constexpr std::array<OutputProcessor::EndUseCat, (int)Constant::eFuel::Num> fuel2sovEndUseCat = {
+            OutputProcessor::EndUseCat::ElectricityEmissions,
+            OutputProcessor::EndUseCat::NaturalGasEmissions,
+            OutputProcessor::EndUseCat::GasolineEmissions,
+            OutputProcessor::EndUseCat::DieselEmissions,
+            OutputProcessor::EndUseCat::CoalEmissions,
+            OutputProcessor::EndUseCat::PropaneEmissions,
+            OutputProcessor::EndUseCat::FuelOilNo1Emissions,
+            OutputProcessor::EndUseCat::FuelOilNo2Emissions,
+            OutputProcessor::EndUseCat::OtherFuel1Emissions,
+            OutputProcessor::EndUseCat::OtherFuel2Emissions,
+            OutputProcessor::EndUseCat::Invalid,
+            OutputProcessor::EndUseCat::Invalid,
+            OutputProcessor::EndUseCat::Invalid,
+            OutputProcessor::EndUseCat::Invalid,
+            OutputProcessor::EndUseCat::Invalid // used for OtherEquipment object
+        };
+
         // Need to check whether this fuel is used?
         SetupOutputVariable(state,
                             format("Environmental Impact {} Source Energy", Constant::eFuelNames[(int)fuel]),
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             pollComp.sourceVal,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "Site",
-                            {},
-                            "Source",
-                            format("{}Emissions", Constant::eFuelNames[(int)fuel]),
-                            {},
-                            "");
+                            Constant::eResource::Source,
+                            OutputProcessor::Group::Invalid,
+                            fuel2sovEndUseCat[(int)fuel]);
 
         for (int iPollutant = 0; iPollutant < (int)Pollutant::Num; ++iPollutant) {
             SetupOutputVariable(state,
                                 format("Environmental Impact {} {}", Constant::eFuelNames[(int)fuel], poll2outVarStrs[iPollutant]),
-                                poll2Units[iPollutant],
+                                pollUnits[iPollutant],
                                 pollComp.pollutantVals[iPollutant],
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 "Site",
-                                {},
-                                poll2Names[iPollutant],
-                                format("{}Emissions", Constant::eFuelNames[(int)fuel]),
-                                {},
-                                "");
+                                poll2Resource[iPollutant],
+                                OutputProcessor::Group::Invalid,
+                                fuel2sovEndUseCat[(int)fuel]);
         }
 
         if (fuel == Constant::eFuel::Electricity) {
@@ -476,28 +492,24 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
             // Doing this here as opposed to outside the outer loop to preserve meter order and reduce ordering diffs
             SetupOutputVariable(state,
                                 "Environmental Impact Purchased Electricity Source Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 pm->pollComps[(int)PollFuelComponent::ElectricityPurchased].sourceVal,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 "Site",
-                                {},
-                                "Source",
-                                "PurchasedElectricityEmissions",
-                                {},
-                                "");
+                                Constant::eResource::Source,
+                                OutputProcessor::Group::Invalid,
+                                OutputProcessor::EndUseCat::PurchasedElectricityEmissions);
             SetupOutputVariable(state,
                                 "Environmental Impact Surplus Sold Electricity Source",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 pm->pollComps[(int)PollFuelComponent::ElectricitySurplusSold].sourceVal,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 "Site",
-                                {},
-                                "Source",
-                                "SoldElectricityEmissions",
-                                {},
-                                "");
+                                Constant::eResource::Source,
+                                OutputProcessor::Group::Invalid,
+                                OutputProcessor::EndUseCat::SoldElectricityEmissions);
         }
 
     } // End of the NumEnergyTypes Do Loop
@@ -505,40 +517,39 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
     // And Total Carbon Equivalent variables
     SetupOutputVariable(state,
                         "Environmental Impact Total N2O Emissions Carbon Equivalent Mass",
-                        OutputProcessor::Unit::kg,
+                        Constant::Units::kg,
                         pm->TotCarbonEquivFromN2O,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         "Site",
-                        {},
-                        "Carbon Equivalent",
-                        "CarbonEquivalentEmissions",
-                        {},
-                        "");
+                        Constant::eResource::CarbonEquivalent,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::CarbonEquivalentEmissions);
     SetupOutputVariable(state,
                         "Environmental Impact Total CH4 Emissions Carbon Equivalent Mass",
-                        OutputProcessor::Unit::kg,
+                        Constant::Units::kg,
                         pm->TotCarbonEquivFromCH4,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         "Site",
-                        {},
-                        "Carbon Equivalent",
-                        "CarbonEquivalentEmissions",
-                        {},
-                        "");
+                        Constant::eResource::CarbonEquivalent,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::CarbonEquivalentEmissions);
     SetupOutputVariable(state,
                         "Environmental Impact Total CO2 Emissions Carbon Equivalent Mass",
-                        OutputProcessor::Unit::kg,
+                        Constant::Units::kg,
                         pm->TotCarbonEquivFromCO2,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         "Site",
-                        {},
-                        "Carbon Equivalent",
-                        "CarbonEquivalentEmissions",
-                        {},
-                        "");
+                        Constant::eResource::CarbonEquivalent,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::CarbonEquivalentEmissions);
+
+    // Connect pollution meters to energy meters
+    for (int iMeter = 0; iMeter < (int)PollFacilityMeter::Num; ++iMeter) {
+        pm->facilityMeterNums[iMeter] = GetMeterIndex(state, Util::makeUPPER(pollFacilityMeterNames[iMeter]));
+    }
 }
 
 void CheckPollutionMeterReporting(EnergyPlusData &state)

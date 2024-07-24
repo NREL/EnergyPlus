@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -75,6 +75,7 @@ class AverageZoneTemps(EnergyPlusPlugin):
                     self.api.exchange.get_variable_handle(state, "Zone Mean Air Temperature", zone_name)
                 )
             self.data["avg_temp_variable"] = self.api.exchange.get_global_handle(state, "AverageBuildingTemp")
+            #  x = self.api.exchange.get_api_data(state)  # use this to inspect API data
             self.do_setup = False
         zone_temps = list()
         for t_handle in self.data["zone_temps"]:

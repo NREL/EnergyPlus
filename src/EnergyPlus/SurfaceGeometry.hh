@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -90,7 +90,9 @@ namespace SurfaceGeometry {
 
     void CreateMissingSpaces(EnergyPlusData &state, Array1D<SurfaceGeometry::SurfaceData> &Surfaces);
 
-    void createSpaceSurfaceLists(EnergyPlusData &state, bool &ErrorsFound);
+    void createSpaceSurfaceLists(EnergyPlusData &state);
+
+    void setSurfaceFirstLast(EnergyPlusData &state);
 
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
                                 SurfaceData &baseSurface, // Base surface data (in)
@@ -495,6 +497,10 @@ struct SurfaceGeometryData : BaseGlobalStruct
     Array1D<Real64> A; // containers for convexity test
     Array1D<Real64> B;
     int VertSize = 0; // size of X,Y,Z,A,B arrays
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

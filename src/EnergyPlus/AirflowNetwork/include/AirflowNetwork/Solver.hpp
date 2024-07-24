@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,6 +64,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 
 namespace EnergyPlus {
 
@@ -324,8 +325,8 @@ namespace AirflowNetwork {
         Array1D<Real64> MA;
         Array1D<Real64> MV;
         Array1D_int IVEC;
-        int VentilationCtrl = 0;  // Hybrid ventilation control type
-        int NumOfExhaustFans = 0; // Number of exhaust fans
+        Avail::VentCtrlStatus ventCtrlStatus = Avail::VentCtrlStatus::NoAction; // Hybrid ventilation control type
+        int NumOfExhaustFans = 0;                                               // Number of exhaust fans
         int NumAirflowNetwork = 0;
         int AirflowNetworkNumOfDetOpenings = 0;
         int AirflowNetworkNumOfSimOpenings = 0;
@@ -350,11 +351,11 @@ namespace AirflowNetwork {
         int DisSysNumOfTermUnits = 0;
         int DisSysNumOfLinks = 0;
         int NumOfExtNodes = 0;
-        Real64 IncAng = 0.0;                     // Wind incidence angle relative to facade normal (deg)
-        int SupplyFanType = 0;                   // Supply air fan type
-        Real64 MaxOnOffFanRunTimeFraction = 0.0; // max Run time fraction for an On/Off fan flow rate among airloops
-        Real64 CurrentEndTimeLast = 0.0;         // last end time
-        Real64 TimeStepSysLast = 0.0;            // last system time step
+        Real64 IncAng = 0.0;                                  // Wind incidence angle relative to facade normal (deg)
+        HVAC::FanType supplyFanType = HVAC::FanType::Invalid; // Supply air fan type
+        Real64 MaxOnOffFanRunTimeFraction = 0.0;              // max Run time fraction for an On/Off fan flow rate among airloops
+        Real64 CurrentEndTimeLast = 0.0;                      // last end time
+        Real64 TimeStepSysLast = 0.0;                         // last system time step
         int AirflowNetworkNumOfOccuVentCtrls = 0;
         int IntraZoneNumOfNodes = 0;
         int IntraZoneNumOfLinks = 0;
@@ -540,6 +541,10 @@ namespace AirflowNetwork {
         Array1D<AirflowNetwork::ReliefFlow> DisSysCompReliefAirData;
         Array1D<AirflowNetwork::AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
 
+        void init_state([[maybe_unused]] EnergyPlusData &state) override
+        {
+        }
+
         void clear_state() override
         {
             OccupantVentilationControl.deallocate();
@@ -548,7 +553,7 @@ namespace AirflowNetwork {
             MA.deallocate();
             MV.deallocate();
             IVEC.deallocate();
-            VentilationCtrl = 0;
+            ventCtrlStatus = Avail::VentCtrlStatus::NoAction;
             NumOfExhaustFans = 0;
             NumAirflowNetwork = 0;
             AirflowNetworkNumOfDetOpenings = 0;
@@ -575,7 +580,7 @@ namespace AirflowNetwork {
             DisSysNumOfLinks = 0;
             NumOfExtNodes = 0;
             IncAng = 0.0;
-            SupplyFanType = 0;
+            supplyFanType = HVAC::FanType::Invalid;
             MaxOnOffFanRunTimeFraction = 0.0;
             CurrentEndTimeLast = 0.0;
             TimeStepSysLast = 0.0;

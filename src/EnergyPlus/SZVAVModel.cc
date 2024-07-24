@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -71,9 +71,6 @@ namespace SZVAVModel {
 
     // Module containing routines for general use
 
-    // Using/Aliasing
-    using DataHVACGlobals::Bisection;
-
     // Data
     // This module should not contain variables in the module sense as it is
     // intended strictly to provide "interfaces" to routines used by other
@@ -94,7 +91,7 @@ namespace SZVAVModel {
                         [[maybe_unused]] bool const HXUnitOn,
                         [[maybe_unused]] int const AirLoopNum,
                         Real64 &PartLoadRatio,
-                        [[maybe_unused]] DataHVACGlobals::CompressorOperation const CompressorONFlag)
+                        [[maybe_unused]] HVAC::CompressorOp const CompressorONFlag)
     {
 
         int constexpr MaxIter(100); // maximum number of iterations
@@ -206,7 +203,7 @@ namespace SZVAVModel {
         // Step 1: Determine boundary for region 1
         // calculate sensible load based on minimum air flow rate and specified supply air temperature limit
         if (SZVAVModel.ATMixerExists) {
-            if (SZVAVModel.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
+            if (SZVAVModel.ATMixerType == HVAC::MixerType::SupplySide) {
                 // Air terminal supply side mixer
                 lowBoundaryLoad =
                     minAirMassFlow * (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(SZVAVModel.ATMixerOutNode).Temp, ZoneHumRat) -
@@ -558,7 +555,7 @@ namespace SZVAVModel {
                         bool const HXUnitOn,
                         int const AirLoopNum,
                         Real64 &PartLoadRatio,
-                        DataHVACGlobals::CompressorOperation const CompressorONFlag)
+                        HVAC::CompressorOp const CompressorONFlag)
     {
 
         UnitarySystems::UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[SysIndex];
@@ -671,7 +668,7 @@ namespace SZVAVModel {
         // Step 1: Determine boundary for region 1
         // calculate sensible load based on minimum air flow rate and specified supply air temperature limit
         if (SZVAVModel.ATMixerExists) {
-            if (SZVAVModel.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
+            if (SZVAVModel.ATMixerType == HVAC::MixerType::SupplySide) {
                 // Air terminal supply side mixer
                 boundaryLoadMet =
                     minAirMassFlow * (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(SZVAVModel.ATMixerOutNode).Temp, ZoneHumRat) -

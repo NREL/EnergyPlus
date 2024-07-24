@@ -9,6 +9,7 @@ endif()
 set(test_src
     TestHelpers/IdfParser.cc
     TestHelpers/IdfParser.hh
+    TestHelpers/CustomMatchers.hh
     Fixtures/EnergyPlusFixture.cc
     Fixtures/EnergyPlusFixture.hh
     Fixtures/IdfParserFixture.hh
@@ -61,6 +62,7 @@ set(test_src
     ChillerConstantCOP.unit.cc
     ChillerElectric.unit.cc
     ChillerElectricEIR.unit.cc
+    ChillerReformulatedEIR.unit.cc
     ChillerExhaustAbsorption.unit.cc
     ChillerGasAbsorption.unit.cc
     ChillerIndirectAbsorption.unit.cc
@@ -70,11 +72,13 @@ set(test_src
     Coils/CoilCoolingDXCurveFitSpeed.unit.cc
     Coils/CoilCoolingDXFixture.hh
     CondenserLoopTowers.unit.cc
+    Construction.unit.cc
     ConstructionInternalSource.unit.cc
     ConvectionCoefficients.unit.cc
     CoolTower.unit.cc
     CrossVentMgr.unit.cc
     CurveManager.unit.cc
+    CustomMatchers.unit.cc
     DElightManager.unit.cc
     DOASEffectOnZoneSizing.unit.cc
     DXCoils.unit.cc
@@ -120,6 +124,7 @@ set(test_src
     GeneralRoutines.unit.cc
     GroundHeatExchangers.unit.cc
     HVACControllers.unit.cc
+    HVACCooledBeam.unit.cc
     HVACDXSystem.unit.cc
     HVACDXHeatPumpSystem.unit.cc
     HVACFan.unit.cc
@@ -150,6 +155,7 @@ set(test_src
     ICSCollector.unit.cc
     IceThermalStorage.unit.cc
     IdfParser.unit.cc
+    IndoorGreen.unit.cc
     InputProcessor.unit.cc
     IntegratedHeatPump.unit.cc
     InternalHeatGains.unit.cc
@@ -196,6 +202,7 @@ set(test_src
     Psychrometrics.unit.cc
     Pumps.unit.cc
     PurchasedAirManager.unit.cc
+    RefrigeratedCase.unit.cc
     ReportCoilSelection.unit.cc
     ResultsFramework.unit.cc
     RoomAirModelUserTempPattern.unit.cc
@@ -219,8 +226,8 @@ set(test_src
     SizeWaterHeatingCoil.unit.cc
     SizingAnalysisObjects.unit.cc
     SizingManager.unit.cc
+    SolarCollectors.unit.cc
     SolarShading.unit.cc
-    SortAndStringUtilities.unit.cc
     Standard621SimplifiedProcedure.unit.cc
     StandardRatings.unit.cc
     StringUtilities.unit.cc
@@ -230,6 +237,7 @@ set(test_src
     SwimmingPool.unit.cc
     SystemAvailabilityManager.unit.cc
     SystemReports.unit.cc
+    Timer.unit.cc
     ThermalChimney.unit.cc
     ThermalComfort.unit.cc
     TranspiredCollector.unit.cc

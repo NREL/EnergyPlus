@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -87,6 +87,7 @@ extern "C" {
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SystemReports.hh>
+#include <EnergyPlus/Timer.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 // Third Party Headers
 #include <fast_float/fast_float.h>
@@ -451,40 +452,6 @@ namespace Util {
             fsPerfLog.close();
         }
     }
-
-    Real64 epElapsedTime()
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   February 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // An alternative method for timing elapsed times is to call the standard
-        // Date_And_Time routine and set the "time".
-
-        // Return value
-        Real64 calctime; // calculated time based on hrs, minutes, seconds, milliseconds
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Array1D<Int32> clockvalues(8);
-        // value(1)   Current year
-        // value(2)   Current month
-        // value(3)   Current day
-        // value(4)   Time difference with respect to UTC in minutes (0-59)
-        // value(5)   Hour of the day (0-23)
-        // value(6)   Minutes (0-59)
-        // value(7)   Seconds (0-59)
-        // value(8)   Milliseconds (0-999)
-
-        date_and_time(_, _, _, clockvalues);
-        calctime = clockvalues(5) * 3600.0 + clockvalues(6) * 60.0 + clockvalues(7) + clockvalues(8) / 1000.0;
-
-        return calctime;
-    }
-
 } // namespace Util
 
 int AbortEnergyPlus(EnergyPlusData &state)
@@ -587,17 +554,8 @@ int AbortEnergyPlus(EnergyPlusData &state)
     NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
 
     // catch up with timings if in middle
-    state.dataSysVars->Time_Finish = Util::epElapsedTime();
-    if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
-    state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
-    if (state.dataSysVars->Elapsed_Time < 0.0) state.dataSysVars->Elapsed_Time = 0.0;
-    Hours = state.dataSysVars->Elapsed_Time / 3600.0;
-    state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
-    Minutes = state.dataSysVars->Elapsed_Time / 60.0;
-    state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
-    Seconds = state.dataSysVars->Elapsed_Time;
-    if (Seconds < 0.0) Seconds = 0.0;
-    const std::string Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
+    state.dataSysVars->runtimeTimer.tock();
+    const std::string Elapsed = state.dataSysVars->runtimeTimer.formatAsHourMinSecs();
 
     state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
@@ -727,20 +685,11 @@ int EndEnergyPlus(EnergyPlusData &state)
     NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
     strip(NumSevereDuringSizing);
 
-    state.dataSysVars->Time_Finish = Util::epElapsedTime();
-    if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
-    state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
+    state.dataSysVars->runtimeTimer.tock();
     if (state.dataGlobal->createPerfLog) {
-        Util::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
+        Util::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->runtimeTimer.elapsedSeconds()));
     }
-    Hours = state.dataSysVars->Elapsed_Time / 3600.0;
-    state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
-    Minutes = state.dataSysVars->Elapsed_Time / 60.0;
-    state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
-    Seconds = state.dataSysVars->Elapsed_Time;
-    if (Seconds < 0.0) Seconds = 0.0;
-    const std::string Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
-
+    const std::string Elapsed = state.dataSysVars->runtimeTimer.formatAsHourMinSecs();
     state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
@@ -1653,24 +1602,6 @@ void ShowSevereDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh
     ShowSevereError(state, format("{}: {} = {}, duplicate name.", eoh.routineName, eoh.objectType, eoh.objectName));
 }
 
-void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
-{
-    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
-    ShowContinueError(state, format("{} = {}, item not found.", fieldName, fieldVal));
-}
-
-void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
-{
-    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
-    ShowContinueError(state, format("{} = {}, invalid key.", fieldName, fieldVal));
-}
-
-void ShowSevereInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
-{
-    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
-    ShowContinueError(state, format("{} = {}, invalid boolean (\"Yes\"/\"No\").", fieldName, fieldVal));
-}
-
 void ShowSevereEmptyField(
     EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view depFieldName, std::string_view depFieldVal)
 {
@@ -1679,11 +1610,54 @@ void ShowSevereEmptyField(
                       format("{} cannot be empty{}.", fieldName, depFieldName.empty() ? "" : format(" when {} = {}", depFieldName, depFieldVal)));
 }
 
-void ShowWarningInvalidKey(
-    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal, std::string_view defaultVal)
+void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, item not found.", fieldName, fieldVal));
+}
+
+void ShowSevereInvalidKey(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal, std::string_view msg)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, invalid key.", fieldName, fieldVal));
+    if (!msg.empty()) ShowContinueError(state, format(msg));
+}
+
+void ShowSevereInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, invalid boolean (\"Yes\"/\"No\").", fieldName, fieldVal));
+}
+
+void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{}", msg));
+}
+
+void ShowWarningItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, item not found", fieldName, fieldVal));
+}
+
+void ShowWarningCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg)
+{
+    ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{}", msg));
+}
+
+void ShowWarningInvalidKey(EnergyPlusData &state,
+                           ErrorObjectHeader const &eoh,
+                           std::string_view fieldName,
+                           std::string_view fieldVal,
+                           std::string_view defaultVal,
+                           std::string_view msg)
 {
     ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
     ShowContinueError(state, format("{} = {}, invalid key, {} will be used.", fieldName, fieldVal, defaultVal));
+    if (!msg.empty()) ShowContinueError(state, format(msg));
 }
 
 void ShowWarningInvalidBool(

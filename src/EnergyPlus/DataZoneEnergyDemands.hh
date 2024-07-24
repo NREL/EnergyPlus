@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,10 +72,12 @@ namespace DataZoneEnergyDemands {
         int StageNum = 0; // The stage number when staged thermostate is used:
         // 0 no load, >0 Heating stage, <0 Cooling stage
 
+        virtual ~ZoneSystemDemandData() = default;
+
         virtual void beginEnvironmentInit() = 0;
 
         virtual void setUpOutputVars(
-            EnergyPlusData &state, std::string_view prefix, std::string_view name, bool staged, bool attachMeters, int zoneMult, int listMult) = 0;
+            EnergyPlusData &state, std::string_view prefix, std::string const &name, bool staged, bool attachMeters, int zoneMult, int listMult) = 0;
     };
 
     struct ZoneSystemSensibleDemand : ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
@@ -105,7 +107,7 @@ namespace DataZoneEnergyDemands {
 
         void setUpOutputVars(EnergyPlusData &state,
                              std::string_view prefix,
-                             std::string_view name,
+                             std::string const &name,
                              bool staged,
                              bool attachMeters,
                              int zoneMult,
@@ -146,7 +148,7 @@ namespace DataZoneEnergyDemands {
 
         void setUpOutputVars(EnergyPlusData &state,
                              std::string_view prefix,
-                             std::string_view name,
+                             std::string const &name,
                              [[maybe_unused]] bool staged = false,
                              [[maybe_unused]] bool attachMeters = false,
                              [[maybe_unused]] int zoneMult = 0,
@@ -169,6 +171,10 @@ struct DataZoneEnergyDemandsData : BaseGlobalStruct
     EPVector<DataZoneEnergyDemands::ZoneSystemMoistureDemand> ZoneSysMoistureDemand;
     EPVector<DataZoneEnergyDemands::ZoneSystemSensibleDemand> spaceSysEnergyDemand;
     EPVector<DataZoneEnergyDemands::ZoneSystemMoistureDemand> spaceSysMoistureDemand;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

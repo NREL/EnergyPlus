@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -79,7 +79,42 @@ namespace PlantManager {
 
     void SetupReports(EnergyPlusData &state);
 
-    void InitializeLoops(EnergyPlusData &state, bool FirstHVACIteration); // true if first iteration of the simulation
+    void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData &thisLoop, int &rowCounter);
+
+    // void fillPlantToplogyRow(EnergyPlusData &state,
+    //                          const std::string_view &compName,
+    //                          const std::string_view &compType,
+    //                          const std::string_view &side,
+    //                          const std::string_view &parentType,
+    //                          const std::string_view &parentName,
+    //                          const std::string_view &fluidName,
+    //                          const int reportOffset);
+
+    void fillPlantToplogySplitterRow2(EnergyPlusData &state,
+                                      const std::string_view &loopType,
+                                      const std::string_view &loopName,
+                                      const std::string_view &side,
+                                      const std::string_view &splitterName,
+                                      int &rowCounter);
+
+    void fillPlantToplogyMixerRow2(EnergyPlusData &state,
+                                   const std::string_view &loopType,
+                                   const std::string_view &loopName,
+                                   const std::string_view &side,
+                                   const std::string_view &mixerName,
+                                   int &rowCounter);
+
+    void fillPlantToplogyComponentRow2(EnergyPlusData &state,
+                                       const std::string_view &loopType,
+                                       const std::string_view &loopName,
+                                       const std::string_view &side,
+                                       const std::string_view &branchName,
+                                       const std::string_view &compType,
+                                       const std::string_view &compName,
+                                       int &rowCounter);
+
+    void InitializeLoops(EnergyPlusData &state,
+                         bool FirstHVACIteration); // true if first iteration of the simulation
 
     void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state);
 
@@ -140,6 +175,10 @@ struct PlantMgrData : BaseGlobalStruct
     int NewOtherDemandSideCallingIndex = 0;
     int newCallingIndex = 0;
     PlantManager::EmptyPlantComponent dummyPlantComponent;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

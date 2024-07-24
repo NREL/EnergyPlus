@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -221,10 +221,13 @@ namespace ZoneTempPredictorCorrector {
         Real64 tempDepLoad = 0.0;
         Real64 airRelHum = 0.0;   // Zone relative humidity in percent
         Real64 AirPowerCap = 0.0; // "air power capacity"  Vol*VolMult*rho*Cp/timestep [W/degK]
+        int hmThermalMassMultErrIndex = 0;
+
+        virtual ~ZoneSpaceHeatBalanceData() = default;
 
         void beginEnvironmentInit(EnergyPlusData &state);
 
-        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name);
+        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string const &key);
 
         void predictSystemLoad(EnergyPlusData &state,
                                bool shortenTimeStepSys,
@@ -336,6 +339,14 @@ namespace ZoneTempPredictorCorrector {
                                  Real64 AirCap                  // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"rd
     );
 
+    void processInverseModelMultpHM(EnergyPlusData &state,
+                                    Real64 &multiplierHM, // Hybrid model thermal mass multiplier
+                                    Real64 &multSumHM,    // Sum of Hybrid model thermal mass multipliers
+                                    Real64 &countSumHM,   // Count of number of points in sum
+                                    Real64 &multAvgHM,    // Average of hybrid model mass multipier
+                                    int zoneNum           // Zone number for the hybrid model
+    );
+
     void InverseModelHumidity(EnergyPlusData &state,
                               int ZoneNum,                   // Zone number
                               Real64 LatentGain,             // Zone sum of latent gain
@@ -378,6 +389,8 @@ namespace ZoneTempPredictorCorrector {
     void OverrideAirSetPointsforEMSCntrl(EnergyPlusData &state);
 
     void FillPredefinedTableOnThermostatSetpoints(EnergyPlusData &state);
+
+    void FillPredefinedTableOnThermostatSchedules(EnergyPlusData &state);
 
     std::tuple<Real64, int, std::string>
     temperatureAndCountInSch(EnergyPlusData &state, int scheduleIndex, bool isSummer, int dayOfWeek, int hourOfDay);
@@ -445,6 +458,10 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
 
     EPVector<ZoneTempPredictorCorrector::ZoneHeatBalanceData> zoneHeatBalance;
     EPVector<ZoneTempPredictorCorrector::SpaceHeatBalanceData> spaceHeatBalance;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

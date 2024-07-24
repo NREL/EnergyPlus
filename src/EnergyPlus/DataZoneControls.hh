@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -85,8 +85,8 @@ namespace DataZoneControls {
 
         // these are all allocated to NumControlTypes, should be a struct allocated once
         Array1D_string ControlType; // from IDF, the "types" (string-should be an enum) of control modes for this particular thermostat - delete this
-        Array1D_string ControlTypeName;                           // from IDF, the names of the control modes for this particular thermostat
-        Array1D<DataHVACGlobals::ThermostatType> ControlTypeEnum; // from IDF, the enum types of each control mode for this particular thermostat
+        Array1D_string ControlTypeName;                // from IDF, the names of the control modes for this particular thermostat
+        Array1D<HVAC::ThermostatType> ControlTypeEnum; // from IDF, the enum types of each control mode for this particular thermostat
 
         // these now reflect that actual underlying setpoint temperature schedule indexes for each possible control type,
         // so they can be used to call directly to ScheduleValue(...)
@@ -292,6 +292,10 @@ struct DataZoneControlsData : BaseGlobalStruct
     Array1D<DataZoneControls::TStatObject> ComfortTStatObjects;
     Array1D<DataZoneControls::TStatObject> StagedTStatObjects;
     Array1D<DataZoneControls::ZoneStagedControls> StageControlledZone;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

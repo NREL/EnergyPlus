@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,9 +64,6 @@
 namespace EnergyPlus {
 
 namespace PackagedThermalStorageCoil {
-
-    // Using/Aliasing
-    using namespace DataHVACGlobals;
 
     // control types
     enum class PTSCCtrlType
@@ -440,7 +437,7 @@ namespace PackagedThermalStorageCoil {
     void SimTESCoil(EnergyPlusData &state,
                     std::string_view CompName, // name of the fan coil unit
                     int &CompIndex,
-                    int const FanOpMode, // allows parent object to control fan mode
+                    HVAC::FanOp const fanOp, // allows parent object to control fan mode
                     PTSCOperatingMode &TESOpMode,
                     ObjexxFCL::Optional<Real64 const> PartLoadRatio = _ // part load ratio (for single speed cycling unit)
     );
@@ -453,11 +450,11 @@ namespace PackagedThermalStorageCoil {
 
     void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum);
 
-    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
+    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, HVAC::FanOp const fanOp, Real64 const PartLoadRatio);
 
-    void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
+    void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, HVAC::FanOp const fanOp, Real64 const PartLoadRatio);
 
-    void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
+    void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, HVAC::FanOp const fanOp, Real64 const PartLoadRatio);
 
     void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum);
 
@@ -504,6 +501,10 @@ struct PackagedThermalStorageCoilData : BaseGlobalStruct
     Array1D_bool MySizeFlag;   // One time sizing flag
     Array1D_bool MyEnvrnFlag;  // flag for init once at start of environment
     Array1D_bool MyWarmupFlag; // flag for init after warmup complete
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

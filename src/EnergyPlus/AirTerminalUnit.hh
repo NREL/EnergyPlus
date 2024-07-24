@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -100,6 +100,8 @@ public: // Methods
     virtual Real64 getPrimAirDesignVolFlow() = 0;
 
     virtual int getTermUnitSizingIndex() = 0;
+
+    virtual void reportTerminalUnit(EnergyPlusData &state) = 0;
 
 protected:                                               // Data
     AirTerminalUnitType terminalType = notYetDetermined; // Type of air distribution unit  //Legacy For use during transition to OO

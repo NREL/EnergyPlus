@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -5507,36 +5507,6 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
                 thisTUFZSizing.DesHeatOAFlowFrac = 0.0;
             }
         }
-
-        // begin std 229 air terminal new table
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermZoneName,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.ZoneNum > 0 ? state.dataHeatBal->Zone(thisTUFZSizing.ZoneNum).Name : "N/A");
-
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermMinFlow,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.DesCoolVolFlowMin); // ? there is another name that looks similar (see the next line)
-
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermMinOutdoorFlow, thisTUFZSizing.ADUName, thisTUFZSizing.MinOA);
-
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermSupCoolingSP, thisTUFZSizing.ADUName, thisTUFZSizing.CoolDesTemp);
-
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermSupHeatingSP, thisTUFZSizing.ADUName, thisTUFZSizing.HeatDesTemp);
-
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermHeatingCap,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.DesHeatLoad); // ? DesHeatLoad ==? Heating capacity?
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermCoolingCap,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.DesCoolLoad); // ? DesCoolLoad ==? Cooling capacity?
-        // end std 229 air terminal new table
     }
 }
 } // namespace EnergyPlus::SizingManager

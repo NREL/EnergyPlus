@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -448,17 +448,17 @@ namespace HybridModel {
                         state.dataHybridModel->HybridModelZone(ZonePtr).InfiltrationCalc_C) {
                         SetupOutputVariable(state,
                                             "Zone Infiltration Hybrid Model Air Change Rate",
-                                            OutputProcessor::Unit::ach,
+                                            Constant::Units::ach,
                                             state.dataHeatBal->Zone(ZonePtr).InfilOAAirChangeRateHM,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                         SetupOutputVariable(state,
                                             "Zone Infiltration Hybrid Model Mass Flow Rate",
-                                            OutputProcessor::Unit::kg_s,
+                                            Constant::Units::kg_s,
                                             state.dataHeatBal->Zone(ZonePtr).MCPIHM,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                     }
                     if (state.dataHybridModel->HybridModelZone(ZonePtr).PeopleCountCalc_T ||
@@ -466,13 +466,21 @@ namespace HybridModel {
                         state.dataHybridModel->HybridModelZone(ZonePtr).PeopleCountCalc_C) {
                         SetupOutputVariable(state,
                                             "Zone Hybrid Model People Count",
-                                            OutputProcessor::Unit::None,
+                                            Constant::Units::None,
                                             state.dataHeatBal->Zone(ZonePtr).NumOccHM,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                     }
-
+                    if (state.dataHybridModel->HybridModelZone(ZonePtr).InternalThermalMassCalc_T) {
+                        SetupOutputVariable(state,
+                                            "Zone Hybrid Model Thermal Mass Multiplier",
+                                            Constant::Units::None,
+                                            state.dataHeatBal->Zone(ZonePtr).ZoneVolCapMultpSensHM,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
+                                            state.dataHeatBal->Zone(ZonePtr).Name);
+                    }
                 } else {
                     ShowSevereError(
                         state,

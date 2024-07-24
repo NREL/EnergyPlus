@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -175,6 +175,10 @@ struct SolarReflectionManagerData : BaseGlobalStruct
     Vector3<Real64> URay;            // Unit vector along ray from ground hit point
     Vector3<Real64> SurfVertToGndPt; // Vector from a vertex of possible obstructing surface to ground hit point (m)
     Vector3<Real64> SurfVert;        // Surface vertex (m)
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

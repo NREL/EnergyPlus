@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -346,44 +346,40 @@ namespace BaseboardElectric {
             auto &thisBaseboard = baseboard->baseboards(BaseboardNum);
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisBaseboard.Energy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisBaseboard.EquipName,
-                                {},
-                                eResourceSOV::EnergyTransfer,
-                                EndUseCatSOV::Baseboard,
-                                {},
-                                GroupSOV::HVAC); // "System");
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Baseboard);
 
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisBaseboard.Power,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisBaseboard.EquipName);
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisBaseboard.ElecUseLoad,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisBaseboard.EquipName,
-                                {},
-                                eResourceSOV::Electricity,
-                                EndUseCatSOV::Heating,
-                                {},
-                                GroupSOV::HVAC); // "System");
+                                Constant::eResource::Electricity,
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Heating);
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisBaseboard.ElecUseRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisBaseboard.EquipName);
         }
     }
@@ -450,7 +446,7 @@ namespace BaseboardElectric {
             std::string_view const CompName = baseboard.EquipName;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = baseboard.ZonePtr;
-            int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+            int SizingMethod = HVAC::HeatingCapacitySizing;
             int FieldNum = 1;
             std::string const SizingString = format("{} [W]", baseboard.FieldNames(FieldNum));
             int CapSizingMethod = baseboard.HeatingCapMethod;
@@ -519,7 +515,7 @@ namespace BaseboardElectric {
         //  thermal loss that could be accounted for with this efficiency input.
         Real64 Effic = baseboard.BaseboardEfficiency;
 
-        if (GetCurrentScheduleValue(state, baseboard.SchedPtr) > 0.0 && LoadMet >= DataHVACGlobals::SmallLoad) {
+        if (GetCurrentScheduleValue(state, baseboard.SchedPtr) > 0.0 && LoadMet >= HVAC::SmallLoad) {
 
             // if the load exceeds the capacity than the capacity is set to the BB limit.
             if (LoadMet > baseboard.NominalCapacity) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -86,7 +86,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -134,21 +133,11 @@ namespace AirflowNetwork {
     using Curve::CurveValue;
     using Curve::GetCurveIndex;
     using DataEnvironment::OutDryBulbTempAt;
-    using DataHVACGlobals::ContFanCycCoil;
-    using DataHVACGlobals::CycFanCycCoil;
-    using DataHVACGlobals::FanType_SimpleConstVolume;
-    using DataHVACGlobals::FanType_SimpleOnOff;
-    using DataHVACGlobals::FanType_SimpleVAV;
-    using DataHVACGlobals::FanType_ZoneExhaust;
     using DataSurfaces::cExtBoundCondition;
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::OtherSideCoefNoCalcExt;
     using DataSurfaces::SurfaceClass;
     using Fans::GetFanIndex;
-    using Fans::GetFanInletNode;
-    using Fans::GetFanOutletNode;
-    using Fans::GetFanType;
-    using Fans::GetFanVolFlow;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -176,7 +165,7 @@ namespace AirflowNetwork {
 
         // Locals
         int i;
-        int AFNSupplyFanType = 0;
+        HVAC::FanType AFNSupplyFanType = HVAC::FanType::Invalid;
 
         if (AirflowNetworkGetInputFlag) {
             get_input();
@@ -216,32 +205,32 @@ namespace AirflowNetwork {
                 }
             }
             Real64 FanMassFlowRate = 0.0;
-            int FanOperModeCyc = 0;
-            AFNSupplyFanType = 0;
+            HVAC::FanOp FanOperModeCyc = HVAC::FanOp::Invalid;
+            AFNSupplyFanType = HVAC::FanType::Invalid;
 
             for (i = 1; i <= DisSysNumOfCVFs; i++) {
-                AFNSupplyFanType = DisSysCompCVFData(i).FanTypeNum;
+                AFNSupplyFanType = DisSysCompCVFData(i).fanType;
                 FanMassFlowRate = max(FanMassFlowRate, m_state.dataLoopNodes->Node(DisSysCompCVFData(i).OutletNode).MassFlowRate);
                 // VAV take high priority
-                if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleVAV) {
-                    AFNSupplyFanType = DisSysCompCVFData(i).FanTypeNum;
+                if (DisSysCompCVFData(i).fanType == HVAC::FanType::VAV) {
+                    AFNSupplyFanType = DisSysCompCVFData(i).fanType;
                     break;
                 }
-                if (FanMassFlowRate > DataHVACGlobals::VerySmallMassFlow &&
-                    m_state.dataAirLoop->AirLoopAFNInfo(i).LoopFanOperationMode == CycFanCycCoil &&
+                if (FanMassFlowRate > HVAC::VerySmallMassFlow &&
+                    m_state.dataAirLoop->AirLoopAFNInfo(i).LoopFanOperationMode == HVAC::FanOp::Cycling &&
                     m_state.dataAirLoop->AirLoopAFNInfo(i).LoopSystemOnMassFlowrate > 0.0) {
-                    FanOperModeCyc = CycFanCycCoil;
-                    AFNSupplyFanType = DisSysCompCVFData(i).FanTypeNum;
-                    if (AFNSupplyFanType == FanType_SimpleOnOff) {
+                    FanOperModeCyc = HVAC::FanOp::Cycling;
+                    AFNSupplyFanType = DisSysCompCVFData(i).fanType;
+                    if (AFNSupplyFanType == HVAC::FanType::OnOff) {
                         break;
                     }
                 }
             }
             //            Revised to meet heat exchanger requirement
-            if ((FanMassFlowRate > DataHVACGlobals::VerySmallMassFlow) && (!FirstHVACIteration)) {
-                if (AFNSupplyFanType == FanType_SimpleOnOff && FanOperModeCyc == CycFanCycCoil) {
+            if ((FanMassFlowRate > HVAC::VerySmallMassFlow) && (!FirstHVACIteration)) {
+                if (AFNSupplyFanType == HVAC::FanType::OnOff && FanOperModeCyc == HVAC::FanOp::Cycling) {
                     AirflowNetworkFanActivated = true;
-                } else if (AFNSupplyFanType == FanType_SimpleVAV) {
+                } else if (AFNSupplyFanType == HVAC::FanType::VAV) {
                     if (present(Iter) && Iter > 1) AirflowNetworkFanActivated = true;
                 } else if (AirflowNetworkUnitarySystem) {
                     if (present(Iter) && Iter > 1) AirflowNetworkFanActivated = true;
@@ -250,19 +239,19 @@ namespace AirflowNetwork {
                 }
             }
         }
-        if (allocated(m_state.dataZoneEquip->ZoneEquipConfig) && m_state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0 &&
+        if (allocated(m_state.dataZoneEquip->ZoneEquipConfig) && m_state.dataAvail->NumHybridVentSysAvailMgrs > 0 &&
             allocated(m_state.dataAirSystemsData->PrimaryAirSystems)) {
             hybrid_ventilation_control();
         }
-        if (VentilationCtrl == 1 && m_state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0) {
+        if (ventCtrlStatus == Avail::VentCtrlStatus::Open && m_state.dataAvail->NumHybridVentSysAvailMgrs > 0) {
             AirflowNetworkFanActivated = false;
         }
 
         if (present(Iter) && present(ResimulateAirZone) && distribution_simulated) {
-            if (AirflowNetworkFanActivated && Iter < 3 && AFNSupplyFanType == FanType_SimpleOnOff) {
+            if (AirflowNetworkFanActivated && Iter < 3 && AFNSupplyFanType == HVAC::FanType::OnOff) {
                 ResimulateAirZone = true;
             }
-            if (AFNSupplyFanType == FanType_SimpleVAV) {
+            if (AFNSupplyFanType == HVAC::FanType::VAV) {
                 if (!AirflowNetworkFanActivated && Iter < 3) ResimulateAirZone = true;
             }
             if (AirflowNetworkUnitarySystem) {
@@ -473,27 +462,25 @@ namespace AirflowNetwork {
                 }
 
                 // This breaks the component model, need to fix
-                bool fanErrorFound = false;
-                int fanIndex;
-                GetFanIndex(m_state, thisObjectName, fanIndex, fanErrorFound);
-                if (fanErrorFound) {
+                int fanIndex = GetFanIndex(m_state, thisObjectName);
+                if (fanIndex == 0) {
                     ShowSevereError(m_state,
                                     format("{}: {} = {} is not found in Fan:ZoneExhaust objects.", RoutineName, CurrentModuleObject, thisObjectName));
                     success = false;
                 }
-                Real64 flowRate;
 
-                GetFanVolFlow(m_state, fanIndex, flowRate);
+                auto *fan = m_state.dataFans->fans(fanIndex);
+
+                Real64 flowRate = fan->maxAirFlowRate;
                 flowRate *= m_state.dataEnvrn->StdRhoAir;
                 bool nodeErrorsFound{false};
-                int inletNode = GetFanInletNode(m_state, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
-                int outletNode = GetFanOutletNode(m_state, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
+                int inletNode = fan->inletNodeNum;
+                int outletNode = fan->outletNodeNum;
                 if (nodeErrorsFound) {
                     success = false;
                 }
-                int fanType_Num;
-                GetFanType(m_state, thisObjectName, fanType_Num, fanErrorFound);
-                if (fanType_Num != FanType_ZoneExhaust) {
+                HVAC::FanType fanType = fan->type;
+                if (fanType != HVAC::FanType::Exhaust) {
                     ShowSevereError(m_state,
                                     format("{}: {} = {}. The specified Name is not found as a valid Fan:ZoneExhaust object.",
                                            RoutineName,
@@ -1366,82 +1353,84 @@ namespace AirflowNetwork {
                 m_state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string fan_name = Util::makeUPPER(fields.at("fan_name").get<std::string>());
-                std::string fan_type = fields.at("supply_fan_object_type").get<std::string>();
 
                 int fanIndex;
                 Real64 flowRate = 0.0;
-                int fanType_Num = 0;
                 int inletNode;
                 int outletNode;
 
-                if (Util::SameString(Util::makeUPPER(fan_type), "FAN:SYSTEMMODEL")) {
-                    m_state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(m_state, fan_name));
-                    fanIndex = HVACFan::getFanObjectVectorIndex(m_state, fan_name);
+                HVAC::FanType fanType = static_cast<HVAC::FanType>(
+                    getEnumValue(HVAC::fanTypeNamesUC, Util::makeUPPER(fields.at("supply_fan_object_type").get<std::string>())));
+
+                HVAC::FanType fanType2 = HVAC::FanType::Invalid;
+
+                if (fanType == HVAC::FanType::SystemModel) {
+                    fanIndex = Fans::GetFanIndex(m_state, fan_name);
                     if (fanIndex < 0) {
                         ShowSevereError(m_state, "...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).name);
                         success = false;
                     } else {
-                        flowRate = m_state.dataHVACFan->fanObjs[fanIndex]->designAirVolFlowRate;
-                        flowRate *= m_state.dataEnvrn->StdRhoAir;
+                        auto *fanSys = dynamic_cast<Fans::FanSystem *>(m_state.dataFans->fans(fanIndex));
+                        assert(fanSys != nullptr);
+                        flowRate = fanSys->maxAirFlowRate * m_state.dataEnvrn->StdRhoAir;
                         DisSysCompCVFData(i).FanModelFlag = true;
-                        inletNode = m_state.dataHVACFan->fanObjs[fanIndex]->inletNodeNum;
-                        outletNode = m_state.dataHVACFan->fanObjs[fanIndex]->outletNodeNum;
-                        if (m_state.dataHVACFan->fanObjs[fanIndex]->speedControl == HVACFan::FanSystem::SpeedControlMethod::Continuous) {
-                            fanType_Num = FanType_SimpleVAV;
+                        inletNode = fanSys->inletNodeNum;
+                        outletNode = fanSys->outletNodeNum;
+                        if (fanSys->speedControl == Fans::SpeedControl::Continuous) {
+                            fanType2 = HVAC::FanType::VAV;
                             VAVSystem = true;
                         } else {
-                            fanType_Num = FanType_SimpleOnOff;
+                            fanType2 = HVAC::FanType::OnOff;
                         }
-                        SupplyFanType = fanType_Num;
+                        supplyFanType = fanType2;
                     }
 
                 } else {
+                    fanIndex = GetFanIndex(m_state, fan_name);
 
-                    bool FanErrorFound = false;
-                    GetFanIndex(m_state, fan_name, fanIndex, FanErrorFound);
-
-                    if (FanErrorFound) {
-                        ShowSevereError(m_state, "...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).name);
+                    if (fanIndex == 0) {
+                        ErrorObjectHeader eoh{RoutineName, CurrentModuleObject, DisSysCompCVFData(i).name};
+                        ShowSevereItemNotFound(m_state, eoh, "Fan Name", fan_name);
                         success = false;
                     }
 
-                    GetFanVolFlow(m_state, fanIndex, flowRate);
-                    flowRate *= m_state.dataEnvrn->StdRhoAir;
+                    auto *fan = m_state.dataFans->fans(fanIndex);
+                    flowRate = fan->maxAirFlowRate * m_state.dataEnvrn->StdRhoAir;
 
-                    GetFanType(m_state, fan_name, fanType_Num, FanErrorFound);
-                    SupplyFanType = fanType_Num;
+                    fanType2 = fan->type;
+                    supplyFanType = fanType2;
                 }
 
-                if (!(fanType_Num == FanType_SimpleConstVolume || fanType_Num == FanType_SimpleOnOff || fanType_Num == FanType_SimpleVAV)) {
-                    ShowSevereError(m_state,
-                                    format(RoutineName) + "The Supply Fan Object Type in " + CurrentModuleObject + " = " + thisObjectName +
-                                        " is not a valid fan type.");
+                if (!(fanType2 == HVAC::FanType::Constant || fanType2 == HVAC::FanType::OnOff || fanType2 == HVAC::FanType::VAV)) {
+                    ShowSevereError(
+                        m_state,
+                        format("{}The Supply Fan Object Type in {} = {} is not a valid fan type.", RoutineName, CurrentModuleObject, thisObjectName));
                     ShowContinueError(m_state, "Valid fan types are  Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume, or Fan:SystemModel.");
                     success = false;
                 } else {
-                    if (Util::SameString(fan_type, "Fan:ConstantVolume") && fanType_Num == FanType_SimpleOnOff) {
-                        ShowSevereError(m_state, "The Supply Fan Object Type defined in " + CurrentModuleObject + " is " + fan_type);
+                    if (fanType == HVAC::FanType::Constant && fanType2 == HVAC::FanType::OnOff) {
+                        ShowSevereError(m_state, "The Supply Fan Object Type defined in " + CurrentModuleObject + " is Fan:ConstantVolume");
                         ShowContinueError(m_state, "The Supply Fan Object Type defined in an AirLoopHVAC is Fan:OnOff");
                         success = false;
-                    }
-                    if (Util::SameString(fan_type, "Fan:OnOff") && fanType_Num == FanType_SimpleConstVolume) {
-                        ShowSevereError(m_state, "The Supply Fan Object Type defined in " + CurrentModuleObject + " is " + fan_type);
+                    } else if (fanType == HVAC::FanType::OnOff && fanType2 == HVAC::FanType::Constant) {
+                        ShowSevereError(m_state, "The Supply Fan Object Type defined in " + CurrentModuleObject + " is Fan:SimpleOnOff");
                         ShowContinueError(m_state, "The Supply Fan Object Type defined in an AirLoopHVAC is Fan:ConstantVolume");
                         success = false;
                     }
                 }
                 bool ErrorsFound{false};
-                if (fanType_Num == FanType_SimpleConstVolume) {
-                    inletNode = GetFanInletNode(m_state, "Fan:ConstantVolume", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode(m_state, "Fan:ConstantVolume", fan_name, ErrorsFound);
+                auto *fan = m_state.dataFans->fans(fanIndex);
+                if (fanType2 == HVAC::FanType::Constant) {
+                    inletNode = fan->inletNodeNum;
+                    outletNode = fan->outletNodeNum;
                 }
-                if (fanType_Num == FanType_SimpleOnOff && !DisSysCompCVFData(i).FanModelFlag) {
-                    inletNode = GetFanInletNode(m_state, "Fan:OnOff", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode(m_state, "Fan:OnOff", fan_name, ErrorsFound);
+                if (fanType2 == HVAC::FanType::OnOff && !DisSysCompCVFData(i).FanModelFlag) {
+                    inletNode = fan->inletNodeNum;
+                    outletNode = fan->outletNodeNum;
                 }
-                if (fanType_Num == FanType_SimpleVAV && !DisSysCompCVFData(i).FanModelFlag) {
-                    inletNode = GetFanInletNode(m_state, "Fan:VariableVolume", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode(m_state, "Fan:VariableVolume", fan_name, ErrorsFound);
+                if (fanType2 == HVAC::FanType::VAV && !DisSysCompCVFData(i).FanModelFlag) {
+                    inletNode = fan->inletNodeNum;
+                    outletNode = fan->outletNodeNum;
                     VAVSystem = true;
                 }
 
@@ -1453,7 +1442,7 @@ namespace AirflowNetwork {
                 DisSysCompCVFData(i).Ctrl = 1.0;      // Control ratio
                 DisSysCompCVFData(i).FanIndex = fanIndex;
                 DisSysCompCVFData(i).FlowRate = flowRate;
-                DisSysCompCVFData(i).FanTypeNum = fanType_Num;
+                DisSysCompCVFData(i).fanType = fanType2;
                 DisSysCompCVFData(i).InletNode = inletNode;
                 DisSysCompCVFData(i).OutletNode = outletNode;
 
@@ -3582,9 +3571,9 @@ namespace AirflowNetwork {
         // Assign occupant ventilation control number from zone to surface
         for (int i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             int j = MultizoneSurfaceData(i).SurfNum;
-            if (m_state.dataSurface->SurfWinOriginalClass(j) == SurfaceClass::Window ||
-                m_state.dataSurface->SurfWinOriginalClass(j) == SurfaceClass::Door ||
-                m_state.dataSurface->SurfWinOriginalClass(j) == SurfaceClass::GlassDoor) {
+            auto const &surf = m_state.dataSurface->Surface(j);
+            if (surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::Door ||
+                surf.OriginalClass == SurfaceClass::GlassDoor) {
                 for (n = 1; n <= AirflowNetworkNumOfZones; ++n) {
                     if (MultizoneZoneData(n).ZoneNum == m_state.dataSurface->Surface(j).Zone) {
                         if (MultizoneZoneData(n).OccupantVentilationControlNum > 0 && MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) {
@@ -4621,6 +4610,8 @@ namespace AirflowNetwork {
                 int compnum = compnum_iter->second;
                 AirflowNetworkLinkageData(count).CompNum = compnum;
 
+                auto &surf = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum);
+
                 switch (AirflowNetworkLinkageData(count).element->type()) {
                 case ComponentType::DOP: {
                     // if (AirflowNetworkLinkageData(count).CompName ==
@@ -4630,26 +4621,23 @@ namespace AirflowNetwork {
                     //    if (AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::DOP) {
                     ++j;
                     AirflowNetworkLinkageData(count).DetOpenNum = j;
-                    MultizoneSurfaceData(count).Multiplier = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Multiplier;
-                    if (m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt < 10.0 ||
-                        m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt > 170.0) {
+                    MultizoneSurfaceData(count).Multiplier = surf.Multiplier;
+                    if (surf.Tilt < 10.0 || surf.Tilt > 170.0) {
                         ShowWarningError(m_state, "An AirflowNetwork:Multizone:Surface object has an air-flow opening corresponding to");
                         ShowContinueError(m_state, "window or door = " + MultizoneSurfaceData(count).SurfName + ", which is within ");
                         ShowContinueError(m_state, "10 deg of being horizontal. Airflows through large horizontal openings are poorly");
                         ShowContinueError(m_state, "modeled in the AirflowNetwork model resulting in only one-way airflow.");
                     }
-                    if (!(m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Window ||
-                          m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::GlassDoor ||
-                          m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Door ||
-                          m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
+                    if (!(surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::GlassDoor ||
+                          surf.OriginalClass == SurfaceClass::Door || surf.IsAirBoundarySurf)) {
                         ShowSevereError(m_state,
                                         format(RoutineName) +
                                             "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
                                             AirflowNetworkLinkageData(count).Name);
                         ErrorsFound = true;
                     }
-                    if (m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Door ||
-                        m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::GlassDoor) {
+
+                    if (surf.OriginalClass == SurfaceClass::Door || surf.OriginalClass == SurfaceClass::GlassDoor) {
                         if (MultizoneCompDetOpeningData(AirflowNetworkCompData(compnum).TypeNum).LVOType == 2) {
                             ShowSevereError(m_state,
                                             format(RoutineName) +
@@ -4662,9 +4650,8 @@ namespace AirflowNetwork {
                 } break;
                 case ComponentType::SOP: {
                     // if (AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::SOP) {
-                    MultizoneSurfaceData(count).Multiplier = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Multiplier;
-                    if (m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt < 10.0 ||
-                        m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt > 170.0) {
+                    MultizoneSurfaceData(count).Multiplier = surf.Multiplier;
+                    if (surf.Tilt < 10.0 || surf.Tilt > 170.0) {
                         ShowSevereError(m_state, "An AirflowNetwork:Multizone:Surface object has an air-flow opening corresponding to");
                         ShowContinueError(m_state, "window or door = " + MultizoneSurfaceData(count).SurfName + ", which is within");
                         ShowContinueError(m_state, "10 deg of being horizontal. Airflows through horizontal openings are not allowed.");
@@ -4672,10 +4659,8 @@ namespace AirflowNetwork {
                         ErrorsFound = true;
                     }
 
-                    if (!(m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Window ||
-                          m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::GlassDoor ||
-                          m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Door ||
-                          m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
+                    if (!(surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::GlassDoor ||
+                          surf.OriginalClass == SurfaceClass::Door || surf.IsAirBoundarySurf)) {
                         ShowSevereError(m_state,
                                         format(RoutineName) +
                                             "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
@@ -4685,7 +4670,7 @@ namespace AirflowNetwork {
                 } break;
                 case ComponentType::HOP: {
                     // if (AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::HOP) {
-                    MultizoneSurfaceData(count).Multiplier = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Multiplier;
+                    MultizoneSurfaceData(count).Multiplier = surf.Multiplier;
                     // Get linkage height from upper and lower zones
                     if (MultizoneZoneData(AirflowNetworkLinkageData(count).NodeNums[0]).ZoneNum > 0) {
                         AirflowNetworkLinkageData(count).NodeHeights[0] =
@@ -4714,10 +4699,7 @@ namespace AirflowNetwork {
                             ErrorsFound = true;
                         }
                     }
-                    if (!(m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt > 170.0 &&
-                          m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt < 190.0) &&
-                        !(m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt > -10.0 &&
-                          m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt < 10.0)) {
+                    if (!(surf.Tilt > 170.0 && surf.Tilt < 190.0) && !(surf.Tilt > -10.0 && surf.Tilt < 10.0)) {
                         ShowWarningError(m_state, "An AirflowNetwork:Multizone:Surface object has an air-flow opening corresponding to");
                         ShowContinueError(m_state, "window or door = " + MultizoneSurfaceData(count).SurfName + ", which is above");
                         ShowContinueError(m_state, "10 deg of being horizontal. Airflows through non-horizontal openings are not modeled");
@@ -4725,10 +4707,8 @@ namespace AirflowNetwork {
                                           "with the object of AirflowNetwork:Multizone:Component:HorizontalOpening = " +
                                               AirflowNetworkCompData(compnum).Name);
                     }
-                    if (!(m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Window ||
-                          m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::GlassDoor ||
-                          m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Door ||
-                          m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
+                    if (!(surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::GlassDoor ||
+                          surf.OriginalClass == SurfaceClass::Door || surf.IsAirBoundarySurf)) {
                         ShowSevereError(m_state,
                                         format(RoutineName) +
                                             "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
@@ -5273,7 +5253,7 @@ namespace AirflowNetwork {
         if (initializeOneTimeFlag) {
             exchangeData.allocate(m_state.dataGlobal->NumOfZones); // AirflowNetwork exchange data due to air-forced system
             for (i = 1; i <= DisSysNumOfCVFs; i++) {
-                if (DisSysCompCVFData(i).FanTypeNum == AirflowNetwork::FanType_SimpleOnOff) {
+                if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff) {
                     multiExchangeData.allocate(m_state.dataGlobal->NumOfZones);
                     break;
                 }
@@ -5284,38 +5264,38 @@ namespace AirflowNetwork {
                 for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
                     SetupOutputVariable(m_state,
                                         "AFN Zone Outdoor Air Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         exchangeData(i).SumMHr,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         Zone(i).Name);
                     SetupOutputVariable(m_state,
                                         "AFN Zone Mixing Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         exchangeData(i).SumMMHr,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         Zone(i).Name);
                     SetupOutputVariable(m_state,
                                         "AFN Zone Outdoor Air CO2 Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         exchangeData(i).SumMHrCO,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         Zone(i).Name);
                     SetupOutputVariable(m_state,
                                         "AFN Zone Mixing CO2 Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         exchangeData(i).SumMMHrCO,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         Zone(i).Name);
                     SetupOutputVariable(m_state,
                                         "AFN Zone Total CO2 Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         exchangeData(i).TotalCO2,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         Zone(i).Name);
                 }
             }
@@ -5324,39 +5304,39 @@ namespace AirflowNetwork {
                     if (!m_state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         SetupOutputVariable(m_state,
                                             "AFN Zone Outdoor Air Mass Flow Rate",
-                                            OutputProcessor::Unit::kg_s,
+                                            Constant::Units::kg_s,
                                             exchangeData(i).SumMHr,
-                                            OutputProcessor::SOVTimeStepType::System,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::System,
+                                            OutputProcessor::StoreType::Average,
                                             Zone(i).Name);
                         SetupOutputVariable(m_state,
                                             "AFN Zone Mixing Mass Flow Rate",
-                                            OutputProcessor::Unit::kg_s,
+                                            Constant::Units::kg_s,
                                             exchangeData(i).SumMMHr,
-                                            OutputProcessor::SOVTimeStepType::System,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::System,
+                                            OutputProcessor::StoreType::Average,
                                             Zone(i).Name);
                     }
                     SetupOutputVariable(m_state,
                                         "AFN Zone Outdoor Air Generic Air Contaminant Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         exchangeData(i).SumMHrGC,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         Zone(i).Name);
                     SetupOutputVariable(m_state,
                                         "AFN Zone Mixing Generic Air Contaminant Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         exchangeData(i).SumMMHrGC,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         Zone(i).Name);
                     SetupOutputVariable(m_state,
                                         "AFN Zone Total Generic Air Contaminant Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         exchangeData(i).TotalGC,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         Zone(i).Name);
                 }
             }
@@ -5551,7 +5531,7 @@ namespace AirflowNetwork {
         linkReport.allocate(AirflowNetworkNumOfLinks);             // Report link simulation variable in air distribution system
 
         for (i = 1; i <= DisSysNumOfCVFs; i++) {
-            if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
+            if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff) {
                 nodeReport.allocate(AirflowNetworkNumOfZones);
                 linkReport1.allocate(AirflowNetworkNumOfSurfaces);
                 break;
@@ -5575,7 +5555,7 @@ namespace AirflowNetwork {
 
         bool OnOffFanFlag = false;
         for (i = 1; i <= DisSysNumOfCVFs; i++) {
-            if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
+            if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff) {
                 OnOffFanFlag = true;
             }
         }
@@ -5584,92 +5564,92 @@ namespace AirflowNetwork {
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             SetupOutputVariable(m_state,
                                 "AFN Node Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 AirflowNetworkNodeSimu(i).TZ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 AirflowNetworkNodeData(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Node Humidity Ratio",
-                                OutputProcessor::Unit::kgWater_kgDryAir,
+                                Constant::Units::kgWater_kgDryAir,
                                 AirflowNetworkNodeSimu(i).WZ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 AirflowNetworkNodeData(i).Name);
             if (m_state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 SetupOutputVariable(m_state,
                                     "AFN Node CO2 Concentration",
-                                    OutputProcessor::Unit::ppm,
+                                    Constant::Units::ppm,
                                     AirflowNetworkNodeSimu(i).CO2Z,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     AirflowNetworkNodeData(i).Name);
             }
             if (m_state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                 SetupOutputVariable(m_state,
                                     "AFN Node Generic Air Contaminant Concentration",
-                                    OutputProcessor::Unit::ppm,
+                                    Constant::Units::ppm,
                                     AirflowNetworkNodeSimu(i).GCZ,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     AirflowNetworkNodeData(i).Name);
             }
-            if (!(SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfZones)) {
+            if (!(supplyFanType == HVAC::FanType::OnOff && i <= AirflowNetworkNumOfZones)) {
                 SetupOutputVariable(m_state,
                                     "AFN Node Total Pressure",
-                                    OutputProcessor::Unit::Pa,
+                                    Constant::Units::Pa,
                                     AirflowNetworkNodeSimu(i).PZ,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     AirflowNetworkNodeData(i).Name);
             }
             if (AirflowNetworkNodeData(i).ExtNodeNum > 0) {
                 SetupOutputVariable(m_state,
                                     "AFN Node Wind Pressure",
-                                    OutputProcessor::Unit::Pa,
+                                    Constant::Units::Pa,
                                     AirflowNetworkNodeSimu(i).PZ,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     AirflowNetworkNodeData(i).Name);
             }
         }
 
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
-            if (!(SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfSurfaces)) {
+            if (!(supplyFanType == HVAC::FanType::OnOff && i <= AirflowNetworkNumOfSurfaces)) {
                 SetupOutputVariable(m_state,
                                     "AFN Linkage Node 1 to Node 2 Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
+                                    Constant::Units::kg_s,
                                     linkReport(i).FLOW,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     AirflowNetworkLinkageData(i).Name);
                 SetupOutputVariable(m_state,
                                     "AFN Linkage Node 2 to Node 1 Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
+                                    Constant::Units::kg_s,
                                     linkReport(i).FLOW2,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     AirflowNetworkLinkageData(i).Name);
                 SetupOutputVariable(m_state,
                                     "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     linkReport(i).VolFLOW,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     AirflowNetworkLinkageData(i).Name);
                 SetupOutputVariable(m_state,
                                     "AFN Linkage Node 2 to Node 1 Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     linkReport(i).VolFLOW2,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     AirflowNetworkLinkageData(i).Name);
                 SetupOutputVariable(m_state,
                                     "AFN Linkage Node 1 to Node 2 Pressure Difference",
-                                    OutputProcessor::Unit::Pa,
+                                    Constant::Units::Pa,
                                     AirflowNetworkLinkSimu(i).DP,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     AirflowNetworkLinkageData(i).Name);
             }
         }
@@ -5685,10 +5665,10 @@ namespace AirflowNetwork {
                 SurfNum = MultizoneSurfaceData(i).SurfNum;
                 SetupOutputVariable(m_state,
                                     "AFN Surface Venting Window or Door Opening Factor",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     MultizoneSurfaceData(i).OpenFactor,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     MultizoneSurfaceData(i).SurfName);
                 if (m_state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator(m_state,
@@ -5701,74 +5681,74 @@ namespace AirflowNetwork {
                 }
                 SetupOutputVariable(m_state,
                                     "AFN Surface Venting Window or Door Opening Modulation Multiplier",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     m_state.dataSurface->SurfWinVentingOpenFactorMultRep(SurfNum),
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     m_state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(m_state,
                                     "AFN Surface Venting Inside Setpoint Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     m_state.dataSurface->SurfWinInsideTempForVentingRep(SurfNum),
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     m_state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(m_state,
                                     "AFN Surface Venting Availability Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     m_state.dataSurface->SurfWinVentingAvailabilityRep(SurfNum),
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     m_state.dataSurface->Surface(SurfNum).Name);
                 if (MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
                     SetupOutputVariable(m_state,
                                         "AFN Surface Venting Window or Door Opening Factor at Previous Time Step",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         MultizoneSurfaceData(i).OpenFactorLast,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         MultizoneSurfaceData(i).SurfName);
                     SetupOutputVariable(m_state,
                                         "AFN Surface Opening Elapsed Time",
-                                        OutputProcessor::Unit::min,
+                                        Constant::Units::min,
                                         MultizoneSurfaceData(i).OpenElapsedTime,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         MultizoneSurfaceData(i).SurfName);
                     SetupOutputVariable(m_state,
                                         "AFN Surface Closing Elapsed Time",
-                                        OutputProcessor::Unit::min,
+                                        Constant::Units::min,
                                         MultizoneSurfaceData(i).CloseElapsedTime,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         MultizoneSurfaceData(i).SurfName);
                     SetupOutputVariable(m_state,
                                         "AFN Surface Opening Status at Previous Time Step",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         MultizoneSurfaceData(i).PrevOpeningstatus,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         MultizoneSurfaceData(i).SurfName);
                     SetupOutputVariable(m_state,
                                         "AFN Surface Opening Status",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         MultizoneSurfaceData(i).OpeningStatus,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         MultizoneSurfaceData(i).SurfName);
                     SetupOutputVariable(m_state,
                                         "AFN Surface Opening Probability Status",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         MultizoneSurfaceData(i).OpeningProbStatus,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         MultizoneSurfaceData(i).SurfName);
                     SetupOutputVariable(m_state,
                                         "AFN Surface Closing Probability Status",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         MultizoneSurfaceData(i).ClosingProbStatus,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         MultizoneSurfaceData(i).SurfName);
                 }
             }
@@ -5778,452 +5758,452 @@ namespace AirflowNetwork {
             // Multizone losses due to force air systems
             SetupOutputVariable(m_state,
                                 "AFN Zone Infiltration Sensible Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneInfiSenGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Infiltration Sensible Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiSenGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Ventilation Sensible Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneVentSenGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Ventilation Sensible Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneVentSenGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Mixing Sensible Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneMixSenGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Mixing Sensible Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneMixSenGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Infiltration Sensible Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneInfiSenLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Infiltration Sensible Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiSenLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Ventilation Sensible Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneVentSenLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Ventilation Sensible Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneVentSenLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Mixing Sensible Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneMixSenLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Mixing Sensible Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneMixSenLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Infiltration Latent Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Infiltration Latent Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Infiltration Latent Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Infiltration Latent Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Ventilation Latent Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneVentLatGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Ventilation Latent Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneVentLatGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Ventilation Latent Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneVentLatLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Ventilation Latent Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneVentLatLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Mixing Latent Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneMixLatGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Mixing Latent Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneMixLatGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Mixing Latent Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).MultiZoneMixLatLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Mixing Latent Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             // Supply leak losses due to force air systems
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Leaked Air Sensible Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).LeakSenGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Leaked Air Sensible Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).LeakSenGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Leaked Air Sensible Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).LeakSenLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Leaked Air Sensible Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).LeakSenLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Leaked Air Latent Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).LeakLatGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Leaked Air Latent Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).LeakLatGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Leaked Air Latent Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).LeakLatLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Leaked Air Latent Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).LeakLatLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             // Conduction losses due to force air systems
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Conduction Sensible Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).CondSenGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Conduction Sensible Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).CondSenGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Conduction Sensible Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).CondSenLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Conduction Sensible Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).CondSenLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Diffusion Latent Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).DiffLatGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Diffusion Latent Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).DiffLatGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Diffusion Latent Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).DiffLatLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Diffusion Latent Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).DiffLatLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             // Radiation losses due to forced air systems
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Radiation Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).RadGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Radiation Sensible Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).RadGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Radiation Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).RadLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Duct Radiation Sensible Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).RadLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             // Total losses due to force air systems
             SetupOutputVariable(m_state,
                                 "AFN Distribution Sensible Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).TotalSenGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Distribution Sensible Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).TotalSenGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Distribution Sensible Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).TotalSenLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Distribution Sensible Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).TotalSenLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Distribution Latent Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).TotalLatGainW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Distribution Latent Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).TotalLatGainJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Distribution Latent Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkReportData(i).TotalLatLossW,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Distribution Latent Heat Loss Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 AirflowNetworkReportData(i).TotalLatLossJ,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
         }
 
         for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
             SetupOutputVariable(m_state,
                                 "AFN Zone Infiltration Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 AirflowNetworkZnRpt(i).InfilVolume,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Infiltration Mass",
-                                OutputProcessor::Unit::kg,
+                                Constant::Units::kg,
                                 AirflowNetworkZnRpt(i).InfilMass,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Infiltration Air Change Rate",
-                                OutputProcessor::Unit::ach,
+                                Constant::Units::ach,
                                 AirflowNetworkZnRpt(i).InfilAirChangeRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Ventilation Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 AirflowNetworkZnRpt(i).VentilVolume,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Ventilation Mass",
-                                OutputProcessor::Unit::kg,
+                                Constant::Units::kg,
                                 AirflowNetworkZnRpt(i).VentilMass,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Ventilation Air Change Rate",
-                                OutputProcessor::Unit::ach,
+                                Constant::Units::ach,
                                 AirflowNetworkZnRpt(i).VentilAirChangeRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Mixing Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 AirflowNetworkZnRpt(i).MixVolume,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Mixing Mass",
-                                OutputProcessor::Unit::kg,
+                                Constant::Units::kg,
                                 AirflowNetworkZnRpt(i).MixMass,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 Zone(i).Name);
 
             SetupOutputVariable(m_state,
                                 "AFN Zone Exfiltration Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkZnRpt(i).ExfilTotalLoss,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Exfiltration Sensible Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkZnRpt(i).ExfilSensiLoss,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
             SetupOutputVariable(m_state,
                                 "AFN Zone Exfiltration Latent Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 AirflowNetworkZnRpt(i).ExfilLatentLoss,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 Zone(i).Name);
         }
 
@@ -6231,75 +6211,75 @@ namespace AirflowNetwork {
             for (i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                 SetupOutputVariable(m_state,
                                     "AFN Zone Average Pressure",
-                                    OutputProcessor::Unit::Pa,
+                                    Constant::Units::Pa,
                                     nodeReport(i).PZ,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     Zone(i).Name);
                 SetupOutputVariable(m_state,
                                     "AFN Zone On Cycle Pressure",
-                                    OutputProcessor::Unit::Pa,
+                                    Constant::Units::Pa,
                                     nodeReport(i).PZON,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     Zone(i).Name);
                 SetupOutputVariable(m_state,
                                     "AFN Zone Off Cycle Pressure",
-                                    OutputProcessor::Unit::Pa,
+                                    Constant::Units::Pa,
                                     nodeReport(i).PZOFF,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     Zone(i).Name);
             }
             for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
                 SetupOutputVariable(m_state,
                                     "AFN Linkage Node 1 to 2 Average Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
+                                    Constant::Units::kg_s,
                                     linkReport1(i).FLOW,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     MultizoneSurfaceData(i).SurfName);
                 SetupOutputVariable(m_state,
                                     "AFN Linkage Node 2 to 1 Average Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
+                                    Constant::Units::kg_s,
                                     linkReport1(i).FLOW2,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     MultizoneSurfaceData(i).SurfName);
                 SetupOutputVariable(m_state,
                                     "AFN Linkage Node 1 to 2 Average Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     linkReport1(i).VolFLOW,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     MultizoneSurfaceData(i).SurfName);
                 SetupOutputVariable(m_state,
                                     "AFN Linkage Node 2 to 1 Average Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     linkReport1(i).VolFLOW2,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     MultizoneSurfaceData(i).SurfName);
                 SetupOutputVariable(m_state,
                                     "AFN Surface Average Pressure Difference",
-                                    OutputProcessor::Unit::Pa,
+                                    Constant::Units::Pa,
                                     linkReport1(i).DP,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     MultizoneSurfaceData(i).SurfName);
                 SetupOutputVariable(m_state,
                                     "AFN Surface On Cycle Pressure Difference",
-                                    OutputProcessor::Unit::Pa,
+                                    Constant::Units::Pa,
                                     linkReport1(i).DPON,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     MultizoneSurfaceData(i).SurfName);
                 SetupOutputVariable(m_state,
                                     "AFN Surface Off Cycle Pressure Difference",
-                                    OutputProcessor::Unit::Pa,
+                                    Constant::Units::Pa,
                                     linkReport1(i).DPOFF,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     MultizoneSurfaceData(i).SurfName);
             }
         }
@@ -6330,11 +6310,8 @@ namespace AirflowNetwork {
         // This subroutine performs simulations of nodal pressures and linkage airflows.
 
         // Using/Aliasing
-        using DataHVACGlobals::VerySmallMassFlow;
         using General::SolveRoot;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
+        using HVAC::VerySmallMassFlow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -6432,9 +6409,9 @@ namespace AirflowNetwork {
             }
             if (MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) MultizoneSurfaceData(i).OpenFactor = 0.0;
             j = MultizoneSurfaceData(i).SurfNum;
-            if (m_state.dataSurface->SurfWinOriginalClass(j) == SurfaceClass::Window ||
-                m_state.dataSurface->SurfWinOriginalClass(j) == SurfaceClass::Door ||
-                m_state.dataSurface->SurfWinOriginalClass(j) == SurfaceClass::GlassDoor || m_state.dataSurface->Surface(j).IsAirBoundarySurf) {
+            auto const &surf = m_state.dataSurface->Surface(j);
+            if (surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::Door ||
+                surf.OriginalClass == SurfaceClass::GlassDoor || surf.IsAirBoundarySurf) {
                 if (MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
                     if (MultizoneSurfaceData(i).OpeningStatus == OpenStatus::FreeOperation) {
                         if (MultizoneSurfaceData(i).OpeningProbStatus == ProbabilityCheck::ForceChange) {
@@ -6513,9 +6490,9 @@ namespace AirflowNetwork {
             for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
                 if (i > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone) continue;
                 j = MultizoneSurfaceData(i).SurfNum;
-                if (m_state.dataSurface->SurfWinOriginalClass(j) == SurfaceClass::Window ||
-                    m_state.dataSurface->SurfWinOriginalClass(j) == SurfaceClass::Door ||
-                    m_state.dataSurface->SurfWinOriginalClass(j) == SurfaceClass::GlassDoor) {
+                auto const &surf = m_state.dataSurface->Surface(j);
+                if (surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::Door ||
+                    surf.OriginalClass == SurfaceClass::GlassDoor) {
                     if (MultizoneSurfaceData(i).HybridCtrlGlobal) {
                         MultizoneSurfaceData(i).OpenFactor = GlobalOpenFactor;
                     }
@@ -6551,7 +6528,7 @@ namespace AirflowNetwork {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinExhaustMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxExhaustMassFlowrate = Node(PressureControllerData(1).OANodeNum).MassFlowRate;
-            if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+            if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling &&
                 m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
                 MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
@@ -6638,7 +6615,7 @@ namespace AirflowNetwork {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinReliefMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxReliefMassFlowrate = Node(PressureControllerData(1).OANodeNum).MassFlowRate;
-            if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+            if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling &&
                 m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
                 MaxReliefMassFlowrate = MaxReliefMassFlowrate / m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
@@ -8913,7 +8890,7 @@ namespace AirflowNetwork {
             for (FanNum = 1; FanNum <= DisSysNumOfCVFs; ++FanNum) {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
             }
-            if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
+            if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
                 LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
                 // ON Cycle calculation
                 onceZoneFlag = false;
@@ -9233,7 +9210,7 @@ namespace AirflowNetwork {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) {
                     Tamb = OutDryBulbTempAt(m_state, AirflowNetworkLinkageData(i).NodeHeights[0]);
                     AirDensity = PsyRhoAirFnPbTdbW(m_state, m_state.dataEnvrn->OutBaroPress, Tamb, m_state.dataEnvrn->OutHumRat);
-                    if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
+                    if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
                         LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
                         linkReport(i).VolFLOW = linkReport1(i).FLOW / AirDensity;
                         linkReport(i).VolFLOW2 = linkReport1(i).FLOW2 / AirDensity;
@@ -9256,7 +9233,7 @@ namespace AirflowNetwork {
                                               (AirflowNetworkNodeSimu(n).PZ + AirflowNetworkNodeSimu(M).PZ) / 2.0 + m_state.dataEnvrn->OutBaroPress,
                                               (AirflowNetworkNodeSimu(n).TZ + AirflowNetworkNodeSimu(M).TZ) / 2.0,
                                               (AirflowNetworkNodeSimu(n).WZ + AirflowNetworkNodeSimu(M).WZ) / 2.0);
-                        if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
+                        if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
                             LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
                             linkReport(i).VolFLOW = linkReport(i).FLOW / AirDensity * (1.0 - LoopOnOffFanRunTimeFraction(AirLoopNum));
                             linkReport(i).VolFLOW2 = linkReport(i).FLOW2 / AirDensity * (1.0 - LoopOnOffFanRunTimeFraction(AirLoopNum));
@@ -9285,7 +9262,7 @@ namespace AirflowNetwork {
 
         // Using/Aliasing
         auto &NumPrimaryAirSys = m_state.dataHVACGlobal->NumPrimaryAirSys;
-        using DataHVACGlobals::VerySmallMassFlow;
+        using HVAC::VerySmallMassFlow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int n;
@@ -9442,7 +9419,7 @@ namespace AirflowNetwork {
         // Save zone loads from multizone calculation for later summation
         bool OnOffFanFlag = false;
         for (int i = 1; i <= DisSysNumOfCVFs; i++) {
-            if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
+            if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff) {
                 OnOffFanFlag = true;
                 break;
             }
@@ -9541,9 +9518,9 @@ namespace AirflowNetwork {
             OnOffFanRunTimeFraction = 1.0;
             LoopOnOffFanRunTimeFraction(AirLoopNum) = 1.0;
             // Calculate the part load ratio, can't be greater than 1 for a simple ONOFF fan
-            if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff &&
+            if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff &&
                 Node(DisSysCompCVFData(FanNum).InletNode).MassFlowRate > VerySmallMassFlow &&
-                m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
+                m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling) {
                 // Hard code here
                 PartLoadRatio = m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
                 LoopPartLoadRatio(AirLoopNum) = m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
@@ -9556,7 +9533,7 @@ namespace AirflowNetwork {
             }
             m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
 
-            if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && LoopPartLoadRatio(AirLoopNum) < 1.0) {
+            if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff && LoopPartLoadRatio(AirLoopNum) < 1.0) {
                 for (std::size_t i = 0; i < linkReport.size(); ++i) {
                     auto &r(linkReport[i]);
                     auto const &s(AirflowNetworkLinkSimu[i]);
@@ -9583,8 +9560,8 @@ namespace AirflowNetwork {
                 for (FanNum = 1; FanNum <= DisSysNumOfCVFs; ++FanNum) {
                     if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
                 }
-                if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff &&
-                    m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == ContFanCycCoil) {
+                if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff &&
+                    m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Continuous) {
                     OnOffRatio = std::abs((m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate -
                                            m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate) /
                                           m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate);
@@ -9796,7 +9773,7 @@ namespace AirflowNetwork {
             for (FanNum = 1; FanNum <= DisSysNumOfCVFs; ++FanNum) {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
             }
-            if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && OnOffFanRunTimeFraction < 1.0) {
+            if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff && OnOffFanRunTimeFraction < 1.0) {
                 for (int i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
                     exchangeData(i).MultiZoneSen *= OnOffFanRunTimeFraction;
                     exchangeData(i).MultiZoneLat *= OnOffFanRunTimeFraction;
@@ -9826,7 +9803,7 @@ namespace AirflowNetwork {
                         exchangeData(i).SumMMHrGC *= OnOffFanRunTimeFraction;
                     }
                 }
-                if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
+                if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling) {
                     for (int i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
                         exchangeData(i).SumMCp += multiExchangeData(i).SumMCp * (1.0 - OnOffFanRunTimeFraction);
                         exchangeData(i).SumMCpT += multiExchangeData(i).SumMCpT * (1.0 - OnOffFanRunTimeFraction);
@@ -9850,7 +9827,7 @@ namespace AirflowNetwork {
                 }
             }
 
-            if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff) {
+            if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff) {
                 for (int i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                     if (AirflowNetworkNodeData(i).AirLoopNum == AirLoopNum) {
                         nodeReport(i).PZ = AirflowNetworkNodeSimu(i).PZ * LoopPartLoadRatio(AirLoopNum) +
@@ -10161,7 +10138,6 @@ namespace AirflowNetwork {
         using namespace DataLoopNode;
         auto &NumPrimaryAirSys = m_state.dataHVACGlobal->NumPrimaryAirSys;
         using DXCoils::SetDXCoilAirLoopNumber;
-        using Fans::SetFanAirLoopNumber;
         using HeatingCoils::SetHeatingCoilAirLoopNumber;
         using HVACStandAloneERV::GetStandAloneERVNodeNumber;
         using SplitterComponent::GetSplitterNodeNumbers;
@@ -10311,7 +10287,11 @@ namespace AirflowNetwork {
                         ErrorsFound = true;
                     } else {
                         NodeFound(i) = true;
-                        AirflowNetworkNodeData(zoneNum).EPlusNodeNum = i;
+                        for (int iZone = 1; iZone <= AirflowNetworkNumOfZones; iZone++) {
+                            if (MultizoneZoneData(iZone).ZoneNum == zoneNum) {
+                                AirflowNetworkNodeData(iZone).EPlusNodeNum = i;
+                            }
+                        }
                     }
                     break;
                 }
@@ -10491,12 +10471,17 @@ namespace AirflowNetwork {
                 m_state.afn->DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).AirLoopNum =
                     AirflowNetworkLinkageData(i).AirLoopNum;
                 if (m_state.afn->DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanModelFlag) {
-                    m_state.dataHVACFan
-                        ->fanObjs[m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
-                                      .FanIndex]
-                        ->AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans
+                        ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
+                                   .FanIndex)
+                        ->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans
+                        ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
+                                   .FanIndex)
+                        ->isAFNFan = true;
                 } else {
-                    SetFanAirLoopNumber(m_state, n, AirflowNetworkLinkageData(i).AirLoopNum);
+                    m_state.dataFans->fans(n)->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans->fans(n)->isAFNFan = true;
                 }
             }
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == iEPlusComponentType::COI) {
@@ -10635,7 +10620,22 @@ namespace AirflowNetwork {
                     } else {
                         SetDXCoilAirLoopNumber(m_state, DisSysCompCoilData(i).name, DisSysCompCoilData(i).AirLoopNum);
                     }
-
+                } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC:MULTISTAGE") {
+                    ValidateComponent(
+                        m_state, "Coil:Heating:Electric:MultiStage", DisSysCompCoilData(i).name, IsNotOK, format(RoutineName) + CurrentModuleObject);
+                    if (IsNotOK) {
+                        ErrorsFound = true;
+                    } else {
+                        SetHeatingCoilAirLoopNumber(m_state, DisSysCompCoilData(i).name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
+                    }
+                } else if (SELECT_CASE_var == "COIL:HEATING:GAS:MULTISTAGE") {
+                    ValidateComponent(
+                        m_state, "Coil:Heating:Gas:MultiStage", DisSysCompCoilData(i).name, IsNotOK, format(RoutineName) + CurrentModuleObject);
+                    if (IsNotOK) {
+                        ErrorsFound = true;
+                    } else {
+                        SetHeatingCoilAirLoopNumber(m_state, DisSysCompCoilData(i).name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
+                    }
                 } else {
                     ShowSevereError(m_state, format(RoutineName) + CurrentModuleObject + " Invalid coil type = " + DisSysCompCoilData(i).name);
                     ErrorsFound = true;
@@ -10662,7 +10662,7 @@ namespace AirflowNetwork {
                 if (LocalError) ErrorsFound = true;
                 if (VAVSystem) {
                     for (int j = 1; j <= DisSysNumOfCVFs; j++) {
-                        if (DisSysCompCVFData(j).FanTypeNum == FanType_SimpleVAV) {
+                        if (DisSysCompCVFData(j).fanType == HVAC::FanType::VAV) {
                             if (DisSysCompCVFData(j).AirLoopNum == DisSysCompTermUnitData(i).AirLoopNum &&
                                 !Util::SameString(DisSysCompTermUnitData(i).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat")) {
                                 ShowSevereError(m_state,
@@ -10883,14 +10883,14 @@ namespace AirflowNetwork {
         if (DisSysNumOfCVFs > 1) {
             bool OnOffFanFlag = false;
             for (int i = 1; i <= DisSysNumOfCVFs; i++) {
-                if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff && !DisSysCompCVFData(i).FanModelFlag) {
+                if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff && !DisSysCompCVFData(i).FanModelFlag) {
                     OnOffFanFlag = true;
                     break;
                 }
-                if (DisSysCompCVFData(i).FanModelFlag && DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
-                    int fanIndex = HVACFan::getFanObjectVectorIndex(m_state, DisSysCompCVFData(i).name);
-                    if (m_state.dataHVACFan->fanObjs[fanIndex]->AirPathFlag) {
-                        DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
+                if (DisSysCompCVFData(i).FanModelFlag && DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff) {
+                    int fanIndex = Fans::GetFanIndex(m_state, DisSysCompCVFData(i).name);
+                    if (m_state.dataFans->fans(fanIndex)->airPathFlag) {
+                        DisSysCompCVFData(i).fanType = HVAC::FanType::Constant;
                     } else {
                         OnOffFanFlag = true;
                         break;
@@ -10902,13 +10902,13 @@ namespace AirflowNetwork {
                     if (!m_state.dataZoneEquip->ZoneEquipConfig(AirflowNetworkNodeData(j).EPlusZoneNum).IsControlled) continue;
                     for (int i = 1; i <= DisSysNumOfCVFs; i++) {
                         if (DisSysCompCVFData(i).AirLoopNum == AirflowNetworkNodeData(j).AirLoopNum &&
-                            DisSysCompCVFData(i).FanTypeNum != FanType_SimpleOnOff) {
+                            DisSysCompCVFData(i).fanType != HVAC::FanType::OnOff) {
                             SetupOutputVariable(m_state,
                                                 "AFN Node Total Pressure",
-                                                OutputProcessor::Unit::Pa,
+                                                Constant::Units::Pa,
                                                 AirflowNetworkNodeSimu(j).PZ,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 AirflowNetworkNodeData(j).Name);
                         }
                     }
@@ -10919,41 +10919,41 @@ namespace AirflowNetwork {
                         continue;
                     for (int j = 1; j <= DisSysNumOfCVFs; j++) {
                         if (DisSysCompCVFData(j).AirLoopNum == AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).AirLoopNum &&
-                            DisSysCompCVFData(j).FanTypeNum != FanType_SimpleOnOff) {
+                            DisSysCompCVFData(j).fanType != HVAC::FanType::OnOff) {
                             SetupOutputVariable(m_state,
                                                 "AFN Linkage Node 1 to Node 2 Mass Flow Rate",
-                                                OutputProcessor::Unit::kg_s,
+                                                Constant::Units::kg_s,
                                                 linkReport(i).FLOW,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 AirflowNetworkLinkageData(i).Name);
                             SetupOutputVariable(m_state,
                                                 "AFN Linkage Node 2 to Node 1 Mass Flow Rate",
-                                                OutputProcessor::Unit::kg_s,
+                                                Constant::Units::kg_s,
                                                 linkReport(i).FLOW2,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 AirflowNetworkLinkageData(i).Name);
                             SetupOutputVariable(m_state,
                                                 "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
-                                                OutputProcessor::Unit::m3_s,
+                                                Constant::Units::m3_s,
                                                 linkReport(i).VolFLOW,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 AirflowNetworkLinkageData(i).Name);
                             SetupOutputVariable(m_state,
                                                 "AFN Linkage Node 2 to Node 1 Volume Flow Rate",
-                                                OutputProcessor::Unit::m3_s,
+                                                Constant::Units::m3_s,
                                                 linkReport(i).VolFLOW2,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 AirflowNetworkLinkageData(i).Name);
                             SetupOutputVariable(m_state,
                                                 "AFN Linkage Node 1 to Node 2 Pressure Difference",
-                                                OutputProcessor::Unit::Pa,
+                                                Constant::Units::Pa,
                                                 AirflowNetworkLinkSimu(i).DP,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 AirflowNetworkLinkageData(i).Name);
                         }
                     }
@@ -10963,10 +10963,10 @@ namespace AirflowNetwork {
         bool FanModelConstFlag = false;
         for (int i = 1; i <= DisSysNumOfCVFs; i++) {
             if (DisSysCompCVFData(i).FanModelFlag) {
-                int fanIndex = HVACFan::getFanObjectVectorIndex(m_state, DisSysCompCVFData(i).name);
-                if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff && m_state.dataHVACFan->fanObjs[fanIndex]->AirPathFlag) {
-                    DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
-                    SupplyFanType = FanType_SimpleConstVolume;
+                int fanIndex = Fans::GetFanIndex(m_state, DisSysCompCVFData(i).name); // What is this accomplishing here?
+                if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff && m_state.dataFans->fans(fanIndex)->airPathFlag) {
+                    DisSysCompCVFData(i).fanType = HVAC::FanType::Constant;
+                    supplyFanType = HVAC::FanType::Constant;
                     FanModelConstFlag = true;
                     break;
                 }
@@ -10974,41 +10974,41 @@ namespace AirflowNetwork {
         }
         if (FanModelConstFlag) {
             for (int i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
-                if (SupplyFanType == FanType_SimpleConstVolume) {
+                if (supplyFanType == HVAC::FanType::Constant) {
                     SetupOutputVariable(m_state,
                                         "AFN Linkage Node 1 to Node 2 Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         linkReport(i).FLOW,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         AirflowNetworkLinkageData(i).Name);
                     SetupOutputVariable(m_state,
                                         "AFN Linkage Node 2 to Node 1 Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         linkReport(i).FLOW2,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         AirflowNetworkLinkageData(i).Name);
                     SetupOutputVariable(m_state,
                                         "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
-                                        OutputProcessor::Unit::m3_s,
+                                        Constant::Units::m3_s,
                                         linkReport(i).VolFLOW,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         AirflowNetworkLinkageData(i).Name);
                     SetupOutputVariable(m_state,
                                         "AFN Linkage Node 2 to Node 1 Volume Flow Rate",
-                                        OutputProcessor::Unit::m3_s,
+                                        Constant::Units::m3_s,
                                         linkReport(i).VolFLOW2,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         AirflowNetworkLinkageData(i).Name);
                     SetupOutputVariable(m_state,
                                         "AFN Linkage Node 1 to Node 2 Pressure Difference",
-                                        OutputProcessor::Unit::Pa,
+                                        Constant::Units::Pa,
                                         AirflowNetworkLinkSimu(i).DP,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         AirflowNetworkLinkageData(i).Name);
                 }
             }
@@ -11090,15 +11090,9 @@ namespace AirflowNetwork {
             switch (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum) {
             case iComponentTypeNum::CVF: { // 'CVF'
                 int typeNum = AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum;
-                if (DisSysCompCVFData(typeNum).FanTypeNum == FanType_SimpleVAV) {
-                    if (DisSysCompCVFData(typeNum).FanModelFlag) {
-                        DisSysCompCVFData(typeNum).MaxAirMassFlowRate =
-                            m_state.dataHVACFan->fanObjs[DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * m_state.dataEnvrn->StdRhoAir;
-                    } else {
-                        Real64 FanFlow; // Return type
-                        GetFanVolFlow(m_state, DisSysCompCVFData(typeNum).FanIndex, FanFlow);
-                        DisSysCompCVFData(typeNum).MaxAirMassFlowRate = FanFlow * m_state.dataEnvrn->StdRhoAir;
-                    }
+                if (DisSysCompCVFData(typeNum).fanType == HVAC::FanType::VAV) {
+                    DisSysCompCVFData(typeNum).MaxAirMassFlowRate =
+                        m_state.dataFans->fans(DisSysCompCVFData(typeNum).FanIndex)->maxAirFlowRate * m_state.dataEnvrn->StdRhoAir;
                 }
             } break;
             case iComponentTypeNum::FAN:
@@ -11247,16 +11241,7 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs hybrid ventilation control
 
-        auto &HybridVentSysAvailActualZoneNum = m_state.dataHVACGlobal->HybridVentSysAvailActualZoneNum;
-        auto &HybridVentSysAvailAirLoopNum = m_state.dataHVACGlobal->HybridVentSysAvailAirLoopNum;
-        auto &HybridVentSysAvailANCtrlStatus = m_state.dataHVACGlobal->HybridVentSysAvailANCtrlStatus;
-        auto &HybridVentSysAvailMaster = m_state.dataHVACGlobal->HybridVentSysAvailMaster;
-        auto &HybridVentSysAvailVentCtrl = m_state.dataHVACGlobal->HybridVentSysAvailVentCtrl;
-        auto &HybridVentSysAvailWindModifier = m_state.dataHVACGlobal->HybridVentSysAvailWindModifier;
-        auto &NumHybridVentSysAvailMgrs = m_state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr HybridVentCtrl_Close(2);                                                                 // Open windows or doors
         int constexpr IndividualCtrlType(0);                                                                   // Individual window or door control
         int constexpr GlobalCtrlType(1);                                                                       // Global window or door control
         static constexpr std::string_view RoutineName("AirflowNetwork::Solver::hybrid_ventilation_control: "); // include trailing blank space
@@ -11276,11 +11261,12 @@ namespace AirflowNetwork {
         }
         ControlType = IndividualCtrlType;
 
-        for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
-            int AirLoopNum = HybridVentSysAvailAirLoopNum(SysAvailNum);
-            VentilationCtrl = HybridVentSysAvailVentCtrl(SysAvailNum);
-            if (HybridVentSysAvailANCtrlStatus(SysAvailNum) > 0) {
-                ControlType = static_cast<int>(GetCurrentScheduleValue(m_state, HybridVentSysAvailANCtrlStatus(SysAvailNum)));
+        for (SysAvailNum = 1; SysAvailNum <= m_state.dataAvail->NumHybridVentSysAvailMgrs; ++SysAvailNum) {
+            auto &hybridVentMgr = m_state.dataAvail->HybridVentData(SysAvailNum);
+            int AirLoopNum = hybridVentMgr.AirLoopNum;
+            ventCtrlStatus = hybridVentMgr.ctrlStatus;
+            if (hybridVentMgr.ANCtrlStatus > 0) {
+                ControlType = static_cast<int>(GetCurrentScheduleValue(m_state, hybridVentMgr.ANCtrlStatus));
             }
             bool Found = false; // Logical to indicate whether a master surface is found or not
             int ActualZoneNum = 0;
@@ -11294,28 +11280,29 @@ namespace AirflowNetwork {
                             break;
                         }
                     } else {
-                        if (HybridVentSysAvailActualZoneNum(SysAvailNum) == ControlledZoneNum) {
-                            ActualZoneNum = HybridVentSysAvailActualZoneNum(SysAvailNum);
+                        if (hybridVentMgr.ControlledZoneNum == ControlledZoneNum) {
+                            ActualZoneNum = hybridVentMgr.ControlledZoneNum;
                         }
                     }
                 }
                 if (ActualZoneNum > 0) {
                     for (ANSurfaceNum = 1; ANSurfaceNum <= AirflowNetworkNumOfSurfaces; ++ANSurfaceNum) {
                         SurfNum = MultizoneSurfaceData(ANSurfaceNum).SurfNum;
-                        if (m_state.dataSurface->Surface(SurfNum).Zone == ActualZoneNum) {
-                            if (VentilationCtrl == HybridVentCtrl_Close) {
+                        auto const &surf = m_state.dataSurface->Surface(SurfNum);
+
+                        if (surf.Zone == ActualZoneNum) {
+                            if (ventCtrlStatus == Avail::VentCtrlStatus::Close) {
                                 MultizoneSurfaceData(ANSurfaceNum).HybridVentClose = true;
                             } else {
-                                if (HybridVentSysAvailWindModifier(SysAvailNum) >= 0) {
-                                    MultizoneSurfaceData(ANSurfaceNum).WindModifier = HybridVentSysAvailWindModifier(SysAvailNum);
+                                if (hybridVentMgr.WindModifier >= 0) {
+                                    MultizoneSurfaceData(ANSurfaceNum).WindModifier = hybridVentMgr.WindModifier;
                                 }
                                 if (ControlType == GlobalCtrlType) {
                                     MultizoneSurfaceData(ANSurfaceNum).HybridCtrlGlobal = true;
-                                    if (HybridVentSysAvailMaster(SysAvailNum) == ActualZoneNum) {
-                                        if ((m_state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::Window ||
-                                             m_state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::Door ||
-                                             m_state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::GlassDoor) &&
-                                            m_state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+                                    if (hybridVentMgr.Master == ActualZoneNum) {
+                                        if ((surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::Door ||
+                                             surf.OriginalClass == SurfaceClass::GlassDoor) &&
+                                            surf.ExtBoundCond == ExternalEnvironment) {
                                             MultizoneSurfaceData(ANSurfaceNum).HybridCtrlMaster = true;
                                             Found = true;
                                         }
@@ -11326,13 +11313,13 @@ namespace AirflowNetwork {
                     }
                 }
             }
-            if (ControlType == GlobalCtrlType && !Found && !m_state.dataGlobal->WarmupFlag && VentilationCtrl != HybridVentCtrl_Close) {
+            if (ControlType == GlobalCtrlType && !Found && !m_state.dataGlobal->WarmupFlag && ventCtrlStatus != Avail::VentCtrlStatus::Close) {
                 ++HybridGlobalErrCount;
                 if (HybridGlobalErrCount < 2) {
                     ShowWarningError(m_state,
                                      format("{}The hybrid ventilation control schedule value indicates global control in the controlled zone = {}",
                                             RoutineName,
-                                            m_state.dataHeatBal->Zone(HybridVentSysAvailMaster(SysAvailNum)).Name));
+                                            m_state.dataHeatBal->Zone(hybridVentMgr.Master).Name));
                     ShowContinueError(m_state,
                                       "The exterior surface containing an opening component in the controlled zone is not found.  No global control "
                                       "will not be modeled.");
@@ -12055,7 +12042,6 @@ namespace AirflowNetwork {
         int NodeMixer = 0;
         int NodeZoneIntlet = 0;
         int NodeZoneReturn = 0;
-        int NumOfBranches = 0;
         int AFNNodeNum;
         int AFNLinkNum;
         int AFNLinkNum1;
@@ -12857,19 +12843,19 @@ namespace AirflowNetwork {
         }
 
         switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
-        case DataHVACGlobals::ThermostatType::SingleHeating:
+        case HVAC::ThermostatType::SingleHeating:
             if (thisZoneHB.MAT <= state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) {
                 return false;
             }
             break;
-        case DataHVACGlobals::ThermostatType::SingleCooling:
+        case HVAC::ThermostatType::SingleCooling:
             if (thisZoneHB.MAT >= state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
                 return false;
             }
             break;
-        case DataHVACGlobals::ThermostatType::SingleHeatCool:
+        case HVAC::ThermostatType::SingleHeatCool:
             return false;
-        case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
+        case HVAC::ThermostatType::DualSetPointWithDeadBand:
             if (thisZoneHB.MAT < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) ||
                 thisZoneHB.MAT > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
                 return false;

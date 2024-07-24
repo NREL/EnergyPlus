@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -139,6 +139,7 @@ namespace HVACSingleDuctInduc {
         }
         void ReportIndUnit(EnergyPlusData &state);
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void reportTerminalUnit(EnergyPlusData &state);
     };
 
     void SimIndUnit(EnergyPlusData &state,
@@ -191,6 +192,10 @@ struct HVACSingleDuctInducData : BaseGlobalStruct
     Array1D_bool MyAirDistInitFlag;
     Array1D<HVACSingleDuctInduc::IndUnitData> IndUnit;
     bool ZoneEquipmentListChecked = false;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

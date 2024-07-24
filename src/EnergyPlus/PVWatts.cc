@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -175,43 +175,41 @@ namespace PVWatts {
         // Set up output variables
         SetupOutputVariable(state,
                             "Generator Produced DC Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             outputDCPower_,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             name_);
         SetupOutputVariable(state,
                             "Generator Produced DC Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             outputDCEnergy_,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             name_,
-                            {},
-                            "ElectricityProduced",
-                            "Photovoltaics",
-                            {},
-                            "Plant");
+                            Constant::eResource::ElectricityProduced,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Photovoltaic);
         SetupOutputVariable(state,
                             "Generator PV Cell Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             cellTemperature_,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             name_);
         SetupOutputVariable(state,
                             "Plane of Array Irradiance",
-                            OutputProcessor::Unit::W_m2,
+                            Constant::Units::W_m2,
                             planeOfArrayIrradiance_,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             name_);
         SetupOutputVariable(state,
                             "Shaded Percent",
-                            OutputProcessor::Unit::Perc,
+                            Constant::Units::Perc,
                             shadedPercent_,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             name_);
     }
 

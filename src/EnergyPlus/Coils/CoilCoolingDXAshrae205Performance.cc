@@ -58,7 +58,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -130,11 +129,11 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
 void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
                                            const DataLoopNode::NodeData &inletNode,
                                            DataLoopNode::NodeData &outletNode,
-                                           int, // useAlternateMode,
-                                           Real64 &PLR,
-                                           int &speedNum,
-                                           Real64 &speedRatio,
-                                           int const fanOpMode,
+                                           HVAC::CoilMode, // useAlternateMode,
+                                           //Real64 &PLR,
+                                           int const speedNum,
+                                           Real64 const speedRatio,
+                                           HVAC::FanOp const fanOpMode,
                                            DataLoopNode::NodeData &condInletNode,
                                            DataLoopNode::NodeData &condOutletNode,
                                            bool const, // singleMode,
@@ -145,7 +144,7 @@ void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
     this->recoveredEnergyRate = 0.0;
     this->NormalSHR = 0.0;
 
-    this->calculate(state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+    this->calculate(state, inletNode, outletNode, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     this->OperatingMode = 1;
 
 #if 0
@@ -188,10 +187,10 @@ void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
 void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
                                             const DataLoopNode::NodeData &inletNode,
                                             DataLoopNode::NodeData &outletNode,
-                                            Real64 &PLR,
-                                            int &speedNum,
-                                            Real64 &speedRatio,
-                                            int const fanOpMode,
+                                            //Real64 &PLR,
+                                            int const speedNum,
+                                            Real64 const speedRatio,
+                                            HVAC::FanOp const fanOpMode,
                                             DataLoopNode::NodeData &condInletNode,
                                             DataLoopNode::NodeData &) // condOutletNode)
 {
@@ -202,13 +201,13 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
     wasteHeatRate = 0; // currently unused; set here for all cases
 
     auto air_mass_flow_rate = inletNode.MassFlowRate;
-    if (fanOpMode == DataHVACGlobals::CycFanCycCoil && this_speed == 1) {
+    if (fanOpMode == HVAC::FanOp::Cycling && this_speed == 1) {
         // Entire system, fan and coil, are on or off for portions of a timestep
-        if (PLR > 0.0) {
+        if (speedRatio > 0.0) {
             // Inlet node mass flow rate is the time-averaged mass flow rate during cycling,
             // so we divide by PLR to calculate the instantaneous (on-cycle) flow rate.
             // Performance calculation depends on the on-cycle rate.
-            air_mass_flow_rate = air_mass_flow_rate / PLR;
+            air_mass_flow_rate = air_mass_flow_rate / speedRatio;
         } else {
             air_mass_flow_rate = 0.0;
         }
@@ -222,7 +221,7 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
         Psychrometrics::PsyRhFnTdbWPb(state, indoor_coil_entering_dry_bulb_temperature, inletNode.HumRat, ambient_pressure);
     auto outdoor_coil_dry_bulb_temperature = condInletNode.Temp;
 
-    if (((this_speed == 1) && (PLR == 0.0)) || (inletNode.MassFlowRate == 0.0)) {
+    if (((this_speed == 1) && (speedRatio == 0.0)) || (inletNode.MassFlowRate == 0.0)) {
         // Standby performance
         powerUse = representation->performance.performance_map_standby.calculate_performance(outdoor_coil_dry_bulb_temperature)
                        .gross_power; // TODO convert to Kelvin
@@ -268,13 +267,13 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
                                             .gross_total_capacity;
 
     powerUse = gross_power;
-    auto load = PLR * gross_capacity_maximum_speed;
+    auto load = speedRatio * gross_capacity_maximum_speed;
     auto cycling_ratio = load / gross_capacity_minimum_speed;
     auto cd = this->representation->performance.cycling_degradation_coefficient;
     auto part_load_factor = (1.0 - cd) + (cd * cycling_ratio);
     RTF = cycling_ratio / part_load_factor;
 
-    if (fanOpMode == DataHVACGlobals::ContFanCycCoil) {
+    if (fanOpMode == HVAC::FanOp::Continuous) {
         // Fan on, compressor cycling
         outletNode.HumRat = outletNode.HumRat * cycling_ratio + (1.0 - cycling_ratio) * inletNode.HumRat;
         outletNode.Enthalpy = outletNode.Enthalpy * cycling_ratio + (1.0 - cycling_ratio) * inletNode.Enthalpy;

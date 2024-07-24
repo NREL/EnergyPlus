@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -92,7 +92,9 @@ struct CoilCoolingDXCurveFitSpeed
     std::string parentName;
 
     CoilCoolingDXCurveFitSpeed() = default;
+
     explicit CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, const std::string &name);
+
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification &input_data);
 
     CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
@@ -157,15 +159,16 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
     // flow per capacity values, they will be overridden with alternate values later if it is 100% OA coil
-    Real64 minRatedVolFlowPerRatedTotCap = DataHVACGlobals::MinRatedVolFlowPerRatedTotCap1;
-    Real64 maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1;
+    Real64 minRatedVolFlowPerRatedTotCap = HVAC::MinRatedVolFlowPerRatedTotCap1;
+    Real64 maxRatedVolFlowPerRatedTotCap = HVAC::MaxRatedVolFlowPerRatedTotCap1;
 
     void CalcSpeedOutput(EnergyPlusData &state,
                          const DataLoopNode::NodeData &inletNode,
                          DataLoopNode::NodeData &outletNode,
-                         Real64 &PLR,
-                         int const fanOpMode,
+                         Real64 const _PLR,
+                         HVAC::FanOp const fanOp,
                          Real64 condInletTemp);
+
     void size(EnergyPlusData &state);
 
     Real64 CalcBypassFactor(EnergyPlusData &state,

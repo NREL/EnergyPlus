@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -213,250 +213,250 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
                 // Setup Report variables for the Nodes for HVAC Reporting, CurrentModuleObject='Node Name'
                 SetupOutputVariable(state,
                                     "System Node Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     state.dataLoopNodes->Node(NumNode).Temp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
+                                    Constant::Units::kg_s,
                                     Node(NumNode).MassFlowRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Humidity Ratio",
-                                    OutputProcessor::Unit::kgWater_kgDryAir,
+                                    Constant::Units::kgWater_kgDryAir,
                                     Node(NumNode).HumRat,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Setpoint Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     Node(NumNode).TempSetPoint,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Setpoint High Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     Node(NumNode).TempSetPointHi,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Setpoint Low Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     Node(NumNode).TempSetPointLo,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Setpoint Humidity Ratio",
-                                    OutputProcessor::Unit::kgWater_kgDryAir,
+                                    Constant::Units::kgWater_kgDryAir,
                                     Node(NumNode).HumRatSetPoint,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Setpoint Minimum Humidity Ratio",
-                                    OutputProcessor::Unit::kgWater_kgDryAir,
+                                    Constant::Units::kgWater_kgDryAir,
                                     Node(NumNode).HumRatMin,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Setpoint Maximum Humidity Ratio",
-                                    OutputProcessor::Unit::kgWater_kgDryAir,
+                                    Constant::Units::kgWater_kgDryAir,
                                     Node(NumNode).HumRatMax,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Relative Humidity",
-                                    OutputProcessor::Unit::Perc,
+                                    Constant::Units::Perc,
                                     state.dataLoopNodes->MoreNodeInfo(NumNode).RelHumidity,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Pressure",
-                                    OutputProcessor::Unit::Pa,
+                                    Constant::Units::Pa,
                                     Node(NumNode).Press,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Standard Density Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     state.dataLoopNodes->MoreNodeInfo(NumNode).VolFlowRateStdRho,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 if (Node(NumNode).FluidType == DataLoopNode::NodeFluidType::Air ||
                     Node(NumNode).FluidType == DataLoopNode::NodeFluidType::Water) { // setup volume flow rate report for actual/current density
                     SetupOutputVariable(state,
                                         "System Node Current Density Volume Flow Rate",
-                                        OutputProcessor::Unit::m3_s,
+                                        Constant::Units::m3_s,
                                         state.dataLoopNodes->MoreNodeInfo(NumNode).VolFlowRateCrntRho,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                     SetupOutputVariable(state,
                                         "System Node Current Density",
-                                        OutputProcessor::Unit::kg_m3,
+                                        Constant::Units::kg_m3,
                                         state.dataLoopNodes->MoreNodeInfo(NumNode).Density,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                     SetupOutputVariable(state,
                                         "System Node Specific Heat",
-                                        OutputProcessor::Unit::J_kgK,
+                                        Constant::Units::J_kgK,
                                         state.dataLoopNodes->MoreNodeInfo(NumNode).SpecificHeat,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                 }
 
                 SetupOutputVariable(state,
                                     "System Node Enthalpy",
-                                    OutputProcessor::Unit::J_kg,
+                                    Constant::Units::J_kg,
                                     state.dataLoopNodes->MoreNodeInfo(NumNode).ReportEnthalpy,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Wetbulb Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     state.dataLoopNodes->MoreNodeInfo(NumNode).WetBulbTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Dewpoint Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     state.dataLoopNodes->MoreNodeInfo(NumNode).AirDewPointTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Wind Speed",
-                                    OutputProcessor::Unit::m_s,
+                                    Constant::Units::m_s,
                                     Node(NumNode).OutAirWindSpeed,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Wind Direction",
-                                    OutputProcessor::Unit::deg,
+                                    Constant::Units::deg,
                                     Node(NumNode).OutAirWindDir,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Quality",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     Node(NumNode).Quality,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Height",
-                                    OutputProcessor::Unit::m,
+                                    Constant::Units::m,
                                     Node(NumNode).Height,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     NodeID(NumNode));
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state,
                                         "System Node Minimum Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         Node(NumNode).TempMin,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                     SetupOutputVariable(state,
                                         "System Node Maximum Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         Node(NumNode).TempMax,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                     SetupOutputVariable(state,
                                         "System Node Minimum Limit Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         Node(NumNode).MassFlowRateMin,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                     SetupOutputVariable(state,
                                         "System Node Maximum Limit Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         Node(NumNode).MassFlowRateMax,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                     SetupOutputVariable(state,
                                         "System Node Minimum Available Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         Node(NumNode).MassFlowRateMinAvail,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                     SetupOutputVariable(state,
                                         "System Node Maximum Available Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         Node(NumNode).MassFlowRateMaxAvail,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                     SetupOutputVariable(state,
                                         "System Node Setpoint Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         Node(NumNode).MassFlowRateSetPoint,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                     SetupOutputVariable(state,
                                         "System Node Requested Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         Node(NumNode).MassFlowRateRequest,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                     SetupOutputVariable(state,
                                         "System Node Last Timestep Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         Node(NumNode).TempLastTimestep,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                     SetupOutputVariable(state,
                                         "System Node Last Timestep Enthalpy",
-                                        OutputProcessor::Unit::J_kg,
+                                        Constant::Units::J_kg,
                                         Node(NumNode).EnthalpyLastTimestep,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                 }
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     SetupOutputVariable(state,
                                         "System Node CO2 Concentration",
-                                        OutputProcessor::Unit::ppm,
+                                        Constant::Units::ppm,
                                         Node(NumNode).CO2,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     SetupOutputVariable(state,
                                         "System Node Generic Air Contaminant Concentration",
-                                        OutputProcessor::Unit::ppm,
+                                        Constant::Units::ppm,
                                         Node(NumNode).GenContam,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         NodeID(NumNode));
                 }
             }
@@ -971,7 +971,6 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
     using FluidProperties::GetSatDensityRefrig;
     using FluidProperties::GetSatEnthalpyRefrig;
     using FluidProperties::GetSpecificHeatGlycol;
-    using OutputProcessor::ReqReportVariables;
     using Psychrometrics::CPCW;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
@@ -1033,21 +1032,21 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
         for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) {
             nodeReportingStrings.push_back(std::string(NodeReportingCalc + state.dataLoopNodes->NodeID(iNode)));
             nodeFluidNames.push_back(FluidProperties::GetGlycolNameByIndex(state, state.dataLoopNodes->Node(iNode).FluidIndex));
-            for (int iReq = 1; iReq <= state.dataOutputProcessor->NumOfReqVariables; ++iReq) {
-                if (Util::SameString(state.dataOutputProcessor->ReqRepVars(iReq).Key, state.dataLoopNodes->NodeID(iNode)) ||
-                    state.dataOutputProcessor->ReqRepVars(iReq).Key.empty()) {
-                    if (Util::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Wetbulb Temperature")) {
+
+            for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
+                if (Util::SameString(reqVar->key, state.dataLoopNodes->NodeID(iNode)) || reqVar->key.empty()) {
+                    if (Util::SameString(reqVar->name, "System Node Wetbulb Temperature")) {
                         state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) = true;
-                        NodeWetBulbSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
-                    } else if (Util::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Relative Humidity")) {
+                        NodeWetBulbSchedPtr(iNode) = reqVar->SchedPtr;
+                    } else if (Util::SameString(reqVar->name, "System Node Relative Humidity")) {
                         NodeRelHumidityRepReq(iNode) = true;
-                        NodeRelHumiditySchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
-                    } else if (Util::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Dewpoint Temperature")) {
+                        NodeRelHumiditySchedPtr(iNode) = reqVar->SchedPtr;
+                    } else if (Util::SameString(reqVar->name, "System Node Dewpoint Temperature")) {
                         NodeDewPointRepReq(iNode) = true;
-                        NodeDewPointSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
-                    } else if (Util::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Specific Heat")) {
+                        NodeDewPointSchedPtr(iNode) = reqVar->SchedPtr;
+                    } else if (Util::SameString(reqVar->name, "System Node Specific Heat")) {
                         NodeSpecificHeatRepReq(iNode) = true;
-                        NodeSpecificHeatSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
+                        NodeSpecificHeatSchedPtr(iNode) = reqVar->SchedPtr;
                     }
                 }
             }

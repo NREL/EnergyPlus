@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -5247,7 +5247,7 @@ Real64 CalcBeausoleilMorrisonMixedAssistedWall(EnergyPlusData &state,
 {
     std::string_view constexpr routineName = "CalcBeausoleilMorrisonMixedAssistedWall";
 
-    if ((std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff) && (Height != 0.0)) {
+    if ((std::abs(DeltaTemp) > HVAC::SmallTempDiff) && (Height != 0.0)) {
         Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(state, ZoneNum);
         Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
         return CalcBeausoleilMorrisonMixedAssistedWall(DeltaTemp, Height, SurfTemp, SupplyAirTemp, AirChangeRate);
@@ -5317,7 +5317,7 @@ Real64 CalcBeausoleilMorrisonMixedOpposingWall(EnergyPlusData &state,
 {
     std::string_view constexpr routineName = "CalcBeausoleilMorrisonMixedOpposingWall";
     ErrorObjectHeader eoh{routineName, "Zone", state.dataHeatBal->Zone(ZoneNum).Name};
-    if (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff) { // protect divide by zero
+    if (std::abs(DeltaTemp) > HVAC::SmallTempDiff) { // protect divide by zero
 
         if (Height == 0.0) {
             ShowWarningHydraulicDiameterZero(state, state.dataConvect->BMMixedOpposingWallErrorIDX2, eoh);
@@ -5447,7 +5447,7 @@ Real64 CalcBeausoleilMorrisonMixedStableFloor(EnergyPlusData &state,
 {
     std::string_view constexpr routineName = "CalcBeausoleilMorrisonMixedStableFloor";
 
-    if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
+    if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > HVAC::SmallTempDiff)) {
         Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(state, ZoneNum);
         Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
         return CalcBeausoleilMorrisonMixedStableFloor(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
@@ -5503,7 +5503,7 @@ Real64 CalcBeausoleilMorrisonMixedUnstableFloor(EnergyPlusData &state,
 )
 {
     std::string_view constexpr routineName = "CalcBeausoleilMorrisonMixedUnstableFloor";
-    if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
+    if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > HVAC::SmallTempDiff)) {
         Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(state, ZoneNum);
         Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
         return CalcBeausoleilMorrisonMixedUnstableFloor(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
@@ -5558,7 +5558,7 @@ Real64 CalcBeausoleilMorrisonMixedStableCeiling(EnergyPlusData &state,
 )
 {
     std::string_view constexpr routineName = "CalcBeausoleilMorrisonMixedStableCeiling";
-    if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
+    if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > HVAC::SmallTempDiff)) {
         Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(state, ZoneNum);
         Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
         return CalcBeausoleilMorrisonMixedStableCeiling(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
@@ -5615,7 +5615,7 @@ Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(EnergyPlusData &state,
 {
     std::string_view constexpr routineName = "CalcBeausoleilMorrisonMixedUnstableCeiling";
 
-    if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
+    if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > HVAC::SmallTempDiff)) {
         Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(state, ZoneNum);
         Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
         return CalcBeausoleilMorrisonMixedUnstableCeiling(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);

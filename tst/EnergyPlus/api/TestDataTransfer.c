@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,7 +70,13 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
 
         unsigned int arraySize;
         struct APIDataEntry *data = getAPIData(state, &arraySize); // inspect this to see what's available to exchange
-        const char **surfaceNames = getObjectNames(state, "BuildingSurface:Detailed", &arraySize);
+        // FILE *fp = fopen("/tmp/data.csv", "w");
+        // for (unsigned int a = 0; a < arraySize; a++) {
+        //     const struct APIDataEntry d = *(data + a);
+        //     fprintf(fp, "%s,%s,%s,%s,%s\n", d.what, d.name, d.key, d.type, d.unit);
+        // }
+        // fclose(fp);
+        char **surfaceNames = getObjectNames(state, "BuildingSurface:Detailed", &arraySize);
 
         if (arraySize == 0) {
             printf("Encountered a file with no BuildingSurface:Detailed, can't run this script on that file! Aborting!");

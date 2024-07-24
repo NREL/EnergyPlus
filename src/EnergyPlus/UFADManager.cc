@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -674,7 +674,7 @@ namespace RoomAir {
         } // END FLOOR
     }
 
-    static constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
+    static constexpr std::array<DataHeatBalance::IntGainType, 51> IntGainTypesOccupied = {
         DataHeatBalance::IntGainType::People,
         DataHeatBalance::IntGainType::WaterHeaterMixed,
         DataHeatBalance::IntGainType::WaterHeaterStratified,
@@ -686,6 +686,7 @@ namespace RoomAir {
         DataHeatBalance::IntGainType::HotWaterEquipment,
         DataHeatBalance::IntGainType::SteamEquipment,
         DataHeatBalance::IntGainType::OtherEquipment,
+        DataHeatBalance::IntGainType::IndoorGreen,
         DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
         DataHeatBalance::IntGainType::GeneratorFuelCell,
         DataHeatBalance::IntGainType::WaterUseEquipment,
@@ -704,10 +705,36 @@ namespace RoomAir {
         DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
         DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
         DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
-        DataHeatBalance::IntGainType::RefrigerationWalkIn};
+        DataHeatBalance::IntGainType::RefrigerationWalkIn,
+        DataHeatBalance::IntGainType::RefrigerationTransSysAirCooledGasCooler,
+        DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeMT,
+        DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeLT,
+        DataHeatBalance::IntGainType::Pump_VarSpeed,
+        DataHeatBalance::IntGainType::Pump_ConSpeed,
+        DataHeatBalance::IntGainType::Pump_Cond,
+        DataHeatBalance::IntGainType::PumpBank_VarSpeed,
+        DataHeatBalance::IntGainType::PumpBank_ConSpeed,
+        DataHeatBalance::IntGainType::PlantComponentUserDefined,
+        DataHeatBalance::IntGainType::CoilUserDefined,
+        DataHeatBalance::IntGainType::ZoneHVACForcedAirUserDefined,
+        DataHeatBalance::IntGainType::AirTerminalUserDefined,
+        DataHeatBalance::IntGainType::PackagedTESCoilTank,
+        DataHeatBalance::IntGainType::SecCoolingDXCoilSingleSpeed,
+        DataHeatBalance::IntGainType::SecHeatingDXCoilSingleSpeed,
+        DataHeatBalance::IntGainType::SecCoolingDXCoilTwoSpeed,
+        DataHeatBalance::IntGainType::SecCoolingDXCoilMultiSpeed,
+        DataHeatBalance::IntGainType::SecHeatingDXCoilMultiSpeed,
+        DataHeatBalance::IntGainType::ElectricLoadCenterConverter,
+        DataHeatBalance::IntGainType::FanSystemModel};
 
     static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesUpSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
                                                                                           DataHeatBalance::IntGainType::Lights};
+
+    // Explicitly list internal gains not applicable for UFAD
+    // Explicitly list internal gains not applicable for Displacement Vent
+    static constexpr std::array<DataHeatBalance::IntGainType, 2> ExcludedIntGainTypes = {
+        DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkCarbonDioxide,
+        DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam};
 
     void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
@@ -733,8 +760,6 @@ namespace RoomAir {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-        using InternalHeatGains::SumInternalConvectionGainsByTypes;
-        using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -781,12 +806,12 @@ namespace RoomAir {
         Real64 PowerPerPlume = zoneU.PowerPerPlume;
         // gains from occupants, task lighting, elec equip, gas equip, other equip, hot water equip, steam equip,
         // baseboards (nonthermostatic), water heater skin loss
-        Real64 ConvGainsOccSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+        Real64 ConvGainsOccSubzone = InternalHeatGains::SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
         if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-            ConvGainsOccSubzone += SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+            ConvGainsOccSubzone += InternalHeatGains::SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
         }
 
         // Add convection from pool cover to occupied region
@@ -794,11 +819,15 @@ namespace RoomAir {
 
         // gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 
-        Real64 ConvGainsUpSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
+        Real64 ConvGainsUpSubzone = InternalHeatGains::SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
         ConvGainsUpSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
         if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-            ConvGainsUpSubzone += SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
+            ConvGainsUpSubzone += InternalHeatGains::SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
         }
+
+        // Make sure all types of internal gains have been gathered
+        assert((int)(size(IntGainTypesOccupied) + size(IntGainTypesUpSubzone) + size(ExcludedIntGainTypes)) ==
+               (int)DataHeatBalance::IntGainType::Num);
 
         Real64 ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + thisZoneHB.SysDepZoneLoadsLagged;
         Real64 ZoneEquipConfigNum = zoneU.ZoneEquipPtr;

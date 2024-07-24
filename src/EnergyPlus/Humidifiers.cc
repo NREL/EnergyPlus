@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,7 +102,7 @@ namespace Humidifiers {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallMassFlow;
     using namespace ScheduleManager;
 
     void SimHumidifier(EnergyPlusData &state,
@@ -441,13 +441,7 @@ namespace Humidifiers {
             if (lAlphaBlanks(7)) {
                 Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Fixed;
             } else { // water from storage tank
-                if (Alphas(7) == "FixedInletWaterTemperature") {
-                    Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Fixed;
-                } else if (Alphas(7) == "VariableInletWaterTemperature") {
-                    Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Variable;
-                } else {
-                    Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Fixed;
-                }
+                Humidifier(HumNum).InletWaterTempOption = static_cast<InletWaterTemp>(getEnumValue(inletWaterTempsUC, Alphas(7)));
             }
         }
 
@@ -456,168 +450,152 @@ namespace Humidifiers {
             if (Humidifier(HumNum).SuppliedByWaterSystem) {
                 SetupOutputVariable(state,
                                     "Humidifier Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     Humidifier(HumNum).WaterConsRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Water Volume",
-                                    OutputProcessor::Unit::m3,
+                                    Constant::Units::m3,
                                     Humidifier(HumNum).WaterCons,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Storage Tank Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     Humidifier(HumNum).TankSupplyVdot,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Storage Tank Water Volume",
-                                    OutputProcessor::Unit::m3,
+                                    Constant::Units::m3,
                                     Humidifier(HumNum).TankSupplyVol,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     Humidifier(HumNum).Name,
-                                    {},
-                                    "Water",
-                                    "HUMIDIFIER",
-                                    {},
-                                    "SYSTEM");
+                                    Constant::eResource::Water,
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::Humidification);
                 SetupOutputVariable(state,
                                     "Humidifier Starved Storage Tank Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     Humidifier(HumNum).StarvedSupplyVdot,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Starved Storage Tank Water Volume",
-                                    OutputProcessor::Unit::m3,
+                                    Constant::Units::m3,
                                     Humidifier(HumNum).StarvedSupplyVol,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     Humidifier(HumNum).Name,
-                                    {},
-                                    "Water",
-                                    "HUMIDIFIER",
-                                    {},
-                                    "SYSTEM");
+                                    Constant::eResource::Water,
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::Humidification);
                 SetupOutputVariable(state,
                                     "Humidifier Mains Water Volume",
-                                    OutputProcessor::Unit::m3,
+                                    Constant::Units::m3,
                                     Humidifier(HumNum).StarvedSupplyVol,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     Humidifier(HumNum).Name,
-                                    {},
-                                    "MainsWater",
-                                    "HUMIDIFIER",
-                                    {},
-                                    "SYSTEM");
+                                    Constant::eResource::MainsWater,
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::Humidification);
 
             } else {
                 SetupOutputVariable(state,
                                     "Humidifier Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     Humidifier(HumNum).WaterConsRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Water Volume",
-                                    OutputProcessor::Unit::m3,
+                                    Constant::Units::m3,
                                     Humidifier(HumNum).WaterCons,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     Humidifier(HumNum).Name,
-                                    {},
-                                    "WATER",
-                                    "HUMIDIFIER",
-                                    {},
-                                    "System");
+                                    Constant::eResource::Water,
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::Humidification);
                 SetupOutputVariable(state,
                                     "Humidifier Mains Water Volume",
-                                    OutputProcessor::Unit::m3,
+                                    Constant::Units::m3,
                                     Humidifier(HumNum).WaterCons,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     Humidifier(HumNum).Name,
-                                    {},
-                                    "MAINSWATER",
-                                    "HUMIDIFIER",
-                                    {},
-                                    "System");
+                                    Constant::eResource::MainsWater,
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::Humidification);
             }
             if (Humidifier(HumNum).HumType == HumidType::Electric) {
                 SetupOutputVariable(state,
                                     "Humidifier Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     Humidifier(HumNum).ElecUseRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     Humidifier(HumNum).ElecUseEnergy,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     Humidifier(HumNum).Name,
-                                    {},
-                                    "ELECTRICITY",
-                                    "HUMIDIFIER",
-                                    {},
-                                    "System");
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::Humidification);
             } else if (Humidifier(HumNum).HumType == HumidType::Gas) {
                 SetupOutputVariable(state,
                                     "Humidifier NaturalGas Use Thermal Efficiency",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     Humidifier(HumNum).ThermalEff,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier NaturalGas Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     Humidifier(HumNum).GasUseRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier NaturalGas Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     Humidifier(HumNum).GasUseEnergy,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     Humidifier(HumNum).Name,
-                                    {},
-                                    "NATURALGAS",
-                                    "HUMIDIFIER",
-                                    {},
-                                    "System");
+                                    Constant::eResource::NaturalGas,
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::Humidification);
                 SetupOutputVariable(state,
                                     "Humidifier Auxiliary Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     Humidifier(HumNum).AuxElecUseRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Auxiliary Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     Humidifier(HumNum).AuxElecUseEnergy,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     Humidifier(HumNum).Name,
-                                    {},
-                                    "ELECTRICITY",
-                                    "HUMIDIFIER",
-                                    {},
-                                    "System");
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::Humidification);
             }
         }
 
@@ -676,8 +654,7 @@ namespace Humidifiers {
                         ShowContinueError(state, format("  expecting it on Node=\"{}\".", state.dataLoopNodes->NodeID(AirOutNode)));
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
-                        CheckIfNodeSetPointManagedByEMS(
-                            state, AirOutNode, EMSManager::SPControlType::HumidityRatioMinSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                        CheckIfNodeSetPointManagedByEMS(state, AirOutNode, HVAC::CtrlVarType::MinHumRat, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
                                             format("Humidifiers: Missing humidity setpoint for {} = {}",
@@ -845,10 +822,10 @@ namespace Humidifiers {
                         OutletHumRatDes = std::max(thisFinalSysSizing.CoolSupHumRat, thisFinalSysSizing.HeatSupHumRat);
                     } else { // ELSE size to supply air duct flow rate
                         switch (state.dataSize->CurDuctType) {
-                        case DataHVACGlobals::AirDuctType::Cooling: {
+                        case HVAC::AirDuctType::Cooling: {
                             AirVolFlow = thisFinalSysSizing.DesCoolVolFlow;
                         } break;
-                        case DataHVACGlobals::AirDuctType::Heating: {
+                        case HVAC::AirDuctType::Heating: {
                             AirVolFlow = thisFinalSysSizing.DesHeatVolFlow;
                         } break;
                         default: {

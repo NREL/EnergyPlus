@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Verify PR label action
-        uses: mheap/github-action-required-labels@v3
+        uses: mheap/github-action-required-labels@v5
         with:
           mode: minimum
           count: 1

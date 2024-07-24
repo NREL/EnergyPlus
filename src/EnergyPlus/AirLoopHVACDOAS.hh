@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -123,7 +123,7 @@ namespace AirLoopHVACDOAS {
         int NumOfAirLoops = 0;
         int m_InletNodeNum = 0;
         int m_OutletNodeNum = 0;
-        int m_FanIndex = -1;
+        int m_FanIndex = 0;
         int m_FanInletNodeNum = 0;
         int m_FanOutletNodeNum = 0;
         SimAirServingZones::CompType m_FanTypeNum = SimAirServingZones::CompType::Invalid;
@@ -183,9 +183,14 @@ struct AirLoopHVACDOASData : BaseGlobalStruct
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
     std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
     std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = AirLoopHVACDOASData();
+        new (this) AirLoopHVACDOASData();
     }
 };
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -112,7 +112,7 @@ void HeatingAirflowUASizer::initializeForSystemMainDuct(EnergyPlusData &state,
 {
     this->initializeFromAPI(state, elevation);
     this->curSysNum = 1;
-    this->curDuctType = DataHVACGlobals::AirDuctType::Main;
+    this->curDuctType = HVAC::AirDuctType::Main;
     this->finalSysSizing.allocate(1);
     this->finalSysSizing(1).SysAirMinFlowRat = minFlowRateRatio;
     this->finalSysSizing(1).DesMainVolFlow = overallSystemVolFlow;
@@ -177,21 +177,21 @@ Real64 HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue,
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                 }
             } else {
-                if (this->curDuctType == DataHVACGlobals::AirDuctType::Main) {
+                if (this->curDuctType == HVAC::AirDuctType::Main) {
                     if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
                         this->autoSizedValue =
                             this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                     }
-                } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Cooling) {
+                } else if (this->curDuctType == HVAC::AirDuctType::Cooling) {
                     if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
                         this->autoSizedValue =
                             this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                     }
-                } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Heating) {
+                } else if (this->curDuctType == HVAC::AirDuctType::Heating) {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
@@ -200,7 +200,7 @@ Real64 HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue,
             this->autoSizedValue *= this->stdRhoAir;
         }
     }
-    if (this->autoSizedValue < DataHVACGlobals::SmallAirVolFlow) {
+    if (this->autoSizedValue < HVAC::SmallAirVolFlow) {
         this->addErrorMessage("Autosized value was zero or less than zero");
         this->autoSizedValue = 0.0;
     }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,13 +76,11 @@
 
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/ExhaustAirSystemManager.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/MixerComponent.hh>
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
 using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::Fans;
@@ -377,8 +375,8 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
     // state->dataMixerComponent->MixerCond.allocate(2);
     // state->dataMixerComponent->MixerCond(1).MixerName = "MIXER1";
     // state->dataMixerComponent->MixerCond(2).MixerName = "MIXER2";
-    // state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan1"));
-    // state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan2"));
+    // state->dataFans->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan1"));
+    // state->dataFans->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan2"));
 
     ASSERT_TRUE(process_idf(idf_objects));
     ScheduleManager::ProcessScheduleInput(*state);

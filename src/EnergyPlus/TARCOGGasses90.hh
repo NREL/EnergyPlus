@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -97,6 +97,10 @@ struct TARCOGGasses90Data : BaseGlobalStruct
     Array1D<Real64> mukpdwn = Array1D<Real64>(TARCOGGassesParams::maxgas);
     Array1D<Real64> kpdown = Array1D<Real64>(TARCOGGassesParams::maxgas);
     Array1D<Real64> kdpdown = Array1D<Real64>(TARCOGGassesParams::maxgas);
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

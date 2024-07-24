@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -85,7 +85,7 @@ class DataExchange:
     """
 
     class _APIDataEntry(Structure):
-        _fields_ = [("what", c_char_p),("name", c_char_p),("key", c_char_p),("type", c_char_p),]
+        _fields_ = [("what", c_char_p),("name", c_char_p),("key", c_char_p),("type", c_char_p),("unit", c_char_p)]
 
     class APIDataExchangePoint:
         """
@@ -93,7 +93,7 @@ class DataExchange:
         class could represent output variables, output meters, actuators, and more.  The "type" member variable
         can be used to filter a specific type.
         """
-        def __init__(self, _what: str, _name: str, _key: str, _type: str):
+        def __init__(self, _what: str, _name: str, _key: str, _type: str, _unit: str):
             #: This variable will hold the basic type of API data point, in string form.
             #: This can be one of the following: "Actuator", "InternalVariable", "PluginGlobalVariable",
             #: "PluginTrendVariable", "OutputMeter", or "OutputVariable".  Once the full list of data exchange points
@@ -110,6 +110,9 @@ class DataExchange:
             #: and represents the control actuation.  For a node setpoint actuation, this could be "temperature" or
             #: "humidity", for example.
             self.type: str = _type
+            #: This represents the unit of measure for this exchange point.  
+            #: This is NOT used for plugin variables such as PluginGlobalVariable and PluginTrendVariable.
+            self.unit: str = _unit
 
     def __init__(self, api: cdll, running_as_python_plugin: bool = False):
         """
@@ -299,7 +302,9 @@ class DataExchange:
                 r[i].what.decode('utf-8'),
                 r[i].name.decode('utf-8'),
                 r[i].key.decode('utf-8'),
-                r[i].type.decode('utf-8')) for i in range(count.value)
+                r[i].type.decode('utf-8'),
+                r[i].unit.decode('utf-8'),
+            ) for i in range(count.value)
         ]
         self.api.freeAPIData(r, count)  # free the underlying C memory now that we have a Python copy
         return list_response
@@ -1158,7 +1163,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: The current zone time step in fractional hours.
         """
-        return self.api.systemTimeStep(state)
+        return self.api.zoneTimeStep(state)
 
     def system_time_step(self, state: c_void_p) -> float:
         """

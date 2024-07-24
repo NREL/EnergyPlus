@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,11 +102,6 @@ namespace FluidProperties {
     // supplying the same data for concentrations of 0.0 and 1.0 only.
     // Temperature data has to be supplied in ascending order only.
 
-    void InitializeGlycRoutines()
-    {
-        // TODO: Delete this, the cache is now part of state and initialized with the state constructor
-    }
-
     void GetFluidPropertiesData(EnergyPlusData &state)
     {
 
@@ -161,6 +156,9 @@ namespace FluidProperties {
         //   In several cases we need to pass water data to the initializer, but an
         //   Array initializer only takes one argument.  std::bind is used to convert the
         //   actual initializer into a function of one argument.
+
+        state.dataFluidProps->NumOfRefrigerants = 0;
+        state.dataFluidProps->NumOfGlycols = 0;
 
         // For default "glycol" fluids of Water, Ethylene Glycol, and Propylene Glycol
 
@@ -656,8 +654,6 @@ namespace FluidProperties {
         Numbers = 0.0;
         cNumericFieldNames = "";
         lNumericFieldBlanks = false;
-
-        InitializeGlycRoutines();
 
         // Check to see if there is any FluidName input.  If not, this is okay as
         // long as the user only desires to simulate loops with water.  More than
@@ -4926,8 +4922,6 @@ namespace FluidProperties {
         Real64 Temperature; // Temperature to drive values
         Real64 ReturnValue; // Values returned from glycol functions
 
-        state.dataFluidProps->GetInput = false; // input has already been gotten
-
         for (int GlycolNum = 1; GlycolNum <= state.dataFluidProps->NumOfGlycols; ++GlycolNum) {
             auto &glycol = state.dataFluidProps->GlycolData(GlycolNum);
             int GlycolIndex = 0; // used in routine calls -- value is returned when first 0
@@ -5167,8 +5161,6 @@ namespace FluidProperties {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Temperature; // Temperature to drive values
         Real64 ReturnValue; // Values returned from refrigerant functions
-
-        state.dataFluidProps->GetInput = false; // input has already been gotten
 
         for (int RefrigNum = 1; RefrigNum <= state.dataFluidProps->NumOfRefrigerants; ++RefrigNum) {
             int RefrigIndex = 0; // used in routine calls -- value is returned when first 0
@@ -5606,23 +5598,15 @@ namespace FluidProperties {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int HiTempIndex;        // index value of next highest Temperature from table
         int LoTempIndex;        // index value of next lowest Temperature from table
-        int RefrigNum;          // index for refrigerant under consideration
         Real64 TempInterpRatio; // ratio to interpolate in temperature domain
-        // error counters and dummy string
-        bool ErrorFlag; // error flag for current call
 
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
-        RefrigNum = 0;
+        int RefrigNum = 0; // index for refrigerant under consideration
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
             ReportFatalRefrigerantErrors(
                 state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
         }
 
-        ErrorFlag = false;
+        bool ErrorFlag = false;
 
         if (RefrigIndex > 0) {
             RefrigNum = RefrigIndex;
@@ -5717,23 +5701,15 @@ namespace FluidProperties {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int HiPresIndex;        // index value of next highest Temperature from table
         int LoPresIndex;        // index value of next lowest Temperature from table
-        int RefrigNum;          // index for refrigerant under consideration
         Real64 PresInterpRatio; // ratio to interpolate in temperature domain
-        // error counters and dummy string
-        bool ErrorFlag; // error flag for current call
 
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
-        RefrigNum = 0;
+        int RefrigNum = 0; // index for refrigerant under consideration
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
             ReportFatalRefrigerantErrors(
                 state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatTemperatureRefrig", "properties", CalledFrom);
         }
 
-        ErrorFlag = false;
+        bool ErrorFlag = false;
 
         if (RefrigIndex > 0) {
             RefrigNum = RefrigIndex;
@@ -5832,14 +5808,7 @@ namespace FluidProperties {
         static constexpr std::string_view RoutineName("GetSatEnthalpyRefrig");
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int RefrigNum; // index for refrigerant under consideration
-
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
-        RefrigNum = 0;
+        int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
             ReportFatalRefrigerantErrors(
                 state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
@@ -5904,13 +5873,6 @@ namespace FluidProperties {
         Real64 LoSatProp;       // Sat. prop. at lower temp & given quality
         Real64 HiSatProp;       // Sat. prop. at higher temp & given quality
         Real64 TempInterpRatio; // ratio to interpolate in temperature domain
-
-        // error counters and dummy string
-
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
@@ -6040,11 +6002,6 @@ namespace FluidProperties {
         // FUNCTION PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetSatSpecificHeatRefrig: ");
 
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
             ReportFatalRefrigerantErrors(
@@ -6145,12 +6102,6 @@ namespace FluidProperties {
 
         int HiTempIndex;  // high temperature index value
         int HiPressIndex; // high pressure index value
-
-        // see if data is there
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
@@ -6397,11 +6348,6 @@ namespace FluidProperties {
         int HiTempIndex;     // Index value of higher temperature from data
         int LoEnthalpyIndex; // Index value of lower enthalpy from data
         int HiEnthalpyIndex; // Index value of higher enthalpy from data
-
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
@@ -6674,11 +6620,6 @@ namespace FluidProperties {
         Real64 RefTSat;      // Saturated temperature of the refrigerant. Used to check whether the refrigernat is in the superheat area
         Real64 Temp;         // Temperature of the superheated refrigerant at the given enthalpy and pressure
 
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
             ReportFatalRefrigerantErrors(
@@ -6821,12 +6762,6 @@ namespace FluidProperties {
 
         int HiTempIndex;  // high temperature index value
         int HiPressIndex; // high pressure index value
-
-        // see if data is there
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         int RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
@@ -7091,12 +7026,6 @@ namespace FluidProperties {
         // FUNCTION PARAMETERS:
         static constexpr std::string_view RoutineName("GetSpecificHeatGlycol: ");
 
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         // If no glycols, no fluid properties can be evaluated
         int GlycolNum(0);
         if (state.dataFluidProps->NumOfGlycols == 0)
@@ -7242,12 +7171,6 @@ namespace FluidProperties {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         bool LowErrorThisTime = false;
         bool HighErrorThisTime = false;
-
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         // If no glycols, no fluid properties can be evaluated
         int GlycolNum = 0;
@@ -7405,12 +7328,6 @@ namespace FluidProperties {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         bool LowErrorThisTime = false;
         bool HighErrorThisTime = false;
-
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         // If no glycols, no fluid properties can be evaluated
         int GlycolNum = 0;
@@ -7572,12 +7489,6 @@ namespace FluidProperties {
         bool LowErrorThisTime = false;
         bool HighErrorThisTime = false;
 
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         // If no glycols, no fluid properties can be evaluated
         int GlycolNum = 0;
         if (state.dataFluidProps->NumOfGlycols == 0)
@@ -7727,12 +7638,6 @@ namespace FluidProperties {
         // Return value
         int FindRefrigerant;
 
-        // Make sure we have already read in the input
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         // Check to see if this glycol shows up in the glycol data
         int Found = Util::FindItemInList(Util::makeUPPER(Refrigerant), state.dataFluidProps->RefrigData);
 
@@ -7768,12 +7673,6 @@ namespace FluidProperties {
 
         // Return value
         int FindGlycol;
-
-        // Make sure we have already read in the input
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
 
         // Check to see if this glycol shows up in the glycol data
         int Found = Util::FindItemInList(Util::makeUPPER(Glycol),
@@ -8024,11 +7923,6 @@ namespace FluidProperties {
         // Return value
         int CheckFluidPropertyName;
 
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         // Item must be either in Refrigerant or Glycol list
         int Found = 0;
         if (state.dataFluidProps->NumOfRefrigerants > 0) {
@@ -8192,12 +8086,6 @@ namespace FluidProperties {
     void GetFluidDensityTemperatureLimits(EnergyPlusData &state, int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
 
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         if (FluidIndex > 0) {
             MinTempLimit = state.dataFluidProps->GlycolData(FluidIndex).RhoLowTempValue;
             MaxTempLimit = state.dataFluidProps->GlycolData(FluidIndex).RhoHighTempValue;
@@ -8206,12 +8094,6 @@ namespace FluidProperties {
 
     void GetFluidSpecificHeatTemperatureLimits(EnergyPlusData &state, int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
-        // Get the input if we haven't already
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
         if (FluidIndex > 0) {
             MinTempLimit = state.dataFluidProps->GlycolData(FluidIndex).CpLowTempValue;
             MaxTempLimit = state.dataFluidProps->GlycolData(FluidIndex).CpHighTempValue;

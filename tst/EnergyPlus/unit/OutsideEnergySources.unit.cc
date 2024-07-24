@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -95,9 +95,9 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
     auto &thisDistrictHeatingSteam = state->dataOutsideEnergySrcs->EnergySource(3);
 
     // Tests for GetOutsideEnergySourcesInput()
-    EXPECT_TRUE(compare_enums(thisDistrictHeatingWater.EnergyType, DataPlant::PlantEquipmentType::PurchHotWater));
-    EXPECT_TRUE(compare_enums(thisDistrictCooling.EnergyType, DataPlant::PlantEquipmentType::PurchChilledWater));
-    EXPECT_TRUE(compare_enums(thisDistrictHeatingSteam.EnergyType, DataPlant::PlantEquipmentType::PurchSteam));
+    EXPECT_ENUM_EQ(thisDistrictHeatingWater.EnergyType, DataPlant::PlantEquipmentType::PurchHotWater);
+    EXPECT_ENUM_EQ(thisDistrictCooling.EnergyType, DataPlant::PlantEquipmentType::PurchChilledWater);
+    EXPECT_ENUM_EQ(thisDistrictHeatingSteam.EnergyType, DataPlant::PlantEquipmentType::PurchSteam);
 
     EXPECT_EQ(thisDistrictHeatingWater.NomCap, 1000000.0);
     EXPECT_EQ(thisDistrictCooling.NomCap, 900000.0);
