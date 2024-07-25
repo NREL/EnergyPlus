@@ -116,7 +116,6 @@ namespace OutdoorAirUnit {
     using HVAC::SmallMassFlow;
     using namespace ScheduleManager;
     using namespace Psychrometrics;
-    using namespace FluidProperties;
 
     // component types addressed by this module
     constexpr static std::string_view ZoneHVACOAUnit = {"ZoneHVAC:OutdoorAirUnit"};
@@ -218,7 +217,6 @@ namespace OutdoorAirUnit {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-        using FluidProperties::FindRefrigerant;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
         using SteamCoils::GetCoilAirInletNode;
@@ -719,7 +717,7 @@ namespace OutdoorAirUnit {
                             thisOutAirUnit.OAEquip(CompNum).MinVolWaterFlow = 0.0;
                             // below: no extra error needed if steam properties not in input
                             // file because getting the steam coil will have done that.
-                            thisOutAirUnit.OAEquip(CompNum).FluidIndex = FindRefrigerant(state, "Steam");
+                            thisOutAirUnit.OAEquip(CompNum).FluidIndex = FluidProperties::GetRefrigNum(state, "STEAM");
                             break;
                         }
                         case CompType::WaterCoil_DetailedCool: {
@@ -1285,13 +1283,13 @@ namespace OutdoorAirUnit {
                     if (thisOutAirUnit.OAEquip(compLoop).Type == CompType::SteamCoil_AirHeat) {
                         thisOutAirUnit.OAEquip(compLoop).MaxVolWaterFlow =
                             GetCoilMaxSteamFlowRate(state, thisOutAirUnit.OAEquip(compLoop).ComponentIndex, errFlag);
-                        Real64 const rho =
-                            GetSatDensityRefrig(state,
-                                                state.dataPlnt->PlantLoop(thisOutAirUnit.OAEquip(compLoop).plantLoc.loopNum).FluidName,
-                                                Constant::SteamInitConvTemp,
-                                                1.0,
-                                                state.dataPlnt->PlantLoop(thisOutAirUnit.OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
-                                                RoutineName);
+                        Real64 const rho = FluidProperties::GetSatDensityRefrig(
+                            state,
+                            state.dataPlnt->PlantLoop(thisOutAirUnit.OAEquip(compLoop).plantLoc.loopNum).FluidName,
+                            Constant::SteamInitConvTemp,
+                            1.0,
+                            state.dataPlnt->PlantLoop(thisOutAirUnit.OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
+                            RoutineName);
                         thisOutAirUnit.OAEquip(compLoop).MaxWaterMassFlow = rho * thisOutAirUnit.OAEquip(compLoop).MaxVolWaterFlow;
                         thisOutAirUnit.OAEquip(compLoop).MinWaterMassFlow = rho * thisOutAirUnit.OAEquip(compLoop).MinVolWaterFlow;
                         InitComponentNodes(state,

@@ -385,7 +385,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                                    state.dataIPShortCut->cAlphaArgs(7),
                                                    "Hot Water Nodes");
             } else {
-                thisChiller.SteamFluidIndex = FluidProperties::FindRefrigerant(state, fluidNameSteam);
+                thisChiller.SteamFluidIndex = FluidProperties::GetRefrigNum(state, fluidNameSteam);
                 thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                         state.dataIPShortCut->cAlphaArgs(6),
                                                                                         ErrorsFound,
