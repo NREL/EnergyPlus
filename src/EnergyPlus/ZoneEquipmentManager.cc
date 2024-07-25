@@ -1916,6 +1916,7 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
         zoneCFS.CoolOutHumRatSeq(ts) = 0.0;
         zoneCFS.CoolLoadNoDOASSeq(ts) = 0.0;
     }
+
     if (zoneCFS.zoneLatentSizing) {
         // Zero out latent simple sums
         zoneCFS.DesLatentHeatVolFlow = 0.0;
@@ -1950,7 +1951,45 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
         }
     }
 
+    // Other - Initialize to first space values (clear later if not all the same)
+    int firstSpace = state.dataHeatBal->Zone(zoneNum).spaceIndexes[0];
+    auto &firstSpaceCFS = state.dataSize->CalcFinalSpaceSizing(firstSpace);
+    zoneCFS.HeatDesDay = firstSpaceCFS.HeatDesDay;
+    zoneCFS.HeatDDNum = firstSpaceCFS.HeatDDNum;
+    zoneCFS.cHeatDDDate = firstSpaceCFS.cHeatDDDate;
+    zoneCFS.TimeStepNumAtHeatMax = firstSpaceCFS.TimeStepNumAtHeatMax;
+    zoneCFS.HeatNoDOASDDNum = firstSpaceCFS.HeatNoDOASDDNum;
+    zoneCFS.HeatNoDOASDesDay = firstSpaceCFS.HeatNoDOASDesDay;
+    zoneCFS.TimeStepNumAtHeatNoDOASMax = firstSpaceCFS.TimeStepNumAtHeatNoDOASMax;
+    zoneCFS.CoolDesDay = firstSpaceCFS.CoolDesDay;
+    zoneCFS.CoolDDNum = firstSpaceCFS.CoolDDNum;
+    zoneCFS.cCoolDDDate = firstSpaceCFS.cCoolDDDate;
+    zoneCFS.TimeStepNumAtCoolMax = firstSpaceCFS.TimeStepNumAtCoolMax;
+    if (zoneCFS.zoneLatentSizing) {
+        zoneCFS.LatHeatDesDay = firstSpaceCFS.LatHeatDesDay;
+        zoneCFS.cLatentHeatDDDate = firstSpaceCFS.cLatentHeatDDDate;
+        zoneCFS.LatentHeatDDNum = firstSpaceCFS.LatentHeatDDNum;
+        zoneCFS.TimeStepNumAtLatentHeatMax = firstSpaceCFS.TimeStepNumAtLatentHeatMax;
+        zoneCFS.LatentHeatNoDOASDDNum = firstSpaceCFS.LatentHeatNoDOASDDNum;
+        zoneCFS.LatHeatNoDOASDesDay = firstSpaceCFS.LatHeatNoDOASDesDay;
+        zoneCFS.TimeStepNumAtLatentHeatNoDOASMax = firstSpaceCFS.TimeStepNumAtLatentHeatNoDOASMax;
+        zoneCFS.LatCoolDesDay = firstSpaceCFS.LatCoolDesDay;
+        zoneCFS.cLatentCoolDDDate = firstSpaceCFS.cLatentCoolDDDate;
+        zoneCFS.LatentCoolDDNum = firstSpaceCFS.LatentCoolDDNum;
+        zoneCFS.TimeStepNumAtLatentCoolMax = firstSpaceCFS.TimeStepNumAtLatentCoolMax;
+        zoneCFS.CoolNoDOASDDNum = firstSpaceCFS.CoolNoDOASDDNum;
+        zoneCFS.CoolNoDOASDesDay = firstSpaceCFS.CoolNoDOASDesDay;
+        zoneCFS.TimeStepNumAtCoolNoDOASMax = firstSpaceCFS.TimeStepNumAtCoolNoDOASMax;
+        zoneCFS.LatentCoolNoDOASDDNum = firstSpaceCFS.LatentCoolNoDOASDDNum;
+        zoneCFS.LatCoolNoDOASDesDay = firstSpaceCFS.LatCoolNoDOASDesDay;
+        zoneCFS.TimeStepNumAtLatentCoolNoDOASMax = firstSpaceCFS.TimeStepNumAtLatentCoolNoDOASMax;
+    }
+
     int numSpaces = 0; // Track this for averages later
+    bool heatDDNumAllSame = true;
+    bool coolDDNumAllSame = true;
+    int priorHeatDDNum = 0;
+    int priorCoolDDNum = 0;
     for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
         auto &spaceCFS = state.dataSize->CalcFinalSpaceSizing(spaceNum);
         ++numSpaces;
@@ -2006,20 +2045,24 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
         }
 
         // Other
-        // zoneCFS.HeatDesDay = spaceCFS.HeatDesDay;
-        // zoneCFS.HeatDDNum = spaceCFS.HeatDDNum;
-        // zoneCFS.cHeatDDDate = desDayWeath.DateString;
-        // zoneCFS.TimeStepNumAtHeatMax = spaceCFS.TimeStepNumAtHeatMax;
-        // zoneCFS.HeatNoDOASDDNum = spaceCFS.HeatNoDOASDDNum;
-        // zoneCFS.HeatNoDOASDesDay = spaceCFS.HeatNoDOASDesDay;
-        // zoneCFS.TimeStepNumAtHeatNoDOASMax = spaceCFS.TimeStepNumAtHeatNoDOASMax;
-        // zoneCFS.LatentHeatNoDOASDDNum = spaceCFS.LatentHeatNoDOASDDNum;
-        // zoneCFS.LatHeatNoDOASDesDay = spaceCFS.LatHeatNoDOASDesDay;
-        // zoneCFS.TimeStepNumAtLatentHeatNoDOASMax = spaceCFS.TimeStepNumAtLatentHeatNoDOASMax;
-        // zoneCFS.CoolDesDay = spaceCFS.CoolDesDay;
-        // zoneCFS.CoolDDNum = spaceCFS.CoolDDNum;
-        // zoneCFS.cCoolDDDate = desDayWeath.DateString;
-        // zoneCFS.TimeStepNumAtCoolMax = spaceCFS.TimeStepNumAtCoolMax;
+        if ((zoneCFS.HeatDDNum != 0) && (zoneCFS.HeatDDNum != spaceCFS.HeatDDNum)) {
+            zoneCFS.HeatDesDay = "n/a";
+            zoneCFS.HeatDDNum = 0;
+            zoneCFS.cHeatDDDate = "";
+        }
+        if ((zoneCFS.HeatNoDOASDDNum != 0) && (zoneCFS.HeatNoDOASDDNum != spaceCFS.HeatNoDOASDDNum)) {
+            zoneCFS.HeatNoDOASDDNum = 0;
+            zoneCFS.HeatNoDOASDesDay = "n/a";
+        }
+        if ((zoneCFS.CoolDDNum != 0) && (zoneCFS.CoolDDNum != spaceCFS.CoolDDNum)) {
+            zoneCFS.CoolDesDay = "n/a";
+            zoneCFS.CoolDDNum = 0;
+            zoneCFS.cCoolDDDate = "";
+        }
+        if ((zoneCFS.CoolNoDOASDDNum != 0) && (zoneCFS.CoolNoDOASDDNum != spaceCFS.CoolNoDOASDDNum)) {
+            zoneCFS.CoolNoDOASDDNum = 0;
+            zoneCFS.CoolNoDOASDesDay = "n/a";
+        }
 
         if (zoneCFS.zoneLatentSizing) {
             // Simple sums
@@ -2045,20 +2088,24 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
             zoneCFS.DesLatentCoolCoilInHumRat += spaceCFS.DesLatentCoolCoilInHumRat * spaceCFS.DesLatentCoolVolFlow;
 
             // Other
-            // zoneCFS.LatHeatDesDay = spaceCFS.LatHeatDesDay;
-            // zoneCFS.cLatentHeatDDDate = desDayWeath.DateString;
-            // zoneCFS.LatentHeatDDNum = spaceCFS.LatentHeatDDNum;
-            // zoneCFS.TimeStepNumAtLatentHeatMax = spaceCFS.TimeStepNumAtLatentHeatMax;
-            // zoneCFS.LatCoolDesDay = spaceCFS.LatCoolDesDay;
-            // zoneCFS.cLatentCoolDDDate = desDayWeath.DateString;
-            // zoneCFS.LatentCoolDDNum = spaceCFS.LatentCoolDDNum;
-            // zoneCFS.TimeStepNumAtLatentCoolMax = spaceCFS.TimeStepNumAtLatentCoolMax;
-            // zoneCFS.CoolNoDOASDDNum = spaceCFS.CoolNoDOASDDNum;
-            // zoneCFS.CoolNoDOASDesDay = spaceCFS.CoolNoDOASDesDay;
-            // zoneCFS.TimeStepNumAtCoolNoDOASMax = spaceCFS.TimeStepNumAtCoolNoDOASMax;
-            // zoneCFS.LatentCoolNoDOASDDNum = spaceCFS.LatentCoolNoDOASDDNum;
-            // zoneCFS.LatCoolNoDOASDesDay = spaceCFS.LatCoolNoDOASDesDay;
-            // zoneCFS.TimeStepNumAtLatentCoolNoDOASMax = spaceCFS.TimeStepNumAtLatentCoolNoDOASMax;
+            if ((zoneCFS.LatentHeatDDNum != 0) && (zoneCFS.LatentHeatDDNum != spaceCFS.LatentHeatDDNum)) {
+                zoneCFS.LatHeatDesDay = "n/a";
+                zoneCFS.cLatentHeatDDDate = "";
+                zoneCFS.LatentHeatDDNum = 0;
+            }
+            if ((zoneCFS.LatentHeatNoDOASDDNum != 0) && (zoneCFS.LatentHeatNoDOASDDNum != spaceCFS.LatentHeatNoDOASDDNum)) {
+                zoneCFS.LatentHeatNoDOASDDNum = 0;
+                zoneCFS.LatHeatNoDOASDesDay = "n/a";
+            }
+            if ((zoneCFS.LatentCoolDDNum != 0) && (zoneCFS.LatentCoolDDNum != spaceCFS.LatentCoolDDNum)) {
+                zoneCFS.LatCoolDesDay = "n/a";
+                zoneCFS.cLatentCoolDDDate = "";
+                zoneCFS.LatentCoolDDNum = 0;
+            }
+            if ((zoneCFS.LatentCoolNoDOASDDNum != 0) && (zoneCFS.LatentCoolNoDOASDDNum != spaceCFS.LatentCoolNoDOASDDNum)) {
+                zoneCFS.LatentCoolNoDOASDDNum = 0;
+                zoneCFS.LatCoolNoDOASDesDay = "n/a";
+            }
 
             // Time-series sums
             for (int ts = 1; ts <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++ts) {
@@ -2093,24 +2140,39 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
         zoneCFS.DesCoolCoilInTemp /= zoneCFS.DesCoolMassFlow;
         zoneCFS.DesCoolCoilInHumRat /= zoneCFS.DesCoolMassFlow;
     }
+    // Timestep at max
+    zoneCFS.TimeStepNumAtHeatMax = 0;
+    zoneCFS.TimeStepNumAtHeatNoDOASMax = 0;
+    zoneCFS.TimeStepNumAtCoolMax = 0;
+    zoneCFS.TimeStepNumAtHeatNoDOASMax = 0;
+    Real64 maxHeatLoad = 0.0;
+    Real64 maxHeatLoadNoDOAS = 0.0;
+    Real64 maxCoolLoad = 0.0;
+    Real64 maxCoolLoadNoDOAS = 0.0;
     for (int ts = 1; ts <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++ts) {
-        if (zoneCFS.HeatFlowSeq(ts) > 0) {
-            zoneCFS.HeatZoneTempSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
-            zoneCFS.HeatOutTempSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
-            zoneCFS.HeatZoneRetTempSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
-            zoneCFS.HeatZoneHumRatSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
-            zoneCFS.HeatOutHumRatSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
-            zoneCFS.HeatLoadNoDOASSeq(ts) /= zoneCFS.HeatFlowSeq(ts);
+        Real64 tsHeatFlow = zoneCFS.HeatFlowSeq(ts);
+        if (tsHeatFlow > 0) {
+            zoneCFS.HeatZoneTempSeq(ts) /= tsHeatFlow;
+            zoneCFS.HeatOutTempSeq(ts) /= tsHeatFlow;
+            zoneCFS.HeatZoneRetTempSeq(ts) /= tsHeatFlow;
+            zoneCFS.HeatZoneHumRatSeq(ts) /= tsHeatFlow;
+            zoneCFS.HeatOutHumRatSeq(ts) /= tsHeatFlow;
         }
-        if (zoneCFS.CoolFlowSeq(ts) > 0) {
-            zoneCFS.CoolZoneTempSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
-            zoneCFS.CoolOutTempSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
-            zoneCFS.CoolZoneRetTempSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
-            zoneCFS.CoolZoneHumRatSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
-            zoneCFS.CoolOutHumRatSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
-            zoneCFS.CoolLoadNoDOASSeq(ts) /= zoneCFS.CoolFlowSeq(ts);
+        if (zoneCFS.HeatLoadSeq(ts) > maxHeatLoad) zoneCFS.TimeStepNumAtHeatMax = ts;
+        if (zoneCFS.HeatLoadNoDOASSeq(ts) > maxHeatLoadNoDOAS) zoneCFS.TimeStepNumAtHeatNoDOASMax = ts;
+
+        Real64 tsCoolFlow = zoneCFS.CoolFlowSeq(ts);
+        if (tsCoolFlow > 0) {
+            zoneCFS.CoolZoneTempSeq(ts) /= tsCoolFlow;
+            zoneCFS.CoolOutTempSeq(ts) /= tsCoolFlow;
+            zoneCFS.CoolZoneRetTempSeq(ts) /= tsCoolFlow;
+            zoneCFS.CoolZoneHumRatSeq(ts) /= tsCoolFlow;
+            zoneCFS.CoolOutHumRatSeq(ts) /= tsCoolFlow;
         }
+        if (zoneCFS.CoolLoadSeq(ts) > maxCoolLoad) zoneCFS.TimeStepNumAtCoolMax = ts;
+        if (zoneCFS.CoolLoadNoDOASSeq(ts) > maxCoolLoadNoDOAS) zoneCFS.TimeStepNumAtCoolNoDOASMax = ts;
     }
+
     if (zoneCFS.zoneLatentSizing) {
         if (zoneCFS.DesLatentHeatMassFlow > 0) {
             zoneCFS.ZoneTempAtLatentHeatPeak /= zoneCFS.DesLatentHeatMassFlow;
@@ -2125,6 +2187,21 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
             zoneCFS.ZoneRetTempAtLatentCoolPeak /= zoneCFS.DesLatentCoolMassFlow;
             zoneCFS.DesLatentCoolCoilInTemp /= zoneCFS.DesLatentCoolMassFlow;
             zoneCFS.DesLatentCoolCoilInHumRat /= zoneCFS.DesLatentCoolMassFlow;
+        }
+        // Timestep at max
+        zoneCFS.TimeStepNumAtLatentHeatMax = 0;
+        zoneCFS.TimeStepNumAtLatentHeatNoDOASMax = 0;
+        zoneCFS.TimeStepNumAtLatentCoolMax = 0;
+        zoneCFS.TimeStepNumAtLatentCoolNoDOASMax = 0;
+        Real64 maxLatHeatLoad = 0.0;
+        Real64 maxLatHeatLoadNoDOAS = 0.0;
+        Real64 maxLatCoolLoad = 0.0;
+        Real64 maxLatCoolLoadNoDOAS = 0.0;
+        for (int ts = 1; ts <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++ts) {
+            if (zoneCFS.LatentHeatFlowSeq(ts) > maxLatHeatLoad) zoneCFS.TimeStepNumAtLatentHeatMax = ts;
+            if (zoneCFS.HeatLatentLoadNoDOASSeq(ts) > maxLatHeatLoadNoDOAS) zoneCFS.TimeStepNumAtLatentHeatNoDOASMax = ts;
+            if (zoneCFS.LatentCoolLoadSeq(ts) > maxLatCoolLoad) zoneCFS.TimeStepNumAtLatentCoolMax = ts;
+            if (zoneCFS.CoolLatentLoadNoDOASSeq(ts) > maxLatCoolLoadNoDOAS) zoneCFS.TimeStepNumAtLatentCoolNoDOASMax = ts;
         }
     }
 
