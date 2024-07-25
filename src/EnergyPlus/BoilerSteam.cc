@@ -267,7 +267,7 @@ namespace BoilerSteam {
                                                "Hot Steam Nodes");
 
             if (SteamFluidIndex == 0 && BoilerNum == 1) {
-                SteamFluidIndex = FluidProperties::FindRefrigerant(state, fluidNameSteam);
+                SteamFluidIndex = FluidProperties::GetRefrigNum(state, fluidNameSteam); // Steam is a refrigerant?
                 if (SteamFluidIndex == 0) {
                     ShowSevereError(
                         state, format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));

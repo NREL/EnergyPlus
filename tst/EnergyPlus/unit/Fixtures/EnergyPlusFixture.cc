@@ -361,6 +361,7 @@ bool EnergyPlusFixture::process_idf(std::string_view const idf_snippet, bool use
 
     inputProcessor->initializeMaps();
     SimulationManager::PostIPProcessing(*state);
+
     state->init_state(*state);
 
     if (state->dataSQLiteProcedures->sqlite) {
