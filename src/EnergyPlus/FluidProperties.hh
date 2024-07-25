@@ -69,6 +69,8 @@ struct EnergyPlusData;
 
 namespace FluidProperties {
 
+#undef PERFORMANCE_OPT
+
 #ifdef EP_cache_GlycolSpecificHeat
     int constexpr t_sh_cache_size = 1024 * 1024;
     int constexpr t_sh_precision_bits = 24;
@@ -92,133 +94,141 @@ namespace FluidProperties {
         SatSupDensityPress,
         Num
     };
-        
+
     struct RefrigProps
     {
         // Members
-        std::string Name;            // Name of the refrigerant
+        std::string Name; // Name of the refrigerant
         int Num = 0;
         bool used = false;
 
-        std::string satTempArrayName;   // Array of saturated temperature points, must be same for all properties
-        std::string supTempArrayName;   // Array of superheated temperature points, must be same for all properties
-            
-        int NumPsPoints = 0;             // Number of saturation pressure
-        Real64 PsLowTempValue = 0.0;       // Low Temperature Value for Ps (>0.0)
-        Real64 PsHighTempValue = 0.0;      // High Temperature Value for Ps (max in tables)
-        int PsLowTempIndex = 0;          // Low Temperature Min Index for Ps (>0.0)
-        int PsHighTempIndex = 0;         // High Temperature Max Index for Ps (>0.0)
-        Real64 PsLowPresValue = 0.0;       // Low Pressure Value for Ps (>0.0)
-        Real64 PsHighPresValue = 0.0;      // High Pressure Value for Ps (max in tables)
-        int PsLowPresIndex = 0;          // Low Pressure Min Index for Ps (>0.0)
-        int PsHighPresIndex = 0;         // High Pressure Max Index for Ps (>0.0)
-        Array1D<Real64> PsTemps;     // Temperatures for saturation pressures
-        Array1D<Real64> PsValues;    // Saturation pressures at PsTemps
+        std::string satTempArrayName; // Array of saturated temperature points, must be same for all properties
+        std::string supTempArrayName; // Array of superheated temperature points, must be same for all properties
+
+        int NumPsPoints = 0;          // Number of saturation pressure
+        Real64 PsLowTempValue = 0.0;  // Low Temperature Value for Ps (>0.0)
+        Real64 PsHighTempValue = 0.0; // High Temperature Value for Ps (max in tables)
+        int PsLowTempIndex = 0;       // Low Temperature Min Index for Ps (>0.0)
+        int PsHighTempIndex = 0;      // High Temperature Max Index for Ps (>0.0)
+        Real64 PsLowPresValue = 0.0;  // Low Pressure Value for Ps (>0.0)
+        Real64 PsHighPresValue = 0.0; // High Pressure Value for Ps (max in tables)
+        int PsLowPresIndex = 0;       // Low Pressure Min Index for Ps (>0.0)
+        int PsHighPresIndex = 0;      // High Pressure Max Index for Ps (>0.0)
+        Array1D<Real64> PsTemps;      // Temperatures for saturation pressures
+        Array1D<Real64> PsValues;     // Saturation pressures at PsTemps
+#ifdef PERFORMANCE_OPT
         Array1D<Real64> PsTempRatios; // PsTempRatios(i) = (PsValues(i+1) - PsValues(i)) / (PsTemps(i+1) - PsTemps(i)).  Speed optimization.
-            
-        int NumHPoints = 0;              // Number of enthalpy points
-        Real64 HfLowTempValue = 0.0;       // Low Temperature Value for Hf (>0.0)
-        Real64 HfHighTempValue = 0.0;      // High Temperature Value for Hf (max in tables)
-        int HfLowTempIndex = 0;          // Low Temperature Min Index for Hf (>0.0)
-        int HfHighTempIndex = 0;         // High Temperature Max Index for Hf (>0.0)
-        Real64 HfgLowTempValue = 0.0;      // Low Temperature Value for Hfg (>0.0)
-        Real64 HfgHighTempValue = 0.0;     // High Temperature Value for Hfg (max in tables)
-        int HfgLowTempIndex = 0;         // Low Temperature Min Index for Hfg (>0.0)
-        int HfgHighTempIndex = 0;        // High Temperature Max Index for Hfg (>0.0)
-        Array1D<Real64> HTemps;      // Temperatures for enthalpy points
-        Array1D<Real64> HfValues;    // Enthalpy of saturated fluid at HTemps
-        Array1D<Real64> HfgValues;   // Enthalpy of saturated fluid/gas at HTemps
+#endif                                // PERFORMANCE_OPT
+
+        int NumHPoints = 0;            // Number of enthalpy points
+        Real64 HfLowTempValue = 0.0;   // Low Temperature Value for Hf (>0.0)
+        Real64 HfHighTempValue = 0.0;  // High Temperature Value for Hf (max in tables)
+        int HfLowTempIndex = 0;        // Low Temperature Min Index for Hf (>0.0)
+        int HfHighTempIndex = 0;       // High Temperature Max Index for Hf (>0.0)
+        Real64 HfgLowTempValue = 0.0;  // Low Temperature Value for Hfg (>0.0)
+        Real64 HfgHighTempValue = 0.0; // High Temperature Value for Hfg (max in tables)
+        int HfgLowTempIndex = 0;       // Low Temperature Min Index for Hfg (>0.0)
+        int HfgHighTempIndex = 0;      // High Temperature Max Index for Hfg (>0.0)
+        Array1D<Real64> HTemps;        // Temperatures for enthalpy points
+        Array1D<Real64> HfValues;      // Enthalpy of saturated fluid at HTemps
+        Array1D<Real64> HfgValues;     // Enthalpy of saturated fluid/gas at HTemps
+#ifdef PERFORMANCE_OPT
         Array1D<Real64> HfTempRatios;
         Array1D<Real64> HfgTempRatios;
-            
-        int NumCpPoints = 0;             // Number of specific heat of fluid points
-        Real64 CpfLowTempValue = 0.0;      // Low Temperature Value for Cpf (>0.0)
-        Real64 CpfHighTempValue = 0.0;     // High Temperature Value for Cpf (max in tables)
-        int CpfLowTempIndex = 0;         // Low Temperature Min Index for Cpf (>0.0)
-        int CpfHighTempIndex = 0;        // High Temperature Max Index for Cpf (>0.0)
-        Real64 CpfgLowTempValue = 0.0;     // Low Temperature Value for Cpfg (>0.0)
-        Real64 CpfgHighTempValue = 0.0;    // High Temperature Value for Cpfg (max in tables)
-        int CpfgLowTempIndex = 0;        // Low Temperature Min Index for Cpfg (>0.0)
-        int CpfgHighTempIndex = 0;       // High Temperature Max Index for Cpfg (>0.0)
-        Array1D<Real64> CpTemps;     // Temperatures for specific heat points
-        Array1D<Real64> CpfValues;   // Specific heat of saturated fluid at CpTemps
-        Array1D<Real64> CpfgValues;  // Specific heat of saturated fluid/gas at CpTemps
+#endif // PERFORMANCE_OPT
+
+        int NumCpPoints = 0;            // Number of specific heat of fluid points
+        Real64 CpfLowTempValue = 0.0;   // Low Temperature Value for Cpf (>0.0)
+        Real64 CpfHighTempValue = 0.0;  // High Temperature Value for Cpf (max in tables)
+        int CpfLowTempIndex = 0;        // Low Temperature Min Index for Cpf (>0.0)
+        int CpfHighTempIndex = 0;       // High Temperature Max Index for Cpf (>0.0)
+        Real64 CpfgLowTempValue = 0.0;  // Low Temperature Value for Cpfg (>0.0)
+        Real64 CpfgHighTempValue = 0.0; // High Temperature Value for Cpfg (max in tables)
+        int CpfgLowTempIndex = 0;       // Low Temperature Min Index for Cpfg (>0.0)
+        int CpfgHighTempIndex = 0;      // High Temperature Max Index for Cpfg (>0.0)
+        Array1D<Real64> CpTemps;        // Temperatures for specific heat points
+        Array1D<Real64> CpfValues;      // Specific heat of saturated fluid at CpTemps
+        Array1D<Real64> CpfgValues;     // Specific heat of saturated fluid/gas at CpTemps
+#ifdef PERFORMANCE_OPT
         Array1D<Real64> CpfTempRatios;
         Array1D<Real64> CpfgTempRatios;
-            
+#endif // PERFORMANCE_OPT
+
         int NumRhoPoints = 0;            // Number of density of fluid points
-        Real64 RhofLowTempValue = 0.0;     // Low Temperature Value for Rhof (>0.0)
-        Real64 RhofHighTempValue = 0.0;    // High Temperature Value for Rhof (max in tables)
+        Real64 RhofLowTempValue = 0.0;   // Low Temperature Value for Rhof (>0.0)
+        Real64 RhofHighTempValue = 0.0;  // High Temperature Value for Rhof (max in tables)
         int RhofLowTempIndex = 0;        // Low Temperature Min Index for Rhof (>0.0)
         int RhofHighTempIndex = 0;       // High Temperature Max Index for Rhof (>0.0)
-        Real64 RhofgLowTempValue = 0.0;    // Low Temperature Value for Rhofg (>0.0)
-        Real64 RhofgHighTempValue = 0.0;   // High Temperature Value for Rhofg (max in tables)
+        Real64 RhofgLowTempValue = 0.0;  // Low Temperature Value for Rhofg (>0.0)
+        Real64 RhofgHighTempValue = 0.0; // High Temperature Value for Rhofg (max in tables)
         int RhofgLowTempIndex = 0;       // Low Temperature Min Index for Rhofg (>0.0)
         int RhofgHighTempIndex = 0;      // High Temperature Max Index for Rhofg (>0.0)
-        Array1D<Real64> RhoTemps;    // Temperatures for density of fluid points
-        Array1D<Real64> RhofValues;  // Density of saturated fluid at RhoTemps
-        Array1D<Real64> RhofgValues; // Density of saturated fluid/gas at RhoTemps
+        Array1D<Real64> RhoTemps;        // Temperatures for density of fluid points
+        Array1D<Real64> RhofValues;      // Density of saturated fluid at RhoTemps
+        Array1D<Real64> RhofgValues;     // Density of saturated fluid/gas at RhoTemps
+#ifdef PERFORMANCE_OPT
         Array1D<Real64> RhofTempRatios;
         Array1D<Real64> RhofgTempRatios;
-            
-        int NumSupTempPoints = 0;         // Number of temperature points for superheated enthalpy
-        int NumSupPressPoints = 0;        // Number of pressure points for superheated enthalpy
-        Array1D<Real64> SupTemps;     // Temperatures for superheated gas
-        Array1D<Real64> SupPress;     // Pressures for superheated gas
+#endif // PERFORMANCE_OPT
+
+        int NumSupTempPoints = 0;    // Number of temperature points for superheated enthalpy
+        int NumSupPressPoints = 0;   // Number of pressure points for superheated enthalpy
+        Array1D<Real64> SupTemps;    // Temperatures for superheated gas
+        Array1D<Real64> SupPress;    // Pressures for superheated gas
         Array2D<Real64> HshValues;   // Enthalpy of superheated gas at HshTemps, HshPress
         Array2D<Real64> RhoshValues; // Density of superheated gas at HshTemps, HshPress
 
         std::array<ErrorCountIndex, (int)RefrigError::Num> errors;
 
         Real64 getQuality(EnergyPlusData &state,
-                          Real64 Temperature,             // actual temperature given as input
-                          Real64 Enthalpy,                // actual enthalpy given as input
-                          std::string_view CalledFrom);     // routine this function was called from (error messages)
+                          Real64 Temperature,           // actual temperature given as input
+                          Real64 Enthalpy,              // actual enthalpy given as input
+                          std::string_view CalledFrom); // routine this function was called from (error messages)
 
         Real64 getSatPressure(EnergyPlusData &state,
                               Real64 Temperature,           // actual temperature given as input
-                              std::string_view CalledFrom);   // routine this function was called from (error messages)
+                              std::string_view CalledFrom); // routine this function was called from (error messages)
 
         Real64 getSatTemperature(EnergyPlusData &state,
                                  Real64 Pressure,              // actual temperature given as input
-                                 std::string_view CalledFrom);   // routine this function was called from (error messages)
+                                 std::string_view CalledFrom); // routine this function was called from (error messages)
 
         Real64 getSatEnthalpy(EnergyPlusData &state,
                               Real64 Temperature,           // actual temperature given as input
                               Real64 Quality,               // actual quality given as input
-                              std::string_view CalledFrom);   // routine this function was called from (error messages)
+                              std::string_view CalledFrom); // routine this function was called from (error messages)
 
         Real64 getSatDensity(EnergyPlusData &state,
                              Real64 Temperature,           // actual temperature given as input
                              Real64 Quality,               // actual quality given as input
-                             std::string_view CalledFrom);   // routine this function was called from (error messages)
+                             std::string_view CalledFrom); // routine this function was called from (error messages)
 
         Real64 getSatSpecificHeat(EnergyPlusData &state,
                                   Real64 Temperature,           // actual temperature given as input
                                   Real64 Quality,               // actual quality given as input
-                                  std::string_view CalledFrom);   // routine this function was called from (error messages)
+                                  std::string_view CalledFrom); // routine this function was called from (error messages)
 
         Real64 getSupHeatEnthalpy(EnergyPlusData &state,
                                   Real64 Temperature,           // actual temperature given as input
                                   Real64 Pressure,              // actual pressure given as input
-                                  std::string_view CalledFrom);   // routine this function was called from (error messages)
+                                  std::string_view CalledFrom); // routine this function was called from (error messages)
 
         Real64 getSupHeatPressure(EnergyPlusData &state,
                                   Real64 Temperature,           // actual temperature given as input
                                   Real64 Enthalpy,              // actual enthalpy given as input
-                                  std::string_view CalledFrom);   // routine this function was called from (error messages)
+                                  std::string_view CalledFrom); // routine this function was called from (error messages)
 
         Real64 getSupHeatTemp(EnergyPlusData &state,
                               Real64 Pressure,              // actual pressure given as input
                               Real64 Enthalpy,              // actual enthalpy given as input
                               Real64 TempLow,               // lower bound of temperature in the iteration
                               Real64 TempUp,                // upper bound of temperature in the iteration
-                              std::string_view CalledFrom);   // routine this function was called from (error messages)
-            
+                              std::string_view CalledFrom); // routine this function was called from (error messages)
+
         Real64 getSupHeatDensity(EnergyPlusData &state,
                                  Real64 Temperature,           // actual temperature given as input
                                  Real64 Pressure,              // actual pressure given as input
-                                 std::string_view CalledFrom);   // routine this function was called from (error messages)
+                                 std::string_view CalledFrom); // routine this function was called from (error messages)
     };
 
     enum class GlycolError
@@ -234,121 +244,133 @@ namespace FluidProperties {
         ViscosityHigh,
         Num
     };
-        
+
     struct GlycolRawProps
     {
         // Members
-        std::string Name;           // Name of the glycol
+        std::string Name; // Name of the glycol
         int Num = 0;
 
         std::string CpTempArrayName;
-        bool CpDataPresent = false;         // Flag set when specific heat data is available
-        int NumCpTempPoints = 0;           // Number of temperature points for specific heat
-        int NumCpConcPoints = 0;           // Number of concentration points for specific heat
+        bool CpDataPresent = false; // Flag set when specific heat data is available
+        int NumCpTempPoints = 0;    // Number of temperature points for specific heat
+        int NumCpConcPoints = 0;    // Number of concentration points for specific heat
         Array1D<Real64> CpTemps;    // Temperatures for specific heat of glycol
         Array1D<Real64> CpConcs;    // Concentration for specific heat of glycol
         Array2D<Real64> CpValues;   // Specific heat data values
 
         std::string RhoTempArrayName;
-        bool RhoDataPresent = false;        // Flag set when density data is available
-        int NumRhoTempPoints = 0;          // Number of temperature points for density
-        int NumRhoConcPoints = 0;          // Number of concentration points for density
-        Array1D<Real64> RhoTemps;   // Temperatures for density of glycol
-        Array1D<Real64> RhoConcs;   // Concentration for density of glycol
-        Array2D<Real64> RhoValues;  // Density data values
+        bool RhoDataPresent = false; // Flag set when density data is available
+        int NumRhoTempPoints = 0;    // Number of temperature points for density
+        int NumRhoConcPoints = 0;    // Number of concentration points for density
+        Array1D<Real64> RhoTemps;    // Temperatures for density of glycol
+        Array1D<Real64> RhoConcs;    // Concentration for density of glycol
+        Array2D<Real64> RhoValues;   // Density data values
 
         std::string CondTempArrayName;
-        bool CondDataPresent = false;       // Flag set when conductivity data is available
-        int NumCondTempPoints = 0;         // Number of temperature points for conductivity
-        int NumCondConcPoints = 0;         // Number of concentration points for conductivity
-        Array1D<Real64> CondTemps;  // Temperatures for conductivity of glycol
-        Array1D<Real64> CondConcs;  // Concentration for conductivity of glycol
-        Array2D<Real64> CondValues; // conductivity values
+        bool CondDataPresent = false; // Flag set when conductivity data is available
+        int NumCondTempPoints = 0;    // Number of temperature points for conductivity
+        int NumCondConcPoints = 0;    // Number of concentration points for conductivity
+        Array1D<Real64> CondTemps;    // Temperatures for conductivity of glycol
+        Array1D<Real64> CondConcs;    // Concentration for conductivity of glycol
+        Array2D<Real64> CondValues;   // conductivity values
 
         std::string ViscTempArrayName;
-        bool ViscDataPresent = false;       // Flag set when viscosity data is available
-        int NumViscTempPoints = 0;         // Number of temperature points for viscosity
-        int NumViscConcPoints = 0;         // Number of concentration points for viscosity
-        Array1D<Real64> ViscTemps;  // Temperatures for viscosity of glycol
-        Array1D<Real64> ViscConcs;  // Concentration for viscosity of glycol
-        Array2D<Real64> ViscValues; // viscosity values
+        bool ViscDataPresent = false; // Flag set when viscosity data is available
+        int NumViscTempPoints = 0;    // Number of temperature points for viscosity
+        int NumViscConcPoints = 0;    // Number of concentration points for viscosity
+        Array1D<Real64> ViscTemps;    // Temperatures for viscosity of glycol
+        Array1D<Real64> ViscConcs;    // Concentration for viscosity of glycol
+        Array2D<Real64> ViscValues;   // viscosity values
     };
 
-    struct GlycolProps 
+    struct GlycolProps
     {
         // Members
-        std::string Name;       // Name of the glycol mixture (used by other parts of code)
+        std::string Name; // Name of the glycol mixture (used by other parts of code)
         int Num = 0;
         bool used = false;
-            
+
         std::string GlycolName; // Name of non-water fluid that is part of this mixture
         // (refers to ethylene glycol, propylene glycol, or user fluid)
         int BaseGlycolIndex = 0; // Index in user defined glycol data (>0 = index in raw data,
         // -1=propylene glycol, -2=ethylene glycol)
-        Real64 Concentration = 0.0;       // Concentration (if applicable)
+        Real64 Concentration = 0.0; // Concentration (if applicable)
 
-        bool CpDataPresent = false;         // Flag set when specific heat data is available
-        Real64 CpLowTempValue = 0.0;       // Low Temperature Value for Cp (>0.0)
-        Real64 CpHighTempValue = 0.0;     // High Temperature Value for Cp (max in tables)
-        int CpLowTempIndex = 0;         // Low Temperature Min Index for Cp (>0.0)
-        int CpHighTempIndex = 0;        // High Temperature Max Index for Cp (>0.0)
-        int NumCpTempPoints = 0;           // Number of temperature points for specific heat
-        Array1D<Real64> CpTemps;    // Temperatures for specific heat of glycol
-        Array1D<Real64> CpValues;   // Specific heat data values (J/kg-K)
+        bool CpDataPresent = false;   // Flag set when specific heat data is available
+        Real64 CpLowTempValue = 0.0;  // Low Temperature Value for Cp (>0.0)
+        Real64 CpHighTempValue = 0.0; // High Temperature Value for Cp (max in tables)
+        int CpLowTempIndex = 0;       // Low Temperature Min Index for Cp (>0.0)
+        int CpHighTempIndex = 0;      // High Temperature Max Index for Cp (>0.0)
+        int NumCpTempPoints = 0;      // Number of temperature points for specific heat
+        Array1D<Real64> CpTemps;      // Temperatures for specific heat of glycol
+        Array1D<Real64> CpValues;     // Specific heat data values (J/kg-K)
+#ifdef PERFORMANCE_OPT
+        int LoCpTempIdxLast = 1;
         Array1D<Real64> CpTempRatios; // Speed optimization
-            
-        bool RhoDataPresent = false;        // Flag set when density data is available
-        int NumRhoTempPoints = 0.0;          // Number of temperature points for density
-        Real64 RhoLowTempValue = 0.0;     // Low Temperature Value for Rho (>0.0)
-        Real64 RhoHighTempValue = 0.0;    // High Temperature Value for Rho (max in tables)
-        int RhoLowTempIndex = 0;        // Low Temperature Min Index for Rho (>0.0)
-        int RhoHighTempIndex = 0;       // High Temperature Max Index for Rho (>0.0)
-        Array1D<Real64> RhoTemps;   // Temperatures for density of glycol
-        Array1D<Real64> RhoValues;  // Density data values (kg/m3)
+#endif                                // PERFORMANCE_OPT
+
+        bool RhoDataPresent = false;   // Flag set when density data is available
+        int NumRhoTempPoints = 0.0;    // Number of temperature points for density
+        Real64 RhoLowTempValue = 0.0;  // Low Temperature Value for Rho (>0.0)
+        Real64 RhoHighTempValue = 0.0; // High Temperature Value for Rho (max in tables)
+        int RhoLowTempIndex = 0;       // Low Temperature Min Index for Rho (>0.0)
+        int RhoHighTempIndex = 0;      // High Temperature Max Index for Rho (>0.0)
+        Array1D<Real64> RhoTemps;      // Temperatures for density of glycol
+        Array1D<Real64> RhoValues;     // Density data values (kg/m3)
+#ifdef PERFORMANCE_OPT
+        int LoRhoTempIdxLast = 1;
         Array1D<Real64> RhoTempRatios; // Speed optimization
-            
-        bool CondDataPresent = false;       // Flag set when conductivity data is available
-        int NumCondTempPoints = 0;         // Number of temperature points for conductivity
-        Real64 CondLowTempValue = 0.0;    // Low Temperature Value for Cond (>0.0)
-        Real64 CondHighTempValue = 0.0;   // High Temperature Value for Cond (max in tables)
+#endif                                 // PERFORMANCE_OPT
+
+        bool CondDataPresent = false;   // Flag set when conductivity data is available
+        int NumCondTempPoints = 0;      // Number of temperature points for conductivity
+        Real64 CondLowTempValue = 0.0;  // Low Temperature Value for Cond (>0.0)
+        Real64 CondHighTempValue = 0.0; // High Temperature Value for Cond (max in tables)
         int CondLowTempIndex = 0;       // Low Temperature Min Index for Cond (>0.0)
         int CondHighTempIndex = 0;      // High Temperature Max Index for Cond (>0.0)
-        Array1D<Real64> CondTemps;  // Temperatures for conductivity of glycol
-        Array1D<Real64> CondValues; // conductivity values (W/m-K)
+        Array1D<Real64> CondTemps;      // Temperatures for conductivity of glycol
+        Array1D<Real64> CondValues;     // conductivity values (W/m-K)
+#ifdef PERFORMANCE_OPT
+        int LoCondTempIdxLast = 1;
         Array1D<Real64> CondTempRatios; // Speed optimization
-            
-        bool ViscDataPresent = false;       // Flag set when viscosity data is available
-        int NumViscTempPoints = 0;         // Number of temperature points for viscosity
-        Real64 ViscLowTempValue = 0.0;    // Low Temperature Value for Visc (>0.0)
-        Real64 ViscHighTempValue = 0.0;   // High Temperature Value for Visc (max in tables)
+#endif                                  // PERFORMANCE_OPT
+
+        bool ViscDataPresent = false;   // Flag set when viscosity data is available
+        int NumViscTempPoints = 0;      // Number of temperature points for viscosity
+        Real64 ViscLowTempValue = 0.0;  // Low Temperature Value for Visc (>0.0)
+        Real64 ViscHighTempValue = 0.0; // High Temperature Value for Visc (max in tables)
         int ViscLowTempIndex = 0;       // Low Temperature Min Index for Visc (>0.0)
         int ViscHighTempIndex = 0;      // High Temperature Max Index for Visc (>0.0)
-        Array1D<Real64> ViscTemps;  // Temperatures for viscosity of glycol
-        Array1D<Real64> ViscValues; // viscosity values (mPa-s)
+        Array1D<Real64> ViscTemps;      // Temperatures for viscosity of glycol
+        Array1D<Real64> ViscValues;     // viscosity values (mPa-s)
+#ifdef PERFORMANCE_OPT
+        int LoViscTempIdxLast = 1;
         Array1D<Real64> ViscTempRatios;
-            
+#endif // PERFORMANCE_OPT
+
         std::array<ErrorCountIndex, (int)GlycolError::Num> errors;
 
 #ifdef EP_cache_GlycolSpecificHeat
         Real64 getSpecificHeat_raw(EnergyPlusData &state,
                                    Real64 Temperature,         // actual temperature given as input
                                    std::string_view CalledFrom // routine this function was called from (error messages)
-    );
+        );
 #endif
         Real64 getSpecificHeat(EnergyPlusData &state,
-                               Real64 Temperature,         // actual temperature given as input
+                               Real64 Temperature,           // actual temperature given as input
                                std::string_view CalledFrom); // routine this function was called from (error messages)
 
         Real64 getDensity(EnergyPlusData &state,
-                          Real64 Temperature,         // actual temperature given as input
+                          Real64 Temperature,           // actual temperature given as input
                           std::string_view CalledFrom); // routine this function was called from (error messages)
 
         Real64 getConductivity(EnergyPlusData &state,
-                               Real64 Temperature,         // actual temperature given as input
+                               Real64 Temperature,           // actual temperature given as input
                                std::string_view CalledFrom); // routine this function was called from (error messages)
 
         Real64 getViscosity(EnergyPlusData &state,
-                            Real64 Temperature,         // actual temperature given as input
+                            Real64 Temperature,           // actual temperature given as input
                             std::string_view CalledFrom); // routine this function was called from (error messages)
     };
 
@@ -510,15 +532,15 @@ namespace FluidProperties {
         return Xhi - (((Thi - Tact) / (Thi - Tlo)) * (Xhi - Xlo));
     }
 
-    int GetRefrigNum(EnergyPlusData &state, std::string_view name); 
+    int GetRefrigNum(EnergyPlusData &state, std::string_view name);
     RefrigProps *GetRefrig(EnergyPlusData &state, std::string_view name);
-        
-    int GetGlycolRawNum(EnergyPlusData &state, std::string_view name); 
-    GlycolRawProps *GetGlycolRaw(EnergyPlusData &state, std::string_view name);        
 
-    int GetGlycolNum(EnergyPlusData &state, std::string_view name); 
-    GlycolProps *GetGlycol(EnergyPlusData &state, std::string_view name);        
-        
+    int GetGlycolRawNum(EnergyPlusData &state, std::string_view name);
+    GlycolRawProps *GetGlycolRaw(EnergyPlusData &state, std::string_view name);
+
+    int GetGlycolNum(EnergyPlusData &state, std::string_view name);
+    GlycolProps *GetGlycol(EnergyPlusData &state, std::string_view name);
+
     std::string GetGlycolNameByIndex(EnergyPlusData &state, int Idx); // carries in substance index
 
     int FindArrayIndex(Real64 Value,                 // Value to be placed/found within the array of values
@@ -543,7 +565,7 @@ namespace FluidProperties {
     );
 
     bool CheckFluidPropertyName(EnergyPlusData &state,
-                               std::string const &NameToCheck); // Name from input(?) to be checked against valid FluidPropertyNames
+                                std::string const &NameToCheck); // Name from input(?) to be checked against valid FluidPropertyNames
 
     void ReportOrphanFluids(EnergyPlusData &state);
 
@@ -581,21 +603,21 @@ namespace FluidProperties {
         Real64 superHeatedDensity(EnergyPlusData &state, Real64 temperature, Real64 pressure);
     };
 
-} // namespace Fluid
+} // namespace FluidProperties
 
 struct FluidData : BaseGlobalStruct
 {
     bool DebugReportGlycols = false;
     bool DebugReportRefrigerants = false;
-    int GlycolErrorLimitTest = 1;      // how many times error is printed with details before recurring called
+    int GlycolErrorLimitTest = 1; // how many times error is printed with details before recurring called
     int RefrigErrorLimitTest = 1; // how many times error is printed with details before recurring called
 
-    Array1D<FluidProperties::RefrigProps*> refrigs;
-    Array1D<FluidProperties::GlycolRawProps*> glycolsRaw;
-    Array1D<FluidProperties::GlycolProps*> glycols;
+    Array1D<FluidProperties::RefrigProps *> refrigs;
+    Array1D<FluidProperties::GlycolRawProps *> glycolsRaw;
+    Array1D<FluidProperties::GlycolProps *> glycols;
 
     std::array<int, (int)FluidProperties::GlycolError::Num> glycolErrorLimits = {0, 0, 0, 0, 0, 0, 0, 0};
-        
+
     int SatErrCountGetSupHeatEnthalpyRefrig = 0;
     int SatErrCountGetSupHeatDensityRefrig = 0;
     int TempLoRangeErrIndexGetQualityRefrig = 0;
@@ -615,10 +637,13 @@ struct FluidData : BaseGlobalStruct
     void clear_state() override
     {
 
-        for (int i = 1; i <= refrigs.isize(); ++i) delete refrigs(i);
-        for (int i = 1; i <= glycolsRaw.isize(); ++i) delete glycolsRaw(i);
-        for (int i = 1; i <= glycols.isize(); ++i) delete glycols(i);
-        
+        for (int i = 1; i <= refrigs.isize(); ++i)
+            delete refrigs(i);
+        for (int i = 1; i <= glycolsRaw.isize(); ++i)
+            delete glycolsRaw(i);
+        for (int i = 1; i <= glycols.isize(); ++i)
+            delete glycols(i);
+
         new (this) FluidData();
     }
 };

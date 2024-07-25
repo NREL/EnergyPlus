@@ -309,5 +309,5 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     // clean up
     state->dataWaterToAirHeatPump->WatertoAirHP.deallocate();
-    delete state->dataFluidProps->refrigs(1); 
+    delete state->dataFluidProps->refrigs(1);
 }

@@ -1234,8 +1234,8 @@ void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
 void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
                                    std::string const &Message, // Message automatically written to "error file" at end of simulation
                                    int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
-                                   Real64 const val, 
-                                   std::string const &units              // optional char string (<=15 length) of units for sum value
+                                   Real64 const val,
+                                   std::string const &units // optional char string (<=15 length) of units for sum value
 )
 {
 
@@ -1339,8 +1339,8 @@ void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
 void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
                                     std::string const &Message, // Message automatically written to "error file" at end of simulation
                                     int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
-                                    Real64 const val, 
-                                    std::string const &units              // optional char string (<=15 length) of units for sum value
+                                    Real64 const val,
+                                    std::string const &units // optional char string (<=15 length) of units for sum value
 )
 {
 
@@ -1385,7 +1385,7 @@ void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
     ++state.dataErrTracking->TotalWarningErrors;
     StoreRecurringErrorMessage(state, " ** Warning ** " + Message, MsgIndex, val, val, _, units, units, "");
 }
-        
+
 void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
                                      std::string const &Message, // Message automatically written to "error file" at end of simulation
                                      int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
