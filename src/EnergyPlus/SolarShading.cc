@@ -658,9 +658,9 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     state.dataSysVars->shadingGroupsNum = NumAlphas - (aNum - 1);
-    state.dataSysVars->zoneName.allocate(state.dataSysVars->shadingGroupsNum);
+    state.dataSysVars->shadingGroupZoneListNames.allocate(state.dataSysVars->shadingGroupsNum);
     for (int numZone = 1; numZone <= state.dataSysVars->shadingGroupsNum; ++numZone) {
-        state.dataSysVars->zoneName(numZone) = state.dataIPShortCut->cAlphaArgs(aNum - 1 + numZone);
+        state.dataSysVars->shadingGroupZoneListNames(numZone) = state.dataIPShortCut->cAlphaArgs(aNum - 1 + numZone);
     }
 
     if (!state.dataSysVars->DetailedSolarTimestepIntegration && state.dataSurface->ShadingTransmittanceVaries &&
@@ -757,7 +757,8 @@ void processShadowingInput(EnergyPlusData &state)
         if (NumOfShadingGroups > 0) {
             DisableSelfShadingGroups.allocate(NumOfShadingGroups);
             for (int i = 1; i <= NumOfShadingGroups; i++) {
-                Found = Util::FindItemInList(state.dataSysVars->zoneName(i), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
+                Found = Util::FindItemInList(
+                    state.dataSysVars->shadingGroupZoneListNames(i), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
                 if (Found != 0) DisableSelfShadingGroups(i) = Found;
             }
 

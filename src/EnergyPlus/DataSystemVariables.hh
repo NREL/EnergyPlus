@@ -115,8 +115,8 @@ struct SystemVarsData : BaseGlobalStruct
     bool DisableSelfShadingWithinGroup = false;
     bool DisableSelfShadingBetweenGroup = false;
 
-    int shadingGroupsNum = 0; // number of shading groups
-    Array1D_string zoneName;  // array of zone names in user input
+    int shadingGroupsNum = 0;                 // number of shading groups
+    Array1D_string shadingGroupZoneListNames; // array of zone names in user input
 
     bool TrackAirLoopEnvFlag = false; // If TRUE generates a file with runtime statistics for each HVAC
     //  controller on each air loop
