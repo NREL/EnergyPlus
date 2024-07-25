@@ -197,6 +197,8 @@ namespace WindowAC {
                                 bool &HXUnitOn                 // Used to control HX heat recovery as needed
     );
 
+    bool GetWindowACNodeNumber(EnergyPlusData &state, int const WindACNum);
+
     int GetWindowACZoneInletAirNode(EnergyPlusData &state, int const WindACNum);
 
     int GetWindowACOutAirNode(EnergyPlusData &state, int const WindACNum);
