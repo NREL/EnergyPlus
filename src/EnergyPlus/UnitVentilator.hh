@@ -262,6 +262,8 @@ namespace UnitVentilator {
 
     int GetUnitVentilatorReturnAirNode(EnergyPlusData &state, int const UnitVentNum);
 
+    int getUnitVentilatorIndex(EnergyPlusData &state, std::string_view CompName);
+
     Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state,
                                                       int const UnitVentNum,     // Unit Ventilator index number
                                                       Real64 const MinOAFrac,    // Minimum Outside Air Fraction
