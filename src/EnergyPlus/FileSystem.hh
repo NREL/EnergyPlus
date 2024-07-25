@@ -317,7 +317,7 @@ namespace FileSystem {
 
     std::string toGenericString(fs::path const &p);
 
-    fs::path appendSuffixToPath(fs::path const& outputFilePrefixFullPath, const std::string &suffix);
+    fs::path appendSuffixToPath(fs::path const &outputFilePrefixFullPath, const std::string &suffix);
 
 } // namespace FileSystem
 } // namespace EnergyPlus
