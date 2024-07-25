@@ -2049,7 +2049,7 @@ namespace SolarCollectors {
         Real64 DeltaT = std::abs(TAbsorber - TWater);
         Real64 TReference = TAbsorber - 0.25 * (TAbsorber - TWater);
         // record fluid prop index for water
-        int WaterIndex = FluidProperties::FindGlycol(state, fluidNameWater);
+        int WaterIndex = FluidProperties::GetGlycolNum(state, fluidNameWater);
         // find properties of water - always assume water
         Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
         Real64 CondOfWater = FluidProperties::GetConductivityGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
