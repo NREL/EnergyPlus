@@ -2849,7 +2849,7 @@ namespace FluidProperties {
         static constexpr std::string_view routineName = "RefrigProps::getSatTemperature";
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        bool ErrorFlag; // error flag for current call
+        bool ErrorFlag = false; // error flag for current call
 
         auto &df = state.dataFluidProps;
 
