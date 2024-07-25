@@ -139,7 +139,6 @@ namespace VariableSpeedCoils {
         // This subroutine manages variable-speed Water to Air Heat Pump component simulation.
 
         // Using/Aliasing
-        using FluidProperties::FindGlycol;
         using General::SolveRoot;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -7749,7 +7748,6 @@ namespace VariableSpeedCoils {
         // as negative.
 
         // Using/Aliasing
-        using FluidProperties::FindGlycol;
 
         // Return value
         Real64 CoilCapacity; // returned capacity of matched coil
@@ -7809,9 +7807,6 @@ namespace VariableSpeedCoils {
         // This function looks up the coil index for the given coil and returns it.  If
         // incorrect coil type or name is given, ErrorsFound is returned as true and index is returned
         // as zero.
-
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
 
         // Return value
         int IndexNum; // returned index of matched coil
@@ -7993,9 +7988,6 @@ namespace VariableSpeedCoils {
         // incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
         // as zero.
 
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
-
         // Return value
         int NodeNumber; // returned outlet node of matched coil
 
@@ -8040,9 +8032,6 @@ namespace VariableSpeedCoils {
         // This function looks up the given coil and returns the outlet node.  If
         // incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
         // as zero.
-
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
 
         // Return value
         int NodeNumber; // returned outlet node of matched coil
@@ -8217,9 +8206,6 @@ namespace VariableSpeedCoils {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine was designed to "push" information from a parent object to
         // this WSHP coil object.
-
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataVariableSpeedCoils->GetCoilsInputFlag) { // First time subroutine has been entered

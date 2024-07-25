@@ -2612,8 +2612,6 @@ namespace SimulationManager {
 
         // Using/Aliasing
         // using SQLiteProcedures::CreateSQLiteDatabase;
-        using FluidProperties::FindGlycol;
-
         state.dataGlobal->DoingInputProcessing = false;
 
         state.dataInputProcessing->inputProcessor->preProcessorCheck(
