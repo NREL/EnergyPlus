@@ -1499,6 +1499,36 @@ namespace WindowAC {
         } // WindAC(WindACNum)%DXCoilType_Num == CoilDX_CoolingHXAssisted && *
     }
 
+    bool GetWindowACNodeNumber(EnergyPlusData &state, int const NodeNumber)
+    {
+        if (state.dataWindowAC->GetWindowACInputFlag) {
+            GetWindowAC(state);
+            state.dataWindowAC->GetWindowACInputFlag = false;
+        }
+
+        bool windowACOutdoorAir = false;
+
+        for (int windowACIndex = 1; windowACIndex <= state.dataWindowAC->NumWindAC; ++windowACIndex) {
+            auto &windowAC = state.dataWindowAC->WindAC(windowACIndex);
+            if (windowAC.OutAirVolFlow == 0) {
+                windowACOutdoorAir = true;
+            } else {
+                windowACOutdoorAir = false;
+            }
+            int FanInletNodeIndex = 0;
+            int FanOutletNodeIndex = 0;
+            FanInletNodeIndex = state.dataFans->fans(windowAC.FanIndex)->inletNodeNum;
+            FanOutletNodeIndex = state.dataFans->fans(windowAC.FanIndex)->outletNodeNum;
+
+            if (windowACOutdoorAir &&
+                (NodeNumber == windowAC.OutsideAirNode || NodeNumber == windowAC.MixedAirNode || NodeNumber == windowAC.AirReliefNode ||
+                 NodeNumber == FanInletNodeIndex || NodeNumber == FanOutletNodeIndex || NodeNumber == windowAC.AirInNode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     int GetWindowACZoneInletAirNode(EnergyPlusData &state, int const WindACNum)
     {
 
@@ -1617,6 +1647,22 @@ namespace WindowAC {
         }
 
         return GetWindowACMixedAirNode;
+    }
+
+    int getWindowACIndex(EnergyPlusData &state, std::string_view CompName)
+    {
+        if (state.dataWindowAC->GetWindowACInputFlag) {
+            GetWindowAC(state);
+            state.dataWindowAC->GetWindowACInputFlag = false;
+        }
+
+        for (int WindACIndex = 1; WindACIndex <= state.dataWindowAC->NumWindAC; ++WindACIndex) {
+            if (Util::SameString(state.dataWindowAC->WindAC(WindACIndex).Name, CompName)) {
+                return WindACIndex;
+            }
+        }
+
+        return 0;
     }
 
 } // namespace WindowAC

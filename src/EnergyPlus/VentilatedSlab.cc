@@ -4761,6 +4761,21 @@ namespace VentilatedSlab {
         }
     }
 
+    int getVentilatedSlabIndex(EnergyPlusData &state, std::string_view CompName)
+    {
+        if (state.dataVentilatedSlab->GetInputFlag) {
+            GetVentilatedSlabInput(state);
+            state.dataVentilatedSlab->GetInputFlag = false;
+        }
+
+        for (int VentSlabNum = 1; VentSlabNum <= state.dataVentilatedSlab->NumOfVentSlabs; ++VentSlabNum) {
+            if (Util::SameString(state.dataVentilatedSlab->VentSlab(VentSlabNum).Name, CompName)) {
+                return VentSlabNum;
+            }
+        }
+
+        return 0;
+    }
     //*****************************************************************************************
 
 } // namespace VentilatedSlab
