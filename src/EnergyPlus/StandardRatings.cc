@@ -6361,7 +6361,7 @@ namespace StandardRatings {
                     p_H1_low + (p_H0_low - p_H1_low) * ((1.67 - (8.33)) / (16.67 - (8.33)));
 
                 // Equation 11.194 AHRI-2023
-                Real64 N_HE = (p_H2_int != p_35_low) ? min(1.0, (p_H2_int - p_35_low) / (p_H2_full - p_35_low)) : 0.0;
+                Real64 N_HE = (p_H2_full != p_35_low) ? min(1.0, (p_H2_int - p_35_low) / (p_H2_full - p_35_low)) : 0.0;
                 N_HE = max(0.0, N_HE);
 
                 // Equation 11.193 AHRI-2023
