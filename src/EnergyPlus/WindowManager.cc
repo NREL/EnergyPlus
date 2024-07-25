@@ -2373,7 +2373,7 @@ namespace Window {
                         wm->thick[TotGlassLay] = matBlind->SlatThickness;
                         wm->scon[TotGlassLay] = matBlind->SlatConductivity / matBlind->SlatThickness;
 
-                        if (surfWin.blind.matNum) {
+                        if (surfWin.blind.movableSlats) {
                             int slatIdxLo = surfWin.blind.slatAngIndex;
                             int slatIdxHi = std::min(Material::MaxSlatAngs, slatIdxLo + 1);
 

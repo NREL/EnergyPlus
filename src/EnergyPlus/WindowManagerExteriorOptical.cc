@@ -189,22 +189,20 @@ namespace Window {
             auto &construction = state.dataConstruction->Construct(ConstrNum);
             if (construction.isGlazingConstruction(state)) {
                 for (int LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
-                    auto *materialBase = s_mat->materials(construction.LayerPoint(LayNum));
-                    auto *material = dynamic_cast<Material::MaterialChild *>(materialBase);
-                    assert(material != nullptr);
-                    if (material->group != Material::Group::WindowGas && material->group != Material::Group::WindowGasMixture &&
-                        material->group != Material::Group::ComplexWindowGap && material->group != Material::Group::ComplexWindowShade) {
+                    auto const *mat = s_mat->materials(construction.LayerPoint(LayNum));
+                    if (mat->group != Material::Group::WindowGas && mat->group != Material::Group::WindowGasMixture &&
+                        mat->group != Material::Group::ComplexWindowGap && mat->group != Material::Group::ComplexWindowShade) {
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
                         // of construction. It will basically trigger Window optical calculations if this
                         // property is >0.
                         construction.TransDiff = 0.1;
 
                         WavelengthRange aRange = WavelengthRange::Solar;
-                        auto aSolarLayer = getScatteringLayer(state, material, aRange); // (AUTO_OK_OBJ)
+                        auto aSolarLayer = getScatteringLayer(state, mat, aRange); // (AUTO_OK_OBJ)
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aSolarLayer);
 
                         aRange = WavelengthRange::Visible;
-                        auto aVisibleLayer = getScatteringLayer(state, material, aRange); // (AUTO_OK_OBJ)
+                        auto aVisibleLayer = getScatteringLayer(state, mat, aRange); // (AUTO_OK_OBJ)
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aVisibleLayer);
                     }
                 }
@@ -226,53 +224,31 @@ namespace Window {
             int ConstrNumSh = surf.activeShadedConstruction;
             if (ConstrNumSh == 0) continue;
             int TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
-            bool IntShade = false;
-            bool IntBlind = false;
-            int ShadeLayPtr = 0;
-            int BlNum = 0;
-            auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
-                s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)));
-            assert(thisMaterial != nullptr);
-            if (thisMaterial->group == Material::Group::Shade) {
-                IntShade = true;
-                ShadeLayPtr = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay);
-            }
-            if (thisMaterial->group == Material::Group::WindowBlind) {
-                IntBlind = true;
-                BlNum = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay);
-            }
+            auto const *mat = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay));
 
-            if (IntShade || IntBlind) {
+            if (mat->group == Material::Group::Shade) {
+                Real64 EpsGlIR = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
+                Real64 RhoGlIR = 1 - EpsGlIR;
+                Real64 TauShIR = mat->TransThermal;
+                Real64 EpsShIR = mat->AbsorpThermal;
+                Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
+                surfWin.EffShBlindEmiss[1] = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                surfWin.EffGlassEmiss[1] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+
+            } else if (mat->group == Material::Group::WindowBlind) {
+                Real64 EpsGlIR = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
+                Real64 RhoGlIR = 1 - EpsGlIR;
+
+                auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(mat);
                 for (int ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
-                    Real64 EpsGlIR = 0.0;
-                    Real64 RhoGlIR = 0.0;
-                    if (IntShade || IntBlind) {
-                        EpsGlIR = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
-                        RhoGlIR = 1 - EpsGlIR;
-                    }
-                    if (IntShade) {
-                        auto const *thisMaterialShade = dynamic_cast<const Material::MaterialChild *>(s_mat->materials(ShadeLayPtr));
-                        Real64 TauShIR = thisMaterialShade->TransThermal;
-                        Real64 EpsShIR = thisMaterialShade->AbsorpThermal;
-                        Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        surfWin.EffShBlindEmiss[1] = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        surfWin.EffGlassEmiss[1] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
-                    }
-                    if (IntBlind) {
-                        auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
-                        Real64 TauShIR = matBlind->IRFrontTrans(ISlatAng);
-                        Real64 EpsShIR = matBlind->IRBackEmiss(ISlatAng);
-                        Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        surfWin.EffShBlindEmiss[ISlatAng] = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        surfWin.EffGlassEmiss[ISlatAng] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
-                    }
-                    // Loop over remaining slat angles only if blind with movable slats
-                    if (IntShade) break; // Loop over remaining slat angles only if blind
-                    if (IntBlind) {
-                        auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
-                        if (matBlind->SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
-                    }
-                } // End of slat angle loop
+                    Real64 TauShIR = matBlind->IRFrontTrans(ISlatAng);
+                    Real64 EpsShIR = matBlind->IRBackEmiss(ISlatAng);
+                    Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
+                    surfWin.EffShBlindEmiss[ISlatAng] = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                    surfWin.EffGlassEmiss[ISlatAng] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+
+                    if (matBlind->SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
+                }
             }     // End of check if interior shade or interior blind
         }         // End of surface loop
     }
@@ -392,7 +368,6 @@ namespace Window {
 
     std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createVisibleRangeMaterial(EnergyPlusData &state)
     {
-        auto &s_mat = state.dataMaterial;
         auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(m_MaterialProperties);
         assert(matBlind != nullptr);
 
