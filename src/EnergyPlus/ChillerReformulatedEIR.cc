@@ -671,8 +671,8 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
         if (NumNums > 15) {
             thisChiller.MinCondFlowRatio = state.dataIPShortCut->rNumericArgs(16);
         }
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(20)) {
-            thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(20)));
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
+            thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(19)));
         }
         thisChiller.thermosiphonMinTempDiff = state.dataIPShortCut->rNumericArgs(17);
     }

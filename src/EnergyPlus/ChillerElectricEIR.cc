@@ -791,8 +791,8 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
         } else {
             thisChiller.EndUseSubcategory = "General";
         }
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(21)) {
-            thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(21)));
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(20)) {
+            thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(20)));
         }
         thisChiller.thermosiphonMinTempDiff = state.dataIPShortCut->rNumericArgs(20);
     }
