@@ -186,9 +186,8 @@ void InitSolarCalculations(EnergyPlusData &state)
             state.dataSolarShading->shd_stream =
                 std::make_unique<std::fstream>(state.dataStrGlobals->outputShdFilePath, std::ios_base::out | std::ios_base::trunc);
             if (!state.dataSolarShading->shd_stream) {
-                ShowFatalError(state,
-                               format("InitSolarCalculations: Could not open file \"{}\" for output (write).",
-                                      state.dataStrGlobals->outputShdFilePath.string()));
+                ShowFatalError(
+                    state, format("InitSolarCalculations: Could not open file \"{}\" for output (write).", state.dataStrGlobals->outputShdFilePath));
             }
         } else {
             state.dataSolarShading->shd_stream = std::make_unique<std::iostream>(nullptr);

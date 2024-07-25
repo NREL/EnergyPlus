@@ -183,7 +183,7 @@ namespace DataSystemVariables {
         for (std::size_t i = 0; i < numPathsToTest; ++i) {
             if (FileSystem::fileExists(pathsToCheck[i].first)) {
                 foundFilePath = pathsToCheck[i].first;
-                print(state.files.audit, "found ({})={}\n", pathsToCheck[i].second, FileSystem::getAbsolutePath(foundFilePath).string());
+                print(state.files.audit, "found ({})={}\n", pathsToCheck[i].second, FileSystem::getAbsolutePath(foundFilePath));
 
                 return foundFilePath;
             } else {
@@ -198,15 +198,15 @@ namespace DataSystemVariables {
                 if (!found) {
                     pathsChecked.push_back(currentPath);
                 }
-                print(state.files.audit, "not found ({})={}\n", pathsToCheck[i].second, FileSystem::getAbsolutePath(pathsToCheck[i].first).string());
+                print(state.files.audit, "not found ({})={}\n", pathsToCheck[i].second, FileSystem::getAbsolutePath(pathsToCheck[i].first));
             }
         }
 
         // If we get here, we didn't find the file
-        ShowSevereError(state, format("{}\"{}\" not found.", contextString, originalInputFilePath.string()));
+        ShowSevereError(state, format("{}\"{}\" not found.", contextString, originalInputFilePath));
         ShowContinueError(state, "  Paths searched:");
         for (auto &path : pathsChecked) {
-            ShowContinueError(state, format("    {}: \"{}\"", path.second, path.first.string()));
+            ShowContinueError(state, format("    {}: \"{}\"", path.second, path.first));
         }
 
         return foundFilePath;

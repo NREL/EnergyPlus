@@ -68,7 +68,7 @@ InputFile &InputFile::ensure_open(EnergyPlusData &state, const std::string &call
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(state, fmt::format("{}: Could not open file {} for input (read).", caller, filePath.string()));
+        ShowFatalError(state, fmt::format("{}: Could not open file {} for input (read).", caller, filePath));
     }
     return *this;
 }
@@ -217,7 +217,7 @@ InputOutputFile &InputOutputFile::ensure_open(EnergyPlusData &state, const std::
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(state, fmt::format("{}: Could not open file {} for output (write).", caller, filePath.string()));
+        ShowFatalError(state, fmt::format("{}: Could not open file {} for output (write).", caller, filePath));
     }
     return *this;
 }
