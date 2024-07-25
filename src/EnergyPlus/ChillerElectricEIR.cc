@@ -1926,6 +1926,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
 
     // If not air or evap cooled then set to the condenser node that is attached to a cooling tower
     Real64 condInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
+    this->CondInletTemp = condInletTemp; // needed for thermosiphon model
 
     // LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
     Real64 ChillerRefCap = this->RefCap;
@@ -2350,7 +2351,6 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
         }
         this->ChillerEIRFPLR = 0.0;
     }
-
     if (this->thermosiphonDisabled(state)) {
         this->Power = (AvailChillerCap / ReferenceCOP) * this->ChillerEIRFPLR * this->ChillerEIRFT * FRAC;
     }

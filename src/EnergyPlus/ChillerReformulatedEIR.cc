@@ -2090,6 +2090,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
 
     // Set module-level chiller evap and condenser inlet temperature variables
     Real64 condInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
+    this->CondInletTemp = condInletTemp; // needed for thermosiphon model
 
     // If no loop demand or chiller OFF, return
     // If chiller load is 0 or chiller is not running then leave the subroutine. Before leaving
@@ -2443,9 +2444,6 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
         // Chiller cycles below minimum part load ratio, FRAC = amount of time chiller is ON during this time step
         if (PartLoadRat < this->MinPartLoadRat) FRAC = min(1.0, (PartLoadRat / this->MinPartLoadRat));
 
-        // set the module level variable used for reporting FRAC
-        this->ChillerCyclingRatio = FRAC;
-
         // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
         if (AvailChillerCap > 0.0) {
             PartLoadRat = max(PartLoadRat, this->MinUnloadRat);
@@ -2463,6 +2461,9 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
         }
 
     } // This is the end of the FlowLock Block
+
+    // set the module level variable used for reporting FRAC
+    this->ChillerCyclingRatio = FRAC;
 
     this->ChillerEIRFT = max(0.0, Curve::CurveValue(state, this->ChillerEIRFTIndex, this->EvapOutletTemp, this->ChillerCondAvgTemp));
 

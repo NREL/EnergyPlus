@@ -1528,6 +1528,7 @@ namespace PlantChillers {
         } // End of the Air Cooled/Evap Cooled Logic block
 
         Real64 condInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
+        this->CondInletTemp = condInletTemp; // needed if thermosiphon model is used
 
         // correct inlet temperature if using heat recovery
         if (this->HeatRecActive) {
@@ -1607,9 +1608,6 @@ namespace PlantChillers {
             } else {
                 FRAC = 1.0;
             }
-            if (this->thermosiphonDisabled(state)) {
-                this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / this->COP * FRAC;
-            }
 
             // Either set the flow to the Constant value or calculate the flow for the variable volume
             if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
@@ -1671,6 +1669,10 @@ namespace PlantChillers {
                 }
 
             } // End of Constant Variable Flow If Block
+
+            if (this->thermosiphonDisabled(state)) {
+                this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / this->COP * FRAC;
+            }
 
             // If there is a fault of Chiller SWT Sensor
             if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
