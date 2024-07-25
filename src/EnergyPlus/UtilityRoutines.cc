@@ -1231,6 +1231,56 @@ void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
         state, " ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
 }
 
+void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
+                                   std::string const &Message, // Message automatically written to "error file" at end of simulation
+                                   int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                   Real64 const val,
+                                   std::string const &units // optional char string (<=15 length) of units for sum value
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Michael J. Witte
+    //       DATE WRITTEN   August 2004
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine stores a recurring ErrorMessage with a Severe designation
+    // for output at the end of the simulation with automatic tracking of number
+    // of occurrences and optional tracking of associated min, max, and sum values
+
+    // METHODOLOGY EMPLOYED:
+    // Calls StoreRecurringErrorMessage utility routine.
+
+    // Using/Aliasing
+    using namespace DataStringGlobals;
+    using namespace DataErrorTracking;
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    //  Use for recurring "severe" error messages shown once at end of simulation
+    //  with count of occurrences and optional max, min, sum
+
+    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+        if (has(Message, MessageSearch[Loop])) {
+            ++state.dataErrTracking->MatchCounts(Loop);
+            break;
+        }
+    }
+    bool bNewMessageFound = true;
+    for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
+        if (Util::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Severe  ** " + Message)) {
+            bNewMessageFound = false;
+            MsgIndex = Loop;
+            break;
+        }
+    }
+    if (bNewMessageFound) {
+        MsgIndex = 0;
+    }
+
+    ++state.dataErrTracking->TotalSevereErrors;
+    StoreRecurringErrorMessage(state, " ** Severe  ** " + Message, MsgIndex, val, val, _, units, units, "");
+}
+
 void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
                                     std::string const &Message, // Message automatically written to "error file" at end of simulation
                                     int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
@@ -1284,6 +1334,56 @@ void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
     ++state.dataErrTracking->TotalWarningErrors;
     StoreRecurringErrorMessage(
         state, " ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
+}
+
+void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
+                                    std::string const &Message, // Message automatically written to "error file" at end of simulation
+                                    int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                    Real64 const val,
+                                    std::string const &units // optional char string (<=15 length) of units for sum value
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Michael J. Witte
+    //       DATE WRITTEN   August 2004
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine stores a recurring ErrorMessage with a Warning designation
+    // for output at the end of the simulation with automatic tracking of number
+    // of occurrences and optional tracking of associated min, max, and sum values
+
+    // METHODOLOGY EMPLOYED:
+    // Calls StoreRecurringErrorMessage utility routine.
+
+    // Using/Aliasing
+    using namespace DataStringGlobals;
+    using namespace DataErrorTracking;
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    //  Use for recurring "warning" error messages shown once at end of simulation
+    //  with count of occurrences and optional max, min, sum
+
+    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+        if (has(Message, MessageSearch[Loop])) {
+            ++state.dataErrTracking->MatchCounts(Loop);
+            break;
+        }
+    }
+    bool bNewMessageFound = true;
+    for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
+        if (Util::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Warning ** " + Message)) {
+            bNewMessageFound = false;
+            MsgIndex = Loop;
+            break;
+        }
+    }
+    if (bNewMessageFound) {
+        MsgIndex = 0;
+    }
+
+    ++state.dataErrTracking->TotalWarningErrors;
+    StoreRecurringErrorMessage(state, " ** Warning ** " + Message, MsgIndex, val, val, _, units, units, "");
 }
 
 void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,

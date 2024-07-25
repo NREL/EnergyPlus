@@ -543,9 +543,6 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 
 TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 {
-    using FluidProperties::GetSpecificHeatGlycol;
-    using FluidProperties::Water;
-
     std::string idf_objects = delimited_string({
         "Schedule:Constant,",
         "    WaterHeaterSP1Schedule,  !- Name",
@@ -774,7 +771,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     state->dataWaterThermalTanks->mdotAir = 0.0993699992873531;
 
     int GlycolIndex = 0;
-    const Real64 Cp = FluidProperties::GetSpecificHeatGlycol(*state, Water, Tank.TankTemp, GlycolIndex, "HPWHEnergyBalance");
+    const Real64 Cp = FluidProperties::GetSpecificHeatGlycol(*state, "WATER", Tank.TankTemp, GlycolIndex, "HPWHEnergyBalance");
 
     Tank.CalcHeatPumpWaterHeater(*state, false);
 
@@ -3223,7 +3220,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     // Source side is in the demand side of the plant loop
     Tank.SrcSidePlantLoc.loopSideNum = EnergyPlus::DataPlant::LoopSideLocation::Demand;
     Tank.SavedSourceOutletTemp = 60.0;
-    rho = GetDensityGlycol(*state, "Water", Tank.TankTemp, WaterIndex, "MixedTankAlternateSchedule");
+    rho = FluidProperties::GetDensityGlycol(*state, "Water", Tank.TankTemp, WaterIndex, "MixedTankAlternateSchedule");
 
     // Set the available max flow rates for tank and node
     Tank.PlantSourceMassFlowRateMax = Tank.SourceDesignVolFlowRate * rho;

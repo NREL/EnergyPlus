@@ -92,12 +92,12 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
 {
     // test consecutive call to fluid properties getInput
     FluidProperties::GetFluidPropertiesData(*state);
-    EXPECT_EQ(1, state->dataFluidProps->NumOfRefrigerants);
-    EXPECT_EQ(1, state->dataFluidProps->NumOfGlycols);
+    EXPECT_EQ(1, state->dataFluidProps->refrigs.isize());
+    EXPECT_EQ(1, state->dataFluidProps->glycols.isize());
 
     FluidProperties::GetFluidPropertiesData(*state); // should never happen but if it does it's safe
-    EXPECT_EQ(1, state->dataFluidProps->NumOfRefrigerants);
-    EXPECT_EQ(1, state->dataFluidProps->NumOfGlycols);
+    EXPECT_EQ(1, state->dataFluidProps->refrigs.isize());
+    EXPECT_EQ(1, state->dataFluidProps->glycols.isize());
 
     // This test captures all code paths through the RegulateCondenserCompFlowReqOp function
     // We only need a single component to check here

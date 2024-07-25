@@ -267,7 +267,6 @@ namespace SteamBaseboardRadiator {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using FluidProperties::FindRefrigerant;
 
         using GlobalNames::VerifyUniqueBaseboardName;
         using NodeInputManager::GetOnlySingleNode;
@@ -780,7 +779,7 @@ namespace SteamBaseboardRadiator {
             }
 
             if (state.dataSteamBaseboardRadiator->SteamIndex == 0 && BaseboardNum == 1) {
-                state.dataSteamBaseboardRadiator->SteamIndex = FindRefrigerant(state, "Steam");
+                state.dataSteamBaseboardRadiator->SteamIndex = FluidProperties::GetRefrigNum(state, "STEAM");
                 if (state.dataSteamBaseboardRadiator->SteamIndex == 0) {
                     ShowSevereError(state, format("{}Steam Properties for {} not found.", RoutineName, state.dataIPShortCut->cAlphaArgs(1)));
                     if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
