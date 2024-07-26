@@ -89,7 +89,10 @@ jobs:
         # Download my patched QtIFW
         mkdir QtIFW && cd QtIFW
         aria2c https://github.com/jmarrec/QtIFW-fixup/releases/download/v5.0.0-dev-with-fixup/QtIFW-5.0.0-${{ matrix.arch }}.zip
+        xattr -r -d com.apple.quarantine ./QtIFW-5.0.0-arm64.zip
         unzip QtIFW-5.0.0-${{ matrix.arch }}.zip
+        rm -Rf ./*.zip
+        chmod +x *
         ./installerbase --version
         echo "$(pwd)" >> $GITHUB_PATH
 
