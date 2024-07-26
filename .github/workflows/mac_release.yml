@@ -13,6 +13,7 @@ env:
   FC: gfortran-13
   SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
   Python_REQUIRED_VERSION: 3.12.2
+  BUILD_DOCS: false  # Installing MacTex takes like 15min, so you can speed things up by disabling it
 
 jobs:
   build_installer_artifact:
@@ -126,10 +127,15 @@ jobs:
       shell: bash
       run: |
         set -x
-        echo "Using brew to install mactex and adding it to PATH"
         brew update
-        brew install --cask mactex-no-gui
-        echo "/Library/TeX/texbin" >> $GITHUB_PATH
+        if [[ "$BUILD_DOCS" != "false" ]]; then
+          echo "Using brew to install mactex and adding it to PATH"
+          brew install --cask mactex-no-gui
+          echo "/Library/TeX/texbin" >> $GITHUB_PATH
+          echo "DOCUMENTATION_BUILD=BuildWithAll" >> $GITHUB_ENV
+        else
+          echo "DOCUMENTATION_BUILD=DoNotBuild" >> $GITHUB_ENV
+        fi
         # The MACOSX_DEPLOYMENT_TARGET environment variable sets the default value for the CMAKE_OSX_DEPLOYMENT_TARGET variable.
         # We use cmake commands to build some subprojects, so setting it globally
         echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
@@ -152,7 +158,7 @@ jobs:
               -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
               -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/ \
               -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
-              -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" \
+              -DDOCUMENTATION_BUILD:STRING=$DOCUMENTATION_BUILD -DTEX_INTERACTION:STRING="batchmode" \
               -DENABLE_OPENMP:BOOL=OFF -DUSE_OpenMP:BOOL=OFF \
               -DCPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION:STRING="Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" \
               -DCPACK_CODESIGNING_NOTARY_PROFILE_NAME:STRING=EnergyPlus \
