@@ -2,8 +2,10 @@ name: Mac Releases
 
 on:
   push:
+    branches: [codesigning, develop]
     tags:
       - '*'
+  workflow_dispatch:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,10 +54,62 @@ jobs:
         python-version: ${{ env.Python_REQUIRED_VERSION }}
         # check-latest: true # Force pick up the python I built instead of the (potential) toolcache one. I could also do `rm -Rf $RUNNER_TOOL_CACHE/Python/3.12.2` before this action
 
-    - name: Setup QtIFW 4.x
-      uses: jmarrec/setup-qtifw@v1
-      with:
-        qtifw-version: '4.6.1'
+#    - name: Setup QtIFW 4.x
+#      uses: jmarrec/setup-qtifw@v1
+#      with:
+#        qtifw-version: '4.6.1'
+
+    - name: "Configure for codesigning"
+      run: |
+        set -x
+        cd $RUNNER_TEMP
+        mkdir codesigning && cd codesigning
+        # ----- Create certificate files from secrets base64 -----
+        echo ${{ secrets.MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_P12_BASE64 }} | base64 --decode > certificate_application.p12
+        echo ${{ secrets.MACOS_DEVELOPER_ID_INSTALLER_CERTIFICATE_P12_BASE64 }} | base64 --decode > certificate_installer.p12
+
+        # ----- Configure Keychain -----
+        KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+        security create-keychain -p "${{ secrets.MACOS_KEYCHAIN_PASSWORD }}" $KEYCHAIN_PATH
+        # Unlock it for 6 hours
+        security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+        security unlock-keychain -p "${{ secrets.MACOS_KEYCHAIN_PASSWORD }}" $KEYCHAIN_PATH
+
+        # ----- Import certificates on Keychain -----
+        security import certificate_application.p12 -P "${{ secrets.MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_P12_PASSWORD }}" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security import certificate_installer.p12 -P "${{ secrets.MACOS_DEVELOPER_ID_INSTALLER_CERTIFICATE_P12_PASSWORD }}" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security list-keychain -d user -s $KEYCHAIN_PATH
+        security find-identity -vvvv $KEYCHAIN_PATH
+
+        # Add needed intermediary certificates
+        aria2c https://www.apple.com/certificateauthority/AppleWWDRCAG2.cer
+        aria2c https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
+        security import AppleWWDRCAG2.cer -k $KEYCHAIN_PATH
+        security import DeveloperIDG2CA.cer -k $KEYCHAIN_PATH
+        security find-identity -vvvv $KEYCHAIN_PATH
+        security find-identity -v -p codesigning
+
+        # Store AppConnect credentials
+        echo ${{ secrets.NOTARIZATION_API_KEY }} > AppConnect_Developer_API_Key.p8
+        xcrun notarytool store-credentials EnergyPlus \
+              --key AppConnect_Developer_API_Key.p8 \
+              --key-id ${{ secrets.NOTARIZATION_API_TEAM_ID }} \
+              --issuer ${{ secrets.NOTARIZATION_API_TEAM_ID }} \
+              --keychain $KEYCHAIN_PATH
+
+        cd .. && rm -Rf codesigning
+
+        # Download my patched QtIFW
+        mkdir QtIFW && cd QtIFW
+        aria2c https://github.com/jmarrec/QtIFW-fixup/releases/download/v5.0.0-dev-with-fixup/QtIFW-5.0.0-${{ matrix.arch }}.zip
+        unzip QtIFW-5.0.0-${{ matrix.arch }}.zip
+        ./installerbase --version
+        echo "$(pwd)" >> $GITHUB_PATH
+
+    - name: Temp debug setup codesigning
+      run: |
+        ./installerbase --version
+        security find-identity -v -p codesigning
 
     - name: Install Python dependencies
       run: |
@@ -76,6 +130,7 @@ jobs:
         echo "Installing gcc@13 for gfortran support of -static-libquadmath"
         brew list gcc@13 || brew install gcc@13
         which gfortran-13 || echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
+        brew install ninja
 
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
@@ -86,19 +141,21 @@ jobs:
       working-directory: ./build
       shell: bash
       run: |
-        cmake -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
+        cmake -G Ninja -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
               -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }} \
               -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
               -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/ \
               -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" \
               -DENABLE_OPENMP:BOOL=OFF -DUSE_OpenMP:BOOL=OFF \
+              -DCPACK_NOTARY_PROFILE_NAME:STRING=EnergyPlus \
+              -DCPACK_IFW_PACKAGE_SIGNING_IDENTITY:STRING="Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" \
               ../
 
     - name: Build Package
       working-directory: ./build
       shell: bash
-      run: cmake --build . --target package -j 3
+      run: ninja package
 
     - name: otool the exes and libs
       shell: bash
