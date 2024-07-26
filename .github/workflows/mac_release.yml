@@ -81,7 +81,7 @@ jobs:
         xcrun notarytool store-credentials EnergyPlus \
               --key AppConnect_Developer_API_Key.p8 \
               --key-id ${{ secrets.NOTARIZATION_API_TEAM_ID }} \
-              --issuer ${{ secrets.NOTARIZATION_API_TEAM_ID }} \
+              --issuer ${{ secrets.NOTARIZATION_API_ISSUER_ID }} \
               --keychain $KEYCHAIN_PATH
 
         cd .. && rm -Rf codesigning
