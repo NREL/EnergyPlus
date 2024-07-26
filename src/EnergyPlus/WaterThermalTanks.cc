@@ -12507,4 +12507,20 @@ bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumbe
     return HeatPumpWaterHeaterNodeException;
 }
 
+int getHeatPumpWaterHeaterIndex(EnergyPlusData &state, std::string_view CompName)
+{
+    if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
+        GetWaterThermalTankInput(state);
+        state.dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
+    }
+
+    for (int HPNum = 1; HPNum <= state.dataWaterThermalTanks->numHeatPumpWaterHeater; ++HPNum) {
+        if (Util::SameString(state.dataWaterThermalTanks->HPWaterHeater(HPNum).Name, CompName)) {
+            return HPNum;
+        }
+    }
+
+    return 0;
+}
+
 } // namespace EnergyPlus::WaterThermalTanks
