@@ -172,9 +172,9 @@ jobs:
         set -x
         dmg=$(ls EnergyPlus-*.dmg)
         spctl --assess --type open --context context:primary-signature -vvvv $dmg || true
-        codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus.DmgInstaller" -o runtime $f
-        xcrun notarytool submit --keychain-profile "EnergyPlus" --wait $f
-        xcrun stapler staple -v $f
+        codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus.DmgInstaller" -o runtime $dmg
+        xcrun notarytool submit --keychain-profile "EnergyPlus" --wait $dmg
+        xcrun stapler staple -v $dmg
         spctl --assess --type open --context context:primary-signature -vvvv $dmg || true
         mkdir temp_mount
         hdiutil attach -mountpoint ./temp_mount/ $dmg
