@@ -10757,6 +10757,21 @@ int GetVRFTUReturnAirNode(EnergyPlusData &state, int const VRFTUNum)
     }
 }
 
+int getEqIndex(EnergyPlusData &state, std::string_view VRFTUName)
+{
+    if (state.dataHVACVarRefFlow->GetVRFInputFlag) {
+        GetVRFInput(state);
+        state.dataHVACVarRefFlow->GetVRFInputFlag = false;
+    }
+
+    for (int VRFTUNum = 1; VRFTUNum <= state.dataHVACVarRefFlow->NumVRFTU; VRFTUNum++) {
+        if (Util::SameString(VRFTUName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name)) {
+            return VRFTUNum;
+        }
+    }
+    return 0;
+}
+
 void getVRFTUZoneLoad(
     EnergyPlusData &state, int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP, bool const InitFlag)
 {
