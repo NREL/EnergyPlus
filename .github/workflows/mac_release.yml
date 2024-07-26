@@ -41,19 +41,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Remove python ${{ env.Python_REQUIRED_VERSION }} from the toolcache
-      run: |
-        ls $RUNNER_TOOL_CACHE/Python || true
-        rm -Rf "$RUNNER_TOOL_CACHE/Python/${{ env.Python_REQUIRED_VERSION }}"
-        rm -Rf "$RUNNER_TOOL_CACHE/Python/${{ env.Python_REQUIRED_VERSION }}*/"
-
-    - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
-      id: setup-python
-      uses: jmarrec/setup-python@v5
-      with:
-        python-version: ${{ env.Python_REQUIRED_VERSION }}
-        # check-latest: true # Force pick up the python I built instead of the (potential) toolcache one. I could also do `rm -Rf $RUNNER_TOOL_CACHE/Python/3.12.2` before this action
-
 #    - name: Setup QtIFW 4.x
 #      uses: jmarrec/setup-qtifw@v1
 #      with:
@@ -65,8 +52,8 @@ jobs:
         cd $RUNNER_TEMP
         mkdir codesigning && cd codesigning
         # ----- Create certificate files from secrets base64 -----
-        echo ${{ secrets.MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_P12_BASE64 }} | base64 --decode > certificate_application.p12
-        echo ${{ secrets.MACOS_DEVELOPER_ID_INSTALLER_CERTIFICATE_P12_BASE64 }} | base64 --decode > certificate_installer.p12
+        echo "${{ secrets.MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_P12_BASE64 }}" | base64 --decode > certificate_application.p12
+        echo "${{ secrets.MACOS_DEVELOPER_ID_INSTALLER_CERTIFICATE_P12_BASE64 }}" | base64 --decode > certificate_installer.p12
 
         # ----- Configure Keychain -----
         KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
@@ -90,7 +77,7 @@ jobs:
         security find-identity -v -p codesigning
 
         # Store AppConnect credentials
-        echo ${{ secrets.NOTARIZATION_API_KEY }} > AppConnect_Developer_API_Key.p8
+        echo "${{ secrets.NOTARIZATION_API_KEY }}" > AppConnect_Developer_API_Key.p8
         xcrun notarytool store-credentials EnergyPlus \
               --key AppConnect_Developer_API_Key.p8 \
               --key-id ${{ secrets.NOTARIZATION_API_TEAM_ID }} \
@@ -110,6 +97,20 @@ jobs:
       run: |
         ./installerbase --version
         security find-identity -v -p codesigning
+
+
+    - name: Remove python ${{ env.Python_REQUIRED_VERSION }} from the toolcache
+      run: |
+        ls $RUNNER_TOOL_CACHE/Python || true
+        rm -Rf "$RUNNER_TOOL_CACHE/Python/${{ env.Python_REQUIRED_VERSION }}"
+        rm -Rf "$RUNNER_TOOL_CACHE/Python/${{ env.Python_REQUIRED_VERSION }}*/"
+
+    - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
+      id: setup-python
+      uses: jmarrec/setup-python@v5
+      with:
+        python-version: ${{ env.Python_REQUIRED_VERSION }}
+        # check-latest: true # Force pick up the python I built instead of the (potential) toolcache one. I could also do `rm -Rf $RUNNER_TOOL_CACHE/Python/3.12.2` before this action
 
     - name: Install Python dependencies
       run: |
