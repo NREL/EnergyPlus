@@ -71,6 +71,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlusLogger.hh>
 #include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -146,9 +147,9 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         // Since logger context must persist across all calls to libtk205/btwxt, it must be a member
         thisChiller.LoggerContext = {&state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
         thisChiller.Representation = std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(
-            RSInstanceFactory::create("RS0001", rep_file_path.string().c_str(), std::make_shared<EnergyPlusLogger>()));
+            RSInstanceFactory::create("RS0001", FileSystem::toString(rep_file_path).c_str(), std::make_shared<EnergyPlusLogger>()));
         if (nullptr == thisChiller.Representation) {
-            ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path.string()));
+            ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path));
             ErrorsFound = true;
         }
         thisChiller.Representation->performance.performance_map_cooling.get_logger()->set_message_context(&thisChiller.LoggerContext);
