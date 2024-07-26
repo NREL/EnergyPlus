@@ -692,6 +692,104 @@ if(WIN32 AND NOT UNIX)
   endif()
 endif()
 
+if(APPLE)
+  if(CPACK_IFW_PACKAGE_SIGNING_IDENTITY)
+    # Only works if Generator is Xcode
+    set(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "K7JYVQJL7R")
+    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Developer ID Application")
+    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Manual")
+    set(XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED TRUE)
+    message("HELLO")
+
+    #set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/CodeSigning.cmake")
+
+    set(NEEDS_SIGNING
+      "ConvertInputFormat-24.2.0"
+      "EPMacro"
+      "ExpandObjects"
+      "energyplus-24.2.0"
+      "libenergyplusapi.24.2.0.dylib"
+      "libpython3.8.dylib"
+      "runenergyplus"
+      "runepmacro"
+      "runreadvars"
+      "PostProcess/AppGPostProcess"
+      "PostProcess/HVAC-Diagram"
+      "PostProcess/ReadVarsESO"
+      "PostProcess/convertESOMTRpgm/convertESOMTR"
+      "PreProcess/CalcSoilSurfTemp/CalcSoilSurfTemp"
+      "PreProcess/GrndTempCalc/Basement"
+      "PreProcess/GrndTempCalc/Slab"
+      "PreProcess/IDFVersionUpdater/Transition-V22-1-0-to-V22-2-0"
+      "PreProcess/IDFVersionUpdater/Transition-V22-2-0-to-V23-1-0"
+      "PreProcess/IDFVersionUpdater/Transition-V23-1-0-to-V23-2-0"
+      "PreProcess/IDFVersionUpdater/Transition-V23-2-0-to-V24-1-0"
+      "PreProcess/IDFVersionUpdater/Transition-V24-1-0-to-V24-2-0"
+      "PreProcess/IDFVersionUpdater/Transition-V9-0-0-to-V9-1-0"
+      "PreProcess/IDFVersionUpdater/Transition-V9-1-0-to-V9-2-0"
+      "PreProcess/IDFVersionUpdater/Transition-V9-2-0-to-V9-3-0"
+      "PreProcess/IDFVersionUpdater/Transition-V9-3-0-to-V9-4-0"
+      "PreProcess/IDFVersionUpdater/Transition-V9-4-0-to-V9-5-0"
+      "PreProcess/IDFVersionUpdater/Transition-V9-5-0-to-V9-6-0"
+      "PreProcess/IDFVersionUpdater/Transition-V9-6-0-to-V22-1-0"
+      "PreProcess/ParametricPreprocessor/ParametricPreprocessor"
+
+      # Already signed
+      # "PreProcess/EP-Launch-Lite.app"
+      # "PreProcess/IDFVersionUpdater/IDFVersionUpdater.app"
+      # "PostProcess/EP-Compare/EP-Compare.app"
+    )
+
+    install(CODE [[
+      execute_process(
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/ConvertInputFormat-24.2.0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/EPMacro"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/ExpandObjects"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/energyplus-24.2.0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/libenergyplusapi.24.2.0.dylib"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/libintl.8.dylib"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/libpython3.8.dylib"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/runenergyplus"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/runepmacro"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/runreadvars"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PostProcess/AppGPostProcess"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PostProcess/HVAC-Diagram"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PostProcess/ReadVarsESO"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PostProcess/convertESOMTRpgm/convertESOMTR"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/CalcSoilSurfTemp/CalcSoilSurfTemp"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/GrndTempCalc/Basement"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/GrndTempCalc/Slab"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V22-1-0-to-V22-2-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V22-2-0-to-V23-1-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V23-1-0-to-V23-2-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V23-2-0-to-V24-1-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V24-1-0-to-V24-2-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V9-0-0-to-V9-1-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V9-1-0-to-V9-2-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V9-2-0-to-V9-3-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V9-3-0-to-V9-4-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V9-4-0-to-V9-5-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V9-5-0-to-V9-6-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V9-6-0-to-V22-1-0"
+        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/ParametricPreprocessor/ParametricPreprocessor"
+      )
+
+      file(GLOB PYTHON_SOS "${CMAKE_INSTALL_PREFIX}/python_standard_lib/lib-dynload/*.so")
+      foreach(PYTHON_SO ${PYTHON_SOS})
+        execute_process(
+          COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${PYTHON_SO}"
+        )
+      endforeach()
+    ]])
+
+
+#        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/EP-Launch-Lite.app"
+#        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/IDFVersionUpdater.app"
+#        COMMAND codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus" -o runtime "${CMAKE_INSTALL_PREFIX}/PostProcess/EP-Compare/EP-Compare.app"
+#
+  endif()
+endif()
+
 ######################################################################################################################################################
 #                                                    P A C K A G I N G   &   C O M P O N E N T S                                                     #
 ######################################################################################################################################################
