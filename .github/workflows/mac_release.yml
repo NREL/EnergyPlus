@@ -170,6 +170,24 @@ jobs:
       run: |
         ninja package
 
+    - name: Upload Tarball as artifact for testing
+      uses: actions/upload-artifact@v4
+      with:
+        name: energyplus-${{ matrix.os }}.tar.gz
+        path: build/EnergyPlus-*-${{ matrix.arch }}.tar.gz
+        if-no-files-found: error
+        retention-days: 7
+        overwrite: false
+
+    - name: Upload DMG as artifact for testing
+      uses: actions/upload-artifact@v4
+      with:
+        name: energyplus-${{ matrix.os }}.dmg
+        path: build/EnergyPlus-*-${{ matrix.arch }}.dmg
+        if-no-files-found: error
+        retention-days: 7
+        overwrite: false
+
     - name: Test Package signing
       working-directory: ./build
       shell: bash
@@ -199,7 +217,6 @@ jobs:
         codesign -dvvv ./test_install/libenergyplusapi.dylib
         codesign -dvvv ./test_install/libpython*.dylib
         codesign -dvvv ./test_install/ConvertInputFormat
-        codesign -dvvv ./test_install/PostProcess/ReadVarsESO
         echo "::endgroup::"
 
         begin_group "Running a simulation with python"
@@ -220,24 +237,6 @@ jobs:
         otool -L PreProcess/IDFVersionUpdater/Transition-V23-1-0-to-V23-2-0 || true
         otool -L PostProcess/ReadVarsESO || true
         otool -L PostProcess/HVAC-Diagram || true
-
-    - name: Upload Tarball as artifact for testing
-      uses: actions/upload-artifact@v4
-      with:
-        name: energyplus-${{ matrix.os }}.tar.gz
-        path: build/EnergyPlus-*-${{ matrix.arch }}.tar.gz
-        if-no-files-found: error
-        retention-days: 7
-        overwrite: false
-
-    - name: Upload DMG as artifact for testing
-      uses: actions/upload-artifact@v4
-      with:
-        name: energyplus-${{ matrix.os }}.dmg
-        path: build/EnergyPlus-*-${{ matrix.arch }}.dmg
-        if-no-files-found: error
-        retention-days: 7
-        overwrite: false
 
     - name: Upload Tarball to release
       uses: svenstaro/upload-release-action@v2
