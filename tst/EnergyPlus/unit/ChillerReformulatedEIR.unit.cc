@@ -239,16 +239,16 @@ TEST_F(EnergyPlusFixture, ChillerElectricReformulatedEIR_WaterCooledChillerVaria
     thisChiller.initialize(*state, RunFlag, MyLoad);
     thisChiller.calculate(*state, MyLoad, RunFlag, FalsiCondOutTemp);
     EXPECT_GT(thisChiller.ChillerPartLoadRatio, 0.7); // load is large
-    EXPECT_EQ(thisChiller.thermosiphonStatus, 0);      // thermosiphon is off
-    EXPECT_GT(thisChiller.Power, 20000.0);             // power is non-zero
+    EXPECT_EQ(thisChiller.thermosiphonStatus, 0);     // thermosiphon is off
+    EXPECT_GT(thisChiller.Power, 20000.0);            // power is non-zero
 
     state->dataLoopNodes->Node(thisChiller.CondInletNodeNum).Temp = 5.0; // condenser inlet temp < evap outlet temp
 
     thisChiller.initialize(*state, RunFlag, MyLoad);
     thisChiller.calculate(*state, MyLoad, RunFlag, FalsiCondOutTemp);
     EXPECT_GT(thisChiller.ChillerPartLoadRatio, 0.7); // load is large
-    EXPECT_EQ(thisChiller.thermosiphonStatus, 0);      // thermosiphon is off
-    EXPECT_GT(thisChiller.Power, 20000.0);             // power is non-zero
+    EXPECT_EQ(thisChiller.thermosiphonStatus, 0);     // thermosiphon is off
+    EXPECT_GT(thisChiller.Power, 20000.0);            // power is non-zero
 
     MyLoad /= 15.0; // reduce load such that thermosiphon can meet load
     thisChiller.initialize(*state, RunFlag, MyLoad);

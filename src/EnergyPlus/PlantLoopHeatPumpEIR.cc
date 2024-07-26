@@ -1811,7 +1811,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
                 // fields only in cooling object
                 if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) {
-                    auto const thermosiphonTempCurveName = fields.find("thermosiphon_temperature_difference_curve_name");
+                    auto const thermosiphonTempCurveName = fields.find("thermosiphon_capacity_fraction_curve_name");
                     if (thermosiphonTempCurveName != fields.end()) {
                         thisPLHP.thermosiphonTempCurveIndex =
                             Curve::GetCurveIndex(state, Util::makeUPPER(thermosiphonTempCurveName.value().get<std::string>()));
