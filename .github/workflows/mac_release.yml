@@ -63,8 +63,8 @@ jobs:
         security unlock-keychain -p "${{ secrets.MACOS_KEYCHAIN_PASSWORD }}" $KEYCHAIN_PATH
 
         # ----- Import certificates on Keychain -----
-        security import certificate_application.p12 -P "${{ secrets.MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_P12_PASSWORD }}" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-        security import certificate_installer.p12 -P "${{ secrets.MACOS_DEVELOPER_ID_INSTALLER_CERTIFICATE_P12_PASSWORD }}" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security import certificate_application.p12 -P '${{ secrets.MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_P12_PASSWORD }}' -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security import certificate_installer.p12   -P '${{ secrets.MACOS_DEVELOPER_ID_INSTALLER_CERTIFICATE_P12_PASSWORD }}'   -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
         security list-keychain -d user -s $KEYCHAIN_PATH
         security find-identity -vvvv $KEYCHAIN_PATH
 
