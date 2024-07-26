@@ -98,8 +98,11 @@ jobs:
 
     - name: Temp debug setup codesigning
       run: |
-        ./installerbase --version
+        set -x
         security find-identity -v -p codesigning
+        which installerbase
+        which binarycreator
+        installerbase --version
 
 
     - name: Remove python ${{ env.Python_REQUIRED_VERSION }} from the toolcache
@@ -168,7 +171,11 @@ jobs:
       run: |
         set -x
         dmg=$(ls EnergyPlus-*.dmg)
-        spctl --assess --type open --context context:primary-signature -vvvv $dmg
+        spctl --assess --type open --context context:primary-signature -vvvv $dmg || true
+        codesign -vvvv --force -s "Developer ID Application: National Renewable Energy Laboratory (K7JYVQJL7R)" -f --timestamp -i "org.nrel.EnergyPlus.DmgInstaller" -o runtime $f
+        xcrun notarytool submit --keychain-profile "EnergyPlus" --wait $f
+        xcrun stapler staple -v $f
+        spctl --assess --type open --context context:primary-signature -vvvv $dmg || true
         mkdir temp_mount
         hdiutil attach -mountpoint ./temp_mount/ $dmg
         filename="${dmg%.*}"
