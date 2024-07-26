@@ -88,6 +88,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -100,6 +101,7 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
@@ -10159,8 +10161,11 @@ namespace AirflowNetwork {
         EPVector<DataLoopNode::ConnectionType> NodeConnectionType; // Specifies the type of node connection
         std::string CurrentModuleObject;
 
-        bool HPWHFound(false);          // Flag for HPWH identification
-        bool StandaloneERVFound(false); // Flag for Standalone ERV (ZoneHVAC:EnergyRecoveryVentilator) identification
+        bool hpwhFound(false);            // Flag for HPWH identification
+        bool standaloneERVFound(false);   // Flag for Standalone ERV (ZoneHVAC:EnergyRecoveryVentilator) identification
+        bool packagedUnitaryFound(false); // Flag for packaged unitary systems (ZoneHVAC:PackagedTerminalAirConditioner,
+                                          // ZoneHVAC:PackagedTerminalHeatPump, ZoneHVAC:WaterToAirHeatPump) identification
+        bool vrfTUFound(false);
 
         // Validate supply and return connections
         NodeFound.dimension(m_state.dataLoopNodes->NumOfNodes, false);
@@ -10265,13 +10270,25 @@ namespace AirflowNetwork {
                 // Skip HPWH nodes that don't have to be included in the AFN
                 if (GetHeatPumpWaterHeaterNodeNumber(m_state, i)) {
                     NodeFound(i) = true;
-                    HPWHFound = true;
+                    hpwhFound = true;
                 }
 
                 // Skip Standalone ERV nodes that don't have to be included in the AFN
                 if (GetStandAloneERVNodeNumber(m_state, i)) {
                     NodeFound(i) = true;
-                    StandaloneERVFound = true;
+                    standaloneERVFound = true;
+                }
+
+                // Skip zonal unitary system based nodes that don't have to be included in the AFN
+                if (UnitarySystems::getUnitarySystemNodeNumber(m_state, i)) {
+                    NodeFound(i) = true;
+                    packagedUnitaryFound = true;
+                }
+
+                // Skip zonal vrf terminal nodes that don't have to be included in the AFN
+                if (HVACVariableRefrigerantFlow::getVRFTUNodeNumber(m_state, i)) {
+                    NodeFound(i) = true;
+                    vrfTUFound = true;
                 }
             }
 
@@ -10403,15 +10420,27 @@ namespace AirflowNetwork {
                 }
             }
         }
-        if (HPWHFound) {
+        if (hpwhFound) {
             ShowWarningError(m_state,
                              format(RoutineName) + "Heat pump water heater is simulated along with an AirflowNetwork but is not included in "
                                                    "the AirflowNetwork.");
         }
-        if (StandaloneERVFound) {
+        if (standaloneERVFound) {
             ShowWarningError(m_state,
                              format(RoutineName) + "A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an AirflowNetwork but is not "
                                                    "included in the AirflowNetwork.");
+        }
+        if (packagedUnitaryFound) {
+            ShowWarningError(m_state,
+                             format(RoutineName) + "A ZoneHVAC:PackagedTerminalAirConditioner, ZoneHVAC:PackagedTerminalHeatPump, or "
+                                                   "ZoneHVAC:WaterToAirHeatPump is simulated along with an AirflowNetwork but is not "
+                                                   "included in the AirflowNetwork.");
+        }
+        if (vrfTUFound) {
+            ShowWarningError(m_state,
+                             format(RoutineName) +
+                                 "A ZoneHVAC:TerminalUnit:VariableRefrigerantFlow is simulated along with an AirflowNetwork but is not "
+                                 "included in the AirflowNetwork.");
         }
         NodeFound.deallocate();
 
