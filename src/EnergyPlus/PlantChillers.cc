@@ -1588,7 +1588,7 @@ namespace PlantChillers {
         } else {
             OperPartLoadRat = 0.0;
         }
-        this->CyclingRatio = OperPartLoadRat;
+        this->partLoadRatio = OperPartLoadRat;
 
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
@@ -1608,6 +1608,7 @@ namespace PlantChillers {
             } else {
                 FRAC = 1.0;
             }
+            this->cyclingRatio = FRAC;
 
             // Either set the flow to the Constant value or calculate the flow for the variable volume
             if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
@@ -1809,6 +1810,7 @@ namespace PlantChillers {
             } else {
                 FRAC = 1.0;
             }
+            this->cyclingRatio = FRAC;
 
             // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
             if (this->thermosiphonDisabled(state)) {
@@ -2149,7 +2151,7 @@ namespace PlantChillers {
                 return true;
             }
             Real64 thermosiphonCapFrac = Curve::CurveValue(state, this->thermosiphonTempCurveIndex, dT);
-            Real64 capFrac = this->CyclingRatio;
+            Real64 capFrac = this->partLoadRatio * this->cyclingRatio;
             if (thermosiphonCapFrac >= capFrac) {
                 this->thermosiphonStatus = 1;
                 this->Power = 0.0;

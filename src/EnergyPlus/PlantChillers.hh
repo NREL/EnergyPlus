@@ -214,7 +214,8 @@ namespace PlantChillers {
         Real64 HeatRecInletTemp; // (HeatRecOutletTemp is in base already)
         Real64 HeatRecMdot;
         Real64 ChillerCondAvgTemp; // the effective condenser temperature for chiller performance [C]
-        Real64 CyclingRatio = 0.0;
+        Real64 partLoadRatio = 0.0;
+        Real64 cyclingRatio = 0.0;
 
         // thermosiphon model
         int thermosiphonTempCurveIndex = 0;

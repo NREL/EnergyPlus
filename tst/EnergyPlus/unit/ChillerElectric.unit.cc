@@ -370,7 +370,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
 
     thisChiller.initialize(*state, RunFlag, MyLoad);
     thisChiller.calculate(*state, MyLoad, RunFlag, EquipFlowCtrl);
-    EXPECT_GT(thisChiller.CyclingRatio, 0.77);    // load is large
+    EXPECT_GT(thisChiller.partLoadRatio, 0.77);   // load is large
     EXPECT_EQ(thisChiller.thermosiphonStatus, 0); // thermosiphon is off
     EXPECT_GT(thisChiller.Power, 3000.0);         // power is non-zero
 
@@ -378,7 +378,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
 
     thisChiller.initialize(*state, RunFlag, MyLoad);
     thisChiller.calculate(*state, MyLoad, RunFlag, EquipFlowCtrl);
-    EXPECT_GT(thisChiller.CyclingRatio, 0.73);    // load is large
+    EXPECT_GT(thisChiller.partLoadRatio, 0.73);   // load is large
     EXPECT_EQ(thisChiller.thermosiphonStatus, 0); // thermosiphon is off
     EXPECT_GT(thisChiller.Power, 3000.0);         // power is non-zero
 
@@ -387,8 +387,8 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     thisChiller.calculate(*state, MyLoad, RunFlag, EquipFlowCtrl);
     Real64 dT = thisChiller.EvapOutletTemp - thisChiller.CondInletTemp;
     Real64 thermosiphonCapFrac = Curve::CurveValue(*state, thisChiller.thermosiphonTempCurveIndex, dT);
-    EXPECT_LT(thisChiller.CyclingRatio, 0.05);                // load is small
-    EXPECT_GT(thermosiphonCapFrac, thisChiller.CyclingRatio); // thermosiphon capacity can meet load
-    EXPECT_EQ(thisChiller.thermosiphonStatus, 1);             // thermosiphon is on
-    EXPECT_EQ(thisChiller.Power, 0.0);                        // power is zero
+    EXPECT_LT(thisChiller.partLoadRatio, 0.05);                // load is small
+    EXPECT_GT(thermosiphonCapFrac, thisChiller.partLoadRatio); // thermosiphon capacity can meet load
+    EXPECT_EQ(thisChiller.thermosiphonStatus, 1);              // thermosiphon is on
+    EXPECT_EQ(thisChiller.Power, 0.0);                         // power is zero
 }
