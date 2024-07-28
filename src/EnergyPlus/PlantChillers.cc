@@ -6545,6 +6545,11 @@ namespace PlantChillers {
                 }
             }
 
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9)));
+            }
+            thisChiller.thermosiphonMinTempDiff = state.dataIPShortCut->rNumericArgs(8);
+
             // set default design condenser in and evaporator out temperatures
             // Values from AHRI Standard 550/590 (2023, IP Version)
             thisChiller.TempDesEvapOut = 6.67; // Degree Celsius, or 44 Degree Fahrenheit
@@ -6650,6 +6655,14 @@ namespace PlantChillers {
                             "Chiller Condenser Inlet Temperature",
                             Constant::Units::C,
                             this->CondInletTemp,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            this->Name);
+
+        SetupOutputVariable(state,
+                            "Thermosiphon Status",
+                            Constant::Units::None,
+                            this->thermosiphonStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             this->Name);
@@ -6777,6 +6790,10 @@ namespace PlantChillers {
 
         Real64 mdot = 0.0;
         Real64 mdotCond = 0.0;
+        this->thermosiphonStatus = 0;
+        this->partLoadRatio = 0.0;
+        this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
+        this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         if ((MyLoad < 0.0) && RunFlag) {
             mdot = this->EvapMassFlowRateMax;
             mdotCond = this->CondMassFlowRateMax;
@@ -7120,6 +7137,7 @@ namespace PlantChillers {
         Real64 TempEvapOutSetPoint(0.0);     // C - evaporator outlet temperature setpoint
         Real64 COP = this->COP;              // coefficient of performance
         Real64 ChillerNomCap = this->NomCap; // chiller nominal capacity
+        this->Power = 0.0;
 
         // If there is a fault of chiller fouling
         if (this->FaultyChillerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
@@ -7213,6 +7231,7 @@ namespace PlantChillers {
             this->PrintMessage = false;
             return;
         }
+        this->partLoadRatio = std::abs(MyLoad) / ChillerNomCap;
 
         //   calculate end time of current time step
         Real64 const CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
@@ -7298,7 +7317,6 @@ namespace PlantChillers {
         if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = false;
             this->QEvaporator = std::abs(MyLoad);
-            this->Power = std::abs(MyLoad) / COP;
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
@@ -7354,6 +7372,9 @@ namespace PlantChillers {
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
             } // End of Constant or Variable Flow If Block for FlowLock = 0 (or making a flow request)
+            if (this->thermosiphonDisabled(state)) {
+                this->Power = std::abs(MyLoad) / COP;
+            }
 
             // If there is a fault of Chiller SWT Sensor
             if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
@@ -7455,13 +7476,16 @@ namespace PlantChillers {
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
             }
-            // Calculate the Power consumption of the Const COP chiller which is a simplified calculation
-            this->Power = this->QEvaporator / COP;
             if (this->EvapMassFlowRate == 0.0) {
                 this->QEvaporator = 0.0;
                 this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 this->Power = 0.0;
                 this->PrintMessage = false;
+            } else {
+                // Calculate the Power consumption of the Const COP chiller which is a simplified calculation
+                if (this->thermosiphonDisabled(state)) {
+                    this->Power = this->QEvaporator / COP;
+                }
             }
             if (this->QEvaporator == 0.0 && this->CondenserType == DataPlant::CondenserType::EvapCooled) {
                 CalcBasinHeaterPower(
@@ -7539,22 +7563,18 @@ namespace PlantChillers {
             this->Energy = 0.0;
             this->EvaporatorEnergy = 0.0;
             this->CondenserEnergy = 0.0;
-            this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
-            this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
-            this->CondOutletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
-            this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
+            this->CondOutletTemp = this->CondInletTemp;
+            this->EvapOutletTemp = this->EvapInletTemp;
             this->ActualCOP = 0.0;
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
 
             // set outlet node temperatures
-            state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
-            state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
+            state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = this->EvapInletTemp;
+            state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = this->CondInletTemp;
 
         } else {
-            this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
-            this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
             if (this->Power != 0.0) {
                 this->ActualCOP = this->QEvaporator / this->Power;
             } else {
@@ -7635,6 +7655,27 @@ namespace PlantChillers {
                 }
             }
             this->MyFlag = false;
+        }
+    }
+
+    bool ConstCOPChillerSpecs::thermosiphonDisabled(EnergyPlusData &state)
+    {
+        if (this->thermosiphonTempCurveIndex > 0) {
+            this->thermosiphonStatus = 0;
+            Real64 dT = this->EvapOutletTemp - this->CondInletTemp;
+            if (dT < this->thermosiphonMinTempDiff) {
+                return true;
+            }
+            Real64 thermosiphonCapFrac = Curve::CurveValue(state, this->thermosiphonTempCurveIndex, dT);
+            Real64 capFrac = this->partLoadRatio * this->cyclingRatio;
+            if (thermosiphonCapFrac >= capFrac) {
+                this->thermosiphonStatus = 1;
+                this->Power = 0.0;
+                return false;
+            }
+            return true;
+        } else {
+            return true;
         }
     }
 

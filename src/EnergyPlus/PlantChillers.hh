@@ -464,6 +464,13 @@ namespace PlantChillers {
     {
         // Members
         Real64 ActualCOP;
+        Real64 partLoadRatio = 0.0;
+        Real64 cyclingRatio = 1.0;
+
+        // thermosiphon model
+        int thermosiphonTempCurveIndex = 0;
+        Real64 thermosiphonMinTempDiff = 0.0;
+        int thermosiphonStatus = 0;
 
         // Default Constructor
         ConstCOPChillerSpecs() : ActualCOP(0.0)
@@ -491,6 +498,8 @@ namespace PlantChillers {
         void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        bool thermosiphonDisabled(EnergyPlusData &state);
     };
 } // namespace PlantChillers
 
