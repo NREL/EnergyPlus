@@ -1598,7 +1598,23 @@
     Main Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
     WaterCooled,             !- Condenser Type
     LeavingSetpointModulated,!- Chiller Flow Mode
-    ;                        !- Sizing Factor
+    ,                        !- Sizing Factor
+    ,                        !- Basin Heater Capacity
+    ,                        !- Basin Heater Setpoint Temperature
+    ,                        !- Basin Heater Operating Schedule Name
+    ThermoCapFracCurve,      !- Thermosiphon Capacity Fraction Curve Name
+    2.5;                     !- Thermosiphon Minimum Temperature Difference
+
+  Curve:Linear,
+    ThermoCapFracCurve,      !- Name
+    0.0,                     !- Coefficient1 Constant
+    0.06,                    !- Coefficient2 x
+    0.0,                     !- Minimum Value of x
+    10.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Curve Output
+    1.0,                     !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
   SetpointManager:Scheduled,
     Main Chiller Setpoint Manager,  !- Name
@@ -2488,6 +2504,10 @@
   Output:Variable,*,Cooling Tower Mass Flow Rate,timestep;
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,timestep;
+
+  Output:Variable,*,Chiller Electricity Rate,timestep;
+
+  Output:Variable,*,Thermosiphon Status,timestep;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 
