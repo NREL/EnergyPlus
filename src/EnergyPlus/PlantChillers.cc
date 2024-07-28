@@ -611,6 +611,12 @@ namespace PlantChillers {
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                 thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(14)));
+                if (thisChiller.thermosiphonTempCurveIndex == 0) {
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, thisChiller.Name));
+                    ShowContinueError(state,
+                                      format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14)));
+                    ErrorsFound = true;
+                }
             }
             thisChiller.thermosiphonMinTempDiff = state.dataIPShortCut->rNumericArgs(26);
         }
@@ -6547,6 +6553,12 @@ namespace PlantChillers {
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                 thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9)));
+                if (thisChiller.thermosiphonTempCurveIndex == 0) {
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, thisChiller.Name));
+                    ShowContinueError(state,
+                                      format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
+                    ErrorsFound = true;
+                }
             }
             thisChiller.thermosiphonMinTempDiff = state.dataIPShortCut->rNumericArgs(8);
 

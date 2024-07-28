@@ -1815,6 +1815,13 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     if (thermosiphonTempCurveName != fields.end()) {
                         thisPLHP.thermosiphonTempCurveIndex =
                             Curve::GetCurveIndex(state, Util::makeUPPER(thermosiphonTempCurveName.value().get<std::string>()));
+                        if (thisPLHP.thermosiphonTempCurveIndex == 0) {
+                            ShowSevereError(state, format("{} =\"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisPLHP.name));
+                            ShowContinueError(state,
+                                              format("Invalid Thermosiphon Capacity Fraction Curve Name = {}",
+                                                     thermosiphonTempCurveName.value().get<std::string>()));
+                            errorsFound = true;
+                        }
                     }
                     thisPLHP.thermosiphonMinTempDiff = state.dataInputProcessing->inputProcessor->getRealFieldValue(
                         fields, schemaProps, "thermosiphon_minimum_temperature_difference");

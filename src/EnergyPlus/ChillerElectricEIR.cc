@@ -793,6 +793,11 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
         }
         if (!state.dataIPShortCut->lAlphaFieldBlanks(20)) {
             thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(20)));
+            if (thisChiller.thermosiphonTempCurveIndex == 0) {
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, thisChiller.Name));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(20), state.dataIPShortCut->cAlphaArgs(20)));
+                ErrorsFound = true;
+            }
         }
         thisChiller.thermosiphonMinTempDiff = state.dataIPShortCut->rNumericArgs(20);
     }
