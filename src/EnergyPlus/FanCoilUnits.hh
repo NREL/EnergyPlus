@@ -319,7 +319,7 @@ namespace FanCoilUnits {
 
     void ReportFanCoilUnit(EnergyPlusData &state, int FanCoilNum); // number of the current fan coil unit being simulated
 
-    int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int FanCoilNum);
+    int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int const FanCoilNum);
 
     int GetFanCoilOutAirNode(EnergyPlusData &state, int FanCoilNum);
 
@@ -380,6 +380,7 @@ namespace FanCoilUnits {
                                               int WaterControlNode,
                                               Real64 MinWaterFlow);
 
+    int getEqIndex(EnergyPlusData &state, std::string_view CompName);
 } // namespace FanCoilUnits
 
 struct FanCoilUnitsData : BaseGlobalStruct

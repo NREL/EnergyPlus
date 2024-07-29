@@ -58,6 +58,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Solver.hpp>
+#include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -71,19 +72,31 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
+#include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MundtSimMgr.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UFADManager.hh>
+#include <EnergyPlus/UnitHeater.hh>
+#include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
@@ -1250,7 +1263,7 @@ namespace RoomAir {
         int TotNumOfRAFNNodeGainsLists;
         int TotNumOfRAFNNodeHVACLists;
         int TotNumEquip;
-        bool IntEquipError;
+        bool IntEquipFound;
 
         auto &ipsc = state.dataIPShortCut;
         ipsc->cCurrentModuleObject = "RoomAirSettings:AirflowNetwork";
@@ -1564,11 +1577,11 @@ namespace RoomAir {
         }         // loop thru TotNumOfRAFNNodeGainsLists
 
         // Get data of HVAC equipment
-        ipsc->cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:HVACEquipment";
-        TotNumOfRAFNNodeHVACLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+        std::string const cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:HVACEquipment";
+        TotNumOfRAFNNodeHVACLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (int Loop = 1; Loop <= TotNumOfRAFNNodeHVACLists; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     ipsc->cCurrentModuleObject,
+                                                                     cCurrentModuleObject,
                                                                      Loop,
                                                                      ipsc->cAlphaArgs,
                                                                      NumAlphas,
@@ -1580,10 +1593,10 @@ namespace RoomAir {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
-            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
+            ErrorObjectHeader eoh{routineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)};
 
             if (mod((NumAlphas + NumNumbers - 1), 4) != 0) {
-                ShowSevereError(state, format("GetRoomAirflowNetworkData: For {}: {}", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("GetRoomAirflowNetworkData: For {}: {}", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   format("Extensible field set are not evenly divisable by 4. Number of data entries = {}",
                                          fmt::to_string(NumAlphas + NumNumbers - 1)));
@@ -1606,8 +1619,8 @@ namespace RoomAir {
                 auto &roomAFNNode = roomAFNZoneInfo.Node(RAFNNodeNum);
                 if (allocated(roomAFNNode.HVAC)) {
                     ShowSevereError(state, format("GetRoomAirflowNetworkData: Invalid {} = {}", ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1)));
-                    ShowContinueError(state, format("Entered in {} = {}", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                    ShowContinueError(state, format("Duplicate {} name.", ipsc->cCurrentModuleObject));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
+                    ShowContinueError(state, format("Duplicate {} name.", cCurrentModuleObject));
                     ErrorsFound = true;
                     continue;
                 }
@@ -1635,19 +1648,25 @@ namespace RoomAir {
                     roomAFNNodeHVAC.SupplyFraction = ipsc->rNumericArgs(iEquipArg);
                     roomAFNNodeHVAC.ReturnFraction = ipsc->rNumericArgs(iEquipArg);
 
-                    IntEquipError = CheckEquipName(state,
-                                                   roomAFNNodeHVAC.Name,
-                                                   roomAFNNodeHVAC.SupplyNodeName,
-                                                   roomAFNNodeHVAC.ReturnNodeName,
-                                                   TotNumEquip,
-                                                   roomAFNNodeHVAC.zoneEquipType);
+                    // get equipment index
+                    int EquipIndex = 0;
+                    for (int thisZoneEquipNum = 1; thisZoneEquipNum <= state.dataZoneEquip->ZoneEquipList(iZone).NumOfEquipTypes;
+                         ++thisZoneEquipNum) {
+                        if (Util::SameString(state.dataZoneEquip->ZoneEquipList(iZone).EquipName(thisZoneEquipNum), roomAFNNodeHVAC.Name) &&
+                            roomAFNNodeHVAC.zoneEquipType == state.dataZoneEquip->ZoneEquipList(iZone).EquipType(thisZoneEquipNum)) {
+                            EquipIndex = state.dataZoneEquip->ZoneEquipList(iZone).EquipIndex(thisZoneEquipNum);
+                            break;
+                        }
+                    }
+                    IntEquipFound = CheckEquipName(
+                        state, roomAFNNodeHVAC.Name, roomAFNNodeHVAC.SupplyNodeName, roomAFNNodeHVAC.ReturnNodeName, roomAFNNodeHVAC.zoneEquipType);
 
-                    if (!IntEquipError) {
+                    if (!IntEquipFound) {
                         ShowSevereError(state,
                                         format("GetRoomAirflowNetworkData: Invalid {} = {}",
                                                ipsc->cAlphaFieldNames(3 + (iEquip - 1) * 2),
                                                ipsc->cAlphaArgs(2 + (iEquip - 1) * 2)));
-                        ShowContinueError(state, format("Entered in {} = {}", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
+                        ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                         ShowContinueError(state, "Internal gain did not match correctly");
                         ErrorsFound = true;
                     }
@@ -2676,7 +2695,6 @@ namespace RoomAir {
                         std::string const &EquipName, // Equipment Name
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name
-                        int TotNumEquip,              // how many of this equipment type
                         DataZoneEquipment::ZoneEquipType zoneEquipType)
     {
 
@@ -2692,218 +2710,219 @@ namespace RoomAir {
         static constexpr std::string_view routineName = "CheckEquipName";
 
         // Return value
-        bool EquipFind; // True if an error is found
+        bool EquipFind = false; // if true, equip is found
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas;
-        int NumNumbers;
-        int Status;              // Used in GetObjectItem
-        int MaxNums = 0;         // Maximum number of numeric input fields
-        int MaxAlphas = 0;       // Maximum number of alpha input fields
-        int TotalArgs = 0;       // Total number of alpha and numeric arguments(max) for a
-        Array1D_string Alphas;   // Alpha input items for object
-        Array1D<Real64> Numbers; // Numeric input items for object
         bool errorfound;
-
-        NumAlphas = 1;
-        NumNumbers = 1;
-        EquipFind = false;
+        int SupplyNodeNum = 0;
+        int ReturnNodeNum = 0;
 
         SupplyNodeName = "";
+        int EquipIndex;
 
         if (zoneEquipType == DataZoneEquipment::ZoneEquipType::Invalid) return EquipFind;
 
-        std::string_view equipTypeName = DataZoneEquipment::zoneEquipTypeNamesUC[(int)zoneEquipType];
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, equipTypeName, TotalArgs, NumAlphas, NumNumbers);
-
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
-
-        if (MaxNums > NumNumbers) {
-            Numbers.allocate(MaxNums);
-            Numbers = 0.0;
-        } else if (!allocated(Numbers)) {
-            Numbers.allocate(MaxNums);
-        }
-
-        if (MaxAlphas > NumAlphas) {
-            Alphas.allocate(MaxAlphas);
-            Alphas = "";
-        } else if (!allocated(Alphas)) {
-            Alphas.allocate(NumAlphas);
-        }
-
-        for (int I = 1; I <= TotNumEquip; ++I) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state, equipTypeName, I, Alphas, NumAlphas, Numbers, NumNumbers, Status);
-            if (Util::SameString(Alphas(1), EquipName)) {
-                EquipFind = true;
-                break;
-            }
-        }
-
-        ErrorObjectHeader eoh{routineName, equipTypeName, EquipName};
-
         switch (zoneEquipType) {
         case DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal: { // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
-            SupplyNodeName = Alphas(4);
-            ReturnNodeName = ""; // Zone return node
+            EquipIndex = HVACVariableRefrigerantFlow::getEqIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            SupplyNodeNum = state.dataHVACVarRefFlow->VRFTU(EquipIndex).VRFTUOutletNodeNum;
         } break;
         case DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator: { // ZoneHVAC : EnergyRecoveryVentilator
-            int fanIndex = Fans::GetFanIndex(state, Alphas(4));
-            if (fanIndex == 0) {
-                ShowSevereItemNotFound(state, eoh, "", Alphas(4));
-                errorfound = true;
-            }
-
-            int nodeNum = state.dataFans->fans(fanIndex)->outletNodeNum;
-            if (errorfound) {
-            }
-            SupplyNodeName = state.dataLoopNodes->NodeID(nodeNum); // ?????
-            ReturnNodeName = "";                                   // Zone exhaust node
+            EquipIndex = HVACStandAloneERV::getEqIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            SupplyNodeNum = state.dataHVACStandAloneERV->StandAloneERV(EquipIndex).SupplyAirInletNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::FourPipeFanCoil: { // ZoneHVAC : FourPipeFanCoil
-            SupplyNodeName = Alphas(6);
-            ReturnNodeName = Alphas(5);
+            EquipIndex = FanCoilUnits::getEqIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            SupplyNodeNum = state.dataFanCoilUnits->FanCoil(EquipIndex).AirOutNode;
+            ReturnNodeNum = state.dataFanCoilUnits->FanCoil(EquipIndex).AirInNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::OutdoorAirUnit: { // ZoneHVAC : OutdoorAirUnit
-            SupplyNodeName = Alphas(13);
-            ReturnNodeName = Alphas(14);
+            EquipIndex = OutdoorAirUnit::getOutdoorAirUnitEqIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            SupplyNodeNum = state.dataOutdoorAirUnit->OutAirUnit(EquipIndex).AirOutletNode;
+            ReturnNodeNum = state.dataOutdoorAirUnit->OutAirUnit(EquipIndex).AirInletNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner: { // ZoneHVAC : PackagedTerminalAirConditioner
-            SupplyNodeName = Alphas(4);
-            ReturnNodeName = Alphas(3);
+            EquipIndex = UnitarySystems::getZoneEqIndex(state, EquipName, zoneEquipType);
+            if (EquipIndex == -1) return EquipFind;
+            SupplyNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirOutNode;
+            ReturnNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirInNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump: { // ZoneHVAC : PackagedTerminalHeatPump
-            SupplyNodeName = Alphas(4);
-            ReturnNodeName = Alphas(3);
+            EquipIndex = UnitarySystems::getZoneEqIndex(state, EquipName, zoneEquipType);
+            if (EquipIndex == -1) return EquipFind;
+            SupplyNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirOutNode;
+            ReturnNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirInNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::UnitHeater: { // ZoneHVAC : UnitHeater
-            SupplyNodeName = Alphas(4);
-            ReturnNodeName = Alphas(3);
+            EquipIndex = UnitHeater::getUnitHeaterIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            ReturnNodeNum = state.dataUnitHeaters->UnitHeat(EquipIndex).AirInNode;
+            SupplyNodeNum = state.dataUnitHeaters->UnitHeat(EquipIndex).AirOutNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::UnitVentilator: { // ZoneHVAC : UnitVentilator
-            SupplyNodeName = Alphas(7);
-            ReturnNodeName = Alphas(6);
+            EquipIndex = UnitVentilator::getUnitVentilatorIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            ReturnNodeNum = state.dataUnitVentilators->UnitVent(EquipIndex).AirInNode;
+            SupplyNodeNum = state.dataUnitVentilators->UnitVent(EquipIndex).AirOutNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::VentilatedSlab: { // ZoneHVAC : VentilatedSlab
-            SupplyNodeName = Alphas(20);
-            ReturnNodeName = Alphas(18);
+            EquipIndex = VentilatedSlab::getVentilatedSlabIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            ReturnNodeNum = state.dataVentilatedSlab->VentSlab(EquipIndex).ReturnAirNode;
+            SupplyNodeNum = state.dataVentilatedSlab->VentSlab(EquipIndex).ZoneAirInNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir: { // ZoneHVAC : WaterToAirHeatPump
-            SupplyNodeName = Alphas(4);
-            ReturnNodeName = Alphas(3);
+            EquipIndex = UnitarySystems::getZoneEqIndex(state, EquipName, zoneEquipType);
+            if (EquipIndex == -1) return EquipFind;
+            SupplyNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirOutNode;
+            ReturnNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirInNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::WindowAirConditioner: { // ZoneHVAC : WindowAirConditioner
-            SupplyNodeName = Alphas(4);
-            ReturnNodeName = Alphas(3);
+            EquipIndex = WindowAC::getWindowACIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            ReturnNodeNum = state.dataWindowAC->WindAC(EquipIndex).AirInNode;
+            SupplyNodeNum = state.dataWindowAC->WindAC(EquipIndex).AirOutNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::BaseboardElectric: { // ZoneHVAC : Baseboard : RadiantConvective : Electric
+                                                                    // convective equipment without node connection. Will handle later
             SupplyNodeName = "";                                    // convection only
         } break;
         case DataZoneEquipment::ZoneEquipType::BaseboardWater: { // ZoneHVAC : Baseboard : RadiantConvective : Water
+                                                                 // convective equipment without node connection. Will handle later
             SupplyNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::BaseboardSteam: { // ZoneHVAC : Baseboard : RadiantConvective : Steam
+                                                                 // convective equipment without node connection. Will handle later
             SupplyNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::BaseboardConvectiveElectric: { // ZoneHVAC : Baseboard : Convective : Electric
+                                                                              // convective equipment without node connection. Will handle later
             SupplyNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::BaseboardConvectiveWater: { // ZoneHVAC : Baseboard : Convective : Water
+                                                                           // convective equipment without node connection. Will handle later
             SupplyNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::HighTemperatureRadiant: { // ZoneHVAC : HighTemperatureRadiant
+                                                                         // Radiative equipment without node connection. Will handle later
             SupplyNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::DehumidifierDX: { // ZoneHVAC : Dehumidifier : DX
-            SupplyNodeName = Alphas(4);
-            ReturnNodeName = Alphas(3);
+            EquipIndex = ZoneDehumidifier::getZoneDehumidifierIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            ReturnNodeNum = state.dataZoneDehumidifier->ZoneDehumid(EquipIndex).AirInletNodeNum;
+            SupplyNodeNum = state.dataZoneDehumidifier->ZoneDehumid(EquipIndex).AirOutletNodeNum;
         } break;
         case DataZoneEquipment::ZoneEquipType::PurchasedAir: { // ZoneHVAC : IdealLoadsAirSystem
-            SupplyNodeName = Alphas(3);
-            ReturnNodeName = Alphas(4);
+            EquipIndex = PurchasedAirManager::getPurchasedAirIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            ReturnNodeNum = state.dataPurchasedAirMgr->PurchAir(EquipIndex).ZoneExhaustAirNodeNum;
+            SupplyNodeNum = state.dataPurchasedAirMgr->PurchAir(EquipIndex).ZoneSupplyAirNodeNum;
         } break;
         case DataZoneEquipment::ZoneEquipType::RefrigerationChillerSet: { // ZoneHVAC : RefrigerationChillerSet
-            SupplyNodeName = Alphas(5);
-            ReturnNodeName = Alphas(4);
+            // May not apply
+            // SupplyNodeName = Alphas(5);
+            // ReturnNodeName = Alphas(4);
         } break;
         case DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler: { // ZoneHVAC : HybridUnitaryAirConditioners
-            SupplyNodeName = Alphas(11);
-            ReturnNodeName = Alphas(9);
+            EquipIndex = HybridUnitaryAirConditioners::getHybridUnitaryACIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            ReturnNodeNum = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(EquipIndex).InletNode;
+            SupplyNodeNum = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(EquipIndex).OutletNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::ExhaustFan: { // Fan : ZoneExhaust
-            SupplyNodeName = "";                             // ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? May not use
+
+            //            SupplyNodeName = "";                             // ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? May not use
         } break;
         case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater: { // WaterHeater : HeatPump
-            SupplyNodeName = Alphas(8);
-            ReturnNodeName = Alphas(7);
+            EquipIndex = WaterThermalTanks::getHeatPumpWaterHeaterIndex(state, EquipName);
+            if (EquipIndex == 0) return EquipFind;
+            ReturnNodeNum = state.dataWaterThermalTanks->HPWaterHeater(EquipIndex).HeatPumpAirInletNode;
+            SupplyNodeNum = state.dataWaterThermalTanks->HPWaterHeater(EquipIndex).HeatPumpAirOutletNode;
             // For AirTerminals, find matching return node later
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalDualDuctConstantVolume: { // AirTerminal : DualDuct : ConstantVolume
-            SupplyNodeName = Alphas(1);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(1);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalDualDuctVAV: { // AirTerminal : DualDuct : VAV
-            SupplyNodeName = Alphas(1);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(1);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctConstantVolumeReheat: { // AirTerminal : SingleDuct : ConstantVolume : Reheat
-            SupplyNodeName = Alphas(1);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(1);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctConstantVolumeNoReheat: { // AirTerminal : SingleDuct :
-                                                                                              // ConstantVolume : NoReheat
-            SupplyNodeName = Alphas(4);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(4);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctVAVReheat: { // AirTerminal : SingleDuct : VAV : Reheat
-            SupplyNodeName = Alphas(1);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(1);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctVAVNoReheat: { // AirTerminal : SingleDuct : VAV : NoReheat
-            SupplyNodeName = Alphas(1);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(1);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctSeriesPIUReheat: { // AirTerminal : SingleDuct : SeriesPIU : Reheat
-            SupplyNodeName = Alphas(1);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(1);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctParallelPIUReheat: { // AirTerminal : SingleDuct : ParallelPIU : Reheat
-            SupplyNodeName = Alphas(1);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(1);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctCAVFourPipeInduction: { // AirTerminal : SingleDuct :
-                                                                                            // ConstantVolume : FourPipeInduction
-            SupplyNodeName = Alphas(1);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // ConstantVolume : FourPipeInduction
+            // SupplyNodeName = Alphas(1);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctVAVReheatVariableSpeedFan: { // AirTerminal : SingleDuct : VAV
-                                                                                                 // : Reheat : VariableSpeedFan
-            SupplyNodeName = Alphas(1);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // : Reheat : VariableSpeedFan
+            // SupplyNodeName = Alphas(1);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctVAVHeatAndCoolReheat: { // AirTerminal : SingleDuct : VAV :
                                                                                             // HeatAndCool : Reheat
-            SupplyNodeName = Alphas(1);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(1);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctVAVHeatAndCoolNoReheat: { // AirTerminal : SingleDuct : VAV :
                                                                                               // HeatAndCool : NoReheat
-            SupplyNodeName = Alphas(1);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(1);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctConstantVolumeCooledBeam: { // AirTerminal : SingleDuct :
                                                                                                 // ConstantVolume : CooledBeam
-            SupplyNodeName = Alphas(5);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(5);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirTerminalDualDuctVAVOutdoorAir: { // AirTerminal : DualDuct : VAV : OutdoorAir
-            SupplyNodeName = Alphas(3);
-            ReturnNodeName = "";
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(3);
+            // ReturnNodeName = "";
         } break;
         case DataZoneEquipment::ZoneEquipType::AirLoopHVACReturnAir: { // AirLoopHVACReturnAir
-            SupplyNodeName = Alphas(4);                                //
-            ReturnNodeName = "";                                       //
+            // Air teminal components are handled later
+            // SupplyNodeName = Alphas(4);                                //
+            // ReturnNodeName = "";                                       //
         } break;
         default: {
             assert(false);
@@ -2911,14 +2930,15 @@ namespace RoomAir {
 
         } // switch
 
-        // Need to find a better to handle allocate and deallocate
-        if (MaxAlphas > NumAlphas) {
-            Alphas.deallocate();
+        if (SupplyNodeNum > 0) {
+            SupplyNodeName = state.dataLoopNodes->NodeID(SupplyNodeNum);
+            EquipFind = true;
         }
-        if (MaxNums > NumNumbers) {
-            Numbers.deallocate();
+        if (ReturnNodeNum > 0) {
+            ReturnNodeName = state.dataLoopNodes->NodeID(ReturnNodeNum);
+        } else {
+            ReturnNodeName = "";
         }
-
         return EquipFind;
     }
 
