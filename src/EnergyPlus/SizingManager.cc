@@ -4283,6 +4283,11 @@ void reportZoneSizing(EnergyPlusData &state,
             HumRatAtPeak = state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak);
             DOASHeatGainRateAtClPk = zsCalcSizing(DDNum, thisNum).DOASHeatAddSeq(TimeStepAtPeak);
             TStatSetPtAtPk = zSizing(DDNum, thisNum).CoolTstatTempSeq(TimeStepAtPeak);
+        } else {
+            TempAtPeak = zsCalcFinalSizing.OutTempAtCoolPeak;
+            HumRatAtPeak = zsCalcFinalSizing.OutHumRatAtCoolPeak;
+            DOASHeatGainRateAtClPk = zsCalcFinalSizing.DOASCoolLoad;
+            TStatSetPtAtPk = zsCalcFinalSizing.ZoneTempAtCoolPeak;
         }
         reportZoneSizingEio(state,
                             zsFinalSizing.ZoneName,
@@ -4351,6 +4356,11 @@ void reportZoneSizing(EnergyPlusData &state,
             HumRatAtPeak = state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak);
             DOASHeatGainRateAtHtPk = zsCalcSizing(DDNum, thisNum).DOASHeatAddSeq(TimeStepAtPeak);
             TStatSetPtAtPk = zSizing(DDNum, thisNum).HeatTstatTempSeq(TimeStepAtPeak);
+        } else {
+            TempAtPeak = zsCalcFinalSizing.OutTempAtHeatPeak;
+            HumRatAtPeak = zsCalcFinalSizing.OutHumRatAtHeatPeak;
+            DOASHeatGainRateAtHtPk = zsCalcFinalSizing.DOASHeatLoad;
+            TStatSetPtAtPk = zsCalcFinalSizing.ZoneTempAtHeatPeak;
         }
         reportZoneSizingEio(state,
                             zsFinalSizing.ZoneName,

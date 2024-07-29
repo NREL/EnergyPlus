@@ -15970,7 +15970,7 @@ void CollectPeakZoneConditions(
 
         if (isCooling) {
             // Time of Peak Load
-            if ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size()) {
+            if ((desDaySelected > 0) && ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size())) {
                 compLoad.peakDateHrMin = format("{}/{} {}",
                                                 state.dataWeather->DesDayInput(desDaySelected).Month,
                                                 state.dataWeather->DesDayInput(desDaySelected).DayOfMonth,

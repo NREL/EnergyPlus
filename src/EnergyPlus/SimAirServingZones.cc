@@ -6426,8 +6426,14 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                                     (1.0 + termUnitSizing.InducRat);
                 CoolDDNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolDDNum;
                 CoolTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtCoolMax;
-                OutAirTemp += state.dataSize->DesDayWeath(CoolDDNum).Temp(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
-                OutAirHumRat += state.dataSize->DesDayWeath(CoolDDNum).HumRat(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                if (CoolDDNum == 0) {
+                    auto &zoneCFS = state.dataSize->CalcFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneNum);
+                    OutAirTemp += zoneCFS.CoolOutTemp * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                    OutAirHumRat += zoneCFS.CoolOutHumRat * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                } else {
+                    OutAirTemp += state.dataSize->DesDayWeath(CoolDDNum).Temp(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                    OutAirHumRat += state.dataSize->DesDayWeath(CoolDDNum).HumRat(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                }
             }
             if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow > 0.0) {
                 SysCoolRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
@@ -6490,8 +6496,15 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                                         (1.0 + termUnitSizing.InducRat);
                     HeatDDNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatDDNum;
                     HeatTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
-                    OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
-                    OutAirHumRat += state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    if (HeatDDNum == 0) {
+                        auto &zoneCFS = state.dataSize->CalcFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneNum);
+                        OutAirTemp += zoneCFS.HeatOutTemp * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                        OutAirHumRat += zoneCFS.HeatOutHumRat * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    } else {
+                        OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                        OutAirHumRat +=
+                            state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    }
                 }
                 if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
                     SysHeatRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
@@ -6537,8 +6550,15 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                                         (1.0 + termUnitSizing.InducRat);
                     HeatDDNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatDDNum;
                     HeatTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
-                    OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
-                    OutAirHumRat += state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    if (HeatDDNum == 0) {
+                        auto &zoneCFS = state.dataSize->CalcFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneNum);
+                        OutAirTemp += zoneCFS.HeatOutTemp * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                        OutAirHumRat += zoneCFS.HeatOutHumRat * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    } else {
+                        OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                        OutAirHumRat +=
+                            state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    }
                 }
                 if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
                     SysHeatRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
