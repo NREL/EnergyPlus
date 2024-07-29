@@ -2364,11 +2364,14 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
 
             // Mode 3 and 5 use cooling side data stored from the chilled water loop
             // Mode 4 uses all data from the chilled water loop due to no heating demand
-            if (this->SimulClgDominant || CurrentMode == 3) {
+            // Fix for Defect #10065: When the heating load is dominant and the Current Mode is 3,
+            // simulation must go through the "heating" side to properly update the power consumption.
+            // Otherwise, the power consumption could come back zero for heating and cooling.
+            if (this->SimulClgDominant || (CurrentMode == 3 && !this->SimulHtgDominant)) {
                 CurrentMode = 3;
                 QCondenser = this->ChillerHeater(ChillerHeaterNum).Report.QCondSimul;
-                this->adjustChillerHeaterFlowTemp(state, QCondenser, CondMassFlowRate, CondOutletTemp, CondInletTemp, CondDeltaTemp);
-            } else { // Either Mode 2 or 3 or 5
+                this->adjustChillerHeaterCondFlowTemp(state, QCondenser, CondMassFlowRate, CondOutletTemp, CondInletTemp, CondDeltaTemp);
+            } else { // Either Mode 2 or 3 (heating dominant) or 5
                 if (this->SimulHtgDominant) {
                     CurrentMode = 5;
                 } else {
@@ -2459,6 +2462,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
 
                 QCondenser =
                     CHPower * this->ChillerHeater(ChillerHeaterNum).OpenMotorEff + QEvaporator + state.dataPlantCentralGSHP->ChillerFalseLoadRate;
+                Real64 qCondenserFullLoad = QCondenser;
 
                 // Determine heating load for this heater and pass the remaining load to the next chiller heater
                 Real64 CondenserCapMin = QCondenser * MinPartLoadRat;
@@ -2473,11 +2477,32 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 // then recalculate heating load this chiller heater can meet
                 if (CurrentMode == 2 || this->SimulHtgDominant) {
                     if (CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance && CondDeltaTemp > 0.0) {
-                        this->adjustChillerHeaterFlowTemp(state, QCondenser, CondMassFlowRate, CondOutletTemp, CondInletTemp, CondDeltaTemp);
+                        this->adjustChillerHeaterCondFlowTemp(state, QCondenser, CondMassFlowRate, CondOutletTemp, CondInletTemp, CondDeltaTemp);
+                        if (qCondenserFullLoad > 0.0) {
+                            Real64 constexpr diffTolerance = 0.0001;
+                            if (((qCondenserFullLoad - QCondenser) / qCondenserFullLoad) > diffTolerance) {
+                                // QCondenser was reduced, so reduce evaporator side quantities by a factor of the condenser based PLR
+                                PartLoadRat = max(MinPartLoadRat, min((QCondenser / qCondenserFullLoad), MaxPartLoadRat));
+                                QCondenser = PartLoadRat * qCondenserFullLoad;
+                                this->adjustChillerHeaterCondFlowTemp(
+                                    state, QCondenser, CondMassFlowRate, CondOutletTemp, CondInletTemp, CondDeltaTemp);
+                                // In most situations here, QCondenser will not be reduced here, but it has to be taken into account.  This will
+                                // potentially violate the minPLR but this will keep the solution simple for now.
+                                // So, basically multiply all terms in the energy balance by the same factor to maintain the energy balance.
+                                Real64 modifiedPLR = QCondenser / qCondenserFullLoad;
+                                QEvaporator *= modifiedPLR;
+                                CHPower *= modifiedPLR;
+                                PartLoadRat = modifiedPLR;
+                                state.dataPlantCentralGSHP->ChillerFalseLoadRate *= modifiedPLR;
+                                // Now re-adjust things on the evaporator side to get the correct flows/temperatures
+                                this->adjustChillerHeaterEvapFlowTemp(state, QEvaporator, EvapMassFlowRate, EvapOutletTemp, EvapInletTemp);
+                            }
+                        }
                     } else {
                         QCondenser = 0.0;
                         CondOutletTemp = CondInletTemp;
                     }
+                    state.dataPlantCentralGSHP->ChillerPartLoadRatio = PartLoadRat;
                 }
 
             } // End of calculation depending on the modes
@@ -2554,15 +2579,15 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
     }
 }
 
-void WrapperSpecs::adjustChillerHeaterFlowTemp(EnergyPlusData &state,
-                                               Real64 &QCondenser,
-                                               Real64 &CondMassFlowRate,
-                                               Real64 &CondOutletTemp,
-                                               Real64 const CondInletTemp,
-                                               Real64 const CondDeltaTemp)
+void WrapperSpecs::adjustChillerHeaterCondFlowTemp(EnergyPlusData &state,
+                                                   Real64 &QCondenser,
+                                                   Real64 &CondMassFlowRate,
+                                                   Real64 &CondOutletTemp,
+                                                   Real64 const CondInletTemp,
+                                                   Real64 const CondDeltaTemp)
 {
     // Based on whether this is variable or constant flow, adjust either flow or outlet temperature and also the load
-    static constexpr std::string_view RoutineName("adjustChillerHeaterFlow");
+    static constexpr std::string_view RoutineName("adjustChillerHeaterCondFlowTemp");
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
                                                        CondInletTemp,
@@ -2587,6 +2612,34 @@ void WrapperSpecs::adjustChillerHeaterFlowTemp(EnergyPlusData &state,
             QCondenser = CondMassFlowRate * Cp * CondDeltaTemp;
         }
         CondOutletTemp = CondOutletTempCalc;
+    }
+}
+
+void WrapperSpecs::adjustChillerHeaterEvapFlowTemp(
+    EnergyPlusData &state, Real64 const qEvaporator, Real64 &evapMassFlowRate, Real64 &evapOutletTemp, Real64 const evapInletTemp)
+{
+    // Adjust flow and outlet temperature for the evaporator side without modifying the heat transfer rate
+    Real64 constexpr lowLoad = 0.001;
+    static constexpr std::string_view routineName("adjustChillerHeaterEvapFlowTemp");
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                       state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
+                                                       evapInletTemp,
+                                                       state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
+                                                       routineName);
+    Real64 evapDeltaTemp = evapInletTemp - evapOutletTemp;
+
+    if ((qEvaporator < lowLoad) || (evapDeltaTemp <= 0.0)) {
+        evapMassFlowRate = 0.0;
+        evapOutletTemp = evapInletTemp;
+    } else {
+        if (this->VariableFlowCH) { // for variable flow, adjust flow if higher than max value passed in
+            Real64 evapMassFlowRateCalc = qEvaporator / evapDeltaTemp / Cp;
+            if (evapMassFlowRateCalc > evapMassFlowRate) evapMassFlowRateCalc = evapMassFlowRate;
+            evapMassFlowRate = evapMassFlowRateCalc;
+        }
+        // Adjust temperature for either flow type to maintain agreement with qEvaporator
+        evapDeltaTemp = qEvaporator / evapMassFlowRate / Cp;
+        evapOutletTemp = evapInletTemp - evapDeltaTemp;
     }
 }
 
