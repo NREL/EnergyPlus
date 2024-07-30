@@ -165,7 +165,7 @@ struct CoilCoolingDXCurveFitSpeed
     void CalcSpeedOutput(EnergyPlusData &state,
                          const DataLoopNode::NodeData &inletNode,
                          DataLoopNode::NodeData &outletNode,
-                         Real64 const _PLR,
+                         Real64 PLR,
                          HVAC::FanOp const fanOp,
                          Real64 condInletTemp);
 
