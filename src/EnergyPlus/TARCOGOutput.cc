@@ -52,6 +52,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
@@ -291,7 +292,7 @@ void WriteInputArguments(EnergyPlusData &state,
         print(InArgumentsFile, Format_1007, state.dataTARCOGOutputs->iguID);
     }
 
-    print(InArgumentsFile, "     Debug dir:     {}\n", DBGD.string());
+    print(InArgumentsFile, "     Debug dir:     {}\n", DBGD);
 
     print(InArgumentsFile, "\n");
     print(InArgumentsFile, Format_1000);
@@ -1267,8 +1268,8 @@ void PrepDebugFilesAndVariables(EnergyPlusData &state,
 
     // setup file names if file name is provided, otherwise keep default
     if (!Debug_file.empty()) {
-        files.WINCogFilePath = fs::path(Debug_file.string() + ".w7");
-        files.DebugOutputFilePath = fs::path(Debug_file.string() + ".dbg");
+        files.WINCogFilePath = FileSystem::appendSuffixToPath(Debug_file, ".w7");
+        files.DebugOutputFilePath = FileSystem::appendSuffixToPath(Debug_file, ".dbg");
     }
 
     files.WriteDebugOutput = false;

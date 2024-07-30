@@ -2690,7 +2690,7 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
     } else {
         ShowFatalError(state,
                        format("CalcThermalComfortAdaptive: Could not open file {} for input (read). (File does not exist)",
-                              state.files.inputWeatherFilePath.filePath.string()));
+                              state.files.inputWeatherFilePath.filePath));
     }
 }
 
