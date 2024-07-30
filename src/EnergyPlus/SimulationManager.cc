@@ -1579,7 +1579,7 @@ namespace SimulationManager {
     {
         auto result = std::make_unique<std::ofstream>(filePath, mode); // (AUTO_OK_UPTR)
         if (!result->good()) {
-            ShowFatalError(state, format("OpenOutputFiles: Could not open file {} for output (write).", filePath.string()));
+            ShowFatalError(state, format("OpenOutputFiles: Could not open file {} for output (write).", filePath));
         }
         return result;
     }
@@ -1588,7 +1588,7 @@ namespace SimulationManager {
     {
         std::unique_ptr<fmt::ostream> result = nullptr;
 #ifdef _WIN32
-        std::string filePathStr = filePath.string();
+        std::string filePathStr = FileSystem::toString(filePath);
         const char *path = filePathStr.c_str();
 #else
         const char *path = filePath.c_str();
@@ -1598,7 +1598,7 @@ namespace SimulationManager {
             result = std::make_unique<fmt::ostream>(std::move(f));
         } catch (const std::system_error &error) {
             ShowSevereError(state, error.what());
-            ShowFatalError(state, format("OpenOutputFiles: Could not open file {} for output (write).", filePath.string()));
+            ShowFatalError(state, format("OpenOutputFiles: Could not open file {} for output (write).", filePath));
         }
         return result;
     }
@@ -2612,8 +2612,6 @@ namespace SimulationManager {
 
         // Using/Aliasing
         // using SQLiteProcedures::CreateSQLiteDatabase;
-        using FluidProperties::FindGlycol;
-
         state.dataGlobal->DoingInputProcessing = false;
 
         state.dataInputProcessing->inputProcessor->preProcessorCheck(

@@ -104,6 +104,7 @@
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WindowAC.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
@@ -10145,6 +10146,7 @@ namespace AirflowNetwork {
         using SplitterComponent::GetSplitterNodeNumbers;
         using SplitterComponent::GetSplitterOutletNumber;
         using WaterThermalTanks::GetHeatPumpWaterHeaterNodeNumber;
+        using WindowAC::GetWindowACNodeNumber;
         using ZoneDehumidifier::GetZoneDehumidifierNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -10166,6 +10168,7 @@ namespace AirflowNetwork {
         bool packagedUnitaryFound(false); // Flag for packaged unitary systems (ZoneHVAC:PackagedTerminalAirConditioner,
                                           // ZoneHVAC:PackagedTerminalHeatPump, ZoneHVAC:WaterToAirHeatPump) identification
         bool vrfTUFound(false);
+        bool WindowACFound(false); // Flag for Window AC (ZoneHVAC:WindowAirConditioner) identification
 
         // Validate supply and return connections
         NodeFound.dimension(m_state.dataLoopNodes->NumOfNodes, false);
@@ -10289,6 +10292,12 @@ namespace AirflowNetwork {
                 if (HVACVariableRefrigerantFlow::getVRFTUNodeNumber(m_state, i)) {
                     NodeFound(i) = true;
                     vrfTUFound = true;
+                }
+
+                // Skip Window AC with no OA
+                if (GetWindowACNodeNumber(m_state, i)) {
+                    NodeFound(i) = true;
+                    WindowACFound = true;
                 }
             }
 
@@ -10441,6 +10450,11 @@ namespace AirflowNetwork {
                              format(RoutineName) +
                                  "A ZoneHVAC:TerminalUnit:VariableRefrigerantFlow is simulated along with an AirflowNetwork but is not "
                                  "included in the AirflowNetwork.");
+        }
+        if (WindowACFound) {
+            ShowWarningError(m_state,
+                             format(RoutineName) + "A ZoneHVAC:WindowAirConditioner is simulated along with an AirflowNetwork but is not "
+                                                   "included in the AirflowNetwork.");
         }
         NodeFound.deallocate();
 

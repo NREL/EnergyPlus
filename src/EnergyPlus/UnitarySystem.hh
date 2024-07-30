@@ -967,6 +967,9 @@ namespace UnitarySystems {
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
     void isWaterCoilHeatRecoveryType(EnergyPlusData const &state, int const waterCoilNodeNum, bool &nodeNotFound);
 
+    int
+    getZoneEqIndex(EnergyPlusData &state, std::string const &UnitarySysName, DataZoneEquipment::ZoneEquipType zoneEquipType, int const OAUnitNum = 0);
+
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct
 {
