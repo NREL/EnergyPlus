@@ -4,7 +4,7 @@ DEFECT: Fix for Chiller Heater Always Assuming Evaporator is at Full Load
 **Rick Strand, University of Illinois at Urbana-Champaign**
 
  - Original Date: July 22, 2024
- - Revision Date
+ - Revision Date: July 30, 2024
  
 
 ## Justification for New Feature ##
@@ -13,7 +13,7 @@ The current heater mode portion of the chiller heater model in PlantCentralGSHP.
 
 ## E-mail and Conference Call Conclusions ##
 
-This is the first time this will be discussed via email or in a Technicalities Call.
+July 24, 2024: Discussed this on the technicalities call.  Decision was made to not implement an iteration strategy but to simply make an approximation of the PLR from the condenser load and then multiple full load evaporator load, compressor power, and false loading by that PLR.  Not ideal, but given all of the suspected problems in this model, it was decided to not invest too heavily in this now and turn this into a potential development topic in the future.
 
 ## Overview ##
 
@@ -23,7 +23,7 @@ The simlation flow in the heater portion of the model is summarized as follows. 
 
 The problem here is that the evaporator load and the compressor power are still at full load and are never adjusted when the condenser load gets reduced because the heating load does not require full load.  This is the source of the error--evaporator load and compressor power never change in heating mode regardless of the actual part load ratio based on the condenser load.  PLR simply stays at near 100%.  This is not correct and leads to over-estimation of both the evaporator load and the compressor power consumption.
 
-## Approach ##
+## Original Approach ##
 
 Note: before the actual fix takes place, it was decided to make a code improvement pass through the current chiller heater model.  This has already taken place and has been merged into develop.  The point was to make the code re-usable within the chiller heater model but it also realized some improvements in the cooling mode subroutine as well.  The changes took several different code sections and turned them into smaller subroutines.  The heating mode code is now much easier to follow, reducing the size of the routine by a factor of more than 3 (based on printouts of the routine before and after restructuring).  The real benefit will be seen when the problem is fixed as the algorithm should stay fairly compact and easy to follow (hopefully).
 
@@ -67,6 +67,10 @@ Step 7: Calculate the new QCondenser for this iteration.  Reuse existing code th
 Step 8: Call adjustChillerHeaterFlowTemp to adjust flow rate and temperature if necessary.
 
 At this point, a new QCondenser has been calculated so the iteration cycle is done.  No additional code is needed after the iteration cycle as it should just be able to pick up where it left off as it currently does.
+
+## Modified Approach ##
+
+During the technicalities call, it was suggested that rather than iterating, we should just approximate the PLR from the condenser load and then multiply evaporator load and compressor power by this PLR.  The false load was also factored in this way though in this case it was probably zero at full load anyway.  Other problems in the algorithm were also fixed along the way.  No guarantees that this model is now 100% bug free but it should be improved.
 
 ## Testing/Validation/Data Sources ##
 

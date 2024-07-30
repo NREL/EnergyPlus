@@ -436,7 +436,7 @@ namespace PlantCentralGSHP {
                                  Real64 const lowTempLimitEout,
                                  Real64 evapInletTemp,
                                  Real64 &qEvaporator,
-                                 Real64 &evapMassFlowRate,
+                                 Real64 const evapMassFlowRate,
                                  Real64 const Cp);
 
         void calcPLRAndCyclingRatio(EnergyPlusData &state,

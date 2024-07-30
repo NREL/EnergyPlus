@@ -2692,7 +2692,7 @@ void WrapperSpecs::checkEvapOutletTemp(EnergyPlusData &state,
                                        Real64 const lowTempLimitEout,
                                        Real64 const evapInletTemp,
                                        Real64 &qEvaporator,
-                                       Real64 &evapMassFlowRate,
+                                       Real64 const evapMassFlowRate,
                                        Real64 const Cp)
 {
     // Check evaporator temperature low limit and adjust capacity if needed
@@ -2709,10 +2709,9 @@ void WrapperSpecs::checkEvapOutletTemp(EnergyPlusData &state,
 
     // Check if the outlet temperature exceeds the node minimum temperature and adjust capacity if needed
     if (evapOutletTemp < this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin) {
-        if ((this->ChillerHeater(numChillerHeater).EvapInletNode.Temp - this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin) >
-            DataPlant::DeltaTempTol) {
+        if ((evapInletTemp - this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin) > DataPlant::DeltaTempTol) {
             evapOutletTemp = this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin;
-            Real64 evapDeltaTemp = this->ChillerHeater(numChillerHeater).EvapOutletNode.TempMin - evapOutletTemp;
+            Real64 evapDeltaTemp = evapInletTemp - evapOutletTemp;
             qEvaporator = evapMassFlowRate * Cp * evapDeltaTemp;
         } else {
             qEvaporator = 0.0;
@@ -2730,29 +2729,27 @@ void WrapperSpecs::calcPLRAndCyclingRatio(EnergyPlusData &state,
                                           Real64 &frac)
 {
     // Calculate PLR (actualPartLoadRatio) based on evaporator load and available capacity, factoring in max PLR
-    if (availChillerCap > 0.0) {
+    if (availChillerCap <= 0.0) {
+        actualPartLoadRatio = 0;
+        frac = 1.0;
+    } else {
         actualPartLoadRatio = max(0.0, min((qEvaporator / availChillerCap), maxPartLoadRatio));
-    } else {
-        actualPartLoadRatio = 0.0;
-    }
-
-    // Chiller cycles below minimum part load ratio, frac = amount of time chiller is ON during this time step
-    if (actualPartLoadRatio < minPartLoadRatio) frac = min(1.0, (actualPartLoadRatio / minPartLoadRatio));
-    if (frac <= 0.0) frac = 1.0; // CR 9303 COP reporting issue, it should be greater than zero in this routine
-    state.dataPlantCentralGSHP->ChillerCyclingRatio = frac;
-
-    // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-    if (availChillerCap > 0.0) {
+        // If chiller cycles below minimum part load ratio, frac = amount of time chiller is ON during this time step
+        if (minPartLoadRatio > 0.0) {
+            frac = min(1.0, (actualPartLoadRatio / minPartLoadRatio));
+        } else {
+            frac = 1.0;
+        }
         actualPartLoadRatio = max(actualPartLoadRatio, minPartLoadRatio);
-    } else {
-        actualPartLoadRatio = 0.0;
     }
+
+    state.dataPlantCentralGSHP->ChillerCyclingRatio = frac;
 
     // Evaporator part load ratio
     state.dataPlantCentralGSHP->ChillerPartLoadRatio = actualPartLoadRatio;
 
     // Calculate the load due to false loading on chiller over and above water side load
-    state.dataPlantCentralGSHP->ChillerFalseLoadRate = (availChillerCap * actualPartLoadRatio * frac) - qEvaporator;
+    state.dataPlantCentralGSHP->ChillerFalseLoadRate = (availChillerCap * minPartLoadRatio) - qEvaporator;
     if (state.dataPlantCentralGSHP->ChillerFalseLoadRate < HVAC::SmallLoad) {
         state.dataPlantCentralGSHP->ChillerFalseLoadRate = 0.0;
     }
