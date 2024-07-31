@@ -719,7 +719,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_calcPLRAndCyclingRatio)
     frac = -1.0;
     expPLR = 0.4;
     expFrac = 0.5;
-    expFalseLoad = 10000.0;
+    expFalseLoad = 0.0;
     state->dataPlantCentralGSHP->ChillerCyclingRatio = -1.0;
     state->dataPlantCentralGSHP->ChillerPartLoadRatio = -1.0;
     state->dataPlantCentralGSHP->ChillerFalseLoadRate = -1.0;

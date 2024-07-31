@@ -2749,7 +2749,7 @@ void WrapperSpecs::calcPLRAndCyclingRatio(EnergyPlusData &state,
     state.dataPlantCentralGSHP->ChillerPartLoadRatio = actualPartLoadRatio;
 
     // Calculate the load due to false loading on chiller over and above water side load
-    state.dataPlantCentralGSHP->ChillerFalseLoadRate = (availChillerCap * minPartLoadRatio) - qEvaporator;
+    state.dataPlantCentralGSHP->ChillerFalseLoadRate = (availChillerCap * actualPartLoadRatio * frac) - qEvaporator;
     if (state.dataPlantCentralGSHP->ChillerFalseLoadRate < HVAC::SmallLoad) {
         state.dataPlantCentralGSHP->ChillerFalseLoadRate = 0.0;
     }
