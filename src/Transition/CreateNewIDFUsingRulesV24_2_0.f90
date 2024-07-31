@@ -600,32 +600,27 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                       OutArgs(5) = OldFanVO(Num3)%maxAirFlow_str
                       OutArgs(6) = 'Continuous'                             !- Speed Control Method
                       IF (SameString(OldFanVO(Num3)%minFlowInputMethod, "FixedFlowRate")) THEN
-                        OutArgs(7) = OldFanVO(Num3)%maxAirFlow_str
-                      ELSE ! input method is "Fraction"
-                        READ(OldFanVO(Num3)%minAirFlowFrac_str, '(F15.5)') minAirFlowFrac
-                        IF (minAirFlowFrac == 0.0) THEN
+                        IF (.NOT. SameString(OldFanVO(Num3)%maxAirFlow_str, "AUTOSIZE")) THEN
+                          READ(OldFanVO(Num3)%fanPowerMinAirFlow_str, '(F15.5)') fanPowerMinAirFlow
+                          READ(OldFanVO(Num3)%maxAirFlow_str, '(F15.5)') maxAirFlow
+                          WRITE(OutArgs(7), '(F15.5)') (fanPowerMinAirFlow / maxAirFlow)
+                      ELSE ! maxAirFlow_stris autosize
+                          READ(OldFanVO(Num3)%fanPowerMinAirFlow_str, '(F15.5)') fanPowerMinAirFlow
+                          IF (.NOT. fanPowerMinAirFlow == 0) THEN ! don't know how to do division with autosize
+                            CALL writePreprocessorObject(DifLfn, PrognameConversion, 'Warning', &
+                                    'Cannot calculate Electric Power Minimum Flow Rate Fraction for' // sysFanName // &
+                                            'when Maximum Flow Rate is autosize and Fan Power Minimum Air Flow Rate is non-zero')
+                          END IF
                           OutArgs(7) = '0.0'
-                        ELSE
-                          IF (.NOT. SameString(OldFanVO(Num3)%maxAirFlow_str, "AUTOSIZE")) THEN
-                            READ(OldFanVO(Num3)%maxAirFlow_str, '(F15.5)') maxAirFlow
-                            WRITE(OutArgs(7), '(F15.5)') (maxAirFlow * minAirFlowFrac)
-                          ELSE ! don't know how to multiply fraction with autosize
-                            OutArgs(7) = ''
-                          ENDIF
                         ENDIF
+                      ELSE ! input method is "Fraction"
+                        OutArgs(7) = OldFanVO(Num3)%minAirFlowFrac_str
                       ENDIF
                       OutArgs(8) = OldFanVO(Num3)%pressureRise_str          !- Design Pressure Rise {Pa}
                       OutArgs(9) = OldFanVO(Num3)%motorEfficiency           !- Motor Efficiency
                       OutArgs(10) = OldFanVO(Num3)%motorInAirStreamFrac     !- Motor In Air Stream Fraction
-                      IF (.NOT. SameString(OldFanVO(Num3)%maxAirFlow_str, "AUTOSIZE")) THEN
-                        READ(OldFanVO(Num3)%maxAirFlow_str, '(F15.5)') maxAirFlow
-                        READ(OldFanVO(Num3)%pressureRise_str, '(F15.5)') pressureRise
-                        READ(OldFanVO(Num3)%fanTotalEff_str, '(F15.5)') fanTotalEff
-                        WRITE(OutArgs(11), '(F15.5)') (maxAirFlow * pressureRise / fanTotalEff) !- Design Electric Power Consumption {W}
-                      ELSE
-                        OutArgs(11) = 'autosize'
-                        OutArgs(12) = 'TotalEfficiencyAndPressure' ! chose this becuase power per flow or per pressure are unknown
-                      ENDIF
+                      OutArgs(11) = 'autosize'
+                      OutArgs(12) = 'TotalEfficiencyAndPressure' ! chose this becuase power per flow or per pressure are unknown
                       OutArgs(13) = ''                       !- Electric Power Per Unit Flow Rate {W/(m3/s)}
                       OutArgs(14) = ''                       !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
                       OutArgs(15) = OldFanVO(Num3)%fanTotalEff_str          !- Fan Total Efficiency
