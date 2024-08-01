@@ -486,10 +486,9 @@ void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 c
             }
         }
         if (this->heatRecoveryHeatPump) {
-            this->setPartLoadAndCyclingRatio(state, partLoadRatio);
             this->calcLoadSideHeatTransfer(state, availableCapacity);
             this->calcPowerUsage(state);
-            Real64 sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
+            Real64 sourceSideHeatTransfer = this->calcQsource(availableCapacity * partLoadRatio, this->powerUsage);
             // check to see if souce side outlet temp exceeds limit and reduce PLR if necessary
             auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
             Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(state,
