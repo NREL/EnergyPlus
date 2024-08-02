@@ -2918,7 +2918,7 @@ void GetSlatIndicesInterpFac(Real64 slatAng, int &idxLo, int &idxHi, Real64 &int
 {
     idxLo = int(slatAng / dSlatAng) + 1;
     idxHi = std::min(MaxSlatAngs, idxLo+1);
-    interpFac = (slatAng - idxLo * dSlatAng) / dSlatAng;
+    interpFac = (slatAng - ((idxLo - 1) * dSlatAng)) / dSlatAng;
 }
         
         

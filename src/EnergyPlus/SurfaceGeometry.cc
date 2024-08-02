@@ -1105,10 +1105,6 @@ namespace SurfaceGeometry {
         bool errFlag;
 
         int iTmp1;
-        int iTmp2;
-        // unused  INTEGER :: SchID
-        int BlNumNew;
-        int WinShadingControlPtr(0);
         int ErrCount;
         bool izConstDiff;    // differences in construction for IZ surfaces
         bool izConstDiffMsg; // display message about hb diffs only once.
@@ -2431,395 +2427,390 @@ namespace SurfaceGeometry {
         if (!SurfError) {
             for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
                 auto &surf = state.dataSurface->Surface(SurfNum);
-                if (surf.HasShadeControl) {
-                    auto &surfShade = state.dataSurface->surfShades(SurfNum);
-                    WinShadingControlPtr = surf.activeWindowShadingControl; // use first item since others should be identical
-                    if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).slatAngleControl != SlatAngleControl::Fixed) {
-                        surfShade.blind.movableSlats = true;
-                        state.dataSurface->AnyMovableSlat = true;
-                        state.dataHeatBalSurf->SurfMovSlatsIndexList.push_back(SurfNum);
-                    }
+                if (!surf.HasShadeControl) continue;
+                
+                ConstrNumSh = surf.activeShadedConstruction;
+                if (ConstrNumSh <= 0) continue;
+
+                auto &winShadeCtrl = state.dataSurface->WindowShadingControl(surf.activeWindowShadingControl);
+                if (!ANY_BLIND(winShadeCtrl.ShadingType)) continue;
+                // use first item since others should be identical
+
+                auto &surfShade = state.dataSurface->surfShades(SurfNum);
+                // TH 1/7/2010. CR 7930
+                // The old code did not consider between-glass blind. Also there should not be two blinds - both interior and exterior
+                // Use the new generic code (assuming only one blind) as follows
+                for (int iMatNum = 1; iMatNum <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iMatNum) {
+                    auto *mat = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iMatNum));
+                    
+                    if (mat->group != Material::Group::WindowBlind) continue;
+                    
+                    auto *matBlind = dynamic_cast<Material::MaterialBlind *>(mat);
+                    assert(matBlind != nullptr);
+                    
+                    surfShade.blind.matNum = mat->Num;
 #ifdef GET_OUT
-                    ConstrNumSh = surf.activeShadedConstruction;
-                    if (ConstrNumSh <= 0) continue;
-
-                    WinShadingType ShadingType = state.dataSurface->WindowShadingControl(WinShadingControlPtr).ShadingType;
-
-                    // I don't think this is necessary anymore
-                    // only for blinds
-                    if (ANY_BLIND(ShadingType)) {
-                        auto const &surfShade = state.dataSurface->surfShades(SurfNum);
-                        // TH 1/7/2010. CR 7930
-                        // The old code did not consider between-glass blind. Also there should not be two blinds - both interior and exterior
-                        // Use the new generic code (assuming only one blind) as follows
-                        for (iTmp1 = 1; iTmp1 <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iTmp1) {
-                            iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
-                            auto *mat = s_mat->materials(iTmp2);
-
-                            if (mat->group != Material::Group::WindowBlind) continue;
-
-                            auto *matBlind = dynamic_cast<Material::MaterialBlind *>(mat);
-                            assert(matBlind != nullptr);
-
-                            surfShade.blind.matNum = mat->Num;
-                            // TH 2/18/2010. CR 8010
-                            // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
-                            //  the new blind is created only once, it can be shared by multiple windows though.
-                            if (surfShade.blind.movableSlats &&
-                                matBlind->SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
-                                errFlag = false;
-                                AddVariableSlatBlind(state, mat->Num, BlNumNew, errFlag);
-                                // window surface points to new blind
-                                surfWin.blind.matNum = BlNumNew;
-                            }
-                            break;
-                        }
-
-                        if (errFlag) {
-                            ErrorsFound = true;
-                            ShowContinueError(state,
-                                              format("WindowShadingControl {} has errors, program will terminate.",
-                                                     state.dataSurface->WindowShadingControl(WinShadingControlPtr).Name));
-                        }
+                    // TH 2/18/2010. CR 8010
+                    // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
+                    //  the new blind is created only once, it can be shared by multiple windows though.
+                    if (surfShade.blind.movableSlats &&
+                        matBlind->SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
+                        errFlag = false;
+                        AddVariableSlatBlind(state, mat->Num, BlNumNew, errFlag);
+                        // window surface points to new blind
+                        surfWin.blind.matNum = BlNumNew;
                     }
-#endif // GET_OUT                    
-                } // End of surface loop
-
-                // final associate fenestration surfaces referenced in WindowShadingControl
-                FinalAssociateWindowShadingControlFenestration(state, ErrorsFound);
-                CheckWindowShadingControlSimilarForWindow(state, ErrorsFound);
-            }
-
-            // Check for zones with not enough surfaces
-            for (auto &thisZone : state.dataHeatBal->Zone) {
-                int OpaqueHTSurfs = 0;        // Number of floors, walls and roofs in a zone
-                int OpaqueHTSurfsWithWin = 0; // Number of floors, walls and roofs with windows in a zone
-                int InternalMassSurfs = 0;    // Number of internal mass surfaces in a zone
-                int priorBaseSurfNum = 0;
-
-                for (int spaceNum : thisZone.spaceIndexes) {
-                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                    if (thisSpace.HTSurfaceFirst == 0) continue; // Zone with no surfaces
-                    for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-                        auto &thisSurf = state.dataSurface->Surface(SurfNum);
-                        if (thisSurf.Class == SurfaceClass::Floor || thisSurf.Class == SurfaceClass::Wall || thisSurf.Class == SurfaceClass::Roof)
-                            ++OpaqueHTSurfs;
-                        if (thisSurf.Class == SurfaceClass::IntMass) ++InternalMassSurfs;
-                        if (thisSurf.Class == SurfaceClass::Window) {
-                            // Count base surface only once for multiple windows on a wall
-                            int thisBaseSurfNum = thisSurf.BaseSurf;
-                            if (thisBaseSurfNum != priorBaseSurfNum) {
-                                ++OpaqueHTSurfsWithWin;
-                                priorBaseSurfNum = thisBaseSurfNum;
-                            }
-                        }
-                    }
+#endif // GET_OUT                            
+                    break;
                 }
-                if (OpaqueHTSurfsWithWin == 1 && OpaqueHTSurfs == 1 && InternalMassSurfs == 0) {
-                    SurfError = true;
-                    ShowSevereError(state,
-                                    format("{}Zone {} has only one floor, wall or roof, and this surface has a window.", RoutineName, thisZone.Name));
-                    ShowContinueError(state, "Add more floors, walls or roofs, or an internal mass surface.");
-                }
-            }
 
-            // set up vertex of centroid for each surface.
-            CalcSurfaceCentroid(state);
-
-            SetupShadeSurfacesForSolarCalcs(state); // if shading surfaces are solar collectors or PV, then we need full solar calc.
-
-            GetMovableInsulationData(state, ErrorsFound);
-
-            if (state.dataSurface->CalcSolRefl) GetShadingSurfReflectanceData(state, ErrorsFound);
-
-            LayNumOutside = 0;
-
-            auto &s_mat = state.dataMaterial;
-            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                auto &surf = state.dataSurface->Surface(SurfNum);
-                // Check for EcoRoof and only 1 allowed to be used.
-                if (surf.Construction > 0)
-                    state.dataSurface->SurfExtEcoRoof(SurfNum) = state.dataConstruction->Construct(surf.Construction).TypeIsEcoRoof;
-                if (!state.dataSurface->SurfExtEcoRoof(SurfNum)) continue;
-                if (LayNumOutside == 0) {
-                    LayNumOutside = state.dataConstruction->Construct(surf.Construction).LayerPoint(1);
-                    continue;
-                }
-                if (LayNumOutside != state.dataConstruction->Construct(surf.Construction).LayerPoint(1)) {
-                    ShowSevereError(state, format("{}Only one EcoRoof Material is currently allowed for all constructions.", RoutineName));
-                    ShowContinueError(state, format("... first material={}", s_mat->materials(LayNumOutside)->Name));
-                    ShowContinueError(state,
-                                      format("... conflicting Construction={} uses material={}",
-                                             state.dataConstruction->Construct(surf.Construction).Name,
-                                             s_mat->materials(state.dataConstruction->Construct(surf.Construction).LayerPoint(1))->Name));
+                if (errFlag) {
                     ErrorsFound = true;
+                    ShowContinueError(state, format("WindowShadingControl {} has errors, program will terminate.", winShadeCtrl.Name));
                 }
-            }
 
-            // Reserve space to avoid excess allocations
-            state.dataSurface->AllHTSurfaceList.reserve(state.dataSurface->TotSurfaces);
-            state.dataSurface->AllExtSolarSurfaceList.reserve(state.dataSurface->TotSurfaces);
-            state.dataSurface->AllShadowPossObstrSurfaceList.reserve(state.dataSurface->TotSurfaces);
-            state.dataSurface->AllIZSurfaceList.reserve(state.dataSurface->TotSurfaces);
-            state.dataSurface->AllHTNonWindowSurfaceList.reserve(state.dataSurface->TotSurfaces - state.dataSurface->TotWindows);
-            state.dataSurface->AllHTWindowSurfaceList.reserve(state.dataSurface->TotWindows);
-            state.dataSurface->AllExtSolWindowSurfaceList.reserve(state.dataSurface->TotWindows);
-            state.dataSurface->AllExtSolWinWithFrameSurfaceList.reserve(state.dataSurface->TotWindows);
-            state.dataSurface->AllHTKivaSurfaceList.reserve(state.dataSurface->TotSurfaces);
-
-            // Set flag that determines whether a surface can be an exterior obstruction
-            // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
-            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                auto &surf = state.dataSurface->Surface(SurfNum);
-                surf.IsShadowPossibleObstruction = false;
-                if (surf.ExtSolar) {
-                    // This may include some attached shading surfaces
-                    state.dataSurface->AllExtSolarSurfaceList.push_back(SurfNum);
+                if (winShadeCtrl.slatAngleControl != SlatAngleControl::Fixed) {
+                    surfShade.blind.movableSlats = true;
+                    state.dataSurface->AnyMovableSlat = true;
+                    state.dataHeatBalSurf->SurfMovSlatsIndexList.push_back(SurfNum);
                 }
-                if (surf.HeatTransSurf) {
-                    // Outside light shelves get tagged later as HeatTransSurf=true but they haven't been processed yet
-                    state.dataSurface->AllHTSurfaceList.push_back(SurfNum);
-                    int const zoneNum(surf.Zone);
-                    auto &surfZone(state.dataHeatBal->Zone(zoneNum));
-                    surfZone.ZoneHTSurfaceList.push_back(SurfNum);
-                    // Sort window vs non-window surfaces
-                    if (surf.Class == DataSurfaces::SurfaceClass::Window) {
-                        state.dataSurface->AllHTWindowSurfaceList.push_back(SurfNum);
-                        surfZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
-                        if (surf.ExtSolar) {
-                            state.dataSurface->AllExtSolWindowSurfaceList.push_back(SurfNum);
-                            if (surf.FrameDivider > 0) {
-                                state.dataSurface->AllExtSolWinWithFrameSurfaceList.push_back(SurfNum);
-                            }
-                        }
-                    } else {
-                        state.dataSurface->AllHTNonWindowSurfaceList.push_back(SurfNum);
-                        surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
-                    }
-                    int const surfExtBoundCond(surf.ExtBoundCond);
-                    // Build zone and interzone surface lists
-                    if ((surfExtBoundCond > 0) && (surfExtBoundCond != SurfNum)) {
-                        state.dataSurface->AllIZSurfaceList.push_back(SurfNum);
-                        surfZone.ZoneIZSurfaceList.push_back(SurfNum);
-                        auto &adjZone(state.dataHeatBal->Zone(state.dataSurface->Surface(surfExtBoundCond).Zone));
-                        adjZone.ZoneHTSurfaceList.push_back(SurfNum);
-                        adjZone.ZoneIZSurfaceList.push_back(SurfNum);
-                        // Sort window vs non-window surfaces
-                        if (surf.Class == DataSurfaces::SurfaceClass::Window) {
-                            adjZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
-                        } else {
-                            adjZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
+            } // End of surface loop
+
+            // final associate fenestration surfaces referenced in WindowShadingControl
+            FinalAssociateWindowShadingControlFenestration(state, ErrorsFound);
+            CheckWindowShadingControlSimilarForWindow(state, ErrorsFound);
+        }
+
+        // Check for zones with not enough surfaces
+        for (auto &thisZone : state.dataHeatBal->Zone) {
+            int OpaqueHTSurfs = 0;        // Number of floors, walls and roofs in a zone
+            int OpaqueHTSurfsWithWin = 0; // Number of floors, walls and roofs with windows in a zone
+            int InternalMassSurfs = 0;    // Number of internal mass surfaces in a zone
+            int priorBaseSurfNum = 0;
+            
+            for (int spaceNum : thisZone.spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                if (thisSpace.HTSurfaceFirst == 0) continue; // Zone with no surfaces
+                for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                    auto &thisSurf = state.dataSurface->Surface(SurfNum);
+                    if (thisSurf.Class == SurfaceClass::Floor || thisSurf.Class == SurfaceClass::Wall || thisSurf.Class == SurfaceClass::Roof)
+                        ++OpaqueHTSurfs;
+                    if (thisSurf.Class == SurfaceClass::IntMass) ++InternalMassSurfs;
+                    if (thisSurf.Class == SurfaceClass::Window) {
+                        // Count base surface only once for multiple windows on a wall
+                        int thisBaseSurfNum = thisSurf.BaseSurf;
+                        if (thisBaseSurfNum != priorBaseSurfNum) {
+                            ++OpaqueHTSurfsWithWin;
+                            priorBaseSurfNum = thisBaseSurfNum;
                         }
                     }
                 }
-
-                // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
-                if (surf.HeatTransSurf && surf.ExtBoundCond > 0) continue;
-                if (surf.HeatTransSurf && surf.ExtBoundCond == Ground) continue;
-                if (surf.HeatTransSurf && surf.ExtBoundCond == KivaFoundation) {
-                    state.dataSurface->AllHTKivaSurfaceList.push_back(SurfNum);
-                    if (!ErrorsFound) state.dataSurfaceGeometry->kivaManager.foundationInputs[surf.OSCPtr].surfaces.push_back(SurfNum);
-                    continue;
-                }
-                if (surf.HeatTransSurf && surf.ExtBoundCond == OtherSideCoefNoCalcExt) continue;
-                if (surf.HeatTransSurf && surf.ExtBoundCond == OtherSideCoefCalcExt) continue;
-                // Exclude windows and doors, i.e., consider only their base surfaces as possible obstructions
-                if (surf.Class == SurfaceClass::Window || surf.Class == SurfaceClass::Door) continue;
-                // Exclude duplicate shading surfaces
-                if (surf.MirroredSurf) continue;
-                // Exclude air boundary surfaces
-                if (surf.IsAirBoundarySurf) continue;
-
-                surf.IsShadowPossibleObstruction = true;
-                state.dataSurface->AllShadowPossObstrSurfaceList.push_back(SurfNum);
             }
-
-            // Check for IRT surfaces in invalid places.
-            iTmp1 = 0;
-            if (std::any_of(state.dataConstruction->Construct.begin(),
-                            state.dataConstruction->Construct.end(),
-                            [](Construction::ConstructionProps const &e) { return e.TypeIsIRT; })) {
-                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                    auto &surf = state.dataSurface->Surface(SurfNum);
-                    if (!surf.HeatTransSurf) continue;                                   // ignore shading surfaces
-                    if (surf.ExtBoundCond > 0 && surf.ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
-                    if (!state.dataConstruction->Construct(surf.Construction).TypeIsIRT) {
-                        continue;
-                    }
-                    if (!state.dataGlobal->DisplayExtraWarnings) {
-                        ++iTmp1;
-                    } else {
-                        ShowWarningError(state,
-                                         format("{}Surface=\"{}\" uses InfraredTransparent construction in a non-interzone surface. (illegal use)",
-                                                RoutineName,
-                                                surf.Name));
-                    }
-                }
-                if (iTmp1 > 0) {
-                    ShowWarningError(
-                        state,
-                        format("{}Surfaces use InfraredTransparent constructions {} in non-interzone surfaces. (illegal use)", RoutineName, iTmp1));
-                    ShowContinueError(state, "For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
-                }
+            if (OpaqueHTSurfsWithWin == 1 && OpaqueHTSurfs == 1 && InternalMassSurfs == 0) {
+                SurfError = true;
+                ShowSevereError(state,
+                                format("{}Zone {} has only one floor, wall or roof, and this surface has a window.", RoutineName, thisZone.Name));
+                ShowContinueError(state, "Add more floors, walls or roofs, or an internal mass surface.");
             }
+        }
 
-            // Populate SurfaceFilter lists
-            for (int iSurfaceFilter = 1; iSurfaceFilter < static_cast<int>(SurfaceFilter::Num); ++iSurfaceFilter)
-                state.dataSurface->SurfaceFilterLists[iSurfaceFilter].reserve(state.dataSurface->TotSurfaces);
+        // set up vertex of centroid for each surface.
+        CalcSurfaceCentroid(state);
 
-            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                auto const &surf = state.dataSurface->Surface(SurfNum);
-                if (!surf.HeatTransSurf) continue;
-                if (surf.ExtBoundCond > 0) {
-                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorSurfaces)].push_back(SurfNum);
-                    if (state.dataConstruction->Construct(surf.Construction).TypeIsWindow) {
-                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorWindows)].push_back(SurfNum);
-                    } else if (surf.Class == SurfaceClass::Wall) {
-                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorWalls)].push_back(SurfNum);
-                    } else if (surf.Class == SurfaceClass::Floor) {
-                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorFloors)].push_back(SurfNum);
-                    } else if (surf.Class == SurfaceClass::Roof) {
-                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorRoofs)].push_back(SurfNum);
-                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorCeilings)].push_back(SurfNum);
+        SetupShadeSurfacesForSolarCalcs(state); // if shading surfaces are solar collectors or PV, then we need full solar calc.
+        
+        GetMovableInsulationData(state, ErrorsFound);
+        
+        if (state.dataSurface->CalcSolRefl) GetShadingSurfReflectanceData(state, ErrorsFound);
+        
+        LayNumOutside = 0;
+        
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            auto &surf = state.dataSurface->Surface(SurfNum);
+            // Check for EcoRoof and only 1 allowed to be used.
+            if (surf.Construction > 0)
+                state.dataSurface->SurfExtEcoRoof(SurfNum) = state.dataConstruction->Construct(surf.Construction).TypeIsEcoRoof;
+            if (!state.dataSurface->SurfExtEcoRoof(SurfNum)) continue;
+            if (LayNumOutside == 0) {
+                LayNumOutside = state.dataConstruction->Construct(surf.Construction).LayerPoint(1);
+                continue;
+            }
+            if (LayNumOutside != state.dataConstruction->Construct(surf.Construction).LayerPoint(1)) {
+                ShowSevereError(state, format("{}Only one EcoRoof Material is currently allowed for all constructions.", RoutineName));
+                ShowContinueError(state, format("... first material={}", s_mat->materials(LayNumOutside)->Name));
+                ShowContinueError(state,
+                                  format("... conflicting Construction={} uses material={}",
+                                         state.dataConstruction->Construct(surf.Construction).Name,
+                                         s_mat->materials(state.dataConstruction->Construct(surf.Construction).LayerPoint(1))->Name));
+                ErrorsFound = true;
+            }
+        }
+        
+        // Reserve space to avoid excess allocations
+        state.dataSurface->AllHTSurfaceList.reserve(state.dataSurface->TotSurfaces);
+        state.dataSurface->AllExtSolarSurfaceList.reserve(state.dataSurface->TotSurfaces);
+        state.dataSurface->AllShadowPossObstrSurfaceList.reserve(state.dataSurface->TotSurfaces);
+        state.dataSurface->AllIZSurfaceList.reserve(state.dataSurface->TotSurfaces);
+        state.dataSurface->AllHTNonWindowSurfaceList.reserve(state.dataSurface->TotSurfaces - state.dataSurface->TotWindows);
+        state.dataSurface->AllHTWindowSurfaceList.reserve(state.dataSurface->TotWindows);
+        state.dataSurface->AllExtSolWindowSurfaceList.reserve(state.dataSurface->TotWindows);
+        state.dataSurface->AllExtSolWinWithFrameSurfaceList.reserve(state.dataSurface->TotWindows);
+        state.dataSurface->AllHTKivaSurfaceList.reserve(state.dataSurface->TotSurfaces);
+        
+        // Set flag that determines whether a surface can be an exterior obstruction
+        // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            auto &surf = state.dataSurface->Surface(SurfNum);
+            surf.IsShadowPossibleObstruction = false;
+            if (surf.ExtSolar) {
+                // This may include some attached shading surfaces
+                state.dataSurface->AllExtSolarSurfaceList.push_back(SurfNum);
+            }
+            if (surf.HeatTransSurf) {
+                // Outside light shelves get tagged later as HeatTransSurf=true but they haven't been processed yet
+                state.dataSurface->AllHTSurfaceList.push_back(SurfNum);
+                int const zoneNum(surf.Zone);
+                auto &surfZone(state.dataHeatBal->Zone(zoneNum));
+                surfZone.ZoneHTSurfaceList.push_back(SurfNum);
+                // Sort window vs non-window surfaces
+                if (surf.Class == DataSurfaces::SurfaceClass::Window) {
+                    state.dataSurface->AllHTWindowSurfaceList.push_back(SurfNum);
+                    surfZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
+                    if (surf.ExtSolar) {
+                        state.dataSurface->AllExtSolWindowSurfaceList.push_back(SurfNum);
+                        if (surf.FrameDivider > 0) {
+                            state.dataSurface->AllExtSolWinWithFrameSurfaceList.push_back(SurfNum);
+                        }
                     }
                 } else {
-                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorSurfaces)].push_back(SurfNum);
-                    if (state.dataConstruction->Construct(surf.Construction).TypeIsWindow) {
-                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorWindows)].push_back(SurfNum);
-                    } else if (surf.Class == SurfaceClass::Wall) {
-                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorWalls)].push_back(SurfNum);
-                    } else if (surf.Class == SurfaceClass::Floor) {
-                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorFloors)].push_back(SurfNum);
-                    } else if (surf.Class == SurfaceClass::Roof) {
-                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorRoofs)].push_back(SurfNum);
-                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorCeilings)].push_back(SurfNum);
+                    state.dataSurface->AllHTNonWindowSurfaceList.push_back(SurfNum);
+                    surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
+                }
+                int const surfExtBoundCond(surf.ExtBoundCond);
+                // Build zone and interzone surface lists
+                if ((surfExtBoundCond > 0) && (surfExtBoundCond != SurfNum)) {
+                    state.dataSurface->AllIZSurfaceList.push_back(SurfNum);
+                    surfZone.ZoneIZSurfaceList.push_back(SurfNum);
+                    auto &adjZone(state.dataHeatBal->Zone(state.dataSurface->Surface(surfExtBoundCond).Zone));
+                    adjZone.ZoneHTSurfaceList.push_back(SurfNum);
+                    adjZone.ZoneIZSurfaceList.push_back(SurfNum);
+                    // Sort window vs non-window surfaces
+                    if (surf.Class == DataSurfaces::SurfaceClass::Window) {
+                        adjZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
+                    } else {
+                        adjZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
                     }
                 }
             }
-
-            // Note, could do same for Window Area and detecting if Interzone Surface in Zone
-
-            if (state.dataSurfaceGeometry->Warning1Count > 0) {
-                ShowWarningMessage(state,
-                                   format("{}Window dimensions differ from Window 5/6 data file dimensions, {} times.",
-                                          RoutineName,
-                                          state.dataSurfaceGeometry->Warning1Count));
-                ShowContinueError(state, "This will affect the frame heat transfer calculation if the frame in the Data File entry");
-                ShowContinueError(state, "is not uniform, i.e., has sections with different geometry and/or thermal properties.");
-                ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
+            
+            // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
+            if (surf.HeatTransSurf && surf.ExtBoundCond > 0) continue;
+            if (surf.HeatTransSurf && surf.ExtBoundCond == Ground) continue;
+            if (surf.HeatTransSurf && surf.ExtBoundCond == KivaFoundation) {
+                state.dataSurface->AllHTKivaSurfaceList.push_back(SurfNum);
+                if (!ErrorsFound) state.dataSurfaceGeometry->kivaManager.foundationInputs[surf.OSCPtr].surfaces.push_back(SurfNum);
+                continue;
             }
-            if (state.dataSurfaceGeometry->Warning2Count > 0) {
-                ShowWarningMessage(state,
-                                   format("{}Exterior Windows have been replaced with Window 5/6 two glazing systems, {} times.",
-                                          RoutineName,
-                                          state.dataSurfaceGeometry->Warning2Count));
-                ShowContinueError(state, "Note that originally entered dimensions are overridden.");
-                ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
-            }
-            if (state.dataSurfaceGeometry->Warning3Count > 0) {
-                ShowWarningMessage(state,
-                                   format("{}Interior Windows have been replaced with Window 5/6 two glazing systems, {} times.",
-                                          RoutineName,
-                                          state.dataSurfaceGeometry->Warning3Count));
-                ShowContinueError(state, "Note that originally entered dimensions are overridden.");
-                ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
-            }
-
-            if (state.dataErrTracking->TotalMultipliedWindows > 0) {
-                ShowWarningMessage(state,
-                                   format("{}There are {} window/glass door(s) that may cause inaccurate shadowing due to Solar Distribution.",
-                                          RoutineName,
-                                          state.dataErrTracking->TotalMultipliedWindows));
-                ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
-                state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalMultipliedWindows;
-            }
-            if (state.dataErrTracking->TotalCoincidentVertices > 0) {
-                ShowWarningMessage(state,
-                                   format("{}There are {} coincident/collinear vertices; These have been deleted unless the deletion would bring the "
-                                          "number of surface sides < 3.",
-                                          RoutineName,
-                                          state.dataErrTracking->TotalCoincidentVertices));
-                ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
-                state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalCoincidentVertices;
-            }
-            if (state.dataErrTracking->TotalDegenerateSurfaces > 0) {
-                ShowSevereMessage(state,
-                                  format("{}There are {} degenerate surfaces; Degenerate surfaces are those with number of sides < 3.",
-                                         RoutineName,
-                                         state.dataErrTracking->TotalDegenerateSurfaces));
-                ShowContinueError(state, "These surfaces should be deleted.");
-                ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
-                state.dataErrTracking->TotalSevereErrors += state.dataErrTracking->TotalDegenerateSurfaces;
-            }
-
-            GetHTSurfExtVentedCavityData(state, ErrorsFound);
-
-            state.dataSurfaceGeometry->exposedFoundationPerimeter.getData(state, ErrorsFound);
-
-            GetSurfaceHeatTransferAlgorithmOverrides(state, ErrorsFound);
-
-            // Set up enclosures, process Air Boundaries if any
-            SetupEnclosuresAndAirBoundaries(state, state.dataViewFactor->EnclRadInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
-
-            GetSurfaceGroundSurfsData(state, ErrorsFound);
-
-            GetSurfaceSrdSurfsData(state, ErrorsFound);
-
-            GetSurfaceLocalEnvData(state, ErrorsFound);
-
-            if (SurfError || ErrorsFound) {
-                ErrorsFound = true;
-                ShowFatalError(state, format("{}Errors discovered, program terminates.", RoutineName));
-            }
-
-            int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
-                              TotOverhangsProjection + TotFins + TotFinsProjection;
-            int NumDElightCmplxFen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
-            if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || Dayltg::doesDayLightingUseDElight(state))) {
-                ShowWarningError(state,
-                                 format("{}When using DElight daylighting the presence of exterior shading surfaces is ignored.", RoutineName));
-            }
-
-            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            if (surf.HeatTransSurf && surf.ExtBoundCond == OtherSideCoefNoCalcExt) continue;
+            if (surf.HeatTransSurf && surf.ExtBoundCond == OtherSideCoefCalcExt) continue;
+            // Exclude windows and doors, i.e., consider only their base surfaces as possible obstructions
+            if (surf.Class == SurfaceClass::Window || surf.Class == SurfaceClass::Door) continue;
+            // Exclude duplicate shading surfaces
+            if (surf.MirroredSurf) continue;
+            // Exclude air boundary surfaces
+            if (surf.IsAirBoundarySurf) continue;
+            
+            surf.IsShadowPossibleObstruction = true;
+            state.dataSurface->AllShadowPossObstrSurfaceList.push_back(SurfNum);
+        } // for (SurfNum)
+        
+        // Check for IRT surfaces in invalid places.
+        iTmp1 = 0;
+        if (std::any_of(state.dataConstruction->Construct.begin(),
+                        state.dataConstruction->Construct.end(),
+                        [](Construction::ConstructionProps const &e) { return e.TypeIsIRT; })) {
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 auto &surf = state.dataSurface->Surface(SurfNum);
-                // Initialize run time surface arrays
-                state.dataSurface->SurfActiveConstruction(SurfNum) = surf.Construction;
-                surf.RepresentativeCalcSurfNum = SurfNum;
+                if (!surf.HeatTransSurf) continue;                                   // ignore shading surfaces
+                if (surf.ExtBoundCond > 0 && surf.ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
+                if (!state.dataConstruction->Construct(surf.Construction).TypeIsIRT) {
+                    continue;
+                }
+                if (!state.dataGlobal->DisplayExtraWarnings) {
+                    ++iTmp1;
+                } else {
+                    ShowWarningError(state,
+                                     format("{}Surface=\"{}\" uses InfraredTransparent construction in a non-interzone surface. (illegal use)",
+                                            RoutineName,
+                                            surf.Name));
+                }
             }
+            if (iTmp1 > 0) {
+                ShowWarningError(
+                                 state,
+                                 format("{}Surfaces use InfraredTransparent constructions {} in non-interzone surfaces. (illegal use)", RoutineName, iTmp1));
+                ShowContinueError(state, "For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
+            }
+        }
 
-            // Representative surface calculations: Assign representative heat transfer surfaces
-            if (state.dataSurface->UseRepresentativeSurfaceCalculations &&
-                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName") == 0) {
-                for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                    for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                        auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                        for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; surfNum++) {
-                            auto &surface(state.dataSurface->Surface(surfNum));
-                            // Conditions where surface always needs to be unique
-                            bool forceUniqueSurface =
-                                surface.HasShadeControl ||
-                                state.dataSurface->SurfWinAirflowSource(surfNum) != DataSurfaces::WindowAirFlowSource::Invalid ||
-                                state.dataConstruction->Construct(surface.Construction).SourceSinkPresent ||
-                                surface.Class == SurfaceClass::TDD_Dome ||
-                                (surface.Class == SurfaceClass::Window &&
-                                 (surface.OriginalClass == SurfaceClass::TDD_Diffuser ||
-                                  state.dataSurface->SurfWinWindowModelType(surfNum) != WindowModel::Detailed ||
-                                  state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
-                                  state.dataConstruction->Construct(surface.Construction).TCFlag == 1));
-                            if (!forceUniqueSurface) {
+        // Populate SurfaceFilter lists
+        for (int iSurfaceFilter = 1; iSurfaceFilter < static_cast<int>(SurfaceFilter::Num); ++iSurfaceFilter)
+            state.dataSurface->SurfaceFilterLists[iSurfaceFilter].reserve(state.dataSurface->TotSurfaces);
+        
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            auto const &surf = state.dataSurface->Surface(SurfNum);
+            if (!surf.HeatTransSurf) continue;
+            if (surf.ExtBoundCond > 0) {
+                state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorSurfaces)].push_back(SurfNum);
+                if (state.dataConstruction->Construct(surf.Construction).TypeIsWindow) {
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorWindows)].push_back(SurfNum);
+                } else if (surf.Class == SurfaceClass::Wall) {
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorWalls)].push_back(SurfNum);
+                } else if (surf.Class == SurfaceClass::Floor) {
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorFloors)].push_back(SurfNum);
+                } else if (surf.Class == SurfaceClass::Roof) {
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorRoofs)].push_back(SurfNum);
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorCeilings)].push_back(SurfNum);
+                }
+            } else {
+                state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorSurfaces)].push_back(SurfNum);
+                if (state.dataConstruction->Construct(surf.Construction).TypeIsWindow) {
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorWindows)].push_back(SurfNum);
+                } else if (surf.Class == SurfaceClass::Wall) {
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorWalls)].push_back(SurfNum);
+                } else if (surf.Class == SurfaceClass::Floor) {
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorFloors)].push_back(SurfNum);
+                } else if (surf.Class == SurfaceClass::Roof) {
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorRoofs)].push_back(SurfNum);
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorCeilings)].push_back(SurfNum);
+                }
+            }
+        } // for (SurfNum)
+        
+        // Note, could do same for Window Area and detecting if Interzone Surface in Zone
+        
+        if (state.dataSurfaceGeometry->Warning1Count > 0) {
+            ShowWarningMessage(state,
+                               format("{}Window dimensions differ from Window 5/6 data file dimensions, {} times.",
+                                      RoutineName,
+                                      state.dataSurfaceGeometry->Warning1Count));
+            ShowContinueError(state, "This will affect the frame heat transfer calculation if the frame in the Data File entry");
+            ShowContinueError(state, "is not uniform, i.e., has sections with different geometry and/or thermal properties.");
+            ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
+        }
+        if (state.dataSurfaceGeometry->Warning2Count > 0) {
+            ShowWarningMessage(state,
+                               format("{}Exterior Windows have been replaced with Window 5/6 two glazing systems, {} times.",
+                                      RoutineName,
+                                      state.dataSurfaceGeometry->Warning2Count));
+            ShowContinueError(state, "Note that originally entered dimensions are overridden.");
+            ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
+        }
+        if (state.dataSurfaceGeometry->Warning3Count > 0) {
+            ShowWarningMessage(state,
+                               format("{}Interior Windows have been replaced with Window 5/6 two glazing systems, {} times.",
+                                      RoutineName,
+                                      state.dataSurfaceGeometry->Warning3Count));
+            ShowContinueError(state, "Note that originally entered dimensions are overridden.");
+            ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
+        }
+        
+        if (state.dataErrTracking->TotalMultipliedWindows > 0) {
+            ShowWarningMessage(state,
+                               format("{}There are {} window/glass door(s) that may cause inaccurate shadowing due to Solar Distribution.",
+                                      RoutineName,
+                                      state.dataErrTracking->TotalMultipliedWindows));
+            ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
+            state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalMultipliedWindows;
+        }
+        if (state.dataErrTracking->TotalCoincidentVertices > 0) {
+            ShowWarningMessage(state,
+                               format("{}There are {} coincident/collinear vertices; These have been deleted unless the deletion would bring the "
+                                      "number of surface sides < 3.",
+                                      RoutineName,
+                                      state.dataErrTracking->TotalCoincidentVertices));
+            ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
+            state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalCoincidentVertices;
+        }
+        if (state.dataErrTracking->TotalDegenerateSurfaces > 0) {
+            ShowSevereMessage(state,
+                              format("{}There are {} degenerate surfaces; Degenerate surfaces are those with number of sides < 3.",
+                                     RoutineName,
+                                     state.dataErrTracking->TotalDegenerateSurfaces));
+            ShowContinueError(state, "These surfaces should be deleted.");
+            ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
+            state.dataErrTracking->TotalSevereErrors += state.dataErrTracking->TotalDegenerateSurfaces;
+        }
+        
+        GetHTSurfExtVentedCavityData(state, ErrorsFound);
+        
+        state.dataSurfaceGeometry->exposedFoundationPerimeter.getData(state, ErrorsFound);
+        
+        GetSurfaceHeatTransferAlgorithmOverrides(state, ErrorsFound);
+        
+        // Set up enclosures, process Air Boundaries if any
+        SetupEnclosuresAndAirBoundaries(state, state.dataViewFactor->EnclRadInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
+        
+        GetSurfaceGroundSurfsData(state, ErrorsFound);
+        
+        GetSurfaceSrdSurfsData(state, ErrorsFound);
+        
+        GetSurfaceLocalEnvData(state, ErrorsFound);
+        
+        if (SurfError || ErrorsFound) {
+            ErrorsFound = true;
+            ShowFatalError(state, format("{}Errors discovered, program terminates.", RoutineName));
+        }
+        
+        int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
+            TotOverhangsProjection + TotFins + TotFinsProjection;
+        int NumDElightCmplxFen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
+        if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || Dayltg::doesDayLightingUseDElight(state))) {
+            ShowWarningError(state,
+                             format("{}When using DElight daylighting the presence of exterior shading surfaces is ignored.", RoutineName));
+        }
+
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            auto &surf = state.dataSurface->Surface(SurfNum);
+            // Initialize run time surface arrays
+            state.dataSurface->SurfActiveConstruction(SurfNum) = surf.Construction;
+            surf.RepresentativeCalcSurfNum = SurfNum;
+        }
+        
+        // Representative surface calculations: Assign representative heat transfer surfaces
+        if (state.dataSurface->UseRepresentativeSurfaceCalculations &&
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName") == 0) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+                for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; surfNum++) {
+                        auto &surface(state.dataSurface->Surface(surfNum));
+                        // Conditions where surface always needs to be unique
+                        bool forceUniqueSurface =
+                            surface.HasShadeControl ||
+                            state.dataSurface->SurfWinAirflowSource(surfNum) != DataSurfaces::WindowAirFlowSource::Invalid ||
+                            state.dataConstruction->Construct(surface.Construction).SourceSinkPresent ||
+                            surface.Class == SurfaceClass::TDD_Dome ||
+                            (surface.Class == SurfaceClass::Window &&
+                             (surface.OriginalClass == SurfaceClass::TDD_Diffuser ||
+                              state.dataSurface->SurfWinWindowModelType(surfNum) != WindowModel::Detailed ||
+                              state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
+                              state.dataConstruction->Construct(surface.Construction).TCFlag == 1));
+                        if (!forceUniqueSurface) {
                                 state.dataSurface->Surface(surfNum).set_representative_surface(state, surfNum);
-                            }
                         }
                     }
-                }
-            }
-            // Initialize surface with movable insulation index list
-            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
-                if (state.dataSurface->SurfMaterialMovInsulExt(SurfNum) > 0 || state.dataSurface->SurfMaterialMovInsulInt(SurfNum) > 0) {
-                    state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
                 }
             }
         }
+
+        // Initialize surface with movable insulation index list
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            if (state.dataSurface->SurfMaterialMovInsulExt(SurfNum) > 0 || state.dataSurface->SurfMaterialMovInsulInt(SurfNum) > 0) {
+                    state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
+            }
+        }
+    
         if (SurfError || ErrorsFound) {
             ErrorsFound = true;
             ShowFatalError(state, format("{}Errors discovered, program terminates.", RoutineName));

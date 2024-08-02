@@ -1509,6 +1509,15 @@ namespace Window {
                 Real64 EpsGlIR = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
                 Real64 RhoGlIR = 1 - EpsGlIR;
 
+                // surfShade.blind has not been initialized yet
+                surfShade.blind.slatAngThisTSDeg = matBlind->SlatAngle;
+                surfShade.blind.slatAngThisTS = surfShade.blind.slatAngThisTS * Constant::DegToRad;
+
+                Material::GetSlatIndicesInterpFac(surfShade.blind.slatAngThisTS,
+                                                  surfShade.blind.slatAngIdxLo, surfShade.blind.slatAngIdxHi, surfShade.blind.slatAngInterpFac);
+                surfShade.blind.tar.interpSlatAng(matBlind->tars[surfShade.blind.slatAngIdxLo], matBlind->tars[surfShade.blind.slatAngIdxHi],
+                                                  surfShade.blind.slatAngInterpFac);
+
                 Real64 TauShIR = surfShade.blind.tar.IR.Front.Tra;
                 Real64 EpsShIR = surfShade.blind.tar.IR.Back.Emi;
                 Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
@@ -7432,14 +7441,14 @@ namespace Window {
                 int iSlatAngLo, iSlatAngHi;
                 if (matBlind->SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
                     Real64 interpFac;
-                    Material::GetSlatIndicesInterpFac(matBlind->SlatAngle, iSlatAngLo, iSlatAngHi, interpFac);
+                    Material::GetSlatIndicesInterpFac(matBlind->SlatAngle * Constant::DegToRad, iSlatAngLo, iSlatAngHi, interpFac);
                 } else {
                     iSlatAngLo = 1;
                     iSlatAngHi = Material::MaxSlatAngs;
                 }
                         
 
-                for (int ISlatAng = iSlatAngLo; ISlatAng <= iSlatAngHi; ++ISlatAng) {
+                for (int ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
 
                     auto &btar = matBlind->tars[ISlatAng];
                         
