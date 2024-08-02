@@ -601,11 +601,20 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                       OutArgs(6) = 'Continuous'                             !- Speed Control Method
                       IF (SameString(OldFanVO(Num3)%minFlowInputMethod, "FixedFlowRate")) THEN
                         IF (.NOT. SameString(OldFanVO(Num3)%maxAirFlow_str, "AUTOSIZE")) THEN
-                          READ(OldFanVO(Num3)%fanPowerMinAirFlow_str, '(F15.5)') fanPowerMinAirFlow
-                          READ(OldFanVO(Num3)%maxAirFlow_str, '(F15.5)') maxAirFlow
+                          fanPowerMinAirFlow = ProcessNumber(OldFanVO(Num3)%fanPowerMinAirFlow_str, ErrFlag)
+                          IF (ErrFlag) THEN
+                            CALL ShowSevereError('Invalid Number, FAN:VARIABLEVOLUME field 8, Fan Power Minimum Air Flow Rate, Name=' // TRIM(OutArgs(1)), Auditf)
+                          END IF
+                          maxAirFlow = ProcessNumber(OldFanVO(Num3)%maxAirFlow_str, ErrFlag)
+                          IF (ErrFlag) THEN
+                            CALL ShowSevereError('Invalid Number, FAN:VARIABLEVOLUME field 5, Maximum Flow Rate, Name=' // TRIM(OutArgs(1)), Auditf)
+                          END IF
                           WRITE(OutArgs(7), '(F15.5)') (fanPowerMinAirFlow / maxAirFlow)
                       ELSE ! maxAirFlow_stris autosize
-                          READ(OldFanVO(Num3)%fanPowerMinAirFlow_str, '(F15.5)') fanPowerMinAirFlow
+                          fanPowerMinAirFlow = ProcessNumber(OldFanVO(Num3)%fanPowerMinAirFlow_str, ErrFlag)
+                          IF (ErrFlag) THEN
+                            CALL ShowSevereError('Invalid Number, FAN:VARIABLEVOLUME field 8, Fan Power Minimum Air Flow Rate, Name=' // TRIM(OutArgs(1)), Auditf)
+                          END IF
                           IF (.NOT. fanPowerMinAirFlow == 0) THEN ! don't know how to do division with autosize
                             CALL writePreprocessorObject(DifLfn, PrognameConversion, 'Warning', &
                                     'Cannot calculate Electric Power Minimum Flow Rate Fraction for' // sysFanName // &
