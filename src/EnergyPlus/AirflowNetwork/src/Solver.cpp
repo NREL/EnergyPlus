@@ -10143,10 +10143,12 @@ namespace AirflowNetwork {
         using DXCoils::SetDXCoilAirLoopNumber;
         using HeatingCoils::SetHeatingCoilAirLoopNumber;
         using HVACStandAloneERV::GetStandAloneERVNodeNumber;
+        using HVACVariableRefrigerantFlow::getVRFTUNodeNumber;
         using SplitterComponent::GetSplitterNodeNumbers;
         using SplitterComponent::GetSplitterOutletNumber;
+        using UnitarySystems::getUnitarySystemNodeNumber;
         using WaterThermalTanks::GetHeatPumpWaterHeaterNodeNumber;
-        using WindowAC::GetWindowACNodeNumber;
+        using WindowAC::getWindowACNodeNumber;
         using ZoneDehumidifier::GetZoneDehumidifierNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -10168,7 +10170,7 @@ namespace AirflowNetwork {
         bool packagedUnitaryFound(false); // Flag for packaged unitary systems (ZoneHVAC:PackagedTerminalAirConditioner,
                                           // ZoneHVAC:PackagedTerminalHeatPump, ZoneHVAC:WaterToAirHeatPump) identification
         bool vrfTUFound(false);
-        bool WindowACFound(false); // Flag for Window AC (ZoneHVAC:WindowAirConditioner) identification
+        bool windowACFound(false); // Flag for Window AC (ZoneHVAC:WindowAirConditioner) identification
 
         // Validate supply and return connections
         NodeFound.dimension(m_state.dataLoopNodes->NumOfNodes, false);
@@ -10283,21 +10285,21 @@ namespace AirflowNetwork {
                 }
 
                 // Skip zonal unitary system based nodes that don't have to be included in the AFN
-                if (UnitarySystems::getUnitarySystemNodeNumber(m_state, i)) {
+                if (getUnitarySystemNodeNumber(m_state, i)) {
                     NodeFound(i) = true;
                     packagedUnitaryFound = true;
                 }
 
                 // Skip zonal vrf terminal nodes that don't have to be included in the AFN
-                if (HVACVariableRefrigerantFlow::getVRFTUNodeNumber(m_state, i)) {
+                if (getVRFTUNodeNumber(m_state, i)) {
                     NodeFound(i) = true;
                     vrfTUFound = true;
                 }
 
                 // Skip Window AC with no OA
-                if (GetWindowACNodeNumber(m_state, i)) {
+                if (getWindowACNodeNumber(m_state, i)) {
                     NodeFound(i) = true;
-                    WindowACFound = true;
+                    windowACFound = true;
                 }
             }
 
@@ -10451,7 +10453,7 @@ namespace AirflowNetwork {
                                  "A ZoneHVAC:TerminalUnit:VariableRefrigerantFlow is simulated along with an AirflowNetwork but is not "
                                  "included in the AirflowNetwork.");
         }
-        if (WindowACFound) {
+        if (windowACFound) {
             ShowWarningError(m_state,
                              format(RoutineName) + "A ZoneHVAC:WindowAirConditioner is simulated along with an AirflowNetwork but is not "
                                                    "included in the AirflowNetwork.");
