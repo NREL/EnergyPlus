@@ -107,7 +107,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(2).PerfMode.allocate(1);
-    state->dataDXCoils->DXCoilNumericFields(2).PerfMode(1).FieldNames.allocate(17);
+    state->dataDXCoils->DXCoilNumericFields(2).PerfMode(1).FieldNames.allocate(18);
     state->dataDXCoils->DXCoil(2).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
     state->dataDXCoils->DXCoil(2).DefrostCapacity = 5000.0;
     state->dataDXCoils->DXCoil(2).Name = "DX Heating coil";
@@ -4648,9 +4648,9 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_NEAR(16365.95, state->dataDXCoils->DXCoil(2).MSRatedTotCap(1), 0.01);
     // Check EIO reporting
     const std::string htg_coil_eio_output =
-        R"EIO( Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Speed 2 Gross Rated Heating COP [m3/s], 1.75000
+        R"EIO( Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Speed 2 Rated Air Flow Rate [m3/s], 1.75000
  Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Speed 1 Rated Air Flow Rate [m3/s], 0.87500
- Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Speed 1 Rated Waste Heat Fraction of Power Input [W], 32731.91226
+ Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Speed 2 Gross Rated Heating Capacity [W], 32731.91226
  Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Speed 1 Gross Rated Heating Capacity [W], 16365.95613
  Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Resistive Defrost Heater Capacity, 0.00000
 ! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number
