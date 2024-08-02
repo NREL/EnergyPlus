@@ -650,7 +650,6 @@ namespace HeatBalanceHAMTManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int sid;
         int conid;
-        int matid;
         int errorCount;
 
         Real64 runor;

@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGParams.hh>
@@ -61,9 +62,6 @@
 namespace EnergyPlus {
 
 namespace Material {
-
-    constexpr int MaxSlatAngs(19);
-    constexpr int MaxProfAngs(37);
 
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
@@ -404,25 +402,131 @@ namespace Material {
         virtual ~MaterialChild() override = default;
     };
 
-    struct BlindBmTransAbsRef
+    // Blind 
+    constexpr int MaxSlatAngs = 19;
+    constexpr int MaxProfAngs = 37;
+
+    constexpr Real64 dProfAng = Constant::Pi / (MaxProfAngs - 1);
+    constexpr Real64 dSlatAng = Constant::Pi / (MaxSlatAngs - 1);
+        
+    struct BlindBmTAR
     {
-        Array2D<Real64> SolFrontBeamBeamTrans; // Blind solar front beam-beam transmittance vs.
-        // profile angle, slat angle
-        Array2D<Real64> SolFrontBeamBeamRefl; // Blind solar front beam-beam reflectance vs. profile angle,
-        // slat angle (zero)
-        Array2D<Real64> SolBackBeamBeamTrans; // Blind solar back beam-beam transmittance vs. profile angle,
-        // slat angle
-        Array2D<Real64> SolBackBeamBeamRefl; // Blind solar back beam-beam reflectance vs. profile angle,
-        // slat angle (zero)
-        Array2D<Real64> SolFrontBeamDiffTrans; // Blind solar front beam-diffuse transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> SolFrontBeamDiffRefl; // Blind solar front beam-diffuse reflectance
-        // vs. profile angle, slat angle
-        Array2D<Real64> SolBackBeamDiffTrans; // Blind solar back beam-diffuse transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> SolBackBeamDiffRefl; // Blind solar back beam-diffuse reflectance
+        Real64 BmTra = 0.0; // Beam-beam transmittance
+        Real64 DfTra = 0.0; // Beam-diff transmittance
+            
+        Real64 BmRef = 0.0; // Beam-beam reflectance
+        Real64 DfRef = 0.0; // Beam-diff reflectance
+            
+        Real64 Abs = 0.0; // Absorptance
+
+        void interpSlatAng(BlindBmTAR const &t1, BlindBmTAR const &t2, Real64 interpFac) {
+            BmTra = Interp(t1.BmTra, t2.BmTra, interpFac);
+            DfTra = Interp(t1.DfTra, t2.DfTra, interpFac);
+
+            BmRef = Interp(t1.BmRef, t2.BmRef, interpFac);
+            DfRef = Interp(t1.DfRef, t2.DfRef, interpFac);
+
+            Abs = Interp(t1.Abs, t2.Abs, interpFac);
+        }
+    };
+
+    struct BlindDfTAR
+    {
+        Real64 Tra = 0.0;
+        Real64 Abs = 0.0;
+        Real64 Ref = 0.0;
+                    
+        void interpSlatAng(BlindDfTAR const &t1, BlindDfTAR const &t2, Real64 interpFac) {
+            Tra = Interp(t1.Tra, t2.Tra, interpFac);
+            Ref = Interp(t1.Ref, t2.Ref, interpFac);
+            Abs = Interp(t1.Abs, t2.Abs, interpFac);
+        }
+    };
+            
+    struct BlindDfTARGS
+    {
+        Real64 Tra = 0.0;
+        Real64 TraGnd = 0.0;
+        Real64 TraSky = 0.0;
+
+        Real64 Ref = 0.0;
+        Real64 RefGnd = 0.0;
+        Real64 RefSky = 0.0;
+
+        Real64 Abs = 0.0;
+        Real64 AbsGnd = 0.0;
+        Real64 AbsSky = 0.0;
+
+        void interpSlatAng(BlindDfTARGS const &t1, BlindDfTARGS const &t2, Real64 interpFac) {
+            Tra = Interp(t1.Tra, t2.Tra, interpFac);
+            TraGnd = Interp(t1.TraGnd, t2.TraGnd, interpFac);
+            TraSky = Interp(t1.TraSky, t2.TraSky, interpFac);
+            Ref = Interp(t1.Ref, t2.Ref, interpFac);
+            RefGnd = Interp(t1.RefGnd, t2.RefGnd, interpFac);
+            RefSky = Interp(t1.RefSky, t2.RefSky, interpFac);
+            Abs = Interp(t1.Abs, t2.Abs, interpFac);
+            AbsGnd = Interp(t1.AbsGnd, t2.AbsGnd, interpFac);
+            AbsSky = Interp(t1.AbsSky, t2.AbsSky, interpFac);
+        }
+    };
+
+    struct BlindBmDf
+    {
+        std::array<BlindBmTAR, MaxProfAngs+1> Bm;
+        BlindDfTARGS Df;
+
+        void interpSlatAng(BlindBmDf const &t1, BlindBmDf const &t2, Real64 interpFac) {
+            for (int i = 0; i < MaxProfAngs+1; ++i) Bm[i].interpSlatAng(t1.Bm[i], t2.Bm[i], interpFac);
+            Df.interpSlatAng(t1.Df, t2.Df, interpFac);
+        }
     };
         
+    struct BlindFrontBack
+    {
+        BlindBmDf Front;
+        BlindBmDf Back;
+
+        void interpSlatAng(BlindFrontBack const &t1, BlindFrontBack const &t2, Real64 interpFac) {
+            Front.interpSlatAng(t1.Front, t2.Front, interpFac);
+            Back.interpSlatAng(t1.Back, t2.Back, interpFac);
+        }
+    };
+
+    struct BlindTraEmi
+    {
+        Real64 Tra;
+        Real64 Emi;
+
+        void interpSlatAng(BlindTraEmi const &t1, BlindTraEmi const &t2, Real64 interpFac) {
+            Tra = Interp(t1.Tra, t2.Tra, interpFac);
+            Emi = Interp(t1.Emi, t2.Emi, interpFac);
+        }            
+    };
+
+    struct BlindFrontBackIR
+    {
+        BlindTraEmi Front;
+        BlindTraEmi Back;
+
+        void interpSlatAng(BlindFrontBackIR const &t1, BlindFrontBackIR const &t2, Real64 interpFac) {
+            Front.interpSlatAng(t1.Front, t2.Front, interpFac);
+            Back.interpSlatAng(t1.Back, t2.Back, interpFac);
+        }
+    };
+        
+    struct BlindTraAbsRef
+    {
+        BlindFrontBack Sol;
+        BlindFrontBack Vis;
+        BlindFrontBackIR IR;
+
+        void interpSlatAng(BlindTraAbsRef const &t1, BlindTraAbsRef const &t2, Real64 interpFac) {
+            Sol.interpSlatAng(t1.Sol, t2.Sol, interpFac);
+            Vis.interpSlatAng(t1.Vis, t2.Vis, interpFac);
+            IR.interpSlatAng(t1.IR, t2.IR, interpFac);
+        }
+    };
+
     struct MaterialBlind : public MaterialBase 
     {
         // Input properties
@@ -465,41 +569,30 @@ namespace Material {
         Real64 rightOpeningMult = 0.0; // Area of air-flow opening at right side of blind, expressed as a fraction
         //  of the blind-to-glass opening area at the right side of the blind
         // Calculated blind properties
+
+        std::array<BlindTraAbsRef, MaxSlatAngs+1> tars;
+#ifdef GET_OUT
         // Blind solar properties
-        Array2D<Real64> SolFrontBeamBeamTrans; // Blind solar front beam-beam transmittance vs.
-        // profile angle, slat angle
-        Array2D<Real64> SolFrontBeamBeamRefl; // Blind solar front beam-beam reflectance vs. profile angle,
-        // slat angle (zero)
-        Array2D<Real64> SolBackBeamBeamTrans; // Blind solar back beam-beam transmittance vs. profile angle,
-        // slat angle
-        Array2D<Real64> SolBackBeamBeamRefl; // Blind solar back beam-beam reflectance vs. profile angle,
-        // slat angle (zero)
+        Array2D<Real64> SolFrontBeamBeamTrans; // Blind solar front beam-beam transmittance 
+        Array2D<Real64> SolFrontBeamBeamRefl; // Blind solar front beam-beam reflectance 
+        Array2D<Real64> SolBackBeamBeamTrans; // Blind solar back beam-beam transmittance 
+        Array2D<Real64> SolBackBeamBeamRefl; // Blind solar back beam-beam reflectance
         Array2D<Real64> SolFrontBeamDiffTrans; // Blind solar front beam-diffuse transmittance
-        // vs. profile angle, slat angle
         Array2D<Real64> SolFrontBeamDiffRefl; // Blind solar front beam-diffuse reflectance
-        // vs. profile angle, slat angle
         Array2D<Real64> SolBackBeamDiffTrans; // Blind solar back beam-diffuse transmittance
-        // vs. profile angle, slat angle
         Array2D<Real64> SolBackBeamDiffRefl; // Blind solar back beam-diffuse reflectance
-        // vs. profile angle, slat angle
-        Array1D<Real64> SolFrontDiffDiffTrans; // Blind solar front diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffTransGnd; // Blind ground solar front diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffTransSky; // Blind sky solar front diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffRefl; // Blind solar front diffuse-diffuse reflectance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffReflGnd; // Blind ground solar front diffuse-diffuse reflectance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffReflSky; // Blind sky solar front diffuse-diffuse reflectance
-        // vs. slat angle
-        Array1D<Real64> SolBackDiffDiffTrans; // Blind solar back diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolBackDiffDiffRefl; // Blind solar back diffuse-diffuse reflectance
-        // vs. slat angle
         Array2D<Real64> SolFrontBeamAbs;    // Blind solar front beam absorptance vs. slat angle
         Array2D<Real64> SolBackBeamAbs;     // Blind solar back beam absorptance vs. slat angle
+
+        Array1D<Real64> SolFrontDiffDiffTrans; // Blind solar front diffuse-diffuse transmittance
+        Array1D<Real64> SolFrontDiffDiffTransGnd; // Blind ground solar front diffuse-diffuse transmittance
+        Array1D<Real64> SolFrontDiffDiffTransSky; // Blind sky solar front diffuse-diffuse transmittance
+        Array1D<Real64> SolFrontDiffDiffRefl; // Blind solar front diffuse-diffuse reflectance
+        Array1D<Real64> SolFrontDiffDiffReflGnd; // Blind ground solar front diffuse-diffuse reflectance
+        Array1D<Real64> SolFrontDiffDiffReflSky; // Blind sky solar front diffuse-diffuse reflectance
+        Array1D<Real64> SolBackDiffDiffTrans; // Blind solar back diffuse-diffuse transmittance
+        Array1D<Real64> SolBackDiffDiffRefl; // Blind solar back diffuse-diffuse reflectance
+
         Array1D<Real64> SolFrontDiffAbs;    // Blind solar front diffuse absorptance vs. slat angle
         Array1D<Real64> SolFrontDiffAbsGnd; // Blind ground solar front diffuse absorptance vs. slat angle
         Array1D<Real64> SolFrontDiffAbsSky; // Blind sky solar front diffuse absorptance vs. slat angle
@@ -534,9 +627,11 @@ namespace Material {
         Array1D<Real64> IRFrontEmiss; // Blind IR front emissivity vs. slat angle
         Array1D<Real64> IRBackTrans;  // Blind IR back transmittance vs. slat angle
         Array1D<Real64> IRBackEmiss;  // Blind IR back emissivity vs. slat angle
-
+#endif // GET_OUT
+            
         // Default Constructor
         MaterialBlind()
+#ifdef GET_OUT                
             : SolFrontBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0),
               SolBackBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolBackBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0),
               SolFrontBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0),
@@ -552,9 +647,12 @@ namespace Material {
               VisBackBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0), VisFrontDiffDiffTrans(MaxSlatAngs, 0.0), VisFrontDiffDiffRefl(MaxSlatAngs, 0.0),
               VisBackDiffDiffTrans(MaxSlatAngs, 0.0), VisBackDiffDiffRefl(MaxSlatAngs, 0.0), IRFrontTrans(MaxSlatAngs, 0.0),
               IRFrontEmiss(MaxSlatAngs, 0.0), IRBackTrans(MaxSlatAngs, 0.0), IRBackEmiss(MaxSlatAngs, 0.0)
+#endif // GET_OUT              
         {
             group = Group::WindowBlind;
         }
+
+        Real64 BeamBeamTrans(Real64 profAng, Real64 slatAng) const;
     };
 
     struct WindowComplexShade
@@ -724,6 +822,9 @@ namespace Material {
                                  Real64 theta, // Sun azimuth relative to surface outward normal (rad)
                                  ScreenBmTransAbsRef &tar);
 
+    void NormalizeProfSlat(Real64 &profAng, Real64 &slatAng);
+    void GetProfIndices(Real64 profAng, int &iProf1, int &iProf2);
+    void GetSlatIndicesInterpFac(Real64 slatAng, int &iSlat1, int &iSlat2, Real64 &interpFac);
 } // namespace Material
 
 struct MaterialData : BaseGlobalStruct

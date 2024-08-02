@@ -2015,10 +2015,7 @@ void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
 {
     this->AbsDiff.allocate(state.dataHeatBal->MaxSolidWinLayers);
     this->AbsDiffBack.allocate(state.dataHeatBal->MaxSolidWinLayers);
-    this->BlAbsDiff.allocate(Material::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers);
-    this->BlAbsDiffGnd.allocate(Material::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers);
-    this->BlAbsDiffSky.allocate(Material::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers);
-    this->BlAbsDiffBack.allocate(Material::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers);
+    this->layerSlatBlindDfAbs.allocate(state.dataHeatBal->MaxSolidWinLayers);
     this->AbsBeamCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
     this->AbsBeamBackCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
     this->tBareSolCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
@@ -2046,12 +2043,14 @@ void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
         this->AbsDiff(Layer) = 0.0;
         this->AbsDiffBack(Layer) = 0.0;
     }
-    for (int Index = 1; Index <= Material::MaxSlatAngs; ++Index) {
-        for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
-            this->BlAbsDiff(Index, Layer) = 0.0;
-            this->BlAbsDiffGnd(Index, Layer) = 0.0;
-            this->BlAbsDiffSky(Index, Layer) = 0.0;
-            this->BlAbsDiffBack(Index, Layer) = 0.0;
+    for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+        auto &slatBlindDfAbs = this->layerSlatBlindDfAbs(Layer);
+        for (int Index = 1; Index <= Material::MaxSlatAngs; ++Index) {
+            auto &blindDfAbs = slatBlindDfAbs[Index];
+            blindDfAbs.Sol.Front.Df.Abs = 0.0;
+            blindDfAbs.Sol.Front.Df.AbsGnd = 0.0;
+            blindDfAbs.Sol.Front.Df.AbsGnd = 0.0;
+            blindDfAbs.Sol.Back.Df.Abs = 0.0;
         }
     }
     for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {

@@ -298,14 +298,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBal->space(1).WindowSurfaceLast = 1;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->surfShades.allocate(state->dataSurface->TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
-    for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
-        Material::MaterialBase *p = new Material::MaterialBase;
-        state->dataMaterial->materials.push_back(p);
-    }
-    state->dataSurface->SurfaceWindow(1).EffShBlindEmiss[1] = 0.1;
-    state->dataSurface->SurfaceWindow(1).EffGlassEmiss[1] = 0.1;
+
+    state->dataSurface->surfShades(1).effShadeEmi = 0.1;
+    state->dataSurface->surfShades(1).effGlassEmi = 0.1;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).Construction = 1;
@@ -4883,6 +4881,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_IncSolarMultiplier)
     state->dataHeatBal->TotConstructs = 1;
     int totConstructs = state->dataHeatBal->TotConstructs;
     state->dataSurface->Surface.allocate(totSurf);
+    state->dataSurface->surfShades.allocate(totSurf);
     state->dataConstruction->Construct.allocate(totConstructs);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataGlobal->NumOfTimeStepInHour = 6;

@@ -1271,6 +1271,7 @@ namespace SurfaceGeometry {
 
         state.dataSurface->Surface.allocate(state.dataSurface->TotSurfaces); // Allocate the Surface derived type appropriately
         state.dataSurface->SurfaceWindow.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->surfShades.allocate(state.dataSurface->TotSurfaces);
         AllocateSurfaceArrays(state);
         AllocateSurfaceWindows(state, state.dataSurface->TotSurfaces);
 
@@ -2424,28 +2425,30 @@ namespace SurfaceGeometry {
         }
 
         auto &s_mat = state.dataMaterial;
-        
+
+        // I don't think this entire loop matters
         errFlag = false;
         if (!SurfError) {
             for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
                 auto &surf = state.dataSurface->Surface(SurfNum);
-                auto &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
                 if (surf.HasShadeControl) {
+                    auto &surfShade = state.dataSurface->surfShades(SurfNum);
                     WinShadingControlPtr = surf.activeWindowShadingControl; // use first item since others should be identical
                     if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).slatAngleControl != SlatAngleControl::Fixed) {
-                        surfWin.blind.movableSlats = true;
+                        surfShade.blind.movableSlats = true;
                         state.dataSurface->AnyMovableSlat = true;
                         state.dataHeatBalSurf->SurfMovSlatsIndexList.push_back(SurfNum);
                     }
-
+#ifdef GET_OUT
                     ConstrNumSh = surf.activeShadedConstruction;
                     if (ConstrNumSh <= 0) continue;
 
                     WinShadingType ShadingType = state.dataSurface->WindowShadingControl(WinShadingControlPtr).ShadingType;
 
+                    // I don't think this is necessary anymore
                     // only for blinds
                     if (ANY_BLIND(ShadingType)) {
-
+                        auto const &surfShade = state.dataSurface->surfShades(SurfNum);
                         // TH 1/7/2010. CR 7930
                         // The old code did not consider between-glass blind. Also there should not be two blinds - both interior and exterior
                         // Use the new generic code (assuming only one blind) as follows
@@ -2458,11 +2461,11 @@ namespace SurfaceGeometry {
                             auto *matBlind = dynamic_cast<Material::MaterialBlind *>(mat);
                             assert(matBlind != nullptr);
 
-                            surfWin.blind.matNum = mat->Num;
+                            surfShade.blind.matNum = mat->Num;
                             // TH 2/18/2010. CR 8010
                             // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
                             //  the new blind is created only once, it can be shared by multiple windows though.
-                            if (surfWin.blind.movableSlats &&
+                            if (surfShade.blind.movableSlats &&
                                 matBlind->SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
                                 errFlag = false;
                                 AddVariableSlatBlind(state, mat->Num, BlNumNew, errFlag);
@@ -2479,6 +2482,7 @@ namespace SurfaceGeometry {
                                                      state.dataSurface->WindowShadingControl(WinShadingControlPtr).Name));
                         }
                     }
+#endif // GET_OUT                    
                 } // End of surface loop
 
                 // final associate fenestration surfaces referenced in WindowShadingControl

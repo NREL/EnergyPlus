@@ -888,7 +888,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     SetFlagForWindowConstructionWithShadeOrBlindLayer(*state);
     EXPECT_TRUE(state->dataSurface->SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has blind
     // set the blind to movable
-    state->dataSurface->SurfaceWindow(windowSurfNum).blind.movableSlats = true;
+    state->dataSurface->surfShades(windowSurfNum).blind.movableSlats = true;
     // check if EMS actuator is available when blind layer is added
     SetupWindowShadingControlActuators(*state);
     EXPECT_EQ(state->dataRuntimeLang->numEMSActuatorsAvailable, 2);

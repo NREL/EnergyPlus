@@ -143,7 +143,6 @@ namespace HeatBalFiniteDiffManager {
         int MaterialNumProp;                // Number of material properties being passed
         Array1D<Real64> MaterialProps;      // Temporary array to transfer material properties (allocated based on user input)
         bool ErrorsFound(false);            // If errors detected in input
-        int Loop;
         int propNum;
         int pcMat;
         int vcMat;

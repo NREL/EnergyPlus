@@ -279,8 +279,9 @@ namespace HeatBalanceIntRadExchange {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss(state, constrNum);
                 } else if (construct.WindowTypeBSDF && state.dataSurface->SurfWinShadingFlag(SurfNum) == DataSurfaces::WinShadingType::IntShade) {
+                    auto &surfShade = state.dataSurface->surfShades(SurfNum);
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
-                    SurfaceEmiss[ZoneSurfNum] = surfWindow.EffShBlindEmiss[1] + surfWindow.EffGlassEmiss[1];
+                    SurfaceEmiss[ZoneSurfNum] = surfShade.effShadeEmi + surfShade.effGlassEmi;
                 } else if (construct.WindowTypeBSDF) {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;

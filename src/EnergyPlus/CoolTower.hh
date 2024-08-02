@@ -145,7 +145,7 @@ struct CoolTowerData : BaseGlobalStruct
     bool GetInputFlag = true;
     Array1D<CoolTower::CoolTowerParams> CoolTowerSys;
 
-    void init_state([[maybe_unused]] EnergyPlusData &state)
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
 

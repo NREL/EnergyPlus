@@ -8142,7 +8142,6 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
     int ConstrNum; // construction index
 
     auto &surf = state.dataSurface->Surface(SurfNum);
-    auto &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
     
     auto &CFS = state.dataWindowEquivLayer->CFS;
 
@@ -8198,7 +8197,8 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
         }
     }
     if (CFS(EQLNum).VBLayerPtr > 0) {
-        surfWin.blind.slatAngThisTSDeg = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
+        auto &surfShade = state.dataSurface->surfShades(SurfNum);
+        surfShade.blind.slatAngThisTSDeg = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
     }
 }
 

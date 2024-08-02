@@ -97,7 +97,7 @@ constexpr std::array<std::string_view, (int)MinFlowFracMethod::Num> minFlowFracM
 constexpr std::array<std::string_view, (int)MinFlowFracMethod::Num> minFlowFracMethodNamesUC = {"FRACTION", "FIXEDFLOWRATE"};
 
 void FanBase::simulate(EnergyPlusData &state,
-                       bool const _FirstHVACIteration,
+                       [[maybe_unused]] bool const _FirstHVACIteration,
                        ObjexxFCL::Optional<Real64 const> _speedRatio, // SpeedRatio for Fan:SystemModel
 
                        // = current flow/ max design flow rate.  It is not exactly the same as
@@ -1344,7 +1344,6 @@ void FanComponent::set_size(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool _bPRINT = true;  // TRUE if sizing is reported to output (eio)
-    int NumFansSized = 0; // counter used to deallocate temporary string array after all fans have been sized
 
     std::string SizingString = sizingPrefix + " [m3/s]";
 

@@ -1700,7 +1700,6 @@ namespace EMSManager {
 
         for (int loopSurfNum = 1; loopSurfNum <= state.dataSurface->TotSurfaces; ++loopSurfNum) {
             auto &surf = state.dataSurface->Surface(loopSurfNum);
-            auto &surfWin = state.dataSurface->SurfaceWindow(loopSurfNum);
             
             if (surf.Class != DataSurfaces::SurfaceClass::Window) continue;
             if (surf.ExtBoundCond != DataSurfaces::ExternalEnvironment) continue;
@@ -1714,14 +1713,16 @@ namespace EMSManager {
                                  "[ShadeStatus]",
                                  state.dataSurface->SurfWinShadingFlagEMSOn(loopSurfNum),
                                  state.dataSurface->SurfWinShadingFlagEMSValue(loopSurfNum));
-                if (surfWin.blind.movableSlats) {
+
+                auto &surfShade = state.dataSurface->surfShades(loopSurfNum);
+                if (surfShade.blind.movableSlats) {
                     SetupEMSActuator(state,
                                      "Window Shading Control",
                                      surf.Name,
                                      "Slat Angle",
                                      "[degrees]",
-                                     surfWin.blind.slatAngThisTSDegEMSon,
-                                     surfWin.blind.slatAngThisTSDegEMSValue);
+                                     surfShade.blind.slatAngThisTSDegEMSon,
+                                     surfShade.blind.slatAngThisTSDegEMSValue);
                 }
             } else if (state.dataSurface->WindowShadingControl(surf.activeWindowShadingControl).ShadingType ==
                        DataSurfaces::WinShadingType::ExtScreen) {

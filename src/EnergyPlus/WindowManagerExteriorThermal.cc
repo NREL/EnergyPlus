@@ -140,18 +140,10 @@ namespace Window {
             }
             SurfInsideTemp = aTemp - Constant::Kelvin;
             if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                Real64 EffShBlEmiss;
-                Real64 EffGlEmiss;
-                int slatIdxLo = surfWin.blind.slatAngIndex;
-                int slatIdxHi = std::min(Material::MaxSlatAngs, slatIdxLo + 1);
-                Real64 slatInterpFac = surfWin.blind.slatAngInterpFac;
-                if (surfWin.blind.movableSlats) {
-                    EffShBlEmiss = General::Interp(surfWin.EffShBlindEmiss[slatIdxLo], surfWin.EffShBlindEmiss[slatIdxHi], slatInterpFac);
-                    EffGlEmiss = General::Interp(surfWin.EffGlassEmiss[slatIdxLo], surfWin.EffGlassEmiss[slatIdxHi], slatInterpFac);
-                } else {
-                    EffShBlEmiss = surfWin.EffShBlindEmiss[1];
-                    EffGlEmiss = surfWin.EffGlassEmiss[1];
-                }
+                    auto const &surfShade = state.dataSurface->surfShades(SurfNum);
+                Real64 EffShBlEmiss = surfShade.effShadeEmi;
+                Real64 EffGlEmiss = surfShade.effGlassEmi;
+
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                     (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (state.dataWindowManager->thetas[2 * totSolidLayers - 3] - Constant::Kelvin)) /
                     (EffShBlEmiss + EffGlEmiss);
@@ -160,6 +152,7 @@ namespace Window {
 
         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = aSystem->getHc(Tarcog::ISO15099::Environment::Indoor);
         if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum)) || aFactory.isInteriorShade()) {
+            auto &surfShade = state.dataSurface->surfShades(SurfNum);
             // It is not clear why EnergyPlus keeps this interior calculations separately for interior shade. This does create different
             // solution from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
             // through shade (consider case when openings are zero) is different from heat flow obtained by these equations. Will keep
@@ -199,21 +192,20 @@ namespace Window {
 
             // Effective shade and glass emissivities that are used later for energy calculations.
             // This needs to be checked as well. (Simon)
-            Real64 EffShBlEmiss = EpsShIR1 * (1.0 + RhoGlIR2 * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2));
-            std::fill(surfWin.EffShBlindEmiss.begin(), surfWin.EffShBlindEmiss.end(), EffShBlEmiss);
-
-            Real64 EffGlEmiss = glassEmiss * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2);
-            std::fill(surfWin.EffGlassEmiss.begin(), surfWin.EffGlassEmiss.end(), EffGlEmiss);
+            surfShade.effShadeEmi = EpsShIR1 * (1.0 + RhoGlIR2 * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2));
+            surfShade.effGlassEmi = glassEmiss * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2);
 
             Real64 glassTemperature = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getTemperature();
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
-                (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (glassTemperature - Constant::Kelvin)) / (EffShBlEmiss + EffGlEmiss);
+                (surfShade.effShadeEmi * SurfInsideTemp + surfShade.effGlassEmi * (glassTemperature - Constant::Kelvin)) /
+                    (surfShade.effShadeEmi + surfShade.effGlassEmi);
 
         } else {
             // Another adoptation to old source that looks suspicious. Check if heat flow through
             // window is actually matching these values. (Simon)
 
             //
+            auto &surfShade = state.dataSurface->surfShades(SurfNum);
             int totLayers = aLayers.size();
             auto aGlassLayer = aLayers[totLayers - 1];                                  // (AUTO_OK_SPTR)
             auto backSurface = aGlassLayer->getSurface(FenestrationCommon::Side::Back); // (AUTO_OK_SPTR)
@@ -228,8 +220,7 @@ namespace Window {
 
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                 aLayers[totLayers - 1]->getTemperature(FenestrationCommon::Side::Back) - Constant::Kelvin;
-            std::fill(surfWin.EffGlassEmiss.begin(), surfWin.EffGlassEmiss.end(),
-                      aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity());
+            surfShade.effGlassEmi = aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity();
 
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
@@ -559,6 +550,7 @@ namespace Window {
             conductivity = mat->Conductivity;
 
         } else if (mat->group == Material::Group::WindowBlind) {
+            auto const &surfShade = state.dataSurface->surfShades(m_SurfNum);
             auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(mat);
             assert(matBlind != nullptr);
             thickness = matBlind->SlatThickness;
@@ -568,12 +560,11 @@ namespace Window {
             Aleft = matBlind->leftOpeningMult;
             Aright = matBlind->rightOpeningMult;
 
-            auto &surfWin = state.dataSurface->SurfaceWindow(m_SurfNum);
-            Afront = surfWin.blind.airFlowPermeability;
-            emissFront = InterpSlatAng(surfWin.blind.slatAngThisTS, surfWin.blind.movableSlats, matBlind->IRFrontEmiss);
-            emissBack = InterpSlatAng(surfWin.blind.slatAngThisTS, surfWin.blind.movableSlats, matBlind->IRBackEmiss);
-            transThermalFront = InterpSlatAng(surfWin.blind.slatAngThisTS, surfWin.blind.movableSlats, matBlind->IRFrontTrans);
-            transThermalBack = InterpSlatAng(surfWin.blind.slatAngThisTS, surfWin.blind.movableSlats, matBlind->IRBackTrans);
+            Afront = surfShade.blind.airFlowPermeability;
+            emissFront = surfShade.blind.tar.IR.Front.Emi;
+            emissBack = surfShade.blind.tar.IR.Back.Emi;
+            transThermalFront = surfShade.blind.tar.IR.Front.Tra;
+            transThermalBack = surfShade.blind.tar.IR.Back.Tra;
             if (t_Index == 1) {
                 m_ExteriorShade = true;
             }
@@ -702,11 +693,12 @@ namespace Window {
         auto &s_mat = state.dataMaterial;
         auto &surf = state.dataSurface->Surface(m_SurfNum);
         auto &surfWin = state.dataSurface->SurfaceWindow(m_SurfNum);
+        auto const &surfShade = state.dataSurface->surfShades(m_SurfNum);
         
         const WinShadingType ShadeFlag = getShadeType(state, m_ConstructionNumber);
 
         if (ShadeFlag == WinShadingType::IntBlind || ShadeFlag == WinShadingType::ExtBlind) {
-            thickness = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfWin.blind.matNum))->toGlassDist;
+            thickness = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfShade.blind.matNum))->toGlassDist;
         } else if (ShadeFlag == WinShadingType::ExtScreen) {
             thickness = dynamic_cast<Material::MaterialScreen const *>(s_mat->materials(surfWin.screenNum))->toGlassDist;
         } else if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade) {

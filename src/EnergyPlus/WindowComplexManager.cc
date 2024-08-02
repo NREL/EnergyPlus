@@ -3389,14 +3389,15 @@ namespace WindowComplexManager {
             if (ShadeFlag == WinShadingType::IntShade) state.dataSurface->SurfWinConvCoeffWithShade(SurfNum) = 0.0;
 
             if (ShadeFlag == WinShadingType::IntShade) {
+                auto const &surfShade = state.dataSurface->surfShades(SurfNum);
                 SurfInsideTemp = theta(2 * ngllayer + 2) - Constant::Kelvin;
 
                 // // Get properties of inside shading layer
 
-                Real64 EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1];
-                Real64 EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[1];
+                Real64 EffShEmiss = surfShade.effShadeEmi;
+                Real64 EffGlEmiss = surfShade.effGlassEmi;
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
-                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - Constant::Kelvin)) / (EffShBlEmiss + EffGlEmiss);
+                    (EffShEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - Constant::Kelvin)) / (EffShEmiss + EffGlEmiss);
 
             } else {
                 SurfOutsideTemp = theta(1) - Constant::Kelvin;

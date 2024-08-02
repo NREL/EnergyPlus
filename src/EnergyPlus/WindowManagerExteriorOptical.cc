@@ -215,7 +215,7 @@ namespace Window {
 
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto &surf = state.dataSurface->Surface(SurfNum);
-            auto &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
+            auto &surfShade = state.dataSurface->surfShades(SurfNum);
                 
             if (!surf.HeatTransSurf) continue;
             if (!state.dataConstruction->Construct(surf.Construction).TypeIsWindow) continue;
@@ -232,23 +232,28 @@ namespace Window {
                 Real64 TauShIR = mat->TransThermal;
                 Real64 EpsShIR = mat->AbsorpThermal;
                 Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                surfWin.EffShBlindEmiss[1] = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                surfWin.EffGlassEmiss[1] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                surfShade.effShadeEmi = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                surfShade.effGlassEmi = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
 
             } else if (mat->group == Material::Group::WindowBlind) {
-                Real64 EpsGlIR = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
+                auto &constrSh = state.dataConstruction->Construct(ConstrNumSh);
+                Real64 EpsGlIR = s_mat->materials(constrSh.LayerPoint(TotLay - 1))->AbsorpThermalBack;
                 Real64 RhoGlIR = 1 - EpsGlIR;
 
                 auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(mat);
                 for (int ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
-                    Real64 TauShIR = matBlind->IRFrontTrans(ISlatAng);
-                    Real64 EpsShIR = matBlind->IRBackEmiss(ISlatAng);
+                    auto const &btar = matBlind->tars[ISlatAng];
+                    Real64 TauShIR = btar.IR.Front.Tra;
+                    Real64 EpsShIR = btar.IR.Front.Emi;
                     Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                    surfWin.EffShBlindEmiss[ISlatAng] = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                    surfWin.EffGlassEmiss[ISlatAng] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
-
-                    if (matBlind->SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
+                    constrSh.effShadeBlindEmi[ISlatAng] = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                    constrSh.effGlassEmi[ISlatAng] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                 }
+
+                surfShade.effShadeEmi = Interp(constrSh.effShadeBlindEmi[surfShade.blind.slatAngIdxLo],
+                                               constrSh.effShadeBlindEmi[surfShade.blind.slatAngIdxHi], surfShade.blind.slatAngInterpFac);
+                surfShade.effGlassEmi = Interp(constrSh.effGlassEmi[surfShade.blind.slatAngIdxLo],
+                                               constrSh.effGlassEmi[surfShade.blind.slatAngIdxHi], surfShade.blind.slatAngInterpFac);
             }     // End of check if interior shade or interior blind
         }         // End of surface loop
     }

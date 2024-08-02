@@ -917,8 +917,6 @@ namespace DataSurfaces {
         // Multiplier on sunlit fraction due to shadowing of glass by
         // frame and divider inside and outside projections
         std::array<Real64, (int)Constant::HoursInDay + 1> InOutProjSLFracMult = {1.0};
-        std::array<Real64, Material::MaxSlatAngs + 1> EffShBlindEmiss = {0.0}; // Effective emissivity of interior blind or shade
-        std::array<Real64, Material::MaxSlatAngs + 1> EffGlassEmiss = {0.0};   // Effective emissivity of glass adjacent to interior blind or shade
 
         // for shadowing of ground by building and obstructions [W/m2]
         // Enclosure inside surface area minus this surface and its
@@ -929,8 +927,14 @@ namespace DataSurfaces {
         // floor/wall/ceiling (m2)
         std::array<Real64, (int)FWC::Num> EnclAreaReflProdMinusThisSurf = {0.0, 0.0, 0.0};
 
-        // Just a way to group these fields together within the larger object
-        struct {
+        BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
+        bool hasShade = false;
+        bool hasBlind = false;
+        bool hasScreen = false;
+    };
+
+    struct SurfaceShade {
+        struct {    
             int matNum = 0;
             bool movableSlats = false;     // True if window has a blind with movable slats
             Real64 slatAngThisTS = 0.0;  // Slat angle this time step for window with blind on (radians)
@@ -938,18 +942,23 @@ namespace DataSurfaces {
             bool slatAngThisTSDegEMSon = false;      // flag that indicate EMS system is actuating SlatAngThisTSDeg
             Real64 slatAngThisTSDegEMSValue = 0.0; // value that EMS sets for slat angle in degrees
             bool slatBlockBeam = false;             // True if blind slats block incident beam solar
-            int slatAngIndex = 0;
+            int slatAngIdxLo = 0;
+            int slatAngIdxHi = 0;
             Real64 slatAngInterpFac = 0.0;
             Real64 profAng = 0.0;
-            int profAngIndex = 0;
+            int profAngIdxLo = 0;
+            int profAngIdxHi = 0;
             Real64 profAngInterpFac = 0.0;
             Real64 bmBmTrans = 0.0;
             Real64 airFlowPermeability = 0.0; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
-        } blind;
-            
-        BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
-    };
 
+            Material::BlindTraAbsRef tar;
+        } blind;
+
+        Real64 effShadeEmi = 0.0; // Effective emissivity of interior blind or shade
+        Real64 effGlassEmi = 0.0;   // Effective emissivity of glass adjacent to interior blind or shade
+    };
+            
     struct SurfaceWindowFrameDiv
     {
     };
@@ -1794,6 +1803,7 @@ struct SurfacesData : BaseGlobalStruct
 
     EPVector<DataSurfaces::SurfaceData> Surface;
     EPVector<DataSurfaces::SurfaceWindowCalc> SurfaceWindow;
+    EPVector<DataSurfaces::SurfaceShade> surfShades;
     Array1D<DataSurfaces::FrameDividerProperties> FrameDivider;
     EPVector<DataSurfaces::StormWindowData> StormWindow;
     EPVector<DataSurfaces::WindowShadingControlData> WindowShadingControl;

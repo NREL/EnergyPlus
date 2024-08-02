@@ -526,12 +526,11 @@ struct DaylightingData : BaseGlobalStruct
     // K = sun position index.
     std::array<Dayltg::Illums, (int)Constant::HoursInDay + 1> horIllum = {
         Dayltg::Illums()};             // Horizontal illuminance from sky, by sky type, for each hour of the day
-    Array2D<Dayltg::Illums> dirIllum;  // Sky-related component of direct illuminance
-    Array2D<Dayltg::Illums> reflIllum; // Sky-related portion of internally reflected illuminance
-    Array2D<Dayltg::Illums> winLum;    // Sky-related window luminance
+    Array1D<std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num>> dirIllum;  // Sky-related component of direct illuminance
+    Array1D<std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num>> reflIllum; // Sky-related portion of internally reflected illuminance
+    Array1D<std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num>> winLum;    // Sky-related window luminance
 
-    Array2D<Dayltg::Illums> avgWinLum; // Sky-related average window luminance
-
+    Array1D<std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num>> avgWinLum; // Sky-related average window luminance
     // Allocatable daylight factor arrays  -- are in the ZoneDaylight Structure
 
     Array2D<Real64> TDDTransVisBeam;

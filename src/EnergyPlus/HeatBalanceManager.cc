@@ -5568,7 +5568,7 @@ namespace HeatBalanceManager {
     }
 
     void SetupComplexFenestrationMaterialInput(EnergyPlusData &state,
-                                               int matNum, // num of material items thus far
+                                               [[maybe_unused]] int matNum, // num of material items thus far
                                                bool &ErrorsFound)
     {
 

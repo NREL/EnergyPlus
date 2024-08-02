@@ -2649,7 +2649,7 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
     }
 }
 
-void CalcScreenTransmittance(EnergyPlusData &state,
+void CalcScreenTransmittance([[maybe_unused]] EnergyPlusData &state,
                              MaterialScreen const *screen,
                              Real64 phi,   // Sun altitude relative to surface outward normal (radians, 0 to Pi)
                              Real64 theta, // Optional sun azimuth relative to surface outward normal (radians, 0 to Pi)
@@ -2678,12 +2678,6 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Real64 Tdirect;          // Beam solar transmitted through screen (dependent on sun angle)
     Real64 Tscattered;       // Beam solar reflected through screen (dependent on sun angle)
     Real64 TscatteredVis;    // Visible beam solar reflected through screen (dependent on sun angle)
-    Real64 Tscattermax;      // Maximum solar beam  scattered transmittance
-    Real64 TscattermaxVis;   // Maximum visible beam scattered transmittance
-    Real64 ExponentInterior; // Exponent used in scattered transmittance calculation
-    // when Delta < DeltaMax (0,0 to peak)
-    Real64 ExponentExterior; // Exponent used in scattered transmittance calculation
-    // when Delta > DeltaMax (peak to max)
 
     assert(phi >= 0.0 && phi <= Constant::Pi);
     assert(theta >= 0.0 && theta <= Constant::Pi);
@@ -2691,9 +2685,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Real64 sinPhi = std::sin(phi);
     Real64 cosPhi = std::cos(phi);
     Real64 tanPhi = sinPhi / cosPhi;
-    Real64 sinTheta = std::sin(theta);
     Real64 cosTheta = std::cos(theta);
-    Real64 tanTheta = sinTheta / cosTheta;
 
     bool sunInFront = (phi < Constant::PiOvr2) && (theta < Constant::PiOvr2); // Sun is in front of screen
 
@@ -2870,4 +2862,65 @@ void GetPhiThetaIndices(Real64 phi, Real64 theta, Real64 dPhi, Real64 dTheta, in
     iTheta2 = (iTheta1 == maxITheta - 1) ? iTheta1 : iTheta1 + 1;
 } // GetPhiThetaIndices()
 
+
+Real64 MaterialBlind::BeamBeamTrans(Real64 const ProfAng,        // Solar profile angle (rad)
+                                    Real64 const SlatAng        // Slat angle (rad)
+) const 
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Fred Winkelmann
+    //       DATE WRITTEN   Jan 2002
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Calculates beam-to-beam transmittance of a window blind
+
+    // METHODOLOGY EMPLOYED:
+    // Based on solar profile angle and slat geometry
+
+    Real64 CosProfAng = std::cos(ProfAng); // Cosine of profile angle
+    Real64 gamma = SlatAng - ProfAng;
+    Real64 wbar = this->SlatSeparation;
+    if (CosProfAng != 0.0) wbar = this->SlatWidth * std::cos(gamma) / CosProfAng;
+    Real64 BeamBeamTrans = max(0.0, 1.0 - std::abs(wbar / this->SlatSeparation));
+
+    if (BeamBeamTrans > 0.0) {
+
+        // Correction factor that accounts for finite thickness of slats. It is used to modify the
+        // blind transmittance to account for reflection and absorption by the slat edges.
+        // fEdge is ratio of area subtended by edge of slat to area between tops of adjacent slats.
+
+        Real64 fEdge = 0.0; // Slat edge correction factor
+        Real64 fEdge1 = 0.0;
+        if (std::abs(std::sin(gamma)) > 0.01) {
+            if ((SlatAng > 0.0 && SlatAng <= Constant::PiOvr2 && ProfAng <= SlatAng) ||
+                (SlatAng > Constant::PiOvr2 && SlatAng <= Constant::Pi && ProfAng > -(Constant::Pi - SlatAng)))
+                fEdge1 = this->SlatThickness * std::abs(std::sin(gamma)) / ((this->SlatSeparation + this->SlatThickness / std::abs(std::sin(SlatAng))) * CosProfAng);
+                fEdge = min(1.0, std::abs(fEdge1));
+            }
+            BeamBeamTrans *= (1.0 - fEdge);
+        }
+
+        return BeamBeamTrans;
+
+    } // MaterialBlind::BeamBeamTrans()
+
+
+void GetProfIndices(Real64 profAng, int &idxLo, int &idxHi)
+{
+    idxLo = int((profAng + Constant::PiOvr2) / dProfAng) + 1;
+    idxHi = std::min(MaxProfAngs, idxLo+1);
+}
+                
+void GetSlatIndicesInterpFac(Real64 slatAng, int &idxLo, int &idxHi, Real64 &interpFac)
+{
+    idxLo = int(slatAng / dSlatAng) + 1;
+    idxHi = std::min(MaxSlatAngs, idxLo+1);
+    interpFac = (slatAng - idxLo * dSlatAng) / dSlatAng;
+}
+        
+        
 } // namespace EnergyPlus::Material
+

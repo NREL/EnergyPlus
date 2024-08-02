@@ -371,13 +371,6 @@ namespace Window {
                              Array2A<Real64> PropArray // Array of blind properties
     );
 
-    Real64 BlindBeamBeamTrans(Real64 ProfAng,        // Solar profile angle (rad)
-                              Real64 SlatAng,        // Slat angle (rad)
-                              Real64 SlatWidth,      // Slat width (m)
-                              Real64 SlatSeparation, // Slat separation (distance between surfaces of adjacent slats) (m)
-                              Real64 SlatThickness   // Slat thickness (m)
-    );
-
     constexpr Real64 InterpProfSlat(Real64 const SlatLower,
                                     Real64 const SlatUpper,
                                     Real64 const ProfLower,
