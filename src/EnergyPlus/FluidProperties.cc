@@ -2843,7 +2843,7 @@ namespace FluidProperties {
         // and linearly interpolates the corresponding saturation temperature values.
 
         // Return value
-        Real64 ReturnValue;
+        Real64 ReturnValue = 0.0;
 
         // FUNCTION PARAMETER DEFINITIONS:
         static constexpr std::string_view routineName = "RefrigProps::getSatTemperature";
