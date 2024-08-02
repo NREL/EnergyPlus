@@ -657,8 +657,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                       OutArgs(4) = OldFanVO(Num3)%coeff3             !- Coefficient3 x**2
                       OutArgs(5) = OldFanVO(Num3)%coeff4             !- Coefficient4 x**3
                       OutArgs(6) = OldFanVO(Num3)%coeff5             !- Coefficient5 x**4
-                      READ(OldFanVO(Num3)%fanPowerMinAirFlow_str, '(F15.5)') fanPowerMinAirFlow
-                      WRITE(OutArgs(7), '(F10.7)') (fanPowerMinAirFlow / maxAirFlow)  !- Minimum Value of x
+                      OutArgs(7) = '0.0'              !- Minimum Value of x
                       OutArgs(8) = '1.0'              !- Maximum Value of x
                       OutArgs(9) = '0.0'              !- Minimum Curve Output
                       OutArgs(10) = '5.0'             !- Maximum Curve Output
