@@ -617,8 +617,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                           END IF
                           IF (.NOT. fanPowerMinAirFlow == 0) THEN ! don't know how to do division with autosize
                             CALL writePreprocessorObject(DifLfn, PrognameConversion, 'Warning', &
-                                    'Cannot calculate Electric Power Minimum Flow Rate Fraction for' // sysFanName // &
-                                            'when Maximum Flow Rate is autosize and Fan Power Minimum Air Flow Rate is non-zero')
+                                    'Cannot calculate Electric Power Minimum Flow Rate Fraction for Fan:SystemModel=' // sysFanName // &
+                                            ' when old Fan:VariableVolume Maximum Flow Rate is autosize and Fan Power Minimum Air Flow Rate is non-zero. ' // &
+                                            'Electric Power Minimum Flow Rate Fraction is set to zero. ' // &
+                                            'Manually size the Maximum Flow Rate if Electric Power Minimum Flow Rate Fraction should not be zero.')
+                            CALL ShowWarningError('Cannot calculate Electric Power Minimum Flow Rate Fraction for Fan:SystemModel=' // sysFanName // &
+                                    ' when old Fan:VariableVolume Maximum Flow Rate is autosize and Fan Power Minimum Air Flow Rate is non-zero. ' // &
+                                    'Electric Power Minimum Flow Rate Fraction is set to zero. ' // &
+                                    'Manually size the Maximum Flow Rate if Electric Power Minimum Flow Rate Fraction should not be zero.', Auditf)
                           END IF
                           OutArgs(7) = '0.0'
                         ENDIF
