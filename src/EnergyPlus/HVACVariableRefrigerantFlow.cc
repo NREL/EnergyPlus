@@ -10846,12 +10846,12 @@ bool getVRFTUNodeNumber(EnergyPlusData &state, int const nodeNumber)
     for (int vrfTUIndex = 1; vrfTUIndex <= state.dataHVACVarRefFlow->NumVRFTU; ++vrfTUIndex) {
         auto &vrfTU = state.dataHVACVarRefFlow->VRFTU(vrfTUIndex);
 
-        bool vrfTUOutdoorAir = false;
+        bool noVrfTUOutdoorAir = false;
         if (vrfTU.CoolOutAirVolFlow == 0 && vrfTU.HeatOutAirVolFlow == 0 && vrfTU.NoCoolHeatOutAirVolFlow == 0) {
-            vrfTUOutdoorAir = true;
+            noVrfTUOutdoorAir = true;
         }
 
-        if (vrfTUOutdoorAir &&
+        if (noVrfTUOutdoorAir &&
             (nodeNumber == vrfTU.VRFTUInletNodeNum || nodeNumber == vrfTU.VRFTUOutletNodeNum || nodeNumber == vrfTU.fanInletNode ||
              nodeNumber == vrfTU.fanOutletNode || nodeNumber == vrfTU.heatCoilAirOutNode || nodeNumber == vrfTU.coolCoilAirOutNode ||
              nodeNumber == vrfTU.VRFTUOAMixerOANodeNum || nodeNumber == vrfTU.VRFTUOAMixerRelNodeNum || nodeNumber == vrfTU.VRFTUOAMixerRetNodeNum ||

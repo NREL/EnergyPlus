@@ -16755,16 +16755,16 @@ namespace UnitarySystems {
             int FanInletNodeIndex = state.dataFans->fans(unitarySys.m_FanIndex)->inletNodeNum;
             int FanOutletNodeIndex = state.dataFans->fans(unitarySys.m_FanIndex)->outletNodeNum;
 
-            bool unitarySysOutdoorAir = false;
+            bool noUnitarySysOutdoorAir = false;
             if (unitarySys.m_CoolOutAirVolFlow == 0 && unitarySys.m_HeatOutAirVolFlow == 0 && unitarySys.m_NoCoolHeatOutAirVolFlow == 0) {
-                unitarySysOutdoorAir = true;
+                noUnitarySysOutdoorAir = true;
             }
 
             if (unitarySys.m_sysType == UnitarySys::SysType::PackagedWSHP || unitarySys.m_sysType == UnitarySys::SysType::PackagedAC ||
                 unitarySys.m_sysType == UnitarySys::SysType::PackagedHP) {
-                if (unitarySysOutdoorAir && (nodeNumber == FanInletNodeIndex || nodeNumber == FanOutletNodeIndex ||
-                                             nodeNumber == unitarySys.AirInNode || nodeNumber == unitarySys.m_OAMixerNodes[0] ||
-                                             nodeNumber == unitarySys.m_OAMixerNodes[1] || nodeNumber == unitarySys.m_OAMixerNodes[2]) ||
+                if (noUnitarySysOutdoorAir && (nodeNumber == FanInletNodeIndex || nodeNumber == FanOutletNodeIndex ||
+                                               nodeNumber == unitarySys.AirInNode || nodeNumber == unitarySys.m_OAMixerNodes[0] ||
+                                               nodeNumber == unitarySys.m_OAMixerNodes[1] || nodeNumber == unitarySys.m_OAMixerNodes[2]) ||
                     nodeNumber == unitarySys.m_OAMixerNodes[3] || nodeNumber == unitarySys.CoolCoilOutletNodeNum ||
                     nodeNumber == unitarySys.HeatCoilOutletNodeNum) {
                     return true;
