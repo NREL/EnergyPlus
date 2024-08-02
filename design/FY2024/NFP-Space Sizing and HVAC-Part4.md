@@ -4,6 +4,7 @@ Extend Spaces to Sizing and HVAC - Part 4
 **Michael J. Witte, GARD Analytics, Inc.**
 
  - Original June 17, 2024
+ - Revised, August 2, 2024
 
 ## Table of Contents ##
 
@@ -26,6 +27,7 @@ Extend Spaces to Sizing and HVAC - Part 4
 [Design](#design)
 
 ## E-mail and Conference Call Conclusions ##
+June 17-20, Q&A in the pull request with rraustad. Made some minor updates to the NFP to clarify the sizing methods and to mention that an spsz output file will be created, similar to the existing zsz output.
 
 
 ## Background and Overview ##
@@ -61,7 +63,16 @@ This NFP proposes additional optional capabilities:
 
 ## Approach ##
 ### Sizing
-* Currently zone sizing is independent of space sizing, essentially sizing all zone equipment to the coincident space peak. A new input will be added to Sizing:Zone to allow zone sizing using the non-coincident space peaks.
+A new input will be added to Sizing:Zone to allow zone sizing using the non-coincident space peaks or the coincident peak. 
+
+Space sizing is an actual heat balance on each space. Currently zone sizing is an actual heat balance on each zone (as a whole) although some of the components for the zone heat balance are sums across the spaces (even when space heat balance is off). e.g. internal gains. The current zone sizing calculations will be used to calculate the coincident zone sizing using the combined spaces. 
+
+For the non-coincident zone sizing, the individual space peaks will be summed and other values (such as outdoor temperature) will be averaged.
+
+When space sizing is active, sizing results are reported in the table output for both spaces and zones. There will be no change here.
+
+When space sizing is active, a new spssz output file will be generated, similar to the existing zsz output. This will require a new field in the OutputControl:Files object.
+
 
 ### HVAC
 * Calculate return flows at the Space level. Currently, space return nodes can be specified, but there is no flow assigned to them. All return flow is lumped at the zone level.
@@ -79,14 +90,25 @@ Compare Space vs Zone-level results.
 Some new objects and some changes to existing objects are proposed.
 
 ### Sizing:Zone
-* *New field:"*
+* *New field at the end:"*
 ```
-  A??, \field Type of Space Sum to Use
+  A15; \field Type of Space Sum to Use
       \type choice
       \key Coincident
       \key NonCoincident
       \default Coincident
 ```
+
+### OutputControl:Files
+* *New field in the middle:"*
+```
+  A9 , \field Output Space Sizing
+       \type choice
+       \key Yes
+       \key No
+       \default Yes
+```
+
 ### ZoneRefrigerationDoorMixing
 (If budget allows, otherwise limit these to single-space zones.)
 * *Change field "Zone 1 Name" to "Zone or Space Name 1."*
@@ -105,6 +127,7 @@ Some new objects and some changes to existing objects are proposed.
 
 
 ## Outputs Description ##
+A new Spsz output file will be created when space sizing is active.
 
 
 ## Engineering Reference ##
@@ -112,11 +135,11 @@ Some new objects and some changes to existing objects are proposed.
 
 ## Example File and Transition Changes ##
 
-* Transition may be required for idf Sizing:Zone if the new field is placed in the middle of the object.
+* Transition will be required for idf OutputControl:Files.
 
 * Field name changes may be required for epJSON inputs for ZoneRefrigerationDoorMixing, ZoneCoolTower:Shower, and/or ZoneThermalChimney.
 
-* The existing example file 5ZoneAirCooledWithSpaces will be copied to a new example file that uses the new Sizing:Zone Conincident Space sum option.
+* The existing example file 5ZoneAirCooledWithSpaces will be copied to a new example file that uses the new Sizing:Zone Coincident Space sum option.
 
 
 ## Design ##
