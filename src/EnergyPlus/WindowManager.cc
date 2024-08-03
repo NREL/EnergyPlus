@@ -933,502 +933,525 @@ namespace Window {
             // and correct the system glass layer absorptances for the effect of reflection
             // and transmission by shade, screen or blind. Get system reflectance (front and back,
             // solar and visible)
+            auto &constr = thisConstruct;
+            
+            // Solar and visible properties of isolated shade or blind
+            // (Note: for shades or screen we go through the following loop over slat angles only once.)
+            
+            Real64 const tsolDiff_2(pow_2(tsolDiff));
+            Real64 const tvisDiff_2(pow_2(tvisDiff));
+            
+            if (IntShade) {
+                auto const *matSh = dynamic_cast<Material::MaterialChild const *>(s_mat->materials(constr.LayerPoint(ShadeLayNum)));
+                assert(matSh != nullptr);
+                ShadeAbs = matSh->AbsorpSolar;
+                ShadeTrans = matSh->Trans;
+                ShadeTransVis = matSh->TransVis;
+                ShadeRefl = matSh->ReflectShade;
+                ShadeReflVis = matSh->ReflectShadeVis;
+                rsh = ShadeRefl;
+                rshv = ShadeReflVis;
+                tsh = ShadeTrans;
+                tshv = ShadeTransVis;
+                ash = ShadeAbs;
+                
+                // Correction factors for inter-reflections between glass and shading device
+                ShadeReflFac = 1.0 / (1.0 - ShadeRefl * constr.ReflectSolDiffBack);
+                ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * constr.ReflectVisDiffBack);
+                
+                // Front incident solar, beam, interior shade
+                for (int IPhi = 1; IPhi <= 10; ++IPhi) {
+                    for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                        solabsPhi(IGlass, IPhi) += tsolPhi(IPhi) * ShadeRefl * ShadeReflFac * constr.AbsDiffBack(IGlass);
+                    }
+                    solabsShadePhi(IPhi) = tsolPhi(IPhi) * ShadeReflFac * ShadeAbs;
+                    tsolPhi(IPhi) *= ShadeReflFac * ShadeTrans;
+                    tvisPhi(IPhi) *= ShadeReflFacVis * ShadeTransVis;
+                }
+                
+                // Front incident solar, diffuse, interior shade
+                for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                    constr.AbsDiff(IGlass) += tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
+                }
+                
+                constr.AbsDiffShade = tsolDiff * ShadeReflFac * ShadeAbs;
+                constr.TransDiff = tsolDiff * ShadeReflFac * ShadeTrans;
+                constr.TransDiffVis = tvisDiff * ShadeReflFacVis * ShadeTransVis;
+                constr.ReflectSolDiffFront += tsolDiff_2 * ShadeRefl * ShadeReflFac;
+                constr.ReflectVisDiffFront += tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
+                
+                // Back incident solar, diffuse, interior shade
+                
+                for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                    constr.AbsDiffBack(IGlass) *= ShadeTrans * ShadeReflFac;
+                }
+                
+                constr.AbsDiffBackShade = ShadeAbs * (1 + ShadeTrans * ShadeReflFac * constr.ReflectSolDiffBack);
+                constr.ReflectSolDiffBack = ShadeRefl + pow_2(ShadeTrans) * constr.ReflectSolDiffBack * ShadeReflFac;
+                constr.ReflectVisDiffBack = ShadeReflVis + pow_2(ShadeTransVis) * constr.ReflectVisDiffBack * ShadeReflFacVis;
 
-            if (ShadeOn || BlindOn || ScreenOn) {
+            // Exterior Shade
+            } else if (ExtShade) {
+                auto const *matSh = dynamic_cast<Material::MaterialChild const *>(s_mat->materials(constr.LayerPoint(ShadeLayNum)));
+                assert(matSh != nullptr);
+                ShadeAbs = matSh->AbsorpSolar;
+                ShadeTrans = matSh->Trans;
+                ShadeTransVis = matSh->TransVis;
+                ShadeRefl = matSh->ReflectShade;
+                ShadeReflVis = matSh->ReflectShadeVis;
+                rsh = ShadeRefl;
+                rshv = ShadeReflVis;
+                tsh = ShadeTrans;
+                tshv = ShadeTransVis;
+                ash = ShadeAbs;
+                
+                // Correction factors for inter-reflections between glass and shading device
+                ShadeReflFac = 1.0 / (1.0 - ShadeRefl * constr.ReflectSolDiffFront);
+                ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * constr.ReflectVisDiffFront);
+                
+                for (int IPhi = 1; IPhi <= 10; ++IPhi) {
+                    for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                        solabsPhi(IGlass, IPhi) = ShadeTrans * solabsDiff(IGlass) * ShadeReflFac;
+                    }
+                    tsolPhi(IPhi) = ShadeTrans * ShadeReflFac * tsolDiff;
+                    tvisPhi(IPhi) = ShadeTransVis * ShadeReflFacVis * tvisDiff;
+                    solabsShadePhi(IPhi) = ShadeAbs * (1.0 + ShadeTrans * ShadeReflFac * constr.ReflectSolDiffFront);
+                }
+                
+                // Front incident solar, diffuse, exterior shade/screen/blind
+                for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                    constr.AbsDiff(IGlass) = ShadeTrans * ShadeReflFac * solabsDiff(IGlass);
+                }
+                
+                // Front incident solar, diffuse, exterior shade/screen
+                constr.AbsDiffShade = ShadeAbs * (1.0 + ShadeTrans * ShadeReflFac * constr.ReflectSolDiffFront);
+                constr.TransDiff = tsolDiff * ShadeReflFac * ShadeTrans;
+                constr.TransDiffVis = tvisDiff * ShadeReflFacVis * ShadeTransVis;
+                constr.ReflectSolDiffFront = ShadeRefl + pow_2(ShadeTrans) * constr.ReflectSolDiffFront * ShadeReflFac;
+                constr.ReflectVisDiffFront = ShadeReflVis + pow_2(ShadeTransVis) * constr.ReflectVisDiffFront * ShadeReflFacVis;
+                
+                // Back incident solar, diffuse, exterior shade/screen
+                for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                    constr.AbsDiffBack(IGlass) += tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
+                }
+                constr.AbsDiffBackShade = tsolDiff * ShadeReflFac * ShadeAbs;
+                constr.ReflectSolDiffBack += tsolDiff_2 * ShadeRefl * ShadeReflFac;
+                constr.ReflectVisDiffBack += tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
 
-                // Solar and visible properties of isolated shade or blind
-                // (Note: for shades or screen we go through the following loop over slat angles only once.)
-
-                Real64 const tsolDiff_2(pow_2(tsolDiff));
-                Real64 const tvisDiff_2(pow_2(tvisDiff));
-                for (int ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
-
-                    if (ShadeOn) {
-                        auto const *thisMaterialSh =
-                            dynamic_cast<Material::MaterialChild *>(s_mat->materials(thisConstruct.LayerPoint(ShadeLayNum)));
-                        assert(thisMaterialSh != nullptr);
-                        ShadeAbs = thisMaterialSh->AbsorpSolar;
-                        ShadeTrans = thisMaterialSh->Trans;
-                        ShadeTransVis = thisMaterialSh->TransVis;
-                        ShadeRefl = thisMaterialSh->ReflectShade;
-                        ShadeReflVis = thisMaterialSh->ReflectShadeVis;
-                        rsh = ShadeRefl;
-                        rshv = ShadeReflVis;
-                        tsh = ShadeTrans;
-                        tshv = ShadeTransVis;
-                        ash = ShadeAbs;
+            // Between-glass shade
+            } else if (BGShade) {
+                auto const *matSh = dynamic_cast<Material::MaterialChild const *>(s_mat->materials(constr.LayerPoint(ShadeLayNum)));
+                assert(matSh != nullptr);
+                ShadeAbs = matSh->AbsorpSolar;
+                ShadeTrans = matSh->Trans;
+                ShadeTransVis = matSh->TransVis;
+                ShadeRefl = matSh->ReflectShade;
+                ShadeReflVis = matSh->ReflectShadeVis;
+                rsh = ShadeRefl;
+                rshv = ShadeReflVis;
+                tsh = ShadeTrans;
+                tshv = ShadeTransVis;
+                ash = ShadeAbs;
+                
+                // Between-glass shade/blind; assumed to be between glass #2 and glass #3
+                tsh2 = pow_2(tsh);
+                tshv2 = pow_2(tshv);
+                td1 = constr.tBareSolDiff(1);
+                td2 = constr.tBareSolDiff(2);
+                td1v = constr.tBareVisDiff(1);
+                td2v = constr.tBareVisDiff(2);
+                afd1 = constr.afBareSolDiff(1);
+                afd2 = constr.afBareSolDiff(2);
+                abd1 = constr.abBareSolDiff(1);
+                abd2 = constr.abBareSolDiff(2);
+                rb1 = constr.rbBareSolDiff(1);
+                rb2 = constr.rbBareSolDiff(2);
+                rb1v = constr.rbBareVisDiff(1);
+                rb2v = constr.rbBareVisDiff(2);
+                rf1 = constr.rfBareSolDiff(1);
+                rf2 = constr.rfBareSolDiff(2);
+                rf1v = constr.rfBareVisDiff(1);
+                rf2v = constr.rfBareVisDiff(2);
+                
+                if (NGlass == 2) {
                         
-                    } else if (IntBlind || ExtBlind) {
-                        auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
-                        auto const &btar = matBlind->tars[ISlatAng];
-                        ShadeTrans = btar.Sol.Front.Df.Tra;
-                        ShadeTransGnd = btar.Sol.Front.Df.TraGnd;
-                        ShadeTransSky = btar.Sol.Front.Df.TraSky;
-                        ShadeTransVis = btar.Vis.Front.Df.Tra;
-                        if (IntBlind) { // Interior blind
-                            ShadeAbs = btar.Sol.Front.Df.Abs;
-                            ShadeRefl = btar.Sol.Front.Df.Ref;
-                            ShadeReflGnd = btar.Sol.Front.Df.RefGnd;
-                            ShadeReflSky = btar.Sol.Front.Df.RefSky;
-                            ShadeReflVis = btar.Vis.Front.Df.Ref;
-                        } else { // Exterior blind
-                            ShadeAbs = btar.Sol.Back.Df.Abs;
-                            ShadeRefl = btar.Sol.Back.Df.Ref;
-                            ShadeReflVis = btar.Vis.Back.Df.Ref;
-                        }
+                    // Front incident solar, beam, between-glass shade, NGlass = 2
+
+                    for (int IPhi = 1; IPhi <= 10; ++IPhi) {
+                        t1 = tBareSolPhi(1, IPhi);
+                        t1v = tBareVisPhi(1, IPhi);
+                        af1 = afBareSolPhi(1, IPhi);
+                        ab1 = abBareSolPhi(1, IPhi);
+                        tsolPhi(IPhi) = t1 * (tsh + rsh * rb1 * tsh + tsh * rf2 * rsh) * td2;
+                        tvisPhi(IPhi) = t1v * (tshv + rshv * rb1v * tshv + tshv * rf2v * rshv) * td2v;
+                        solabsShadePhi(IPhi) = t1 * (ash + rsh * rb1 + tsh * rf2) * ash;
+                        solabsPhi(1, IPhi) = af1 + t1 * (rsh + rsh * rb1 * rsh + tsh * rf2 * tsh) * abd1;
+                        solabsPhi(2, IPhi) = t1 * (tsh + rsh * rb1 * tsh + tsh * rf2 * rsh) * afd2;
+                    } // End of loop over incidence angles
+                    
+                    // Front incident solar, diffuse, between-glass shade, NGlass = 2
                         
-                    } else if (BGBlind) {
-                        auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
-                        assert(matBlind != nullptr);
-                        auto const &btar = matBlind->tars[ISlatAng];
-                        tsh = btar.Sol.Front.Df.Tra;
-                        tshGnd = btar.Sol.Front.Df.TraGnd;
-                        tshSky = btar.Sol.Front.Df.TraSky;
-                        tshv = btar.Vis.Front.Df.Tra;
-                        rfsh = btar.Sol.Front.Df.Ref;
-                        rfshGnd = btar.Sol.Front.Df.RefGnd;
-                        rfshSky = btar.Sol.Front.Df.RefSky;
-                        rfshv = btar.Vis.Front.Df.Ref;
-                        rbsh = btar.Sol.Back.Df.Ref;
-                        rbshv = btar.Vis.Back.Df.Ref;
-                        afsh = btar.Sol.Front.Df.Abs;
-                        afshGnd = btar.Sol.Front.Df.AbsGnd;
-                        afshSky = btar.Sol.Front.Df.AbsSky;
-                        absh = btar.Sol.Back.Df.Abs;
+                    constr.TransDiff = td1 * (tsh + rsh * rb1 * tsh + tsh * rb2 * rsh) * td2;
+                    constr.TransDiffVis = td1v * (tshv + rshv * rb1v * tshv + tshv * rb2v * rshv) * td2v;
+                    constr.AbsDiffShade = td1 * (ash + rsh * rb1 * ash + tsh * rf2 * ash);
+                    constr.AbsDiff(1) = afd1 + td1 * (rsh + tsh * rb2 * tsh) * abd1;
+                    constr.AbsDiff(2) = td1 * (tsh + rsh * rb1 * tsh + tsh * rf2 * rsh) * afd2;
+                    constr.ReflectSolDiffFront = rf1 + td1 * (rsh + rsh * rb1 * rsh + tsh * rf2 * tsh) * td1;
+                    constr.ReflectVisDiffFront = rf1v + td1v * (rshv + rshv * rb1v * rshv + tshv * rf2v * tshv) * td1v;
+                    
+                    // Back incident solar, diffuse, between-glass shade, NGlass = 2
+                    
+                    constr.AbsDiffBackShade = td2 * (ash + rsh * rf2 * ash + tsh * rb1 * ash);
+                    constr.AbsDiffBack(1) = td2 * (tsh + rsh * rf2 * tsh + tsh * rb1 * rsh) * abd1;
+                    constr.AbsDiffBack(2) = abd2 + td2 * (rsh + rsh * rf2 * rsh + tsh * rb1 * tsh) * afd2;
+                    constr.ReflectSolDiffBack = rb2 + td2 * (rsh + rsh * rf2 * rsh + tsh * rb1 * tsh) * td2;
+                    constr.ReflectVisDiffBack = rb2v + td2v * (rshv + rshv * rf2v * rshv + tshv * rb1v * tshv) * td2v;
+                    
+                } else if (NGlass == 3) {
 
-                    } else if (ScreenOn) {
-                        //       diffuse screen properties are calculated during initialization (quarter-hemispherical integration of beam properties)
-                        auto const *matScreen =
-                            dynamic_cast<Material::MaterialScreen const *>(s_mat->materials(thisConstruct.LayerPoint(ShadeLayNum)));
-                        assert(matScreen != nullptr);
+                    td3 = constr.tBareSolDiff(3);
+                    td3v = constr.tBareVisDiff(3);
+                    afd3 = constr.afBareSolDiff(3);
+                    abd3 = constr.abBareSolDiff(3);
+                    rb3 = constr.rbBareSolDiff(3);
+                    rb3v = constr.rbBareVisDiff(3);
+                    rf3 = constr.rfBareSolDiff(3);
+                    rf3v = constr.rfBareVisDiff(3);
+                    
+                    // Front incident solar, beam, between-glass shade, NGlass = 3
+                    
+                    for (int IPhi = 1; IPhi <= 10; ++IPhi) {
+                        t1 = tBareSolPhi(1, IPhi);
+                        t1v = tBareVisPhi(1, IPhi);
+                        t2 = tBareSolPhi(2, IPhi);
+                        t2v = tBareVisPhi(2, IPhi);
+                        af1 = afBareSolPhi(1, IPhi);
+                        af2 = afBareSolPhi(2, IPhi);
+                        ab1 = abBareSolPhi(1, IPhi);
+                        ab2 = abBareSolPhi(2, IPhi);
+                        rbmf2 = max(0.0, 1.0 - (t2 + af2));
+                        
+                        tsolPhi(IPhi) = t1 * t2 * (tsh + tsh * rf3 * rsh + rsh * td2 * rb1 * td2 * tsh + rsh * rb2 * tsh) * td3;
+                        tvisPhi(IPhi) =
+                                t1v * t2v * (tshv + tshv * rf3v * rshv + rshv * td2v * rb1v * td2v * tshv + rshv * rb2v * tshv) * td3v;
+                        solabsShadePhi(IPhi) = t1 * t2 * (1 + rsh * td2 * rb1 * td2 + rsh * rb2) * ash;
+                        solabsPhi(1, IPhi) =
+                                af1 + rbmf2 * ab1 + t1 * t2 * rsh * (1 + rf3 * tsh + rb2 * rsh + td2 * rb1 * td2 * rsh) * td2 * abd1;
+                        solabsPhi(2, IPhi) =
+                                t1 * af2 + t1 * t2 * ((rsh + tsh * rf3 * tsh + rsh * rb2 * rsh) * abd2 + rsh * td2 * rb1 * afd2);
+                        solabsPhi(3, IPhi) = t1 * t2 * (tsh + rsh * (rb2 * tsh + td2 * rb2 * td2 * tsh + rf3 * rsh)) * afd3;
+                    } // End of loop over incidence angle
+                    
+                    // Front incident solar, diffuse, between-glass shade, NGlass = 3
+                    
+                    constr.TransDiff = td1 * td2 * (tsh + rsh * td2 * rb1 * td2 * tsh + rsh * rb2 * tsh + tsh * rf3 * rsh) * td3;
+                    constr.TransDiffVis =
+                            td1v * td2v * (tshv + rshv * td2v * rb1v * td2v * tshv + rshv * rb2v * tshv + tshv * rf3v * rshv) * td3v;
+                    constr.AbsDiffShade = td1 * td2 * (ash * (1 + rsh * td2 * rb1 * td2 + rsh * rb2 * ash) + tsh * rf3 * ash);
+                    constr.AbsDiff(1) =
+                            afd1 + td1 * (rf2 + td2 * (rsh + rsh * rb2 * rsh + tsh * rf3 * tsh + rsh * td2 * rb1 * td2 * rsh) * td2) * abd1;
+                    constr.AbsDiff(2) = td1 * (afd2 + td2 * (rsh + rsh * rb2 * rsh + tsh * rf3 * tsh) * abd2);
+                    constr.AbsDiff(3) = td1 * td2 * (tsh + rsh * rb2 * tsh + rsh * td2 * rb1 * td2 * tsh + tsh * rf3 * rsh) * afd3;
+                    constr.ReflectSolDiffFront =
+                            rf1 + td1 * rf2 * td1 +
+                            td1 * td2 * (rsh + tsh * rf3 * tsh + rsh * rb2 * rsh + rsh * td2 * rb1 * td2 * rsh) * td2 * td1;
+                    constr.ReflectVisDiffFront =
+                            rf1v + td1v * rf2v * td1v +
+                            td1v * td2v * (rshv + tshv * rf3v * tshv + rshv * rb2v * rshv + rshv * td2v * rb1v * td2v * rshv) * td2v * td1v;
+                    
+                    // Back incident solar, diffuse, between-glass shade, NGlass = 3
+                    
+                    constr.AbsDiffBackShade = td3 * ((1 + rsh * rf3) * ash + (tsh * td2 * rb1 * td2 + tsh * rb2) * ash);
+                    constr.AbsDiffBack(1) =
+                            td3 * (tsh + rsh * rf3 * tsh + tsh * rb2 * rsh + tsh * td2 * rb1 * td2 * rsh) * td2 * abd1;
+                    constr.AbsDiffBack(2) = td3 * ((tsh + rsh * rf3 * tsh) * abd2 + (tsh * td2 * rb1 * td2 + tsh * rb2) * afd2);
+                    constr.AbsDiffBack(3) = abd3 + td3 * (rsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * afd3;
+                    constr.ReflectSolDiffBack =
+                            rb3 + td3 * (rsh + rsh * rf3 * rsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * td3;
+                    constr.ReflectVisDiffBack =
+                            rb3v + td3v * (rshv + rshv * rf3 * rshv + tshv * rb2v * tshv + tshv * td2v * rb1v * td2v * tshv) * td3v;
+                    
+                } // End of check if NGlass = 3
 
-                        ShadeAbs = matScreen->DfAbs;
-                        ShadeTrans = matScreen->DfTrans;
-                        ShadeTransVis = matScreen->DfTransVis;
-                        ShadeRefl = matScreen->DfRef;
-                        ShadeReflVis = matScreen->DfRefVis;
-                        rsh = ShadeRefl;
-                        rshv = ShadeReflVis;
-                        tsh = ShadeTrans;
-                        tshv = ShadeTransVis;
-                        ash = ShadeAbs;
+            // Interior blind
+            } else if (IntBlind) {
+                auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
+                // Correction factors for inter-reflections between glass and shading device
+                ShadeReflFac = 1.0 / (1.0 - ShadeRefl * thisConstruct.ReflectSolDiffBack);
+                ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * thisConstruct.ReflectVisDiffBack);
+
+                for (int iSlatAng = 1; iSlatAng <= Material::MaxSlatAngs; ++iSlatAng) {
+                    auto const &btar = matBlind->tars[iSlatAng];
+                    ShadeTrans = btar.Sol.Front.Df.Tra;
+                    ShadeTransGnd = btar.Sol.Front.Df.TraGnd;
+                    ShadeTransSky = btar.Sol.Front.Df.TraSky;
+                    ShadeTransVis = btar.Vis.Front.Df.Tra;
+                    ShadeAbs = btar.Sol.Front.Df.Abs;
+                    ShadeRefl = btar.Sol.Front.Df.Ref;
+                    ShadeReflGnd = btar.Sol.Front.Df.RefGnd;
+                    ShadeReflSky = btar.Sol.Front.Df.RefSky;
+                    ShadeReflVis = btar.Vis.Front.Df.Ref;
+                    
+                    // Front incident solar, diffuse, interior blind
+                    for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                        auto &dfAbs = constr.layerSlatBlindDfAbs(IGlass)[iSlatAng];
+                        dfAbs.Sol.Front.Df.Abs = constr.AbsDiff(IGlass) + tsolDiff * ShadeRefl * ShadeReflFac * constr.AbsDiffBack(IGlass);
+                        dfAbs.Sol.Front.Df.AbsGnd = constr.AbsDiff(IGlass) + tsolDiff * ShadeReflGnd * ShadeReflFac * constr.AbsDiffBack(IGlass);
+                        dfAbs.Sol.Front.Df.AbsSky = constr.AbsDiff(IGlass) + tsolDiff * ShadeReflSky * ShadeReflFac * constr.AbsDiffBack(IGlass);
                     }
 
-                    // Correction factors for inter-reflections between glass and shading device
-
-                    if (ExtShade || ExtBlind || ExtScreen) {
-                        ShadeReflFac = 1.0 / (1.0 - ShadeRefl * thisConstruct.ReflectSolDiffFront);
-                        ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * thisConstruct.ReflectVisDiffFront);
-                    } else if (IntShade || IntBlind) {
-                        ShadeReflFac = 1.0 / (1.0 - ShadeRefl * thisConstruct.ReflectSolDiffBack);
-                        ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * thisConstruct.ReflectVisDiffBack);
+                    auto &cbtar = constr.blindTARs[iSlatAng];
+                    
+                    cbtar.Sol.Front.Df.Abs = tsolDiff * ShadeReflFac * ShadeAbs;
+                    cbtar.Sol.Front.Df.AbsGnd = tsolDiff * ShadeReflFac * btar.Sol.Front.Df.AbsGnd;
+                    cbtar.Sol.Front.Df.AbsSky = tsolDiff * ShadeReflFac * btar.Sol.Front.Df.AbsSky;
+                    cbtar.Sol.Front.Df.Tra = tsolDiff * ShadeReflFac * ShadeTrans;
+                    cbtar.Sol.Front.Df.TraGnd = tsolDiff * ShadeReflFac * ShadeTransGnd;
+                    cbtar.Sol.Front.Df.TraSky = tsolDiff * ShadeReflFac * ShadeTransSky;
+                    cbtar.Vis.Front.Df.Tra = tvisDiff * ShadeReflFacVis * ShadeTransVis;
+                    cbtar.Sol.Front.Df.Ref = constr.ReflectSolDiffFront + tsolDiff_2 * ShadeRefl * ShadeReflFac;
+                    cbtar.Vis.Front.Df.Ref = constr.ReflectVisDiffFront + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
+                    
+                    // Back incident solar, diffuse, interior blind
+                    
+                    for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                        auto &dfAbs = constr.layerSlatBlindDfAbs(IGlass)[iSlatAng];
+                        dfAbs.Sol.Back.Df.Abs = constr.AbsDiffBack(IGlass) * ShadeTrans * ShadeReflFac;
                     }
+                    
+                    cbtar.Sol.Back.Df.Abs = btar.Sol.Back.Df.Abs + ShadeTrans * ShadeReflFac * constr.ReflectSolDiffBack * ShadeAbs;
+                    cbtar.Sol.Back.Df.Ref = btar.Sol.Back.Df.Ref + pow_2(ShadeTrans) * constr.ReflectSolDiffBack * ShadeReflFac;
+                    cbtar.Vis.Back.Df.Ref = btar.Vis.Back.Df.Ref + pow_2(ShadeTransVis) * constr.ReflectVisDiffBack * ShadeReflFacVis;
+                }
 
-                    if (ExtShade || ExtBlind || ExtScreen) { // Exterior shade or blind
+            // Exterior blind
+            } else if (ExtBlind) {
+                auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
 
-                        // Front incident solar, beam, exterior shade, screen or blind
+                // Correction factors for inter-reflections between glass and shading device
+                ShadeReflFac = 1.0 / (1.0 - ShadeRefl * constr.ReflectSolDiffFront);
+                ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * constr.ReflectVisDiffFront);
+                
+                for (int iSlatAng = 1; iSlatAng <= Material::MaxSlatAngs; ++iSlatAng) {
+                    auto const &btar = matBlind->tars[iSlatAng];
+                    ShadeTrans = btar.Sol.Front.Df.Tra;
+                    ShadeTransGnd = btar.Sol.Front.Df.TraGnd;
+                    ShadeTransSky = btar.Sol.Front.Df.TraSky;
+                    ShadeTransVis = btar.Vis.Front.Df.Tra;
+                    ShadeAbs = btar.Sol.Back.Df.Abs;
+                    ShadeRefl = btar.Sol.Back.Df.Ref;
+                    ShadeReflVis = btar.Vis.Back.Df.Ref;
+                
+                
+                    for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                        auto &dfAbs = constr.layerSlatBlindDfAbs(IGlass)[iSlatAng];
+                        dfAbs.Sol.Front.Df.Abs = ShadeTrans * ShadeReflFac * solabsDiff(IGlass);
+                        dfAbs.Sol.Front.Df.AbsGnd = ShadeTransGnd * ShadeReflFac * solabsDiff(IGlass);
+                        dfAbs.Sol.Front.Df.AbsSky = ShadeTransSky * ShadeReflFac * solabsDiff(IGlass);
+                    }
+                
+                    auto &cbtar = constr.blindTARs[iSlatAng];
+                    cbtar.Sol.Front.Df.Abs = btar.Sol.Front.Df.Abs + ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
+                    cbtar.Sol.Front.Df.AbsGnd = btar.Sol.Front.Df.AbsGnd + ShadeTransGnd * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
+                    cbtar.Sol.Front.Df.AbsSky = btar.Sol.Front.Df.AbsSky + ShadeTransSky * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
+                    cbtar.Sol.Front.Df.Tra = tsolDiff * ShadeReflFac * ShadeTrans;
+                    cbtar.Sol.Front.Df.TraGnd = tsolDiff * ShadeReflFac * ShadeTransGnd;
+                    cbtar.Sol.Front.Df.TraSky = tsolDiff * ShadeReflFac * ShadeTransSky;
+                    cbtar.Vis.Front.Df.Tra = tvisDiff * ShadeReflFacVis * ShadeTransVis;
+                    cbtar.Sol.Front.Df.Ref = ShadeRefl + pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffFront * ShadeReflFac;
+                    cbtar.Vis.Front.Df.Ref = ShadeReflVis + pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffFront * ShadeReflFacVis;
+                
+                    // Back incident solar, diffuse, exterior shade/blind
+                    for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                        auto &dfAbs = constr.layerSlatBlindDfAbs(IGlass)[iSlatAng];
+                        dfAbs.Sol.Back.Df.Abs = constr.AbsDiffBack(IGlass) + tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
+                    }
+                    
+                    cbtar.Sol.Back.Df.Abs = tsolDiff * ShadeReflFac * ShadeAbs;
+                    cbtar.Sol.Back.Df.Ref = constr.ReflectSolDiffBack + tsolDiff_2 * ShadeRefl * ShadeReflFac;
+                    cbtar.Vis.Back.Df.Ref = constr.ReflectVisDiffBack + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
+                }
 
-                        if (ExtShade) {
-                            for (int IPhi = 1; IPhi <= 10; ++IPhi) {
-                                for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                    solabsPhi(IGlass, IPhi) = ShadeTrans * solabsDiff(IGlass) * ShadeReflFac;
-                                }
-                                tsolPhi(IPhi) = ShadeTrans * ShadeReflFac * tsolDiff;
-                                tvisPhi(IPhi) = ShadeTransVis * ShadeReflFacVis * tvisDiff;
-                                solabsShadePhi(IPhi) = ShadeAbs * (1.0 + ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffFront);
-                            }
-                        }
+            // Between-glass blind
+            } else if (BGBlind) {
+                auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
+                assert(matBlind != nullptr);
 
-                        // Front incident solar, diffuse, exterior shade/screen/blind
+                // Between-glass shade/blind; assumed to be between glass #2 and glass #3
+                tsh2 = pow_2(tsh);
+                tshv2 = pow_2(tshv);
+                td1 = constr.tBareSolDiff(1);
+                td2 = constr.tBareSolDiff(2);
+                td1v = constr.tBareVisDiff(1);
+                td2v = constr.tBareVisDiff(2);
+                afd1 = constr.afBareSolDiff(1);
+                afd2 = constr.afBareSolDiff(2);
+                abd1 = constr.abBareSolDiff(1);
+                abd2 = constr.abBareSolDiff(2);
+                rb1 = constr.rbBareSolDiff(1);
+                rb2 = constr.rbBareSolDiff(2);
+                rb1v = constr.rbBareVisDiff(1);
+                rb2v = constr.rbBareVisDiff(2);
+                rf1 = constr.rfBareSolDiff(1);
+                rf2 = constr.rfBareSolDiff(2);
+                rf1v = constr.rfBareVisDiff(1);
+                rf2v = constr.rfBareVisDiff(2);
+                
+                for (int iSlatAng = 1; iSlatAng <= Material::MaxSlatAngs; ++iSlatAng) {
+                    auto const &btar = matBlind->tars[iSlatAng];
+                    tsh = btar.Sol.Front.Df.Tra;
+                    tshGnd = btar.Sol.Front.Df.TraGnd;
+                    tshSky = btar.Sol.Front.Df.TraSky;
+                    tshv = btar.Vis.Front.Df.Tra;
+                    rfsh = btar.Sol.Front.Df.Ref;
+                    rfshGnd = btar.Sol.Front.Df.RefGnd;
+                    rfshSky = btar.Sol.Front.Df.RefSky;
+                    rfshv = btar.Vis.Front.Df.Ref;
+                    rbsh = btar.Sol.Back.Df.Ref;
+                    rbshv = btar.Vis.Back.Df.Ref;
+                    afsh = btar.Sol.Front.Df.Abs;
+                    afshGnd = btar.Sol.Front.Df.AbsGnd;
+                    afshSky = btar.Sol.Front.Df.AbsSky;
+                    absh = btar.Sol.Back.Df.Abs;
 
-                        if (ExtBlind) {
-                            for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                auto &dfAbs = thisConstruct.layerSlatBlindDfAbs(IGlass)[ISlatAng];
-                                dfAbs.Sol.Front.Df.Abs = ShadeTrans * ShadeReflFac * solabsDiff(IGlass);
-                                dfAbs.Sol.Front.Df.AbsGnd = ShadeTransGnd * ShadeReflFac * solabsDiff(IGlass);
-                                dfAbs.Sol.Front.Df.AbsSky = ShadeTransSky * ShadeReflFac * solabsDiff(IGlass);
-                            }
-
-                        } else if (ExtShade || ExtScreen) {
-                            for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                thisConstruct.AbsDiff(IGlass) = ShadeTrans * ShadeReflFac * solabsDiff(IGlass);
-                            }
-                        }
+                    auto &cbtar = constr.blindTARs[iSlatAng];
+                    if (NGlass == 2) {
+                        // Front incident solar, diffuse, between-glass blind, NGlass = 2
+                        auto &dfAbs1 = constr.layerSlatBlindDfAbs(1)[iSlatAng];
+                        auto &dfAbs2 = constr.layerSlatBlindDfAbs(2)[iSlatAng];
+                        dfAbs1.Sol.Front.Df.Abs = afd1 + td1 * (rfsh + rfsh * rb1 * rfsh + tsh * rb2 * tsh) * abd1;
+                        dfAbs1.Sol.Front.Df.AbsGnd = afd1 + td1 * (rfshGnd + rfshGnd * rb1 * rfshGnd + tshGnd * rb2 * tsh) * abd1;
+                        dfAbs1.Sol.Front.Df.AbsSky = afd1 + td1 * (rfshSky + rfshSky * rb1 * rfshSky + tshSky * rb2 * tsh) * abd1;
+                        dfAbs2.Sol.Front.Df.Abs = td1 * (tsh + rfsh * rb1 * tsh + tsh * rf2 * rbsh) * afd2;
+                        dfAbs2.Sol.Front.Df.AbsGnd = td1 * (tshGnd + rfshGnd * rb1 * tsh + tshGnd * rf2 * rbsh) * afd2;
+                        dfAbs2.Sol.Front.Df.AbsSky = td1 * (tshSky + rfshSky * rb1 * tsh + tshSky * rf2 * rbsh) * afd2;
+                        cbtar.Sol.Front.Df.Abs = td1 * (afsh + rfsh * rb1 * afsh + tsh * rf2 * absh);
+                        cbtar.Sol.Front.Df.AbsGnd = td1 * (afshGnd + rfsh * rb1 * afsh + tshGnd * rf2 * absh);
+                        cbtar.Sol.Front.Df.AbsSky = td1 * (afshSky + rfsh * rb1 * afsh + tshSky * rf2 * absh);
+                        cbtar.Sol.Front.Df.Tra = td1 * (tsh + rfsh * rb1 * tsh + tsh * rb2 * rbsh) * td2;
+                        cbtar.Sol.Front.Df.TraGnd = td1 * (tshGnd + rfsh * rb1 * tshGnd + tshGnd * rb2 * rbsh) * td2;
+                        cbtar.Sol.Front.Df.TraSky = td1 * (tshSky + rfsh * rb1 * tshSky + tshSky * rb2 * rbsh) * td2;
+                        cbtar.Vis.Front.Df.Tra = td1v * (tshv + rfshv * rb1v * tshv + tshv * rb2v * rbshv) * td2v;
+                        cbtar.Sol.Front.Df.Ref = rf1 + td1 * (rfsh + rfsh * rb1 * rfsh + tsh * rf2 * tsh) * td1;
+                        cbtar.Vis.Front.Df.Ref = rf1v + td1v * (rfshv + rfshv * rb1v * rfshv + tshv * rf2v * tshv) * td1v;
                         
-                        if (ExtBlind) {
-                            auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
-                            assert(matBlind != nullptr);
-                            auto const &btar = matBlind->tars[ISlatAng];
-                            auto &cbtar = thisConstruct.blindTARs[ISlatAng];
-                            cbtar.Sol.Front.Df.Abs =
-                                btar.Sol.Front.Df.Abs + ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
-                            cbtar.Sol.Front.Df.AbsGnd =
-                                btar.Sol.Front.Df.AbsGnd + ShadeTransGnd * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
-                            cbtar.Sol.Front.Df.AbsSky =
-                                btar.Sol.Front.Df.AbsSky + ShadeTransSky * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
-                            cbtar.Sol.Front.Df.Tra = tsolDiff * ShadeReflFac * ShadeTrans;
-                            cbtar.Sol.Front.Df.TraGnd = tsolDiff * ShadeReflFac * ShadeTransGnd;
-                            cbtar.Sol.Front.Df.TraSky = tsolDiff * ShadeReflFac * ShadeTransSky;
-                            cbtar.Vis.Front.Df.Tra = tvisDiff * ShadeReflFacVis * ShadeTransVis;
-                            cbtar.Sol.Front.Df.Ref = ShadeRefl + pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffFront * ShadeReflFac;
-                            cbtar.Vis.Front.Df.Ref = ShadeReflVis + pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffFront * ShadeReflFacVis;
+                        // Back incident solar, diffuse, between-glass blind, NGlass = 2
+                        
+                        dfAbs1.Sol.Back.Df.Abs = td2 * (tsh + rbsh * rf2 * tsh + tsh * rb1 * rfsh) * abd1;
+                        dfAbs2.Sol.Back.Df.Abs = abd2 + td2 * (rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh) * afd2;
+                        cbtar.Sol.Back.Df.Abs = td2 * (absh + rbsh * rf2 * absh + tsh * rb1 * afsh);
+                        cbtar.Sol.Back.Df.Ref = rb2 + td2 * (rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh) * td2;
+                        cbtar.Vis.Back.Df.Ref = rb2v + td2v * (rbshv + rbshv * rf2v * rbshv + tshv * rb1v * tshv) * td2v;
 
-                        } else if (ExtShade || ExtScreen) {
-                            thisConstruct.AbsDiffShade = ShadeAbs * (1.0 + ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffFront);
-                            thisConstruct.TransDiff = tsolDiff * ShadeReflFac * ShadeTrans;
-                            thisConstruct.TransDiffVis = tvisDiff * ShadeReflFacVis * ShadeTransVis;
-                            thisConstruct.ReflectSolDiffFront = ShadeRefl + pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffFront * ShadeReflFac;
-                            thisConstruct.ReflectVisDiffFront =
-                                ShadeReflVis + pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffFront * ShadeReflFacVis;
-                        }
+                    } else if (NGlass == 3) {
+                        auto &dfAbs1 = constr.layerSlatBlindDfAbs(1)[iSlatAng];
+                        auto &dfAbs2 = constr.layerSlatBlindDfAbs(2)[iSlatAng];
+                        auto &dfAbs3 = constr.layerSlatBlindDfAbs(3)[iSlatAng];
+                        td3 = constr.tBareSolDiff(3);
+                        td3v = constr.tBareVisDiff(3);
+                        afd3 = constr.afBareSolDiff(3);
+                        abd3 = constr.abBareSolDiff(3);
+                        rb3 = constr.rbBareSolDiff(3);
+                        rb3v = constr.rbBareVisDiff(3);
+                        rf3 = constr.rfBareSolDiff(3);
+                        rf3v = constr.rfBareVisDiff(3);
+                        
+                        // Front incident solar, diffuse, between-glass blind, NGlass = 3
+                        
+                        dfAbs1.Sol.Front.Df.Abs =
+                                afd1 +
+                                td1 * (rf2 + td2 * (rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh + rfsh * td2 * rb1 * td2 * rfsh) * td2) * abd1;
+                        dfAbs1.Sol.Front.Df.AbsGnd =
+                                afd1 +
+                                td1 *
+                                (rf2 + td2 * (rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh + rfshGnd * td2 * rb1 * td2 * rfsh) * td2) *
+                                abd1;
+                        dfAbs1.Sol.Front.Df.AbsSky = 
+                                afd1 +
+                                td1 *
+                                (rf2 + td2 * (rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh + rfshSky * td2 * rb1 * td2 * rfsh) * td2) *
+                                abd1;
+                        dfAbs2.Sol.Front.Df.Abs = td1 * (afd2 + td2 * (rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh) * abd2);
+                        dfAbs2.Sol.Front.Df.AbsGnd = td1 * (afd2 + td2 * (rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh) * abd2);
+                        dfAbs2.Sol.Front.Df.AbsSky = td1 * (afd2 + td2 * (rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh) * abd2);
+                        dfAbs3.Sol.Front.Df.Abs =
+                                td1 * td2 * (tsh + rfsh * rb2 * tsh + rfsh * td2 * rb1 * td2 * tsh + tsh * rf3 * rbsh) * afd3;
+                        dfAbs3.Sol.Front.Df.AbsGnd = 
+                                td1 * td2 * (tshGnd + rfshGnd * rb2 * tsh + rfshGnd * td2 * rb1 * td2 * tsh + tshGnd * rf3 * rbsh) * afd3;
+                        dfAbs3.Sol.Front.Df.AbsSky = 
+                                td1 * td2 * (tshSky + rfshSky * rb2 * tsh + rfshSky * td2 * rb1 * td2 * tsh + tshSky * rf3 * rbsh) * afd3;
+                        cbtar.Sol.Front.Df.Abs = td1 * td2 * (afsh * (1 + rfsh * td2 * rb1 * td2) + rfsh * rb2 * afsh + tsh * rf3 * absh);
+                        cbtar.Sol.Front.Df.AbsGnd = td1 * td2 * (afshGnd + afsh * rfsh * (td2 * rb1 * td2 + rb2) + tshGnd * rf3 * absh);
+                        cbtar.Sol.Front.Df.AbsSky = td1 * td2 * (afshSky + afsh * rfsh * (td2 * rb1 * td2 + rb2) + tshSky * rf3 * absh);
+                        cbtar.Sol.Front.Df.Tra = td1 * td2 * (tsh + rfsh * td2 * rb1 * td2 * tsh + rfsh * rb2 * tsh + tsh * rf3 * rbsh) * td3;
+                        cbtar.Sol.Front.Df.TraGnd =
+                                td1 * td2 * (tshGnd + rfsh * td2 * rb1 * td2 * tshGnd + rfsh * rb2 * tshGnd + tshGnd * rf3 * rbsh) * td3;
+                        cbtar.Sol.Front.Df.TraSky = 
+                                td1 * td2 * (tshSky + rfsh * td2 * rb1 * td2 * tshSky + rfsh * rb2 * tshSky + tshSky * rf3 * rbsh) * td3;
+                        cbtar.Vis.Front.Df.Tra = 
+                                td1v * td2v * (tshv + rfshv * td2v * rb1v * td2v * tshv + rfshv * rb2v * tshv + tshv * rf3v * rbshv) * td3v;
+                        cbtar.Sol.Front.Df.Ref = 
+                                rf1 + td1 * rf2 * td1 +
+                                td1 * td2 * (rfsh + tsh * rf3 * tsh + rfsh * rb2 * rfsh + rfsh * td2 * rb1 * td2 * rfsh) * td2 * td1;
+                        cbtar.Vis.Front.Df.Ref = 
+                                rf1v + td1v * rf2v * td1v +
+                                td1v * td2v * (rfshv + tshv * rf3v * tshv + rfshv * rb2v * rfshv + rfshv * td2v * rb1v * td2v * rfshv) * td2v *
+                                td1v;
+                        
+                        // Back incident solar, diffuse, between-glass blind, NGlass = 3
+                        
+                        dfAbs1.Sol.Back.Df.Abs = td3 * (tsh + rbsh * rf3 * tsh + tsh * rb2 * rfsh + tsh * td2 * rb1 * td2 * rfsh) * td2 * abd1;
+                        dfAbs2.Sol.Back.Df.Abs = td3 * ((tsh + rbsh * rf3 * tsh) * abd2 + (tsh * td2 * rb1 * td2 + tsh * rb2) * afd2);
+                        dfAbs3.Sol.Back.Df.Abs = abd3 + td3 * (rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * afd3;
+                        cbtar.Sol.Back.Df.Abs = td3 * ((1 + rbsh * rf3) * absh + (tsh * td2 * rb1 * td2 + tsh * rb2) * afsh);
+                        cbtar.Sol.Back.Df.Ref = rb3 + td3 * (rbsh + rbsh * rf3 * rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * td3;
+                        cbtar.Vis.Back.Df.Ref =
+                                rb3v + td3v * (rbshv + rbshv * rf3v * rbshv + tshv * rb2v * tshv + tshv * td2v * rb1v * td2v * tshv) * td3v;
+                    } // if (NGlass == 3)
+                } // for (iSlatAng)
 
-                        // Back incident solar, diffuse, exterior shade/blind
-
-                        if (ExtBlind) {
-                            for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                auto &dfAbs = thisConstruct.layerSlatBlindDfAbs(IGlass)[ISlatAng];
-                                dfAbs.Sol.Back.Df.Abs = thisConstruct.AbsDiffBack(IGlass) + tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
-                            }
-
-                            auto &cbtar = thisConstruct.blindTARs[ISlatAng];
-                            cbtar.Sol.Back.Df.Abs = tsolDiff * ShadeReflFac * ShadeAbs;
-                            cbtar.Sol.Back.Df.Ref = thisConstruct.ReflectSolDiffBack + tsolDiff_2 * ShadeRefl * ShadeReflFac;
-                            cbtar.Vis.Back.Df.Ref = thisConstruct.ReflectVisDiffBack + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
-                            
-                        } else if (ExtShade || ExtScreen) {
-                            for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                thisConstruct.AbsDiffBack(IGlass) += tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
-                            }
-                            thisConstruct.AbsDiffBackShade = tsolDiff * ShadeReflFac * ShadeAbs;
-                            thisConstruct.ReflectSolDiffBack += tsolDiff_2 * ShadeRefl * ShadeReflFac;
-                            thisConstruct.ReflectVisDiffBack += tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
-                        }
-
-                    } // End check if exterior shade, screen or blind
-
-                    if (IntShade || IntBlind) { // Interior shade or blind
-
-                        // Front incident solar, beam, interior shade
-
-                        if (IntShade) {
-                            for (int IPhi = 1; IPhi <= 10; ++IPhi) {
-                                for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                    solabsPhi(IGlass, IPhi) += tsolPhi(IPhi) * ShadeRefl * ShadeReflFac * thisConstruct.AbsDiffBack(IGlass);
-                                }
-                                solabsShadePhi(IPhi) = tsolPhi(IPhi) * ShadeReflFac * ShadeAbs;
-                                tsolPhi(IPhi) *= ShadeReflFac * ShadeTrans;
-                                tvisPhi(IPhi) *= ShadeReflFacVis * ShadeTransVis;
-                            }
-                        } // End of check if interior shade
-
-                        // Front incident solar, diffuse, interior blind
-
-                        if (IntBlind) {
-                            for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                auto &dfAbs = thisConstruct.layerSlatBlindDfAbs(IGlass)[ISlatAng];
-                                dfAbs.Sol.Front.Df.Abs = 
-                                   thisConstruct.AbsDiff(IGlass) + tsolDiff * ShadeRefl * ShadeReflFac * thisConstruct.AbsDiffBack(IGlass);
-                                dfAbs.Sol.Front.Df.AbsGnd =
-                                    thisConstruct.AbsDiff(IGlass) + tsolDiff * ShadeReflGnd * ShadeReflFac * thisConstruct.AbsDiffBack(IGlass);
-                                dfAbs.Sol.Front.Df.AbsSky =
-                                    thisConstruct.AbsDiff(IGlass) + tsolDiff * ShadeReflSky * ShadeReflFac * thisConstruct.AbsDiffBack(IGlass);
-                            }
-
-                            auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
-                            assert(matBlind != nullptr);
-                            auto const &btar = matBlind->tars[ISlatAng];
-                            auto &cbtar = thisConstruct.blindTARs[ISlatAng];
-
-                            cbtar.Sol.Front.Df.Abs = tsolDiff * ShadeReflFac * ShadeAbs;
-                            cbtar.Sol.Front.Df.AbsGnd = tsolDiff * ShadeReflFac * btar.Sol.Front.Df.AbsGnd;
-                            cbtar.Sol.Front.Df.AbsSky = tsolDiff * ShadeReflFac * btar.Sol.Front.Df.AbsSky;
-                            cbtar.Sol.Front.Df.Tra = tsolDiff * ShadeReflFac * ShadeTrans;
-                            cbtar.Sol.Front.Df.TraGnd = tsolDiff * ShadeReflFac * ShadeTransGnd;
-                            cbtar.Sol.Front.Df.TraSky = tsolDiff * ShadeReflFac * ShadeTransSky;
-                            cbtar.Vis.Front.Df.Tra = tvisDiff * ShadeReflFacVis * ShadeTransVis;
-                            cbtar.Sol.Front.Df.Ref = thisConstruct.ReflectSolDiffFront + tsolDiff_2 * ShadeRefl * ShadeReflFac;
-                            cbtar.Vis.Front.Df.Ref = thisConstruct.ReflectVisDiffFront + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
-
-                            // Back incident solar, diffuse, interior blind
-
-                            for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                auto &dfAbs = thisConstruct.layerSlatBlindDfAbs(IGlass)[ISlatAng];
-                                dfAbs.Sol.Back.Df.Abs = thisConstruct.AbsDiffBack(IGlass) * ShadeTrans * ShadeReflFac;
-                            }
-
-                            cbtar.Sol.Back.Df.Abs = btar.Sol.Back.Df.Abs + ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffBack * ShadeAbs;
-                            cbtar.Sol.Back.Df.Ref = btar.Sol.Back.Df.Ref + pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffBack * ShadeReflFac;
-                            cbtar.Vis.Back.Df.Ref = btar.Vis.Back.Df.Ref + pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffBack * ShadeReflFacVis;
-                        } // End of check if interior blind
-
-                        // Front incident solar, diffuse, interior shade
-
-                        if (IntShade) {
-                            for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                thisConstruct.AbsDiff(IGlass) += tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
-                            }
-
-                            thisConstruct.AbsDiffShade = tsolDiff * ShadeReflFac * ShadeAbs;
-                            thisConstruct.TransDiff = tsolDiff * ShadeReflFac * ShadeTrans;
-                            thisConstruct.TransDiffVis = tvisDiff * ShadeReflFacVis * ShadeTransVis;
-                            thisConstruct.ReflectSolDiffFront += tsolDiff_2 * ShadeRefl * ShadeReflFac;
-                            thisConstruct.ReflectVisDiffFront += tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
-
-                            // Back incident solar, diffuse, interior shade
-
-                            for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                thisConstruct.AbsDiffBack(IGlass) *= ShadeTrans * ShadeReflFac;
-                            }
-
-                            thisConstruct.AbsDiffBackShade = ShadeAbs * (1 + ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffBack);
-                            thisConstruct.ReflectSolDiffBack = ShadeRefl + pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffBack * ShadeReflFac;
-                            thisConstruct.ReflectVisDiffBack =
-                                ShadeReflVis + pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffBack * ShadeReflFacVis;
-                        } // End of check if interior shade
-
-                    } // End check if interior shade or blind
-
-                    if (BGShade || BGBlind) { // Between-glass shade/blind; assumed to be between glass #2 and glass #3
-
-                        tsh2 = pow_2(tsh);
-                        tshv2 = pow_2(tshv);
-                        td1 = thisConstruct.tBareSolDiff(1);
-                        td2 = thisConstruct.tBareSolDiff(2);
-                        td1v = thisConstruct.tBareVisDiff(1);
-                        td2v = thisConstruct.tBareVisDiff(2);
-                        afd1 = thisConstruct.afBareSolDiff(1);
-                        afd2 = thisConstruct.afBareSolDiff(2);
-                        abd1 = thisConstruct.abBareSolDiff(1);
-                        abd2 = thisConstruct.abBareSolDiff(2);
-                        rb1 = thisConstruct.rbBareSolDiff(1);
-                        rb2 = thisConstruct.rbBareSolDiff(2);
-                        rb1v = thisConstruct.rbBareVisDiff(1);
-                        rb2v = thisConstruct.rbBareVisDiff(2);
-                        rf1 = thisConstruct.rfBareSolDiff(1);
-                        rf2 = thisConstruct.rfBareSolDiff(2);
-                        rf1v = thisConstruct.rfBareVisDiff(1);
-                        rf2v = thisConstruct.rfBareVisDiff(2);
-
-                        if (BGShade) {
-                            if (NGlass == 2) {
-
-                                // Front incident solar, beam, between-glass shade, NGlass = 2
-
-                                for (int IPhi = 1; IPhi <= 10; ++IPhi) {
-                                    t1 = tBareSolPhi(1, IPhi);
-                                    t1v = tBareVisPhi(1, IPhi);
-                                    af1 = afBareSolPhi(1, IPhi);
-                                    ab1 = abBareSolPhi(1, IPhi);
-                                    tsolPhi(IPhi) = t1 * (tsh + rsh * rb1 * tsh + tsh * rf2 * rsh) * td2;
-                                    tvisPhi(IPhi) = t1v * (tshv + rshv * rb1v * tshv + tshv * rf2v * rshv) * td2v;
-                                    solabsShadePhi(IPhi) = t1 * (ash + rsh * rb1 + tsh * rf2) * ash;
-                                    solabsPhi(1, IPhi) = af1 + t1 * (rsh + rsh * rb1 * rsh + tsh * rf2 * tsh) * abd1;
-                                    solabsPhi(2, IPhi) = t1 * (tsh + rsh * rb1 * tsh + tsh * rf2 * rsh) * afd2;
-                                } // End of loop over incidence angles
-
-                                // Front incident solar, diffuse, between-glass shade, NGlass = 2
-
-                                thisConstruct.TransDiff = td1 * (tsh + rsh * rb1 * tsh + tsh * rb2 * rsh) * td2;
-                                thisConstruct.TransDiffVis = td1v * (tshv + rshv * rb1v * tshv + tshv * rb2v * rshv) * td2v;
-                                thisConstruct.AbsDiffShade = td1 * (ash + rsh * rb1 * ash + tsh * rf2 * ash);
-                                thisConstruct.AbsDiff(1) = afd1 + td1 * (rsh + tsh * rb2 * tsh) * abd1;
-                                thisConstruct.AbsDiff(2) = td1 * (tsh + rsh * rb1 * tsh + tsh * rf2 * rsh) * afd2;
-                                thisConstruct.ReflectSolDiffFront = rf1 + td1 * (rsh + rsh * rb1 * rsh + tsh * rf2 * tsh) * td1;
-                                thisConstruct.ReflectVisDiffFront = rf1v + td1v * (rshv + rshv * rb1v * rshv + tshv * rf2v * tshv) * td1v;
-
-                                // Back incident solar, diffuse, between-glass shade, NGlass = 2
-
-                                thisConstruct.AbsDiffBackShade = td2 * (ash + rsh * rf2 * ash + tsh * rb1 * ash);
-                                thisConstruct.AbsDiffBack(1) = td2 * (tsh + rsh * rf2 * tsh + tsh * rb1 * rsh) * abd1;
-                                thisConstruct.AbsDiffBack(2) = abd2 + td2 * (rsh + rsh * rf2 * rsh + tsh * rb1 * tsh) * afd2;
-                                thisConstruct.ReflectSolDiffBack = rb2 + td2 * (rsh + rsh * rf2 * rsh + tsh * rb1 * tsh) * td2;
-                                thisConstruct.ReflectVisDiffBack = rb2v + td2v * (rshv + rshv * rf2v * rshv + tshv * rb1v * tshv) * td2v;
-
-                            } // End of check if NGlass = 2
-
-                            if (NGlass == 3) {
-
-                                td3 = thisConstruct.tBareSolDiff(3);
-                                td3v = thisConstruct.tBareVisDiff(3);
-                                afd3 = thisConstruct.afBareSolDiff(3);
-                                abd3 = thisConstruct.abBareSolDiff(3);
-                                rb3 = thisConstruct.rbBareSolDiff(3);
-                                rb3v = thisConstruct.rbBareVisDiff(3);
-                                rf3 = thisConstruct.rfBareSolDiff(3);
-                                rf3v = thisConstruct.rfBareVisDiff(3);
-
-                                // Front incident solar, beam, between-glass shade, NGlass = 3
-
-                                for (int IPhi = 1; IPhi <= 10; ++IPhi) {
-                                    t1 = tBareSolPhi(1, IPhi);
-                                    t1v = tBareVisPhi(1, IPhi);
-                                    t2 = tBareSolPhi(2, IPhi);
-                                    t2v = tBareVisPhi(2, IPhi);
-                                    af1 = afBareSolPhi(1, IPhi);
-                                    af2 = afBareSolPhi(2, IPhi);
-                                    ab1 = abBareSolPhi(1, IPhi);
-                                    ab2 = abBareSolPhi(2, IPhi);
-                                    rbmf2 = max(0.0, 1.0 - (t2 + af2));
-
-                                    tsolPhi(IPhi) = t1 * t2 * (tsh + tsh * rf3 * rsh + rsh * td2 * rb1 * td2 * tsh + rsh * rb2 * tsh) * td3;
-                                    tvisPhi(IPhi) =
-                                        t1v * t2v * (tshv + tshv * rf3v * rshv + rshv * td2v * rb1v * td2v * tshv + rshv * rb2v * tshv) * td3v;
-                                    solabsShadePhi(IPhi) = t1 * t2 * (1 + rsh * td2 * rb1 * td2 + rsh * rb2) * ash;
-                                    solabsPhi(1, IPhi) =
-                                        af1 + rbmf2 * ab1 + t1 * t2 * rsh * (1 + rf3 * tsh + rb2 * rsh + td2 * rb1 * td2 * rsh) * td2 * abd1;
-                                    solabsPhi(2, IPhi) =
-                                        t1 * af2 + t1 * t2 * ((rsh + tsh * rf3 * tsh + rsh * rb2 * rsh) * abd2 + rsh * td2 * rb1 * afd2);
-                                    solabsPhi(3, IPhi) = t1 * t2 * (tsh + rsh * (rb2 * tsh + td2 * rb2 * td2 * tsh + rf3 * rsh)) * afd3;
-                                } // End of loop over incidence angle
-
-                                // Front incident solar, diffuse, between-glass shade, NGlass = 3
-
-                                thisConstruct.TransDiff = td1 * td2 * (tsh + rsh * td2 * rb1 * td2 * tsh + rsh * rb2 * tsh + tsh * rf3 * rsh) * td3;
-                                thisConstruct.TransDiffVis =
-                                    td1v * td2v * (tshv + rshv * td2v * rb1v * td2v * tshv + rshv * rb2v * tshv + tshv * rf3v * rshv) * td3v;
-                                thisConstruct.AbsDiffShade = td1 * td2 * (ash * (1 + rsh * td2 * rb1 * td2 + rsh * rb2 * ash) + tsh * rf3 * ash);
-                                thisConstruct.AbsDiff(1) =
-                                    afd1 + td1 * (rf2 + td2 * (rsh + rsh * rb2 * rsh + tsh * rf3 * tsh + rsh * td2 * rb1 * td2 * rsh) * td2) * abd1;
-                                thisConstruct.AbsDiff(2) = td1 * (afd2 + td2 * (rsh + rsh * rb2 * rsh + tsh * rf3 * tsh) * abd2);
-                                thisConstruct.AbsDiff(3) = td1 * td2 * (tsh + rsh * rb2 * tsh + rsh * td2 * rb1 * td2 * tsh + tsh * rf3 * rsh) * afd3;
-                                thisConstruct.ReflectSolDiffFront =
-                                    rf1 + td1 * rf2 * td1 +
-                                    td1 * td2 * (rsh + tsh * rf3 * tsh + rsh * rb2 * rsh + rsh * td2 * rb1 * td2 * rsh) * td2 * td1;
-                                thisConstruct.ReflectVisDiffFront =
-                                    rf1v + td1v * rf2v * td1v +
-                                    td1v * td2v * (rshv + tshv * rf3v * tshv + rshv * rb2v * rshv + rshv * td2v * rb1v * td2v * rshv) * td2v * td1v;
-
-                                // Back incident solar, diffuse, between-glass shade, NGlass = 3
-
-                                thisConstruct.AbsDiffBackShade = td3 * ((1 + rsh * rf3) * ash + (tsh * td2 * rb1 * td2 + tsh * rb2) * ash);
-                                thisConstruct.AbsDiffBack(1) =
-                                    td3 * (tsh + rsh * rf3 * tsh + tsh * rb2 * rsh + tsh * td2 * rb1 * td2 * rsh) * td2 * abd1;
-                                thisConstruct.AbsDiffBack(2) = td3 * ((tsh + rsh * rf3 * tsh) * abd2 + (tsh * td2 * rb1 * td2 + tsh * rb2) * afd2);
-                                thisConstruct.AbsDiffBack(3) = abd3 + td3 * (rsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * afd3;
-                                thisConstruct.ReflectSolDiffBack =
-                                    rb3 + td3 * (rsh + rsh * rf3 * rsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * td3;
-                                thisConstruct.ReflectVisDiffBack =
-                                    rb3v + td3v * (rshv + rshv * rf3 * rshv + tshv * rb2v * tshv + tshv * td2v * rb1v * td2v * tshv) * td3v;
-
-                            } // End of check if NGlass = 3
-
-                        } // End of check if between-glass shade
-
-                        if (BGBlind) {
-
-                            if (NGlass == 2) {
-                                // Front incident solar, diffuse, between-glass blind, NGlass = 2
-                                auto &cbtar = thisConstruct.blindTARs[ISlatAng];
-                                auto &dfAbs1 = thisConstruct.layerSlatBlindDfAbs(1)[ISlatAng];
-                                auto &dfAbs2 = thisConstruct.layerSlatBlindDfAbs(2)[ISlatAng];
-                                dfAbs1.Sol.Front.Df.Abs = afd1 + td1 * (rfsh + rfsh * rb1 * rfsh + tsh * rb2 * tsh) * abd1;
-                                dfAbs1.Sol.Front.Df.AbsGnd = afd1 + td1 * (rfshGnd + rfshGnd * rb1 * rfshGnd + tshGnd * rb2 * tsh) * abd1;
-                                dfAbs1.Sol.Front.Df.AbsSky = afd1 + td1 * (rfshSky + rfshSky * rb1 * rfshSky + tshSky * rb2 * tsh) * abd1;
-                                dfAbs2.Sol.Front.Df.Abs = td1 * (tsh + rfsh * rb1 * tsh + tsh * rf2 * rbsh) * afd2;
-                                dfAbs2.Sol.Front.Df.AbsGnd = td1 * (tshGnd + rfshGnd * rb1 * tsh + tshGnd * rf2 * rbsh) * afd2;
-                                dfAbs2.Sol.Front.Df.AbsSky = td1 * (tshSky + rfshSky * rb1 * tsh + tshSky * rf2 * rbsh) * afd2;
-                                cbtar.Sol.Front.Df.Abs = td1 * (afsh + rfsh * rb1 * afsh + tsh * rf2 * absh);
-                                cbtar.Sol.Front.Df.AbsGnd = td1 * (afshGnd + rfsh * rb1 * afsh + tshGnd * rf2 * absh);
-                                cbtar.Sol.Front.Df.AbsSky = td1 * (afshSky + rfsh * rb1 * afsh + tshSky * rf2 * absh);
-                                cbtar.Sol.Front.Df.Tra = td1 * (tsh + rfsh * rb1 * tsh + tsh * rb2 * rbsh) * td2;
-                                cbtar.Sol.Front.Df.TraGnd = td1 * (tshGnd + rfsh * rb1 * tshGnd + tshGnd * rb2 * rbsh) * td2;
-                                cbtar.Sol.Front.Df.TraSky = td1 * (tshSky + rfsh * rb1 * tshSky + tshSky * rb2 * rbsh) * td2;
-                                cbtar.Vis.Front.Df.Tra = td1v * (tshv + rfshv * rb1v * tshv + tshv * rb2v * rbshv) * td2v;
-                                cbtar.Sol.Front.Df.Ref = rf1 + td1 * (rfsh + rfsh * rb1 * rfsh + tsh * rf2 * tsh) * td1;
-                                cbtar.Vis.Front.Df.Ref = rf1v + td1v * (rfshv + rfshv * rb1v * rfshv + tshv * rf2v * tshv) * td1v;
-
-                                // Back incident solar, diffuse, between-glass blind, NGlass = 2
-
-                                dfAbs1.Sol.Back.Df.Abs = td2 * (tsh + rbsh * rf2 * tsh + tsh * rb1 * rfsh) * abd1;
-                                dfAbs2.Sol.Back.Df.Abs = abd2 + td2 * (rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh) * afd2;
-                                cbtar.Sol.Back.Df.Abs = td2 * (absh + rbsh * rf2 * absh + tsh * rb1 * afsh);
-                                cbtar.Sol.Back.Df.Ref = rb2 + td2 * (rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh) * td2;
-                                cbtar.Vis.Back.Df.Ref = rb2v + td2v * (rbshv + rbshv * rf2v * rbshv + tshv * rb1v * tshv) * td2v;
-
-                            } // End of check if NGlass = 2
-
-                            if (NGlass == 3) {
-                                auto &cbtar = thisConstruct.blindTARs[ISlatAng];
-                                auto &dfAbs1 = thisConstruct.layerSlatBlindDfAbs(1)[ISlatAng];
-                                auto &dfAbs2 = thisConstruct.layerSlatBlindDfAbs(2)[ISlatAng];
-                                auto &dfAbs3 = thisConstruct.layerSlatBlindDfAbs(3)[ISlatAng];
-                                td3 = thisConstruct.tBareSolDiff(3);
-                                td3v = thisConstruct.tBareVisDiff(3);
-                                afd3 = thisConstruct.afBareSolDiff(3);
-                                abd3 = thisConstruct.abBareSolDiff(3);
-                                rb3 = thisConstruct.rbBareSolDiff(3);
-                                rb3v = thisConstruct.rbBareVisDiff(3);
-                                rf3 = thisConstruct.rfBareSolDiff(3);
-                                rf3v = thisConstruct.rfBareVisDiff(3);
-
-                                // Front incident solar, diffuse, between-glass blind, NGlass = 3
-
-                                dfAbs1.Sol.Front.Df.Abs =
-                                    afd1 +
-                                    td1 * (rf2 + td2 * (rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh + rfsh * td2 * rb1 * td2 * rfsh) * td2) * abd1;
-                                dfAbs1.Sol.Front.Df.AbsGnd =
-                                    afd1 +
-                                    td1 *
-                                        (rf2 + td2 * (rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh + rfshGnd * td2 * rb1 * td2 * rfsh) * td2) *
-                                        abd1;
-                                dfAbs1.Sol.Front.Df.AbsSky = 
-                                    afd1 +
-                                    td1 *
-                                        (rf2 + td2 * (rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh + rfshSky * td2 * rb1 * td2 * rfsh) * td2) *
-                                        abd1;
-                                dfAbs2.Sol.Front.Df.Abs = td1 * (afd2 + td2 * (rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh) * abd2);
-                                dfAbs2.Sol.Front.Df.AbsGnd = td1 * (afd2 + td2 * (rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh) * abd2);
-                                dfAbs2.Sol.Front.Df.AbsSky = td1 * (afd2 + td2 * (rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh) * abd2);
-                                dfAbs3.Sol.Front.Df.Abs =
-                                    td1 * td2 * (tsh + rfsh * rb2 * tsh + rfsh * td2 * rb1 * td2 * tsh + tsh * rf3 * rbsh) * afd3;
-                                dfAbs3.Sol.Front.Df.AbsGnd = 
-                                    td1 * td2 * (tshGnd + rfshGnd * rb2 * tsh + rfshGnd * td2 * rb1 * td2 * tsh + tshGnd * rf3 * rbsh) * afd3;
-                                dfAbs3.Sol.Front.Df.AbsSky = 
-                                    td1 * td2 * (tshSky + rfshSky * rb2 * tsh + rfshSky * td2 * rb1 * td2 * tsh + tshSky * rf3 * rbsh) * afd3;
-                                cbtar.Sol.Front.Df.Abs = td1 * td2 * (afsh * (1 + rfsh * td2 * rb1 * td2) + rfsh * rb2 * afsh + tsh * rf3 * absh);
-                                cbtar.Sol.Front.Df.AbsGnd = td1 * td2 * (afshGnd + afsh * rfsh * (td2 * rb1 * td2 + rb2) + tshGnd * rf3 * absh);
-                                cbtar.Sol.Front.Df.AbsSky = td1 * td2 * (afshSky + afsh * rfsh * (td2 * rb1 * td2 + rb2) + tshSky * rf3 * absh);
-                                cbtar.Sol.Front.Df.Tra = td1 * td2 * (tsh + rfsh * td2 * rb1 * td2 * tsh + rfsh * rb2 * tsh + tsh * rf3 * rbsh) * td3;
-                                cbtar.Sol.Front.Df.TraGnd =
-                                    td1 * td2 * (tshGnd + rfsh * td2 * rb1 * td2 * tshGnd + rfsh * rb2 * tshGnd + tshGnd * rf3 * rbsh) * td3;
-                                cbtar.Sol.Front.Df.TraSky = 
-                                    td1 * td2 * (tshSky + rfsh * td2 * rb1 * td2 * tshSky + rfsh * rb2 * tshSky + tshSky * rf3 * rbsh) * td3;
-                                cbtar.Vis.Front.Df.Tra = 
-                                    td1v * td2v * (tshv + rfshv * td2v * rb1v * td2v * tshv + rfshv * rb2v * tshv + tshv * rf3v * rbshv) * td3v;
-                                cbtar.Sol.Front.Df.Ref = 
-                                    rf1 + td1 * rf2 * td1 +
-                                    td1 * td2 * (rfsh + tsh * rf3 * tsh + rfsh * rb2 * rfsh + rfsh * td2 * rb1 * td2 * rfsh) * td2 * td1;
-                                cbtar.Vis.Front.Df.Ref = 
-                                    rf1v + td1v * rf2v * td1v +
-                                    td1v * td2v * (rfshv + tshv * rf3v * tshv + rfshv * rb2v * rfshv + rfshv * td2v * rb1v * td2v * rfshv) * td2v *
-                                        td1v;
-
-                                // Back incident solar, diffuse, between-glass blind, NGlass = 3
-
-                                dfAbs1.Sol.Back.Df.Abs = td3 * (tsh + rbsh * rf3 * tsh + tsh * rb2 * rfsh + tsh * td2 * rb1 * td2 * rfsh) * td2 * abd1;
-                                dfAbs2.Sol.Back.Df.Abs = td3 * ((tsh + rbsh * rf3 * tsh) * abd2 + (tsh * td2 * rb1 * td2 + tsh * rb2) * afd2);
-                                dfAbs3.Sol.Back.Df.Abs = abd3 + td3 * (rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * afd3;
-                                cbtar.Sol.Back.Df.Abs = td3 * ((1 + rbsh * rf3) * absh + (tsh * td2 * rb1 * td2 + tsh * rb2) * afsh);
-                                cbtar.Sol.Back.Df.Ref = rb3 + td3 * (rbsh + rbsh * rf3 * rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * td3;
-                                cbtar.Vis.Back.Df.Ref =
-                                    rb3v + td3v * (rbshv + rbshv * rf3v * rbshv + tshv * rb2v * tshv + tshv * td2v * rb1v * td2v * tshv) * td3v;
-
-                            } // End of check if NGlass = 3
-
-                        } // End of check if between-glass blind
-
-                    } // End of check if between-glass shade or blind
-
-                    // Continue loop over slat angles only for blinds with variable slat angle
-                    if (ShadeOn || ScreenOn) break;
-                    if (BlindOn) {
-                        auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
-                        assert(matBlind != nullptr);
-                        if (matBlind->SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
-                    }
-                } // End of slat angle loop
-            }     // End of check if construction has a shade or blind
-
+            // Exterior screen
+            } else if (ExtScreen) {
+                //       diffuse screen properties are calculated during initialization (quarter-hemispherical integration of beam properties)
+                auto const *matScreen = dynamic_cast<Material::MaterialScreen const *>(s_mat->materials(thisConstruct.LayerPoint(ShadeLayNum)));
+                assert(matScreen != nullptr);
+                
+                ShadeAbs = matScreen->DfAbs;
+                ShadeTrans = matScreen->DfTrans;
+                ShadeTransVis = matScreen->DfTransVis;
+                ShadeRefl = matScreen->DfRef;
+                ShadeReflVis = matScreen->DfRefVis;
+                rsh = ShadeRefl;
+                rshv = ShadeReflVis;
+                tsh = ShadeTrans;
+                tshv = ShadeTransVis;
+                ash = ShadeAbs;
+                
+                // Correction factors for inter-reflections between glass and shading device
+                ShadeReflFac = 1.0 / (1.0 - ShadeRefl * constr.ReflectSolDiffFront);
+                ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * constr.ReflectVisDiffFront);
+                
+                // Front incident solar, diffuse, exterior shade/screen/blind
+                for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                    constr.AbsDiff(IGlass) = ShadeTrans * ShadeReflFac * solabsDiff(IGlass);
+                }
+                    
+                // Front incident solar, diffuse, exterior shade/screen
+                constr.AbsDiffShade = ShadeAbs * (1.0 + ShadeTrans * ShadeReflFac * constr.ReflectSolDiffFront);
+                constr.TransDiff = tsolDiff * ShadeReflFac * ShadeTrans;
+                constr.TransDiffVis = tvisDiff * ShadeReflFacVis * ShadeTransVis;
+                constr.ReflectSolDiffFront = ShadeRefl + pow_2(ShadeTrans) * constr.ReflectSolDiffFront * ShadeReflFac;
+                constr.ReflectVisDiffFront = ShadeReflVis + pow_2(ShadeTransVis) * constr.ReflectVisDiffFront * ShadeReflFacVis;
+                
+                // Back incident solar, diffuse, exterior shade/screen
+                for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
+                    constr.AbsDiffBack(IGlass) += tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
+                }
+                constr.AbsDiffBackShade = tsolDiff * ShadeReflFac * ShadeAbs;
+                constr.ReflectSolDiffBack += tsolDiff_2 * ShadeRefl * ShadeReflFac;
+                constr.ReflectVisDiffBack += tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
+            } // if (ExtScreen)
+                
             // Curve fits to get solar transmittance, reflectance, layer absorptance and
             // visible transmittance as polynomials in cosine of incidence angle
 
@@ -7533,9 +7556,9 @@ namespace Window {
                             sumAbs += denom * (btargs.Abs + btargs1.Abs) * 0.5;
                         }
 
-                        btar.Sol.Front.Df.TraGnd = std::min(0.0, sumTra1 / sumDenom) + std::min(0.0, sumTra2 / sumDenom);
-                        btar.Sol.Front.Df.RefGnd = std::min(0.0, sumRef / sumDenom);
-                        btar.Sol.Front.Df.AbsGnd = std::min(0.0, sumAbs / sumDenom);
+                        btar.Sol.Front.Df.TraGnd = std::max(0.0, sumTra1 / sumDenom) + std::max(0.0, sumTra2 / sumDenom);
+                        btar.Sol.Front.Df.RefGnd = std::max(0.0, sumRef / sumDenom);
+                        btar.Sol.Front.Df.AbsGnd = std::max(0.0, sumAbs / sumDenom);
 
                         sumDenom = sumTra1 = sumTra2 = sumRef = sumAbs = 0.0;
 
@@ -7553,9 +7576,9 @@ namespace Window {
                             sumAbs += denom * (btargs.Abs + btargs1.Abs) * 0.5;
                         }
 
-                        btar.Sol.Front.Df.TraSky = std::min(0.0, sumTra1 / sumDenom) + std::min(0.0, sumTra2 / sumDenom);
-                        btar.Sol.Front.Df.RefSky = std::min(0.0, sumRef / sumDenom);
-                        btar.Sol.Front.Df.AbsSky = std::min(0.0, sumAbs / sumDenom);
+                        btar.Sol.Front.Df.TraSky = std::max(0.0, sumTra1 / sumDenom) + std::max(0.0, sumTra2 / sumDenom);
+                        btar.Sol.Front.Df.RefSky = std::max(0.0, sumRef / sumDenom);
+                        btar.Sol.Front.Df.AbsSky = std::max(0.0, sumAbs / sumDenom);
                     } // for (ISlatAng)
                 }
 

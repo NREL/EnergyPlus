@@ -3269,7 +3269,6 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     Vector3<Real64> HitPtRefl; // Point that ray hits reflecting surface
                     Vector3<Real64> SunVecMir; // Sun ray mirrored in reflecting surface
                     Vector3<Real64> ReflNorm;  // Normal vector to reflecting surface
-                    Vector3<Real64> TransBmBmMultRefl;
                     // This window has associated obstructions that could reflect beam onto the window
                     for (int loop = 1, loop_end = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs; loop <= loop_end;
                          ++loop) {
@@ -3369,14 +3368,14 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                        surfWin.lightWellEff;
                             dl->dirIllum(iHour)[iWinCover_Bare].sunDisk += SunVecMir.z * SpecReflectance * TVisRefl; // Bare window
 
-                            TransBmBmMultRefl = 0.0;
+                            Real64 TransBmBmMultRefl = 0.0;
                             if (ANY_BLIND(ShType)) {
                                 auto const &surfShade = s_surf->surfShades(IWin);
                                 auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfShade.blind.matNum));
                                     
                                 Real64 ProfAng = ProfileAngle(state, IWin, SunVecMir, matBlind->SlatOrientation);
-                                TransBmBmMultRefl[iWinCover_Shaded] = matBlind->BeamBeamTrans(ProfAng, surfShade.blind.slatAngThisTS);
-                                dl->dirIllum(iHour)[iWinCover_Shaded].sunDisk += SunVecMir.z * SpecReflectance * TVisRefl * TransBmBmMultRefl[iWinCover_Shaded];
+                                TransBmBmMultRefl = matBlind->BeamBeamTrans(ProfAng, surfShade.blind.slatAngThisTS);
+                                dl->dirIllum(iHour)[iWinCover_Shaded].sunDisk += SunVecMir.z * SpecReflectance * TVisRefl * TransBmBmMultRefl;
                             } else if (ShType == WinShadingType::ExtScreen) {
                                 // pass angle from sun to window normal here using PHSUN and THSUN from above and
                                 // surface angles SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
@@ -3393,12 +3392,10 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 GetBilinearInterpCoeffs(
                                     phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
 
-                                TransBmBmMultRefl(1) = BilinearInterp(screen->btars[ip1][it1].BmTrans,
-                                                                               screen->btars[ip1][it2].BmTrans,
-                                                                               screen->btars[ip2][it1].BmTrans,
-                                                                               screen->btars[ip2][it2].BmTrans,
-                                                                               coeffs);
-                                dl->dirIllum(iHour)[iWinCover_Shaded].sunDisk += SunVecMir.z * SpecReflectance * TVisRefl * TransBmBmMultRefl[iWinCover_Shaded];
+                                TransBmBmMultRefl = BilinearInterp(screen->btars[ip1][it1].BmTrans, screen->btars[ip1][it2].BmTrans,
+                                                                   screen->btars[ip2][it1].BmTrans, screen->btars[ip2][it2].BmTrans,
+                                                                   coeffs);
+                                dl->dirIllum(iHour)[iWinCover_Shaded].sunDisk += SunVecMir.z * SpecReflectance * TVisRefl * TransBmBmMultRefl;
                             } // End of check if window has a blind or screen
 
                             // Glare from reflected solar disk
@@ -3413,9 +3410,9 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                         std::pow(s_surf->SurfaceWindow(IWin).refPts(iRefPoint).solidAngWtd, 0.8);
                                 dl->avgWinLum(iHour)[iWinCover_Bare].sunDisk += XAVWL * TVisRefl * SpecReflectance; // Bare window
                                 if (ANY_BLIND(ShType)) {
-                                    dl->avgWinLum(iHour)[iWinCover_Shaded].sunDisk += XAVWL * TVisRefl * SpecReflectance * TransBmBmMultRefl[iWinCover_Shaded];
+                                    dl->avgWinLum(iHour)[iWinCover_Shaded].sunDisk += XAVWL * TVisRefl * SpecReflectance * TransBmBmMultRefl;
                                 } else if (ShType == WinShadingType::ExtScreen) {
-                                    dl->avgWinLum(iHour)[iWinCover_Shaded].sunDisk += XAVWL * TVisRefl * SpecReflectance * TransBmBmMultRefl[iWinCover_Shaded];
+                                    dl->avgWinLum(iHour)[iWinCover_Shaded].sunDisk += XAVWL * TVisRefl * SpecReflectance * TransBmBmMultRefl;
                                 }
                             }
                         } // End of check that obstruction can specularly reflect
@@ -7396,8 +7393,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 if (s_surf->SurfWinSolarDiffusing(IWin)) IConstShaded = s_surf->Surface(IWin).Construction;
 
                 // Transmittance of window including shade, screen or blind
-                transBmBmMult = 0.0;
-                transMult = 0.0;
+                Real64 transBmBmMult = 0.0;
+                Real64 transMult = 0.0;
 
                 if (ShadeOn) { // Shade
                     if (s_surf->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
@@ -7630,8 +7627,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
             // -- Window with shade, screen, blind or diffusing glass
             if (ShadeOn || BlindOn || ScreenOn || s_surf->SurfWinSolarDiffusing(IWin)) {
-                transBmBmMult = 0.0;
-                transMult = 0.0;
+                Real64 transBmBmMult = 0.0;
+                Real64 transMult = 0.0;
 
                 if (ShadeOn || ScreenOn || s_surf->SurfWinSolarDiffusing(IWin)) { // Shade or screen on or diffusing glass
                     if (s_surf->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
