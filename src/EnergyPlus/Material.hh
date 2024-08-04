@@ -403,7 +403,7 @@ namespace Material {
     };
 
     // Blind 
-    constexpr int MaxSlatAngs = 19;
+    constexpr int MaxSlatAngs = 37;
     constexpr int MaxProfAngs = 37;
 
     constexpr Real64 dProfAng = Constant::Pi / (MaxProfAngs - 1);
