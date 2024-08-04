@@ -153,6 +153,8 @@ namespace ZoneDehumidifier {
 
     bool GetZoneDehumidifierNodeNumber(EnergyPlusData &state, int NodeNumber); // Node being tested
 
+    int getZoneDehumidifierIndex(EnergyPlusData &state, std::string_view CompName);
+
 } // namespace ZoneDehumidifier
 
 struct ZoneDehumidifierData : BaseGlobalStruct

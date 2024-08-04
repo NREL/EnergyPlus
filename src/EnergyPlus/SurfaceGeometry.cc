@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -2449,18 +2450,6 @@ namespace SurfaceGeometry {
                     assert(matBlind != nullptr);
                     
                     surfShade.blind.matNum = mat->Num;
-#ifdef GET_OUT
-                    // TH 2/18/2010. CR 8010
-                    // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
-                    //  the new blind is created only once, it can be shared by multiple windows though.
-                    if (surfShade.blind.movableSlats &&
-                        matBlind->SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
-                        errFlag = false;
-                        AddVariableSlatBlind(state, mat->Num, BlNumNew, errFlag);
-                        // window surface points to new blind
-                        surfWin.blind.matNum = BlNumNew;
-                    }
-#endif // GET_OUT                            
                     break;
                 }
 
@@ -11325,7 +11314,7 @@ namespace SurfaceGeometry {
 
                 // Exterior horizontal insulation
                 if (!s_ipsc->lAlphaFieldBlanks(alpF)) {
-                    int index = Util::FindItemInPtrList(s_ipsc->cAlphaArgs(alpF), s_mat->materials);
+                    int index = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(alpF));
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -11395,7 +11384,7 @@ namespace SurfaceGeometry {
 
                 // Exterior vertical insulation
                 if (!s_ipsc->lAlphaFieldBlanks(alpF)) {
-                    int index = Util::FindItemInPtrList(s_ipsc->cAlphaArgs(alpF), s_mat->materials);
+                    int index = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(alpF));
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -11493,7 +11482,7 @@ namespace SurfaceGeometry {
 
                 // Footing
                 if (!s_ipsc->lAlphaFieldBlanks(alpF)) {
-                    int index = Util::FindItemInPtrList(s_ipsc->cAlphaArgs(alpF), s_mat->materials);
+                    int index = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(alpF));
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -15699,9 +15688,9 @@ namespace SurfaceGeometry {
 
             if (SignFlag != PrevSignFlag) {
                 if (state.dataGlobal->DisplayExtraWarnings && surfaceTmp.ExtSolar &&
-                    (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) &&
-                    // Warn only once
-                    surfaceTmp.IsConvex) {
+                    (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) && surfaceTmp.IsConvex &&
+                    !state.dataSysVars->SutherlandHodgman &&
+                    (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PolygonClipping)) {
                     ShowWarningError(state,
                                      format("CheckConvexity: Zone=\"{}\", Surface=\"{}\" is non-convex.",
                                             state.dataHeatBal->Zone(surfaceTmp.Zone).Name,

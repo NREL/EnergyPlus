@@ -1467,7 +1467,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
     auto &thisDaylgtCtrl = dl->daylightControl(ZoneNum);
     int numExtWins = dl->enclDaylight(1).TotalExtWindows;
     int numRefPts = thisDaylgtCtrl.TotalDaylRefPoints;
-    int numSlatAngs = state->dataSurface->actualMaxSlatAngs;
 
     for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
         for (int iWin = 1; iWin <= numExtWins; ++iWin) {
@@ -1795,7 +1794,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     auto &thisDaylgtCtrl = dl->daylightControl(ZoneNum);
     int numExtWins = dl->enclDaylight(1).TotalExtWindows;
     int numRefPts = thisDaylgtCtrl.TotalDaylRefPoints;
-    int numSlatAngs = state->dataSurface->actualMaxSlatAngs;
 
     for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
         for (int iWin = 1; iWin <= numExtWins; ++iWin) {

@@ -177,13 +177,13 @@ namespace Construction {
         Array1D<Real64> AbsDiff; // Diffuse solar absorptance for each glass layer,
         // bare glass or shade on
 
-        std::array<Real64, Material::MaxSlatAngs+1> effShadeBlindEmi;
-        std::array<Real64, Material::MaxSlatAngs+1> effGlassEmi;
+        std::array<Real64, Material::MaxSlatAngs> effShadeBlindEmi;
+        std::array<Real64, Material::MaxSlatAngs> effGlassEmi;
             
-        std::array<BlindSolVis, Material::MaxSlatAngs+1> blindTARs;
+        std::array<BlindSolVis, Material::MaxSlatAngs> blindTARs;
 
         // Sol diffuse absorptance per glass layer with blind on
-        Array1D<std::array<BlindSolDfAbs, Material::MaxSlatAngs+1>> layerSlatBlindDfAbs;
+        Array1D<std::array<BlindSolDfAbs, Material::MaxSlatAngs>> layerSlatBlindDfAbs;
             
         Array1D<Real64> AbsDiffBack;   // Diffuse back solar absorptance for each glass layer
         Real64 AbsDiffShade = 0.0;            // Diffuse solar absorptance for shade

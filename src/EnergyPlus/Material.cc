@@ -90,7 +90,7 @@ constexpr std::array<std::string_view, (int)EcoRoofCalcMethod::Num> ecoRoofCalcM
 int GetMaterialNum(EnergyPlusData &state, std::string const &matName)
 {
     auto &s_mat = state.dataMaterial;
-    auto found = s_mat->materialMap.find(matName);
+    auto found = s_mat->materialMap.find(Util::makeUPPER(matName));
     return (found != s_mat->materialMap.end()) ? found->second : 0;
 }
 
@@ -239,12 +239,12 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             assert(instance != instancesValue.end());
             
             auto const &objectFields = instance.value();
-            std::string matName = Util::makeUPPER(key);
+            std::string matNameUC = Util::makeUPPER(key);
             s_ip->markObjectAsUsed(s_ipsc->cCurrentModuleObject, key);
 
-            ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, matName};
+            ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, key};
             
-            if (s_mat->materialMap.find(matName) != s_mat->materialMap.end()) {
+            if (s_mat->materialMap.find(matNameUC) != s_mat->materialMap.end()) {
                 ShowSevereDuplicateName(state, eoh);
                 ErrorsFound = true;
                 continue;
@@ -253,11 +253,11 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             // Load the material derived type from the input data.
             auto *mat = new MaterialChild;
             mat->group = Group::Regular;
-            mat->Name = matName;
+            mat->Name = key;
 
             s_mat->materials.push_back(mat);
             mat->Num = s_mat->materials.isize();
-            s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
+            s_mat->materialMap.insert_or_assign(matNameUC, mat->Num);
 
             std::string roughness = s_ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
             mat->Roughness = static_cast<SurfaceRoughness>(getEnumValue(surfaceRoughnessNamesUC, Util::makeUPPER(roughness)));
@@ -286,11 +286,11 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     if (TotFfactorConstructs + TotCfactorConstructs >= 1) {
         auto *mat = new MaterialChild;
         mat->group = Group::Regular;
-        mat->Name = "~FC_CONCRETE";
+        mat->Name = "~FC_Concrete";
         
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
-        s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
+        s_mat->materialMap.insert_or_assign(Util::makeUPPER(mat->Name), mat->Num);
         
         mat->Thickness = 0.15;    // m, 0.15m = 6 inches
         mat->Conductivity = 1.95; // W/mK
@@ -372,11 +372,11 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         for (Loop = 1; Loop <= TotFfactorConstructs + TotCfactorConstructs; ++Loop) {
             auto *mat = new MaterialChild;
             mat->group = Group::Regular;
-            mat->Name = format("~FC_INSULATION_{}", Loop);
+            mat->Name = format("~FC_Insulation_{}", Loop);
 
             s_mat->materials.push_back(mat);
             mat->Num = s_mat->materials.isize();
-            s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
+            s_mat->materialMap.insert_or_assign(Util::makeUPPER(mat->Name), mat->Num);
 
             mat->ROnly = true;
             mat->Roughness = SurfaceRoughness::MediumRough;
@@ -1818,11 +1818,6 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
     } // TotScreensEQL loop
 
-    // Window Blind Materials
-    if ((state.dataHeatBal->TotBlindsEQL == 0) && (state.dataHeatBal->TotBlinds == 0)) {
-        state.dataSurface->actualMaxSlatAngs = 1; // first slot is used for shades
-    }
-
     s_ipsc->cCurrentModuleObject = "WindowMaterial:Blind";
     for (Loop = 1; Loop <= state.dataHeatBal->TotBlinds; ++Loop) {
 
@@ -2916,9 +2911,9 @@ void GetProfIndices(Real64 profAng, int &idxLo, int &idxHi)
                 
 void GetSlatIndicesInterpFac(Real64 slatAng, int &idxLo, int &idxHi, Real64 &interpFac)
 {
-    idxLo = int(slatAng / dSlatAng) + 1;
+    idxLo = int(slatAng / dSlatAng);
     idxHi = std::min(MaxSlatAngs, idxLo+1);
-    interpFac = (slatAng - ((idxLo - 1) * dSlatAng)) / dSlatAng;
+    interpFac = (slatAng - (idxLo * dSlatAng)) / dSlatAng;
 }
         
         

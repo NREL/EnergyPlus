@@ -1761,19 +1761,6 @@ namespace DataHeatBalance {
                                         int ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound);
 
-    void AddVariableSlatBlind(EnergyPlusData &state,
-                              int inBlindNumber,   // current Blind Number/pointer to name
-                              int &outBlindNumber, // resultant Blind Number to pass back
-                              bool &errFlag        // error flag should one be needed
-    );
-
-    void CalcScreenTransmittance(EnergyPlusData &state,
-                                 int SurfaceNum,
-                                 ObjexxFCL::Optional<Real64 const> Phi = _,     // Optional sun altitude relative to surface outward normal (radians)
-                                 ObjexxFCL::Optional<Real64 const> Theta = _,   // Optional sun azimuth relative to surface outward normal (radians)
-                                 ObjexxFCL::Optional_int_const ScreenNumber = _ // Optional screen number
-    );
-
     Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
                                          int numSurf,  // index for Surface array.
                                          bool &isValid // returns true if result is valid

@@ -942,8 +942,8 @@ namespace DataSurfaces {
             bool slatAngThisTSDegEMSon = false;      // flag that indicate EMS system is actuating SlatAngThisTSDeg
             Real64 slatAngThisTSDegEMSValue = 0.0; // value that EMS sets for slat angle in degrees
             bool slatBlockBeam = false;             // True if blind slats block incident beam solar
-            int slatAngIdxLo = 0;
-            int slatAngIdxHi = 0;
+            int slatAngIdxLo = -1;
+            int slatAngIdxHi = -1;
             Real64 slatAngInterpFac = 0.0;
             Real64 profAng = 0.0;
             int profAngIdxLo = 0;
@@ -1819,8 +1819,6 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::SurroundingSurfacesProperty> SurroundingSurfsProperty;
     EPVector<DataSurfaces::IntMassObject> IntMassObjects;
     EPVector<DataSurfaces::GroundSurfacesProperty> GroundSurfsProperty;
-
-    int actualMaxSlatAngs = Material::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
 
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {

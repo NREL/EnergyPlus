@@ -458,7 +458,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_findAnySurfacesUsingConstruct
 
     // call the function for initialization of finite difference calculation
     std::string const error_string = delimited_string({"   ** Severe  ** InitialInitHeatBalFiniteDiff: Found Material that is too thin and/or too "
-                                                       "highly conductive, material name = REG MAT F05 CEILING AIR SPACE RESISTANCE",
+                                                       "highly conductive, material name = Reg Mat F05 Ceiling air space resistance",
                                                        "   **   ~~~   ** High conductivity Material layers are not well supported by Conduction "
                                                        "Finite Difference, material conductivity = 2.000 [W/m-K]",
                                                        "   **   ~~~   ** Material thermal diffusivity = 1.626E-003 [m2/s]",
@@ -467,7 +467,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_findAnySurfacesUsingConstruct
                                                        "   ...Summary of Errors that led to program termination:",
                                                        "   ..... Reference severe error count=1",
                                                        "   ..... Last severe error=InitialInitHeatBalFiniteDiff: Found Material that is too thin "
-                                                       "and/or too highly conductive, material name = REG MAT F05 CEILING AIR SPACE RESISTANCE"});
+                                                       "and/or too highly conductive, material name = Reg Mat F05 Ceiling air space resistance"});
     EXPECT_ANY_THROW(InitialInitHeatBalFiniteDiff(*state));
 
     compare_err_stream(error_string, true);

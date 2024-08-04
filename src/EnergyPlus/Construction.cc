@@ -131,15 +131,15 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
     // greater than this, then the coefficients will not yield a valid steady
     // state solution.
 
-    constexpr Real64 MaxAllowedTimeStep(4.0); // Sets the maximum allowed time step
-    // for CTF calculations to be 4 hours.  This is done in response to some
+    constexpr Real64 MaxAllowedTimeStep = 7.0; // Sets the maximum allowed time step
+    // for CTF calculations to be 7 hours.  This is done in response to some
     // rare situations where odd or faulty input will cause the routine to
     // go off and get some huge time step (in excess of 20 hours).  This value
     // is a compromise that does not really solve any input problems.  One run
     // indicated that 2 meters of concrete will result in a time step of slightly
-    // more than 3 hours.  So, 4 hours was arbitrarily picked as a ceiling for
+    // more than 3 hours.  So, 7 hours was arbitrarily picked as a ceiling for
     // time steps so that an error message can be produced to warn the user
-    // that something isn't right.  Note that the 4 hour limit does not guarantee
+    // that something isn't right.  Note that the 7 hour limit does not guarantee
     // that problems won't exist and it does not necessarily avoid any problems
     // that interpolated temperature histories might cause.
 
@@ -2045,8 +2045,8 @@ void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
     }
     for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
         auto &slatBlindDfAbs = this->layerSlatBlindDfAbs(Layer);
-        for (int Index = 1; Index <= Material::MaxSlatAngs; ++Index) {
-            auto &blindDfAbs = slatBlindDfAbs[Index];
+        for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
+            auto &blindDfAbs = slatBlindDfAbs[iSlatAng];
             blindDfAbs.Sol.Front.Df.Abs = 0.0;
             blindDfAbs.Sol.Front.Df.AbsGnd = 0.0;
             blindDfAbs.Sol.Front.Df.AbsGnd = 0.0;

@@ -606,19 +606,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                               state.dataHeatBal->Zone(thisDayltgCtrl.zoneIndex).Name,
                               s_surf->Surface(windowSurfNum).Name);
                     }
-#ifdef GET_OUT
-                    else {
-                        // blind with variable slat angle
-                        Real64 SlatAngle = 180.0 / double(Material::MaxSlatAngs - 1) * double(ISlatAngle - 2);
-                        print(state.files.dfs,
-                              "{},{},{},{},{:.1R}\n",
-                              state.dataEnvrn->CurMnDy,
-                              state.dataViewFactor->EnclSolInfo(enclNum).Name,
-                              state.dataHeatBal->Zone(thisDayltgCtrl.zoneIndex).Name,
-                              s_surf->Surface(windowSurfNum).Name,
-                              SlatAngle);
-                    }
-#endif // GET_OUT
+
                     for (int IHR = 1; IHR <= Constant::HoursInDay; ++IHR) {
                         // For each Daylight Reference Point
                         auto &daylFacHr = thisDayltgCtrl.daylFac[IHR];
@@ -2900,7 +2888,6 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     // (EDIRSK, EDIRSU) and average window luminance (AVWLSK, AVWLSU) are:
     // I=1 for clear sky, =2 Clear turbid, =3 Intermediate, =4 Overcast;
     // J=1 for bare window, =2 for window with shade or fixed slat-angle blind;
-    //  = 2,3,...,MaxSlatAngs+1 for window with variable slat-angle blind;
     // K = sun position index.
 
     // ----- CASE I -- BARE WINDOW (no shading device)
@@ -3499,7 +3486,6 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     int const enclNum = surf.SolarEnclIndex;
 
     // Loop over shading index (1=bare window; 2=diffusing glazing, shade, screen or fixed slat-angle blind;
-    // 2 to Material::MaxSlatAngs+1 for variable slat-angle blind)
 
     // TH. 9/22/2009. CR 7625 - daylight illuminance spikes during some sunset hours due to the calculated sky and sun
     //  related daylight factors > 1, which theoretically can occur when sun is perpendicular to the window
@@ -3609,8 +3595,7 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
 
     if (s_surf->SurfSunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return;
 
-    // Loop over shading index (1=bare window; 2=diffusing glazing, shade, screen or fixed slat-angle blind;
-    // 2 to Material::MaxSlatAngs+1 for variable slat-angle blind)
+    // Loop over shading index (1=bare window; 2=diffusing glazing, shade, screen or blind;
 
     // TH. 9/22/2009. CR 7625 - daylight illuminance spikes during some sunset hours due to the calculated sky and sun
     //  related daylight factors > 1, which theoretically can occur when sun is perpendicular to the window
@@ -6120,24 +6105,21 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                     // Adjust daylight quantities based on ratio between switched and unswitched visible transmittance
                     for (int IL = 1; IL <= NREFPT; ++IL) {
-                        // DaylIllum(IL) and BacLum(IL) were calculated at the clear state: IS = 1,
-                        //  and need to adjusted for intermediate switched state at VisTransSelected: IS = 2
-                        int IS = 1;
-
+                        // DaylIllum(IL) and BacLum(IL) were calculated at the clear state: 
+                        //  and need to adjusted for intermediate switched state at VisTransSelected:
                         auto &daylFromWinAtRefPt = thisDayltgCtrl.refPts(IL).extWins(loop).lums;
                         auto const &tmpDayl = tmpDaylFromWinAtRefPt(IL, loop);
 
                         VTRAT = s_surf->SurfWinVisTransSelected(IWin) / (shadeGroupLums.unswitchedTvis + 0.000001);
-                        dl->DaylIllum(IL) += (VTRAT - 1.0) * daylFromWinAtRefPt[iLum_Illum][IS - 1];
-                        thisDayltgCtrl.refPts(IL).lums[iLum_Back] += (VTRAT - 1.0) * daylFromWinAtRefPt[iLum_Back][IS - 1];
+                        dl->DaylIllum(IL) += (VTRAT - 1.0) * daylFromWinAtRefPt[iLum_Illum][iWinCover_Bare];
+                        thisDayltgCtrl.refPts(IL).lums[iLum_Back] += (VTRAT - 1.0) * daylFromWinAtRefPt[iLum_Back][iWinCover_Bare];
 
                         // Adjust illum, background illum and source luminance for this window in intermediate switched state
                         //  for later use in the DayltgGlare calc because SurfaceWindow(IWin)%ShadingFlag = WinShadingType::SwitchableGlazing = 2
-                        IS = 2;
                         VTRAT = s_surf->SurfWinVisTransSelected(IWin) / (shadeGroupLums.switchedTvis + 0.000001);
-                        daylFromWinAtRefPt[iLum_Illum][IS - 1] = VTRAT * tmpDayl[iLum_Illum][IS - 1];
-                        daylFromWinAtRefPt[iLum_Back][IS - 1] = VTRAT * tmpDayl[iLum_Back][IS - 1];
-                        daylFromWinAtRefPt[iLum_Source][IS - 1] = VTRAT * tmpDayl[iLum_Source][IS - 1];
+                        daylFromWinAtRefPt[iLum_Illum][iWinCover_Shaded] = VTRAT * tmpDayl[iLum_Illum][iWinCover_Shaded];
+                        daylFromWinAtRefPt[iLum_Back][iWinCover_Shaded] = VTRAT * tmpDayl[iLum_Back][iWinCover_Shaded];
+                        daylFromWinAtRefPt[iLum_Source][iWinCover_Shaded] = VTRAT * tmpDayl[iLum_Source][iWinCover_Shaded];
                     } // for (IL)
                 }     // if (loop > 0 && ASETIL < 1)
                 // If new daylight does not exceed the illuminance setpoint, done, no more checking other groups of switchable glazings
@@ -6936,9 +6918,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Vector3<Real64> nearestHitPt; // Hit point of ray on nearest obstruction (m)
     Vector3<Real64> obsHitPt;     // Coordinates of hit point on an obstruction (m)
     Vector3<Real64> groundHitPt;  // Coordinates of point that ray from window center hits the ground (m)
-    // std::array<Real64, Material::MaxSlatAngs+1> FLFWSU = {0.0};                     // Sun-related downgoing luminous flux, excluding entering beam
-    // std::array<Real64, Material::MaxSlatAngs+1> FLFWSUdisk = {0.0};                 // Sun-related downgoing luminous flux, due to entering beam
-    // std::array<Real64, Material::MaxSlatAngs+1> FLCWSU = {0.0};                     // Sun-related upgoing luminous flux
     std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> FLCW = {Illums()}; // Sky-related upgoing luminous flux
     std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> FLFW = {Illums()}; // Sky-related downgoing luminous flux
     Real64 transMult;
@@ -8863,7 +8842,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
 
         auto openMapFile = [&](const fs::path &filePath) -> InputOutputFile & {
             auto &outputFile = *illumMap.mapFile;
-            outputFile.filePath = fs::path(filePath.string() + fmt::to_string(MapNum));
+            outputFile.filePath = FileSystem::appendSuffixToPath(filePath, fmt::to_string(MapNum));
             outputFile.ensure_open(state, "ReportIllumMap");
             return outputFile;
         };

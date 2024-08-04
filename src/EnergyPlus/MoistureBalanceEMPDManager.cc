@@ -199,7 +199,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         // Load the material derived type from the input data.
-        MaterNum = Util::FindItemInPtrList(MaterialNames(1), state.dataMaterial->materials);
+        MaterNum = Material::GetMaterialNum(state, MaterialNames(1));
         if (MaterNum == 0) {
             ShowSevereError(state,
                             format("{}: invalid {} entered={}, must match to a valid Material name.",

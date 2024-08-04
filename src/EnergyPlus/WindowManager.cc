@@ -1180,7 +1180,7 @@ namespace Window {
                 ShadeReflFac = 1.0 / (1.0 - ShadeRefl * thisConstruct.ReflectSolDiffBack);
                 ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * thisConstruct.ReflectVisDiffBack);
 
-                for (int iSlatAng = 1; iSlatAng <= Material::MaxSlatAngs; ++iSlatAng) {
+                for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
                     auto const &btar = matBlind->tars[iSlatAng];
                     ShadeTrans = btar.Sol.Front.Df.Tra;
                     ShadeTransGnd = btar.Sol.Front.Df.TraGnd;
@@ -1232,7 +1232,7 @@ namespace Window {
                 ShadeReflFac = 1.0 / (1.0 - ShadeRefl * constr.ReflectSolDiffFront);
                 ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * constr.ReflectVisDiffFront);
                 
-                for (int iSlatAng = 1; iSlatAng <= Material::MaxSlatAngs; ++iSlatAng) {
+                for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
                     auto const &btar = matBlind->tars[iSlatAng];
                     ShadeTrans = btar.Sol.Front.Df.Tra;
                     ShadeTransGnd = btar.Sol.Front.Df.TraGnd;
@@ -1297,7 +1297,7 @@ namespace Window {
                 rf1v = constr.rfBareVisDiff(1);
                 rf2v = constr.rfBareVisDiff(2);
                 
-                for (int iSlatAng = 1; iSlatAng <= Material::MaxSlatAngs; ++iSlatAng) {
+                for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
                     auto const &btar = matBlind->tars[iSlatAng];
                     tsh = btar.Sol.Front.Df.Tra;
                     tshGnd = btar.Sol.Front.Df.TraGnd;
@@ -7461,22 +7461,12 @@ namespace Window {
                 // vary slat angle from 0 to 180 deg in 10-deg steps (for Material::MaxSlatAngs = 19).
                 // If blind has fixed slat angle, calculate properties at that angle only.
 
-                int iSlatAngLo, iSlatAngHi;
-                if (matBlind->SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
-                    Real64 interpFac;
-                    Material::GetSlatIndicesInterpFac(matBlind->SlatAngle * Constant::DegToRad, iSlatAngLo, iSlatAngHi, interpFac);
-                } else {
-                    iSlatAngLo = 1;
-                    iSlatAngHi = Material::MaxSlatAngs;
-                }
-                        
+                for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
 
-                for (int ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
-
-                    auto &btar = matBlind->tars[ISlatAng];
+                    auto &btar = matBlind->tars[iSlatAng];
                         
                     st_lay = 0.0;
-                    bld_el = Material::dSlatAng * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
+                    bld_el = Material::dSlatAng * iSlatAng; // 0 <= bld_el <= 180 deg
 
                     BlindOpticsDiffuse(state, matBlind->Num, ISolVis, bld_pr, bld_el, st_lay);
 
@@ -7537,8 +7527,8 @@ namespace Window {
                 }     // End of loop over profile angles
 
                 if (ISolVis == 1) {
-                    for (int ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
-                        auto &btar = matBlind->tars[ISlatAng];
+                    for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
+                        auto &btar = matBlind->tars[iSlatAng];
                         
                         Real64 sumDenom = 0.0, sumTra1 = 0.0, sumTra2 = 0.0, sumRef = 0.0, sumAbs = 0.0;
                         
@@ -7579,7 +7569,7 @@ namespace Window {
                         btar.Sol.Front.Df.TraSky = std::max(0.0, sumTra1 / sumDenom) + std::max(0.0, sumTra2 / sumDenom);
                         btar.Sol.Front.Df.RefSky = std::max(0.0, sumRef / sumDenom);
                         btar.Sol.Front.Df.AbsSky = std::max(0.0, sumAbs / sumDenom);
-                    } // for (ISlatAng)
+                    } // for (iSlatAng)
                 }
 
             } // End of loop over solar vs. visible properties

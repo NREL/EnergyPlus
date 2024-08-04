@@ -241,13 +241,13 @@ namespace Window {
                 Real64 RhoGlIR = 1 - EpsGlIR;
 
                 auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(mat);
-                for (int ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
-                    auto const &btar = matBlind->tars[ISlatAng];
+                for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
+                    auto const &btar = matBlind->tars[iSlatAng];
                     Real64 TauShIR = btar.IR.Front.Tra;
                     Real64 EpsShIR = btar.IR.Front.Emi;
                     Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                    constrSh.effShadeBlindEmi[ISlatAng] = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                    constrSh.effGlassEmi[ISlatAng] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                    constrSh.effShadeBlindEmi[iSlatAng] = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                    constrSh.effGlassEmi[iSlatAng] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                 }
 
                 surfShade.effShadeEmi = Interp(constrSh.effShadeBlindEmi[surfShade.blind.slatAngIdxLo],
