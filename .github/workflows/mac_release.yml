@@ -219,6 +219,14 @@ jobs:
         codesign -dvvv ./test_install/ConvertInputFormat
         echo "::endgroup::"
 
+        begin_group "Full Check signature of _CPack_Packages for both IFW and TGZ"
+        python ../scripts/dev/verify_signature.py --verbose .
+        echo "::endgroup::"
+
+        begin_group "Full Check signature of installed DMG for all executables"
+        python ../scripts/dev/verify_signature.py --install --verbose test_install
+        echo "::endgroup::"
+
         begin_group "Running a simulation with python"
         ./test_install/energyplus --help
         ./test_install/energyplus -w ./test_install/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw -d out ./test_install/ExampleFiles/PythonPluginCustomSchedule.idf
@@ -344,8 +352,11 @@ jobs:
           codesign -dvvv ./test_install/libenergyplusapi.dylib
           codesign -dvvv ./test_install/libpython*.dylib
           codesign -dvvv ./test_install/ConvertInputFormat
-          # TODO: I've got zero clue why this is false on mac 12.1
-          codesign -dvvv ./test_install/PostProcess/ReadVarsESO || true
+          codesign -dvvv ./test_install/PostProcess/ReadVarsESO
+          echo "::endgroup::"
+
+          begin_group "Full Check signature of installed DMG for all executables"
+          python ../checkout/scripts/dev/verify_signature.py --install --verbose test_install
           echo "::endgroup::"
 
           begin_group "Running a simulation with python"
