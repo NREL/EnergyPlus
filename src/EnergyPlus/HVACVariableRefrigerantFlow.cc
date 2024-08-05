@@ -10859,8 +10859,8 @@ bool getVRFTUNodeNumber(EnergyPlusData &state, int const nodeNumber)
              nodeNumber == vrfTU.SuppHeatCoilAirOutletNode)) {
             return true;
         }
-        return false;
     }
+        return false;
 }
 
 void VRFCondenserEquipment::CalcVRFIUTeTc_FluidTCtrl(EnergyPlusData &state)
