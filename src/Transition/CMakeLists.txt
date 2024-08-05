@@ -74,6 +74,11 @@ foreach(i RANGE 1 ${end})
     if(NOT ${FORTRAN_STATIC_EXE})
       install_target_prereqs("${LAST_NAME}" PreProcess/IDFVersionUpdater)
     endif()
+
+    if(APPLE AND CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
+      include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/CodeSigning.cmake")
+      register_install_codesign_target("${LAST_NAME}" PreProcess/IDFVersionUpdater)
+    endif()
   endif()
 
 endforeach()

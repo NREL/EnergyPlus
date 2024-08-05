@@ -75,36 +75,15 @@ foreach(path ${_all_root_dylibs})
   endif()
 endforeach()
 
-if(BUILD_FORTRAN)
-  set(_fortran_utilities_relpaths
-    "ExpandObjects"
-    "PostProcess/ReadVarsESO"
-    "PostProcess/AppGPostProcess"
-    "PostProcess/HVAC-Diagram"
-    "PostProcess/convertESOMTRpgm/convertESOMTR"
-    "PreProcess/CalcSoilSurfTemp/CalcSoilSurfTemp"
-    "PreProcess/GrndTempCalc/Basement"
-    "PreProcess/GrndTempCalc/Slab"
-    "PreProcess/ParametricPreprocessor/ParametricPreprocessor"
-  )
-
-  file(GLOB FORTRAN_UTILITIES "${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/Transition-V*")
-  foreach(path ${_fortran_utilities_relpaths})
-    list(APPEND FORTRAN_UTILITIES "${CMAKE_INSTALL_PREFIX}/${path}")
-  endforeach()
-endif()
-
 file(GLOB PYTHON_SOS "${CMAKE_INSTALL_PREFIX}/python_standard_lib/lib-dynload/*.so")
-
 
 print_relative_paths(PREFIX "FULL_PATHS=" ABSOLUTE_PATHS ${FULL_PATHS})
 print_relative_paths(PREFIX "ROOT_DYLIBS=" ABSOLUTE_PATHS ${ROOT_DYLIBS})
-print_relative_paths(PREFIX "FORTRAN_UTILITIES=" ABSOLUTE_PATHS ${FORTRAN_UTILITIES} NEWLINE)
 print_relative_paths(PREFIX "PYTHON_SOS, in ${CMAKE_INSTALL_PREFIX}/python_standard_lib/lib-dynload/=" ABSOLUTE_PATHS ${PYTHON_SOS} NAME_ONLY)
 
 include(${CMAKE_CURRENT_LIST_DIR}/CodeSigning.cmake)
 codesign_files_macos(
-  FILES ${FULL_PATHS} ${ROOT_DYLIBS} ${FORTRAN_UTILITIES} ${PYTHON_SOS}
+  FILES ${FULL_PATHS} ${ROOT_DYLIBS} ${PYTHON_SOS}
   SIGNING_IDENTITY ${CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION}
   PREFIX "org.nrel.EnergyPlus."
   FORCE VERBOSE

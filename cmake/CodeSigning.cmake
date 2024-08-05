@@ -324,3 +324,37 @@ function(setup_macos_codesigning_variables)
   endif()
 endfunction()
 #------------------------------------------------------------------------------
+
+function(register_install_codesign_target TARGET_NAME INSTALL_PATH)
+
+  if(NOT TARGET ${TARGET_NAME})
+    message("Not a target")
+    return()
+  endif()
+
+  if(NOT APPLE)
+    message("Not Apple")
+    return()
+  endif()
+
+  if(NOT CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
+    message("Missing CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION")
+    return()
+  endif()
+
+  cmake_policy(PUSH)
+  cmake_policy(SET CMP0087 NEW) # install(CODE) and install(SCRIPT) support generator expressions.
+
+  install(
+    CODE "
+    include(\"${CMAKE_CURRENT_FUNCTION_LIST_FILE}\")
+    codesign_files_macos(
+      FILES \"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/$<TARGET_FILE_NAME:${TARGET_NAME}>\"
+      SIGNING_IDENTITY \"${CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION}\"
+      IDENTIFIER \"org.nrel.EnergyPlus.${TARGET_NAME}\"
+      FORCE VERBOSE
+      )
+  ")
+  cmake_policy(POP)
+
+endfunction()

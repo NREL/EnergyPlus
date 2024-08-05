@@ -28,3 +28,8 @@ if(NOT ${FORTRAN_STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
   install_target_prereqs(ParametricPreprocessor PreProcess/ParametricPreprocessor)
 endif()
+
+if(APPLE AND CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/CodeSigning.cmake")
+  register_install_codesign_target(ParametricPreprocessor PreProcess/ParametricPreprocessor)
+endif()
