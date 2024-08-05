@@ -697,9 +697,9 @@ if(APPLE)
 
   if(CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
     set(FILES_TO_SIGN
-      $<TARGET_FILE_NAME:ConvertInputFormat> # "ConvertInputFormat-24.2.0"
-      $<TARGET_FILE_NAME:energyplus> # energyplus-24.2.0"
-      $<TARGET_FILE_NAME:energyplusapi># "libenergyplusapi.24.2.0.dylib"
+      #$<TARGET_FILE_NAME:ConvertInputFormat> # "ConvertInputFormat-24.2.0"
+      #$<TARGET_FILE_NAME:energyplus> # energyplus-24.2.0"
+      #$<TARGET_FILE_NAME:energyplusapi># "libenergyplusapi.24.2.0.dylib"
 
       # Bash scripts, not sure if needed or not
       "runenergyplus"
