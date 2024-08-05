@@ -224,6 +224,10 @@ jobs:
         ./test_install/energyplus -w ./test_install/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw -d out ./test_install/ExampleFiles/PythonPluginCustomSchedule.idf
         echo "::endgroup::"
 
+    - name: Setup tmate session
+      if: ${{ always() }}
+      uses: mxschmitt/action-tmate@v3
+
     - name: otool the exes and libs
       shell: bash
       working-directory: ./build
