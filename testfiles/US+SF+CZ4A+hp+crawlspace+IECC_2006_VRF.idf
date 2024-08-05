@@ -530,7 +530,7 @@
     0,                       !- Coefficient3 x**2
     0.91,                    !- Coefficient4 x**3
     0,                       !- Coefficient5 x**4
-     0.6974790,              !- Minimum Value of x
+    0.0,                     !- Minimum Value of x
     1.0,                     !- Maximum Value of x
     0.0,                     !- Minimum Curve Output
     5.0,                     !- Maximum Curve Output
