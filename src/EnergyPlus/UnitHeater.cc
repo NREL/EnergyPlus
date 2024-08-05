@@ -1893,6 +1893,22 @@ namespace UnitHeater {
         }
     }
 
+    int getUnitHeaterIndex(EnergyPlusData &state, std::string_view CompName)
+    {
+        if (state.dataUnitHeaters->GetUnitHeaterInputFlag) {
+            GetUnitHeaterInput(state);
+            state.dataUnitHeaters->GetUnitHeaterInputFlag = false;
+        }
+
+        for (int UnitHeatNum = 1; UnitHeatNum <= state.dataUnitHeaters->NumOfUnitHeats; ++UnitHeatNum) {
+            if (Util::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name, CompName)) {
+                return UnitHeatNum;
+            }
+        }
+
+        return 0;
+    }
+
 } // namespace UnitHeater
 
 } // namespace EnergyPlus
