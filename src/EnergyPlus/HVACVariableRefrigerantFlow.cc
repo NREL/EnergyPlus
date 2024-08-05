@@ -10860,7 +10860,7 @@ bool getVRFTUNodeNumber(EnergyPlusData &state, int const nodeNumber)
             return true;
         }
     }
-        return false;
+    return false;
 }
 
 void VRFCondenserEquipment::CalcVRFIUTeTc_FluidTCtrl(EnergyPlusData &state)
