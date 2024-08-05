@@ -1176,9 +1176,6 @@ namespace Window {
             // Interior blind
             } else if (IntBlind) {
                 auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
-                // Correction factors for inter-reflections between glass and shading device
-                ShadeReflFac = 1.0 / (1.0 - ShadeRefl * thisConstruct.ReflectSolDiffBack);
-                ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * thisConstruct.ReflectVisDiffBack);
 
                 for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
                     auto const &btar = matBlind->tars[iSlatAng];
@@ -1192,6 +1189,10 @@ namespace Window {
                     ShadeReflSky = btar.Sol.Front.Df.RefSky;
                     ShadeReflVis = btar.Vis.Front.Df.Ref;
                     
+                    // Correction factors for inter-reflections between glass and shading device
+                    ShadeReflFac = 1.0 / (1.0 - ShadeRefl * thisConstruct.ReflectSolDiffBack);
+                    ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * thisConstruct.ReflectVisDiffBack);
+
                     // Front incident solar, diffuse, interior blind
                     for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
                         auto &dfAbs = constr.layerSlatBlindDfAbs(IGlass)[iSlatAng];
@@ -1228,10 +1229,6 @@ namespace Window {
             } else if (ExtBlind) {
                 auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
 
-                // Correction factors for inter-reflections between glass and shading device
-                ShadeReflFac = 1.0 / (1.0 - ShadeRefl * constr.ReflectSolDiffFront);
-                ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * constr.ReflectVisDiffFront);
-                
                 for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
                     auto const &btar = matBlind->tars[iSlatAng];
                     ShadeTrans = btar.Sol.Front.Df.Tra;
@@ -1242,6 +1239,9 @@ namespace Window {
                     ShadeRefl = btar.Sol.Back.Df.Ref;
                     ShadeReflVis = btar.Vis.Back.Df.Ref;
                 
+                    // Correction factors for inter-reflections between glass and shading device
+                    ShadeReflFac = 1.0 / (1.0 - ShadeRefl * constr.ReflectSolDiffFront);
+                    ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * constr.ReflectVisDiffFront);
                 
                     for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
                         auto &dfAbs = constr.layerSlatBlindDfAbs(IGlass)[iSlatAng];
@@ -1534,7 +1534,7 @@ namespace Window {
 
                 // surfShade.blind has not been initialized yet
                 surfShade.blind.slatAngThisTSDeg = matBlind->SlatAngle;
-                surfShade.blind.slatAngThisTS = surfShade.blind.slatAngThisTS * Constant::DegToRad;
+                surfShade.blind.slatAngThisTS = surfShade.blind.slatAngThisTSDeg * Constant::DegToRad;
 
                 Material::GetSlatIndicesInterpFac(surfShade.blind.slatAngThisTS,
                                                   surfShade.blind.slatAngIdxLo, surfShade.blind.slatAngIdxHi, surfShade.blind.slatAngInterpFac);
@@ -3673,7 +3673,10 @@ namespace Window {
                 reflDiff = state.dataConstruction->Construct(ConstrNumSh).ReflectSolDiffBack;
             } else if (ANY_BLIND(ShadeFlag)) {
                 auto const &surfShade = s_surf->surfShades(SurfNum);
-                reflDiff = surfShade.blind.tar.Sol.Back.Df.Ref;
+                auto const &constrSh = state.dataConstruction->Construct(ConstrNumSh);
+                reflDiff = Interp(constrSh.blindTARs[surfShade.blind.slatAngIdxLo].Sol.Back.Df.Ref,
+                                  constrSh.blindTARs[surfShade.blind.slatAngIdxHi].Sol.Back.Df.Ref,
+                                  surfShade.blind.slatAngInterpFac);
             } else if (ShadeFlag == WinShadingType::SwitchableGlazing) {
                 reflDiff = InterpSw(s_surf->SurfWinSwitchingFactor(SurfNum),
                                     state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack,
