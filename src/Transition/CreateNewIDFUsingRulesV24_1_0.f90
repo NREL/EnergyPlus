@@ -138,7 +138,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(20), DIMENSION(4) :: HxEffectAt75Airflow
   CHARACTER(20), DIMENSION(4) :: HxEffectAt100Airflow
   CHARACTER(MaxNameLength + 2), DIMENSION(4) :: HxTableName
-  LOGICAL :: tableAdded
+  LOGICAL :: tableAdded = .false.
   LOGICAL :: tableIndependentVarAdded = .false.
   CHARACTER(10) :: tableID
   REAL :: effect75
