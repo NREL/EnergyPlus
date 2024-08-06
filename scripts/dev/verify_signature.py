@@ -54,9 +54,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import argparse
+import json
 import os
 import platform
+import re
 import subprocess
+import warnings
 from enum import Enum
 from pathlib import Path
 from typing import List
@@ -124,7 +127,7 @@ def verify_signature(p, verbose=False, root_dir=None):
     if verbose:
         if root_dir is not None:
             p = p.relative_to(root_dir)
-        print(f"- {p}: OK")
+        print(f"- {p}: signature OK")
 
 
 def compare_executables():
@@ -143,6 +146,124 @@ def compare_executables():
         print(f"Extra TGZ files: {extra_tgz_files}")
 
 
+_OTOOL_ARCHITECTURE_RE = re.compile(r"^(?P<name>.*?)(?: \(architecture (?P<architecture>\w+)\))?:$")
+
+LINKED_RE = re.compile(
+    r"(?P<libname>.*) \(compatibility version (?P<compat_version>\d+\.\d+\.\d+), "
+    r"current version (?P<current_version>\d+\.\d+\.\d+)(?:, \w+)?\)"
+)
+
+RPATH_RE = re.compile(r"path (?P<rpath>.*) \(offset \d+\)")
+
+RESOLVED_PATHS = ["@loader_path", "@executable_path", "@rpath"]
+
+
+def get_linked_libraries(p):
+    linked_libs = []
+    lines = subprocess.check_output(["otool", "-L", str(p)], encoding="utf-8", universal_newlines=True).splitlines()
+    if "is not an object file" in lines[0]:
+        return None
+    lines = [x.strip() for x in lines[1:]]
+
+    for line in lines:
+        if m := LINKED_RE.match(line):
+            linked_libs.append(m.groupdict())
+        else:
+            raise ValueError(f"For {p}, cannot parse line: '{line}'")
+    return linked_libs
+
+
+def get_rpath(p):
+    rpaths = []
+    lines = subprocess.check_output(["otool", "-l", str(p)], encoding="utf-8", universal_newlines=True).splitlines()
+    lines = [x.strip() for x in lines]
+    for i, line in enumerate(lines):
+        if line.startswith("cmd LC_RPATH"):
+            assert lines[i + 1].startswith("cmdsize")
+            rpath_line = lines[i + 2]
+            m = RPATH_RE.match(rpath_line)
+            assert m
+            rpaths.append(m["rpath"])
+    return rpaths
+
+
+def otool(p, verify_resolve=False, verbose=False):
+    linked_libs = get_linked_libraries(p)
+    if linked_libs is None:
+        return None
+
+    rpaths = get_rpath(p)
+
+    if verbose:
+        print(f"- Otooling {p}")
+
+    first_time = True
+    rpath_infos = [{"actual": "implicit", "resolved": str(p.parent)}]
+    for rpath in rpaths:
+        rpath_dict = {}
+        rpath_dict["actual"] = rpath
+        if not rpath.startswith("@"):
+            rpath_infos.append(rpath_dict)
+            continue
+
+        if verbose:
+            if first_time:
+                print("  * Resolving Rpaths")
+                first_time = False
+            print(f"    * Trying to resolve rpath '{rpath}'")
+        rpath_dict["resolved"] = None
+        resolved_path = rpath
+        for resolv in RESOLVED_PATHS:
+            resolved_path = resolved_path.replace(resolv, str(p.parent))
+        resolved_path = Path(resolved_path).resolve()
+        if resolved_path.exists():
+            if verbose:
+                print(f"      - Found {resolved_path}")
+            rpath_dict["resolved"] = str(resolved_path)
+        elif verify_resolve:
+            warnings.warn(f"Could not resolve rpath '{rpath}' for '{p}'")
+        rpath_infos.append(rpath_dict)
+
+    first_time = True
+    for linked_lib in linked_libs:
+        libname = linked_lib["libname"]
+        if not libname.startswith("@"):
+            continue
+
+        if verbose:
+            if first_time:
+                print("  * Resolving Libraries")
+                first_time = False
+            print(f"    * Trying to resolve library '{libname}'")
+        linked_lib["resolved"] = None
+        found = False
+        for rpath_info in rpath_infos:
+            rpath = rpath_info.get("resolved", rpath_info["actual"])
+            resolved_path = libname
+            for resolv in RESOLVED_PATHS:
+                resolved_path = resolved_path.replace(resolv, str(rpath))
+
+            resolved_path = Path(resolved_path)
+            if resolved_path.exists():
+                if verbose:
+                    print(f"      - Found '{resolved_path}'")
+                linked_lib["resolved"] = str(resolved_path)
+                found = True
+                break
+        if not found and verify_resolve:
+            raise ValueError(f"Could not resolve '{libname}' for '{p}'")
+
+    info = {
+        "linked_libraries": linked_libs,
+        "rpaths": rpath_infos,
+    }
+
+    if verbose:
+        print("-" * 80)
+
+    return info
+
+
 if __name__ == "__main__":
 
     if platform.system() != "Darwin":
@@ -152,7 +273,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "build_dir",
         type=Path,
-        help="Root of the Build directory where CMakeCache.txt can be found (or the install dir if --install is passed",
+        help="Root of the Build directory where CMakeCache.txt can be found (or the install dir if --install is passed)",
     )
     parser.add_argument(
         "--install", action="store_true", default=False, help="This is an install dir, not the build_dir"
@@ -160,22 +281,37 @@ if __name__ == "__main__":
     parser.add_argument(
         "--verbose", action="store_true", default=False, help="This is an install dir, not the build_dir"
     )
+    parser.add_argument("--otool", action="store_true", default=False, help="Output OTOOL info on all executables")
+    parser.add_argument(
+        "--otool-out-file", metavar="JSON_FILE", required=False, type=Path, help="Output OTOOL info to JSON file"
+    )
+
     args = parser.parse_args()
+
+    if args.otool_out_file and not args.otool:
+        raise ValueError("--otool-out-file requires --otool")
 
     build_dir = args.build_dir.resolve()
     if not (build_dir.exists() and build_dir.is_dir()):
-        raise IOError(f"{build_dir} is not a valid directory")
+        raise NotADirectoryError(f"{build_dir} is not a valid directory")
 
+    top_level_otool_infos = {}
     if args.install:
         if not (build_dir / "energyplus").is_file():
             raise ValueError(f"{build_dir} does not contain energyplus exe")
         print(f"Checking Install dir {build_dir}")
         executable_files = find_executable_files(root_dir=build_dir)
-        excludes = ["runenergyplus", "runreadvars", "runepmacro"]
+        excludes = ["runenergyplus", "runreadvars", "runepmacro", "maintenancetool"]
         executable_files = [x for x in executable_files if not any([n in x.name for n in excludes])]
+        otool_infos = {}
         for p in executable_files:
             verify_signature(p, verbose=args.verbose, root_dir=build_dir)
+            if args.otool:
+                otool_info = otool(p=p, verify_resolve=True, verbose=args.verbose)
+                if otool_info is not None:
+                    otool_infos[str(p)] = otool_info
         print("Everything is signed correctly")
+        top_level_otool_infos["install_dir"] = otool_infos
     else:
         if not (build_dir / "CMakeCache.txt").is_file():
             raise ValueError(f"{build_dir} does not contain CMakeCache.txt, did you forget to build?")
@@ -191,7 +327,34 @@ if __name__ == "__main__":
             if cmake_install_prefix is None:
                 continue
             executable_files = find_executable_files(root_dir=cmake_install_prefix)
+            otool_infos = {}
             for p in executable_files:
                 verify_signature(p, verbose=args.verbose, root_dir=cmake_install_prefix)
+                if args.otool:
+                    otool_info = otool(p=p, verify_resolve=True, verbose=args.verbose)
+                    if otool_info is not None:
+                        otool_infos[str(p)] = otool_info
             print("Everything is signed correctly")
+            top_level_otool_infos[generator.name] = otool_infos
             print("=" * 80)
+
+    if args.otool:
+        short_otool_infos = {}
+        for k, otool_infos in top_level_otool_infos.items():
+            short_otool_infos[k] = {}
+            for libpath, otool_info in otool_infos.items():
+                short_otool_infos[k][libpath] = []
+                for linked_libs in otool_info["linked_libraries"]:
+                    short_otool_infos[k][libpath].append(linked_libs.get("resolved", linked_libs["libname"]))
+
+        print("Shortened & resolved otool info:")
+        print(json.dumps(short_otool_infos, indent=2))
+
+        if args.otool_out_file:
+            otool_out_file = args.otool_out_file.resolve()
+            otool_out_file_short = otool_out_file.parent / f"{otool_out_file.stem}_short.json"
+            print(f"Saving full otool infos to {otool_out_file} and short version to {otool_out_file_short}")
+            otool_out_file.unlink(missing_ok=True)
+            otool_out_file.write_text(json.dumps(top_level_otool_infos, indent=2))
+            otool_out_file_short.unlink(missing_ok=True)
+            otool_out_file_short.write_text(json.dumps(short_otool_infos, indent=2))
