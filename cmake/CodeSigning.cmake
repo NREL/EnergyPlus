@@ -23,7 +23,7 @@ This module defines functions to codesign, notarize and staple macOS files.
   The options are:
 
   ``SIGNING_IDENTITY identity``
-    Required, this is something like "Developer ID Application: The Name (TEAMID)"
+    Required, this is something like ``Developer ID Application: <The Name> (<TEAMID>)``
 
   ``FILES path...``
     The files to codesign
@@ -41,12 +41,12 @@ This module defines functions to codesign, notarize and staple macOS files.
     Passed as ``--identifier identifier``.
 
   ``PREFIX``
-    What to pass to ``--prefix``. eg 'org.nrel.EnergyPlus.' with a trailing dot. Ignored if IDENTIFIER is passed
+    What to pass to ``--prefix``. eg 'org.nrel.EnergyPlus.' with a **trailing dot**. Ignored if ``IDENTIFIER`` is passed
 
 
 .. cmake:command:: notarize_files_macos
 
-    Runs ``notarytool``, ``staple`` on the files::
+  Runs ``notarytool``, ``staple`` on the files::
 
       notarize_files_macos(
                            NOTARY_PROFILE_NAME <profile-name>
@@ -76,13 +76,13 @@ This module defines functions to codesign, notarize and staple macOS files.
 
 .. cmake:command:: setup_macos_codesigning_variables
 
-   Defines CMake Configure options::
+  Defines CMake Configure options::
 
     setup_macos_codesigning_variables()
 
-  The options are:
+  The resulting configure options are:
 
-  * ``CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION``
+  * :cmake:variable:`CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION`
 
     Pre-populated options from ``security-find-identity -v -p codesign``.
     This should be a valid "Developer ID Application"
@@ -92,10 +92,41 @@ This module defines functions to codesign, notarize and staple macOS files.
     * set ``CPACK_IFW_PACKAGE_SIGNING_IDENTITY`` to the same value, so binarycreator signs the .app installer created
     * define another ``CPACK_CODESIGNING_NOTARY_PROFILE_NAME`` option
 
-  * ``CPACK_CODESIGNING_NOTARY_PROFILE_NAME``
+  * :cmake:variable:`CPACK_CODESIGNING_NOTARY_PROFILE_NAME`
 
     Authenticate using credentials stored in the Keychain by notarytool.
     Use the profile name that you previously provided via the ``xcrun notarytool store-credentials`` command
+
+
+.. cmake:command:: register_install_codesign_target
+
+  Given a target and a relative install path,
+  this will register an ``install(CODE)`` command to codesign the executable or library::
+
+      register_install_codesign_target(
+        <TARGET_NAME> <DESTINATION>
+      )
+
+
+  It is necessary to have issued an ``install(TARGET <TARGET_NAME> DESTINATION <DESTINATION>)`` command before calling this function,
+  and done any call to ``fixup_executable`` or ``install_name_tool`` that would invalidate the signature.
+
+  This function will therefore run in the _CPack staging area, after any rpath adjustments, and ensure the signature sticks.
+
+  It will only do something on ``APPLE`` and if :cmake:variable:`CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION` is defined.
+
+  It requires ``CMP0087`` to be set to ``NEW``.
+
+  Internally, it requires this very file and calls ``codesign_files_macos`` on the target file.
+
+  The required parameters are:
+
+  ``TARGET_NAME``
+    A valid target added via ``add_executable``/``add_library``
+    Required, should be set to the name you used during ``xcrun notarytool store-credentials``
+
+  ``DESTINATION``
+    The destination for the installed target (eg: ``"."`` or ``lib/``)
 #]=======================================================================]
 
 function(print_cmd_if_verbose cmd VERBOSE)
@@ -325,10 +356,10 @@ function(setup_macos_codesigning_variables)
 endfunction()
 #------------------------------------------------------------------------------
 
-function(register_install_codesign_target TARGET_NAME INSTALL_PATH)
+function(register_install_codesign_target TARGET_NAME DESTINATION)
 
   if(NOT TARGET ${TARGET_NAME})
-    message("Not a target")
+    message("${TARGET_NAME} is not a valid target")
     return()
   endif()
 
@@ -342,19 +373,15 @@ function(register_install_codesign_target TARGET_NAME INSTALL_PATH)
     return()
   endif()
 
-  cmake_policy(PUSH)
-  cmake_policy(SET CMP0087 NEW) # install(CODE) and install(SCRIPT) support generator expressions.
-
   install(
     CODE "
     include(\"${CMAKE_CURRENT_FUNCTION_LIST_FILE}\")
     codesign_files_macos(
-      FILES \"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/$<TARGET_FILE_NAME:${TARGET_NAME}>\"
+      FILES \"\${CMAKE_INSTALL_PREFIX}/${DESTINATION}/$<TARGET_FILE_NAME:${TARGET_NAME}>\"
       SIGNING_IDENTITY \"${CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION}\"
       IDENTIFIER \"org.nrel.EnergyPlus.${TARGET_NAME}\"
       FORCE VERBOSE
       )
   ")
-  cmake_policy(POP)
 
 endfunction()
