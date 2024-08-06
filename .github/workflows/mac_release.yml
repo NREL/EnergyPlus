@@ -242,7 +242,7 @@ jobs:
     - name: Upload otool info as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: otool_infos_cpack
+        name: otool_infos_cpack_${{ matrix.arch }}
         path: build/otool*json
         if-no-files-found: error
 
@@ -364,6 +364,6 @@ jobs:
     - name: Upload otool info as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: otool_info_dmg
+        name: otool_info_dmg_${{ matrix.arch }}
         path: dmg/otool*json
         if-no-files-found: error
