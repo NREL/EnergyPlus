@@ -352,6 +352,7 @@ if __name__ == "__main__":
 
         if args.otool_out_file:
             otool_out_file = args.otool_out_file.resolve()
+            otool_out_file.parent.mkdir(parents=True, exist_ok=True)
             otool_out_file_short = otool_out_file.parent / f"{otool_out_file.stem}_short.json"
             print(f"Saving full otool infos to {otool_out_file} and short version to {otool_out_file_short}")
             otool_out_file.unlink(missing_ok=True)
