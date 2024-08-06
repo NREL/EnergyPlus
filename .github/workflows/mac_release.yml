@@ -242,7 +242,7 @@ jobs:
     - name: Upload otool info as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: otool_infos_cpack_${{ matrix.arch }}
+        name: otool_infos_cpack_${{ matrix.os }}_${{ matrix.arch }}
         path: build/otool*json
         if-no-files-found: error
 
@@ -276,10 +276,12 @@ jobs:
         include:
           - macos_dev_target: 12.1
             os: macos-12
+            arch: x86_64
             python-arch: x64
             test_key: mac12
           - macos_dev_target: 13.0
             os: macos-14
+            arch: arm64
             python-arch: arm64
             test_key: mac13-arm64
 
@@ -364,6 +366,6 @@ jobs:
     - name: Upload otool info as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: otool_info_dmg_${{ matrix.arch }}
+        name: otool_info_dmg_${{ matrix.os }}_${{ matrix.arch }}
         path: dmg/otool*json
         if-no-files-found: error
