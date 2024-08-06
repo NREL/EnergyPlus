@@ -5833,7 +5833,7 @@ namespace Window {
         DPhi = 5.0 * Constant::DegToRadians;
 
         // Integrate from -90 to 0 deg
-        for (int IPhi = 1; IPhi <= 18; ++IPhi) {
+        for (int IPhi = 1; IPhi <= (Material::MaxProfAngs / 2); ++IPhi) {
             Phi = -Constant::PiOvr2 + (IPhi - 0.5) * DPhi;
             Sum += std::cos(Phi) * DPhi * InterpProfAng(Phi, Property);
             SumDenom += std::cos(Phi) * DPhi;
@@ -5876,7 +5876,7 @@ namespace Window {
         DPhi = 5.0 * Constant::DegToRadians;
 
         // Integrate from 0 to 90 deg
-        for (int IPhi = 19; IPhi <= 36; ++IPhi) {
+        for (int IPhi = (Material::MaxProfAngs / 2) + 1; IPhi <= Material::MaxProfAngs - 1; ++IPhi) {
             Phi = -Constant::PiOvr2 + (IPhi - 0.5) * DPhi;
             Sum += std::cos(Phi) * DPhi * InterpProfAng(Phi, Property);
             SumDenom += std::cos(Phi) * DPhi;
@@ -7461,7 +7461,7 @@ namespace Window {
         Array1D<Real64> bld_pr(15);     // Slat properties
         Array1D<Real64> st_lay(16);     // Solar-optical blind/glazing system properties
         Real64 sun_el;                  // Solar profile angle (radians)
-        Array1D<Real64> sun_el_deg(37); // Solar profile angle (deg) corresponding to sun_el values
+        Array1D<Real64> sun_el_deg(Material::MaxProfAngs); // Solar profile angle (deg) corresponding to sun_el values
         Real64 bld_el;                  // Slat angle (elevation of slat normal vector in plane
         //  perpendicular to window and containing the slat normal vector) (radians)
         int IProfAng; // Profile angle index
@@ -7538,7 +7538,7 @@ namespace Window {
                 // If blind has variable slat angle, vary slat angle from 0 to 180 deg in 10-deg steps
                 // (for Material::MaxSlatAngs = 19). If blind has fixed slat angle, calculate properties at that angle only.
 
-                for (int IProfAng = 1; IProfAng <= 37; ++IProfAng) {
+                for (int IProfAng = 1; IProfAng <= Material::MaxProfAngs; ++IProfAng) {
                     sun_el = -Constant::Pi / 2.0 + (Constant::Pi / 36.0) * (IProfAng - 1);
                     sun_el_deg(IProfAng) = 57.2958 * sun_el;
 
@@ -7583,14 +7583,18 @@ namespace Window {
 
                 if (ISolVis == 1) {
                     for (int ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
-                        blind.SolFrontDiffDiffTransGnd(ISlatAng) = DiffuseAverageProfAngGnd(blind.SolFrontBeamBeamTrans(ISlatAng, {1, 37})) +
-                                                                   DiffuseAverageProfAngGnd(blind.SolFrontBeamDiffTrans(ISlatAng, {1, 37}));
-                        blind.SolFrontDiffDiffTransSky(ISlatAng) = DiffuseAverageProfAngSky(blind.SolFrontBeamBeamTrans(ISlatAng, {1, 37})) +
-                                                                   DiffuseAverageProfAngSky(blind.SolFrontBeamDiffTrans(ISlatAng, {1, 37}));
-                        blind.SolFrontDiffAbsGnd(ISlatAng) = DiffuseAverageProfAngGnd(blind.SolFrontBeamAbs(ISlatAng, {1, 37}));
-                        blind.SolFrontDiffAbsSky(ISlatAng) = DiffuseAverageProfAngSky(blind.SolFrontBeamAbs(ISlatAng, {1, 37}));
-                        blind.SolFrontDiffDiffReflGnd(ISlatAng) = DiffuseAverageProfAngGnd(blind.SolFrontBeamDiffRefl(ISlatAng, {1, 37}));
-                        blind.SolFrontDiffDiffReflSky(ISlatAng) = DiffuseAverageProfAngSky(blind.SolFrontBeamDiffRefl(ISlatAng, {1, 37}));
+                        blind.SolFrontDiffDiffTransGnd(ISlatAng) =
+                                DiffuseAverageProfAngGnd(blind.SolFrontBeamBeamTrans(ISlatAng, {1, Material::MaxProfAngs})) +
+                                DiffuseAverageProfAngGnd(blind.SolFrontBeamDiffTrans(ISlatAng, {1, Material::MaxProfAngs}));
+                        blind.SolFrontDiffDiffTransSky(ISlatAng) =
+                                DiffuseAverageProfAngSky(blind.SolFrontBeamBeamTrans(ISlatAng, {1, Material::MaxProfAngs})) +
+                                DiffuseAverageProfAngSky(blind.SolFrontBeamDiffTrans(ISlatAng, {1, Material::MaxProfAngs}));
+                        blind.SolFrontDiffAbsGnd(ISlatAng) = DiffuseAverageProfAngGnd(blind.SolFrontBeamAbs(ISlatAng, {1, Material::MaxProfAngs}));
+                        blind.SolFrontDiffAbsSky(ISlatAng) = DiffuseAverageProfAngSky(blind.SolFrontBeamAbs(ISlatAng, {1, Material::MaxProfAngs}));
+                        blind.SolFrontDiffDiffReflGnd(ISlatAng) =
+                                DiffuseAverageProfAngGnd(blind.SolFrontBeamDiffRefl(ISlatAng, {1, Material::MaxProfAngs}));
+                        blind.SolFrontDiffDiffReflSky(ISlatAng) =
+                                DiffuseAverageProfAngSky(blind.SolFrontBeamDiffRefl(ISlatAng, {1, Material::MaxProfAngs}));
 
                         // TH 2/17/2010. Added. Loop only for movable slat blinds
                         if (blind.SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
@@ -8485,7 +8489,7 @@ namespace Window {
         // Linear interpolation.
 
         // Argument array dimensioning
-        PropArray.dim(Material::MaxSlatAngs, 37);
+        PropArray.dim(Material::MaxSlatAngs, Material::MaxProfAngs);
 
         Real64 SlatAng1 = std::clamp(SlatAng, 0.0, Constant::Pi);
 
@@ -8505,14 +8509,14 @@ namespace Window {
             Real64 SlatAngRatio = (SlatAng1 - (IBeta - 1) * DeltaSlatAng) / DeltaSlatAng; // Slat angle interpolation factor
             Val1 = PropArray(IBeta, IAlpha); // Property values at points enclosing the given ProfAngle and SlatAngle
             Val2 = PropArray(min(Material::MaxSlatAngs, IBeta + 1), IAlpha);
-            Real64 Val3 = PropArray(IBeta, min(37, IAlpha + 1));
-            Real64 Val4 = PropArray(min(Material::MaxSlatAngs, IBeta + 1), min(37, IAlpha + 1));
+            Real64 Val3 = PropArray(IBeta, min(Material::MaxProfAngs, IAlpha + 1));
+            Real64 Val4 = PropArray(min(Material::MaxSlatAngs, IBeta + 1), min(Material::MaxProfAngs, IAlpha + 1));
             Real64 ValA = Val1 + SlatAngRatio * (Val2 - Val1); // Property values at given SlatAngle to be interpolated in profile angle
             Real64 ValB = Val3 + SlatAngRatio * (Val4 - Val3);
             return ValA + ProfAngRatio * (ValB - ValA);
         } else { // Fixed-angle slats: interpolate only in profile angle
             Val1 = PropArray(1, IAlpha);
-            Val2 = PropArray(1, min(37, IAlpha + 1));
+            Val2 = PropArray(1, min(Material::MaxProfAngs, IAlpha + 1));
             return Val1 + ProfAngRatio * (Val2 - Val1);
         }
     } // InterpProfSlatAng()
