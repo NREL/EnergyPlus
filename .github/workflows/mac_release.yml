@@ -2,7 +2,6 @@ name: Mac Releases
 
 on:
   push:
-    branches: [codesigning, develop]
     tags:
       - '*'
   workflow_dispatch:
@@ -13,7 +12,7 @@ env:
   FC: gfortran-13
   SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
   Python_REQUIRED_VERSION: 3.12.2
-  BUILD_DOCS: false  # Installing MacTex takes like 15min, so you can speed things up by disabling it
+  BUILD_DOCS: true  # Installing MacTex takes like 15min, so you can speed things up by disabling it
 
 jobs:
   build_installer_artifact:
@@ -96,14 +95,6 @@ jobs:
         chmod +x *
         ./installerbase --version
         echo "$(pwd)" >> $GITHUB_PATH
-
-    - name: Temp debug setup codesigning
-      run: |
-        set -x
-        security find-identity -v -p codesigning
-        which installerbase
-        which binarycreator
-        installerbase --version
 
     - name: Remove python ${{ env.Python_REQUIRED_VERSION }} from the toolcache
       run: |
