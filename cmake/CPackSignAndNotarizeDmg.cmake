@@ -10,7 +10,7 @@ To do so, it uses the `CodeSigning`_ functions :cmake:command:`codesign_files_ma
 
 It requires that this be set: :cmake:variable:`CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION`
 
-And it will only notarize if this is set :cmake:variable:`CPACK_CODESIGNING_NOTARY_PROFILE_NAME`
+And it will only notarize if this is set: :cmake:variable:`CPACK_CODESIGNING_NOTARY_PROFILE_NAME`
 
 #]=======================================================================]
 message(STATUS "The message from ${CMAKE_CURRENT_LIST_FILE} and generator ${CPACK_GENERATOR}")

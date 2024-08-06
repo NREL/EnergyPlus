@@ -76,7 +76,7 @@ import subprocess
 
 source_suffix = '.rst'
 # Doxygen
-subprocess.call('doxygen Doxyfile', shell=True)
+# subprocess.call('doxygen Doxyfile', shell=True)
 
 # -- Project information -----------------------------------------------------
 
@@ -103,7 +103,6 @@ extensions = [
     'sphinx.ext.viewcode',
     #'sphinx_sitemap',
     'sphinx.ext.inheritance_diagram',
-    'breathe',
     'sphinxcontrib.moderncmakedomain',
     'rst2pdf.pdfbuilder',
 ]
@@ -130,14 +129,14 @@ html_theme_options = {
     'analytics_id': '',  #  Provided by Google in your dashboard
     'display_version': True,
     'prev_next_buttons_location': 'bottom',
-    'style_external_links': False,
+    'style_external_links': True,
 
     'logo_only': False,
 
     # Toc options
     'collapse_navigation': True,
     'sticky_navigation': True,
-    'navigation_depth': 4,
+    'navigation_depth': -1,
     'includehidden': True,
     'titles_only': False
 }
@@ -154,16 +153,6 @@ html_baseurl = ''
 # html_js_files = [
 #     'js/version_switcher.js',
 # ]
-
-# -- Breathe configuration -------------------------------------------------
-
-master_doc = 'index'
-
-breathe_projects = {
-	'C++ Sphinx Doxygen Breathe': "@conf_out_path@/xml/"
-}
-breathe_default_project = 'C++ Sphinx Doxygen Breathe'
-breathe_default_members = ('members', 'undoc-members')
 
 ############################
 # SETUP THE RTD LOWER-LEFT #

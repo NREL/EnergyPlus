@@ -111,7 +111,7 @@ This module defines functions to codesign, notarize and staple macOS files.
   It is necessary to have issued an ``install(TARGET <TARGET_NAME> DESTINATION <DESTINATION>)`` command before calling this function,
   and done any call to ``fixup_executable`` or ``install_name_tool`` that would invalidate the signature.
 
-  This function will therefore run in the _CPack staging area, after any rpath adjustments, and ensure the signature sticks.
+  This function will therefore run in the CPack staging area, after any rpath adjustments, and ensure the signature sticks.
 
   It will only do something on ``APPLE`` and if :cmake:variable:`CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION` is defined.
 

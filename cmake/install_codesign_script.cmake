@@ -1,21 +1,46 @@
-message("Codesigning inner executables and library from ${CMAKE_CURRENT_LIST_FILE}")
+#[=======================================================================[.rst:
+install_codesign_script
+-----------------------
 
-message("CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
-message("CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION=${CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION}")
-message("BUILD_FORTRAN=${BUILD_FORTRAN}")
+This file is meant to be used up as a ``install(SCRIPT)``
 
-if(NOT CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
-  message(FATAL_ERROR "CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION is required")
-endif()
+Pre-conditions:
 
-if(NOT FILES_TO_SIGN)
-  message(FATAL_ERROR "FILES_TO_SIGN is required")
-endif()
+- It requires that you're running on ``APPLE``
 
-if(NOT BUILD_FORTRAN)
-  message(FATAL_ERROR "BUILD_FORTRAN is required")
-endif()
+- **Important: In the scope of this** ``install(SCRIPT)``, you must define
 
+    * :cmake:variable:`CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION`
+    * You need to also set a variable ``FILES_TO_SIGN``
+
+**In the scope** meaning that you have to issue some ``install(CODE ..)`` commands prior to calling it, and they must be:
+
+    * Part of the same ``project()``
+    * Using the same CPack ``COMPONENT``
+
+This script will codesign the ``FILES_TO_SIGN``, as well as the globbed copied Python .so and the root dylibs (such as ``libintl8.dylib``)
+
+* ``python_standard_lib/lib-dynload/*.so``
+* ``lib*.dylib``
+
+To do so, it uses the `CodeSigning`_ functions :cmake:command:`codesign_files_macos`
+
+This script will therefore run in the CPack staging area, and should be added after installation of the Python sos and root dylib,
+after any rpath adjustments, to ensure the signature sticks.
+
+Usage::
+
+  if(APPLE AND CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
+    set(FILES_TO_SIGN "fileA" "fileB")
+    install(CODE "set(CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION \"${CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION}\")" COMPONENT Unspecified)
+    install(CODE "set(FILES_TO_SIGN \"${FILES_TO_SIGN}\")" COMPONENT Unspecified)
+    # call the script
+    install(SCRIPT "${CMAKE_CURRENT_LIST_DIR}/install_codesign_script.cmake" COMPONENT Unspecified)
+  endif()
+#]=======================================================================]
+
+#------------------------------------------------------------------------------
+# Just a helper
 function(print_relative_paths)
   set(prefix "")
   set(valueLessKeywords NAME_ONLY NEWLINE)
@@ -58,7 +83,20 @@ function(print_relative_paths)
     message("${_PREFIX}${rel_paths}")
   endif()
 endfunction()
+#------------------------------------------------------------------------------
 
+message("Codesigning inner executables and library from ${CMAKE_CURRENT_LIST_FILE}")
+
+message("CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
+message("CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION=${CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION}")
+
+if(NOT CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
+  message(FATAL_ERROR "CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION is required")
+endif()
+
+if(NOT FILES_TO_SIGN)
+  message(FATAL_ERROR "FILES_TO_SIGN is required")
+endif()
 
 foreach(path ${FILES_TO_SIGN})
   list(APPEND FULL_PATHS "${CMAKE_INSTALL_PREFIX}/${path}")

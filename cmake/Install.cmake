@@ -697,31 +697,30 @@ if(APPLE)
 
   if(CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
     set(FILES_TO_SIGN
-      #$<TARGET_FILE_NAME:ConvertInputFormat> # "ConvertInputFormat-24.2.0"
-      #$<TARGET_FILE_NAME:energyplus> # energyplus-24.2.0"
-      #$<TARGET_FILE_NAME:energyplusapi># "libenergyplusapi.24.2.0.dylib"
+      # Targets are signed already via register_install_codesign_target
+      #$<TARGET_FILE_NAME:ConvertInputFormat>
+      #$<TARGET_FILE_NAME:energyplus>
+      #$<TARGET_FILE_NAME:energyplusapi>
 
       # Bash scripts, not sure if needed or not
       "runenergyplus"
       "runepmacro"
       "runreadvars"
-      # Already signed because just copied from bin to package
+      # Copied-verbatim apps: Already signed because just copied from bin to package
       # "EPMacro"
       # "PreProcess/EP-Launch-Lite.app"
       # "PreProcess/IDFVersionUpdater/IDFVersionUpdater.app"
       # "PostProcess/EP-Compare/EP-Compare.app"
     )
 
-    # Codesign inner binaries and libraries, in the staging area
-    # set(CODESIGNING_CMAKE_FILE "${CMAKE_CURRENT_LIST_DIR}/CodeSigning.cmake")
-    # Define some variables for the script
+    # Codesign inner binaries and libraries, in the CPack staging area for the EnergyPlus project, component Unspecified
+    # Define some required variables for the script in the scope of the install(SCRIPT) first
     install(CODE "set(CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION \"${CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION}\")" COMPONENT Unspecified)
-    install(CODE "set(CPACK_CODESIGNING_NOTARY_PROFILE_NAME \"${CPACK_CODESIGNING_NOTARY_PROFILE_NAME}\")" COMPONENT Unspecified)
     install(CODE "set(FILES_TO_SIGN \"${FILES_TO_SIGN}\")" COMPONENT Unspecified)
-    install(CODE "set(BUILD_FORTRAN \"${BUILD_FORTRAN}\")" COMPONENT Unspecified)
     # call the script
     install(SCRIPT "${CMAKE_CURRENT_LIST_DIR}/install_codesign_script.cmake" COMPONENT Unspecified)
 
+    # Register the CPACK_POST_BUILD_SCRIPTS
     set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/CPackSignAndNotarizeDmg.cmake")
 
   endif()
