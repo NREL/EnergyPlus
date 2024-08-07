@@ -199,7 +199,6 @@ void GetTESCoilInput(EnergyPlusData &state)
     using BranchNodeConnections::TestCompSet;
     using DataZoneEquipment::FindControlledZoneIndexFromSystemNodeNumberForZone;
     using FluidProperties::CheckFluidPropertyName;
-    using FluidProperties::FindGlycol;
     using FluidProperties::GetFluidDensityTemperatureLimits;
     using FluidProperties::GetFluidSpecificHeatTemperatureLimits;
     using GlobalNames::VerifyUniqueCoilName;
@@ -286,7 +285,7 @@ void GetTESCoilInput(EnergyPlusData &state)
             break;
         case MediaType::Water:
             thisTESCoil.StorageFluidName = "WATER";
-            thisTESCoil.StorageFluidIndex = FindGlycol(state, "WATER");
+            thisTESCoil.StorageFluidIndex = FluidProperties::GetGlycolNum(state, "WATER");
             break;
         default:
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, thisTESCoil.Name));
@@ -304,7 +303,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                         state, format("Check that fluid property data have been input for fluid name = {}", state.dataIPShortCut->cAlphaArgs(6)));
                     ErrorsFound = true;
                 } else {
-                    thisTESCoil.StorageFluidIndex = FindGlycol(state, state.dataIPShortCut->cAlphaArgs(6));
+                    thisTESCoil.StorageFluidIndex = FluidProperties::GetGlycolNum(state, state.dataIPShortCut->cAlphaArgs(6));
                     if (thisTESCoil.StorageFluidIndex == 0) {
                         ShowSevereError(state, format("{}{}=\"{}\", invalid fluid data", RoutineName, cCurrentModuleObject, thisTESCoil.Name));
                         ShowContinueError(state,

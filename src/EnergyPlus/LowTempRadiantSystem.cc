@@ -272,7 +272,6 @@ namespace LowTempRadiantSystem {
         using DataSizing::FractionOfAutosizedCoolingCapacity;
         using DataSizing::FractionOfAutosizedHeatingCapacity;
         using DataSizing::HeatingDesignCapacity;
-        using FluidProperties::FindGlycol;
 
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
@@ -376,7 +375,7 @@ namespace LowTempRadiantSystem {
 
         state.dataLowTempRadSys->HydrRadSys.allocate(state.dataLowTempRadSys->NumOfHydrLowTempRadSys);
         if (state.dataLowTempRadSys->NumOfHydrLowTempRadSys > 0) {
-            GlycolIndex = FindGlycol(state, fluidNameWater);
+            GlycolIndex = FluidProperties::GetGlycolNum(state, fluidNameWater);
             for (auto &e : state.dataLowTempRadSys->HydrRadSys)
                 e.GlycolIndex = GlycolIndex;
             if (GlycolIndex == 0) {
@@ -390,7 +389,7 @@ namespace LowTempRadiantSystem {
 
         state.dataLowTempRadSys->CFloRadSys.allocate(state.dataLowTempRadSys->NumOfCFloLowTempRadSys);
         if (state.dataLowTempRadSys->NumOfCFloLowTempRadSys > 0) {
-            GlycolIndex = FindGlycol(state, fluidNameWater);
+            GlycolIndex = FluidProperties::GetGlycolNum(state, fluidNameWater);
             for (auto &e : state.dataLowTempRadSys->CFloRadSys)
                 e.GlycolIndex = GlycolIndex;
             if (GlycolIndex == 0) {
