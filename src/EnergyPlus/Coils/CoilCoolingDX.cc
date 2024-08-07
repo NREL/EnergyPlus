@@ -662,8 +662,6 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                              bool const singleMode,
                              Real64 const LoadSHR)
 {
-    assert(speedNum != 0);
-
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit(state);
         this->myOneTimeInitFlag = false;
