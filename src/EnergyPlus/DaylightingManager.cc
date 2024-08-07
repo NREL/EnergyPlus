@@ -3186,7 +3186,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         assert(matBlind != nullptr);
 
                         Real64 ProfAng = ProfileAngle(state, IWin, RAYCOS, matBlind->SlatOrientation);
-                        transBmBmMult = matBlind->BeamBeamTrans(ProfAng, surfShade.blind.slatAngThisTS);
+                        transBmBmMult = matBlind->BeamBeamTrans(ProfAng, surfShade.blind.slatAng);
                         dl->dirIllum(iHour)[iWinCover_Shaded].sunDisk = RAYCOS.z * TVISS * transBmBmMult * ObTransDisk;
 
                     } else if (ShType == WinShadingType::ExtScreen) {
@@ -3361,7 +3361,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfShade.blind.matNum));
                                     
                                 Real64 ProfAng = ProfileAngle(state, IWin, SunVecMir, matBlind->SlatOrientation);
-                                TransBmBmMultRefl = matBlind->BeamBeamTrans(ProfAng, surfShade.blind.slatAngThisTS);
+                                TransBmBmMultRefl = matBlind->BeamBeamTrans(ProfAng, surfShade.blind.slatAng);
                                 dl->dirIllum(iHour)[iWinCover_Shaded].sunDisk += SunVecMir.z * SpecReflectance * TVisRefl * TransBmBmMultRefl;
                             } else if (ShType == WinShadingType::ExtScreen) {
                                 // pass angle from sun to window normal here using PHSUN and THSUN from above and
@@ -7422,23 +7422,23 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     assert(matBlind != nullptr);
                     Real64 ProfAng = ProfileAngle(state, IWin, U, matBlind->SlatOrientation);
 
-                    auto &btar = surfShade.blind.tar;
+                    auto &btar = surfShade.blind.TAR;
                     int idxLo = surfShade.blind.profAngIdxLo;
                     int idxHi = std::min(Material::MaxProfAngs, idxLo+1);
                     Real64 interpFac = surfShade.blind.profAngInterpFac;
-                    TransBlBmDiffFront = Interp(btar.Vis.Front.Bm[idxLo].DfTra, btar.Vis.Front.Bm[idxHi].DfTra, interpFac);
+                    TransBlBmDiffFront = Interp(btar.Vis.Ft.Bm[idxLo].DfTra, btar.Vis.Ft.Bm[idxHi].DfTra, interpFac);
 
                     if (ShType == WinShadingType::IntBlind) { // Interior blind
                         ReflGlDiffDiffBack = construct.ReflectVisDiffBack;
-                        ReflBlBmDiffFront = Interp(btar.Vis.Front.Bm[idxLo].DfRef, btar.Vis.Front.Bm[idxHi].DfRef, interpFac);
-                        ReflBlDiffDiffFront = btar.Vis.Front.Df.Ref;
-                        TransBlDiffDiffFront = btar.Vis.Front.Df.Tra;
+                        ReflBlBmDiffFront = Interp(btar.Vis.Ft.Bm[idxLo].DfRef, btar.Vis.Ft.Bm[idxHi].DfRef, interpFac);
+                        ReflBlDiffDiffFront = btar.Vis.Ft.Df.Ref;
+                        TransBlDiffDiffFront = btar.Vis.Ft.Df.Tra;
                         transMult = TVISBR * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                               (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                     } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                         ReflGlDiffDiffFront = construct.ReflectVisDiffFront;
-                        ReflBlDiffDiffBack = btar.Vis.Back.Df.Ref;
+                        ReflBlDiffDiffBack = btar.Vis.Bk.Df.Ref;
                         transMult = TransBlBmDiffFront * surfWin.glazedFrac * construct.TransDiffVis /
                                 (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * surfWin.lightWellEff;
                         
@@ -7447,10 +7447,10 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         td2 = construct.tBareVisDiff(2);
                         rbd1 = construct.rbBareVisDiff(1);
                         rfd2 = construct.rfBareVisDiff(2);
-                        Real64 tfshBd = Interp(btar.Vis.Front.Bm[idxLo].DfTra, btar.Vis.Front.Bm[idxHi].DfTra, interpFac);
-                        tfshd = btar.Vis.Front.Df.Tra;
-                        Real64 rfshB = Interp(btar.Vis.Front.Bm[idxLo].DfRef, btar.Vis.Front.Bm[idxHi].DfRef, interpFac);
-                        rbshd = btar.Vis.Front.Df.Ref;
+                        Real64 tfshBd = Interp(btar.Vis.Ft.Bm[idxLo].DfTra, btar.Vis.Ft.Bm[idxHi].DfTra, interpFac);
+                        tfshd = btar.Vis.Ft.Df.Tra;
+                        Real64 rfshB = Interp(btar.Vis.Ft.Bm[idxLo].DfRef, btar.Vis.Ft.Bm[idxHi].DfRef, interpFac);
+                        rbshd = btar.Vis.Ft.Df.Ref;
                         if (construct.TotGlassLayers == 2) { // 2 glass layers
                             transMult = t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * surfWin.lightWellEff;
                         } else { // 3 glass layers; blind between layers 2 and 3
@@ -7463,7 +7463,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         }
                     }
 
-                    transBmBmMult = TVISBR * matBlind->BeamBeamTrans(ProfAng, surfShade.blind.slatAngThisTS);
+                    transBmBmMult = TVISBR * matBlind->BeamBeamTrans(ProfAng, surfShade.blind.slatAng);
                 } else { // Diffusing glass
                     transMult = General::POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * surfWin.glazedFrac *
                                    surfWin.lightWellEff;
@@ -7646,33 +7646,33 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     
                     Real64 ProfAng = ProfileAngle(state, IWin, s_surf->SurfSunCosHourly(IHR), matBlind->SlatOrientation);
                     // Are these really cached?
-                    auto &btar = surfShade.blind.tar;
+                    auto &btar = surfShade.blind.TAR;
                     int idxLo = surfShade.blind.profAngIdxLo;
                     int idxHi = surfShade.blind.profAngIdxHi;
                     int interpFac = surfShade.blind.profAngInterpFac;
-                    Real64 TransBlBmDiffFront = Interp(btar.Vis.Front.Bm[idxLo].DfTra, btar.Vis.Front.Bm[idxHi].DfTra, interpFac);
+                    Real64 TransBlBmDiffFront = Interp(btar.Vis.Ft.Bm[idxLo].DfTra, btar.Vis.Ft.Bm[idxHi].DfTra, interpFac);
                     
                     if (ShType == WinShadingType::IntBlind) { // Interior blind
                         // TH CR 8121, 7/7/2010
                         // ReflBlBmDiffFront = WindowManager::InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
-                        Real64 ReflBlBmDiffFront = Interp(btar.Vis.Front.Bm[idxLo].DfRef, btar.Vis.Front.Bm[idxHi].DfRef, interpFac);
+                        Real64 ReflBlBmDiffFront = Interp(btar.Vis.Ft.Bm[idxLo].DfRef, btar.Vis.Ft.Bm[idxHi].DfRef, interpFac);
                         
                         // TH added 7/12/2010 for CR 8121
-                        Real64 ReflBlDiffDiffFront = btar.Vis.Front.Df.Ref;
-                        Real64 TransBlDiffDiffFront = btar.Vis.Front.Df.Tra;
+                        Real64 ReflBlDiffDiffFront = btar.Vis.Ft.Df.Ref;
+                        Real64 TransBlDiffDiffFront = btar.Vis.Ft.Df.Tra;
                         
                         transMult = TVISBSun * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                 (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                     } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                         transMult = TransBlBmDiffFront *
-                                (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * btar.Vis.Back.Df.Ref)) *
+                                (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * btar.Vis.Bk.Df.Ref)) *
                                 surfWin.glazedFrac * surfWin.lightWellEff;
 
                     } else { // Between-glass blind
                         Real64 t1 = General::POLYF(COSBSun, construct.tBareVisCoef(1));
-                        Real64 tfshBd = Interp(btar.Vis.Front.Bm[idxLo].DfTra, btar.Vis.Front.Bm[idxHi].DfTra, interpFac);
-                        Real64 rfshB = Interp(btar.Vis.Front.Bm[idxLo].DfRef, btar.Vis.Front.Bm[idxHi].DfRef, interpFac);
+                        Real64 tfshBd = Interp(btar.Vis.Ft.Bm[idxLo].DfTra, btar.Vis.Ft.Bm[idxHi].DfTra, interpFac);
+                        Real64 rfshB = Interp(btar.Vis.Ft.Bm[idxLo].DfRef, btar.Vis.Ft.Bm[idxHi].DfRef, interpFac);
                         if (construct.TotGlassLayers == 2) { // 2 glass layers
                                 transMult = t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * surfWin.lightWellEff;
                         } else { // 3 glass layers; blind between layers 2 and 3
@@ -7682,7 +7682,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         }
                     }
                     
-                    transBmBmMult =  TVISBSun * matBlind->BeamBeamTrans(surfShade.blind.profAng, surfShade.blind.slatAngThisTS);
+                    transBmBmMult =  TVISBSun * matBlind->BeamBeamTrans(surfShade.blind.profAng, surfShade.blind.slatAng);
                 } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
 
                 if (s_surf->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
@@ -7749,26 +7749,26 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 } else { // Blind on
                         
                     auto const &surfShade = s_surf->surfShades(IWin);
-                    auto const &btar = surfShade.blind.tar;
+                    auto const &btar = surfShade.blind.TAR;
                     auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfShade.blind.matNum));
                     
                     assert(matBlind != nullptr);
                     
-                    TransBlDiffDiffFront = btar.Vis.Front.Df.Tra;
+                    TransBlDiffDiffFront = btar.Vis.Ft.Df.Tra;
                     if (ShType == WinShadingType::IntBlind) { // Interior blind
-                        ReflBlDiffDiffFront = btar.Vis.Front.Df.Ref;
+                        ReflBlDiffDiffFront = btar.Vis.Ft.Df.Ref;
                         transMult = TVisSunRefl * (TransBlDiffDiffFront + ReflBlDiffDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                      (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                     } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                         transMult = TransBlDiffDiffFront *
-                                (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * btar.Vis.Back.Df.Ref)) *
+                                (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * btar.Vis.Bk.Df.Ref)) *
                                 surfWin.glazedFrac * surfWin.lightWellEff;
 
                     } else { // Between-glass blind
                         Real64 t1 = construct.tBareVisDiff(1);
-                        Real64 tfshBd = btar.Vis.Front.Df.Tra;
-                        Real64 rfshB = btar.Vis.Front.Df.Ref;
+                        Real64 tfshBd = btar.Vis.Ft.Df.Tra;
+                        Real64 rfshB = btar.Vis.Ft.Df.Ref;
                         if (construct.TotGlassLayers == 2) { // 2 glass layers
                             transMult = t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * surfWin.lightWellEff;
                         } else { // 3 glass layers; blind between layers 2 and 3

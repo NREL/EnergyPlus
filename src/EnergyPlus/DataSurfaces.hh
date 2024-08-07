@@ -937,10 +937,10 @@ namespace DataSurfaces {
         struct {    
             int matNum = 0;
             bool movableSlats = false;     // True if window has a blind with movable slats
-            Real64 slatAngThisTS = 0.0;  // Slat angle this time step for window with blind on (radians)
-            Real64 slatAngThisTSDeg = 0.0;         // Slat angle this time step for window with blind on (deg)
-            bool slatAngThisTSDegEMSon = false;      // flag that indicate EMS system is actuating SlatAngThisTSDeg
-            Real64 slatAngThisTSDegEMSValue = 0.0; // value that EMS sets for slat angle in degrees
+            Real64 slatAng = 0.0;  // Slat angle this time step for window with blind on (radians)
+            Real64 slatAngDeg = 0.0;         // Slat angle this time step for window with blind on (deg)
+            bool slatAngDegEMSon = false;      // flag that indicate EMS system is actuating SlatAngThisTSDeg
+            Real64 slatAngDegEMSValue = 0.0; // value that EMS sets for slat angle in degrees
             bool slatBlockBeam = false;             // True if blind slats block incident beam solar
             int slatAngIdxLo = -1;
             int slatAngIdxHi = -1;
@@ -952,7 +952,7 @@ namespace DataSurfaces {
             Real64 bmBmTrans = 0.0;
             Real64 airFlowPermeability = 0.0; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
 
-            Material::BlindTraAbsRef tar;
+            Material::BlindTraAbsRef TAR;
         } blind;
 
         Real64 effShadeEmi = 0.0; // Effective emissivity of interior blind or shade

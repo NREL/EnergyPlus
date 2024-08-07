@@ -408,6 +408,38 @@ namespace Material {
 
     constexpr Real64 dProfAng = Constant::Pi / (MaxProfAngs - 1);
     constexpr Real64 dSlatAng = Constant::Pi / (MaxSlatAngs - 1);
+
+    // This may seem like an overly complicated way to handle a set of
+    // multi-dimensional variables, but I think that it is actually
+    // cleaner than either a multi-dimensional array (and certaily
+    // faster) and also better than just a long list of variables.
+
+    // Blind-properties essentially have four dimensions: property
+    // type (transmittance, reflectance, absorptance), beam or
+    // diffuse, front or back, solar or visible (maybe solar or
+    // visible or thermal/IR).  Rather than coming up with and
+    // enforcing a consistent namming scheme for these variables,
+    // arranging them into nested structres keeps the ordering (as
+    // well as the naming) of the dimensions consistent, and also
+    // inserts periods between the dimensions to help with
+    // readability.  In this case, I chose the struct nesting to be
+    // SolVis.Front.Back.BmDf.Prop.  So variables are always going to
+    // be called Sol.Front.Df.Abs and Vis.Back.Df.Ref.
+
+    // For the record, accessing variables in nested structs is as
+    // fast as accessing plain scalar variables.  The reason is that
+    // the compiler knows the position of every variable at every
+    // level of a nested struct at compile time and can load it with a
+    // single offset like it loads every other variable in an object.
+    // This is another downside of references in C++.  Accessing
+    // variables in structures (even nested structures) is fast.
+    // Acessing variables through pointer indirection is slow.
+    // W->X->Y->Z is slower than W.X.Y.Z.  References are pointers,
+    // but they use the . notation rather than -> for accessing
+    // fields.  So if W.X.Y.Z is implemented using nested structures
+    // then it is fast, but if it is implemented using references to
+    // structures then it is slow.  But without context there is no
+    // way to tell which is which.
         
     struct BlindBmTAR
     {
@@ -481,14 +513,14 @@ namespace Material {
         }
     };
         
-    struct BlindFrontBack
+    struct BlindFtBk
     {
-        BlindBmDf Front;
-        BlindBmDf Back;
+        BlindBmDf Ft;
+        BlindBmDf Bk;
 
-        void interpSlatAng(BlindFrontBack const &t1, BlindFrontBack const &t2, Real64 interpFac) {
-            Front.interpSlatAng(t1.Front, t2.Front, interpFac);
-            Back.interpSlatAng(t1.Back, t2.Back, interpFac);
+        void interpSlatAng(BlindFtBk const &t1, BlindFtBk const &t2, Real64 interpFac) {
+            Ft.interpSlatAng(t1.Ft, t2.Ft, interpFac);
+            Bk.interpSlatAng(t1.Bk, t2.Bk, interpFac);
         }
     };
 
@@ -503,22 +535,22 @@ namespace Material {
         }            
     };
 
-    struct BlindFrontBackIR
+    struct BlindFtBkIR
     {
-        BlindTraEmi Front;
-        BlindTraEmi Back;
+        BlindTraEmi Ft;
+        BlindTraEmi Bk;
 
-        void interpSlatAng(BlindFrontBackIR const &t1, BlindFrontBackIR const &t2, Real64 interpFac) {
-            Front.interpSlatAng(t1.Front, t2.Front, interpFac);
-            Back.interpSlatAng(t1.Back, t2.Back, interpFac);
+        void interpSlatAng(BlindFtBkIR const &t1, BlindFtBkIR const &t2, Real64 interpFac) {
+            Ft.interpSlatAng(t1.Ft, t2.Ft, interpFac);
+            Bk.interpSlatAng(t1.Bk, t2.Bk, interpFac);
         }
     };
         
     struct BlindTraAbsRef
     {
-        BlindFrontBack Sol;
-        BlindFrontBack Vis;
-        BlindFrontBackIR IR;
+        BlindFtBk Sol;
+        BlindFtBk Vis;
+        BlindFtBkIR IR;
 
         void interpSlatAng(BlindTraAbsRef const &t1, BlindTraAbsRef const &t2, Real64 interpFac) {
             Sol.interpSlatAng(t1.Sol, t2.Sol, interpFac);
@@ -540,6 +572,8 @@ namespace Material {
         Real64 MinSlatAngle = 0.0;     // Minimum slat angle for variable-angle slats (deg) (user input)
         Real64 MaxSlatAngle = 0.0;     // Maximum slat angle for variable-angle slats (deg) (user input)
         Real64 SlatConductivity = 0.0; // Slat conductivity (W/m-K)
+
+#ifdef GET_OUT            
         // Solar slat properties
         Real64 SlatTransSolBeamDiff = 0.0;     // Slat solar beam-diffuse transmittance
         Real64 SlatFrontReflSolBeamDiff = 0.0; // Slat front solar beam-diffuse reflectance
@@ -558,6 +592,10 @@ namespace Material {
         Real64 SlatTransIR = 0.0;      // Slat IR transmittance
         Real64 SlatFrontEmissIR = 0.0; // Slat front emissivity
         Real64 SlatBackEmissIR = 0.0;  // Slat back emissivity
+#endif // GET_OUT
+
+        BlindTraAbsRef slatTAR;
+            
         // Some characteristics for blind thermal calculation
         Real64 toGlassDist = 0.0;    // Distance between window shade and adjacent glass (m)
         Real64 topOpeningMult = 0.0; // Area of air-flow opening at top of blind, expressed as a fraction
@@ -569,8 +607,8 @@ namespace Material {
         Real64 rightOpeningMult = 0.0; // Area of air-flow opening at right side of blind, expressed as a fraction
         //  of the blind-to-glass opening area at the right side of the blind
         // Calculated blind properties
-
-        std::array<BlindTraAbsRef, MaxSlatAngs> tars;
+            
+        std::array<BlindTraAbsRef, MaxSlatAngs> TARs;
             
         // Default Constructor
         MaterialBlind()

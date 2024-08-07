@@ -561,10 +561,10 @@ namespace Window {
             Aright = matBlind->rightOpeningMult;
 
             Afront = surfShade.blind.airFlowPermeability;
-            emissFront = surfShade.blind.tar.IR.Front.Emi;
-            emissBack = surfShade.blind.tar.IR.Back.Emi;
-            transThermalFront = surfShade.blind.tar.IR.Front.Tra;
-            transThermalBack = surfShade.blind.tar.IR.Back.Tra;
+            emissFront = surfShade.blind.TAR.IR.Ft.Emi;
+            emissBack = surfShade.blind.TAR.IR.Bk.Emi;
+            transThermalFront = surfShade.blind.TAR.IR.Ft.Tra;
+            transThermalBack = surfShade.blind.TAR.IR.Bk.Tra;
             if (t_Index == 1) {
                 m_ExteriorShade = true;
             }

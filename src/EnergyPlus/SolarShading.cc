@@ -6522,7 +6522,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             
             Real64 ProfAng = 0.0; // Window solar profile angle (radians)
 
-            Real64 SlatAng = surfShade.blind.slatAngThisTS;
+            Real64 SlatAng = surfShade.blind.slatAng;
             int PipeNum = s_surf->SurfWinTDDPipeNum(SurfNum);
             int SurfNum2 = SurfNum;
             if (surf.OriginalClass == SurfaceClass::TDD_Diffuser) {
@@ -6571,28 +6571,28 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                 int profIdxHi = surfShade.blind.profAngIdxHi;
                 Real64 profInterpFac = surfShade.blind.profAngInterpFac;
 
-                FrontDiffDiffTrans = surfShade.blind.tar.Sol.Front.Df.Tra;
+                FrontDiffDiffTrans = surfShade.blind.TAR.Sol.Ft.Df.Tra;
 
                 if (SunLitFract > 0.0 || SunlitFracWithoutReveal) {
-                    auto const &btar1 = surfShade.blind.tar;
-                    auto const &btarFront1Lo = btar1.Sol.Front.Bm[profIdxLo];
-                    auto const &btarFront1Hi = btar1.Sol.Front.Bm[profIdxHi];
+                    auto const &btar1 = surfShade.blind.TAR;
+                    auto const &btarFront1Lo = btar1.Sol.Ft.Bm[profIdxLo];
+                    auto const &btarFront1Hi = btar1.Sol.Ft.Bm[profIdxHi];
                         
                     FrontBeamAbs = Interp(btarFront1Lo.Abs, btarFront1Hi.Abs, profInterpFac);
                     FrontBeamDiffTrans = Interp(btarFront1Lo.DfTra, btarFront1Hi.DfTra, profInterpFac);
                     if (ShadeFlag != WinShadingType::ExtBlind) { // FRONT: interior or bg blinds
-                        FrontDiffDiffRefl = btar1.Sol.Front.Df.Ref;
-                        FrontDiffAbs = btar1.Sol.Front.Df.Abs;
+                        FrontDiffDiffRefl = btar1.Sol.Ft.Df.Ref;
+                        FrontDiffAbs = btar1.Sol.Ft.Df.Abs;
                         FrontBeamDiffRefl = Interp(btarFront1Lo.DfRef, btarFront1Hi.DfRef, profInterpFac);
                     }
                         
                     if (ShadeFlag != WinShadingType::IntBlind) { // BACK: exterior or bg blinds{
-                        BackDiffDiffTrans = btar1.Sol.Back.Df.Tra;
-                        BackDiffDiffRefl = btar1.Sol.Back.Df.Ref;
-                        BackDiffAbs = btar1.Sol.Back.Df.Abs;
+                        BackDiffDiffTrans = btar1.Sol.Bk.Df.Tra;
+                        BackDiffDiffRefl = btar1.Sol.Bk.Df.Ref;
+                        BackDiffAbs = btar1.Sol.Bk.Df.Abs;
                         
-                        auto const &btarBack1Lo = btar1.Sol.Back.Bm[profIdxLo];
-                        auto const &btarBack1Hi = btar1.Sol.Back.Bm[profIdxHi];
+                        auto const &btarBack1Lo = btar1.Sol.Bk.Bm[profIdxLo];
+                        auto const &btarBack1Hi = btar1.Sol.Bk.Bm[profIdxHi];
                         
                         BackBeamDiffTrans = Interp(btarBack1Lo.DfTra, btarBack1Hi.DfTra, profInterpFac);
                         BackBeamDiffRefl = Interp(btarBack1Lo.DfRef, btarBack1Hi.DfRef, profInterpFac);
@@ -7060,15 +7060,15 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             auto const &btarLo = constrSh.blindTARs[slatIdxLo];
                             auto const &btarHi = constrSh.blindTARs[slatIdxHi];
                             
-                            DiffTrans = Interp(btarLo.Sol.Front.Df.Tra, btarHi.Sol.Front.Df.Tra, slatInterpFac);
+                            DiffTrans = Interp(btarLo.Sol.Ft.Df.Tra, btarHi.Sol.Ft.Df.Tra, slatInterpFac);
 
                             // For blinds with horizontal slats, allow different diffuse/diffuse transmittance for
                             // ground and sky solar
                             auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfShade.blind.matNum));
                             assert(matBlind != nullptr);
                             if (matBlind->SlatOrientation == DataWindowEquivalentLayer::Orientation::Horizontal) {
-                                DiffTransGnd = Interp(btarLo.Sol.Front.Df.TraGnd, btarHi.Sol.Front.Df.TraGnd, slatInterpFac);
-                                DiffTransSky = Interp(btarLo.Sol.Front.Df.TraSky, btarHi.Sol.Front.Df.TraSky, slatInterpFac);
+                                DiffTransGnd = Interp(btarLo.Sol.Ft.Df.TraGnd, btarHi.Sol.Ft.Df.TraGnd, slatInterpFac);
+                                DiffTransSky = Interp(btarLo.Sol.Ft.Df.TraSky, btarHi.Sol.Ft.Df.TraSky, slatInterpFac);
                             }
                         }
 
@@ -7537,7 +7537,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 // The layer order for interior windows is "outside" to "inside," where "outside" refers to
                                 // the adjacent zone and "inside" refers to the current zone.
                                 WinShadingType ShadeFlagBack = s_surf->SurfWinShadingFlag(BackSurfNum);
-                                Real64 slatAngBack = surfShadeBack.blind.slatAngThisTS;
+                                Real64 slatAngBack = surfShadeBack.blind.slatAng;
                                 Real64 CosIncBack =
                                     std::abs(state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, BackSurfNum));
                                 if (s_surf->SurfWinWindowModelType(SurfNum) == WindowModel::BSDF) {
@@ -7631,11 +7631,11 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 // Interior beam absorptance of glass layers and beam absorbed in blind
                                 // of back exterior window with BLIND
                                 if (ANY_BLIND(ShadeFlagBack)) {
-                                    auto const &btarBack = surfShadeBack.blind.tar;
+                                    auto const &btarBack = surfShadeBack.blind.TAR;
                                     auto const *matBlindBack = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfShadeBack.blind.matNum));
                                     assert(matBlindBack != nullptr);
 
-                                    auto const &btar = surfShade.blind.tar;
+                                    auto const &btar = surfShade.blind.TAR;
                                     Real64 profAngBack = surfShadeBack.blind.profAng;
 
                                     int profIdxLoBack = surfShadeBack.blind.profAngIdxLo;
@@ -7647,19 +7647,19 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                                     // Blind solar back beam-diffuse transmittance
                                     // Is this supposed to be blindBack?
-                                    Real64 TBlBmDiffBack = Interp(btar.Sol.Back.Bm[profIdxLoBack].DfTra, btar.Sol.Back.Bm[profIdxLoBack].DfTra,
+                                    Real64 TBlBmDiffBack = Interp(btar.Sol.Bk.Bm[profIdxLoBack].DfTra, btar.Sol.Bk.Bm[profIdxLoBack].DfTra,
                                                                   profInterpFacBack);
 
 
                                     if (ShadeFlagBack == WinShadingType::IntBlind) {
                                         // Interior beam absorptance of GLASS LAYERS of exterior back window with INTERIOR BLIND
-                                        FrontDiffDiffRefl = btarBack.Sol.Front.Df.Ref; // Blind solar front beam reflectance
-                                        FrontDiffAbs = btarBack.Sol.Front.Df.Abs; 
-                                        Real64 RhoBlFront = Interp(btar.Sol.Front.Bm[profIdxLoBack].DfRef, btar.Sol.Front.Bm[profIdxHiBack].DfRef, 
+                                        FrontDiffDiffRefl = btarBack.Sol.Ft.Df.Ref; // Blind solar front beam reflectance
+                                        FrontDiffAbs = btarBack.Sol.Ft.Df.Abs; 
+                                        Real64 RhoBlFront = Interp(btar.Sol.Ft.Bm[profIdxLoBack].DfRef, btar.Sol.Ft.Bm[profIdxHiBack].DfRef, 
                                                                    profInterpFacBack);
-                                        Real64 AbsBlFront = Interp(btar.Sol.Front.Bm[profIdxLoBack].Abs, btar.Sol.Front.Bm[profIdxHiBack].Abs,
+                                        Real64 AbsBlFront = Interp(btar.Sol.Ft.Bm[profIdxLoBack].Abs, btar.Sol.Ft.Bm[profIdxHiBack].Abs,
                                                                    profInterpFacBack);
-                                        Real64 AbsBlBack = Interp(btar.Sol.Back.Bm[profIdxLoBack].Abs, btar.Sol.Back.Bm[profIdxHiBack].Abs,
+                                        Real64 AbsBlBack = Interp(btar.Sol.Bk.Bm[profIdxLoBack].Abs, btar.Sol.Bk.Bm[profIdxHiBack].Abs,
                                                                   profInterpFacBack);
 
                                         Real64 RhoBlDiffFront = FrontDiffDiffRefl; // Glazing system solar back beam-beam reflectance
@@ -7707,11 +7707,11 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                                   .ReflectSolDiffFront; // Glazing system front diffuse solar reflectance
 
                                         // Is this supposed to be beam-beam reflection?
-                                        Real64 RhoBlBack = Interp(btar.Sol.Back.Bm[profIdxLoBack].DfRef, btar.Sol.Back.Bm[profIdxHiBack].DfRef,
+                                        Real64 RhoBlBack = Interp(btar.Sol.Bk.Bm[profIdxLoBack].DfRef, btar.Sol.Bk.Bm[profIdxHiBack].DfRef,
                                                                   profInterpFacBack);
-                                        Real64 RhoBlBmDifBk = Interp(btar.Sol.Back.Bm[profIdxLoBack].DfRef, btar.Sol.Back.Bm[profIdxHiBack].DfRef,
+                                        Real64 RhoBlBmDifBk = Interp(btar.Sol.Bk.Bm[profIdxLoBack].DfRef, btar.Sol.Bk.Bm[profIdxHiBack].DfRef,
                                                                      profInterpFacBack);
-                                        Real64 AbsBlBack = Interp(btar.Sol.Back.Bm[profIdxLoBack].Abs, btar.Sol.Back.Bm[profIdxHiBack].Abs,
+                                        Real64 AbsBlBack = Interp(btar.Sol.Bk.Bm[profIdxLoBack].Abs, btar.Sol.Bk.Bm[profIdxHiBack].Abs,
                                                                   profInterpFacBack);
 
                                         for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
@@ -7758,24 +7758,24 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         Real64 tfshBBk = matBlindBack->BeamBeamTrans(profAngBack, slatAngBack);
                                         Real64 tbshBBk = matBlindBack->BeamBeamTrans(profAngBack, Constant::Pi - slatAngBack);
 
-                                        Real64 tfshBdk = Interp(btar.Sol.Front.Bm[profIdxLoBack].DfTra, btar.Sol.Front.Bm[profIdxHiBack].DfTra,
+                                        Real64 tfshBdk = Interp(btar.Sol.Ft.Bm[profIdxLoBack].DfTra, btar.Sol.Ft.Bm[profIdxHiBack].DfTra,
                                                                 profInterpFacBack);
-                                        Real64 tbshBdk = Interp(btar.Sol.Back.Bm[profIdxLoBack].DfTra, btar.Sol.Back.Bm[profIdxHiBack].DfTra,
+                                        Real64 tbshBdk = Interp(btar.Sol.Bk.Bm[profIdxLoBack].DfTra, btar.Sol.Bk.Bm[profIdxHiBack].DfTra,
                                                                 profInterpFacBack);
-                                        Real64 rfshBk = Interp(btar.Sol.Front.Bm[profIdxLoBack].DfRef, btar.Sol.Front.Bm[profIdxHiBack].DfRef,
+                                        Real64 rfshBk = Interp(btar.Sol.Ft.Bm[profIdxLoBack].DfRef, btar.Sol.Ft.Bm[profIdxHiBack].DfRef,
                                                                profInterpFacBack);
-                                        Real64 rbshBk = Interp(btar.Sol.Back.Bm[profIdxLoBack].DfRef, btar.Sol.Back.Bm[profIdxHiBack].DfRef,
+                                        Real64 rbshBk = Interp(btar.Sol.Bk.Bm[profIdxLoBack].DfRef, btar.Sol.Bk.Bm[profIdxHiBack].DfRef,
                                                                profInterpFacBack);
-                                        Real64 afshBk = Interp(btar.Sol.Front.Bm[profIdxLoBack].Abs, btar.Sol.Front.Bm[profIdxHiBack].Abs,
+                                        Real64 afshBk = Interp(btar.Sol.Ft.Bm[profIdxLoBack].Abs, btar.Sol.Ft.Bm[profIdxHiBack].Abs,
                                                                profInterpFacBack);
-                                        Real64 abshBk = Interp(btar.Sol.Back.Bm[profIdxLoBack].Abs, btar.Sol.Back.Bm[profIdxHiBack].Abs,
+                                        Real64 abshBk = Interp(btar.Sol.Bk.Bm[profIdxLoBack].Abs, btar.Sol.Bk.Bm[profIdxHiBack].Abs,
                                                                profInterpFacBack);
-                                        Real64 tfshdk = btarBack.Sol.Front.Df.Tra;
-                                        Real64 rfshdk = btarBack.Sol.Front.Df.Ref;
-                                        Real64 afshdk = btarBack.Sol.Front.Df.Abs;
-                                        Real64 tbshdk = btarBack.Sol.Back.Df.Tra;
-                                        Real64 rbshdk = btarBack.Sol.Back.Df.Ref;
-                                        Real64 abshdk = btarBack.Sol.Back.Df.Abs;
+                                        Real64 tfshdk = btarBack.Sol.Ft.Df.Tra;
+                                        Real64 rfshdk = btarBack.Sol.Ft.Df.Ref;
+                                        Real64 afshdk = btarBack.Sol.Ft.Df.Abs;
+                                        Real64 tbshdk = btarBack.Sol.Bk.Df.Tra;
+                                        Real64 rbshdk = btarBack.Sol.Bk.Df.Ref;
+                                        Real64 abshdk = btarBack.Sol.Bk.Df.Abs;
                                         Real64 ABlBack;
                                         
                                         if (NBackGlass == 2) {
@@ -9498,10 +9498,10 @@ void WindowShadingManager(EnergyPlusData &state)
                         auto &surfShade = s_surf->surfShades(ISurf);
                         if (state.dataWindowEquivLayer->CFS(EQLNum).L(state.dataWindowEquivLayer->CFS(EQLNum).VBLayerPtr).CNTRL ==
                             state.dataWindowEquivalentLayer->lscNONE) {
-                            surfShade.blind.slatAngThisTSDeg =
+                            surfShade.blind.slatAngDeg =
                                 state.dataWindowEquivLayer->CFS(EQLNum).L(state.dataWindowEquivLayer->CFS(EQLNum).VBLayerPtr).PHI_DEG;
                         } else {
-                            surfShade.blind.slatAngThisTSDeg = 0.0;
+                            surfShade.blind.slatAngDeg = 0.0;
                         }
                     }
                 }
@@ -9924,8 +9924,8 @@ void WindowShadingManager(EnergyPlusData &state)
 
                 // Slat angle control for blinds
                 auto &surfShade = s_surf->surfShades(ISurf);
-                surfShade.blind.slatAngThisTS = 0.0;
-                surfShade.blind.slatAngThisTSDeg = 0.0;
+                surfShade.blind.slatAng = 0.0;
+                surfShade.blind.slatAngDeg = 0.0;
                 surfShade.blind.slatBlockBeam = false;
                 if (ANY_BLIND(s_surf->SurfWinShadingFlag(ISurf)) ||
                     s_surf->SurfWinShadingFlag(ISurf) == WinShadingType::IntBlindConditionallyOff ||
@@ -10064,32 +10064,32 @@ void WindowShadingManager(EnergyPlusData &state)
                             break;
                         } // switch (slatAngControl)
 
-                        if (surfShade.blind.slatAngThisTSDegEMSon) {
-                            slatAng = Constant::DegToRad * surfShade.blind.slatAngThisTSDegEMSValue;
+                        if (surfShade.blind.slatAngDegEMSon) {
+                            slatAng = Constant::DegToRad * surfShade.blind.slatAngDegEMSValue;
                         }
                         
                         // Slat angle is changing, need to recalcualte stored values
-                        if (slatAng != surfShade.blind.slatAngThisTS) {
-                            surfShade.blind.slatAngThisTS = slatAng;
-                            surfShade.blind.slatAngThisTSDeg = surfShade.blind.slatAngThisTS * Constant::RadToDeg;
+                        if (slatAng != surfShade.blind.slatAng) {
+                            surfShade.blind.slatAng = slatAng;
+                            surfShade.blind.slatAngDeg = surfShade.blind.slatAng * Constant::RadToDeg;
                             
-                            Material::GetSlatIndicesInterpFac(surfShade.blind.slatAngThisTS,
+                            Material::GetSlatIndicesInterpFac(surfShade.blind.slatAng,
                                                               surfShade.blind.slatAngIdxLo,
                                                               surfShade.blind.slatAngIdxHi,
                                                               surfShade.blind.slatAngInterpFac);
-                            surfShade.blind.tar.interpSlatAng(matBlind->tars[surfShade.blind.slatAngIdxLo],
-                                                              matBlind->tars[surfShade.blind.slatAngIdxHi],
+                            surfShade.blind.TAR.interpSlatAng(matBlind->TARs[surfShade.blind.slatAngIdxLo],
+                                                              matBlind->TARs[surfShade.blind.slatAngIdxHi],
                                                               surfShade.blind.slatAngInterpFac);
                         }
 
                         surfShade.blind.slatBlockBeam = slatBlockBeam;
                         
                         // Air flow permeability for calculation of convective air flow between blind and glass
-                        Real64 PermeabilityA = std::sin(surfShade.blind.slatAngThisTS) - matBlind->SlatThickness / matBlind->SlatSeparation;
-                        Real64 PermeabilityB = 1.0 - (std::abs(matBlind->SlatWidth * std::cos(surfShade.blind.slatAngThisTS)) +
-                                               matBlind->SlatThickness * std::sin(surfShade.blind.slatAngThisTS)) / matBlind->SlatSeparation;
+                        Real64 PermeabilityA = std::sin(surfShade.blind.slatAng) - matBlind->SlatThickness / matBlind->SlatSeparation;
+                        Real64 PermeabilityB = 1.0 - (std::abs(matBlind->SlatWidth * std::cos(surfShade.blind.slatAng)) +
+                                               matBlind->SlatThickness * std::sin(surfShade.blind.slatAng)) / matBlind->SlatSeparation;
                         surfShade.blind.airFlowPermeability = min(1.0, max(0.0, PermeabilityA, PermeabilityB));
-                        surfShade.blind.bmBmTrans = matBlind->BeamBeamTrans(surfShade.blind.profAng, surfShade.blind.slatAngThisTS);
+                        surfShade.blind.bmBmTrans = matBlind->BeamBeamTrans(surfShade.blind.profAng, surfShade.blind.slatAng);
                     }
                 } // End of check if interior or exterior or between glass blind in place
 
@@ -12008,7 +12008,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                 } else if (ANY_BLIND(ShadeFlag)) {
                                     auto const &slatDfAbsLo = constrSh.layerSlatBlindDfAbs(IGlass)[surfShade.blind.slatAngIdxLo];
                                     auto const &slatDfAbsHi = constrSh.layerSlatBlindDfAbs(IGlass)[surfShade.blind.slatAngIdxHi];
-                                    BlAbsDiffBk = Interp(slatDfAbsLo.Sol.Back.Df.Abs, slatDfAbsHi.Sol.Back.Df.Abs, slatInterpFac);
+                                    BlAbsDiffBk = Interp(slatDfAbsLo.Sol.Bk.Df.Abs, slatDfAbsHi.Sol.Bk.Df.Abs, slatInterpFac);
                                     // Calc diffuse solar absorbed in each window glass layer and shade
                                     WinDifSolLayAbsW = WinDifSolarTrans_Factor * BlAbsDiffBk;
                                 }
@@ -12032,7 +12032,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                 auto const &btarSlatHi = constr.blindTARs[surfShade.blind.slatAngIdxHi];
                                 Real64 slatInterpFac = surfShade.blind.slatAngInterpFac;
                                 // Diffuse back solar reflectance, blind present, vs. slat angle
-                                InsideDifReflectance = Interp(btarSlatLo.Sol.Back.Df.Ref, btarSlatHi.Sol.Back.Df.Ref, slatInterpFac);
+                                InsideDifReflectance = Interp(btarSlatLo.Sol.Bk.Df.Ref, btarSlatHi.Sol.Bk.Df.Ref, slatInterpFac);
                             }
                             DifSolarReflW = WinDifSolarTrans_Factor * InsideDifReflectance;
 
@@ -12050,7 +12050,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                 auto const &btarSlatLo = constrSh.blindTARs[surfShade.blind.slatAngIdxLo];
                                 auto const &btarSlatHi = constrSh.blindTARs[surfShade.blind.slatAngIdxHi];
                                 Real64 slatInterpFac = surfShade.blind.slatAngInterpFac;
-                                AbsDiffBkBl = Interp(btarSlatLo.Sol.Back.Df.Abs, btarSlatHi.Sol.Back.Df.Abs, slatInterpFac);
+                                AbsDiffBkBl = Interp(btarSlatLo.Sol.Bk.Df.Abs, btarSlatHi.Sol.Bk.Df.Abs, slatInterpFac);
                                 ShBlDifSolarAbsW = WinDifSolarTrans_Factor * AbsDiffBkBl;
                             }
                             // Correct for divider shadowing
@@ -12528,7 +12528,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
                         auto const &dfAbsSlatLo = constrSh.layerSlatBlindDfAbs(IGlass)[surfShade.blind.slatAngIdxLo];
                         auto const &dfAbsSlatHi = constrSh.layerSlatBlindDfAbs(IGlass)[surfShade.blind.slatAngIdxHi];
                         Real64 slatInterpFac = surfShade.blind.slatAngInterpFac;
-                        BlAbsDiffBk = Interp(dfAbsSlatLo.Sol.Back.Df.Abs, dfAbsSlatHi.Sol.Back.Df.Abs, slatInterpFac);
+                        BlAbsDiffBk = Interp(dfAbsSlatLo.Sol.Bk.Df.Abs, dfAbsSlatHi.Sol.Bk.Df.Abs, slatInterpFac);
                         // Calc diffuse solar absorbed in each window glass layer and shade
                         WinDifSolLayAbsW = SolarTrans_ViewFactor * BlAbsDiffBk;
                     }
@@ -12555,7 +12555,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
                     auto const &btarSlatHi = constrSh.blindTARs[surfShade.blind.slatAngIdxHi];
                     Real64 slatInterpFac = surfShade.blind.slatAngInterpFac;
                     // Diffuse back solar reflectance, blind present, vs. slat angle
-                    InsideDifReflectance = Interp(btarSlatLo.Sol.Back.Df.Ref, btarSlatHi.Sol.Back.Df.Ref, slatInterpFac);
+                    InsideDifReflectance = Interp(btarSlatLo.Sol.Bk.Df.Ref, btarSlatHi.Sol.Bk.Df.Ref, slatInterpFac);
                 }
                 DifSolarReflW = SolarTrans_ViewFactor * InsideDifReflectance;
 
@@ -12578,7 +12578,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
                     auto const &btarSlatHi = constrSh.blindTARs[surfShade.blind.slatAngIdxHi];
                     Real64 slatInterpFac = surfShade.blind.slatAngInterpFac;
                     // Calc diffuse solar absorbed by blind [W]
-                    AbsDiffBkBl = Interp(btarSlatLo.Sol.Back.Df.Abs, btarSlatHi.Sol.Back.Df.Abs, slatInterpFac);
+                    AbsDiffBkBl = Interp(btarSlatLo.Sol.Bk.Df.Abs, btarSlatHi.Sol.Bk.Df.Abs, slatInterpFac);
                     ShBlDifSolarAbsW = SolarTrans_ViewFactor * AbsDiffBkBl;
                 }
                 // Correct for divider shadowing

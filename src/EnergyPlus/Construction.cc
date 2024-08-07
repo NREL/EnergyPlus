@@ -2047,10 +2047,10 @@ void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
         auto &slatBlindDfAbs = this->layerSlatBlindDfAbs(Layer);
         for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
             auto &blindDfAbs = slatBlindDfAbs[iSlatAng];
-            blindDfAbs.Sol.Front.Df.Abs = 0.0;
-            blindDfAbs.Sol.Front.Df.AbsGnd = 0.0;
-            blindDfAbs.Sol.Front.Df.AbsGnd = 0.0;
-            blindDfAbs.Sol.Back.Df.Abs = 0.0;
+            blindDfAbs.Sol.Ft.Df.Abs = 0.0;
+            blindDfAbs.Sol.Ft.Df.AbsGnd = 0.0;
+            blindDfAbs.Sol.Ft.Df.AbsGnd = 0.0;
+            blindDfAbs.Sol.Bk.Df.Abs = 0.0;
         }
     }
     for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {

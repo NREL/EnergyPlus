@@ -1721,8 +1721,8 @@ namespace EMSManager {
                                      surf.Name,
                                      "Slat Angle",
                                      "[degrees]",
-                                     surfShade.blind.slatAngThisTSDegEMSon,
-                                     surfShade.blind.slatAngThisTSDegEMSValue);
+                                     surfShade.blind.slatAngDegEMSon,
+                                     surfShade.blind.slatAngDegEMSValue);
                 }
             } else if (state.dataSurface->WindowShadingControl(surf.activeWindowShadingControl).ShadingType ==
                        DataSurfaces::WinShadingType::ExtScreen) {

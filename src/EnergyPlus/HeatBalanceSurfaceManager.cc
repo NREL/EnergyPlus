@@ -2006,7 +2006,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Window Blind Slat Angle",
                                 Constant::Units::deg,
-                                surfShade.blind.slatAngThisTSDeg,
+                                surfShade.blind.slatAngDeg,
                                 OutputProcessor::TimeStepType::Zone,
                                 OutputProcessor::StoreType::Average,
                                 surface.Name);
@@ -3093,14 +3093,14 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                         auto const &dfAbsSlatLo = constructionSh.layerSlatBlindDfAbs(Lay)[slatIdxLo];
                                         auto const &dfAbsSlatHi = constructionSh.layerSlatBlindDfAbs(Lay)[slatIdxHi];
                                         
-                                        AbsDiffWin(Lay) = Interp(dfAbsSlatLo.Sol.Front.Df.Abs, dfAbsSlatHi.Sol.Front.Df.Abs, interpFac);
-                                        AbsDiffWinGnd(Lay) = Interp(dfAbsSlatLo.Sol.Front.Df.AbsGnd, dfAbsSlatHi.Sol.Front.Df.AbsGnd, interpFac);
-                                        AbsDiffWinSky(Lay) = Interp(dfAbsSlatLo.Sol.Front.Df.AbsSky, dfAbsSlatHi.Sol.Front.Df.AbsSky, interpFac);
+                                        AbsDiffWin(Lay) = Interp(dfAbsSlatLo.Sol.Ft.Df.Abs, dfAbsSlatHi.Sol.Ft.Df.Abs, interpFac);
+                                        AbsDiffWinGnd(Lay) = Interp(dfAbsSlatLo.Sol.Ft.Df.AbsGnd, dfAbsSlatHi.Sol.Ft.Df.AbsGnd, interpFac);
+                                        AbsDiffWinSky(Lay) = Interp(dfAbsSlatLo.Sol.Ft.Df.AbsSky, dfAbsSlatHi.Sol.Ft.Df.AbsSky, interpFac);
                                     }
 
                                     auto const &tarSlatLo = constructionSh.blindTARs[slatIdxLo];
                                     auto const &tarSlatHi = constructionSh.blindTARs[slatIdxHi];
-                                    AbsDiffBlind = Interp(tarSlatLo.Sol.Front.Df.Abs, tarSlatHi.Sol.Front.Df.Abs, interpFac);
+                                    AbsDiffBlind = Interp(tarSlatLo.Sol.Ft.Df.Abs, tarSlatHi.Sol.Ft.Df.Abs, interpFac);
 
                                     state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum) = AbsDiffBlind * (SkySolarInc + GndSolarInc);
 
@@ -3109,8 +3109,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                         Real64 ACosTlt = std::abs(Surface(SurfNum).CosTilt);
 
                                         // Need to do these interpolations unless we want to cache this in surfShade.blind.
-                                        Real64 AbsDiffBlindGnd = Interp(tarSlatLo.Sol.Front.Df.AbsGnd, tarSlatHi.Sol.Front.Df.AbsGnd, interpFac);
-                                        Real64 AbsDiffBlindSky = Interp(tarSlatLo.Sol.Front.Df.AbsSky, tarSlatHi.Sol.Front.Df.AbsSky, interpFac);
+                                        Real64 AbsDiffBlindGnd = Interp(tarSlatLo.Sol.Ft.Df.AbsGnd, tarSlatHi.Sol.Ft.Df.AbsGnd, interpFac);
+                                        Real64 AbsDiffBlindSky = Interp(tarSlatLo.Sol.Ft.Df.AbsSky, tarSlatHi.Sol.Ft.Df.AbsSky, interpFac);
 
                                         state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum) =
                                             SkySolarInc * (0.5 * ACosTlt * AbsDiffBlindGnd + (1.0 - 0.5 * ACosTlt) * AbsDiffBlindSky) +
@@ -3155,8 +3155,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                         auto const &dfAbsSlatLo = constructionSh.layerSlatBlindDfAbs(Lay)[slatIdxLo];
                                         auto const &dfAbsSlatHi = constructionSh.layerSlatBlindDfAbs(Lay)[slatIdxHi];
 
-                                        Real64 AbsDiffGlassLayGnd = Interp(dfAbsSlatLo.Sol.Front.Df.AbsGnd, dfAbsSlatHi.Sol.Front.Df.AbsGnd, interpFac);
-                                        Real64 AbsDiffGlassLaySky = Interp(dfAbsSlatLo.Sol.Front.Df.AbsSky, dfAbsSlatHi.Sol.Front.Df.AbsSky, interpFac);
+                                        Real64 AbsDiffGlassLayGnd = Interp(dfAbsSlatLo.Sol.Ft.Df.AbsGnd, dfAbsSlatHi.Sol.Ft.Df.AbsGnd, interpFac);
+                                        Real64 AbsDiffGlassLaySky = Interp(dfAbsSlatLo.Sol.Ft.Df.AbsSky, dfAbsSlatHi.Sol.Ft.Df.AbsSky, interpFac);
 
                                         state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
                                             SkySolarInc * (0.5 * ACosTlt * AbsDiffGlassLayGnd + (1.0 - 0.5 * ACosTlt) * AbsDiffGlassLaySky) +
@@ -3484,10 +3484,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     int profIdxHi = surfShade.blind.profAngIdxHi;
                                     Real64 profInterpFac = surfShade.blind.profAngInterpFac;
 
-                                    auto const &btarLo = surfShade.blind.tar.Sol.Front.Bm[profIdxLo];
-                                    auto const &btarHi = surfShade.blind.tar.Sol.Front.Bm[profIdxHi];
+                                    auto const &btarLo = surfShade.blind.TAR.Sol.Ft.Bm[profIdxLo];
+                                    auto const &btarHi = surfShade.blind.TAR.Sol.Ft.Bm[profIdxHi];
                                     
-                                    Real64 FrontDiffTrans = surfShade.blind.tar.Sol.Front.Df.Tra;
+                                    Real64 FrontDiffTrans = surfShade.blind.TAR.Sol.Ft.Df.Tra;
                                     Real64 TBlBmDif = Interp(btarLo.DfTra, btarHi.DfTra, profInterpFac);
 
                                     // TBlBmBm - Blind beam-beam solar transmittance
@@ -3852,7 +3852,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                                 auto const &dfAbsSlatLo = constrSh.layerSlatBlindDfAbs(IGlass)[surfShade.blind.slatAngIdxLo];
                                 auto const &dfAbsSlatHi = constrSh.layerSlatBlindDfAbs(IGlass)[surfShade.blind.slatAngIdxHi];
                                 // Glass layer back diffuse solar absorptance when blind in place
-                                Real64 BlAbsDiffBk = Interp(dfAbsSlatLo.Sol.Back.Df.Abs, dfAbsSlatHi.Sol.Back.Df.Abs, interpFac);
+                                Real64 BlAbsDiffBk = Interp(dfAbsSlatLo.Sol.Bk.Df.Abs, dfAbsSlatHi.Sol.Bk.Df.Abs, interpFac);
 
                                 state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) +=
                                     state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * BlAbsDiffBk;
@@ -3878,7 +3878,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                             auto const &btarLo = constrSh.blindTARs[surfShade.blind.slatAngIdxLo];
                             auto const &btarHi = constrSh.blindTARs[surfShade.blind.slatAngIdxHi];
                             Real64 interpFac = surfShade.blind.slatAngInterpFac;
-                            Real64 AbsDiffBkBl = Interp(btarLo.Sol.Back.Df.Abs, btarHi.Sol.Back.Df.Abs, interpFac);
+                            Real64 AbsDiffBkBl = Interp(btarLo.Sol.Bk.Df.Abs, btarHi.Sol.Bk.Df.Abs, interpFac);
 
                             state.dataSurface->SurfWinIntSWAbsByShade(SurfNum) = state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * AbsDiffBkBl;
                         }
@@ -3934,8 +3934,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                             
                         } else if (ShadeFlag == DataSurfaces::WinShadingType::IntBlind) {
                             auto const &surfShade = state.dataSurface->surfShades(SurfNum);
-                            Real64 SolBackDiffDiffTrans = surfShade.blind.tar.Sol.Back.Df.Tra;
-                            Real64 IRBackTrans = surfShade.blind.tar.IR.Back.Tra;
+                            Real64 SolBackDiffDiffTrans = surfShade.blind.TAR.Sol.Bk.Df.Tra;
+                            Real64 IRBackTrans = surfShade.blind.TAR.IR.Bk.Tra;
 
                             DividerSolAbs *= SolBackDiffDiffTrans;
                             DividerThermAbs *= IRBackTrans;
@@ -4138,7 +4138,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
                         Real64 EffShDevEmiss = surfShade.effShadeEmi;
 
                         if (ShadeFlag == DataSurfaces::WinShadingType::IntBlind) {
-                            TauShIR = surfShade.blind.tar.IR.Back.Tra;
+                            TauShIR = surfShade.blind.TAR.IR.Bk.Tra;
                         }
                         SUM1 += state.dataSurface->SurfWinDividerArea(SurfNum) * (EffShDevEmiss + DividerThermAbs * TauShIR);
                     } else {
@@ -4227,7 +4227,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
                                 auto const &dfAbsSlatLo = constrSh.layerSlatBlindDfAbs(Lay)[surfShade.blind.slatAngIdxLo];
                                 auto const &dfAbsSlatHi = constrSh.layerSlatBlindDfAbs(Lay)[surfShade.blind.slatAngIdxHi];
                                 Real64 interpFac = surfShade.blind.slatAngInterpFac;
-                                AbsDiffLayWin = Interp(dfAbsSlatLo.Sol.Back.Df.Abs, dfAbsSlatHi.Sol.Back.Df.Abs, interpFac);
+                                AbsDiffLayWin = Interp(dfAbsSlatLo.Sol.Bk.Df.Abs, dfAbsSlatHi.Sol.Bk.Df.Abs, interpFac);
                             }
                         }
 
@@ -4255,8 +4255,8 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
                             auto const &btarSlatLo = constrSh.blindTARs[surfShade.blind.slatAngIdxLo];
                             auto const &btarSlatHi = constrSh.blindTARs[surfShade.blind.slatAngIdxHi];
                             Real64 interpFac = surfShade.blind.slatAngInterpFac;
-                            TransDiffWin = Interp(btarSlatLo.Sol.Front.Df.Tra, btarSlatHi.Sol.Front.Df.Tra, interpFac);
-                            DiffAbsShade = Interp(btarSlatLo.Sol.Back.Df.Abs, btarSlatHi.Sol.Back.Df.Abs, interpFac);
+                            TransDiffWin = Interp(btarSlatLo.Sol.Ft.Df.Tra, btarSlatHi.Sol.Ft.Df.Tra, interpFac);
+                            DiffAbsShade = Interp(btarSlatLo.Sol.Bk.Df.Abs, btarSlatHi.Sol.Bk.Df.Abs, interpFac);
                         }
                     }
 

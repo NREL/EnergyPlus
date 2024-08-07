@@ -242,9 +242,9 @@ namespace Window {
 
                 auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(mat);
                 for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
-                    auto const &btar = matBlind->tars[iSlatAng];
-                    Real64 TauShIR = btar.IR.Front.Tra;
-                    Real64 EpsShIR = btar.IR.Front.Emi;
+                    auto const &btar = matBlind->TARs[iSlatAng];
+                    Real64 TauShIR = btar.IR.Ft.Tra;
+                    Real64 EpsShIR = btar.IR.Ft.Emi;
                     Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                     constrSh.effShadeBlindEmi[iSlatAng] = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
                     constrSh.effGlassEmi[iSlatAng] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
@@ -380,10 +380,10 @@ namespace Window {
         Real64 lowLambda = aRange.minLambda();
         Real64 highLambda = aRange.maxLambda();
 
-        Real64 Tf = matBlind->SlatTransVisDiffDiff;
-        Real64 Tb = matBlind->SlatTransVisDiffDiff;
-        Real64 Rf = matBlind->SlatFrontReflVisDiffDiff;
-        Real64 Rb = matBlind->SlatBackReflVisDiffDiff;
+        Real64 Tf = matBlind->slatTAR.Vis.Ft.Df.Tra;
+        Real64 Tb = matBlind->slatTAR.Vis.Ft.Df.Tra;
+        Real64 Rf = matBlind->slatTAR.Vis.Ft.Df.Ref;
+        Real64 Rb = matBlind->slatTAR.Vis.Bk.Df.Ref;
 
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
@@ -397,10 +397,10 @@ namespace Window {
         Real64 lowLambda = aRange.minLambda();
         Real64 highLambda = aRange.maxLambda();
 
-        Real64 Tf = matBlind->SlatTransSolDiffDiff;
-        Real64 Tb = matBlind->SlatTransSolDiffDiff;
-        Real64 Rf = matBlind->SlatFrontReflSolDiffDiff;
-        Real64 Rb = matBlind->SlatBackReflSolDiffDiff;
+        Real64 Tf = matBlind->slatTAR.Sol.Ft.Df.Tra;
+        Real64 Tb = matBlind->slatTAR.Sol.Ft.Df.Tra;
+        Real64 Rf = matBlind->slatTAR.Sol.Ft.Df.Ref;
+        Real64 Rb = matBlind->slatTAR.Sol.Bk.Df.Ref;
 
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }

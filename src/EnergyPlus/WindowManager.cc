@@ -1178,16 +1178,16 @@ namespace Window {
                 auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
 
                 for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
-                    auto const &btar = matBlind->tars[iSlatAng];
-                    ShadeTrans = btar.Sol.Front.Df.Tra;
-                    ShadeTransGnd = btar.Sol.Front.Df.TraGnd;
-                    ShadeTransSky = btar.Sol.Front.Df.TraSky;
-                    ShadeTransVis = btar.Vis.Front.Df.Tra;
-                    ShadeAbs = btar.Sol.Front.Df.Abs;
-                    ShadeRefl = btar.Sol.Front.Df.Ref;
-                    ShadeReflGnd = btar.Sol.Front.Df.RefGnd;
-                    ShadeReflSky = btar.Sol.Front.Df.RefSky;
-                    ShadeReflVis = btar.Vis.Front.Df.Ref;
+                    auto const &btar = matBlind->TARs[iSlatAng];
+                    ShadeTrans = btar.Sol.Ft.Df.Tra;
+                    ShadeTransGnd = btar.Sol.Ft.Df.TraGnd;
+                    ShadeTransSky = btar.Sol.Ft.Df.TraSky;
+                    ShadeTransVis = btar.Vis.Ft.Df.Tra;
+                    ShadeAbs = btar.Sol.Ft.Df.Abs;
+                    ShadeRefl = btar.Sol.Ft.Df.Ref;
+                    ShadeReflGnd = btar.Sol.Ft.Df.RefGnd;
+                    ShadeReflSky = btar.Sol.Ft.Df.RefSky;
+                    ShadeReflVis = btar.Vis.Ft.Df.Ref;
                     
                     // Correction factors for inter-reflections between glass and shading device
                     ShadeReflFac = 1.0 / (1.0 - ShadeRefl * thisConstruct.ReflectSolDiffBack);
@@ -1196,33 +1196,33 @@ namespace Window {
                     // Front incident solar, diffuse, interior blind
                     for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
                         auto &dfAbs = constr.layerSlatBlindDfAbs(IGlass)[iSlatAng];
-                        dfAbs.Sol.Front.Df.Abs = constr.AbsDiff(IGlass) + tsolDiff * ShadeRefl * ShadeReflFac * constr.AbsDiffBack(IGlass);
-                        dfAbs.Sol.Front.Df.AbsGnd = constr.AbsDiff(IGlass) + tsolDiff * ShadeReflGnd * ShadeReflFac * constr.AbsDiffBack(IGlass);
-                        dfAbs.Sol.Front.Df.AbsSky = constr.AbsDiff(IGlass) + tsolDiff * ShadeReflSky * ShadeReflFac * constr.AbsDiffBack(IGlass);
+                        dfAbs.Sol.Ft.Df.Abs = constr.AbsDiff(IGlass) + tsolDiff * ShadeRefl * ShadeReflFac * constr.AbsDiffBack(IGlass);
+                        dfAbs.Sol.Ft.Df.AbsGnd = constr.AbsDiff(IGlass) + tsolDiff * ShadeReflGnd * ShadeReflFac * constr.AbsDiffBack(IGlass);
+                        dfAbs.Sol.Ft.Df.AbsSky = constr.AbsDiff(IGlass) + tsolDiff * ShadeReflSky * ShadeReflFac * constr.AbsDiffBack(IGlass);
                     }
 
                     auto &cbtar = constr.blindTARs[iSlatAng];
                     
-                    cbtar.Sol.Front.Df.Abs = tsolDiff * ShadeReflFac * ShadeAbs;
-                    cbtar.Sol.Front.Df.AbsGnd = tsolDiff * ShadeReflFac * btar.Sol.Front.Df.AbsGnd;
-                    cbtar.Sol.Front.Df.AbsSky = tsolDiff * ShadeReflFac * btar.Sol.Front.Df.AbsSky;
-                    cbtar.Sol.Front.Df.Tra = tsolDiff * ShadeReflFac * ShadeTrans;
-                    cbtar.Sol.Front.Df.TraGnd = tsolDiff * ShadeReflFac * ShadeTransGnd;
-                    cbtar.Sol.Front.Df.TraSky = tsolDiff * ShadeReflFac * ShadeTransSky;
-                    cbtar.Vis.Front.Df.Tra = tvisDiff * ShadeReflFacVis * ShadeTransVis;
-                    cbtar.Sol.Front.Df.Ref = constr.ReflectSolDiffFront + tsolDiff_2 * ShadeRefl * ShadeReflFac;
-                    cbtar.Vis.Front.Df.Ref = constr.ReflectVisDiffFront + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
+                    cbtar.Sol.Ft.Df.Abs = tsolDiff * ShadeReflFac * ShadeAbs;
+                    cbtar.Sol.Ft.Df.AbsGnd = tsolDiff * ShadeReflFac * btar.Sol.Ft.Df.AbsGnd;
+                    cbtar.Sol.Ft.Df.AbsSky = tsolDiff * ShadeReflFac * btar.Sol.Ft.Df.AbsSky;
+                    cbtar.Sol.Ft.Df.Tra = tsolDiff * ShadeReflFac * ShadeTrans;
+                    cbtar.Sol.Ft.Df.TraGnd = tsolDiff * ShadeReflFac * ShadeTransGnd;
+                    cbtar.Sol.Ft.Df.TraSky = tsolDiff * ShadeReflFac * ShadeTransSky;
+                    cbtar.Vis.Ft.Df.Tra = tvisDiff * ShadeReflFacVis * ShadeTransVis;
+                    cbtar.Sol.Ft.Df.Ref = constr.ReflectSolDiffFront + tsolDiff_2 * ShadeRefl * ShadeReflFac;
+                    cbtar.Vis.Ft.Df.Ref = constr.ReflectVisDiffFront + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
                     
                     // Back incident solar, diffuse, interior blind
                     
                     for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
                         auto &dfAbs = constr.layerSlatBlindDfAbs(IGlass)[iSlatAng];
-                        dfAbs.Sol.Back.Df.Abs = constr.AbsDiffBack(IGlass) * ShadeTrans * ShadeReflFac;
+                        dfAbs.Sol.Bk.Df.Abs = constr.AbsDiffBack(IGlass) * ShadeTrans * ShadeReflFac;
                     }
                     
-                    cbtar.Sol.Back.Df.Abs = btar.Sol.Back.Df.Abs + ShadeTrans * ShadeReflFac * constr.ReflectSolDiffBack * ShadeAbs;
-                    cbtar.Sol.Back.Df.Ref = btar.Sol.Back.Df.Ref + pow_2(ShadeTrans) * constr.ReflectSolDiffBack * ShadeReflFac;
-                    cbtar.Vis.Back.Df.Ref = btar.Vis.Back.Df.Ref + pow_2(ShadeTransVis) * constr.ReflectVisDiffBack * ShadeReflFacVis;
+                    cbtar.Sol.Bk.Df.Abs = btar.Sol.Bk.Df.Abs + ShadeTrans * ShadeReflFac * constr.ReflectSolDiffBack * ShadeAbs;
+                    cbtar.Sol.Bk.Df.Ref = btar.Sol.Bk.Df.Ref + pow_2(ShadeTrans) * constr.ReflectSolDiffBack * ShadeReflFac;
+                    cbtar.Vis.Bk.Df.Ref = btar.Vis.Bk.Df.Ref + pow_2(ShadeTransVis) * constr.ReflectVisDiffBack * ShadeReflFacVis;
                 }
 
             // Exterior blind
@@ -1230,14 +1230,14 @@ namespace Window {
                 auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(BlNum));
 
                 for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
-                    auto const &btar = matBlind->tars[iSlatAng];
-                    ShadeTrans = btar.Sol.Front.Df.Tra;
-                    ShadeTransGnd = btar.Sol.Front.Df.TraGnd;
-                    ShadeTransSky = btar.Sol.Front.Df.TraSky;
-                    ShadeTransVis = btar.Vis.Front.Df.Tra;
-                    ShadeAbs = btar.Sol.Back.Df.Abs;
-                    ShadeRefl = btar.Sol.Back.Df.Ref;
-                    ShadeReflVis = btar.Vis.Back.Df.Ref;
+                    auto const &btar = matBlind->TARs[iSlatAng];
+                    ShadeTrans = btar.Sol.Ft.Df.Tra;
+                    ShadeTransGnd = btar.Sol.Ft.Df.TraGnd;
+                    ShadeTransSky = btar.Sol.Ft.Df.TraSky;
+                    ShadeTransVis = btar.Vis.Ft.Df.Tra;
+                    ShadeAbs = btar.Sol.Bk.Df.Abs;
+                    ShadeRefl = btar.Sol.Bk.Df.Ref;
+                    ShadeReflVis = btar.Vis.Bk.Df.Ref;
                 
                     // Correction factors for inter-reflections between glass and shading device
                     ShadeReflFac = 1.0 / (1.0 - ShadeRefl * constr.ReflectSolDiffFront);
@@ -1245,31 +1245,31 @@ namespace Window {
                 
                     for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
                         auto &dfAbs = constr.layerSlatBlindDfAbs(IGlass)[iSlatAng];
-                        dfAbs.Sol.Front.Df.Abs = ShadeTrans * ShadeReflFac * solabsDiff(IGlass);
-                        dfAbs.Sol.Front.Df.AbsGnd = ShadeTransGnd * ShadeReflFac * solabsDiff(IGlass);
-                        dfAbs.Sol.Front.Df.AbsSky = ShadeTransSky * ShadeReflFac * solabsDiff(IGlass);
+                        dfAbs.Sol.Ft.Df.Abs = ShadeTrans * ShadeReflFac * solabsDiff(IGlass);
+                        dfAbs.Sol.Ft.Df.AbsGnd = ShadeTransGnd * ShadeReflFac * solabsDiff(IGlass);
+                        dfAbs.Sol.Ft.Df.AbsSky = ShadeTransSky * ShadeReflFac * solabsDiff(IGlass);
                     }
                 
                     auto &cbtar = constr.blindTARs[iSlatAng];
-                    cbtar.Sol.Front.Df.Abs = btar.Sol.Front.Df.Abs + ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
-                    cbtar.Sol.Front.Df.AbsGnd = btar.Sol.Front.Df.AbsGnd + ShadeTransGnd * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
-                    cbtar.Sol.Front.Df.AbsSky = btar.Sol.Front.Df.AbsSky + ShadeTransSky * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
-                    cbtar.Sol.Front.Df.Tra = tsolDiff * ShadeReflFac * ShadeTrans;
-                    cbtar.Sol.Front.Df.TraGnd = tsolDiff * ShadeReflFac * ShadeTransGnd;
-                    cbtar.Sol.Front.Df.TraSky = tsolDiff * ShadeReflFac * ShadeTransSky;
-                    cbtar.Vis.Front.Df.Tra = tvisDiff * ShadeReflFacVis * ShadeTransVis;
-                    cbtar.Sol.Front.Df.Ref = ShadeRefl + pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffFront * ShadeReflFac;
-                    cbtar.Vis.Front.Df.Ref = ShadeReflVis + pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffFront * ShadeReflFacVis;
+                    cbtar.Sol.Ft.Df.Abs = btar.Sol.Ft.Df.Abs + ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
+                    cbtar.Sol.Ft.Df.AbsGnd = btar.Sol.Ft.Df.AbsGnd + ShadeTransGnd * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
+                    cbtar.Sol.Ft.Df.AbsSky = btar.Sol.Ft.Df.AbsSky + ShadeTransSky * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
+                    cbtar.Sol.Ft.Df.Tra = tsolDiff * ShadeReflFac * ShadeTrans;
+                    cbtar.Sol.Ft.Df.TraGnd = tsolDiff * ShadeReflFac * ShadeTransGnd;
+                    cbtar.Sol.Ft.Df.TraSky = tsolDiff * ShadeReflFac * ShadeTransSky;
+                    cbtar.Vis.Ft.Df.Tra = tvisDiff * ShadeReflFacVis * ShadeTransVis;
+                    cbtar.Sol.Ft.Df.Ref = ShadeRefl + pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffFront * ShadeReflFac;
+                    cbtar.Vis.Ft.Df.Ref = ShadeReflVis + pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffFront * ShadeReflFacVis;
                 
                     // Back incident solar, diffuse, exterior shade/blind
                     for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
                         auto &dfAbs = constr.layerSlatBlindDfAbs(IGlass)[iSlatAng];
-                        dfAbs.Sol.Back.Df.Abs = constr.AbsDiffBack(IGlass) + tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
+                        dfAbs.Sol.Bk.Df.Abs = constr.AbsDiffBack(IGlass) + tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
                     }
                     
-                    cbtar.Sol.Back.Df.Abs = tsolDiff * ShadeReflFac * ShadeAbs;
-                    cbtar.Sol.Back.Df.Ref = constr.ReflectSolDiffBack + tsolDiff_2 * ShadeRefl * ShadeReflFac;
-                    cbtar.Vis.Back.Df.Ref = constr.ReflectVisDiffBack + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
+                    cbtar.Sol.Bk.Df.Abs = tsolDiff * ShadeReflFac * ShadeAbs;
+                    cbtar.Sol.Bk.Df.Ref = constr.ReflectSolDiffBack + tsolDiff_2 * ShadeRefl * ShadeReflFac;
+                    cbtar.Vis.Bk.Df.Ref = constr.ReflectVisDiffBack + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
                 }
 
             // Between-glass blind
@@ -1298,50 +1298,50 @@ namespace Window {
                 rf2v = constr.rfBareVisDiff(2);
                 
                 for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
-                    auto const &btar = matBlind->tars[iSlatAng];
-                    tsh = btar.Sol.Front.Df.Tra;
-                    tshGnd = btar.Sol.Front.Df.TraGnd;
-                    tshSky = btar.Sol.Front.Df.TraSky;
-                    tshv = btar.Vis.Front.Df.Tra;
-                    rfsh = btar.Sol.Front.Df.Ref;
-                    rfshGnd = btar.Sol.Front.Df.RefGnd;
-                    rfshSky = btar.Sol.Front.Df.RefSky;
-                    rfshv = btar.Vis.Front.Df.Ref;
-                    rbsh = btar.Sol.Back.Df.Ref;
-                    rbshv = btar.Vis.Back.Df.Ref;
-                    afsh = btar.Sol.Front.Df.Abs;
-                    afshGnd = btar.Sol.Front.Df.AbsGnd;
-                    afshSky = btar.Sol.Front.Df.AbsSky;
-                    absh = btar.Sol.Back.Df.Abs;
+                    auto const &btar = matBlind->TARs[iSlatAng];
+                    tsh = btar.Sol.Ft.Df.Tra;
+                    tshGnd = btar.Sol.Ft.Df.TraGnd;
+                    tshSky = btar.Sol.Ft.Df.TraSky;
+                    tshv = btar.Vis.Ft.Df.Tra;
+                    rfsh = btar.Sol.Ft.Df.Ref;
+                    rfshGnd = btar.Sol.Ft.Df.RefGnd;
+                    rfshSky = btar.Sol.Ft.Df.RefSky;
+                    rfshv = btar.Vis.Ft.Df.Ref;
+                    rbsh = btar.Sol.Bk.Df.Ref;
+                    rbshv = btar.Vis.Bk.Df.Ref;
+                    afsh = btar.Sol.Ft.Df.Abs;
+                    afshGnd = btar.Sol.Ft.Df.AbsGnd;
+                    afshSky = btar.Sol.Ft.Df.AbsSky;
+                    absh = btar.Sol.Bk.Df.Abs;
 
                     auto &cbtar = constr.blindTARs[iSlatAng];
                     if (NGlass == 2) {
                         // Front incident solar, diffuse, between-glass blind, NGlass = 2
                         auto &dfAbs1 = constr.layerSlatBlindDfAbs(1)[iSlatAng];
                         auto &dfAbs2 = constr.layerSlatBlindDfAbs(2)[iSlatAng];
-                        dfAbs1.Sol.Front.Df.Abs = afd1 + td1 * (rfsh + rfsh * rb1 * rfsh + tsh * rb2 * tsh) * abd1;
-                        dfAbs1.Sol.Front.Df.AbsGnd = afd1 + td1 * (rfshGnd + rfshGnd * rb1 * rfshGnd + tshGnd * rb2 * tsh) * abd1;
-                        dfAbs1.Sol.Front.Df.AbsSky = afd1 + td1 * (rfshSky + rfshSky * rb1 * rfshSky + tshSky * rb2 * tsh) * abd1;
-                        dfAbs2.Sol.Front.Df.Abs = td1 * (tsh + rfsh * rb1 * tsh + tsh * rf2 * rbsh) * afd2;
-                        dfAbs2.Sol.Front.Df.AbsGnd = td1 * (tshGnd + rfshGnd * rb1 * tsh + tshGnd * rf2 * rbsh) * afd2;
-                        dfAbs2.Sol.Front.Df.AbsSky = td1 * (tshSky + rfshSky * rb1 * tsh + tshSky * rf2 * rbsh) * afd2;
-                        cbtar.Sol.Front.Df.Abs = td1 * (afsh + rfsh * rb1 * afsh + tsh * rf2 * absh);
-                        cbtar.Sol.Front.Df.AbsGnd = td1 * (afshGnd + rfsh * rb1 * afsh + tshGnd * rf2 * absh);
-                        cbtar.Sol.Front.Df.AbsSky = td1 * (afshSky + rfsh * rb1 * afsh + tshSky * rf2 * absh);
-                        cbtar.Sol.Front.Df.Tra = td1 * (tsh + rfsh * rb1 * tsh + tsh * rb2 * rbsh) * td2;
-                        cbtar.Sol.Front.Df.TraGnd = td1 * (tshGnd + rfsh * rb1 * tshGnd + tshGnd * rb2 * rbsh) * td2;
-                        cbtar.Sol.Front.Df.TraSky = td1 * (tshSky + rfsh * rb1 * tshSky + tshSky * rb2 * rbsh) * td2;
-                        cbtar.Vis.Front.Df.Tra = td1v * (tshv + rfshv * rb1v * tshv + tshv * rb2v * rbshv) * td2v;
-                        cbtar.Sol.Front.Df.Ref = rf1 + td1 * (rfsh + rfsh * rb1 * rfsh + tsh * rf2 * tsh) * td1;
-                        cbtar.Vis.Front.Df.Ref = rf1v + td1v * (rfshv + rfshv * rb1v * rfshv + tshv * rf2v * tshv) * td1v;
+                        dfAbs1.Sol.Ft.Df.Abs = afd1 + td1 * (rfsh + rfsh * rb1 * rfsh + tsh * rb2 * tsh) * abd1;
+                        dfAbs1.Sol.Ft.Df.AbsGnd = afd1 + td1 * (rfshGnd + rfshGnd * rb1 * rfshGnd + tshGnd * rb2 * tsh) * abd1;
+                        dfAbs1.Sol.Ft.Df.AbsSky = afd1 + td1 * (rfshSky + rfshSky * rb1 * rfshSky + tshSky * rb2 * tsh) * abd1;
+                        dfAbs2.Sol.Ft.Df.Abs = td1 * (tsh + rfsh * rb1 * tsh + tsh * rf2 * rbsh) * afd2;
+                        dfAbs2.Sol.Ft.Df.AbsGnd = td1 * (tshGnd + rfshGnd * rb1 * tsh + tshGnd * rf2 * rbsh) * afd2;
+                        dfAbs2.Sol.Ft.Df.AbsSky = td1 * (tshSky + rfshSky * rb1 * tsh + tshSky * rf2 * rbsh) * afd2;
+                        cbtar.Sol.Ft.Df.Abs = td1 * (afsh + rfsh * rb1 * afsh + tsh * rf2 * absh);
+                        cbtar.Sol.Ft.Df.AbsGnd = td1 * (afshGnd + rfsh * rb1 * afsh + tshGnd * rf2 * absh);
+                        cbtar.Sol.Ft.Df.AbsSky = td1 * (afshSky + rfsh * rb1 * afsh + tshSky * rf2 * absh);
+                        cbtar.Sol.Ft.Df.Tra = td1 * (tsh + rfsh * rb1 * tsh + tsh * rb2 * rbsh) * td2;
+                        cbtar.Sol.Ft.Df.TraGnd = td1 * (tshGnd + rfsh * rb1 * tshGnd + tshGnd * rb2 * rbsh) * td2;
+                        cbtar.Sol.Ft.Df.TraSky = td1 * (tshSky + rfsh * rb1 * tshSky + tshSky * rb2 * rbsh) * td2;
+                        cbtar.Vis.Ft.Df.Tra = td1v * (tshv + rfshv * rb1v * tshv + tshv * rb2v * rbshv) * td2v;
+                        cbtar.Sol.Ft.Df.Ref = rf1 + td1 * (rfsh + rfsh * rb1 * rfsh + tsh * rf2 * tsh) * td1;
+                        cbtar.Vis.Ft.Df.Ref = rf1v + td1v * (rfshv + rfshv * rb1v * rfshv + tshv * rf2v * tshv) * td1v;
                         
                         // Back incident solar, diffuse, between-glass blind, NGlass = 2
                         
-                        dfAbs1.Sol.Back.Df.Abs = td2 * (tsh + rbsh * rf2 * tsh + tsh * rb1 * rfsh) * abd1;
-                        dfAbs2.Sol.Back.Df.Abs = abd2 + td2 * (rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh) * afd2;
-                        cbtar.Sol.Back.Df.Abs = td2 * (absh + rbsh * rf2 * absh + tsh * rb1 * afsh);
-                        cbtar.Sol.Back.Df.Ref = rb2 + td2 * (rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh) * td2;
-                        cbtar.Vis.Back.Df.Ref = rb2v + td2v * (rbshv + rbshv * rf2v * rbshv + tshv * rb1v * tshv) * td2v;
+                        dfAbs1.Sol.Bk.Df.Abs = td2 * (tsh + rbsh * rf2 * tsh + tsh * rb1 * rfsh) * abd1;
+                        dfAbs2.Sol.Bk.Df.Abs = abd2 + td2 * (rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh) * afd2;
+                        cbtar.Sol.Bk.Df.Abs = td2 * (absh + rbsh * rf2 * absh + tsh * rb1 * afsh);
+                        cbtar.Sol.Bk.Df.Ref = rb2 + td2 * (rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh) * td2;
+                        cbtar.Vis.Bk.Df.Ref = rb2v + td2v * (rbshv + rbshv * rf2v * rbshv + tshv * rb1v * tshv) * td2v;
 
                     } else if (NGlass == 3) {
                         auto &dfAbs1 = constr.layerSlatBlindDfAbs(1)[iSlatAng];
@@ -1358,54 +1358,54 @@ namespace Window {
                         
                         // Front incident solar, diffuse, between-glass blind, NGlass = 3
                         
-                        dfAbs1.Sol.Front.Df.Abs =
+                        dfAbs1.Sol.Ft.Df.Abs =
                                 afd1 +
                                 td1 * (rf2 + td2 * (rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh + rfsh * td2 * rb1 * td2 * rfsh) * td2) * abd1;
-                        dfAbs1.Sol.Front.Df.AbsGnd =
+                        dfAbs1.Sol.Ft.Df.AbsGnd =
                                 afd1 +
                                 td1 *
                                 (rf2 + td2 * (rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh + rfshGnd * td2 * rb1 * td2 * rfsh) * td2) *
                                 abd1;
-                        dfAbs1.Sol.Front.Df.AbsSky = 
+                        dfAbs1.Sol.Ft.Df.AbsSky = 
                                 afd1 +
                                 td1 *
                                 (rf2 + td2 * (rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh + rfshSky * td2 * rb1 * td2 * rfsh) * td2) *
                                 abd1;
-                        dfAbs2.Sol.Front.Df.Abs = td1 * (afd2 + td2 * (rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh) * abd2);
-                        dfAbs2.Sol.Front.Df.AbsGnd = td1 * (afd2 + td2 * (rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh) * abd2);
-                        dfAbs2.Sol.Front.Df.AbsSky = td1 * (afd2 + td2 * (rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh) * abd2);
-                        dfAbs3.Sol.Front.Df.Abs =
+                        dfAbs2.Sol.Ft.Df.Abs = td1 * (afd2 + td2 * (rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh) * abd2);
+                        dfAbs2.Sol.Ft.Df.AbsGnd = td1 * (afd2 + td2 * (rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh) * abd2);
+                        dfAbs2.Sol.Ft.Df.AbsSky = td1 * (afd2 + td2 * (rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh) * abd2);
+                        dfAbs3.Sol.Ft.Df.Abs =
                                 td1 * td2 * (tsh + rfsh * rb2 * tsh + rfsh * td2 * rb1 * td2 * tsh + tsh * rf3 * rbsh) * afd3;
-                        dfAbs3.Sol.Front.Df.AbsGnd = 
+                        dfAbs3.Sol.Ft.Df.AbsGnd = 
                                 td1 * td2 * (tshGnd + rfshGnd * rb2 * tsh + rfshGnd * td2 * rb1 * td2 * tsh + tshGnd * rf3 * rbsh) * afd3;
-                        dfAbs3.Sol.Front.Df.AbsSky = 
+                        dfAbs3.Sol.Ft.Df.AbsSky = 
                                 td1 * td2 * (tshSky + rfshSky * rb2 * tsh + rfshSky * td2 * rb1 * td2 * tsh + tshSky * rf3 * rbsh) * afd3;
-                        cbtar.Sol.Front.Df.Abs = td1 * td2 * (afsh * (1 + rfsh * td2 * rb1 * td2) + rfsh * rb2 * afsh + tsh * rf3 * absh);
-                        cbtar.Sol.Front.Df.AbsGnd = td1 * td2 * (afshGnd + afsh * rfsh * (td2 * rb1 * td2 + rb2) + tshGnd * rf3 * absh);
-                        cbtar.Sol.Front.Df.AbsSky = td1 * td2 * (afshSky + afsh * rfsh * (td2 * rb1 * td2 + rb2) + tshSky * rf3 * absh);
-                        cbtar.Sol.Front.Df.Tra = td1 * td2 * (tsh + rfsh * td2 * rb1 * td2 * tsh + rfsh * rb2 * tsh + tsh * rf3 * rbsh) * td3;
-                        cbtar.Sol.Front.Df.TraGnd =
+                        cbtar.Sol.Ft.Df.Abs = td1 * td2 * (afsh * (1 + rfsh * td2 * rb1 * td2) + rfsh * rb2 * afsh + tsh * rf3 * absh);
+                        cbtar.Sol.Ft.Df.AbsGnd = td1 * td2 * (afshGnd + afsh * rfsh * (td2 * rb1 * td2 + rb2) + tshGnd * rf3 * absh);
+                        cbtar.Sol.Ft.Df.AbsSky = td1 * td2 * (afshSky + afsh * rfsh * (td2 * rb1 * td2 + rb2) + tshSky * rf3 * absh);
+                        cbtar.Sol.Ft.Df.Tra = td1 * td2 * (tsh + rfsh * td2 * rb1 * td2 * tsh + rfsh * rb2 * tsh + tsh * rf3 * rbsh) * td3;
+                        cbtar.Sol.Ft.Df.TraGnd =
                                 td1 * td2 * (tshGnd + rfsh * td2 * rb1 * td2 * tshGnd + rfsh * rb2 * tshGnd + tshGnd * rf3 * rbsh) * td3;
-                        cbtar.Sol.Front.Df.TraSky = 
+                        cbtar.Sol.Ft.Df.TraSky = 
                                 td1 * td2 * (tshSky + rfsh * td2 * rb1 * td2 * tshSky + rfsh * rb2 * tshSky + tshSky * rf3 * rbsh) * td3;
-                        cbtar.Vis.Front.Df.Tra = 
+                        cbtar.Vis.Ft.Df.Tra = 
                                 td1v * td2v * (tshv + rfshv * td2v * rb1v * td2v * tshv + rfshv * rb2v * tshv + tshv * rf3v * rbshv) * td3v;
-                        cbtar.Sol.Front.Df.Ref = 
+                        cbtar.Sol.Ft.Df.Ref = 
                                 rf1 + td1 * rf2 * td1 +
                                 td1 * td2 * (rfsh + tsh * rf3 * tsh + rfsh * rb2 * rfsh + rfsh * td2 * rb1 * td2 * rfsh) * td2 * td1;
-                        cbtar.Vis.Front.Df.Ref = 
+                        cbtar.Vis.Ft.Df.Ref = 
                                 rf1v + td1v * rf2v * td1v +
                                 td1v * td2v * (rfshv + tshv * rf3v * tshv + rfshv * rb2v * rfshv + rfshv * td2v * rb1v * td2v * rfshv) * td2v *
                                 td1v;
                         
                         // Back incident solar, diffuse, between-glass blind, NGlass = 3
                         
-                        dfAbs1.Sol.Back.Df.Abs = td3 * (tsh + rbsh * rf3 * tsh + tsh * rb2 * rfsh + tsh * td2 * rb1 * td2 * rfsh) * td2 * abd1;
-                        dfAbs2.Sol.Back.Df.Abs = td3 * ((tsh + rbsh * rf3 * tsh) * abd2 + (tsh * td2 * rb1 * td2 + tsh * rb2) * afd2);
-                        dfAbs3.Sol.Back.Df.Abs = abd3 + td3 * (rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * afd3;
-                        cbtar.Sol.Back.Df.Abs = td3 * ((1 + rbsh * rf3) * absh + (tsh * td2 * rb1 * td2 + tsh * rb2) * afsh);
-                        cbtar.Sol.Back.Df.Ref = rb3 + td3 * (rbsh + rbsh * rf3 * rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * td3;
-                        cbtar.Vis.Back.Df.Ref =
+                        dfAbs1.Sol.Bk.Df.Abs = td3 * (tsh + rbsh * rf3 * tsh + tsh * rb2 * rfsh + tsh * td2 * rb1 * td2 * rfsh) * td2 * abd1;
+                        dfAbs2.Sol.Bk.Df.Abs = td3 * ((tsh + rbsh * rf3 * tsh) * abd2 + (tsh * td2 * rb1 * td2 + tsh * rb2) * afd2);
+                        dfAbs3.Sol.Bk.Df.Abs = abd3 + td3 * (rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * afd3;
+                        cbtar.Sol.Bk.Df.Abs = td3 * ((1 + rbsh * rf3) * absh + (tsh * td2 * rb1 * td2 + tsh * rb2) * afsh);
+                        cbtar.Sol.Bk.Df.Ref = rb3 + td3 * (rbsh + rbsh * rf3 * rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * td3;
+                        cbtar.Vis.Bk.Df.Ref =
                                 rb3v + td3v * (rbshv + rbshv * rf3v * rbshv + tshv * rb2v * tshv + tshv * td2v * rb1v * td2v * tshv) * td3v;
                     } // if (NGlass == 3)
                 } // for (iSlatAng)
@@ -1533,16 +1533,16 @@ namespace Window {
                 Real64 RhoGlIR = 1 - EpsGlIR;
 
                 // surfShade.blind has not been initialized yet
-                surfShade.blind.slatAngThisTSDeg = matBlind->SlatAngle;
-                surfShade.blind.slatAngThisTS = surfShade.blind.slatAngThisTSDeg * Constant::DegToRad;
+                surfShade.blind.slatAngDeg = matBlind->SlatAngle;
+                surfShade.blind.slatAng = surfShade.blind.slatAngDeg * Constant::DegToRad;
 
-                Material::GetSlatIndicesInterpFac(surfShade.blind.slatAngThisTS,
+                Material::GetSlatIndicesInterpFac(surfShade.blind.slatAng,
                                                   surfShade.blind.slatAngIdxLo, surfShade.blind.slatAngIdxHi, surfShade.blind.slatAngInterpFac);
-                surfShade.blind.tar.interpSlatAng(matBlind->tars[surfShade.blind.slatAngIdxLo], matBlind->tars[surfShade.blind.slatAngIdxHi],
+                surfShade.blind.TAR.interpSlatAng(matBlind->TARs[surfShade.blind.slatAngIdxLo], matBlind->TARs[surfShade.blind.slatAngIdxHi],
                                                   surfShade.blind.slatAngInterpFac);
 
-                Real64 TauShIR = surfShade.blind.tar.IR.Front.Tra;
-                Real64 EpsShIR = surfShade.blind.tar.IR.Back.Emi;
+                Real64 TauShIR = surfShade.blind.TAR.IR.Ft.Tra;
+                Real64 EpsShIR = surfShade.blind.TAR.IR.Bk.Emi;
                 Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                 surfShade.effShadeEmi = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
                 surfShade.effGlassEmi = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
@@ -2405,10 +2405,10 @@ namespace Window {
                         wm->thick[TotGlassLay] = matBlind->SlatThickness;
                         wm->scon[TotGlassLay] = matBlind->SlatConductivity / matBlind->SlatThickness;
 
-                        wm->emis[wm->nglface] = surfShade.blind.tar.IR.Front.Emi;
-                        wm->emis[wm->nglface + 1] = surfShade.blind.tar.IR.Back.Emi;
-                        wm->tir[wm->nglface] = surfShade.blind.tar.IR.Front.Tra;
-                        wm->tir[wm->nglface + 1] = surfShade.blind.tar.IR.Back.Tra;
+                        wm->emis[wm->nglface] = surfShade.blind.TAR.IR.Ft.Emi;
+                        wm->emis[wm->nglface + 1] = surfShade.blind.TAR.IR.Bk.Emi;
+                        wm->tir[wm->nglface] = surfShade.blind.TAR.IR.Ft.Tra;
+                        wm->tir[wm->nglface + 1] = surfShade.blind.TAR.IR.Bk.Tra;
                     }
                 }
 
@@ -3674,8 +3674,8 @@ namespace Window {
             } else if (ANY_BLIND(ShadeFlag)) {
                 auto const &surfShade = s_surf->surfShades(SurfNum);
                 auto const &constrSh = state.dataConstruction->Construct(ConstrNumSh);
-                reflDiff = Interp(constrSh.blindTARs[surfShade.blind.slatAngIdxLo].Sol.Back.Df.Ref,
-                                  constrSh.blindTARs[surfShade.blind.slatAngIdxHi].Sol.Back.Df.Ref,
+                reflDiff = Interp(constrSh.blindTARs[surfShade.blind.slatAngIdxLo].Sol.Bk.Df.Ref,
+                                  constrSh.blindTARs[surfShade.blind.slatAngIdxHi].Sol.Bk.Df.Ref,
                                   surfShade.blind.slatAngInterpFac);
             } else if (ShadeFlag == WinShadingType::SwitchableGlazing) {
                 reflDiff = InterpSw(s_surf->SurfWinSwitchingFactor(SurfNum),
@@ -6364,7 +6364,7 @@ namespace Window {
                 Material::GetSlatIndicesInterpFac(SlatAng, slatIdxLo, slatIdxHi, slatInterpFac);
                 Material::BlindTraAbsRef blindTAR;
                 // This interpolates all blind properties.  No need to interpolate them one-by-one
-                blindTAR.interpSlatAng(matBlind->tars[slatIdxLo], matBlind->tars[slatIdxHi], slatInterpFac);
+                blindTAR.interpSlatAng(matBlind->TARs[slatIdxLo], matBlind->TARs[slatIdxHi], slatInterpFac);
 
                 
                 int profIdxLo, profIdxHi;
@@ -6375,22 +6375,22 @@ namespace Window {
                 TBlBmBm = matBlind->BeamBeamTrans(0.0, SlatAng);
                 TBmBmBl = TBmBm * TBlBmBm;
                 TBmBmBlVis = TBmBmVis * TBlBmBm;
-                TBlBmDif = blindTAR.Sol.Front.Bm[profIdxLo].DfTra;
-                TBlBmDifVis = blindTAR.Vis.Front.Bm[profIdxLo].DfTra;
+                TBlBmDif = blindTAR.Sol.Ft.Bm[profIdxLo].DfTra;
+                TBlBmDifVis = blindTAR.Vis.Ft.Bm[profIdxLo].DfTra;
                 TDif = constructBare.TransDiff;
                 TDifVis = constructBare.TransDiffVis;
                 if (ShadeFlag == WinShadingType::IntBlind) {
                     RGlDiffBack = constructBare.ReflectSolDiffBack;
                     RGlDiffBackVis = constructBare.ReflectVisDiffBack;
-                    RhoBlFront = blindTAR.Sol.Front.Bm[profIdxLo].DfRef;
-                    RhoBlFrontVis = blindTAR.Vis.Front.Bm[profIdxLo].DfRef;
-                    AbsBlFront = blindTAR.Sol.Front.Bm[profIdxLo].Abs;
-                    RhoBlDiffFront = blindTAR.Sol.Front.Df.Ref;
-                    RhoBlDiffFrontVis = blindTAR.Vis.Front.Df.Ref;
-                    AbsBlDiffFront = blindTAR.Sol.Front.Df.Abs;
+                    RhoBlFront = blindTAR.Sol.Ft.Bm[profIdxLo].DfRef;
+                    RhoBlFrontVis = blindTAR.Vis.Ft.Bm[profIdxLo].DfRef;
+                    AbsBlFront = blindTAR.Sol.Ft.Bm[profIdxLo].Abs;
+                    RhoBlDiffFront = blindTAR.Sol.Ft.Df.Ref;
+                    RhoBlDiffFrontVis = blindTAR.Vis.Ft.Df.Ref;
+                    AbsBlDiffFront = blindTAR.Sol.Ft.Df.Abs;
                     AbsBeamShadeNorm = TBmBm * (AbsBlFront + RhoBlFront * RGlDiffBack * AbsBlDiffFront / (1.0 - RhoBlDiffFront * RGlDiffBack));
-                    TBlDifDif = blindTAR.Sol.Front.Df.Tra;
-                    TBlDifDifVis = blindTAR.Vis.Front.Df.Tra;
+                    TBlDifDif = blindTAR.Sol.Ft.Df.Tra;
+                    TBlDifDifVis = blindTAR.Vis.Ft.Df.Tra;
                     TSolNorm = TBmBm * (TBlBmBm + TBlBmDif + TBlDifDif * RhoBlFront * RGlDiffBack / (1.0 - RhoBlDiffFront * RGlDiffBack));
                     //     use of TBlBmBm here is correct, visible and IR transmittance are the same (reference deleted CR6925 on 3/20/2006)
                     TVisNorm = TBmBmVis *
@@ -6399,15 +6399,15 @@ namespace Window {
                 } else if (ShadeFlag == WinShadingType::ExtBlind) {
                     RGlFront = POLYF(1.0, constructBare.ReflSolBeamFrontCoef);
                     RGlFrontVis = POLYF(1.0, constructBare.ReflSolBeamFrontCoef);
-                    AbsBlFront = blindTAR.Sol.Front.Bm[profIdxLo].Abs;
-                    AbsBlBack = blindTAR.Sol.Back.Bm[profIdxLo].Abs;
-                    AbsBlDiffBack = blindTAR.Sol.Back.Df.Abs;
+                    AbsBlFront = blindTAR.Sol.Ft.Bm[profIdxLo].Abs;
+                    AbsBlBack = blindTAR.Sol.Bk.Bm[profIdxLo].Abs;
+                    AbsBlDiffBack = blindTAR.Sol.Bk.Df.Abs;
                     RGlDiffFront = constructBare.ReflectSolDiffFront;
                     RGlDiffFrontVis = constructBare.ReflectVisDiffFront;
-                    RhoBlDiffBack = blindTAR.Sol.Back.Df.Ref;
-                    RhoBlDiffBackVis = blindTAR.Vis.Back.Df.Ref;
-                    RhoBlBack = blindTAR.Sol.Back.Bm[profIdxLo].DfRef;
-                    RhoBlBackVis = blindTAR.Vis.Back.Bm[profIdxLo].DfRef;
+                    RhoBlDiffBack = blindTAR.Sol.Bk.Df.Ref;
+                    RhoBlDiffBackVis = blindTAR.Vis.Bk.Df.Ref;
+                    RhoBlBack = blindTAR.Sol.Bk.Bm[profIdxLo].DfRef;
+                    RhoBlBackVis = blindTAR.Vis.Bk.Bm[profIdxLo].DfRef;
                     AbsBeamShadeNorm =
                         AbsBlFront + AbsBlBack * RGlFront * TBlBmBm +
                         (AbsBlDiffBack * RGlDiffFront / (1.0 - RhoBlDiffBack * RGlDiffFront)) * (RGlFront * TBlBmBm * RhoBlBack + TBlBmDif);
@@ -7149,8 +7149,8 @@ namespace Window {
                                   matBlind->SlatSeparation,
                                   matBlind->SlatThickness,
                                   matBlind->SlatAngle,
-                                  matBlind->SlatTransSolBeamDiff,
-                                  matBlind->SlatFrontReflSolBeamDiff,
+                                  matBlind->slatTAR.Sol.Ft.Bm[0].DfTra,
+                                  matBlind->slatTAR.Sol.Ft.Bm[0].DfRef,
                                   matBlind->toGlassDist);
                         } break;
                                 
@@ -7438,27 +7438,27 @@ namespace Window {
                     bld_pr(4) = 0.0;
                     bld_pr(5) = 0.0;
                     bld_pr(6) = 0.0;
-                    bld_pr(7) = matBlind->SlatTransSolBeamDiff;
-                    bld_pr(8) = matBlind->SlatFrontReflSolBeamDiff;
-                    bld_pr(9) = matBlind->SlatBackReflSolBeamDiff;
-                    bld_pr(10) = matBlind->SlatTransSolDiffDiff;
-                    bld_pr(11) = matBlind->SlatFrontReflSolDiffDiff;
-                    bld_pr(12) = matBlind->SlatBackReflSolDiffDiff;
+                    bld_pr(7) = matBlind->slatTAR.Sol.Ft.Bm[0].DfTra;
+                    bld_pr(8) = matBlind->slatTAR.Sol.Ft.Bm[0].DfRef;
+                    bld_pr(9) = matBlind->slatTAR.Sol.Bk.Bm[0].DfRef;
+                    bld_pr(10) = matBlind->slatTAR.Sol.Ft.Df.Tra;
+                    bld_pr(11) = matBlind->slatTAR.Sol.Ft.Df.Ref;
+                    bld_pr(12) = matBlind->slatTAR.Sol.Bk.Df.Ref;
                 } else { // For visible calculation
                     bld_pr(4) = 0.0;
                     bld_pr(5) = 0.0;
                     bld_pr(6) = 0.0;
-                    bld_pr(7) = matBlind->SlatTransVisBeamDiff;
-                    bld_pr(8) = matBlind->SlatFrontReflVisBeamDiff;
-                    bld_pr(9) = matBlind->SlatBackReflVisBeamDiff;
-                    bld_pr(10) = matBlind->SlatTransVisDiffDiff;
-                    bld_pr(11) = matBlind->SlatFrontReflVisDiffDiff;
-                    bld_pr(12) = matBlind->SlatBackReflVisDiffDiff;
+                    bld_pr(7) = matBlind->slatTAR.Vis.Ft.Bm[0].DfTra;
+                    bld_pr(8) = matBlind->slatTAR.Vis.Ft.Bm[0].DfRef;
+                    bld_pr(9) = matBlind->slatTAR.Vis.Bk.Bm[0].DfRef;
+                    bld_pr(10) = matBlind->slatTAR.Vis.Ft.Df.Tra;
+                    bld_pr(11) = matBlind->slatTAR.Vis.Ft.Df.Ref;
+                    bld_pr(12) = matBlind->slatTAR.Vis.Bk.Df.Ref;
                 }
                 // For IR calculation
-                bld_pr(13) = matBlind->SlatTransIR;
-                bld_pr(14) = matBlind->SlatFrontEmissIR;
-                bld_pr(15) = matBlind->SlatBackEmissIR;
+                bld_pr(13) = matBlind->slatTAR.IR.Ft.Tra;
+                bld_pr(14) = matBlind->slatTAR.IR.Ft.Emi;
+                bld_pr(15) = matBlind->slatTAR.IR.Bk.Emi;
 
                 // Calculate diffuse properties of blind. If blind has variable slat angle, &
                 // vary slat angle from 0 to 180 deg in 10-deg steps (for Material::MaxSlatAngs = 19).
@@ -7466,7 +7466,7 @@ namespace Window {
 
                 for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
 
-                    auto &btar = matBlind->tars[iSlatAng];
+                    auto &btar = matBlind->TARs[iSlatAng];
                         
                     st_lay = 0.0;
                     bld_el = Material::dSlatAng * iSlatAng; // 0 <= bld_el <= 180 deg
@@ -7474,21 +7474,21 @@ namespace Window {
                     BlindOpticsDiffuse(state, matBlind->Num, ISolVis, bld_pr, bld_el, st_lay);
 
                     if (ISolVis == 1) { // Fill blind diffuse solar and IR properties
-                        btar.Sol.Front.Df.Tra = st_lay(9);
-                        btar.Sol.Front.Df.Ref = st_lay(10);
-                        btar.Sol.Back.Df.Tra = st_lay(11);
-                        btar.Sol.Back.Df.Ref = st_lay(12);
-                        btar.Sol.Front.Df.Abs = max(0.0, 1.0 - st_lay(9) - st_lay(10));
-                        btar.Sol.Back.Df.Abs = max(0.0, 1.0 - st_lay(11) - st_lay(12));
-                        btar.IR.Front.Tra = st_lay(13);
-                        btar.IR.Front.Emi = st_lay(14);
-                        btar.IR.Back.Tra = st_lay(13);
-                        btar.IR.Back.Emi = st_lay(15);
+                        btar.Sol.Ft.Df.Tra = st_lay(9);
+                        btar.Sol.Ft.Df.Ref = st_lay(10);
+                        btar.Sol.Bk.Df.Tra = st_lay(11);
+                        btar.Sol.Bk.Df.Ref = st_lay(12);
+                        btar.Sol.Ft.Df.Abs = max(0.0, 1.0 - st_lay(9) - st_lay(10));
+                        btar.Sol.Bk.Df.Abs = max(0.0, 1.0 - st_lay(11) - st_lay(12));
+                        btar.IR.Ft.Tra = st_lay(13);
+                        btar.IR.Ft.Emi = st_lay(14);
+                        btar.IR.Bk.Tra = st_lay(13);
+                        btar.IR.Bk.Emi = st_lay(15);
                     } else { // Fill blind diffuse visible properties
-                        btar.Vis.Front.Df.Tra = st_lay(9);
-                        btar.Vis.Front.Df.Ref = st_lay(10);
-                        btar.Vis.Back.Df.Tra = st_lay(11);
-                        btar.Vis.Back.Df.Ref = st_lay(12);
+                        btar.Vis.Ft.Df.Tra = st_lay(9);
+                        btar.Vis.Ft.Df.Ref = st_lay(10);
+                        btar.Vis.Bk.Df.Tra = st_lay(11);
+                        btar.Vis.Bk.Df.Ref = st_lay(12);
                     }
 
 
@@ -7505,40 +7505,40 @@ namespace Window {
                         BlindOpticsBeam(state, matBlind->Num, bld_pr, bld_el, sun_el, st_lay);
 
                         if (ISolVis == 1) { // Fill blind beam solar properties
-                            btar.Sol.Front.Bm[IProfAng].BmTra = st_lay(1);
-                            btar.Sol.Front.Bm[IProfAng].BmRef = st_lay(2);
-                            btar.Sol.Back.Bm[IProfAng].BmTra = st_lay(3);
-                            btar.Sol.Back.Bm[IProfAng].BmRef = st_lay(4);
-                            btar.Sol.Front.Bm[IProfAng].DfTra = st_lay(5);
-                            btar.Sol.Front.Bm[IProfAng].DfRef = st_lay(6);
-                            btar.Sol.Back.Bm[IProfAng].DfTra = st_lay(7);
-                            btar.Sol.Back.Bm[IProfAng].DfRef = st_lay(8);
-                            btar.Sol.Front.Bm[IProfAng].Abs = max(0.0, 1.0 - st_lay(6) - st_lay(1) - st_lay(5));
-                            btar.Sol.Back.Bm[IProfAng].Abs = max(0.0, 1.0 - st_lay(7) - st_lay(3) - st_lay(8));
+                            btar.Sol.Ft.Bm[IProfAng].BmTra = st_lay(1);
+                            btar.Sol.Ft.Bm[IProfAng].BmRef = st_lay(2);
+                            btar.Sol.Bk.Bm[IProfAng].BmTra = st_lay(3);
+                            btar.Sol.Bk.Bm[IProfAng].BmRef = st_lay(4);
+                            btar.Sol.Ft.Bm[IProfAng].DfTra = st_lay(5);
+                            btar.Sol.Ft.Bm[IProfAng].DfRef = st_lay(6);
+                            btar.Sol.Bk.Bm[IProfAng].DfTra = st_lay(7);
+                            btar.Sol.Bk.Bm[IProfAng].DfRef = st_lay(8);
+                            btar.Sol.Ft.Bm[IProfAng].Abs = max(0.0, 1.0 - st_lay(6) - st_lay(1) - st_lay(5));
+                            btar.Sol.Bk.Bm[IProfAng].Abs = max(0.0, 1.0 - st_lay(7) - st_lay(3) - st_lay(8));
 
                         } else { // Fill blind beam visible properties
-                            btar.Vis.Front.Bm[IProfAng].BmTra = st_lay(1);
-                            btar.Vis.Front.Bm[IProfAng].BmRef = st_lay(2);
-                            btar.Vis.Back.Bm[IProfAng].BmTra = st_lay(3);
-                            btar.Vis.Back.Bm[IProfAng].BmRef = st_lay(4);
-                            btar.Vis.Front.Bm[IProfAng].DfTra = st_lay(5);
-                            btar.Vis.Front.Bm[IProfAng].DfRef = st_lay(6);
-                            btar.Vis.Back.Bm[IProfAng].DfTra = st_lay(7);
-                            btar.Vis.Back.Bm[IProfAng].DfRef = st_lay(8);
+                            btar.Vis.Ft.Bm[IProfAng].BmTra = st_lay(1);
+                            btar.Vis.Ft.Bm[IProfAng].BmRef = st_lay(2);
+                            btar.Vis.Bk.Bm[IProfAng].BmTra = st_lay(3);
+                            btar.Vis.Bk.Bm[IProfAng].BmRef = st_lay(4);
+                            btar.Vis.Ft.Bm[IProfAng].DfTra = st_lay(5);
+                            btar.Vis.Ft.Bm[IProfAng].DfRef = st_lay(6);
+                            btar.Vis.Bk.Bm[IProfAng].DfTra = st_lay(7);
+                            btar.Vis.Bk.Bm[IProfAng].DfRef = st_lay(8);
                         }
                     } // End of loop over slat angles
                 }     // End of loop over profile angles
 
                 if (ISolVis == 1) {
                     for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
-                        auto &btar = matBlind->tars[iSlatAng];
+                        auto &btar = matBlind->TARs[iSlatAng];
                         
                         Real64 sumDenom = 0.0, sumTra1 = 0.0, sumTra2 = 0.0, sumRef = 0.0, sumAbs = 0.0;
                         
                         // Integrate from -90 to 0 deg
                         for (int IPhi = 1; IPhi <= 18; ++IPhi) {
-                            auto const &btargs = btar.Sol.Front.Bm[IPhi];
-                            auto const &btargs1 = btar.Sol.Front.Bm[IPhi+1];
+                            auto const &btargs = btar.Sol.Ft.Bm[IPhi];
+                            auto const &btargs1 = btar.Sol.Ft.Bm[IPhi+1];
                             
                             Real64 denom = Material::dProfAng * std::cos(-Constant::PiOvr2 + (IPhi - 0.5) * Material::dProfAng);
                             sumDenom += denom;
@@ -7549,16 +7549,16 @@ namespace Window {
                             sumAbs += denom * (btargs.Abs + btargs1.Abs) * 0.5;
                         }
 
-                        btar.Sol.Front.Df.TraGnd = std::max(0.0, sumTra1 / sumDenom) + std::max(0.0, sumTra2 / sumDenom);
-                        btar.Sol.Front.Df.RefGnd = std::max(0.0, sumRef / sumDenom);
-                        btar.Sol.Front.Df.AbsGnd = std::max(0.0, sumAbs / sumDenom);
+                        btar.Sol.Ft.Df.TraGnd = std::max(0.0, sumTra1 / sumDenom) + std::max(0.0, sumTra2 / sumDenom);
+                        btar.Sol.Ft.Df.RefGnd = std::max(0.0, sumRef / sumDenom);
+                        btar.Sol.Ft.Df.AbsGnd = std::max(0.0, sumAbs / sumDenom);
 
                         sumDenom = sumTra1 = sumTra2 = sumRef = sumAbs = 0.0;
 
                         // Integrate from -90 to 0 deg
                         for (int IPhi = 19; IPhi <= Material::MaxProfAngs - 1; ++IPhi) {
-                            auto const &btargs = btar.Sol.Front.Bm[IPhi];
-                            auto const &btargs1 = btar.Sol.Front.Bm[IPhi+1];
+                            auto const &btargs = btar.Sol.Ft.Bm[IPhi];
+                            auto const &btargs1 = btar.Sol.Ft.Bm[IPhi+1];
                             
                             Real64 denom = Material::dProfAng * std::cos(-Constant::PiOvr2 + (IPhi - 0.5) * Material::dProfAng);
                             sumDenom += denom;
@@ -7569,9 +7569,9 @@ namespace Window {
                             sumAbs += denom * (btargs.Abs + btargs1.Abs) * 0.5;
                         }
 
-                        btar.Sol.Front.Df.TraSky = std::max(0.0, sumTra1 / sumDenom) + std::max(0.0, sumTra2 / sumDenom);
-                        btar.Sol.Front.Df.RefSky = std::max(0.0, sumRef / sumDenom);
-                        btar.Sol.Front.Df.AbsSky = std::max(0.0, sumAbs / sumDenom);
+                        btar.Sol.Ft.Df.TraSky = std::max(0.0, sumTra1 / sumDenom) + std::max(0.0, sumTra2 / sumDenom);
+                        btar.Sol.Ft.Df.RefSky = std::max(0.0, sumRef / sumDenom);
+                        btar.Sol.Ft.Df.AbsSky = std::max(0.0, sumAbs / sumDenom);
                     } // for (iSlatAng)
                 }
 

@@ -70,17 +70,18 @@ namespace Construction {
     //    each window model should validate layers individually
     int constexpr MaxSpectralDataElements(800); // Maximum number in Spectral Data arrays.
 
-     // Nested one-field structs just to keep overall structure consistent with Material::BlindTAR
+     // Nested one-field structs just to keep overall structure
+     // consistent with Material::BlindTAR.  See Material.hh for
+     // discussion of this approach.
     struct BlindSolVis {
         struct {
-            struct { Material::BlindDfTARGS Df; } Front;
-            struct { Material::BlindDfTAR Df; } Back;
+            struct { Material::BlindDfTARGS Df; } Ft;
+            struct { Material::BlindDfTAR Df; } Bk;
         } Sol;
         struct {
-            struct { Material::BlindDfTAR Df; } Front;
-            struct { Material::BlindDfTAR Df; } Back;
+            struct { Material::BlindDfTAR Df; } Ft;
+            struct { Material::BlindDfTAR Df; } Bk;
         } Vis;
-
     };
 
      // Nested one-field structs keep overall structure consistent with Material::BlindTAR
@@ -92,13 +93,13 @@ namespace Construction {
                     Real64 AbsGnd = 0.0;
                     Real64 AbsSky = 0.0;
                 } Df;
-            } Front;
+            } Ft; // Front
 
             struct {
                 struct {
                     Real64 Abs = 0.0;
                 } Df;
-            } Back;
+            } Bk; // Back
         } Sol;
     };
         

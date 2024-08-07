@@ -8198,7 +8198,7 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
     }
     if (CFS(EQLNum).VBLayerPtr > 0) {
         auto &surfShade = state.dataSurface->surfShades(SurfNum);
-        surfShade.blind.slatAngThisTSDeg = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
+        surfShade.blind.slatAngDeg = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
     }
 }
 
