@@ -224,9 +224,9 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             ++sLayer;
             CFS(EQLNum).L(sLayer).Name = thisMaterial->Name;
             // longwave property input
-            CFS(EQLNum).L(sLayer).LWP_MAT.EPSLF = thisMaterial->EmissThermalFront;
-            CFS(EQLNum).L(sLayer).LWP_MAT.EPSLB = thisMaterial->EmissThermalBack;
-            CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = thisMaterial->TausThermal;
+            CFS(EQLNum).L(sLayer).LWP_MAT.EPSLF = thisMaterial->TAR.IR.Ft.Emi;
+            CFS(EQLNum).L(sLayer).LWP_MAT.EPSLB = thisMaterial->TAR.IR.Bk.Emi;
+            CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = thisMaterial->TAR.IR.Ft.Tra;
         }
 
         if (mat->group == Material::Group::BlindEquivalentLayer) {
@@ -239,14 +239,14 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             } else if (thisMaterial->SlatOrientation == DataWindowEquivalentLayer::Orientation::Vertical) {
                 CFS(EQLNum).L(sLayer).LTYPE = LayerType::VBVER;
             }
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->ReflFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->ReflBackBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TausFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TausBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfRef;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfRef;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfTra;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfTra;
 
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = thisMaterial->ReflFrontDiffDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = thisMaterial->ReflBackDiffDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = thisMaterial->TausDiffDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = thisMaterial->TAR.Sol.Ft.Df.Ref;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = thisMaterial->TAR.Sol.Bk.Df.Ref;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = thisMaterial->TAR.Sol.Ft.Df.Tra;
             CFS(EQLNum).L(sLayer).PHI_DEG = thisMaterial->SlatAngle;
             CFS(EQLNum).L(sLayer).CNTRL = static_cast<int>(thisMaterial->slatAngleType);
             CFS(EQLNum).L(sLayer).S = thisMaterial->SlatSeparation;
@@ -257,41 +257,41 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             assert(thisMaterial != nullptr);
             // glazing
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::GLAZE;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = thisMaterial->ReflFrontBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBB = thisMaterial->ReflBackBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TausFrontBeamBeam;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = thisMaterial->TAR.Sol.Ft.Bm[0].BmRef;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBB = thisMaterial->TAR.Sol.Bk.Bm[0].BmRef;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TAR.Sol.Ft.Bm[0].BmTra;
 
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->ReflFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->ReflBackBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TausFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TausBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfRef;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfRef;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfTra;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfTra;
 
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = thisMaterial->ReflFrontDiffDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = thisMaterial->ReflBackDiffDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = thisMaterial->TausDiffDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = thisMaterial->TAR.Sol.Ft.Df.Ref;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = thisMaterial->TAR.Sol.Bk.Df.Ref;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = thisMaterial->TAR.Sol.Ft.Df.Tra;
         } else if (mat->group == Material::Group::ShadeEquivalentLayer) {
             auto const *thisMaterial = dynamic_cast<Material::MaterialChild const *>(mat);
             assert(thisMaterial != nullptr);
             // roller blind
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::ROLLB;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TausFrontBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = thisMaterial->TausBackBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->ReflFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->ReflBackBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TausFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TausBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TAR.Sol.Ft.Bm[0].BmTra;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = thisMaterial->TAR.Sol.Bk.Bm[0].BmTra;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfRef;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfRef;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfTra;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfTra;
 
         } else if (mat->group == Material::Group::DrapeEquivalentLayer) {
             auto const *thisMaterial = dynamic_cast<Material::MaterialChild const *>(mat);
             assert(thisMaterial != nullptr);
             // drapery fabric
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::DRAPE;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TausFrontBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = thisMaterial->TausBackBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->ReflFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->ReflBackBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TausFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TausBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TAR.Sol.Ft.Bm[0].BmTra;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = thisMaterial->TAR.Sol.Bk.Bm[0].BmTra;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfRef;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfRef;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfTra;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfTra;
 
             CFS(EQLNum).L(sLayer).S = thisMaterial->PleatedDrapeLength;
             CFS(EQLNum).L(sLayer).W = thisMaterial->PleatedDrapeWidth;
@@ -304,13 +304,13 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             assert(thisMaterial != nullptr);
             // insect screen
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::INSCRN;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TausFrontBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = thisMaterial->TausBackBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->ReflFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->ReflBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TAR.Sol.Ft.Bm[0].BmTra;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = thisMaterial->TAR.Sol.Bk.Bm[0].BmTra;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfRef;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfRef;
 
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TausFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TausBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfTra;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfTra;
             // wire geometry
             CFS(EQLNum).L(sLayer).S = thisMaterial->ScreenWireSpacing;
             CFS(EQLNum).L(sLayer).W = thisMaterial->ScreenWireDiameter;

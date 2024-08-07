@@ -15936,31 +15936,31 @@ namespace SurfaceGeometry {
                     }          // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
                 } else if ((thisMatLay->group == Material::Group::GlassEquivalentLayer) &&
                            (revMatLay->group == Material::Group::GlassEquivalentLayer)) {
-                    if ((abs(thisMatLay->TausBackBeamBeam - revMatLay->TausFrontBeamBeam) > SmallDiff) ||
-                        (abs(thisMatLay->TausFrontBeamBeam - revMatLay->TausBackBeamBeam) > SmallDiff) ||
-                        (abs(thisMatLay->ReflBackBeamBeam - revMatLay->ReflFrontBeamBeam) > SmallDiff) ||
-                        (abs(thisMatLay->ReflFrontBeamBeam - revMatLay->ReflBackBeamBeam) > SmallDiff) ||
-                        (abs(thisMatLay->TausBackBeamBeamVis - revMatLay->TausFrontBeamBeamVis) > SmallDiff) ||
-                        (abs(thisMatLay->TausFrontBeamBeamVis - revMatLay->TausBackBeamBeamVis) > SmallDiff) ||
-                        (abs(thisMatLay->ReflBackBeamBeamVis - revMatLay->ReflFrontBeamBeamVis) > SmallDiff) ||
-                        (abs(thisMatLay->ReflFrontBeamBeamVis - revMatLay->ReflBackBeamBeamVis) > SmallDiff) ||
-                        (abs(thisMatLay->TausBackBeamDiff - revMatLay->TausFrontBeamDiff) > SmallDiff) ||
-                        (abs(thisMatLay->TausFrontBeamDiff - revMatLay->TausBackBeamDiff) > SmallDiff) ||
-                        (abs(thisMatLay->ReflBackBeamDiff - revMatLay->ReflFrontBeamDiff) > SmallDiff) ||
-                        (abs(thisMatLay->ReflFrontBeamDiff - revMatLay->ReflBackBeamDiff) > SmallDiff) ||
-                        (abs(thisMatLay->TausBackBeamDiffVis - revMatLay->TausFrontBeamDiffVis) > SmallDiff) ||
-                        (abs(thisMatLay->TausFrontBeamDiffVis - revMatLay->TausBackBeamDiffVis) > SmallDiff) ||
-                        (abs(thisMatLay->ReflBackBeamDiffVis - revMatLay->ReflFrontBeamDiffVis) > SmallDiff) ||
-                        (abs(thisMatLay->ReflFrontBeamDiffVis - revMatLay->ReflBackBeamDiffVis) > SmallDiff) ||
-                        (abs(thisMatLay->TausDiffDiff - revMatLay->TausDiffDiff) > SmallDiff) ||
-                        (abs(thisMatLay->ReflBackDiffDiff - revMatLay->ReflFrontDiffDiff) > SmallDiff) ||
-                        (abs(thisMatLay->ReflFrontDiffDiff - revMatLay->ReflBackDiffDiff) > SmallDiff) ||
-                        (abs(thisMatLay->TausDiffDiffVis - revMatLay->TausDiffDiffVis) > SmallDiff) ||
-                        (abs(thisMatLay->ReflBackDiffDiffVis - revMatLay->ReflFrontDiffDiffVis) > SmallDiff) ||
-                        (abs(thisMatLay->ReflFrontDiffDiffVis - revMatLay->ReflBackDiffDiffVis) > SmallDiff) ||
-                        (abs(thisMatLay->TausThermal - revMatLay->TausThermal) > SmallDiff) ||
-                        (abs(thisMatLay->EmissThermalBack - revMatLay->EmissThermalFront) > SmallDiff) ||
-                        (abs(thisMatLay->EmissThermalFront - revMatLay->EmissThermalBack) > SmallDiff) ||
+                    if ((abs(thisMatLay->TAR.Sol.Bk.Bm[0].BmTra - revMatLay->TAR.Sol.Ft.Bm[0].BmTra) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Sol.Ft.Bm[0].BmTra - revMatLay->TAR.Sol.Bk.Bm[0].BmTra) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Sol.Bk.Bm[0].BmRef - revMatLay->TAR.Sol.Ft.Bm[0].BmRef) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Sol.Ft.Bm[0].BmRef - revMatLay->TAR.Sol.Bk.Bm[0].BmRef) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Vis.Bk.Bm[0].BmTra - revMatLay->TAR.Vis.Ft.Bm[0].BmTra) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Vis.Ft.Bm[0].BmTra - revMatLay->TAR.Vis.Bk.Bm[0].BmTra) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Vis.Bk.Bm[0].BmRef - revMatLay->TAR.Vis.Ft.Bm[0].BmRef) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Vis.Ft.Bm[0].BmRef - revMatLay->TAR.Vis.Bk.Bm[0].BmRef) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Sol.Bk.Bm[0].DfTra - revMatLay->TAR.Sol.Ft.Bm[0].DfTra) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Sol.Ft.Bm[0].DfTra - revMatLay->TAR.Sol.Bk.Bm[0].DfTra) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Sol.Bk.Bm[0].DfRef - revMatLay->TAR.Sol.Ft.Bm[0].DfRef) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Sol.Ft.Bm[0].DfRef - revMatLay->TAR.Sol.Bk.Bm[0].DfRef) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Vis.Bk.Bm[0].DfTra - revMatLay->TAR.Vis.Ft.Bm[0].DfTra) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Vis.Ft.Bm[0].DfTra - revMatLay->TAR.Vis.Bk.Bm[0].DfTra) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Vis.Bk.Bm[0].DfRef - revMatLay->TAR.Vis.Ft.Bm[0].DfRef) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Vis.Ft.Bm[0].DfRef - revMatLay->TAR.Vis.Bk.Bm[0].DfRef) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Sol.Ft.Df.Tra - revMatLay->TAR.Sol.Ft.Df.Tra) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Sol.Bk.Df.Ref - revMatLay->TAR.Sol.Ft.Df.Ref) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Sol.Ft.Df.Ref - revMatLay->TAR.Sol.Bk.Df.Ref) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Vis.Ft.Df.Tra - revMatLay->TAR.Vis.Ft.Df.Tra) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Vis.Bk.Df.Ref - revMatLay->TAR.Vis.Ft.Df.Ref) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.Vis.Ft.Df.Ref - revMatLay->TAR.Vis.Bk.Df.Ref) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.IR.Ft.Tra - revMatLay->TAR.IR.Ft.Tra) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.IR.Bk.Emi - revMatLay->TAR.IR.Ft.Emi) > SmallDiff) ||
+                        (abs(thisMatLay->TAR.IR.Ft.Emi - revMatLay->TAR.IR.Bk.Emi) > SmallDiff) ||
                         (abs(thisMatLay->Resistance - revMatLay->Resistance) > SmallDiff)) {
                         RevLayerDiffs = true;
                         break; // exit when diff

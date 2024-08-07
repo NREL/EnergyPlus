@@ -952,7 +952,8 @@ namespace DataSurfaces {
             Real64 bmBmTrans = 0.0;
             Real64 airFlowPermeability = 0.0; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
 
-            Material::BlindTraAbsRef TAR;
+            // Properties are profile-angle dependent
+            Material::BlindTraAbsRef<Material::MaxProfAngs+1> TAR;
         } blind;
 
         Real64 effShadeEmi = 0.0; // Effective emissivity of interior blind or shade

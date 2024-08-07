@@ -6362,7 +6362,7 @@ namespace Window {
                 int slatIdxLo, slatIdxHi; 
                 Real64 slatInterpFac;
                 Material::GetSlatIndicesInterpFac(SlatAng, slatIdxLo, slatIdxHi, slatInterpFac);
-                Material::BlindTraAbsRef blindTAR;
+                Material::BlindTraAbsRef<Material::MaxProfAngs+1> blindTAR;
                 // This interpolates all blind properties.  No need to interpolate them one-by-one
                 blindTAR.interpSlatAng(matBlind->TARs[slatIdxLo], matBlind->TARs[slatIdxHi], slatInterpFac);
 
@@ -7231,20 +7231,20 @@ namespace Window {
                                   thisMaterial->Name,
                                   OpticalDataType,
                                   SpectralDataName,
-                                  thisMaterial->TausFrontBeamBeam,
-                                  thisMaterial->TausBackBeamBeam,
-                                  thisMaterial->ReflFrontBeamBeam,
-                                  thisMaterial->ReflBackBeamBeam,
-                                  thisMaterial->TausFrontBeamDiff,
-                                  thisMaterial->TausBackBeamDiff,
-                                  thisMaterial->ReflFrontBeamDiff,
-                                  thisMaterial->ReflBackBeamDiff,
-                                  thisMaterial->TausDiffDiff,
-                                  thisMaterial->ReflFrontDiffDiff,
-                                  thisMaterial->ReflBackDiffDiff,
-                                  thisMaterial->TausThermal,
-                                  thisMaterial->EmissThermalFront,
-                                  thisMaterial->EmissThermalBack);
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].BmTra,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].BmTra,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].BmRef,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].BmRef,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].DfTra,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].DfTra,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].DfRef,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].DfRef,
+                                  thisMaterial->TAR.Sol.Ft.Df.Tra,
+                                  thisMaterial->TAR.Sol.Ft.Df.Ref,
+                                  thisMaterial->TAR.Sol.Bk.Df.Ref,
+                                  thisMaterial->TAR.IR.Ft.Tra,
+                                  thisMaterial->TAR.IR.Ft.Emi,
+                                  thisMaterial->TAR.IR.Bk.Emi);
                         } break;
                                 
                         case Material::Group::ShadeEquivalentLayer: {
@@ -7255,15 +7255,15 @@ namespace Window {
                             print(state.files.eio,
                                   Format_709,
                                   thisMaterial->Name,
-                                  thisMaterial->TausFrontBeamBeam,
-                                  thisMaterial->TausBackBeamBeam,
-                                  thisMaterial->TausFrontBeamDiff,
-                                  thisMaterial->TausBackBeamDiff,
-                                  thisMaterial->ReflFrontBeamDiff,
-                                  thisMaterial->ReflBackBeamDiff,
-                                  thisMaterial->TausThermal,
-                                  thisMaterial->EmissThermalFront,
-                                  thisMaterial->EmissThermalBack);
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].BmTra,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].BmTra,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].DfTra,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].DfTra,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].DfRef,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].DfRef,
+                                  thisMaterial->TAR.IR.Ft.Tra,
+                                  thisMaterial->TAR.IR.Ft.Emi,
+                                  thisMaterial->TAR.IR.Bk.Emi);
                         } break;
                                 
                         case Material::Group::DrapeEquivalentLayer: {
@@ -7275,14 +7275,14 @@ namespace Window {
                             print(state.files.eio,
                                   Format_710,
                                   thisMaterial->Name,
-                                  thisMaterial->TausFrontBeamBeam,
-                                  thisMaterial->TausFrontBeamDiff,
-                                  thisMaterial->TausBackBeamDiff,
-                                  thisMaterial->ReflFrontBeamDiff,
-                                  thisMaterial->ReflBackBeamDiff,
-                                  thisMaterial->TausThermal,
-                                  thisMaterial->EmissThermalFront,
-                                  thisMaterial->EmissThermalBack,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].BmTra,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].DfTra,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].DfTra,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].DfRef,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].DfRef,
+                                  thisMaterial->TAR.IR.Ft.Tra,
+                                  thisMaterial->TAR.IR.Ft.Emi,
+                                  thisMaterial->TAR.IR.Bk.Emi,
                                   thisMaterial->PleatedDrapeWidth,
                                   thisMaterial->PleatedDrapeLength);
                         } break;
@@ -7296,14 +7296,14 @@ namespace Window {
                             print(state.files.eio,
                                   Format_711,
                                   thisMaterial->Name,
-                                  thisMaterial->TausFrontBeamBeam,
-                                  thisMaterial->TausFrontBeamDiff,
-                                  thisMaterial->TausBackBeamDiff,
-                                  thisMaterial->ReflFrontBeamDiff,
-                                  thisMaterial->ReflBackBeamDiff,
-                                  thisMaterial->TausThermal,
-                                  thisMaterial->EmissThermalFront,
-                                  thisMaterial->EmissThermalBack,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].BmTra,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].DfTra,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].DfTra,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].DfRef,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].DfRef,
+                                  thisMaterial->TAR.IR.Ft.Tra,
+                                  thisMaterial->TAR.IR.Ft.Emi,
+                                  thisMaterial->TAR.IR.Bk.Emi,
                                   thisMaterial->ScreenWireSpacing,
                                   thisMaterial->ScreenWireDiameter);
                         } break;
@@ -7327,16 +7327,16 @@ namespace Window {
                                   thisMaterial->SlatSeparation,
                                   thisMaterial->SlatCrown,
                                   thisMaterial->SlatAngle,
-                                  thisMaterial->TausFrontBeamDiff,
-                                  thisMaterial->TausBackBeamDiff,
-                                  thisMaterial->ReflFrontBeamDiff,
-                                  thisMaterial->ReflBackBeamDiff,
-                                  thisMaterial->TausDiffDiff,
-                                  thisMaterial->ReflFrontDiffDiff,
-                                  thisMaterial->ReflBackDiffDiff,
-                                  thisMaterial->TausThermal,
-                                  thisMaterial->EmissThermalFront,
-                                  thisMaterial->EmissThermalBack);
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].DfTra,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].DfTra,
+                                  thisMaterial->TAR.Sol.Ft.Bm[0].DfRef,
+                                  thisMaterial->TAR.Sol.Bk.Bm[0].DfRef,
+                                  thisMaterial->TAR.Sol.Ft.Df.Tra,
+                                  thisMaterial->TAR.Sol.Ft.Df.Ref,
+                                  thisMaterial->TAR.Sol.Bk.Df.Ref,
+                                  thisMaterial->TAR.IR.Ft.Tra,
+                                  thisMaterial->TAR.IR.Ft.Emi,
+                                  thisMaterial->TAR.IR.Bk.Emi);
                         } break;
                                 
                         case Material::Group::GapEquivalentLayer: {

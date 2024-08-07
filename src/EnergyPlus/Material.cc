@@ -918,37 +918,37 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         mat->Roughness = SurfaceRoughness::VerySmooth;
         mat->ROnly = true;
 
-        mat->TausFrontBeamBeam = s_ipsc->rNumericArgs(1);
-        mat->TausBackBeamBeam = s_ipsc->rNumericArgs(2);
-        mat->ReflFrontBeamBeam = s_ipsc->rNumericArgs(3);
-        mat->ReflBackBeamBeam = s_ipsc->rNumericArgs(4);
-        mat->TausFrontBeamBeamVis = s_ipsc->rNumericArgs(5);
-        mat->TausBackBeamBeamVis = s_ipsc->rNumericArgs(6);
-        mat->ReflFrontBeamBeamVis = s_ipsc->rNumericArgs(7);
-        mat->ReflBackBeamBeamVis = s_ipsc->rNumericArgs(8);
-        mat->TausFrontBeamDiff = s_ipsc->rNumericArgs(9);
-        mat->TausBackBeamDiff = s_ipsc->rNumericArgs(10);
-        mat->ReflFrontBeamDiff = s_ipsc->rNumericArgs(11);
-        mat->ReflBackBeamDiff = s_ipsc->rNumericArgs(12);
-        mat->TausFrontBeamDiffVis = s_ipsc->rNumericArgs(13);
-        mat->TausBackBeamDiffVis = s_ipsc->rNumericArgs(14);
-        mat->ReflFrontBeamDiffVis = s_ipsc->rNumericArgs(15);
-        mat->ReflBackBeamDiffVis = s_ipsc->rNumericArgs(16);
-        mat->TausDiffDiff = s_ipsc->rNumericArgs(17);
-        mat->ReflFrontDiffDiff = s_ipsc->rNumericArgs(18);
-        mat->ReflBackDiffDiff = s_ipsc->rNumericArgs(19);
-        mat->TausDiffDiffVis = s_ipsc->rNumericArgs(20);
-        mat->ReflFrontDiffDiffVis = s_ipsc->rNumericArgs(21);
-        mat->ReflBackDiffDiffVis = s_ipsc->rNumericArgs(22);
-        mat->TausThermal = s_ipsc->rNumericArgs(23);
-        mat->EmissThermalFront = s_ipsc->rNumericArgs(24);
-        mat->EmissThermalBack = s_ipsc->rNumericArgs(25);
+        mat->TAR.Sol.Ft.Bm[0].BmTra = s_ipsc->rNumericArgs(1);
+        mat->TAR.Sol.Bk.Bm[0].BmTra = s_ipsc->rNumericArgs(2);
+        mat->TAR.Sol.Ft.Bm[0].BmRef = s_ipsc->rNumericArgs(3);
+        mat->TAR.Sol.Bk.Bm[0].BmRef = s_ipsc->rNumericArgs(4);
+        mat->TAR.Vis.Ft.Bm[0].BmTra = s_ipsc->rNumericArgs(5);
+        mat->TAR.Vis.Bk.Bm[0].BmTra = s_ipsc->rNumericArgs(6);
+        mat->TAR.Vis.Ft.Bm[0].BmRef = s_ipsc->rNumericArgs(7);
+        mat->TAR.Vis.Bk.Bm[0].BmRef = s_ipsc->rNumericArgs(8);
+        mat->TAR.Sol.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(9);
+        mat->TAR.Sol.Bk.Bm[0].DfTra = s_ipsc->rNumericArgs(10);
+        mat->TAR.Sol.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(11);
+        mat->TAR.Sol.Bk.Bm[0].DfRef = s_ipsc->rNumericArgs(12);
+        mat->TAR.Vis.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(13);
+        mat->TAR.Vis.Bk.Bm[0].DfTra = s_ipsc->rNumericArgs(14);
+        mat->TAR.Vis.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(15);
+        mat->TAR.Vis.Bk.Bm[0].DfRef = s_ipsc->rNumericArgs(16);
+        mat->TAR.Sol.Ft.Df.Tra = mat->TAR.Sol.Bk.Df.Tra = s_ipsc->rNumericArgs(17);
+        mat->TAR.Sol.Ft.Df.Ref = s_ipsc->rNumericArgs(18);
+        mat->TAR.Sol.Bk.Df.Ref = s_ipsc->rNumericArgs(19);
+        mat->TAR.Vis.Ft.Df.Tra = mat->TAR.Vis.Bk.Df.Tra = s_ipsc->rNumericArgs(20);
+        mat->TAR.Vis.Ft.Df.Ref = s_ipsc->rNumericArgs(21);
+        mat->TAR.Vis.Bk.Df.Ref = s_ipsc->rNumericArgs(22);
+        mat->TAR.IR.Ft.Tra = mat->TAR.IR.Bk.Tra = s_ipsc->rNumericArgs(23);
+        mat->TAR.IR.Ft.Emi = s_ipsc->rNumericArgs(24);
+        mat->TAR.IR.Bk.Emi = s_ipsc->rNumericArgs(25);
         mat->Resistance = s_ipsc->rNumericArgs(26);
         if (mat->Resistance <= 0.0) mat->Resistance = 0.158; // equivalent to single pane of 1/4" inch standard glass
         // Assumes thermal emissivity is the same as thermal absorptance
-        mat->AbsorpThermalFront = mat->EmissThermalFront;
-        mat->AbsorpThermalBack = mat->EmissThermalBack;
-        mat->TransThermal = mat->TausThermal;
+        mat->AbsorpThermalFront = mat->TAR.IR.Ft.Tra;
+        mat->AbsorpThermalBack = mat->TAR.IR.Bk.Tra;
+        mat->TransThermal = mat->TAR.IR.Ft.Tra;
 
         mat->windowOpticalData = static_cast<Window::OpticalDataModel>(getEnumValue(Window::opticalDataModelNamesUC, s_ipsc->cAlphaArgs(2)));
 
@@ -1369,22 +1369,22 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         mat->ROnly = true;
 
         //  Front side and back side have the same beam-Beam Transmittance
-        mat->TausFrontBeamBeam = s_ipsc->rNumericArgs(1);
-        mat->TausBackBeamBeam = s_ipsc->rNumericArgs(1);
-        mat->TausFrontBeamDiff = s_ipsc->rNumericArgs(2);
-        mat->TausBackBeamDiff = s_ipsc->rNumericArgs(3);
-        mat->ReflFrontBeamDiff = s_ipsc->rNumericArgs(4);
-        mat->ReflBackBeamDiff = s_ipsc->rNumericArgs(5);
-        mat->TausFrontBeamBeamVis = s_ipsc->rNumericArgs(6);
-        mat->TausFrontBeamDiffVis = s_ipsc->rNumericArgs(7);
-        mat->ReflFrontBeamDiffVis = s_ipsc->rNumericArgs(8);
-        mat->TausThermal = s_ipsc->rNumericArgs(9);
-        mat->EmissThermalFront = s_ipsc->rNumericArgs(10);
-        mat->EmissThermalBack = s_ipsc->rNumericArgs(11);
+        mat->TAR.Sol.Ft.Bm[0].BmTra = s_ipsc->rNumericArgs(1);
+        mat->TAR.Sol.Bk.Bm[0].BmTra = s_ipsc->rNumericArgs(1);
+        mat->TAR.Sol.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(2);
+        mat->TAR.Sol.Bk.Bm[0].DfTra = s_ipsc->rNumericArgs(3);
+        mat->TAR.Sol.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(4);
+        mat->TAR.Sol.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(5);
+        mat->TAR.Vis.Ft.Bm[0].BmTra = s_ipsc->rNumericArgs(6);
+        mat->TAR.Vis.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(7);
+        mat->TAR.Vis.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(8);
+        mat->TAR.IR.Ft.Tra = mat->TAR.IR.Bk.Tra = s_ipsc->rNumericArgs(9);
+        mat->TAR.IR.Ft.Emi = s_ipsc->rNumericArgs(10);
+        mat->TAR.IR.Bk.Emi = s_ipsc->rNumericArgs(11);
         // Assumes thermal emissivity is the same as thermal absorptance
-        mat->AbsorpThermalFront = mat->EmissThermalFront;
-        mat->AbsorpThermalBack = mat->EmissThermalBack;
-        mat->TransThermal = mat->TausThermal;
+        mat->AbsorpThermalFront = mat->TAR.IR.Ft.Emi;
+        mat->AbsorpThermalBack = mat->TAR.IR.Bk.Emi;
+        mat->TransThermal = mat->TAR.IR.Ft.Tra;
 
         if (s_ipsc->rNumericArgs(1) + s_ipsc->rNumericArgs(2) + s_ipsc->rNumericArgs(4) >= 1.0) {
             ErrorsFound = true;
@@ -1458,24 +1458,24 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         mat->ROnly = true;
 
         //  Front side and back side have the same properties
-        mat->TausFrontBeamBeam = s_ipsc->rNumericArgs(1);
-        mat->TausBackBeamBeam = s_ipsc->rNumericArgs(1);
+        mat->TAR.Sol.Ft.Bm[0].BmTra = s_ipsc->rNumericArgs(1);
+        mat->TAR.Sol.Bk.Bm[0].BmTra = s_ipsc->rNumericArgs(1);
 
-        mat->TausFrontBeamDiff = s_ipsc->rNumericArgs(2);
-        mat->TausBackBeamDiff = s_ipsc->rNumericArgs(3);
+        mat->TAR.Sol.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(2);
+        mat->TAR.Sol.Bk.Bm[0].DfTra = s_ipsc->rNumericArgs(3);
 
-        mat->ReflFrontBeamDiff = s_ipsc->rNumericArgs(4);
-        mat->ReflBackBeamDiff = s_ipsc->rNumericArgs(5);
-        mat->TausFrontBeamBeamVis = s_ipsc->rNumericArgs(6);
-        mat->TausFrontBeamDiffVis = s_ipsc->rNumericArgs(7);
-        mat->ReflFrontBeamDiffVis = s_ipsc->rNumericArgs(8);
-        mat->TausThermal = s_ipsc->rNumericArgs(9);
-        mat->EmissThermalFront = s_ipsc->rNumericArgs(10);
-        mat->EmissThermalBack = s_ipsc->rNumericArgs(11);
+        mat->TAR.Sol.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(4);
+        mat->TAR.Sol.Bk.Bm[0].DfRef = s_ipsc->rNumericArgs(5);
+        mat->TAR.Vis.Ft.Bm[0].BmTra = s_ipsc->rNumericArgs(6);
+        mat->TAR.Vis.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(7);
+        mat->TAR.Vis.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(8);
+        mat->TAR.IR.Ft.Tra = mat->TAR.IR.Bk.Tra = s_ipsc->rNumericArgs(9);
+        mat->TAR.IR.Ft.Emi = s_ipsc->rNumericArgs(10);
+        mat->TAR.IR.Bk.Emi = s_ipsc->rNumericArgs(11);
         // Assumes thermal emissivity is the same as thermal absorptance
-        mat->AbsorpThermalFront = mat->EmissThermalFront;
-        mat->AbsorpThermalBack = mat->EmissThermalBack;
-        mat->TransThermal = mat->TausThermal;
+        mat->AbsorpThermalFront = mat->TAR.IR.Ft.Emi;
+        mat->AbsorpThermalBack = mat->TAR.IR.Bk.Emi;
+        mat->TransThermal = mat->TAR.IR.Ft.Tra;
 
         if (!s_ipsc->lNumericFieldBlanks(12) && !s_ipsc->lNumericFieldBlanks(13)) {
             if (s_ipsc->rNumericArgs(12) != 0.0 && s_ipsc->rNumericArgs(13) != 0.0) {
@@ -1724,23 +1724,23 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         // WindowMaterial:Screen:EquivalentLayer,
         matScreen->Roughness = SurfaceRoughness::MediumRough;
         matScreen->ROnly = true;
-        matScreen->TausFrontBeamBeam = s_ipsc->rNumericArgs(1);
-        matScreen->TausBackBeamBeam = s_ipsc->rNumericArgs(1);
-        matScreen->TausFrontBeamDiff = s_ipsc->rNumericArgs(2);
-        matScreen->TausBackBeamDiff = s_ipsc->rNumericArgs(2);
-        matScreen->ReflFrontBeamDiff = s_ipsc->rNumericArgs(3);
-        matScreen->ReflBackBeamDiff = s_ipsc->rNumericArgs(3);
-        matScreen->TausFrontBeamBeamVis = s_ipsc->rNumericArgs(4);
-        matScreen->TausFrontBeamDiffVis = s_ipsc->rNumericArgs(5);
-        matScreen->ReflFrontDiffDiffVis = s_ipsc->rNumericArgs(6);
-        matScreen->TausThermal = s_ipsc->rNumericArgs(7);
-        matScreen->EmissThermalFront = s_ipsc->rNumericArgs(8);
-        matScreen->EmissThermalBack = s_ipsc->rNumericArgs(8);
+        matScreen->TAR.Sol.Ft.Bm[0].BmTra = s_ipsc->rNumericArgs(1);
+        matScreen->TAR.Sol.Bk.Bm[0].BmTra = s_ipsc->rNumericArgs(1);
+        matScreen->TAR.Sol.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(2);
+        matScreen->TAR.Sol.Bk.Bm[0].DfTra = s_ipsc->rNumericArgs(2);
+        matScreen->TAR.Sol.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(3);
+        matScreen->TAR.Sol.Bk.Bm[0].DfRef = s_ipsc->rNumericArgs(3);
+        matScreen->TAR.Vis.Ft.Bm[0].BmTra = s_ipsc->rNumericArgs(4);
+        matScreen->TAR.Vis.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(5);
+        matScreen->TAR.Vis.Ft.Df.Ref = s_ipsc->rNumericArgs(6);
+        matScreen->TAR.IR.Ft.Tra = matScreen->TAR.IR.Bk.Tra = s_ipsc->rNumericArgs(7);
+        matScreen->TAR.IR.Ft.Emi = s_ipsc->rNumericArgs(8);
+        matScreen->TAR.IR.Bk.Emi = s_ipsc->rNumericArgs(8);
 
         // Assumes thermal emissivity is the same as thermal absorptance
-        matScreen->AbsorpThermalFront = matScreen->EmissThermalFront;
-        matScreen->AbsorpThermalBack = matScreen->EmissThermalBack;
-        matScreen->TransThermal = matScreen->TausThermal;
+        matScreen->AbsorpThermalFront = matScreen->TAR.IR.Ft.Emi;
+        matScreen->AbsorpThermalBack = matScreen->TAR.IR.Bk.Emi;
+        matScreen->TransThermal = matScreen->TAR.IR.Ft.Tra;
 
         if (s_ipsc->rNumericArgs(3) < 0.0 || s_ipsc->rNumericArgs(3) > 1.0) {
             ErrorsFound = true;
@@ -1784,27 +1784,27 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             } else {
                 //  Calculate direct normal transmittance (open area fraction)
                 Openness = pow_2(1.0 - matScreen->ScreenWireDiameter / matScreen->ScreenWireSpacing);
-                if ((matScreen->TausFrontBeamBeam - Openness) / Openness > 0.01) {
+                if ((matScreen->TAR.Sol.Ft.Bm[0].BmTra - Openness) / Openness > 0.01) {
                     ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", screen openness specified.");
                     ShowContinueError(state, s_ipsc->cNumericFieldNames(1) + " is > 1.0% of the value calculated from input fields:");
                     ShowContinueError(state, s_ipsc->cNumericFieldNames(9) + " and " + (s_ipsc->cNumericFieldNames(10)));
                     ShowContinueError(state, " using the formula (1-diameter/spacing)**2");
                     ShowContinueError(state, " ...the screen diameter is recalculated from the material openness specified ");
                     ShowContinueError(state, " ...and wire spacing using the formula = wire spacing * (1.0 - SQRT(Opennes))");
-                    matScreen->ScreenWireDiameter = matScreen->ScreenWireSpacing * (1.0 - std::sqrt(matScreen->TausFrontBeamBeam));
+                    matScreen->ScreenWireDiameter = matScreen->ScreenWireSpacing * (1.0 - std::sqrt(matScreen->TAR.Sol.Ft.Bm[0].BmTra));
                     ShowContinueError(state, format(" ...Recalculated {}={:.4R} m", s_ipsc->cNumericFieldNames(10), matScreen->ScreenWireDiameter));
                 }
             }
         }
 
-        if (matScreen->TausFrontBeamBeam + matScreen->ReflFrontBeamDiff >= 1.0) {
+        if (matScreen->TAR.Sol.Ft.Bm[0].BmTra + matScreen->TAR.Sol.Ft.Bm[0].DfRef >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", Illegal value combination.");
             ShowContinueError(state, "Calculated solar transmittance + solar reflectance not < 1.0");
             ShowContinueError(state, "See Engineering Reference for calculation procedure for solar transmittance.");
         }
 
-        if (matScreen->TausFrontBeamBeamVis + matScreen->ReflFrontDiffDiffVis >= 1.0) {
+        if (matScreen->TAR.Vis.Ft.Bm[0].BmTra + matScreen->TAR.Vis.Ft.Df.Ref >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", Illegal value combination.");
             ShowContinueError(state, "Calculated visible transmittance + visible reflectance not < 1.0");
@@ -2129,40 +2129,40 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         mat->SlatCrown = s_ipsc->rNumericArgs(3);
         mat->SlatAngle = s_ipsc->rNumericArgs(4);
 
-        mat->TausFrontBeamDiff = s_ipsc->rNumericArgs(5);
-        mat->TausBackBeamDiff = s_ipsc->rNumericArgs(6);
-        mat->ReflFrontBeamDiff = s_ipsc->rNumericArgs(7);
-        mat->ReflBackBeamDiff = s_ipsc->rNumericArgs(8);
+        mat->TAR.Sol.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(5);
+        mat->TAR.Sol.Bk.Bm[0].DfTra = s_ipsc->rNumericArgs(6);
+        mat->TAR.Sol.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(7);
+        mat->TAR.Sol.Bk.Bm[0].DfRef = s_ipsc->rNumericArgs(8);
 
         if (!s_ipsc->lNumericFieldBlanks(9) && !s_ipsc->lNumericFieldBlanks(10) && !s_ipsc->lNumericFieldBlanks(11) && !s_ipsc->lNumericFieldBlanks(12)) {
-            mat->TausFrontBeamDiffVis = s_ipsc->rNumericArgs(9);
-            mat->TausBackBeamDiffVis = s_ipsc->rNumericArgs(10);
-            mat->ReflFrontBeamDiffVis = s_ipsc->rNumericArgs(11);
-            mat->ReflBackBeamDiffVis = s_ipsc->rNumericArgs(12);
+            mat->TAR.Vis.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(9);
+            mat->TAR.Vis.Bk.Bm[0].DfTra = s_ipsc->rNumericArgs(10);
+            mat->TAR.Vis.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(11);
+            mat->TAR.Vis.Bk.Bm[0].DfRef = s_ipsc->rNumericArgs(12);
         }
         if (!s_ipsc->lNumericFieldBlanks(13) && !s_ipsc->lNumericFieldBlanks(14) && !s_ipsc->lNumericFieldBlanks(15)) {
-            mat->TausDiffDiff = s_ipsc->rNumericArgs(13);
-            mat->ReflFrontDiffDiff = s_ipsc->rNumericArgs(14);
-            mat->ReflBackDiffDiff = s_ipsc->rNumericArgs(15);
+            mat->TAR.Sol.Ft.Df.Tra = s_ipsc->rNumericArgs(13);
+            mat->TAR.Sol.Ft.Df.Ref = s_ipsc->rNumericArgs(14);
+            mat->TAR.Sol.Bk.Df.Ref = s_ipsc->rNumericArgs(15);
         }
         if (!s_ipsc->lNumericFieldBlanks(16) && !s_ipsc->lNumericFieldBlanks(17) && !s_ipsc->lNumericFieldBlanks(18)) {
-            mat->TausDiffDiffVis = s_ipsc->rNumericArgs(13);
-            mat->ReflFrontDiffDiffVis = s_ipsc->rNumericArgs(14);
-            mat->ReflBackDiffDiffVis = s_ipsc->rNumericArgs(15);
+            mat->TAR.Vis.Ft.Df.Tra = s_ipsc->rNumericArgs(13);
+            mat->TAR.Vis.Ft.Df.Ref = s_ipsc->rNumericArgs(14);
+            mat->TAR.Vis.Bk.Df.Ref = s_ipsc->rNumericArgs(15);
         }
         if (!s_ipsc->lNumericFieldBlanks(19)) {
-            mat->TausThermal = s_ipsc->rNumericArgs(19);
+            mat->TAR.IR.Ft.Tra = mat->TAR.IR.Bk.Tra = s_ipsc->rNumericArgs(19);
         }
         if (!s_ipsc->lNumericFieldBlanks(20)) {
-            mat->EmissThermalFront = s_ipsc->rNumericArgs(20);
+            mat->TAR.IR.Ft.Emi = s_ipsc->rNumericArgs(20);
         }
         if (!s_ipsc->lNumericFieldBlanks(21)) {
-            mat->EmissThermalBack = s_ipsc->rNumericArgs(21);
+            mat->TAR.IR.Bk.Emi = s_ipsc->rNumericArgs(21);
         }
         // Assumes thermal emissivity is the same as thermal absorptance
-        mat->AbsorpThermalFront = mat->EmissThermalFront;
-        mat->AbsorpThermalBack = mat->EmissThermalBack;
-        mat->TransThermal = mat->TausThermal;
+        mat->AbsorpThermalFront = mat->TAR.IR.Ft.Emi;
+        mat->AbsorpThermalBack = mat->TAR.IR.Bk.Emi;
+        mat->TransThermal = mat->TAR.IR.Ft.Tra;
 
         // By default all blinds have fixed slat angle,
         //  they are used with window shading controls that adjust slat angles like
