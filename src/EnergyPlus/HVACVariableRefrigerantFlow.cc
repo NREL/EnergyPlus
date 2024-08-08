@@ -13288,7 +13288,7 @@ Real64 VRFCondenserEquipment::VRFOU_FlowRate(EnergyPlusData &state,
         deltaT = this->C3Tc * pow_2(SHSC) + this->C2Tc * SHSC + this->C1Tc;
         T_coil_surf = TeTc - deltaT;
         T_coil_out = T_coil_in + (T_coil_surf - T_coil_in) * (1 - BF);
-        m_air = Q_coil / (T_coil_out - T_coil_in) / 1005.0;
+        m_air = abs(Q_coil) / (T_coil_out - T_coil_in) / 1005.0;
 
     } else if (OperationMode == HXOpMode::EvapMode) {
         // IU Heating: OperationMode 1
