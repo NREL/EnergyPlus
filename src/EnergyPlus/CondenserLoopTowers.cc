@@ -4695,7 +4695,7 @@ namespace CondenserLoopTowers {
 
         // Do not RETURN here if flow rate is less than SmallMassFlow. Check basin heater and then RETURN.
 
-        bool returnFlagSet;
+        bool returnFlagSet = false;
         this->checkMassFlowAndLoad(state, MyLoad, returnFlagSet);
         if (returnFlagSet) return;
 
@@ -4970,7 +4970,7 @@ namespace CondenserLoopTowers {
         // Do not RETURN here if flow rate is less than SmallMassFlow. Check basin heater and then RETURN.
         if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
             return; // TODO: WTF
-        bool returnFlagSet;
+        bool returnFlagSet = false;
         this->checkMassFlowAndLoad(state, MyLoad, returnFlagSet);
         if (returnFlagSet) return;
 
@@ -5203,7 +5203,7 @@ namespace CondenserLoopTowers {
         if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
             return; // TODO: WTF
 
-        bool returnFlagSet;
+        bool returnFlagSet = false;
         this->checkMassFlowAndLoad(state, MyLoad, returnFlagSet);
         if (returnFlagSet) return;
 
@@ -6457,7 +6457,6 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::checkMassFlowAndLoad(EnergyPlusData &state, Real64 const MyLoad, bool &returnFlagSet)
     {
-        returnFlagSet = false;
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             // for multiple cells, we assume that it's a common basin
