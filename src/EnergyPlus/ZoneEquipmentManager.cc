@@ -6403,9 +6403,15 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         // Zone loops structured in getinput so only do each pair of zones bounding door once, even if multiple doors in one zone
         for (int ZoneA = 1; ZoneA <= (state.dataGlobal->NumOfZones - 1); ++ZoneA) {
             if (!state.dataHeatBal->RefDoorMixing(ZoneA).RefDoorMixFlag) continue;
+            auto &thisRefDoorMixing = state.dataHeatBal->RefDoorMixing(ZoneA);
             auto &zoneAHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneA);
             Real64 TZoneA = zoneAHB.MixingMAT;
             Real64 HumRatZoneA = zoneAHB.MixingHumRat;
+            if ((state.dataHeatBal->doSpaceHeatBalance) && (thisRefDoorMixing.spaceIndex > 0)) {
+                auto &spaceAHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisRefDoorMixing.spaceIndex);
+                TZoneA = spaceAHB.MixingMAT;
+                HumRatZoneA = spaceAHB.MixingHumRat;
+            }
             Real64 AirDensityZoneA = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TZoneA, HumRatZoneA, RoutineNameRefrigerationDoorMixing);
             Real64 CpAirZoneA = PsyCpAirFnW(HumRatZoneA);
             for (int j = 1; j <= state.dataHeatBal->RefDoorMixing(ZoneA).NumRefDoorConnections; ++j) {
@@ -6414,6 +6420,11 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 Real64 TZoneB = zoneBHB.MixingMAT;
                 Real64 HumRatZoneB = zoneBHB.MixingHumRat;
                 Real64 CpAirZoneB = PsyCpAirFnW(HumRatZoneB);
+                if ((state.dataHeatBal->doSpaceHeatBalance) && (thisRefDoorMixing.fromSpaceIndex > 0)) {
+                    auto &spaceBHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisRefDoorMixing.fromSpaceIndex);
+                    TZoneB = spaceBHB.MixingMAT;
+                    HumRatZoneB = spaceBHB.MixingHumRat;
+                }
                 Real64 Tavg = (TZoneA + TZoneB) / 2.0;
                 Real64 Wavg = (HumRatZoneA + HumRatZoneB) / 2.0;
                 Real64 AirDensityAvg = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tavg, Wavg, RoutineNameRefrigerationDoorMixing);
@@ -6471,23 +6482,39 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 zoneAHB.MixingMassFlowXHumRat += MassFlowXHumRatToA;
                 zoneBHB.MixingMassFlowXHumRat += MassFlowXHumRatToB;
                 if (state.dataHeatBal->doSpaceHeatBalance) {
-                    // ZoneRefrigerationDoorMixing has no space information, just zones
-                    // Allocate mixing flows by space volume fraction of zone volume
-                    for (int spaceNum : state.dataHeatBal->Zone(ZoneA).spaceIndexes) {
-                        Real64 spaceFrac = state.dataHeatBal->space(spaceNum).fracZoneVolume;
-                        auto &spaceAHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
-                        spaceAHB.MCPM += MassFlowXCpToA * spaceFrac;
-                        spaceAHB.MCPTM += MassFlowXCpXTempToA * spaceFrac;
-                        spaceAHB.MixingMassFlowZone += MassFlowToA * spaceFrac;
-                        spaceAHB.MixingMassFlowXHumRat += MassFlowXHumRatToA * spaceFrac;
+                    if (thisRefDoorMixing.spaceIndex > 0) {
+                        auto &spaceAHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisRefDoorMixing.spaceIndex);
+                        spaceAHB.MCPM += MassFlowXCpToA;
+                        spaceAHB.MCPTM += MassFlowXCpXTempToA;
+                        spaceAHB.MixingMassFlowZone += MassFlowToA;
+                        spaceAHB.MixingMassFlowXHumRat += MassFlowXHumRatToA;
+                    } else {
+                        // Allocate mixing flows by space volume fraction of zone volume
+                        for (int spaceNum : state.dataHeatBal->Zone(ZoneA).spaceIndexes) {
+                            Real64 spaceFrac = state.dataHeatBal->space(spaceNum).fracZoneVolume;
+                            auto &spaceAHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
+                            spaceAHB.MCPM += MassFlowXCpToA * spaceFrac;
+                            spaceAHB.MCPTM += MassFlowXCpXTempToA * spaceFrac;
+                            spaceAHB.MixingMassFlowZone += MassFlowToA * spaceFrac;
+                            spaceAHB.MixingMassFlowXHumRat += MassFlowXHumRatToA * spaceFrac;
+                        }
                     }
-                    for (int spaceNum : state.dataHeatBal->Zone(ZoneB).spaceIndexes) {
-                        Real64 spaceFrac = state.dataHeatBal->space(spaceNum).fracZoneVolume;
-                        auto &spaceBHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
-                        spaceBHB.MCPM += MassFlowXCpToB * spaceFrac;
-                        spaceBHB.MCPTM += MassFlowXCpXTempToB * spaceFrac;
-                        spaceBHB.MixingMassFlowZone += MassFlowToB * spaceFrac;
-                        spaceBHB.MixingMassFlowXHumRat += MassFlowXHumRatToB * spaceFrac;
+                    if (thisRefDoorMixing.spaceIndex > 0) {
+                        auto &spaceBHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisRefDoorMixing.fromSpaceIndex);
+                        spaceBHB.MCPM += MassFlowXCpToB;
+                        spaceBHB.MCPTM += MassFlowXCpXTempToB;
+                        spaceBHB.MixingMassFlowZone += MassFlowToB;
+                        spaceBHB.MixingMassFlowXHumRat += MassFlowXHumRatToB;
+                    } else {
+                        // Allocate mixing flows by space volume fraction of zone volume
+                        for (int spaceNum : state.dataHeatBal->Zone(ZoneB).spaceIndexes) {
+                            Real64 spaceFrac = state.dataHeatBal->space(spaceNum).fracZoneVolume;
+                            auto &spaceBHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
+                            spaceBHB.MCPM += MassFlowXCpToB * spaceFrac;
+                            spaceBHB.MCPTM += MassFlowXCpXTempToB * spaceFrac;
+                            spaceBHB.MixingMassFlowZone += MassFlowToB * spaceFrac;
+                            spaceBHB.MixingMassFlowXHumRat += MassFlowXHumRatToB * spaceFrac;
+                        }
                     }
                 }
 

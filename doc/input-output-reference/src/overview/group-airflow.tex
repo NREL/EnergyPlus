@@ -1518,7 +1518,7 @@ The total heat gain due to the sum of mixing, cross-mixing, and refrigeration-do
 
 ZoneRefrigerationDoorMixing is ideally suited for two zones, at least one of which is refrigerated, that exchange an equal amount of dry air. As with \hyperref[zonemixing]{ZoneMixing}, this is a simplified interzone airflow in EnergyPlus. The ZoneRefrigerationDoorMixing approach shares some features of both \hyperref[zonemixing]{ZoneMixing} and \hyperref[zonecrossmixing]{ZoneCrossMixing}. Like \hyperref[zonecrossmixing]{ZoneCrossMixing}, ZoneRefrigerationDoorMixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. Unlike the other two mixing objects, ZoneRefrigerationDoorMixing always calculates the air exchange rate based on the zone temperature and relative humidity. That is, the user does not specify the air flow rate. The user can moderate the flow through a door-opening schedule.
 
-ZoneRefrigerationDoorMixing can only be entered once for any unique pair of zones. It doesn't matter which zone is listed first and the zones will automatically switch back and forth between source and receiving zones depending upon which zone is colder.
+ZoneRefrigerationDoorMixing can only be entered once for any unique pair of zones. It doesn't matter which zone is listed first and the zones will automatically switch back and forth between source and receiving zones depending upon which zone is colder. If space heat balance is active and a space name is specified for Space or Zone Name 1 or 2, then the space conditions will be used and the exchange will be with that space only. If space heat balance is active and a zone name is specified, then the aveerage zone conditions will be used, and the exchange will be proportioned to all spaces in the zone by space volume.
 
 \subsubsection{Inputs}\label{inputs-7-003}
 
@@ -1526,13 +1526,13 @@ ZoneRefrigerationDoorMixing can only be entered once for any unique pair of zone
 
 The name of the ZoneRefrigerationDoorMixing object.
 
-\paragraph{Field: Zone 1~ Name}\label{field-zone-1-name}
+\paragraph{Field: Zone or Space Name 1}\label{field-zone-1-name}
 
-This field is the name of one of the two zones (ref: Zone) exchanging air and attaches a particular refrigeration door~ mixing statement to both thermal zones in the building.
+This field is the name of one of the two zones (ref: Zone) or spaces exchanging air and attaches a particular refrigeration door~ mixing statement to both thermal zones or spaces in the building. If a space name is used, it must belong to a different zone than Zone or Space Name 2.
 
-\paragraph{Field: Zone 2~ Name}\label{field-zone-2-name}
+\paragraph{Field: Zone or Space Name 2}\label{field-zone-2-name}
 
-This field is the name of the other zone (ref: Zone) exchanging air and attaches a particular refrigeration door~ mixing statement to both thermal zones in the building.
+This field is the name of the other zone (ref: Zone) or space exchanging air and attaches a particular refrigeration door~ mixing statement to both thermal zones or spaces in the building. If a space name is used, it must belong to a different zone than Zone or Space Name 1.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-5}
 
