@@ -87,13 +87,138 @@ using namespace DataEnvironment;
 
 namespace EnergyPlus {
 
+void createFlatCurves(EnergyPlusData *state)
+{
+    state->dataCurveManager->allocateCurveVector(4);
+
+    {
+        auto *curve = state->dataCurveManager->PerfCurve(1);
+        curve->curveType = CurveType::BiQuadratic;
+        curve->interpolationType = InterpType::EvaluateCurveToLimits;
+        curve->Name = "Non Flat BiQuadratic FT";
+        curve->coeff[0] = 0.95624428;
+        curve->coeff[1] = 0;
+        curve->coeff[2] = 0;
+        curve->coeff[3] = 0.005999544;
+        curve->coeff[4] = -0.0000900072;
+        curve->coeff[5] = 0;
+        curve->inputLimits[0].min = 0.0;
+        curve->inputLimits[0].max = 2.0;
+        curve->inputLimits[1].min = 0.0;
+        curve->inputLimits[1].max = 2.0;
+    }
+
+    {
+        auto *curve = state->dataCurveManager->PerfCurve(2);
+        curve->curveType = CurveType::Quadratic;
+        curve->Name = "Flat Quadratic FFlow";
+        curve->coeff[0] = 1;
+        curve->coeff[1] = 0;
+        curve->coeff[2] = 0;
+        curve->inputLimits[0].min = 0;
+        curve->inputLimits[0].max = 2;
+        curve->outputLimits.min = 0;
+        curve->outputLimits.max = 2;
+    }
+
+    {
+        auto *curve = state->dataCurveManager->PerfCurve(3);
+        curve->Name = "Flat Quadratic PLFFPLR";
+        curve->curveType = CurveType::Quadratic;
+        curve->interpolationType = InterpType::EvaluateCurveToLimits;
+        curve->coeff[0] = 1;
+        curve->coeff[1] = 0.0;
+        curve->coeff[2] = 0.0;
+        curve->coeff[3] = 0.0;
+        curve->coeff[4] = 0.0;
+        curve->coeff[5] = 0.0;
+        curve->inputLimits[0].min = 0.0;
+        curve->inputLimits[0].max = 1.0;
+        curve->inputLimits[1].min = 0.7;
+        curve->inputLimits[1].max = 1.0;
+    }
+
+    {
+        auto *curve = state->dataCurveManager->PerfCurve(4);
+        curve->Name = "Flat BiQuadratic FEIR";
+        curve->curveType = CurveType::BiQuadratic;
+        curve->interpolationType = InterpType::EvaluateCurveToLimits;
+        curve->coeff[0] = 1;
+        curve->coeff[1] = 0.0;
+        curve->coeff[2] = 0.0;
+        curve->coeff[3] = 0.0;
+        curve->coeff[4] = 0.0;
+        curve->coeff[5] = 0.0;
+        curve->inputLimits[0].min = -100.0;
+        curve->inputLimits[0].max = 100.0;
+        curve->inputLimits[1].min = -100.0;
+        curve->inputLimits[1].max = 100.0;
+    }
+}
+void createSpeedsWithDefaults(DXCoils::DXCoilData &thisDXCoil)
+{
+    int const numSpeeds = thisDXCoil.NumOfSpeeds;
+    thisDXCoil.MSRatedTotCap.allocate(numSpeeds);
+    thisDXCoil.MSRatedTotCap = DataSizing::AutoSize;
+
+    thisDXCoil.MSRatedSHR.allocate(numSpeeds);
+    thisDXCoil.MSRatedSHR = DataSizing::AutoSize;
+
+    thisDXCoil.MSRatedCOP.allocate(numSpeeds);
+    thisDXCoil.MSRatedCOP = 3.0;
+
+    thisDXCoil.MSRatedAirVolFlowRate.allocate(numSpeeds);
+    thisDXCoil.MSRatedAirVolFlowRate = DataSizing::AutoSize;
+
+    thisDXCoil.MSFanPowerPerEvapAirFlowRate.allocate(numSpeeds);
+    thisDXCoil.MSFanPowerPerEvapAirFlowRate = 777.3;
+
+    thisDXCoil.MSFanPowerPerEvapAirFlowRate_2023.allocate(numSpeeds);
+    thisDXCoil.MSFanPowerPerEvapAirFlowRate_2023 = 934.4;
+
+    thisDXCoil.MSCCapFTemp.allocate(numSpeeds);
+    thisDXCoil.MSCCapFFlow.allocate(numSpeeds);
+    thisDXCoil.MSEIRFTemp.allocate(numSpeeds);
+    thisDXCoil.MSEIRFFlow.allocate(numSpeeds);
+    thisDXCoil.MSPLFFPLR.allocate(numSpeeds);
+
+    thisDXCoil.MSTwet_Rated.allocate(numSpeeds);
+    thisDXCoil.MSTwet_Rated = 0.0;
+
+    thisDXCoil.MSGamma_Rated.allocate(numSpeeds);
+    thisDXCoil.MSGamma_Rated = 0.0;
+
+    thisDXCoil.MSMaxONOFFCyclesperHour.allocate(numSpeeds);
+    thisDXCoil.MSMaxONOFFCyclesperHour = 0.0;
+
+    thisDXCoil.MSLatentCapacityTimeConstant.allocate(numSpeeds);
+    thisDXCoil.MSLatentCapacityTimeConstant = 0.0;
+
+    thisDXCoil.MSWasteHeatFrac.allocate(numSpeeds);
+    thisDXCoil.MSWasteHeatFrac = 0.2;
+
+    thisDXCoil.MSWasteHeat.allocate(numSpeeds);
+
+    thisDXCoil.MSEvapCondEffect.allocate(numSpeeds);
+    thisDXCoil.MSEvapCondEffect = 0.9;
+
+    thisDXCoil.MSEvapCondAirFlow.allocate(numSpeeds);
+    thisDXCoil.MSEvapCondAirFlow = DataSizing::AutoSize;
+
+    thisDXCoil.MSEvapCondPumpElecNomPower.allocate(numSpeeds);
+    thisDXCoil.MSEvapCondPumpElecNomPower = DataSizing::AutoSize;
+
+    // Other
+    thisDXCoil.MSRatedCBF.allocate(numSpeeds);
+    thisDXCoil.MSRatedAirMassFlowRate.allocate(numSpeeds);
+}
+
 TEST_F(EnergyPlusFixture, DXCoils_Test1)
 {
     using Psychrometrics::PsyRhFnTdbWPb;
     using Psychrometrics::PsyTdbFnHW;
     using Psychrometrics::PsyTsatFnHPb;
     using Psychrometrics::PsyWFnTdbH;
-    int DXCoilNum;
 
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
@@ -114,38 +239,20 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataDXCoils->DXCoil(1).NumOfSpeeds = 2;
     state->dataDXCoils->DXCoil(2).NumOfSpeeds = 2;
 
-    for (DXCoilNum = 1; DXCoilNum <= 2; ++DXCoilNum) {
-        state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSRatedSHR.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSRatedCOP.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSCCapFFlow.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSEvapCondEffect.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSEvapCondAirFlow.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSRatedCBF.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSWasteHeatFrac.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSTwet_Rated.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSGamma_Rated.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSMaxONOFFCyclesperHour.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSLatentCapacityTimeConstant.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
-        state->dataDXCoils->DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate_2023.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
+    for (int DXCoilNum = 1; DXCoilNum <= 2; ++DXCoilNum) {
+        createSpeedsWithDefaults(state->dataDXCoils->DXCoil(DXCoilNum));
     }
 
-    state->dataDXCoils->DXCoil(1).MSRatedTotCap(1) = 4455.507579219055;
-    state->dataDXCoils->DXCoil(1).MSRatedTotCap(2) = 6188.507579219055;
-    state->dataDXCoils->DXCoil(1).MSCCapFFlow = 1;
-    state->dataDXCoils->DXCoil(1).MSCCapFTemp = 3;
-    state->dataDXCoils->DXCoil(1).MSEIRFFlow = 1;
-    state->dataDXCoils->DXCoil(1).MSEIRFTemp = 3;
-    state->dataDXCoils->DXCoil(1).MSPLFFPLR = 2;
+    createFlatCurves(state);
+
+    int DXCoilNum = 1;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(1) = 4455.507579219055;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(2) = 6188.507579219055;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSCCapFFlow = 2;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp = 1;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow = 2;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp = 4;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR = 3;
 
     DXCoilNum = 2;
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(1) = 4455.507579219055;
@@ -153,61 +260,17 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedCOP(1) = 4.03;
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedCOP(2) = 3.53;
 
-    state->dataDXCoils->DXCoil(DXCoilNum).MSCCapFFlow = 1;
-    state->dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp = 3;
-    state->dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow = 1;
-    state->dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp = 3;
-    state->dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR = 2;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSCCapFFlow = 2;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp = 1;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow = 2;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp = 4;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR = 3;
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(1) = 0.2339;
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(2) = 0.2924;
     state->dataDXCoils->DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate = 0.0;
     state->dataDXCoils->DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate_2023 = 0.0;
     state->dataDXCoils->DXCoil(DXCoilNum).RegionNum = 4;
     state->dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor = -17.78;
-
-    state->dataCurveManager->allocateCurveVector(3);
-
-    auto *curve1 = state->dataCurveManager->PerfCurve(1);
-    curve1->curveType = CurveType::Quadratic;
-    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
-    curve1->coeff[0] = 1;
-    curve1->coeff[1] = 0.0;
-    curve1->coeff[2] = 0.0;
-    curve1->coeff[3] = 0.0;
-    curve1->coeff[4] = 0.0;
-    curve1->coeff[5] = 0.0;
-    curve1->inputLimits[0].min = 0.0;
-    curve1->inputLimits[0].max = 2.0;
-    curve1->inputLimits[1].min = 0.0;
-    curve1->inputLimits[1].max = 2.0;
-
-    auto *curve2 = state->dataCurveManager->PerfCurve(2);
-    curve2->curveType = CurveType::Quadratic;
-    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
-    curve2->coeff[0] = 1;
-    curve2->coeff[1] = 0.0;
-    curve2->coeff[2] = 0.0;
-    curve2->coeff[3] = 0.0;
-    curve2->coeff[4] = 0.0;
-    curve2->coeff[5] = 0.0;
-    curve2->inputLimits[0].min = 0.0;
-    curve2->inputLimits[0].max = 1.0;
-    curve2->inputLimits[1].min = 0.7;
-    curve2->inputLimits[1].max = 1.0;
-
-    auto *curve3 = state->dataCurveManager->PerfCurve(3);
-    curve3->curveType = CurveType::BiQuadratic;
-    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
-    curve3->coeff[0] = 1;
-    curve3->coeff[1] = 0.0;
-    curve3->coeff[2] = 0.0;
-    curve3->coeff[3] = 0.0;
-    curve3->coeff[4] = 0.0;
-    curve3->coeff[5] = 0.0;
-    curve3->inputLimits[0].min = -100.0;
-    curve3->inputLimits[0].max = 100.0;
-    curve3->inputLimits[1].min = -100.0;
-    curve3->inputLimits[1].max = 100.0;
 
     SetPredefinedTables(*state);
     SizeDXCoil(*state, 2);
