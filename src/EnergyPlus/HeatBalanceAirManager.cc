@@ -3803,7 +3803,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             int AlphaNum = 2;
             int Zone1Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
             int space1Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->space);
-            if ((Zone1Num == 0) && (space1Num==0)) {
+            if ((Zone1Num == 0) && (space1Num == 0)) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", invalid (not found) {}=\"{}\".",
                                        RoutineName,
@@ -3819,7 +3819,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             ++AlphaNum; // 3
             int Zone2Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
             int space2Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->space);
-            if ((Zone2Num == 0) && (space2Num==0)) {
+            if ((Zone2Num == 0) && (space2Num == 0)) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", invalid (not found) {}=\"{}\".",
                                        RoutineName,
