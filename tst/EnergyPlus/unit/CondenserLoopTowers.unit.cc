@@ -904,10 +904,11 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(*state);
 
+    Real64 MyLoad = 0.0;
     state->dataCondenserLoopTowers->towers(1).initialize(*state);
     state->dataCondenserLoopTowers->towers(1).SizeTower(*state);
     state->dataCondenserLoopTowers->towers(1).initialize(*state);
-    state->dataCondenserLoopTowers->towers(1).calculateSingleSpeedTower(*state);
+    state->dataCondenserLoopTowers->towers(1).calculateSingleSpeedTower(*state, MyLoad);
     state->dataCondenserLoopTowers->towers(1).update(*state);
     state->dataCondenserLoopTowers->towers(1).report(*state, true);
 
@@ -927,8 +928,8 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
         outletNodeIndex = std::distance(state->dataLoopNodes->NodeID.begin(), outletNode);
     }
     // TODO: FIXME: This is failing. Actual is -10.409381032746095, expected is 30.
-    EXPECT_GT(state->dataLoopNodes->Node(inletNodeIndex).Temp, 30.0);         // inlet node temperature
-    EXPECT_DOUBLE_EQ(30.0, state->dataLoopNodes->Node(outletNodeIndex).Temp); // outlet node temperature
+    EXPECT_GT(state->dataLoopNodes->Node(inletNodeIndex).Temp, 30.0);                                                    // inlet node temperature
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(inletNodeIndex).Temp, state->dataLoopNodes->Node(outletNodeIndex).Temp); // outlet node temperature
 
     // input not needed for sizing (WasAutoSized = false) using NominalCapacity method but this variable should still size
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUAWasAutoSized);
@@ -3967,7 +3968,8 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     state->dataPlnt->PlantLoop(VSTower.plantLoc.loopNum).LoopSide(VSTower.plantLoc.loopSideNum).TempSetPoint = 30.0;
     VSTower.WaterMassFlowRate = VSTower.DesWaterMassFlowRate * WaterFlowRateRatio;
 
-    VSTower.calculateVariableSpeedTower(*state);
+    Real64 myLoad = 1000.0;
+    VSTower.calculateVariableSpeedTower(*state, myLoad);
     EXPECT_DOUBLE_EQ(30.0, VSTower.OutletWaterTemp);
     EXPECT_DOUBLE_EQ(1.0, VSTower.FanCyclingRatio);
     Real64 TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(*state, WaterFlowRateRatio, VSTower.airFlowRateRatio, AirWetBulbTemp);
@@ -3985,7 +3987,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     VSTower.AirWetBulb = state->dataEnvrn->OutWetBulbTemp;
     VSTower.AirHumRat = state->dataEnvrn->OutHumRat;
 
-    VSTower.calculateVariableSpeedTower(*state);
+    VSTower.calculateVariableSpeedTower(*state, myLoad);
     EXPECT_DOUBLE_EQ(30.0, VSTower.OutletWaterTemp);
     EXPECT_NEAR(0.5424, VSTower.FanCyclingRatio, 0.0001);
     // outside air condition is favorable that fan only needs to cycle at min flow to meet the setpoint
