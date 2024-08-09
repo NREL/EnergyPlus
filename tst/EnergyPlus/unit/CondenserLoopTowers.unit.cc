@@ -4307,4 +4307,69 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CalculateVariableTowerOutletTemp)
     EXPECT_NEAR(tower.WaterTemp - 22.2222, tOutlet, 0.01);
 }
 
+TEST_F(EnergyPlusFixture, CondenserLoopTowers_checkMassFlowAndLoadTest)
+{
+    bool flagToReturn;
+    Real64 myLoad;
+    Real64 constexpr allowedTolerance = 0.0001;
+    Real64 expectedPower;
+    Real64 expectedTemp;
+
+    state->dataCondenserLoopTowers->towers.allocate(1);
+    auto &tower = state->dataCondenserLoopTowers->towers(1);
+    state->dataLoopNodes->Node.allocate(1);
+    tower.WaterInletNodeNum = 1;
+
+    // Test 1: Mass flow rate is low but myLoad is ok--flag should be set to true
+    flagToReturn = false;
+    myLoad = 1000.0;
+    state->dataEnvrn->OutDryBulbTemp = 27.0;
+    tower.WaterMassFlowRate = 0.0;
+    tower.BasinHeaterPowerFTempDiff = 1.0;
+    tower.BasinHeaterSchedulePtr = 0;
+    tower.BasinHeaterSetPointTemp = 26.0;
+    tower.BasinHeaterPower = 1.0;
+    expectedPower = 0.0;
+    tower.checkMassFlowAndLoad(*state, myLoad, flagToReturn);
+    EXPECT_TRUE(flagToReturn);
+    EXPECT_NEAR(expectedPower, tower.BasinHeaterPower, allowedTolerance);
+
+    // Test 2: Mass flow rate is ok but myLoad is zero--flag should be set to true
+    flagToReturn = false;
+    myLoad = 0.0;
+    state->dataEnvrn->OutDryBulbTemp = 27.0;
+    tower.WaterMassFlowRate = 0.5;
+    tower.BasinHeaterPowerFTempDiff = 1.0;
+    tower.BasinHeaterSchedulePtr = 0;
+    tower.BasinHeaterSetPointTemp = 25.0;
+    tower.BasinHeaterPower = 2.0;
+    tower.FanPower = 1.0;
+    tower.airFlowRateRatio = 1.0;
+    tower.Qactual = 1.0;
+    expectedPower = 0.0;
+    expectedTemp = 23.0;
+    state->dataLoopNodes->Node(tower.WaterInletNodeNum).Temp = 23.0;
+    tower.checkMassFlowAndLoad(*state, myLoad, flagToReturn);
+    EXPECT_TRUE(flagToReturn);
+    EXPECT_NEAR(expectedPower, tower.BasinHeaterPower, allowedTolerance);
+    EXPECT_NEAR(expectedTemp, tower.OutletWaterTemp, allowedTolerance);
+    EXPECT_NEAR(0.0, tower.FanPower, allowedTolerance);
+    EXPECT_NEAR(0.0, tower.airFlowRateRatio, allowedTolerance);
+    EXPECT_NEAR(0.0, tower.Qactual, allowedTolerance);
+
+    // Test 3: Mass flow rate and myLoad are both ok--nothing changes, power does not get calculated here
+    flagToReturn = false;
+    myLoad = 1000.0;
+    state->dataEnvrn->OutDryBulbTemp = 27.0;
+    tower.WaterMassFlowRate = 0.5;
+    tower.BasinHeaterPowerFTempDiff = 1.0;
+    tower.BasinHeaterSchedulePtr = 0;
+    tower.BasinHeaterSetPointTemp = 25.0;
+    tower.BasinHeaterPower = 3.0;
+    expectedPower = 3.0;
+    tower.checkMassFlowAndLoad(*state, myLoad, flagToReturn);
+    EXPECT_FALSE(flagToReturn);
+    EXPECT_NEAR(expectedPower, tower.BasinHeaterPower, allowedTolerance);
+}
+
 } // namespace EnergyPlus
