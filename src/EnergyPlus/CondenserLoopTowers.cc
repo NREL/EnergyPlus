@@ -6469,6 +6469,7 @@ namespace CondenserLoopTowers {
         if (std::abs(MyLoad) <= HVAC::SmallLoad) {
             // tower doesn't need to do anything
             this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+            this->WaterMassFlowRate = 0.0;
             this->FanPower = 0.0;
             this->airFlowRateRatio = 0.0;
             this->Qactual = 0.0;
