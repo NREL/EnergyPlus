@@ -5192,6 +5192,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     surf2.SinTilt = 1.0;
     surf1.CosTilt = 0.0;
     surf2.CosTilt = 0.0;
+    surf1.Area = 2.0;
+    surf2.Area = 2.0;
+    state->dataSurface->SurfWinFrameArea(1) = 0.64;
+    state->dataSurface->SurfWinFrameArea(2) = 0.64;
+
 
     state->dataSurface->SurfActiveConstruction(1) = 1;
     state->dataSurface->SurfActiveConstruction(2) = 1;
