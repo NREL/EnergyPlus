@@ -825,7 +825,7 @@ namespace WindTurbine {
                                         ShowWarningError(state,
                                                          format("InitWindTurbine: read from {} file shows <365 days in weather file. Annual average "
                                                                 "wind speed used will be inaccurate.",
-                                                                state.files.inStatFilePath.filePath.string()));
+                                                                state.files.inStatFilePath.filePath));
                                         lineIn.data.erase(0, lnPtr + 1);
                                         warningShown = true;
                                     }
@@ -835,7 +835,7 @@ namespace WindTurbine {
                                     ShowWarningError(state,
                                                      format("InitWindTurbine: read from {} file shows <365 days in weather file. Annual average wind "
                                                             "speed used will be inaccurate.",
-                                                            state.files.inStatFilePath.filePath.string()));
+                                                            state.files.inStatFilePath.filePath));
                                     lineIn.data.erase(0, lnPtr + 1);
                                     warningShown = true;
                                 }

@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ headers
+#include <ios>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
@@ -58,6 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
@@ -2610,10 +2612,12 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
         int rc = -1;
         bool ok = true;
 
+        std::string const dbName_utf8 = FileSystem::toGenericString(dbName);
+
         // Test if we can write to the sqlite error file
-        //  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
+        //  Does there need to be a separate sqlite.err file at all?  Consider using eplusout.err
         if (m_errorStream) {
-            *m_errorStream << "SQLite3 message, " << errorFilePath.string() << " open for processing!" << std::endl;
+            *m_errorStream << "SQLite3 message, " << FileSystem::toGenericString(errorFilePath) << " open for processing!" << std::endl;
         } else {
             ok = false;
         }
@@ -2632,12 +2636,13 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
         // If we can't then there are probably locks on the database
         if (ok) {
             // sqlite3_open_v2 could return SQLITE_BUSY at this point. If so, do not proceed to sqlite3_exec.
-            rc = sqlite3_open_v2(dbName.string().c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
+            rc = sqlite3_open_v2(dbName_utf8.c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
             if (rc) {
                 *m_errorStream << "SQLite3 message, can't get exclusive lock to open database: " << sqlite3_errmsg(m_connection) << std::endl;
                 ok = false;
             }
         }
+
         if (ok) {
             char *zErrMsg = nullptr;
             // Set journal_mode OFF to avoid creating the file dbName + "-journal" (when dbName is a regular file)
@@ -2652,11 +2657,15 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
             } else {
                 if (dbName != ":memory:") {
                     // Remove test db
-                    rc = remove(dbName.string().c_str());
-                    if (rc) {
-                        // File operation failed. SQLite connection is not in an error state.
-                        *m_errorStream << "SQLite3 message, can't remove old database." << std::endl;
-                        ok = false;
+                    // rc = remove(dbName_utf8.c_str());
+                    if (fs::is_regular_file(dbName)) {
+                        std::error_code ec;
+                        if (!fs::remove(dbName, ec)) {
+                            // File operation failed. SQLite connection is not in an error state.
+                            *m_errorStream << "SQLite3 message, can't remove old database. code=" << ec.value() << ", error: " << ec.message()
+                                           << std::endl;
+                            ok = false;
+                        }
                     }
                 }
             }
@@ -2665,7 +2674,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
 
         if (ok) {
             // Now open the output db for the duration of the simulation
-            rc = sqlite3_open_v2(dbName.string().c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
+            rc = sqlite3_open_v2(dbName_utf8.c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
             m_db = std::shared_ptr<sqlite3>(m_connection, sqlite3_close);
             if (rc) {
                 *m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_connection) << std::endl;
