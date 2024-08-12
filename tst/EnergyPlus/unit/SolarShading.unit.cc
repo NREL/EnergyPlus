@@ -6204,3 +6204,25 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
     }
 #endif
 }
+
+TEST_F(EnergyPlusFixture, CLIPLINE_Throw)
+{
+    Real64 const minX = 2.0;
+    Real64 const maxX = 8.0;
+    Real64 const minY = 3.0;
+    Real64 const maxY = 6.0;
+
+    Real64 x0 = maxX;
+    Real64 x1 = maxX;
+    Real64 y0 = 4.5;
+    Real64 y1 = 1.0;
+    bool visible = false;
+    bool rev = false;
+
+    EXPECT_NO_THROW(CLIPLINE(x0, x1, y0, y1, maxX, minX, maxY, minY, visible, rev));
+
+    EXPECT_DOUBLE_EQ(maxX, x0);
+    EXPECT_DOUBLE_EQ(4.5, y0);
+    EXPECT_DOUBLE_EQ(maxX, x1);
+    EXPECT_DOUBLE_EQ(minY, y1); // This is NaN
+}
