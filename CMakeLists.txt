@@ -13,6 +13,8 @@ endif()
 
 cmake_policy(SET CMP0048 NEW) # handling project_version_* variables
 
+cmake_policy(SET CMP0087 NEW) # install(CODE) and install(SCRIPT) support generator expressions.
+
 project(EnergyPlus)
 
 # Raise an error if attempting to compile on macOS older than 10.15 - it does not work
