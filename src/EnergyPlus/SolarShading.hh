@@ -136,7 +136,7 @@ namespace SolarShading {
 
     void CLIP(EnergyPlusData &state, int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT);
 
-    void CLIPLINE(Real64 &x0, Real64 &x1, Real64 &y0, Real64 &y1, Real64 maxX, Real64 minX, Real64 maxY, Real64 minY, bool &visible, bool &rev);
+    void CLIPLINE(Real64 &x0, Real64 &x1, Real64 &y0, Real64 &y1, Real64 maxX, Real64 minX, Real64 maxY, Real64 minY, bool &visible);
 
     void CTRANS(EnergyPlusData &state,
                 int const NS,         // Surface number whose vertex coordinates are being transformed

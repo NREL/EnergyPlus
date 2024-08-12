@@ -6217,9 +6217,8 @@ TEST_F(EnergyPlusFixture, CLIPLINE_Throw)
     Real64 y0 = 4.5;
     Real64 y1 = 1.0;
     bool visible = false;
-    bool rev = false;
 
-    EXPECT_NO_THROW(CLIPLINE(x0, x1, y0, y1, maxX, minX, maxY, minY, visible, rev));
+    EXPECT_NO_THROW(CLIPLINE(x0, x1, y0, y1, maxX, minX, maxY, minY, visible));
 
     EXPECT_DOUBLE_EQ(maxX, x0);
     EXPECT_DOUBLE_EQ(4.5, y0);
@@ -6271,12 +6270,7 @@ TEST_F(EnergyPlusFixture, CLIPLINE_Full)
         std::string const msg = fmt::format("From ({}, {}) to ({}, {})", t.line_ori.p0.x, t.line_ori.p0.y, t.line_ori.p1.x, t.line_ori.p1.y);
 
         bool visible = false;
-        bool rev = false;
-        CLIPLINE(x0, x1, y0, y1, maxX, minX, maxY, minY, visible, rev);
-        if (rev) {
-            std::swap(x0, x1);
-            std::swap(y0, y1);
-        }
+        CLIPLINE(x0, x1, y0, y1, maxX, minX, maxY, minY, visible);
         if (t.visible) {
             EXPECT_TRUE(visible) << msg;
             EXPECT_DOUBLE_EQ(t.line_new.p0.x, x0) << msg;
