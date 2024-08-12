@@ -5303,47 +5303,21 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
     state->dataDXCoils->DXCoilFanOp.allocate(1);
-    state->dataCurveManager->allocateCurveVector(2);
 
     auto &Coil = state->dataDXCoils->DXCoil(1);
-    EnergyPlus::Curve::Curve *constantcurve1 = state->dataCurveManager->PerfCurve(1);
-    EnergyPlus::Curve::Curve *constantcurve2 = state->dataCurveManager->PerfCurve(2);
     auto &AirInletNode = state->dataLoopNodes->Node(1);
     auto &AirOutletNode = state->dataLoopNodes->Node(2);
 
     Coil.DXCoilType_Num = HVAC::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
+
     Coil.NumOfSpeeds = 2;
-    Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);
-    Coil.MSRatedSHR.allocate(Coil.NumOfSpeeds);
-    Coil.MSRatedCOP.allocate(Coil.NumOfSpeeds);
-    Coil.MSRatedAirVolFlowRate.allocate(Coil.NumOfSpeeds);
-    Coil.MSRatedAirMassFlowRate.allocate(Coil.NumOfSpeeds);
-    Coil.MSCCapFTemp.allocate(Coil.NumOfSpeeds);
-    Coil.MSCCapFFlow.allocate(Coil.NumOfSpeeds);
-    Coil.MSEIRFTemp.allocate(Coil.NumOfSpeeds);
-    Coil.MSEIRFFlow.allocate(Coil.NumOfSpeeds);
-    Coil.MSWasteHeat.allocate(Coil.NumOfSpeeds);
-    Coil.MSEvapCondEffect.allocate(Coil.NumOfSpeeds);
-    Coil.MSEvapCondAirFlow.allocate(Coil.NumOfSpeeds);
-    Coil.MSEvapCondPumpElecNomPower.allocate(Coil.NumOfSpeeds);
-    Coil.MSRatedCBF.allocate(Coil.NumOfSpeeds);
-    Coil.MSWasteHeatFrac.allocate(Coil.NumOfSpeeds);
-    Coil.MSPLFFPLR.allocate(Coil.NumOfSpeeds);
-    Coil.MSTwet_Rated.allocate(Coil.NumOfSpeeds);
-    Coil.MSGamma_Rated.allocate(Coil.NumOfSpeeds);
-    Coil.MSMaxONOFFCyclesperHour.allocate(Coil.NumOfSpeeds);
-    Coil.MSLatentCapacityTimeConstant.allocate(Coil.NumOfSpeeds);
-    Coil.MSFanPowerPerEvapAirFlowRate.allocate(Coil.NumOfSpeeds);
-    Coil.MSCCapFTemp = 1;
-    Coil.MSCCapFFlow = 2;
-    Coil.MSEIRFTemp = 1;
-    Coil.MSEIRFFlow = 2;
-    Coil.MSPLFFPLR = 2;
-    Coil.AirOutNode = 2;
-    Coil.AirInNode = 1;
+    createSpeedsWithDefaults(Coil);
+
+    state->dataCurveManager->allocateCurveVector(2);
     // biquadratic curve
+    EnergyPlus::Curve::Curve *constantcurve1 = state->dataCurveManager->PerfCurve(1);
     constantcurve1->Name = "constant biquadratic curve";
     constantcurve1->curveType = CurveType::BiQuadratic;
     constantcurve1->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -5360,6 +5334,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     constantcurve1->outputLimits.min = 1.0;
     constantcurve1->outputLimits.max = 1.0;
     // quadratic curve
+    EnergyPlus::Curve::Curve *constantcurve2 = state->dataCurveManager->PerfCurve(2);
     constantcurve2->Name = "constant quadratic curve";
     constantcurve2->curveType = CurveType::Quadratic;
     constantcurve2->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -5370,14 +5345,22 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     constantcurve2->inputLimits[0].max = 1.0;
     constantcurve2->outputLimits.min = 1.0;
     constantcurve2->outputLimits.max = 1.0;
+
+    Coil.MSCCapFTemp = 1;
+    Coil.MSCCapFFlow = 2;
+    Coil.MSEIRFTemp = 1;
+    Coil.MSEIRFFlow = 2;
+    Coil.MSPLFFPLR = 2;
+    Coil.AirInNode = 1;
+    Coil.AirOutNode = 2;
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
     Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateHigh;
     Coil.MSRatedAirMassFlowRate(1) = state->dataHVACGlobal->MSHPMassFlowRateLow;
     Coil.MSRatedAirMassFlowRate(2) = state->dataHVACGlobal->MSHPMassFlowRateHigh;
-    Coil.MSRatedCBF(1) = 0.0;
-    Coil.MSRatedCBF(2) = 0.0;
+    Coil.MSRatedCBF(1) = 0.00000001;
+    Coil.MSRatedCBF(2) = 0.00000001;
     Coil.MSWasteHeat(1) = 0;
     Coil.MSWasteHeat(2) = 0;
     Coil.MSWasteHeatFrac(1) = 0;
@@ -5404,6 +5387,9 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     state->dataEnvrn->OutHumRat = 0.0120;
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
+    state->dataEnvrn->StdBaroPress = DataEnvironment::StdPressureSeaLevel;
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 20.0, 0.0);
+    Psychrometrics::InitializePsychRoutines(*state);
     int SpeedNum = 2;
     HVAC::FanOp fanOp = HVAC::FanOp::Cycling;
     HVAC::CompressorOp compressorOp = HVAC::CompressorOp::On;
