@@ -1136,6 +1136,10 @@ void processZoneEquipmentInput(EnergyPlusData &state,
         thisEquipConfig.NumReturnNodes = NumNodes;
 
         thisEquipConfig.ReturnNode.allocate(NumNodes);
+        thisEquipConfig.returnNodeSpaceMixerIndex.allocate(NumNodes);
+        for (int &mixIndex : thisEquipConfig.returnNodeSpaceMixerIndex) {
+            mixIndex = -1;
+        }
         thisEquipConfig.ReturnNodeAirLoopNum.allocate(NumNodes);
         thisEquipConfig.ReturnNodeRetPathNum.allocate(NumNodes);
         thisEquipConfig.ReturnNodeRetPathCompNum.allocate(NumNodes);
@@ -1429,11 +1433,6 @@ void processZoneReturnMixerInput(EnergyPlusData &state,
     // Check zone return nodes
     bool found = false;
     auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
-    thisZoneEquipConfig.returnNodeSpaceMixerIndex.allocate(thisZoneEquipConfig.NumReturnNodes);
-    for (int &mixIndex : thisZoneEquipConfig.returnNodeSpaceMixerIndex) {
-        mixIndex = -1;
-    }
-
     int nodeCounter = 0;
     for (int retNodeNum : thisZoneEquipConfig.ReturnNode) {
         ++nodeCounter;

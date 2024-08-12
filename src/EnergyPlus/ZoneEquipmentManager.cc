@@ -5207,7 +5207,14 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
             }
 
             // user defined room air model may feed temp that differs from zone node
-            if (allocated(state.dataRoomAir->AirPatternZoneInfo)) {
+
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing &&
+                (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).returnNodeSpaceMixerIndex(nodeCount) > -1)) {
+                // If a SpaceHVAC:ZoneReturnMixer feeds this node, use the node conditions which was set above in
+                // thisSpaceHVACMixer.setOutletConditions
+                TempZoneAir = state.dataLoopNodes->Node(ReturnNode).Temp;
+                TempRetAir = TempZoneAir;
+            } else if (allocated(state.dataRoomAir->AirPatternZoneInfo)) {
                 if ((state.dataRoomAir->AirPatternZoneInfo(ZoneNum).IsUsed) && (!state.dataGlobal->BeginEnvrnFlag)) {
                     TempZoneAir = state.dataRoomAir->AirPatternZoneInfo(ZoneNum).Tleaving;
                     TempRetAir = TempZoneAir;
