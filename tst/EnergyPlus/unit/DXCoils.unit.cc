@@ -2003,6 +2003,14 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     GetCurveInput(*state);
     GetDXCoils(*state);
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
+
+    state->dataEnvrn->StdBaroPress = DataEnvironment::StdPressureSeaLevel;
+    state->dataEnvrn->OutBaroPress = DataEnvironment::StdPressureSeaLevel;
+    state->dataEnvrn->OutDryBulbTemp = 20.0;
+    state->dataEnvrn->OutHumRat = 0.008;
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    Psychrometrics::InitializePsychRoutines(*state);
+
     // Coil:Cooling:DX:SingleSpeed
     EXPECT_EQ(state->dataDXCoils->DXCoil(1).DXCoilType_Num, HVAC::CoilDX_CoolingSingleSpeed);
     EXPECT_EQ("HEATERCAPCURVE", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(1).CrankcaseHeaterCapacityCurveIndex));
@@ -2067,6 +2075,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     Real64 LatentLoad = 100.0;
     Real64 OnOffAirFlowRatio = 0.5;
     state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 1.0;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).DesignAirMassFlowRate = 1.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RunFrac = 0.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RatedCapCoolTotal = 100.0;
     // power = 26 + 2x
@@ -2085,6 +2094,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     VarSpeedCoilNum = 2;
     state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 0.5;
     state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RunFrac = 0.0;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).DesignAirMassFlowRate = 1.0;
     // power = 28 + 2x
     state->dataEnvrn->OutHumRat = 0.0114507065;
     state->dataEnvrn->OutBaroPress = 98200.0;
