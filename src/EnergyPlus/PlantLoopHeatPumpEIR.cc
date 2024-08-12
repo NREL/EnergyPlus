@@ -221,6 +221,7 @@ void EIRPlantLoopHeatPump::resetReportingVariables()
     this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
     this->heatRecoveryIsActive = false;
     this->heatRecoveryOperatingStatus = 0;
+    this->thermosiphonStatus = 0;
 }
 
 void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state, bool FirstHVACIteration)
@@ -598,8 +599,10 @@ void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state)
     this->eirModFPLRCurveCheck(state, eirModifierFuncPLR);
 
     // compute power usage
-    this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * this->defrostPowerMultiplier *
-                       this->cyclingRatio;
+    if (this->thermosiphonDisabled(state)) {
+        this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp *
+                           this->defrostPowerMultiplier * this->cyclingRatio;
+    }
 }
 
 void EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP(EnergyPlusData &state)
@@ -1806,6 +1809,23 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.maxSupplyWaterTempCurveIndex =
                         Curve::GetCurveIndex(state, Util::makeUPPER(maximumSupplyWaterTempCurveName.value().get<std::string>()));
                 }
+                // fields only in cooling object
+                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) {
+                    auto const thermosiphonTempCurveName = fields.find("thermosiphon_capacity_fraction_curve_name");
+                    if (thermosiphonTempCurveName != fields.end()) {
+                        thisPLHP.thermosiphonTempCurveIndex =
+                            Curve::GetCurveIndex(state, Util::makeUPPER(thermosiphonTempCurveName.value().get<std::string>()));
+                        if (thisPLHP.thermosiphonTempCurveIndex == 0) {
+                            ShowSevereError(state, format("{} =\"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisPLHP.name));
+                            ShowContinueError(state,
+                                              format("Invalid Thermosiphon Capacity Fraction Curve Name = {}",
+                                                     thermosiphonTempCurveName.value().get<std::string>()));
+                            errorsFound = true;
+                        }
+                    }
+                    thisPLHP.thermosiphonMinTempDiff = state.dataInputProcessing->inputProcessor->getRealFieldValue(
+                        fields, schemaProps, "thermosiphon_minimum_temperature_difference");
+                }
 
                 std::string flowControlTypeName =
                     Util::makeUPPER(state.dataInputProcessing->inputProcessor->getAlphaFieldValue(fields, schemaProps, "flow_mode"));
@@ -2220,6 +2240,13 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::Group::Plant,
                                 OutputProcessor::EndUseCat::Cooling,
                                 "Heat Pump");
+            SetupOutputVariable(state,
+                                "Thermosiphon Status",
+                                Constant::Units::None,
+                                this->thermosiphonStatus,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
+                                this->name);
         } else if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
             SetupOutputVariable(state,
                                 "Heat Pump Electricity Energy",
@@ -2440,6 +2467,27 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
             ShowFatalError(state, format("{}: Program terminated due to previous condition(s).", routineName));
         }
         this->oneTimeInitFlag = false;
+    }
+}
+
+bool EIRPlantLoopHeatPump::thermosiphonDisabled(EnergyPlusData &state)
+{
+    if (this->thermosiphonTempCurveIndex > 0) {
+        this->thermosiphonStatus = 0;
+        Real64 dT = this->loadSideOutletTemp - this->sourceSideInletTemp;
+        if (dT < this->thermosiphonMinTempDiff) {
+            return true;
+        }
+        Real64 thermosiphonCapFrac = Curve::CurveValue(state, this->thermosiphonTempCurveIndex, dT);
+        Real64 capFrac = this->partLoadRatio * this->cyclingRatio;
+        if (thermosiphonCapFrac >= capFrac) {
+            this->thermosiphonStatus = 1;
+            this->powerUsage = 0.0;
+            return false;
+        }
+        return true;
+    } else {
+        return true;
     }
 }
 

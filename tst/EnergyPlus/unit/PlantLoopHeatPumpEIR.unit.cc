@@ -3392,31 +3392,45 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
 
 TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
 {
-    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
-                                                      "  hp cooling side,",
-                                                      "  node 1,",
-                                                      "  node 2,",
-                                                      "  AirSource,",
-                                                      "  node 3,",
-                                                      "  node 4,",
-                                                      "  ,",
-                                                      "  ,",
-                                                      "  ,",
-                                                      "  Autosize,",
-                                                      "  Autosize,",
-                                                      "  ,",
-                                                      "  Autosize,",
-                                                      "  3.14,",
-                                                      "  ,",
-                                                      "  dummyCurve,",
-                                                      "  dummyCurve,",
-                                                      "  dummyCurve;",
-                                                      "Curve:Linear,",
-                                                      "  dummyCurve,",
-                                                      "  1,",
-                                                      "  0,",
-                                                      "  1,",
-                                                      "  1;"});
+    std::string const idf_objects =
+        delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                          "  hp cooling side,",
+                          "  node 1,",
+                          "  node 2,",
+                          "  AirSource,",
+                          "  node 3,",
+                          "  node 4,",
+                          "  ,",
+                          "  ,",
+                          "  ,",
+                          "  Autosize,",
+                          "  Autosize,",
+                          "  ,",
+                          "  Autosize,",
+                          "  3.14,",
+                          "  ,",
+                          "  dummyCurve,",
+                          "  dummyCurve,",
+                          "  dummyCurve,",
+                          "  ,",
+                          "  ,",
+                          "  ,",
+                          "  ,",
+                          "  ,",
+                          "  ,",
+                          "  ,",
+                          "  ,",
+                          "  ,",
+                          "  ,",
+                          "  ThermoCapFracCurve;",
+
+                          "Curve:Linear, ThermoCapFracCurve, 0.0, 0.06, 0.0, 10.0, 0.0, 1.0, Dimensionless, Dimensionless;",
+                          "Curve:Linear,",
+                          "  dummyCurve,",
+                          "  1,",
+                          "  0,",
+                          "  1,",
+                          "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool firstHVACIteration = true;
@@ -3465,13 +3479,42 @@ TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
 
     // call with run flag ON, flow locked at nonzero both
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).FlowLock = DataPlant::FlowLock::Locked;
-    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 1.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->sizeLoadSide(*state);
     thisCoolingPLHP->sizeSrcSideASHP(*state);
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
-    EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(1.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_TRUE(thisCoolingPLHP->running);
+
+    // test thermosiphon model
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = 10.0;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).Temp = 6.0;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 6.0;
+    state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 12.0; // condenser inlet temp > evap outlet temp
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).TempSetPointNodeNum = thisCoolingPLHP->loadSideNodes.outlet;
+    Real64 CurLoad = -20000.0;
+    bool RunFlag = true;
+    EnergyPlus::PlantLocation calledFromLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
+
+    thisCoolingPLHP->simulate(*state, calledFromLocation, firstHVACIteration, CurLoad, RunFlag);
+    EXPECT_GT(thisCoolingPLHP->partLoadRatio, 0.4);    // load is large
+    EXPECT_EQ(thisCoolingPLHP->thermosiphonStatus, 0); // thermosiphon is off
+    EXPECT_GT(thisCoolingPLHP->powerUsage, 6300.0);    // power is non-zero
+
+    state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 5.0; // condenser inlet temp < evap outlet temp
+
+    thisCoolingPLHP->simulate(*state, calledFromLocation, firstHVACIteration, CurLoad, RunFlag);
+    EXPECT_GT(thisCoolingPLHP->partLoadRatio, 0.4);    // load is large
+    EXPECT_EQ(thisCoolingPLHP->thermosiphonStatus, 0); // thermosiphon is off
+    EXPECT_GT(thisCoolingPLHP->powerUsage, 6300.0);    // power is non-zero
+
+    CurLoad /= 20.0; // reduce load such that thermosiphon can meet load
+    thisCoolingPLHP->simulate(*state, calledFromLocation, firstHVACIteration, CurLoad, RunFlag);
+    EXPECT_GT(thisCoolingPLHP->partLoadRatio, 0.02);   // load is small
+    EXPECT_EQ(thisCoolingPLHP->thermosiphonStatus, 1); // thermosiphon is on
+    EXPECT_EQ(thisCoolingPLHP->powerUsage, 0.0);       // power is zero
 }
 
 TEST_F(EnergyPlusFixture, Test_Curve_Negative_Energy)
