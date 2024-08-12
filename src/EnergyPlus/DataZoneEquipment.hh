@@ -490,15 +490,11 @@ namespace DataZoneEquipment {
 
     struct ZoneEquipmentMixer : ZoneMixer
     {
-        // int zoneEquipInletNodeNum = 0;
-
         void setInletFlows(EnergyPlusData &state);
     };
 
     struct ZoneReturnMixer : ZoneMixer
     {
-        // int zoneReturnNodeNum = 0;
-
         void setInletConditions(EnergyPlusData &state);
 
         void setInletFlows(EnergyPlusData &state);
