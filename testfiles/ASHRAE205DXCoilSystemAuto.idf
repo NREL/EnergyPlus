@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,24.1;
+  Version,24.2;
 
   Building,
     NONE,                    !- Name
@@ -1648,12 +1648,12 @@
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
 
-Coil:DX:ASHRAE205:Performance,
-  Heat Pump ACDXCoil 1 Performance,
-  RS0004_sample.cbor,
-  Linear,
-  , !- Rated Total Cooling Capacity
-  ; !- Rated Steady-State Heating Capacity
+  Coil:DX:ASHRAE205:Performance,
+    Heat Pump ACDXCoil 1 Performance,
+    RS0004_sample.cbor,
+    Linear,
+    , !- Rated Total Cooling Capacity
+    ; !- Rated Steady-State Heating Capacity
        
   Coil:Heating:DX:SingleSpeed,
     Heat Pump DX Heating Coil 1,  !- Name

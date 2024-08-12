@@ -91,12 +91,9 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
         std::string const &thisObjectName = instance.key();
 
         if (!Util::SameString(name_to_find, thisObjectName)) {
-            continue;
-        } else {
             ShowFatalError(state, format("Could not find Coil:Cooling:DX:Performance object with name: {}", name_to_find));
         }
 
-        this->name = ip->getAlphaFieldValue(fields, objectSchemaProps, "name");
         std::string const rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
         fs::path rep_file_path = DataSystemVariables::CheckForActualFilePath(state, fs::path(rep_file_name), std::string(routineName));
         if (rep_file_path.empty()) {
@@ -106,11 +103,17 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
             // be set The CheckForActualFilePath function emits some nice information to the ERR file, so we just need a simple fatal here
             ShowFatalError(state, "Program terminates due to the missing ASHRAE 205 RS0004 representation file.");
         }
+        std::shared_ptr<EnergyPlusLogger> coil_logger = std::make_shared<EnergyPlusLogger>();
+        this->logger_context = {&state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
+        coil_logger->set_message_context(&logger_context);
         this->representation = std::dynamic_pointer_cast<rs0004_ns::RS0004>(
-            RSInstanceFactory::create("RS0004", rep_file_path.string().c_str(), std::make_shared<EnergyPlusLogger>()));
+            RSInstanceFactory::create("RS0004", rep_file_path.string().c_str(), coil_logger));
         if (nullptr == this->representation) {
-            ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path.string()));
+            ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Coil.", rep_file_path.string()));
             errorsFound = true;
+        } else {
+            this->representation->performance.performance_map_cooling.get_logger()->set_message_context(&logger_context);
+            this->representation->performance.performance_map_standby.get_logger()->set_message_context(&logger_context);
         }
         this->interpolation_type =
             InterpMethods[Util::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
