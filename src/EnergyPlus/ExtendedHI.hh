@@ -77,10 +77,11 @@ namespace ExtendedHI {
     Real64 Ra(Real64 Ts, Real64 Ta);
     Real64 Ra_bar(Real64 Tf, Real64 Ta);
     Real64 Ra_un(Real64 Ts, Real64 Ta);
+    int find_eqvar_name(EnergyPlusData &state, Real64 Ta, Real64 RH);
+    Real64 find_eqvar_value(EnergyPlusData &state, Real64 Ta, Real64 RH);
     Real64 find_eqvar_phi(EnergyPlusData &state, Real64 Ta, Real64 RH);
     Real64 find_eqvar_Rf(EnergyPlusData &state, Real64 Ta, Real64 RH);
     Real64 find_eqvar_rs(EnergyPlusData &state, Real64 Ta, Real64 RH);
-    std::tuple<int, double> find_eqvar(EnergyPlusData &state, double Ta, double RH);
     Real64 find_T(EnergyPlusData &state, int eqvar_name, Real64 eqvar);
     Real64 heatindex(EnergyPlusData &state, Real64 Ta, Real64 RH);
 

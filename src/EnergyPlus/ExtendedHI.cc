@@ -346,8 +346,56 @@ namespace ExtendedHI {
         return dTcdt;
     }
 
+    int find_eqvar_name(EnergyPlusData &state, Real64 Ta, Real64 RH)
+    {
+
+        Real64 Pa = RH * pvstar(Ta);
+        Real64 Rs = 0.0387;
+        Real64 phi = 0.84;
+        Real64 m = (Pc - Pa) / (Zs(Rs) + Za);
+        Real64 m_bar = (Pc - Pa) / (Zs(Rs) + Za_bar);
+
+        int SolFla;
+        Real64 Ts;
+        General::SolveRoot(
+            state,
+            tol,
+            maxIter,
+            SolFla,
+            Ts,
+            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (Zs(Rs) + Za) - (Tc - Ts) / Rs; },
+            std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m)),
+            std::max(Tc, Ta) + Rs * std::abs(m));
+
+        Real64 Tf;
+        General::SolveRoot(
+            state,
+            tol,
+            maxIter,
+            SolFla,
+            Tf,
+            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (Zs(Rs) + Za_bar) - (Tc - Tf) / Rs; },
+            std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m_bar)),
+            std::max(Tc, Ta) + Rs * std::abs(m_bar));
+        Real64 flux1 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs;
+        Real64 flux2 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs - phi * (Tc - Tf) / Rs;
+
+        if (flux1 <= 0.0) {
+            return static_cast<int>(EqvarName::Phi);
+        } else if (flux2 <= 0.0) {
+            return static_cast<int>(EqvarName::Rf);
+        } else {
+            Real64 flux3 = Q - Qv(Ta, Pa) - (Tc - Ta) / Ra_un(Tc, Ta) - (phi_salt * pvstar(Tc) - Pa) / Za_un;
+            if (flux3 < 0.0) {
+                return static_cast<int>(EqvarName::Rs);
+            } else {
+                return static_cast<int>(EqvarName::DTcdt);
+            }
+        }
+    }
+
     //    given T and RH, returns a key and value pair
-    std::tuple<int, Real64> find_eqvar(EnergyPlusData &state, Real64 Ta, Real64 RH)
+    Real64 find_eqvar_value(EnergyPlusData &state, Real64 Ta, Real64 RH)
     {
         Real64 Pa = RH * pvstar(Ta);
         Real64 Rs = 0.0387;
@@ -380,16 +428,12 @@ namespace ExtendedHI {
             std::max(Tc, Ta) + Rs * std::abs(m_bar));
         Real64 flux1 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs;
         Real64 flux2 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs - phi * (Tc - Tf) / Rs;
-        int eqvar_name;
         Real64 Rf;
 
         if (flux1 <= 0.0) {
-            eqvar_name = static_cast<int>(EqvarName::Phi);
             phi = 1.0 - (Q - Qv(Ta, Pa)) * Rs / (Tc - Ts);
-            Rf = std::numeric_limits<Real64>::infinity();
-            return {eqvar_name, phi};
+            return phi;
         } else if (flux2 <= 0.0) {
-            eqvar_name = static_cast<int>(EqvarName::Rf);
             Real64 Ts_bar = Tc - (Q - Qv(Ta, Pa)) * Rs / phi + (1.0 / phi - 1.0) * (Tc - Ts);
             General::SolveRoot(
                 state,
@@ -404,9 +448,8 @@ namespace ExtendedHI {
                 Ta,
                 Ts_bar);
             Rf = Ra_bar(Tf, Ta) * (Ts_bar - Tf) / (Tf - Ta);
-            return {eqvar_name, Rf};
+            return Rf;
         } else {
-            Rf = 0.0;
             Real64 flux3 = Q - Qv(Ta, Pa) - (Tc - Ta) / Ra_un(Tc, Ta) - (phi_salt * pvstar(Tc) - Pa) / Za_un;
             if (flux3 < 0.0) {
                 General::SolveRoot(
@@ -419,7 +462,6 @@ namespace ExtendedHI {
                     0.0,
                     Tc);
                 Rs = (Tc - Ts) / (Q - Qv(Ta, Pa));
-                eqvar_name = static_cast<int>(EqvarName::Rs);
                 Real64 Ps = Pc - (Pc - Pa) * Zs(Rs) / (Zs(Rs) + Za_un);
                 if (Ps > phi_salt * pvstar(Ts)) {
                     General::SolveRoot(
@@ -433,12 +475,11 @@ namespace ExtendedHI {
                         Tc);
                     Rs = (Tc - Ts) / (Q - Qv(Ta, Pa));
                 }
-                return {eqvar_name, Rs};
+                return Rs;
             } else {
                 Rs = 0.0;
-                eqvar_name = static_cast<int>(EqvarName::DTcdt);
                 dTcdt = (1.0 / C) * flux3;
-                return {eqvar_name, dTcdt};
+                return dTcdt;
             }
         }
     }
@@ -480,9 +521,8 @@ namespace ExtendedHI {
         // RH: relative humidity in range of 0.0 to 1.0
         // The function computes the extended heat index, in Kelvinn
 
-        auto eqvars = find_eqvar(state, Ta, RH);
-        int eqvar_name = std::get<0>(eqvars);
-        Real64 eqvar_value = std::get<1>(eqvars);
+        int eqvar_name = find_eqvar_name(state, Ta, RH);
+        Real64 eqvar_value = find_eqvar_value(state, Ta, RH);
 
         Real64 T = find_T(state, eqvar_name, eqvar_value);
 

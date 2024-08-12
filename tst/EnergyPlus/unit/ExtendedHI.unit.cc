@@ -273,9 +273,8 @@ TEST_F(EnergyPlusFixture, extendedHI_find_eqvar)
 
     for (size_t i = 0; i < Ta_values.size(); ++i) {
         for (size_t j = 0; j < RH_values.size(); ++j) {
-            auto const output = ExtendedHI::find_eqvar(*state, Ta_values[i], RH_values[j]);
-            EXPECT_EQ(std::get<0>(output), result_0[i][j]);
-            EXPECT_NEAR(std::get<1>(output), result_1[i][j], tol);
+            EXPECT_EQ(find_eqvar_name(*state, Ta_values[i], RH_values[j]), result_0[i][j]);
+            EXPECT_NEAR(find_eqvar_value(*state, Ta_values[i], RH_values[j]), result_1[i][j], tol);
         }
     }
 }
