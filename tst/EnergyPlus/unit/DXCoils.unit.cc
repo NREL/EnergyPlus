@@ -5160,6 +5160,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     Coil.RatedTotCap(1) = 17580.0;
     Coil.RatedCOP(1) = 3.0;
     Coil.RatedEIR(1) = 1.0 / Coil.RatedCOP(1);
+    Coil.RatedCBF(1) = 0.00000001; // autosizing is disabled so initialize coil bypass factor
     Coil.RatedAirMassFlowRate = 1.0;
     Coil.MinOATCompressor = -17.78;
     Coil.CCapFTemp(1) = 1;
@@ -5215,6 +5216,10 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     state->dataEnvrn->OutHumRat = 0.0120;
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
+    state->dataEnvrn->StdBaroPress = DataEnvironment::StdPressureSeaLevel;
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 20.0, 0.0);
+    Psychrometrics::InitializePsychRoutines(*state);
+
     // run coil at full capacity
     Real64 PartLoadRatio(1.0);
     Real64 AirFlowRatio(1.0);
