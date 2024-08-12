@@ -552,7 +552,44 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
             processZoneEquipMixerInput(state, CurrentModuleObject, zoneNum, objectSchemaProps, objectFields, thisZeqMixer);
         }
-    } // end loop over zone equipment splitters
+    } // end loop over zone equipment mixers
+
+    CurrentModuleObject = "SpaceHVAC:ZoneReturnMixer";
+    instances = ip->epJSON.find(CurrentModuleObject);
+    if (instances != ip->epJSON.end()) {
+        auto const &objectSchemaProps = ip->getObjectSchemaProps(state, CurrentModuleObject);
+        auto &instancesValue = instances.value();
+        int numZoneRetMixers = instancesValue.size();
+        state.dataZoneEquip->zoneReturnMixer.resize(numZoneRetMixers);
+        int zeqRetNum = -1;
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            ++zeqRetNum;
+            auto const &objectFields = instance.value();
+            auto &thisZretMixer = state.dataZoneEquip->zoneReturnMixer[zeqRetNum];
+            thisZretMixer.Name = Util::makeUPPER(instance.key());
+            thisZretMixer.spaceEquipType = DataLoopNode::ConnectionObjectType::SpaceHVACZoneReturnMixer;
+            ip->markObjectAsUsed(CurrentModuleObject, instance.key());
+
+            std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
+            int zoneNum = Util::FindItemInList(zoneName, state.dataHeatBal->Zone);
+            if (zoneNum == 0) {
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisZretMixer.Name));
+                ShowContinueError(state, format("..Zone Name={} not found, remaining items for this object not processed.", zoneName));
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                continue;
+            }
+            if (!state.dataHeatBal->Zone(zoneNum).IsControlled) {
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisZretMixer.Name));
+                ShowContinueError(
+                    state,
+                    format("..Zone Name={} is not a controlled zone. A ZoneHVAC:EquipmentConfiguration object is required for this zone.", zoneName));
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                continue;
+            }
+
+            processZoneReturnMixerInput(state, CurrentModuleObject, zoneNum, objectSchemaProps, objectFields, thisZretMixer);
+        }
+    } // end loop over zone return mixers
 
     CurrentModuleObject = "AirLoopHVAC:SupplyPath";
     for (int PathNum = 1; PathNum <= state.dataZoneEquip->NumSupplyAirPaths; ++PathNum) {
@@ -1368,6 +1405,93 @@ void processZoneEquipMixerInput(EnergyPlusData &state,
     }
 }
 
+void processZoneReturnMixerInput(EnergyPlusData &state,
+                                 std::string_view zeqMixerModuleObject,
+                                 int const zoneNum,
+                                 InputProcessor::json const objectSchemaProps,
+                                 InputProcessor::json const objectFields,
+                                 DataZoneEquipment::ZoneReturnMixer &thisZretMixer)
+
+{
+    static constexpr std::string_view RoutineName("processZoneReturnMixerInput: "); // include trailing blank space
+    auto &ip = state.dataInputProcessing->inputProcessor;
+    bool objectIsParent = true;
+    thisZretMixer.zoneReturnNodeNum = GetOnlySingleNode(state,
+                                                        ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_return_air_node_name"),
+                                                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
+                                                        thisZretMixer.spaceEquipType,
+                                                        thisZretMixer.Name,
+                                                        DataLoopNode::NodeFluidType::Air,
+                                                        DataLoopNode::ConnectionType::Outlet,
+                                                        NodeInputManager::CompFluidStream::Primary,
+                                                        objectIsParent);
+    // Check zone return nodes
+    bool found = false;
+    auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
+    for (int retNodeNum : thisZoneEquipConfig.ReturnNode) {
+        if (thisZretMixer.zoneReturnNodeNum == retNodeNum) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        ShowSevereError(state, format("{}{}={}", RoutineName, zeqMixerModuleObject, thisZretMixer.Name));
+        ShowContinueError(state,
+                          format("Zone Equipment Return Air Node Name={} is not a return air node for ZoneHVAC:EquipmentConnections={}.",
+                                 state.dataLoopNodes->NodeID(thisZretMixer.zoneReturnNodeNum),
+                                 thisZoneEquipConfig.ZoneName));
+        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+    }
+
+    auto extensibles = objectFields.find("spaces");
+    auto const &extensionSchemaProps = objectSchemaProps["spaces"]["items"]["properties"];
+    if (extensibles != objectFields.end()) {
+        auto &extensiblesArray = extensibles.value();
+        int const numSpaces = extensiblesArray.size();
+        thisZretMixer.spaces.resize(numSpaces);
+        int spaceCount = -1;
+        for (auto &extensibleInstance : extensiblesArray) {
+            ++spaceCount;
+            auto &thisZeqSpace = thisZretMixer.spaces[spaceCount];
+            std::string const spaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
+            thisZeqSpace.spaceIndex = Util::FindItemInList(spaceName, state.dataHeatBal->space);
+            if (thisZeqSpace.spaceIndex == 0) {
+                ShowSevereError(state, format("{}{}={}", RoutineName, zeqMixerModuleObject, thisZretMixer.Name));
+                ShowContinueError(state, format("Space Name={} not found.", spaceName));
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+            } else {
+                thisZeqSpace.spaceNodeNum =
+                    GetOnlySingleNode(state,
+                                      ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_return_air_node_name"),
+                                      state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
+                                      thisZretMixer.spaceEquipType,
+                                      thisZretMixer.Name,
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Inlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      objectIsParent);
+                // Check space return nodes
+                bool found = false;
+                auto &thisSpaceEquipConfig = state.dataZoneEquip->spaceEquipConfig(thisZeqSpace.spaceIndex);
+                for (int retNodeNum : thisSpaceEquipConfig.ReturnNode) {
+                    if (thisZeqSpace.spaceNodeNum == retNodeNum) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    ShowSevereError(state, format("{}{}={}", RoutineName, zeqMixerModuleObject, thisZretMixer.Name));
+                    ShowContinueError(state,
+                                      format("Space Return Air Node Name={} is not a return air node for SpaceHVAC:EquipmentConnections={}.",
+                                             state.dataLoopNodes->NodeID(thisZeqSpace.spaceNodeNum),
+                                             thisSpaceEquipConfig.ZoneName));
+                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                }
+            }
+        }
+    }
+}
+
 bool CheckZoneEquipmentList(EnergyPlusData &state,
                             std::string_view const ComponentType, // Type of component
                             std::string_view const ComponentName, // Name of component
@@ -1743,6 +1867,8 @@ void ZoneEquipmentSplitterMixer::size(EnergyPlusData &state)
                               this->Name));
         break;
     default:
+        // If method is not set, then return
+        return;
         break;
     }
 
@@ -2053,6 +2179,180 @@ void EquipConfiguration::hvacTimeStepInit(EnergyPlusData &state, bool FirstHVACI
             if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                 exhNode.GenContam = zoneNode.GenContam;
             }
+        }
+    }
+}
+
+void EquipConfiguration::calcReturnFlows(EnergyPlusData &state,
+                                         Real64 &ExpTotalReturnMassFlow,  // Expected total return air mass flow rate
+                                         Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
+)
+{
+    int numRetNodes = this->NumReturnNodes;
+    Real64 totReturnFlow = 0.0; // Total flow to all return nodes in the zone (kg/s)
+    Real64 totVarReturnFlow =
+        0.0; // Total variable return flow, for return nodes connected to an airloop with an OA system or not with specified flow (kg/s)
+    Real64 returnSchedFrac = ScheduleManager::GetCurrentScheduleValue(state, this->ReturnFlowSchedPtrNum);
+    this->FixedReturnFlow = false;
+    FinalTotalReturnMassFlow = 0.0;
+    this->TotAvailAirLoopOA = 0.0;
+
+    // Set initial flow rate for each return node
+    for (int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
+        int retNode = this->ReturnNode(returnNum);
+
+        if (retNode > 0) {
+            Real64 returnNodeMassFlow = 0.0;
+            auto &retNodeData(state.dataLoopNodes->Node(retNode));
+
+            int inletNum = this->ReturnNodeInletNum(returnNum); // which inlet node matches this return node (same airloop)
+            int ADUNum = 0;
+            if (inletNum > 0) ADUNum = this->InletNodeADUNum(inletNum);
+            int airLoop = this->ReturnNodeAirLoopNum(returnNum);
+            Real64 airLoopReturnFrac = 1.0;
+            if (airLoop > 0) {
+                // Establish corresponding airloop inlet(s) mass flow rate and set return node max/min/maxavail
+                Real64 inletMassFlow = 0.0;
+                int maxMinNodeNum = 0;
+                auto &thisAirLoopFlow(state.dataAirLoop->AirLoopFlow(airLoop));
+                if (ADUNum > 0) {
+                    // Zone return node could carry supply flow to zone without leaks plus any induced flow from plenum (but don't include other
+                    // secondary flows from exhaust nodes)
+                    inletMassFlow = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateZSup +
+                                    state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRatePlenInd;
+                    maxMinNodeNum = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
+                } else if (inletNum > 0) {
+                    // If not connected to an ADU, then use the inlet node flow
+                    inletMassFlow = state.dataLoopNodes->Node(this->InletNode(inletNum)).MassFlowRate;
+                    maxMinNodeNum = this->InletNode(inletNum);
+                }
+                if (maxMinNodeNum > 0) {
+                    auto const &maxMinNodeData(state.dataLoopNodes->Node(maxMinNodeNum));
+                    retNodeData.MassFlowRateMax = maxMinNodeData.MassFlowRateMax;
+                    retNodeData.MassFlowRateMin = maxMinNodeData.MassFlowRateMin;
+                    retNodeData.MassFlowRateMaxAvail = maxMinNodeData.MassFlowRateMaxAvail;
+                } else {
+                    auto const &zoneNodeData(state.dataLoopNodes->Node(this->ZoneNode));
+                    retNodeData.MassFlowRateMax = zoneNodeData.MassFlowRateMax;
+                    retNodeData.MassFlowRateMin = zoneNodeData.MassFlowRateMin;
+                    retNodeData.MassFlowRateMaxAvail = zoneNodeData.MassFlowRateMaxAvail;
+                }
+
+                airLoopReturnFrac = thisAirLoopFlow.DesReturnFrac;
+                if (state.dataAirSystemsData->PrimaryAirSystems(airLoop).OASysExists && (thisAirLoopFlow.MaxOutAir > 0.0)) {
+                    // Set return flow as fraction of matching inlet node flow if there is an OA system and available OA flow > 0.0
+                    returnNodeMassFlow = airLoopReturnFrac * inletMassFlow;
+                    this->TotAvailAirLoopOA += thisAirLoopFlow.MaxOutAir;
+                } else {
+                    // Set return flow to matching inlet node flow
+                    returnNodeMassFlow = inletMassFlow;
+                    this->FixedReturnFlow(returnNum) = true;
+                }
+            } else {
+                returnNodeMassFlow = 0.0;
+            }
+
+            // Return node 1 is special
+            if (returnNum == 1) {
+                // Make no return air flow adjustments during sizing
+                if ((state.dataGlobal->DoingSizing) && numRetNodes == 1) {
+                    returnNodeMassFlow = ExpTotalReturnMassFlow;
+                    if (airLoop > 0) {
+                        if (!state.dataAirSystemsData->PrimaryAirSystems(airLoop).OASysExists ||
+                            (state.dataAirLoop->AirLoopFlow(airLoop).MaxOutAir == 0.0)) {
+                            ExpTotalReturnMassFlow = max(0.0, ExpTotalReturnMassFlow - this->ZoneExhBalanced + this->ZoneExh);
+                            returnNodeMassFlow = ExpTotalReturnMassFlow;
+                        }
+                    }
+                } else if (!state.dataGlobal->DoingSizing) {
+                    if (this->NumReturnFlowBasisNodes > 0) {
+                        // Set base return air flow rate for node 1 using basis node flow rates
+                        Real64 basisNodesMassFlow = 0.0;
+                        for (int nodeNum = 1; nodeNum <= this->NumReturnFlowBasisNodes; ++nodeNum) {
+                            basisNodesMassFlow += state.dataLoopNodes->Node(this->ReturnFlowBasisNode(nodeNum)).MassFlowRate;
+                        }
+                        returnNodeMassFlow = max(0.0, (basisNodesMassFlow * returnSchedFrac));
+                        this->FixedReturnFlow(returnNum) = true;
+                    } else {
+                        // If only 1 return node, use the standard return mass flow
+                        if ((numRetNodes == 1) && !this->FixedReturnFlow(returnNum)) {
+                            returnNodeMassFlow = max(0.0, (ExpTotalReturnMassFlow * returnSchedFrac * airLoopReturnFrac));
+                        }
+                    }
+                }
+            }
+            totReturnFlow += returnNodeMassFlow;
+            retNodeData.MassFlowRate = returnNodeMassFlow;
+            retNodeData.MassFlowRateMinAvail = 0.0;
+            if (!this->FixedReturnFlow(returnNum)) totVarReturnFlow += returnNodeMassFlow;
+        }
+    }
+
+    // if zone mass balance true, set to expected return flow
+    if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) {
+        // applies zone return flow schedule multiplier
+        ExpTotalReturnMassFlow = returnSchedFrac * ExpTotalReturnMassFlow;
+        // set air flow rate for each return node
+        Real64 zoneTotReturnFlow = 0.0;
+        Real64 returnNodeMassFlow = 0.0;
+        for (int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
+            int retNode = this->ReturnNode(returnNum);
+            if (retNode > 0) {
+                if (numRetNodes == 1) {
+                    returnNodeMassFlow = ExpTotalReturnMassFlow;
+                } else { // multiple return nodes
+                    if (ExpTotalReturnMassFlow > 0.0) {
+                        Real64 returnAdjFactor = state.dataLoopNodes->Node(retNode).MassFlowRate / ExpTotalReturnMassFlow;
+                        returnNodeMassFlow = returnAdjFactor * ExpTotalReturnMassFlow;
+                    } else {
+                        returnNodeMassFlow = 0.0;
+                    }
+                }
+            }
+            zoneTotReturnFlow += returnNodeMassFlow;
+        }
+        // Adjust return node flows if zone total return flow is > 0
+        if (zoneTotReturnFlow > 0.0) {
+            for (int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
+                int retNode = this->ReturnNode(returnNum);
+                if (retNode > 0) {
+                    if (numRetNodes == 1) {
+                        // set it to expected return flows
+                        state.dataLoopNodes->Node(retNode).MassFlowRate = ExpTotalReturnMassFlow;
+                        FinalTotalReturnMassFlow = ExpTotalReturnMassFlow;
+                    } else { // multiple return nodes, adjust nodes flow
+                        Real64 newReturnFlow = 0.0;
+                        Real64 returnAdjFactor = ExpTotalReturnMassFlow / zoneTotReturnFlow;
+                        Real64 curReturnFlow = state.dataLoopNodes->Node(retNode).MassFlowRate;
+                        newReturnFlow = curReturnFlow * returnAdjFactor;
+                        state.dataLoopNodes->Node(retNode).MassFlowRate = newReturnFlow;
+                        FinalTotalReturnMassFlow += newReturnFlow;
+                    }
+                }
+            }
+        } else {
+            FinalTotalReturnMassFlow = ExpTotalReturnMassFlow;
+        }
+    } else {
+        // Adjust return flows if greater than expected (i.e. there is exhaust or mixing flow reducing the total available for return)
+        if ((totReturnFlow > ExpTotalReturnMassFlow) && (totVarReturnFlow > 0.0)) {
+            Real64 newReturnFlow = 0.0;
+            Real64 returnAdjFactor = (1 - ((totReturnFlow - ExpTotalReturnMassFlow) / totVarReturnFlow)); // Return flow adjustment factor
+            for (int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
+                int retNode = this->ReturnNode(returnNum);
+                Real64 curReturnFlow = state.dataLoopNodes->Node(retNode).MassFlowRate;
+                if (retNode > 0) {
+                    if (!this->FixedReturnFlow(returnNum)) {
+                        newReturnFlow = curReturnFlow * returnAdjFactor;
+                        FinalTotalReturnMassFlow += newReturnFlow;
+                        state.dataLoopNodes->Node(retNode).MassFlowRate = newReturnFlow;
+                    } else {
+                        FinalTotalReturnMassFlow += curReturnFlow;
+                    }
+                }
+            }
+        } else {
+            FinalTotalReturnMassFlow = totReturnFlow;
         }
     }
 }

@@ -372,6 +372,11 @@ namespace DataZoneEquipment {
         void beginEnvirnInit(EnergyPlusData &state);
 
         void hvacTimeStepInit(EnergyPlusData &state, bool FirstHVACIteration);
+
+        void calcReturnFlows(EnergyPlusData &state,
+                             Real64 &ExpTotalReturnMassFlow,  // Expected total return air mass flow rate
+                             Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
+        );
     };
 
     struct EquipmentData // data for an individual component
@@ -486,6 +491,14 @@ namespace DataZoneEquipment {
         void setInletFlows(EnergyPlusData &state);
     };
 
+    struct ZoneReturnMixer : ZoneEquipmentSplitterMixer
+    {
+        int zoneReturnNodeNum = 0;
+
+        // void setOutletConditions(EnergyPlusData &state);
+
+        // void setInletFlows(EnergyPlusData &state);
+    };
     struct ControlList
     {
         // Members
@@ -567,6 +580,13 @@ namespace DataZoneEquipment {
                                     InputProcessor::json const objectFields,
                                     DataZoneEquipment::ZoneEquipmentMixer &thisZeqMixer);
 
+    void processZoneReturnMixerInput(EnergyPlusData &state,
+                                     std::string_view zeqMixerModuleObject,
+                                     int const zoneNum,
+                                     InputProcessor::json const objectSchemaProps,
+                                     InputProcessor::json const objectFields,
+                                     DataZoneEquipment::ZoneReturnMixer &thisZretMixer);
+
     bool CheckZoneEquipmentList(EnergyPlusData &state,
                                 std::string_view ComponentType, // Type of component
                                 std::string_view ComponentName, // Name of component
@@ -623,6 +643,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     Array1D<ExhaustAirSystemManager::ZoneExhaustControl> ZoneExhaustControlSystem; // 2022-01: maybe a better name?
     std::vector<DataZoneEquipment::ZoneEquipmentSplitter> zoneEquipSplitter;
     std::vector<DataZoneEquipment::ZoneEquipmentMixer> zoneEquipMixer;
+    std::vector<DataZoneEquipment::ZoneReturnMixer> zoneReturnMixer;
 
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {

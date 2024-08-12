@@ -212,12 +212,6 @@ namespace ZoneEquipmentManager {
 
     void CalcZoneMassBalance(EnergyPlusData &state, bool FirstHVACIteration);
 
-    void CalcZoneReturnFlows(EnergyPlusData &state,
-                             int ZoneNum,
-                             Real64 &ExpTotalReturnMassFlow,  // Expected total return air mass flow rate
-                             Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
-    );
-
     void CalcZoneInfiltrationFlows(EnergyPlusData &state,
                                    int ZoneNum,                      // current zone index
                                    Real64 &ZoneReturnAirMassFlowRate // zone total zone return air mass flow rate

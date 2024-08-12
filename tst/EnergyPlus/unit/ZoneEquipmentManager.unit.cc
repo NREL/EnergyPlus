@@ -555,7 +555,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     Real64 StdTotalReturnMassFlow = 0.0;
     Real64 FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).calcReturnFlows(*state, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 0.0);
     EXPECT_EQ(state->dataLoopNodes->Node(returnNode1).MassFlowRate, 0.0);
     EXPECT_EQ(state->dataLoopNodes->Node(returnNode2).MassFlowRate, 0.0);
@@ -572,7 +572,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     StdTotalReturnMassFlow = 0.0;
     FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).calcReturnFlows(*state, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 6.0);
     EXPECT_EQ(state->dataLoopNodes->Node(returnNode1).MassFlowRate, 2.0);
     EXPECT_EQ(state->dataLoopNodes->Node(returnNode2).MassFlowRate, 1.0);
@@ -792,7 +792,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     Real64 StdTotalReturnMassFlow = 0.0;
     Real64 FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).calcReturnFlows(*state, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 0.0);
     EXPECT_EQ(state->dataLoopNodes->Node(returnNode1).MassFlowRate, 0.0);
     EXPECT_EQ(state->dataLoopNodes->Node(returnNode2).MassFlowRate, 0.0);
@@ -809,7 +809,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     StdTotalReturnMassFlow = 6.0;
     FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).calcReturnFlows(*state, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 5.9);
     EXPECT_EQ(state->dataLoopNodes->Node(returnNode1).MassFlowRate, 2.0);
     EXPECT_EQ(state->dataLoopNodes->Node(returnNode2).MassFlowRate, 0.9);
@@ -832,7 +832,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     StdTotalReturnMassFlow = 6.0;
     FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).calcReturnFlows(*state, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 6.0);
     EXPECT_EQ(state->dataLoopNodes->Node(returnNode1).MassFlowRate, 2.0);
     EXPECT_EQ(state->dataLoopNodes->Node(returnNode2).MassFlowRate, 1.0);
