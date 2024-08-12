@@ -587,7 +587,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 continue;
             }
 
-            processZoneReturnMixerInput(state, CurrentModuleObject, zoneNum, objectSchemaProps, objectFields, thisZretMixer);
+            processZoneReturnMixerInput(state, CurrentModuleObject, zoneNum, objectSchemaProps, objectFields, zeqRetNum);
         }
     } // end loop over zone return mixers
 
@@ -1326,20 +1326,20 @@ void processZoneEquipMixerInput(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("processZoneEquipMixerInput: "); // include trailing blank space
     auto &ip = state.dataInputProcessing->inputProcessor;
     bool objectIsParent = true;
-    thisZeqMixer.zoneEquipInletNodeNum = GetOnlySingleNode(state,
-                                                           ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_inlet_node_name"),
-                                                           state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                                           thisZeqMixer.spaceEquipType,
-                                                           thisZeqMixer.Name,
-                                                           DataLoopNode::NodeFluidType::Air,
-                                                           DataLoopNode::ConnectionType::Outlet,
-                                                           NodeInputManager::CompFluidStream::Primary,
-                                                           objectIsParent);
+    thisZeqMixer.outletNodeNum = GetOnlySingleNode(state,
+                                                   ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_inlet_node_name"),
+                                                   state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
+                                                   thisZeqMixer.spaceEquipType,
+                                                   thisZeqMixer.Name,
+                                                   DataLoopNode::NodeFluidType::Air,
+                                                   DataLoopNode::ConnectionType::Outlet,
+                                                   NodeInputManager::CompFluidStream::Primary,
+                                                   objectIsParent);
     // Check zone exhaust nodes
     bool found = false;
     auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
     for (int exhNodeNum : thisZoneEquipConfig.ExhaustNode) {
-        if (thisZeqMixer.zoneEquipInletNodeNum == exhNodeNum) {
+        if (thisZeqMixer.outletNodeNum == exhNodeNum) {
             found = true;
             break;
         }
@@ -1348,7 +1348,7 @@ void processZoneEquipMixerInput(EnergyPlusData &state,
         ShowSevereError(state, format("{}{}={}", RoutineName, zeqMixerModuleObject, thisZeqMixer.Name));
         ShowContinueError(state,
                           format("Zone Equipment Inlet Node Name={} is not an exhaust node for ZoneHVAC:EquipmentConnections={}.",
-                                 state.dataLoopNodes->NodeID(thisZeqMixer.zoneEquipInletNodeNum),
+                                 state.dataLoopNodes->NodeID(thisZeqMixer.outletNodeNum),
                                  thisZoneEquipConfig.ZoneName));
         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
     }
@@ -1410,27 +1410,37 @@ void processZoneReturnMixerInput(EnergyPlusData &state,
                                  int const zoneNum,
                                  InputProcessor::json const objectSchemaProps,
                                  InputProcessor::json const objectFields,
-                                 DataZoneEquipment::ZoneReturnMixer &thisZretMixer)
+                                 int mixerIndex)
 
 {
     static constexpr std::string_view RoutineName("processZoneReturnMixerInput: "); // include trailing blank space
     auto &ip = state.dataInputProcessing->inputProcessor;
     bool objectIsParent = true;
-    thisZretMixer.zoneReturnNodeNum = GetOnlySingleNode(state,
-                                                        ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_return_air_node_name"),
-                                                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                                        thisZretMixer.spaceEquipType,
-                                                        thisZretMixer.Name,
-                                                        DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::ConnectionType::Outlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        objectIsParent);
+    auto &thisZretMixer = state.dataZoneEquip->zoneReturnMixer[mixerIndex];
+    thisZretMixer.outletNodeNum = GetOnlySingleNode(state,
+                                                    ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_return_air_node_name"),
+                                                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
+                                                    thisZretMixer.spaceEquipType,
+                                                    thisZretMixer.Name,
+                                                    DataLoopNode::NodeFluidType::Air,
+                                                    DataLoopNode::ConnectionType::Outlet,
+                                                    NodeInputManager::CompFluidStream::Primary,
+                                                    objectIsParent);
     // Check zone return nodes
     bool found = false;
     auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
+    thisZoneEquipConfig.returnNodeSpaceMixerIndex.allocate(thisZoneEquipConfig.NumReturnNodes);
+    for (int &mixIndex : thisZoneEquipConfig.returnNodeSpaceMixerIndex) {
+        mixIndex = -1;
+    }
+
+    int nodeCounter = 0;
     for (int retNodeNum : thisZoneEquipConfig.ReturnNode) {
-        if (thisZretMixer.zoneReturnNodeNum == retNodeNum) {
+        ++nodeCounter;
+        if (thisZretMixer.outletNodeNum == retNodeNum) {
             found = true;
+            // Zone return node is fed by a space return mixer
+            thisZoneEquipConfig.returnNodeSpaceMixerIndex(nodeCounter) = mixerIndex;
             break;
         }
     }
@@ -1438,7 +1448,7 @@ void processZoneReturnMixerInput(EnergyPlusData &state,
         ShowSevereError(state, format("{}{}={}", RoutineName, zeqMixerModuleObject, thisZretMixer.Name));
         ShowContinueError(state,
                           format("Zone Equipment Return Air Node Name={} is not a return air node for ZoneHVAC:EquipmentConnections={}.",
-                                 state.dataLoopNodes->NodeID(thisZretMixer.zoneReturnNodeNum),
+                                 state.dataLoopNodes->NodeID(thisZretMixer.outletNodeNum),
                                  thisZoneEquipConfig.ZoneName));
         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
     }
@@ -1923,9 +1933,9 @@ void ZoneEquipmentSplitterMixer::size(EnergyPlusData &state)
     }
 }
 
-void ZoneEquipmentMixer::setOutletConditions(EnergyPlusData &state)
+void ZoneMixer::setOutletConditions(EnergyPlusData &state)
 {
-    if (this->zoneEquipInletNodeNum == 0) return;
+    if (this->outletNodeNum == 0) return;
 
     Real64 sumEnthalpy = 0.0;
     Real64 sumHumRat = 0.0;
@@ -1933,7 +1943,7 @@ void ZoneEquipmentMixer::setOutletConditions(EnergyPlusData &state)
     Real64 sumGenContam = 0.0;
     Real64 sumPressure = 0.0;
     Real64 sumFractions = 0.0;
-    auto &equipInletNode = state.dataLoopNodes->Node(this->zoneEquipInletNodeNum);
+    auto &outletNode = state.dataLoopNodes->Node(this->outletNodeNum);
     for (auto &mixerSpace : this->spaces) {
         auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
         sumEnthalpy += spaceOutletNode.Enthalpy * mixerSpace.fraction;
@@ -1947,30 +1957,81 @@ void ZoneEquipmentMixer::setOutletConditions(EnergyPlusData &state)
         sumPressure += spaceOutletNode.Press * mixerSpace.fraction;
         sumFractions += mixerSpace.fraction;
     }
-    equipInletNode.Enthalpy = sumEnthalpy / sumFractions;
-    equipInletNode.HumRat = sumHumRat / sumFractions;
-    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        equipInletNode.CO2 = sumCO2 / sumFractions;
-    }
-    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        equipInletNode.GenContam = sumGenContam / sumFractions;
-    }
-    equipInletNode.Press = sumPressure / sumFractions;
 
-    // Use Enthalpy and humidity ratio to get outlet temperature from psych chart
-    equipInletNode.Temp = Psychrometrics::PsyTdbFnHW(equipInletNode.Enthalpy, equipInletNode.HumRat);
+    // For SpaceHVAC:ZoneReturnMixer, the fractions are dynamic and could be zero if there is no flow
+    if (sumFractions > 0) {
+        outletNode.Enthalpy = sumEnthalpy / sumFractions;
+        outletNode.HumRat = sumHumRat / sumFractions;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            outletNode.CO2 = sumCO2 / sumFractions;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            outletNode.GenContam = sumGenContam / sumFractions;
+        }
+        outletNode.Press = sumPressure / sumFractions;
+
+        // Use Enthalpy and humidity ratio to get outlet temperature from psych chart
+        outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+    }
 }
 
+void ZoneReturnMixer::setInletConditions(EnergyPlusData &state)
+{
+    for (auto &mixerSpace : this->spaces) {
+        auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
+        int spaceZoneNodeNum = state.dataZoneEquip->spaceEquipConfig(mixerSpace.spaceIndex).ZoneNode;
+        auto &spaceNode = state.dataLoopNodes->Node(spaceZoneNodeNum);
+        spaceOutletNode.Temp = spaceNode.Temp;
+        spaceOutletNode.HumRat = spaceNode.HumRat;
+        spaceOutletNode.Enthalpy = spaceNode.Enthalpy;
+        spaceOutletNode.Press = spaceNode.Press;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            spaceOutletNode.CO2 = spaceNode.CO2;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            spaceOutletNode.GenContam = spaceNode.GenContam;
+        }
+    }
+}
 void ZoneEquipmentMixer::setInletFlows(EnergyPlusData &state)
 {
-    if (this->zoneEquipInletNodeNum == 0) return;
+    if (this->outletNodeNum == 0) return;
 
-    auto &equipInletNode = state.dataLoopNodes->Node(this->zoneEquipInletNodeNum);
+    auto &equipInletNode = state.dataLoopNodes->Node(this->outletNodeNum);
     for (auto &mixerSpace : this->spaces) {
         auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
         spaceOutletNode.MassFlowRate = equipInletNode.MassFlowRate * mixerSpace.fraction;
         spaceOutletNode.MassFlowRateMaxAvail = equipInletNode.MassFlowRateMaxAvail * mixerSpace.fraction;
         spaceOutletNode.MassFlowRateMinAvail = equipInletNode.MassFlowRateMinAvail * mixerSpace.fraction;
+    }
+}
+
+void ZoneReturnMixer::setInletFlows(EnergyPlusData &state)
+{
+    if (this->outletNodeNum == 0) return;
+    auto &outletNode = state.dataLoopNodes->Node(this->outletNodeNum);
+
+    Real64 sumMixerInletMassFlow = 0;
+    for (auto const &mixerSpace : this->spaces) {
+        // calc return flows for spaces feeding this mixer
+        auto &spaceEquipConfig = state.dataZoneEquip->spaceEquipConfig(mixerSpace.spaceIndex);
+        Real64 outletMassFlowRate = outletNode.MassFlowRate; // calcReturnFlows might adjust this parameter value, so make a copy here
+        Real64 spaceReturnFlow = 0.0;
+        spaceEquipConfig.calcReturnFlows(state, outletMassFlowRate, spaceReturnFlow);
+        sumMixerInletMassFlow += spaceReturnFlow;
+    }
+
+    for (auto &mixerSpace : this->spaces) {
+        auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
+        // For return mixer, fraction is calculated every time step, not a user input
+        if (sumMixerInletMassFlow > 0.0) {
+            mixerSpace.fraction = spaceOutletNode.MassFlowRate / sumMixerInletMassFlow;
+        } else {
+            mixerSpace.fraction = 0.0;
+        }
+        spaceOutletNode.MassFlowRate = outletNode.MassFlowRate * mixerSpace.fraction;
+        spaceOutletNode.MassFlowRateMaxAvail = outletNode.MassFlowRateMaxAvail * mixerSpace.fraction;
+        spaceOutletNode.MassFlowRateMinAvail = outletNode.MassFlowRateMinAvail * mixerSpace.fraction;
     }
 }
 

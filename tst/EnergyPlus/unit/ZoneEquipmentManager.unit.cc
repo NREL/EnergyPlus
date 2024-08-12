@@ -5217,8 +5217,8 @@ TEST_F(EnergyPlusFixture, SpaceHVACMixerTest)
     mixSpace2.spaceNodeNum = 12;
     mixSpace3.spaceNodeNum = 13;
     state->dataLoopNodes->Node.allocate(13);
-    thisMixer.zoneEquipInletNodeNum = 1;
-    auto &equipInletNode = state->dataLoopNodes->Node(thisMixer.zoneEquipInletNodeNum);
+    thisMixer.outletNodeNum = 1;
+    auto &equipInletNode = state->dataLoopNodes->Node(thisMixer.outletNodeNum);
     auto &mixSpace1Node = state->dataLoopNodes->Node(mixSpace1.spaceNodeNum);
     auto &mixSpace2Node = state->dataLoopNodes->Node(mixSpace2.spaceNodeNum);
     auto &mixSpace3Node = state->dataLoopNodes->Node(mixSpace3.spaceNodeNum);

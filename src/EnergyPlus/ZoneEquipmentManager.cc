@@ -5170,6 +5170,15 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
     Real64 TempZoneAir; // Zone air temperature [C]
     Real64 SumRetAirLatentGainRate;
 
+    // If SpaceHVAC is active calculate SpaceHVAC:ReturnMixer inlet and outlet conditions before setting zone return conditions
+    if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing) {
+        for (auto &thisSpaceHVACMixer : state.dataZoneEquip->zoneReturnMixer) {
+            thisSpaceHVACMixer.setInletFlows(state);
+            thisSpaceHVACMixer.setInletConditions(state);
+            thisSpaceHVACMixer.setOutletConditions(state);
+        }
+    }
+
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
         // A return air system may not exist for certain systems; Therefore when no return node exists
