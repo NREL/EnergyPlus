@@ -6266,6 +6266,7 @@ TEST_F(EnergyPlusFixture, CLIPLINE_Full)
 
         Real64 x1 = t.line_ori.p1.x;
         Real64 y1 = t.line_ori.p1.y;
+        bool is_rev = x0 > x1;
 
         std::string const msg = fmt::format("From ({}, {}) to ({}, {})", t.line_ori.p0.x, t.line_ori.p0.y, t.line_ori.p1.x, t.line_ori.p1.y);
 
@@ -6279,6 +6280,10 @@ TEST_F(EnergyPlusFixture, CLIPLINE_Full)
             EXPECT_DOUBLE_EQ(t.line_new.p1.y, y1) << msg;
         } else {
             EXPECT_FALSE(visible) << msg;
+            if (is_rev) {
+                std::swap(x0, x1);
+                std::swap(y0, y1);
+            }
             EXPECT_DOUBLE_EQ(t.line_ori.p0.x, x0) << msg;
             EXPECT_DOUBLE_EQ(t.line_ori.p0.y, y0) << msg;
             EXPECT_DOUBLE_EQ(t.line_ori.p1.x, x1) << msg;
