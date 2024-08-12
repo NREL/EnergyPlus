@@ -480,9 +480,6 @@ namespace ExtendedHI {
         // RH: relative humidity in range of 0.0 to 1.0
         // The function computes the extended heat index, in Kelvinn
 
-        auto const &HVACSystemRootSolver = state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver;
-        auto const HVACSystemRootSolverBackup = HVACSystemRootSolver;
-        state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Bisection;
         auto eqvars = find_eqvar(state, Ta, RH);
         int eqvar_name = std::get<0>(eqvars);
         Real64 eqvar_value = std::get<1>(eqvars);
@@ -491,7 +488,6 @@ namespace ExtendedHI {
 
         if (Ta == 0.0) T = 0.0;
 
-        state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverBackup;
         return T;
     }
 
