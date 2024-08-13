@@ -12834,7 +12834,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                               _,
                               _,
                               fan->inletAirMassFlowRate,
-                              state.dataDXCoils->DXCoil(this->CoolCoilIndex).CoolingCoilRuntimeFraction,
+                              OnOffFanPartLoadFraction,
                               0,
                               0,
                               _);
