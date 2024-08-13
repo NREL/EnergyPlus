@@ -70,6 +70,7 @@
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
+#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PluginManager.hh>
@@ -482,9 +483,9 @@ namespace HeatBalFiniteDiffManager {
                 thisSurface.CpDelXRhoS1 = 0.0;
                 thisSurface.CpDelXRhoS2 = 0.0;
                 thisSurface.TDpriortimestep = 0.0;
-                thisSurface.PhaseChangeState = 0;
-                thisSurface.PhaseChangeStateOld = 0;
-                thisSurface.PhaseChangeStateOldOld = 0;
+                thisSurface.PhaseChangeState = Material::Phase::Transition;
+                thisSurface.PhaseChangeStateOld = Material::Phase::Transition;
+                thisSurface.PhaseChangeStateOldOld = Material::Phase::Transition;
                 thisSurface.PhaseChangeTemperatureReverse = 50;
 
                 state.dataMstBal->TempOutsideAirFD(SurfNum) = 0.0;
@@ -549,10 +550,6 @@ namespace HeatBalFiniteDiffManager {
         Real64 mAlpha;
         Real64 StabilityTemp;
         Real64 StabilityMoist;
-        Real64 a;
-        Real64 b;
-        Real64 c;
-        Real64 d;
         Real64 kt;
         Real64 RhoS;
         Real64 Por;
@@ -634,8 +631,7 @@ namespace HeatBalFiniteDiffManager {
                 // now there are special equations for R-only layers.
 
                 int CurrentLayer = thisConstruct.LayerPoint(Layer);
-                auto *mat = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->materials(CurrentLayer));
-                assert(mat != nullptr);
+                auto *mat = state.dataMaterial->materials(CurrentLayer);
 
                 thisConstructFD.Name(Layer) = mat->Name;
                 thisConstructFD.Thickness(Layer) = mat->Thickness;
@@ -663,7 +659,7 @@ namespace HeatBalFiniteDiffManager {
 
                     mAlpha = 0.0;
 
-                } else if (mat->group == Material::Group::Air) { //  Group 1 = Air
+                } else if (mat->group == Material::Group::AirGap) { //  Group 1 = Air
 
                     //  Again, these values are only needed temporarily and to calculate flux,
                     //   Air layer will be handled
@@ -695,20 +691,18 @@ namespace HeatBalFiniteDiffManager {
                     }
                     continue;
                 } else {
+                    auto *matReg = mat;
+                    assert(matReg != nullptr);
                     //    Regular material Properties
-                    a = mat->MoistACoeff;
-                    b = mat->MoistBCoeff;
-                    c = mat->MoistCCoeff;
-                    d = mat->MoistDCoeff;
-                    kt = mat->Conductivity;
-                    RhoS = mat->Density;
-                    Por = mat->Porosity;
-                    Cp = mat->SpecHeat;
+                    kt = matReg->Conductivity;
+                    RhoS = matReg->Density;
+                    Por = matReg->Porosity;
+                    Cp = matReg->SpecHeat;
                     // Need Resistance for reg layer
-                    mat->Resistance = mat->Thickness / mat->Conductivity;
-                    Dv = mat->VaporDiffus;
-                    SigmaR(ConstrNum) += mat->Resistance; // add resistance
-                    SigmaC(ConstrNum) += mat->Density * mat->SpecHeat * mat->Thickness;
+                    matReg->Resistance = matReg->Thickness / matReg->Conductivity;
+                    Dv = matReg->VaporDiffus;
+                    SigmaR(ConstrNum) += matReg->Resistance; // add resistance
+                    SigmaC(ConstrNum) += matReg->Density * matReg->SpecHeat * matReg->Thickness;
                     Alpha = kt / (RhoS * Cp);
                     mAlpha = 0.0;
 
@@ -750,7 +744,7 @@ namespace HeatBalFiniteDiffManager {
                 Ipts1 = int(mat->Thickness / dxn);
                 //  set high conductivity layers to a single full size node thickness. (two half nodes)
                 if (Ipts1 <= 1) Ipts1 = 1;
-                if (mat->ROnly || mat->group == Material::Group::Air) {
+                if (mat->ROnly || mat->group == Material::Group::AirGap) {
 
                     Ipts1 = 1; //  single full node in R layers- surfaces of adjacent material or inside/outside layer
                 }
@@ -869,9 +863,9 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).CpDelXRhoS1 = 0.0;
             SurfaceFD(Surf).CpDelXRhoS2 = 0.0;
             SurfaceFD(Surf).TDpriortimestep = 0.0;
-            SurfaceFD(Surf).PhaseChangeState = 0;
-            SurfaceFD(Surf).PhaseChangeStateOld = 0;
-            SurfaceFD(Surf).PhaseChangeStateOldOld = 0;
+            SurfaceFD(Surf).PhaseChangeState = Material::Phase::Transition;
+            SurfaceFD(Surf).PhaseChangeStateOld = Material::Phase::Transition;
+            SurfaceFD(Surf).PhaseChangeStateOldOld = Material::Phase::Transition;
             SurfaceFD(Surf).PhaseChangeTemperatureReverse = 50;
             SurfaceFD(Surf).condNodeReport = 0.0;
             SurfaceFD(Surf).specHeatNodeReport = 0.0;
@@ -999,14 +993,14 @@ namespace HeatBalFiniteDiffManager {
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change State {}", node),
                                     Constant::Units::None,
-                                    SurfaceFD(SurfNum).PhaseChangeState(node),
+                                    (int&)SurfaceFD(SurfNum).PhaseChangeState(node),
                                     OutputProcessor::TimeStepType::Zone,
                                     OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Previous State {}", node),
                                     Constant::Units::None,
-                                    SurfaceFD(SurfNum).PhaseChangeStateOld(node),
+                                    (int&)SurfaceFD(SurfNum).PhaseChangeStateOld(node),
                                     OutputProcessor::TimeStepType::Zone,
                                     OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
@@ -1258,14 +1252,14 @@ namespace HeatBalFiniteDiffManager {
                 // to either liquid or solid), the temperature at which it changes its direction is saved
                 // in the variable PhaseChangeTemperatureReverse, and this variable will hold the value of the temperature until
                 // the next reverse in the process takes place.
-                if (((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING &&
-                      surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION) ||
-                     (surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
-                      surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING)) ||
-                    ((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING &&
-                      surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION) ||
-                     (surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
-                      surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING))) {
+                if (((surfaceFD.PhaseChangeStateOld(I) == Material::Phase::Freezing &&
+                      surfaceFD.PhaseChangeState(I) == Material::Phase::Transition) ||
+                     (surfaceFD.PhaseChangeStateOld(I) == Material::Phase::Transition &&
+                      surfaceFD.PhaseChangeState(I) == Material::Phase::Freezing)) ||
+                    ((surfaceFD.PhaseChangeStateOld(I) == Material::Phase::Melting &&
+                      surfaceFD.PhaseChangeState(I) == Material::Phase::Transition) ||
+                     (surfaceFD.PhaseChangeStateOld(I) == Material::Phase::Transition &&
+                      surfaceFD.PhaseChangeState(I) == Material::Phase::Melting))) {
                     surfaceFD.PhaseChangeTemperatureReverse(I) = surfaceFD.TDT(I);
                 }
             }
@@ -1630,7 +1624,7 @@ namespace HeatBalFiniteDiffManager {
 
                 int const ConstrNum(surface.Construction);
                 int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-                auto const *mat(dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->materials(MatLay)));
+                auto *mat = state.dataMaterial->materials(MatLay);
                 auto const &matFD(s_hbfd->MaterialFD(MatLay));
                 auto const &condActuator = s_hbfd->SurfaceFD(Surf).condMaterialActuators(Lay);
                 auto const &specHeatActuator = s_hbfd->SurfaceFD(Surf).specHeatMaterialActuators(Lay);
@@ -1639,7 +1633,7 @@ namespace HeatBalFiniteDiffManager {
 
                 // Calculate the Dry Heat Conduction Equation
 
-                if (mat->ROnly || mat->group == Material::Group::Air) { // R Layer or Air Layer  **********
+                if (mat->ROnly || mat->group == Material::Group::AirGap) { // R Layer or Air Layer  **********
                     // Use algebraic equation for TDT based on R
                     Real64 const Rlayer(mat->Resistance);
                     TDT_i = (TDT_p + (QRadSWOutFD + hgnd * Tgnd + (hconvo + hrad) * Toa + hsky * Tsky) * Rlayer) /
@@ -1669,10 +1663,11 @@ namespace HeatBalFiniteDiffManager {
                     assert(matFD_TempEnth.u2() >= 3);
                     Real64 const lTE(matFD_TempEnth.index(2, 1));
                     Real64 RhoS(mat->Density);
-                    if (mat->phaseChange) {
-                        adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt);
-                        s_hbfd->SurfaceFD(Surf).EnthalpyF = mat->phaseChange->enthalpyF;
-                        s_hbfd->SurfaceFD(Surf).EnthalpyM = mat->phaseChange->enthalpyM;
+                    if (mat->hasPCM) {
+                        auto *matPC = dynamic_cast<Material::MaterialPhaseChange *>(mat);
+                        adjustPropertiesForPhaseChange(state, i, Surf, matPC, TD_i, TDT_i, Cp, RhoS, kt);
+                        s_hbfd->SurfaceFD(Surf).EnthalpyF = matPC->enthalpyF;
+                        s_hbfd->SurfaceFD(Surf).EnthalpyM = matPC->enthalpyM;
                     } else if (matFD_TempEnth[lTE] + matFD_TempEnth[lTE + 1] + matFD_TempEnth[lTE + 2] >=
                                0.0) { // Phase change material: Use TempEnth data to generate Cp
                         // Enthalpy function used to get average specific heat. Updated by GS so enthalpy function is followed.
@@ -1799,7 +1794,7 @@ namespace HeatBalFiniteDiffManager {
         auto &s_hbfd = state.dataHeatBalFiniteDiffMgr;
         
         int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-        auto const *mat = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->materials(MatLay));
+        auto *mat = state.dataMaterial->materials(MatLay);
         auto const &matFD = s_hbfd->MaterialFD(MatLay);
         auto const &condActuator = s_hbfd->SurfaceFD(Surf).condMaterialActuators(Lay);
         auto const &specHeatActuator = s_hbfd->SurfaceFD(Surf).specHeatMaterialActuators(Lay);
@@ -1837,10 +1832,11 @@ namespace HeatBalFiniteDiffManager {
         assert(matFD_TempEnth.u2() >= 3);
         Real64 const lTE(matFD_TempEnth.index(2, 1));
         Real64 RhoS(mat->Density);
-        if (mat->phaseChange) {
-            adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt);
-            ktA1 = mat->phaseChange->getConductivity(TDT_ip);
-            ktA2 = mat->phaseChange->getConductivity(TDT_mi);
+        if (mat->hasPCM) {
+            auto *matPC = dynamic_cast<Material::MaterialPhaseChange *>(mat);
+            adjustPropertiesForPhaseChange(state, i, Surf, matPC, TD_i, TDT_i, Cp, RhoS, kt);
+            ktA1 = matPC->getConductivity(TDT_ip);
+            ktA2 = matPC->getConductivity(TDT_mi);
         } else if (matFD_TempEnth[lTE] + matFD_TempEnth[lTE + 1] + matFD_TempEnth[lTE + 2] >= 0.0) { // Phase change material: Use TempEnth data
             EnthOld(i) = terpld(matFD_TempEnth, TD_i, 1, 2);                                         // 1: Temperature, 2: Enthalpy
             EnthNew(i) = terpld(matFD_TempEnth, TDT_i, 1, 2);                                        // 1: Temperature, 2: Enthalpy
@@ -1926,10 +1922,10 @@ namespace HeatBalFiniteDiffManager {
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
 
             int const MatLay(construct.LayerPoint(Lay));
-            auto const *mat(dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->materials(MatLay)));
+            auto *mat = state.dataMaterial->materials(MatLay);
 
             int const MatLay2(construct.LayerPoint(Lay + 1));
-            auto const *mat2(dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->materials(MatLay2)));
+            auto *mat2 = state.dataMaterial->materials(MatLay2);
 
             auto const &condActuator1 = surfFD.condMaterialActuators(Lay);
             auto const &condActuator2 = surfFD.condMaterialActuators(Lay + 1);
@@ -1942,8 +1938,8 @@ namespace HeatBalFiniteDiffManager {
             Real64 const TDT_m(TDT(i - 1));
             Real64 const TDT_p(TDT(i + 1));
 
-            bool const RLayerPresent(mat->ROnly || mat->group == Material::Group::Air);
-            bool const RLayer2Present(mat2->ROnly || mat2->group == Material::Group::Air);
+            bool const RLayerPresent(mat->ROnly || mat->group == Material::Group::AirGap);
+            bool const RLayer2Present(mat2->ROnly || mat2->group == Material::Group::AirGap);
 
             Real64 const Rlayer(mat->Resistance);   // Resistance value of R Layer
             Real64 const Rlayer2(mat2->Resistance); // Resistance value of next layer to inside
@@ -2050,8 +2046,10 @@ namespace HeatBalFiniteDiffManager {
                 if (RLayerPresent && !RLayer2Present) { // R-layer first
 
                     // Check for PCM second layer
-                    if (mat2->phaseChange) {
-                        adjustPropertiesForPhaseChange(state, i, SurfNum, mat2, TD_i, TDT_i, Cp2, RhoS2, kt2);
+                    if (mat2->hasPCM) {
+                        auto *matPC2 = dynamic_cast<Material::MaterialPhaseChange *>(mat);
+                        assert(matPC2 != nullptr);
+                        adjustPropertiesForPhaseChange(state, i, SurfNum, matPC2, TD_i, TDT_i, Cp2, RhoS2, kt2);
                     } else if ((matFD_sum < 0.0) && (matFD2_sum > 0.0)) {            // Phase change material Layer2, Use TempEnth Data
                         Real64 const Enth2Old(terpld(matFD2_TempEnth, TD_i, 1, 2));  // 1: Temperature, 2: Thermal conductivity
                         Real64 const Enth2New(terpld(matFD2_TempEnth, TDT_i, 1, 2)); // 1: Temperature, 2: Thermal conductivity
@@ -2100,8 +2098,9 @@ namespace HeatBalFiniteDiffManager {
                 } else if (!RLayerPresent && RLayer2Present) { // R-layer second
 
                     // Check for PCM layer before R layer
-                    if (mat->phaseChange) {
-                        adjustPropertiesForPhaseChange(state, i, SurfNum, mat, TD_i, TDT_i, Cp1, RhoS1, kt1);
+                    if (mat->hasPCM) {
+                        auto *matPC = dynamic_cast<Material::MaterialPhaseChange *>(mat);
+                        adjustPropertiesForPhaseChange(state, i, SurfNum, matPC, TD_i, TDT_i, Cp1, RhoS1, kt1);
                     } else if ((matFD_sum > 0.0) && (matFD2_sum < 0.0)) {           // Phase change material Layer1, Use TempEnth Data
                         Real64 const Enth1Old(terpld(matFD_TempEnth, TD_i, 1, 2));  // 1: Temperature, 2: Thermal conductivity
                         Real64 const Enth1New(terpld(matFD_TempEnth, TDT_i, 1, 2)); // 1: Temperature, 2: Thermal conductivity
@@ -2190,11 +2189,13 @@ namespace HeatBalFiniteDiffManager {
 
                     } // Phase change material check
 
-                    if (mat->phaseChange) {
-                        adjustPropertiesForPhaseChange(state, i, SurfNum, mat, TD_i, TDT_i, Cp1, RhoS1, kt1);
+                    if (mat->hasPCM) {
+                        auto *matPC = dynamic_cast<Material::MaterialPhaseChange *>(mat);
+                        adjustPropertiesForPhaseChange(state, i, SurfNum, matPC, TD_i, TDT_i, Cp1, RhoS1, kt1);
                     }
-                    if (mat2->phaseChange) {
-                        adjustPropertiesForPhaseChange(state, i, SurfNum, mat2, TD_i, TDT_i, Cp2, RhoS2, kt2);
+                    if (mat2->hasPCM) {
+                        auto *matPC2 = dynamic_cast<Material::MaterialPhaseChange *>(mat2);
+                        adjustPropertiesForPhaseChange(state, i, SurfNum, matPC2, TD_i, TDT_i, Cp2, RhoS2, kt2);
                     }
 
                     // EMS Conductivity 1 Override
@@ -2320,14 +2321,14 @@ namespace HeatBalFiniteDiffManager {
         Real64 const QFac(NetLWRadToSurfFD + QRadSWInFD + QRadThermInFD + SurfQdotRadHVACInPerAreaFD);
         if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-            auto const *mat(dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->materials(MatLay)));
+            auto *mat = state.dataMaterial->materials(MatLay);
             auto const &matFD(s_hbfd->MaterialFD(MatLay));
             auto const &condActuator = surfFD.condMaterialActuators(Lay);
             auto const &specHeatActuator = surfFD.specHeatMaterialActuators(Lay);
 
             // Calculate the Dry Heat Conduction Equation
 
-            if (mat->ROnly || mat->group == Material::Group::Air) { // R Layer or Air Layer
+            if (mat->ROnly || mat->group == Material::Group::AirGap) { // R Layer or Air Layer
                 // Use algebraic equation for TDT based on R
                 Real64 constexpr IterDampConst(
                     5.0); // Damping constant for inside surface temperature iterations. Only used for massless (R-value only) Walls
@@ -2364,8 +2365,9 @@ namespace HeatBalFiniteDiffManager {
                 auto const &matFD_TempEnth(matFD.TempEnth);
                 assert(matFD_TempEnth.u2() >= 3);
                 Real64 const lTE(matFD_TempEnth.index(2, 1));
-                if (mat->phaseChange) {
-                    adjustPropertiesForPhaseChange(state, i, SurfNum, mat, TD_i, TDT_i, Cp, RhoS, kt);
+                if (mat->hasPCM) { 
+                   auto *matPC = dynamic_cast<Material::MaterialPhaseChange *>(mat);
+                   adjustPropertiesForPhaseChange(state, i, SurfNum, matPC, TD_i, TDT_i, Cp, RhoS, kt);
                 } else if (matFD_TempEnth[lTE] + matFD_TempEnth[lTE + 1] + matFD_TempEnth[lTE + 2] >=
                            0.0) {                                     // Phase change material: Use TempEnth data
                     EnthOld(i) = terpld(matFD_TempEnth, TD_i, 1, 2);  // 1: Temperature, 2: Enthalpy
@@ -2663,7 +2665,7 @@ namespace HeatBalFiniteDiffManager {
     void adjustPropertiesForPhaseChange(EnergyPlusData &state,
                                         int finiteDifferenceLayerIndex,
                                         int surfNum,
-                                        const Material::MaterialBase *matBase,
+                                        Material::MaterialPhaseChange *mat,
                                         Real64 temperaturePrevious,
                                         Real64 temperatureUpdated,
                                         Real64 &updatedSpecificHeat,
@@ -2673,15 +2675,14 @@ namespace HeatBalFiniteDiffManager {
         auto &s_hbfd = state.dataHeatBalFiniteDiffMgr;
         auto &surfFD = s_hbfd->SurfaceFD(surfNum);
             
-        auto const *mat = dynamic_cast<const Material::MaterialChild *>(matBase);
-        updatedSpecificHeat = mat->phaseChange->getCurrentSpecificHeat(
+        updatedSpecificHeat = mat->getCurrentSpecificHeat(
             temperaturePrevious,
             temperatureUpdated,
             surfFD.PhaseChangeTemperatureReverse(finiteDifferenceLayerIndex),
             surfFD.PhaseChangeStateOld(finiteDifferenceLayerIndex),
             surfFD.PhaseChangeState(finiteDifferenceLayerIndex));
-        updatedDensity = mat->phaseChange->getDensity(temperaturePrevious);
-        updatedThermalConductivity = mat->phaseChange->getConductivity(temperatureUpdated);
+        updatedDensity = mat->getDensity(temperaturePrevious);
+        updatedThermalConductivity = mat->getConductivity(temperatureUpdated);
     }
 
     bool findAnySurfacesUsingConstructionAndCondFD(EnergyPlusData const &state, int const constructionNum)

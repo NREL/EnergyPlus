@@ -60,21 +60,6 @@ namespace EnergyPlus {
 
 namespace DataComplexFenestration {
 
-    struct GapSupportPillar
-    {
-        // Members
-        std::string Name;     // Name of support pillar
-        Real64 Spacing = 0.0; // Spacing between centers of support pillars (m)
-        Real64 Radius = 0.0;  // Support pillar radius (m)
-    };
-
-    struct GapDeflectionState
-    {
-        // Members
-        std::string Name; // Name of deflection state
-        Real64 DeflectedThickness = 0.0;
-    };
-
 } // namespace DataComplexFenestration
 
 } // namespace EnergyPlus

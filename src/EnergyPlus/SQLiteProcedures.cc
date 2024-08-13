@@ -2224,6 +2224,8 @@ bool SQLite::ZoneGroup::insertIntoSQLite(sqlite3_stmt *insertStmt)
 }
 bool SQLite::Material::insertIntoSQLite(sqlite3_stmt *insertStmt)
 {
+    double isoMoistCap = 0.0;
+    double thermGradCoef = 0.0;
     sqliteBindInteger(insertStmt, 1, number);
     sqliteBindText(insertStmt, 2, name);
     sqliteBindInteger(insertStmt, 3, static_cast<int>(group));

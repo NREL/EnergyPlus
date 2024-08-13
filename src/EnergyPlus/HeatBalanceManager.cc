@@ -62,7 +62,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
-#include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -262,9 +261,11 @@ namespace HeatBalanceManager {
 
         GetSiteAtmosphereData(state, ErrorsFound);
 
-        GetWindowGlassSpectralData(state, ErrorsFound);
+        Material::GetWindowGlassSpectralData(state, ErrorsFound);
 
         Material::GetMaterialData(state, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+
+        Material::GetHysteresisData(state, ErrorsFound); 
 
         GetFrameAndDividerData(state);
 
@@ -1317,154 +1318,6 @@ namespace HeatBalanceManager {
         print(state.files.eio, Format_720, state.dataEnvrn->SiteWindExp, state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteTempGradient);
     }
 
-    void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Winkelmann
-        //       DATE WRITTEN   May 2000
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Gets spectral data (transmittance, front reflectance, and back
-        // reflectance at normal incidence vs. wavelength) for glass
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr std::string_view routineName = "GetWindowGlassSpectralData";
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int IOStat;                      // IO Status when calling get input subroutine
-        Array1D_string SpecDataNames(1); // Spectral data alpha names
-        int SpecDataNumAlpha;            // Number of spectral data alpha names being passed
-        int SpecDataNumProp;             // Number of spectral data properties being passed
-        Array1D<Real64> SpecDataProps;   // Temporary array to transfer spectal data properties
-        int Loop;
-        int LamNum; // Wavelength number
-        Real64 Lam; // Wavelength (microns)
-        Real64 Tau; // Transmittance, front reflectance, back reflectance
-        Real64 RhoF;
-        Real64 RhoB;
-
-        state.dataHeatBalMgr->CurrentModuleObject = "MaterialProperty:GlazingSpectralData";
-        state.dataHeatBal->TotSpectralData =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
-        state.dataHeatBal->SpectralData.allocate(state.dataHeatBal->TotSpectralData);
-        if (state.dataHeatBal->TotSpectralData > 0) SpecDataProps.allocate(Construction::MaxSpectralDataElements * 4);
-
-        for (Loop = 1; Loop <= state.dataHeatBal->TotSpectralData; ++Loop) {
-
-            // Call Input Get routine to retrieve spectral data
-            // Name is followed by up to 450 sets of normal-incidence measured values of
-            // [wavelength (microns), transmittance, front reflectance, back reflectance] for
-            // wavelengths covering the short-wave solar spectrum (from about 0.25 to 2.5 microns)
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     state.dataHeatBalMgr->CurrentModuleObject,
-                                                                     Loop,
-                                                                     SpecDataNames,
-                                                                     SpecDataNumAlpha,
-                                                                     SpecDataProps,
-                                                                     SpecDataNumProp,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-
-            // Load the spectral data derived type from the input data.
-            state.dataHeatBal->SpectralData(Loop).Name = SpecDataNames(1);
-            int TotLam = SpecDataNumProp / 4;
-            if (mod(SpecDataNumProp, 4) != 0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" invalid set.", routineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
-                ShowContinueError(
-                    state,
-                    format("... set not even multiple of 4 items (Wavelength,Trans,ReflFront,ReflBack), number of items in dataset = {}",
-                           SpecDataNumProp));
-                ShowContinueError(state, format("... remainder after div by 4 = {}, remainder items will be set to 0.0", mod(SpecDataNumProp, 4)));
-                SpecDataProps({SpecDataNumProp + 1, min(SpecDataNumProp + 4, Construction::MaxSpectralDataElements * 4)}) = 0.0;
-            }
-            if (TotLam > Construction::MaxSpectralDataElements) {
-                ErrorsFound = true;
-                ShowSevereError(state, format("{}: {}=\"{}\" invalid set.", routineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
-                ShowContinueError(
-                    state,
-                    format("... More than max [{}] (Wavelength,Trans,ReflFront,ReflBack) entries in set.", Construction::MaxSpectralDataElements));
-                continue;
-            }
-            state.dataHeatBal->SpectralData(Loop).NumOfWavelengths = TotLam;
-
-            state.dataHeatBal->SpectralData(Loop).WaveLength.allocate(TotLam); // Wavelength (microns)
-            state.dataHeatBal->SpectralData(Loop).Trans.allocate(TotLam);      // Transmittance at normal incidence
-            state.dataHeatBal->SpectralData(Loop).ReflFront.allocate(TotLam);  // Front reflectance at normal incidence
-            state.dataHeatBal->SpectralData(Loop).ReflBack.allocate(TotLam);   // Back reflectance at normal incidence
-
-            for (LamNum = 1; LamNum <= TotLam; ++LamNum) {
-                state.dataHeatBal->SpectralData(Loop).WaveLength(LamNum) = SpecDataProps(4 * LamNum - 3);
-                state.dataHeatBal->SpectralData(Loop).Trans(LamNum) = SpecDataProps(4 * LamNum - 2);
-                // Following is needed since angular calculation in subr TransAndReflAtPhi
-                // fails for Trans = 0.0
-                if (state.dataHeatBal->SpectralData(Loop).Trans(LamNum) < 0.001) state.dataHeatBal->SpectralData(Loop).Trans(LamNum) = 0.001;
-                state.dataHeatBal->SpectralData(Loop).ReflFront(LamNum) = SpecDataProps(4 * LamNum - 1);
-                state.dataHeatBal->SpectralData(Loop).ReflBack(LamNum) = SpecDataProps(4 * LamNum);
-            }
-
-            // Check integrity of the spectral data
-            for (LamNum = 1; LamNum <= TotLam; ++LamNum) {
-                Lam = state.dataHeatBal->SpectralData(Loop).WaveLength(LamNum);
-                Tau = state.dataHeatBal->SpectralData(Loop).Trans(LamNum);
-                RhoF = state.dataHeatBal->SpectralData(Loop).ReflFront(LamNum);
-                RhoB = state.dataHeatBal->SpectralData(Loop).ReflBack(LamNum);
-                if (LamNum < TotLam) {
-                    if (state.dataHeatBal->SpectralData(Loop).WaveLength(LamNum + 1) <= Lam) {
-                        ErrorsFound = true;
-                        ShowSevereError(state,
-                                        format("{}{}=\"{}\" invalid set.", routineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
-                        ShowContinueError(state,
-                                          format("... Wavelengths not in increasing order. at wavelength#={}, value=[{:.4T}], next is [{:.4T}].",
-                                                 LamNum,
-                                                 Lam,
-                                                 state.dataHeatBal->SpectralData(Loop).WaveLength(LamNum + 1)));
-                    }
-                }
-
-                if (Lam < 0.1 || Lam > 4.0) {
-                    ErrorsFound = true;
-                    ShowSevereError(state,
-                                    format("{}{}=\"{}\" invalid value.", routineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
-                    ShowContinueError(
-                        state, format("... A wavelength is not in the range 0.1 to 4.0 microns; at wavelength#={}, value=[{:.4T}].", LamNum, Lam));
-                }
-
-                // TH 2/15/2011. CR 8343
-                // IGDB (International Glazing Database) does not meet the above strict restrictions.
-                //  Relax rules to allow directly use of spectral data from IGDB
-                if (Tau > 1.01) {
-                    ErrorsFound = true;
-                    ShowSevereError(state,
-                                    format("{}: {}=\"{}\" invalid value.", routineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
-                    ShowContinueError(state, format("... A transmittance is > 1.0; at wavelength#={}, value=[{:.4T}].", LamNum, Tau));
-                }
-
-                if (RhoF < 0.0 || RhoF > 1.02 || RhoB < 0.0 || RhoB > 1.02) {
-                    ErrorsFound = true;
-                    ShowSevereError(state,
-                                    format("{}: {}=\"{}\" invalid value.", routineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
-                    ShowContinueError(state, format("... A reflectance is < 0.0 or > 1.0; at wavelength#={}, RhoF value=[{:.4T}].", LamNum, RhoF));
-                    ShowContinueError(state, format("... A reflectance is < 0.0 or > 1.0; at wavelength#={}, RhoB value=[{:.4T}].", LamNum, RhoB));
-                }
-
-                if ((Tau + RhoF) > 1.03 || (Tau + RhoB) > 1.03) {
-                    ErrorsFound = true;
-                    ShowSevereError(state,
-                                    format("{}: {}=\"{}\" invalid value.", routineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
-                    ShowContinueError(state,
-                                      format("... Transmittance + reflectance) > 1.0 for an entry; at wavelength#={}",
-                                             format("{}, value(Tau+RhoF)=[{:.4T}], value(Tau+RhoB)=[{:.4T}].", LamNum, (Tau + RhoF), (Tau + RhoB))));
-                }
-            }
-        }
-
-        if (state.dataHeatBal->TotSpectralData > 0) SpecDataProps.deallocate();
-    }
-
     void GetConstructData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
     {
 
@@ -1484,6 +1337,8 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using namespace DataStringGlobals;
+
+        static constexpr std::string_view routineName = "GetConstructData";
 
         // If UniqueConstructionNames size, then input has already been gotten
         if (state.dataHeatBalMgr->UniqueConstructNames.size()) return;
@@ -1507,6 +1362,7 @@ namespace HeatBalanceManager {
         int iMatGlass; // number of glass layers
         Array1D_string WConstructNames;
 
+        auto &s_ipsc = state.dataIPShortCut;
         auto &s_mat = state.dataMaterial;
         
         // Get the Total number of Constructions from the input
@@ -1566,22 +1422,25 @@ namespace HeatBalanceManager {
 
         int ConstrNum = 0;
 
-        state.dataHeatBalMgr->CurrentModuleObject = "Construction";
+        s_ipsc->cCurrentModuleObject = "Construction";
         for (int Loop = 1; Loop <= TotRegConstructs; ++Loop) { // Loop through all constructs in the input...
 
             // Get the object names for each construction from the input processor
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     s_ipsc->cCurrentModuleObject,
                                                                      Loop,
                                                                      ConstructAlphas,
                                                                      ConstructNumAlpha,
                                                                      DummyProps,
                                                                      DummyNumProp,
                                                                      IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                     s_ipsc->lNumericFieldBlanks,
+                                                                     s_ipsc->lAlphaFieldBlanks,
+                                                                     s_ipsc->cAlphaFieldNames,
+                                                                     s_ipsc->cNumericFieldNames);
+
+            ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, ConstructAlphas(1)};
+            
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          ConstructAlphas(0),
@@ -1590,9 +1449,6 @@ namespace HeatBalanceManager {
                                                          ErrorsFound)) {
                 continue;
             }
-
-            // Glass layer counter
-            iMatGlass = 0;
 
             ++ConstrNum;
             auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
@@ -1604,63 +1460,51 @@ namespace HeatBalanceManager {
 
             // Loop through all of the layers of the construct to match the material names.
             // The loop index is the number minus 1
-            for (int Layer = 1; Layer <= ConstructNumAlpha - 1; ++Layer) {
+
+            for (int GlassLayer = 0, Layer = 1; Layer <= ConstructNumAlpha - 1; ++Layer) {
 
                 // Find the material in the list of materials
-
                 thisConstruct.LayerPoint(Layer) = Material::GetMaterialNum(state, ConstructAlphas(Layer));
 
-                // count number of glass layers
-                if (thisConstruct.LayerPoint(Layer) > 0) {
-                    auto const *mat = s_mat->materials(thisConstruct.LayerPoint(Layer));
-                    if (mat->group == Material::Group::WindowGlass) ++iMatGlass;
-                    if ((mat->group == Material::Group::GlassEquivalentLayer) ||
-                        (mat->group == Material::Group::ShadeEquivalentLayer) ||
-                        (mat->group == Material::Group::DrapeEquivalentLayer) ||
-                        (mat->group == Material::Group::BlindEquivalentLayer) ||
-                        (mat->group == Material::Group::ScreenEquivalentLayer) ||
-                        (mat->group == Material::Group::GapEquivalentLayer)) {
-                        ShowSevereError(
-                            state,
-                            format("Invalid material layer type in window {} = {}", state.dataHeatBalMgr->CurrentModuleObject, thisConstruct.Name));
-                        ShowSevereError(
-                            state,
-                            format("Equivalent Layer material type = {} is allowed only in Construction:WindowEquivalentLayer window object.",
-                                   ConstructAlphas(Layer)));
-                        ErrorsFound = true;
-                    }
-                }
-
                 if (thisConstruct.LayerPoint(Layer) == 0) {
-                    // This may be a TC GlazingGroup
-                    thisConstruct.LayerPoint(Layer) = Util::FindItemInList(ConstructAlphas(Layer), state.dataHeatBal->TCGlazings);
-
-                    if (thisConstruct.LayerPoint(Layer) > 0) {
-                        // reset layer pointer to the first glazing in the TC GlazingGroup
-                        thisConstruct.LayerPoint(Layer) = state.dataHeatBal->TCGlazings(thisConstruct.LayerPoint(Layer)).LayerPoint(1);
-                        thisConstruct.TCLayer = thisConstruct.LayerPoint(Layer);
-                        if (s_mat->materials(thisConstruct.LayerPoint(Layer))->group == Material::Group::WindowGlass) ++iMatGlass;
-                        thisConstruct.TCFlag = 1;
-                        thisConstruct.TCMasterConst = ConstrNum;
-                        thisConstruct.TCGlassID = iMatGlass; // the TC glass layer ID
-                        thisConstruct.TCLayerID = Layer;
-                        thisConstruct.TypeIsWindow = true;
-                    }
-                }
-
-                if (thisConstruct.LayerPoint(Layer) == 0) {
-                    ShowSevereError(state,
-                                    format("Did not find matching material for {} {}, missing material = {}",
-                                           state.dataHeatBalMgr->CurrentModuleObject,
-                                           thisConstruct.Name,
-                                           ConstructAlphas(Layer)));
+                    ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(Layer), ConstructAlphas(Layer));
                     ErrorsFound = true;
-                } else {
-                    state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += state.dataHeatBal->NominalR(thisConstruct.LayerPoint(Layer));
-                    auto const *mat = s_mat->materials(thisConstruct.LayerPoint(Layer));
-                    if (mat->group == Material::Group::Regular && !mat->ROnly) {
-                        state.dataHeatBal->NoRegularMaterialsUsed = false;
-                    }
+                    continue;
+                }
+
+                auto const *mat = s_mat->materials(thisConstruct.LayerPoint(Layer));
+                if (mat->group == Material::Group::Glass) {
+                    ++GlassLayer;
+                } else if (mat->group == Material::Group::GlassEQL || mat->group == Material::Group::ShadeEQL ||
+                           mat->group == Material::Group::DrapeEQL || mat->group == Material::Group::BlindEQL ||
+                           mat->group == Material::Group::ScreenEQL || mat->group == Material::Group::WindowGapEQL) {
+                    ShowSevereError(
+                                    state,
+                                    format("Invalid material layer type in window {} = {}", s_ipsc->cCurrentModuleObject, thisConstruct.Name));
+                    ShowContinueError(
+                                      state,
+                                      format("Equivalent Layer material type = {} is allowed only in Construction:WindowEquivalentLayer window object.",
+                                             ConstructAlphas(Layer)));
+                    ErrorsFound = true;
+                    continue;
+                } else if (mat->group == Material::Group::GlassTCParent) {
+                    // reset layer pointer to the first glazing in the TC GlazingGroup
+                    auto const *matGlassTC = dynamic_cast<Material::MaterialGlassTC const *>(mat);
+                    assert(matGlassTC != nullptr);
+                    
+                    thisConstruct.LayerPoint(Layer) = matGlassTC->matRefs(1).matNum;
+                    if (s_mat->materials(thisConstruct.LayerPoint(Layer))->group == Material::Group::Glass) ++iMatGlass;
+                    thisConstruct.isTCWindow = true;
+                    thisConstruct.isTCMaster = true;
+                    thisConstruct.TCMasterConstrNum = ConstrNum;
+                    thisConstruct.TCGlassNum = GlassLayer; // the TC glass layer ID
+                    thisConstruct.TCLayerNum = Layer;
+                    thisConstruct.TypeIsWindow = true;
+                }
+
+                state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += mat->NominalR;
+                if (mat->group == Material::Group::Regular && !mat->ROnly) {
+                    state.dataHeatBal->NoRegularMaterialsUsed = false;
                 }
 
             } // ...end of the Layer DO loop
@@ -1837,12 +1681,12 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     auto const *mat = s_mat->materials(state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer));
-                    if (!((mat->group == Material::Group::GlassEquivalentLayer) ||
-                          (mat->group == Material::Group::ShadeEquivalentLayer) ||
-                          (mat->group == Material::Group::DrapeEquivalentLayer) ||
-                          (mat->group == Material::Group::BlindEquivalentLayer) ||
-                          (mat->group == Material::Group::ScreenEquivalentLayer) ||
-                          (mat->group == Material::Group::GapEquivalentLayer))) {
+                    if (!((mat->group == Material::Group::GlassEQL) ||
+                          (mat->group == Material::Group::ShadeEQL) ||
+                          (mat->group == Material::Group::DrapeEQL) ||
+                          (mat->group == Material::Group::BlindEQL) ||
+                          (mat->group == Material::Group::ScreenEQL) ||
+                          (mat->group == Material::Group::WindowGapEQL))) {
                         ShowSevereError(state,
                                         format("Invalid material layer type in window {} = {}",
                                                state.dataHeatBalMgr->CurrentModuleObject,
@@ -1857,8 +1701,8 @@ namespace HeatBalanceManager {
                     if (ConstructNumAlpha <= 2) {
 
                     } else {
-                        state.dataHeatBal->NominalRforNominalUCalculation(TotRegConstructs + ConstrNum) +=
-                            state.dataHeatBal->NominalR(state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer));
+                        auto const *mat = s_mat->materials(state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer));
+                        state.dataHeatBal->NominalRforNominalUCalculation(TotRegConstructs + ConstrNum) += mat->NominalR;
                     }
                 }
 
@@ -2302,10 +2146,10 @@ namespace HeatBalanceManager {
             auto const &Constr = state.dataConstruction->Construct(ConstrNum);
             auto const *mat = s_mat->materials(Constr.LayerPoint(Constr.TotLayers));
             bool withNoncompatibleShades =
-                (mat->group == Material::Group::Shade || mat->group == Material::Group::WindowBlind || mat->group == Material::Group::Screen ||
-                 mat->group == Material::Group::GlassEquivalentLayer || mat->group == Material::Group::GapEquivalentLayer ||
-                 mat->group == Material::Group::ShadeEquivalentLayer || mat->group == Material::Group::DrapeEquivalentLayer ||
-                 mat->group == Material::Group::ScreenEquivalentLayer || mat->group == Material::Group::BlindEquivalentLayer || Surf.HasShadeControl);
+                (mat->group == Material::Group::Shade || mat->group == Material::Group::Blind || mat->group == Material::Group::Screen ||
+                 mat->group == Material::Group::GlassEQL || mat->group == Material::Group::WindowGapEQL ||
+                 mat->group == Material::Group::ShadeEQL || mat->group == Material::Group::DrapeEQL ||
+                 mat->group == Material::Group::ScreenEQL || mat->group == Material::Group::BlindEQL || Surf.HasShadeControl);
             if (withNoncompatibleShades) {
                 ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
                 ErrorsFound = true;
@@ -4173,18 +4017,14 @@ namespace HeatBalanceManager {
 
             // Create Material objects
 
-            // reallocate Material type
-
-            state.dataHeatBal->NominalR.redimension(s_mat->TotMaterials, 0.0);
-
             // Glass objects
             NextLine = W5DataFile.readLine();
             if (NextLine.eof) goto Label1000;
             ++FileLineCount;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                    auto *mat = new Material::MaterialChild;
-                    mat->group = Material::Group::WindowGlass;
+                    auto *mat = new Material::MaterialGlass;
+                    mat->group = Material::Group::Glass;
                     mat->Name = (NGlSys == 1) ? format("W5:{}:GLASS{}", DesiredConstructionName, NumName(IGlass)) :
                             format("W5:{}:{}:GLASS{}", DesiredConstructionName, NumName(IGlSys), NumName(IGlass));
 
@@ -4280,7 +4120,7 @@ namespace HeatBalanceManager {
                     }
                     // Nominal resistance of gap at room temperature (based on first gas in mixture)
                     auto const &gas0 = matGas->gases[0];
-                    state.dataHeatBal->NominalR(matNum) = matGas->Thickness / (gas0.con.c0 + gas0.con.c1 * 300.0 + gas0.con.c2 * 90000.0);
+                    matGas->NominalR = matGas->Thickness / (gas0.con.c0 + gas0.con.c1 * 300.0 + gas0.con.c2 * 90000.0);
                 }
             }
 
@@ -4533,9 +4373,9 @@ namespace HeatBalanceManager {
                     int matNum = thisConstruct.LayerPoint(loop);
                     auto const *matBase = s_mat->materials(matNum);
                     assert(matBase != nullptr);
-                    if (matBase->group == Material::Group::WindowGlass) {
+                    if (matBase->group == Material::Group::Glass) {
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += matBase->Thickness / matBase->Conductivity;
-                    } else if (matBase->group == Material::Group::WindowGas || matBase->group == Material::Group::WindowGasMixture) {
+                    } else if (matBase->group == Material::Group::Gas || matBase->group == Material::Group::GasMixture) {
                         auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(matBase);
                         assert(matGas != nullptr);
 
@@ -4823,8 +4663,8 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
             }
 
-            s_mat->materials(thisConstruct.LayerPoint(1))->Resistance = Rfic;
-            state.dataHeatBal->NominalR(thisConstruct.LayerPoint(1)) = Rfic;
+            auto *mat = s_mat->materials(thisConstruct.LayerPoint(1));
+            mat->Resistance = mat->NominalR = Rfic;
 
             // excluding thermal resistance of inside or outside air film
             // 1/Reff gets reported as the "U-Factor no Film" in the summary report Envelope Summary | Opaque Exterior
@@ -4920,8 +4760,8 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
             }
 
-            s_mat->materials(thisConstruct.LayerPoint(1))->Resistance = Rfic;
-            state.dataHeatBal->NominalR(thisConstruct.LayerPoint(1)) = Rfic;
+            auto *mat = s_mat->materials(thisConstruct.LayerPoint(1));
+            mat->Resistance = mat->NominalR = Rfic;
 
             // Reff includes the wall itself and soil, but excluding thermal resistance of inside or outside air film
             // 1/Reff gets reported as the "U-Factor no Film" in the summary report Envelope Summary | Opaque Exterior
@@ -5344,16 +5184,13 @@ namespace HeatBalanceManager {
             
         int NumNewConst = 0;
         for (int Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
-            if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
-                auto const *mat = dynamic_cast<Material::MaterialChild *>(s_mat->materials(state.dataConstruction->Construct(Loop).TCLayer));
-                assert(mat != nullptr);
-                int iTCG = mat->TCParent;
-                if (iTCG == 0) continue; // hope this was caught already
-                int iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
-                for (int iTC = 1; iTC <= iMat; ++iTC) {
-                    ++NumNewConst;
-                }
-            }
+            auto &constr = state.dataConstruction->Construct(Loop);
+                
+            if (!constr.isTCMaster) continue;
+            
+            auto const *matGlassTC = dynamic_cast<Material::MaterialGlassTC const *>(s_mat->materials(constr.LayerPoint(constr.TCLayerNum)));
+            assert(matGlassTC != nullptr);
+            NumNewConst += matGlassTC->numMatRefs;
         }
 
         if (NumNewConst == 0) return; // no need to go further
@@ -5367,553 +5204,34 @@ namespace HeatBalanceManager {
 
         NumNewConst = state.dataHeatBal->TotConstructs;
         for (int Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
-            if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
-                auto const *mat = dynamic_cast<Material::MaterialChild *>(s_mat->materials(state.dataConstruction->Construct(Loop).TCLayer));
-                assert(mat != nullptr);
-                int iTCG = mat->TCParent;
-                if (iTCG == 0) continue; // hope this was caught already
-                int iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
-                for (int iTC = 1; iTC <= iMat; ++iTC) {
-                    ++NumNewConst;
-                    state.dataConstruction->Construct(NumNewConst) = state.dataConstruction->Construct(Loop); // copy data
-                    state.dataConstruction->Construct(NumNewConst).Name =
-                        format("{}_TC_{:.0R}", state.dataConstruction->Construct(Loop).Name, state.dataHeatBal->TCGlazings(iTCG).SpecTemp(iTC));
-                    state.dataConstruction->Construct(NumNewConst).TCLayer = state.dataHeatBal->TCGlazings(iTCG).LayerPoint(iTC);
-                    state.dataConstruction->Construct(NumNewConst).LayerPoint(state.dataConstruction->Construct(Loop).TCLayerID) =
-                        state.dataConstruction->Construct(NumNewConst).TCLayer;
-                    state.dataConstruction->Construct(NumNewConst).TCFlag = 1;
-                    state.dataConstruction->Construct(NumNewConst).TCMasterConst = Loop;
-                    state.dataConstruction->Construct(NumNewConst).TCLayerID = state.dataConstruction->Construct(Loop).TCLayerID;
-                    state.dataConstruction->Construct(NumNewConst).TCGlassID = state.dataConstruction->Construct(Loop).TCGlassID;
-                    state.dataConstruction->Construct(NumNewConst).TypeIsWindow = true;
-                }
+            auto &constr = state.dataConstruction->Construct(Loop);
+            if (!constr.isTCMaster) continue;
+            
+            auto const *matGlassTC = dynamic_cast<Material::MaterialGlassTC *>(s_mat->materials(constr.LayerPoint(constr.TCLayerNum)));
+            assert(matGlassTC != nullptr);
+
+            constr.numTCChildConstrs = matGlassTC->numMatRefs;
+            constr.TCChildConstrs.allocate(constr.numTCChildConstrs);
+
+            for (int iTC = 1; iTC <= constr.numTCChildConstrs; ++iTC) {
+                ++NumNewConst;
+                auto &constrNew = state.dataConstruction->Construct(NumNewConst);
+
+                constrNew = constr; // This should be a deep copy
+                constrNew.Name =  format("{}_TC_{:.0R}", constr.Name, matGlassTC->matRefs(iTC).specTemp);
+                constrNew.LayerPoint(constrNew.TCLayerNum) = matGlassTC->matRefs(iTC).matNum;
+
+                constr.TCChildConstrs(iTC).specTemp = matGlassTC->matRefs(iTC).specTemp;
+                constr.TCChildConstrs(iTC).constrNum = NumNewConst;
+
+                constrNew.isTCWindow = true;
+                constrNew.isTCMaster = false;
+                constrNew.TCMasterConstrNum = Loop;
             }
         }
         state.dataHeatBal->TotConstructs = NumNewConst;
     }
 
-    void SetupSimpleWindowGlazingSystem(EnergyPlusData &state, int matNum)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   January 2009
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Convert simple window performance indices into all the properties needed to
-        // describe a single, equivalent glass layer
-
-        // METHODOLOGY EMPLOYED:
-        // The simple window indices are converted to a single materal layer using a "block model"
-
-        // REFERENCES:
-        // draft paper by Arasteh, Kohler, and Griffith
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Riw(0.0);            // thermal resistance of interior film coefficient under winter conditions (m2-K/W)
-        Real64 Row(0.0);            // theraml resistance of exterior film coefficient under winter conditions (m2-K/W)
-        Real64 Rlw(0.0);            // thermal resistance of block model layer (m2-K/W)
-        Real64 Ris(0.0);            // thermal resistance of interior film coefficient under summer conditions (m2-K/W)
-        Real64 Ros(0.0);            // theraml resistance of exterior film coefficient under summer conditions (m2-K/W)
-        Real64 InflowFraction(0.0); // inward flowing fraction for SHGC, intermediate value non dimensional
-        Real64 SolarAbsorb(0.0);    // solar aborptance
-        bool ErrorsFound(false);
-        Real64 TsolLowSide(0.0);      // intermediate solar transmission for interpolating
-        Real64 TsolHiSide(0.0);       // intermediate solar transmission for interpolating
-        Real64 DeltaSHGCandTsol(0.0); // intermediate difference
-        Real64 RLowSide(0.0);
-        Real64 RHiSide(0.0);
-
-        auto &s_mat = state.dataMaterial;
-        
-        auto *mat = dynamic_cast<Material::MaterialChild *>(s_mat->materials(matNum));
-        assert(mat != nullptr);
-        // first fill out defaults
-        mat->GlassSpectralDataPtr = 0;
-        mat->SolarDiffusing = false;
-        mat->Roughness = Material::SurfaceRoughness::VerySmooth;
-        mat->TransThermal = 0.0;
-        mat->AbsorpThermalBack = 0.84;
-        mat->AbsorpThermalFront = 0.84;
-        mat->AbsorpThermal = mat->AbsorpThermalBack;
-
-        // step 1. Determine U-factor without film coefficients
-        // Simple window model has its own correlation for film coefficients (m2-K/W) under Winter conditions as function of U-factor
-        if (mat->SimpleWindowUfactor < 5.85) {
-            Riw = 1.0 / (0.359073 * std::log(mat->SimpleWindowUfactor) + 6.949915);
-        } else {
-            Riw = 1.0 / (1.788041 * mat->SimpleWindowUfactor - 2.886625);
-        }
-        Row = 1.0 / (0.025342 * mat->SimpleWindowUfactor + 29.163853);
-
-        // determine 1/U without film coefficients
-        Rlw = (1.0 / mat->SimpleWindowUfactor) - Riw - Row;
-        if (Rlw <= 0.0) { // U factor of film coefficients is better than user input.
-            Rlw = max(Rlw, 0.001);
-            ShowWarningError(state,
-                             format("WindowMaterial:SimpleGlazingSystem: {} has U-factor higher than that provided by surface film resistances, "
-                                    "Check value of U-factor",
-                                    mat->Name));
-        }
-
-        // Step 2. determine layer thickness.
-
-        if ((1.0 / Rlw) > 7.0) {
-            mat->Thickness = 0.002;
-        } else {
-            mat->Thickness = 0.05914 - (0.00714 / Rlw);
-        }
-
-        // Step 3. determine effective conductivity
-
-        mat->Conductivity = mat->Thickness / Rlw;
-        if (mat->Conductivity > 0.0) {
-            state.dataHeatBal->NominalR(matNum) = Rlw;
-            mat->Resistance = Rlw;
-        } else {
-            ErrorsFound = true;
-            ShowSevereError(
-                state,
-                format("WindowMaterial:SimpleGlazingSystem: {} has Conductivity <= 0.0, must be >0.0, Check value of U-factor", mat->Name));
-        }
-
-        // step 4. determine solar transmission (revised to 10-1-2009 version from LBNL.)
-
-        if (mat->SimpleWindowUfactor > 4.5) {
-
-            if (mat->SimpleWindowSHGC < 0.7206) {
-
-                mat->Trans = 0.939998 * pow_2(mat->SimpleWindowSHGC) + 0.20332 * mat->SimpleWindowSHGC;
-            } else { // >= 0.7206
-                mat->Trans = 1.30415 * mat->SimpleWindowSHGC - 0.30515;
-            }
-
-        } else if (mat->SimpleWindowUfactor < 3.4) {
-
-            if (mat->SimpleWindowSHGC <= 0.15) {
-                mat->Trans = 0.41040 * mat->SimpleWindowSHGC;
-            } else { // > 0.15
-                mat->Trans = 0.085775 * pow_2(mat->SimpleWindowSHGC) + 0.963954 * mat->SimpleWindowSHGC - 0.084958;
-            }
-        } else { // interpolate. 3.4 <= Ufactor <= 4.5
-
-            if (mat->SimpleWindowSHGC < 0.7206) {
-                TsolHiSide = 0.939998 * pow_2(mat->SimpleWindowSHGC) + 0.20332 * mat->SimpleWindowSHGC;
-            } else { // >= 0.7206
-                TsolHiSide = 1.30415 * mat->SimpleWindowSHGC - 0.30515;
-            }
-
-            if (mat->SimpleWindowSHGC <= 0.15) {
-                TsolLowSide = 0.41040 * mat->SimpleWindowSHGC;
-            } else { // > 0.15
-                TsolLowSide = 0.085775 * pow_2(mat->SimpleWindowSHGC) + 0.963954 * mat->SimpleWindowSHGC - 0.084958;
-            }
-
-            mat->Trans = ((mat->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (TsolHiSide - TsolLowSide) + TsolLowSide;
-        }
-        if (mat->Trans < 0.0) mat->Trans = 0.0;
-
-        // step 5.  determine solar reflectances
-
-        DeltaSHGCandTsol = mat->SimpleWindowSHGC - mat->Trans;
-
-        if (mat->SimpleWindowUfactor > 4.5) {
-
-            Ris = 1.0 / (29.436546 * pow_3(DeltaSHGCandTsol) - 21.943415 * pow_2(DeltaSHGCandTsol) + 9.945872 * DeltaSHGCandTsol + 7.426151);
-            Ros = 1.0 / (2.225824 * DeltaSHGCandTsol + 20.577080);
-        } else if (mat->SimpleWindowUfactor < 3.4) {
-
-            Ris = 1.0 / (199.8208128 * pow_3(DeltaSHGCandTsol) - 90.639733 * pow_2(DeltaSHGCandTsol) + 19.737055 * DeltaSHGCandTsol + 6.766575);
-            Ros = 1.0 / (5.763355 * DeltaSHGCandTsol + 20.541528);
-        } else { // interpolate. 3.4 <= Ufactor <= 4.5
-            // inside first
-            RLowSide = 1.0 / (199.8208128 * pow_3(DeltaSHGCandTsol) - 90.639733 * pow_2(DeltaSHGCandTsol) + 19.737055 * DeltaSHGCandTsol + 6.766575);
-            RHiSide = 1.0 / (29.436546 * pow_3(DeltaSHGCandTsol) - 21.943415 * pow_2(DeltaSHGCandTsol) + 9.945872 * DeltaSHGCandTsol + 7.426151);
-            Ris = ((mat->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (RLowSide - RHiSide) + RLowSide;
-            // then outside
-            RLowSide = 1.0 / (5.763355 * DeltaSHGCandTsol + 20.541528);
-            RHiSide = 1.0 / (2.225824 * DeltaSHGCandTsol + 20.577080);
-            Ros = ((mat->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (RLowSide - RHiSide) + RLowSide;
-        }
-
-        InflowFraction = (Ros + 0.5 * Rlw) / (Ros + Rlw + Ris);
-
-        SolarAbsorb = (mat->SimpleWindowSHGC - mat->Trans) / InflowFraction;
-        mat->ReflectSolBeamBack = 1.0 - mat->Trans - SolarAbsorb;
-        mat->ReflectSolBeamFront = mat->ReflectSolBeamBack;
-
-        // step 6. determine visible properties.
-        if (mat->SimpleWindowVTinputByUser) {
-            mat->TransVis = mat->SimpleWindowVisTran;
-            mat->ReflectVisBeamBack = -0.7409 * pow_3(mat->TransVis) + 1.6531 * pow_2(mat->TransVis) - 1.2299 * mat->TransVis + 0.4545;
-            if (mat->TransVis + mat->ReflectVisBeamBack >= 1.0) {
-                mat->ReflectVisBeamBack = 0.999 - mat->TransVis;
-            }
-
-            mat->ReflectVisBeamFront = -0.0622 * pow_3(mat->TransVis) + 0.4277 * pow_2(mat->TransVis) - 0.4169 * mat->TransVis + 0.2399;
-            if (mat->TransVis + mat->ReflectVisBeamFront >= 1.0) {
-                mat->ReflectVisBeamFront = 0.999 - mat->TransVis;
-            }
-        } else {
-            mat->TransVis = mat->Trans;
-            mat->ReflectVisBeamBack = mat->ReflectSolBeamBack;
-            mat->ReflectVisBeamFront = mat->ReflectSolBeamFront;
-        }
-
-        // step 7. The dependence on incident angle is in subroutine TransAndReflAtPhi
-
-        // step 8.  Hemispherical terms are averaged using standard method
-
-        if (ErrorsFound) {
-            ShowFatalError(state, "Program halted because of input problem(s) in WindowMaterial:SimpleGlazingSystem");
-        }
-    }
-
-    void SetupComplexFenestrationMaterialInput(EnergyPlusData &state,
-                                               [[maybe_unused]] int matNum, // num of material items thus far
-                                               bool &ErrorsFound)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Simon Vidanovic
-        //       DATE WRITTEN   March 2012
-        //       MODIFIED       May 2013 (Simon Vidanovic)
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // get input for complex fenestration materials
-
-        // METHODOLOGY EMPLOYED:
-        // usual GetInput processing.
-
-        // SUBROUTINE PARAMETER DEFINITIONS
-        static constexpr std::string_view routineName = "SetupComplexFenestrationMaterialInput";
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string MaterialNames(5);   // Number of Material Alpha names defined
-        Array1D<Real64> MaterialProps(27); // Temporary array to transfer material properties
-        int NumAlphas;                     // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                    // Number of Numbers for each GetObjectItem call
-        int IOStatus;                      // Used in GetObjectItem
-
-        auto &s_ipsc = state.dataIPShortCut;
-        auto &s_mat = state.dataMaterial;
-        
-        // Reading WindowGap:SupportPillar
-
-        s_ipsc->cCurrentModuleObject = "WindowGap:SupportPillar";
-        state.dataHeatBal->W7SupportPillars = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
-        state.dataHeatBal->SupportPillar.allocate(state.dataHeatBal->W7SupportPillars);
-        for (int Loop = 1; Loop <= state.dataHeatBal->W7SupportPillars; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     s_ipsc->cCurrentModuleObject,
-                                                                     Loop,
-                                                                     s_ipsc->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     s_ipsc->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     s_ipsc->lNumericFieldBlanks,
-                                                                     s_ipsc->lAlphaFieldBlanks,
-                                                                     s_ipsc->cAlphaFieldNames,
-                                                                     s_ipsc->cNumericFieldNames);
-
-            ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-            state.dataHeatBal->SupportPillar(Loop).Name = s_ipsc->cAlphaArgs(1);
-            state.dataHeatBal->SupportPillar(Loop).Spacing = s_ipsc->rNumericArgs(1);
-            state.dataHeatBal->SupportPillar(Loop).Radius = s_ipsc->rNumericArgs(2);
-
-            if (s_ipsc->rNumericArgs(1) <= 0.0) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
-            }
-
-            if (s_ipsc->rNumericArgs(2) <= 0.0) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
-            }
-        }
-
-        // Reading WindowGap:DeflectionState
-        s_ipsc->cCurrentModuleObject = "WindowGap:DeflectionState";
-        state.dataHeatBal->W7DeflectionStates = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
-        state.dataHeatBal->DeflectionState.allocate(state.dataHeatBal->W7DeflectionStates);
-        for (int Loop = 1; Loop <= state.dataHeatBal->W7DeflectionStates; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     s_ipsc->cCurrentModuleObject,
-                                                                     Loop,
-                                                                     s_ipsc->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     s_ipsc->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     s_ipsc->lNumericFieldBlanks,
-                                                                     s_ipsc->lAlphaFieldBlanks,
-                                                                     s_ipsc->cAlphaFieldNames,
-                                                                     s_ipsc->cNumericFieldNames);
-
-            ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-            state.dataHeatBal->DeflectionState(Loop).Name = s_ipsc->cAlphaArgs(1);
-            state.dataHeatBal->DeflectionState(Loop).DeflectedThickness = s_ipsc->rNumericArgs(1);
-            if (s_ipsc->rNumericArgs(1) < 0.0) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be >= 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
-            }
-        }
-
-        // Reading WindowMaterial:Gap
-
-        s_ipsc->cCurrentModuleObject = "WindowMaterial:Gap";
-        state.dataHeatBal->W7MaterialGaps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
-        // ALLOCATE(DeflectionState(W7DeflectionStates))
-        for (int Loop = 1; Loop <= state.dataHeatBal->W7MaterialGaps; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     s_ipsc->cCurrentModuleObject,
-                                                                     Loop,
-                                                                     s_ipsc->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     s_ipsc->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     s_ipsc->lNumericFieldBlanks,
-                                                                     s_ipsc->lAlphaFieldBlanks,
-                                                                     s_ipsc->cAlphaFieldNames,
-                                                                     s_ipsc->cNumericFieldNames);
-
-            ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-            
-            if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
-                ShowSevereDuplicateName(state, eoh);
-                ErrorsFound = true;
-                continue;
-            }
-
-            auto *mat = new Material::MaterialChild;
-            mat->Name = s_ipsc->cAlphaArgs(1);
-
-            s_mat->materials.push_back(mat);
-            mat->Num = s_mat->materials.isize();
-            s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-            
-            mat->group = Material::Group::ComplexWindowGap;
-            mat->Roughness = Material::SurfaceRoughness::Rough;
-            mat->ROnly = true;
-            
-            mat->Thickness = s_ipsc->rNumericArgs(1);
-            if (s_ipsc->rNumericArgs(1) <= 0.0) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh, format("{} must be > 0, entered {:.2R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
-            }
-
-            mat->Pressure = s_ipsc->rNumericArgs(2);
-            if (s_ipsc->rNumericArgs(2) <= 0.0) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh, format("{} must be > 0, entered {:.2R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
-            }
-
-            if (!s_ipsc->lAlphaFieldBlanks(2)) {
-                mat->GasPointer = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(2));
-            } else {
-                ShowSevereError(state,
-                                format("{}: {}=\"{}, object. Illegal value for {} has been found.",
-                                       routineName,
-                                       s_ipsc->cCurrentModuleObject,
-                                       s_ipsc->cAlphaArgs(1),
-                                       s_ipsc->cAlphaFieldNames(1)));
-                ShowContinueError(state, format("{} does not have assigned WindowMaterial:Gas or WindowMaterial:GasMixutre.", s_ipsc->cCurrentModuleObject));
-            }
-            if (!s_ipsc->lAlphaFieldBlanks(3)) {
-                mat->DeflectionStatePtr = Util::FindItemInList(s_ipsc->cAlphaArgs(3), state.dataHeatBal->DeflectionState);
-            }
-            if (!s_ipsc->lAlphaFieldBlanks(4)) {
-                mat->SupportPillarPtr = Util::FindItemInList(s_ipsc->cAlphaArgs(4), state.dataHeatBal->SupportPillar);
-            }
-        }
-
-        // Reading WindowMaterial:ComplexShade
-        s_ipsc->cCurrentModuleObject = "WindowMaterial:ComplexShade";
-        s_mat->TotComplexShades = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
-
-        if (s_mat->TotComplexShades > 0) {
-            s_mat->ComplexShade.allocate(s_mat->TotComplexShades); // Allocate the array Size to the number of complex shades
-        }
-
-        for (int Loop = 1; Loop <= s_mat->TotComplexShades; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     s_ipsc->cCurrentModuleObject,
-                                                                     Loop,
-                                                                     s_ipsc->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     s_ipsc->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     s_ipsc->lNumericFieldBlanks,
-                                                                     s_ipsc->lAlphaFieldBlanks,
-                                                                     s_ipsc->cAlphaFieldNames,
-                                                                     s_ipsc->cNumericFieldNames);
-
-            ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-
-            if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
-                ShowSevereDuplicateName(state, eoh);
-                ErrorsFound = true;
-                continue;
-            }
-            
-            auto *mat = new Material::MaterialChild;
-            mat->Name = s_ipsc->cAlphaArgs(1);
-            mat->group = Material::Group::ComplexWindowShade;
-
-            s_mat->materials.push_back(mat);
-            mat->Num = s_mat->materials.isize();
-            s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-            
-            mat->Roughness = Material::SurfaceRoughness::Rough;
-            mat->ROnly = true;
-
-            // Assign pointer to ComplexShade
-            mat->ComplexShadePtr = Loop;
-
-            auto &complexShade = s_mat->ComplexShade(Loop);
-            
-            complexShade.Name = s_ipsc->cAlphaArgs(1);
-
-            complexShade.LayerType = static_cast<TARCOGParams::TARCOGLayerType>(getEnumValue(TARCOGParams::layerTypeNamesUC, s_ipsc->cAlphaArgs(2)));
-
-            complexShade.Thickness = s_ipsc->rNumericArgs(1);
-            mat->Thickness = s_ipsc->rNumericArgs(1);
-            complexShade.Conductivity = s_ipsc->rNumericArgs(2);
-            mat->Conductivity = s_ipsc->rNumericArgs(2);
-            complexShade.IRTransmittance = s_ipsc->rNumericArgs(3);
-            complexShade.FrontEmissivity = s_ipsc->rNumericArgs(4);
-            complexShade.BackEmissivity = s_ipsc->rNumericArgs(5);
-
-            // Simon: in heat balance radiation exchange routines AbsorpThermal is used
-            // and program will crash if value is not assigned.  Not sure if this is correct
-            // or some additional calculation is necessary. Simon TODO
-            mat->AbsorpThermal = s_ipsc->rNumericArgs(5);
-            mat->AbsorpThermalFront = s_ipsc->rNumericArgs(4);
-            mat->AbsorpThermalBack = s_ipsc->rNumericArgs(5);
-
-            complexShade.TopOpeningMultiplier = s_ipsc->rNumericArgs(6);
-            complexShade.BottomOpeningMultiplier = s_ipsc->rNumericArgs(7);
-            complexShade.LeftOpeningMultiplier = s_ipsc->rNumericArgs(8);
-            complexShade.RightOpeningMultiplier = s_ipsc->rNumericArgs(9);
-            complexShade.FrontOpeningMultiplier = s_ipsc->rNumericArgs(10);
-
-            complexShade.SlatWidth = s_ipsc->rNumericArgs(11);
-            complexShade.SlatSpacing = s_ipsc->rNumericArgs(12);
-            complexShade.SlatThickness = s_ipsc->rNumericArgs(13);
-            complexShade.SlatAngle = s_ipsc->rNumericArgs(14);
-            complexShade.SlatConductivity = s_ipsc->rNumericArgs(15);
-            complexShade.SlatCurve = s_ipsc->rNumericArgs(16);
-
-            if (s_ipsc->rNumericArgs(1) <= 0.0) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
-            }
-
-            if (s_ipsc->rNumericArgs(2) <= 0.0) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
-            }
-
-            if ((s_ipsc->rNumericArgs(3) < 0.0) || (s_ipsc->rNumericArgs(3) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} value must be >= 0 and <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(3), s_ipsc->rNumericArgs(3)));
-            }
-
-            if ((s_ipsc->rNumericArgs(4) <= 0.0) || (s_ipsc->rNumericArgs(4) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} value must be >= 0 and <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(4), s_ipsc->rNumericArgs(4)));
-            }
-
-            if ((s_ipsc->rNumericArgs(5) <= 0.0) || (s_ipsc->rNumericArgs(5) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} value must be >= 0 and <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(5), s_ipsc->rNumericArgs(5)));
-            }
-
-            if ((s_ipsc->rNumericArgs(6) < 0.0) || (s_ipsc->rNumericArgs(6) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be >= 0 or <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(6), s_ipsc->rNumericArgs(6)));
-            }
-
-            if ((s_ipsc->rNumericArgs(7) < 0.0) || (s_ipsc->rNumericArgs(7) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be >=0 or <=1, entered {:.2R}", s_ipsc->cNumericFieldNames(7), s_ipsc->rNumericArgs(7)));
-            }
-
-            if ((s_ipsc->rNumericArgs(8) < 0.0) || (s_ipsc->rNumericArgs(8) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be >=0 or <=1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(8), s_ipsc->rNumericArgs(8)));
-            }
-
-            if ((s_ipsc->rNumericArgs(9) < 0.0) || (s_ipsc->rNumericArgs(9) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be >=0 or <=1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(9), s_ipsc->rNumericArgs(9)));
-            }
-
-            if ((s_ipsc->rNumericArgs(10) < 0.0) || (s_ipsc->rNumericArgs(10) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be >=0 or <=1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(10), s_ipsc->rNumericArgs(10)));
-            }
-
-            if ((complexShade.LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ) ||
-                (complexShade.LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ)) {
-                if (s_ipsc->rNumericArgs(11) <= 0.0) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(11), s_ipsc->rNumericArgs(11)));
-                }
-
-                if (s_ipsc->rNumericArgs(12) <= 0.0) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(12), s_ipsc->rNumericArgs(12)));
-                }
-
-                if (s_ipsc->rNumericArgs(13) <= 0.0) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(13), s_ipsc->rNumericArgs(13)));
-                }
-
-                if ((s_ipsc->rNumericArgs(14) < -90.0) || (s_ipsc->rNumericArgs(14) > 90.0)) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be >=-90 and <=90, entered value = {:.2R}", s_ipsc->cNumericFieldNames(14), s_ipsc->rNumericArgs(14)));
-                }
-
-                if (s_ipsc->rNumericArgs(15) <= 0.0) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(15), s_ipsc->rNumericArgs(15)));
-                }
-
-                if ((s_ipsc->rNumericArgs(16) < 0.0) || ((s_ipsc->rNumericArgs(16) > 0.0) &&
-                     (s_ipsc->rNumericArgs(16) < (s_ipsc->rNumericArgs(11) / 2)))) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be =0 or greater than SlatWidth/2, entered value = {:.2R}",
-                               s_ipsc->cNumericFieldNames(16), s_ipsc->rNumericArgs(16)));
-                }
-            }
-
-            if (ErrorsFound) ShowFatalError(state, "Error in complex fenestration material input.");
-        }
-    }
 
     void SetupComplexFenestrationStateInput(EnergyPlusData &state,
                                             int &ConstrNum, // num of construction items thus far

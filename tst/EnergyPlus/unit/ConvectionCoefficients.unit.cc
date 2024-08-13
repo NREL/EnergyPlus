@@ -3718,7 +3718,8 @@ TEST_F(ConvectionCoefficientsFixture, testTARPNaturalConvectionAlgorithm)
 
 TEST_F(ConvectionCoefficientsFixture, RoofExtConvectionCoefficient)
 {
-
+    auto &s_mat = state->dataMaterial;
+        
     state->dataSurface->Surface.allocate(1);
 
     auto &surf1 = state->dataSurface->Surface(1);
@@ -3755,14 +3756,13 @@ TEST_F(ConvectionCoefficientsFixture, RoofExtConvectionCoefficient)
     state->dataConstruction->Construct(1).LayerPoint(1) = 1;
 
     // define material
-    state->dataMaterial->TotMaterials = 1;
-    Material::MaterialChild *mat = new Material::MaterialChild;
-    state->dataMaterial->materials.push_back(mat);
-    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->materials(1));
-    thisMaterial_1->AbsorpThermalFront = 0.1;
-    thisMaterial_1->Roughness = Material::SurfaceRoughness::Rough;
-    thisMaterial_1->Name = "Roof_Material";
-    thisMaterial_1->group = Material::Group::Regular;
+    s_mat->TotMaterials = 1;
+    auto *mat1 = new Material::MaterialBase;
+    s_mat->materials.push_back(mat1);
+    mat1->AbsorpThermalFront = 0.1;
+    mat1->Roughness = Material::SurfaceRoughness::Rough;
+    mat1->Name = "Roof_Material";
+    mat1->group = Material::Group::Regular;
 
     // set environment air conditions
     state->dataEnvrn->OutBaroPress = 101325.0; // Pa

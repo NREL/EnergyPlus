@@ -111,21 +111,21 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
 
     auto &s_mat = state->dataMaterial;
     
-    auto *mat1 = new Material::MaterialChild;
+    auto *mat1 = new Material::MaterialBase;
     mat1->Name = "WALL_1";
     mat1->group = Material::Group::Regular;
     s_mat->materials.push_back(mat1);
     mat1->Num = s_mat->materials.isize();
     s_mat->materialMap.insert_or_assign(mat1->Name, mat1->Num);
 
-    auto *mat2 = new Material::MaterialChild;
+    auto *mat2 = new Material::MaterialBase;
     mat2->Name = "WALL_2";
     mat2->group = Material::Group::Regular;
     s_mat->materials.push_back(mat2);
     mat2->Num = s_mat->materials.isize();
     s_mat->materialMap.insert_or_assign(mat2->Name, mat2->Num);
 
-    auto *mat3 = new Material::MaterialChild;
+    auto *mat3 = new Material::MaterialBase;
     mat3->Name = "WALL_3";
     mat3->group = Material::Group::Regular;
     s_mat->materials.push_back(mat3);
@@ -248,7 +248,7 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
         ";                        !- Solar Absorptance Schedule Name",
     });
     ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
-    mat1->group = Material::Group::WindowGlass;
+    mat1->group = Material::Group::Glass;
     Material::GetVariableAbsorptanceInput(*state, errors_found);
     compare_err_stream("   ** Severe  ** MaterialProperty:VariableAbsorptance: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, material=WALL_1, must have regular properties (Thermal/Solar Absorptance)\n",
         true);

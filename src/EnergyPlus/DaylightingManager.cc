@@ -1482,9 +1482,9 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
     //  at base TC layer temperature. During each time step calculations at DayltgInteriorIllum,
     //  DayltgInteriorMapIllum, and DayltgGlare, the daylight and glare factors are adjusted by the visible
     //  transmittance ratio = VT of actual TC window based on last hour TC layer temperature / VT of the base TC window
-    if (state.dataConstruction->Construct(IConst).TCFlag == 1) {
+    if (state.dataConstruction->Construct(IConst).isTCWindow) {
         // For thermochromic windows, use the base window construction at base temperature of the TC layer
-        IConst = state.dataConstruction->Construct(IConst).TCMasterConst;
+        IConst = state.dataConstruction->Construct(IConst).TCMasterConstrNum;
     }
 
     ICtrl = surf.activeWindowShadingControl;
@@ -1560,8 +1560,8 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
     Vector3<Real64> WNORM = surf.lcsz;
 
     // Initialize number of window elements
-    NDIVX = 40;
-    NDIVY = 40;
+    NDIVX = 40; // Does this mean that windows are split into 1,600 points for daylighting? WHYYYYYY?
+    NDIVY = 40; 
 
     // Distance from ref point to window plane
     ALF = std::abs(dot(WNORM, REFWC));
@@ -5795,13 +5795,13 @@ void DayltgInteriorIllum(EnergyPlusData &state,
         if (NREFPT > 0) {
             int const IConst = s_surf->Surface(IWin).Construction;
             auto const &construction = state.dataConstruction->Construct(IConst);
-            if (construction.TCFlag == 1) {
+            if (construction.isTCWindow) {
                 // For thermochromic windows, daylight and glare factors are always calculated
                 //  based on the master construction. They need to be adjusted by the VTRatio, including:
                 //  ZoneDaylight()%DaylIllFacSky, DaylIllFacSun, DaylIllFacSunDisk; DaylBackFacSky,
                 //  DaylBackFacSun, DaylBackFacSunDisk, DaylSourceFacSky, DaylSourceFacSun, DaylSourceFacSunDisk
                 VTNow = General::POLYF(1.0, construction.TransVisBeamCoef);
-                VTMaster = General::POLYF(1.0, state.dataConstruction->Construct(construction.TCMasterConst).TransVisBeamCoef);
+                VTMaster = General::POLYF(1.0, state.dataConstruction->Construct(construction.TCMasterConstrNum).TransVisBeamCoef);
                 VTRatio = VTNow / VTMaster;
             }
         }
@@ -8678,13 +8678,13 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
             if (NREFPT > 0) {
                 int IConst = s_surf->Surface(IWin).Construction;
                 auto const &construction = state.dataConstruction->Construct(IConst);
-                if (construction.TCFlag == 1) {
+                if (construction.isTCWindow) {
                     // For thermochromic windows, daylight and glare factors are always calculated
                     //  based on the master construction. They need to be adjusted by the VTRatio, including:
                     //  ZoneDaylight()%DaylIllFacSky, DaylIllFacSun, DaylIllFacSunDisk; DaylBackFacSky,
                     //  DaylBackFacSun, DaylBackFacSunDisk, DaylSourceFacSky, DaylSourceFacSun, DaylSourceFacSunDisk
                     Real64 VTNow = General::POLYF(1.0, construction.TransVisBeamCoef);
-                    Real64 VTMaster = General::POLYF(1.0, state.dataConstruction->Construct(construction.TCMasterConst).TransVisBeamCoef);
+                    Real64 VTMaster = General::POLYF(1.0, state.dataConstruction->Construct(construction.TCMasterConstrNum).TransVisBeamCoef);
                     VTRatio = VTNow / VTMaster;
                 }
             }
@@ -8700,6 +8700,7 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
             auto &surfShade = s_surf->surfShades(IWin);
             //              Loop over reference points
             for (int ILB = 1; ILB <= NREFPT; ++ILB) {
+                // if (ILB != 5) continue;
                 auto const &illSkyCurr = daylFacHrCurr(loop, ILB)[iWinCover_Bare];
                 auto const &illSkyPrev = daylFacHrPrev(loop, ILB)[iWinCover_Bare];
                 auto const &illShSkyCurr = daylFacHrCurr(loop, ILB)[iWinCover_Shaded];

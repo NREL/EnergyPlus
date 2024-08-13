@@ -2444,7 +2444,7 @@ namespace SurfaceGeometry {
                 for (int iMatNum = 1; iMatNum <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iMatNum) {
                     auto *mat = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iMatNum));
                     
-                    if (mat->group != Material::Group::WindowBlind) continue;
+                    if (mat->group != Material::Group::Blind) continue;
                     
                     auto *matBlind = dynamic_cast<Material::MaterialBlind *>(mat);
                     assert(matBlind != nullptr);
@@ -2784,7 +2784,7 @@ namespace SurfaceGeometry {
                              (surface.OriginalClass == SurfaceClass::TDD_Diffuser ||
                               state.dataSurface->SurfWinWindowModelType(surfNum) != WindowModel::Detailed ||
                               state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
-                              state.dataConstruction->Construct(surface.Construction).TCFlag == 1));
+                              state.dataConstruction->Construct(surface.Construction).isTCWindow));
                         if (!forceUniqueSurface) {
                                 state.dataSurface->Surface(surfNum).set_representative_surface(state, surfNum);
                         }
@@ -6136,7 +6136,7 @@ namespace SurfaceGeometry {
                 LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                 if (LayerPtr == 0) continue; // Error is caught already, will terminate later
                 if (s_mat->materials(LayerPtr)->group == Material::Group::Shade ||
-                    s_mat->materials(LayerPtr)->group == Material::Group::WindowBlind ||
+                    s_mat->materials(LayerPtr)->group == Material::Group::Blind ||
                     s_mat->materials(LayerPtr)->group == Material::Group::Screen)
                     ++NumShades;
             }
@@ -6157,9 +6157,10 @@ namespace SurfaceGeometry {
             if (ConstrNum > 0) {
                 for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
                     LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
-                    auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(s_mat->materials(LayerPtr));
-                    assert(thisMaterial != nullptr);
-                    if (thisMaterial->group == Material::Group::WindowGlass && thisMaterial->GlassTransDirtFactor < 1.0) {
+                    auto const *mat = s_mat->materials(LayerPtr);
+                    if (mat->group != Material::Group::Glass) continue;
+                    
+                    if (dynamic_cast<Material::MaterialGlass const *>(mat)->GlassTransDirtFactor < 1.0) {
                         ShowSevereError(state, format("{}: Interior Window or GlassDoor {} has a glass layer with", cRoutineName, SubSurfaceName));
                         ShowContinueError(state, "Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
                         ShowContinueError(state, "A value less than 1.0 for this factor is only allowed for exterior windows and glass doors.");
@@ -10161,7 +10162,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) &&
-                    s_mat->materials(IShadingDevice)->group != Material::Group::WindowBlind) {
+                    s_mat->materials(IShadingDevice)->group != Material::Group::Blind) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" has {}= InteriorBlind or ExteriorBlind but matching shading device is not a window blind",
                                            s_ipsc->cCurrentModuleObject,
@@ -10256,7 +10257,7 @@ namespace SurfaceGeometry {
                     } else if (windowShadingControl.ShadingType == WinShadingType::IntBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers);
                         if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->group !=
-                            Material::Group::WindowBlind) {
+                            Material::Group::Blind) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10272,7 +10273,7 @@ namespace SurfaceGeometry {
                     } else if (windowShadingControl.ShadingType == WinShadingType::ExtBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
                         if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group !=
-                            Material::Group::WindowBlind) {
+                            Material::Group::Blind) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10315,12 +10316,12 @@ namespace SurfaceGeometry {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
                             if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->group !=
-                                Material::Group::WindowBlind)
+                                Material::Group::Blind)
                                 BGShadeBlindError = true;
                         }
                         if (NLayers == 7) {
                             if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->group !=
-                                Material::Group::WindowBlind)
+                                Material::Group::Blind)
                                 BGShadeBlindError = true;
                         }
                         if (BGShadeBlindError) {
@@ -10360,7 +10361,7 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     }
                     if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) &&
-                        s_mat->materials(IShadingDevice)->group != Material::Group::WindowBlind) {
+                        s_mat->materials(IShadingDevice)->group != Material::Group::Blind) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" has {}= InteriorBlind or ExteriorBlind but matching shading device is not a window blind.",
                                                s_ipsc->cCurrentModuleObject,
@@ -10651,7 +10652,7 @@ namespace SurfaceGeometry {
                                              s_ipsc->cAlphaArgs(2)));
                     ErrorsFound = true;
                 } else {
-                    if (s_mat->materials(MatNum)->group != Material::Group::WindowGlass) {
+                    if (s_mat->materials(MatNum)->group != Material::Group::Glass) {
                         ShowSevereError(state, format("{}=\"{}\"", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("{}=\"{}must be a WindowMaterial:Glazing or WindowMaterial:Glazing:RefractionExtinctionMethod",
@@ -12163,12 +12164,12 @@ namespace SurfaceGeometry {
                                                              "WindowMaterial:Gap:EquivalentLayer"});
 
                     Material::Group const MaterialLayerGroup = thisMaterial->group;
-                    if ((MaterialLayerGroup == Material::Group::WindowSimpleGlazing) ||
-                        (MaterialLayerGroup == Material::Group::ShadeEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::Group::DrapeEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::Group::BlindEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::Group::ScreenEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::Group::GapEquivalentLayer)) {
+                    if ((MaterialLayerGroup == Material::Group::GlassSimple) ||
+                        (MaterialLayerGroup == Material::Group::ShadeEQL) ||
+                        (MaterialLayerGroup == Material::Group::DrapeEQL) ||
+                        (MaterialLayerGroup == Material::Group::BlindEQL) ||
+                        (MaterialLayerGroup == Material::Group::ScreenEQL) ||
+                        (MaterialLayerGroup == Material::Group::WindowGapEQL)) {
                         ShowSevereError(state, format("Invalid movable insulation material for {}:", s_ipsc->cCurrentModuleObject));
                         ShowSevereError(
                             state,
@@ -13798,7 +13799,7 @@ namespace SurfaceGeometry {
 
             state.dataConstruction->Construct(ConstrNewSh).LayerPoint = 0;
 
-            auto const *thisMaterialSh = dynamic_cast<const Material::MaterialChild *>(s_mat->materials(ShDevNum));
+            auto const *thisMaterialSh = s_mat->materials(ShDevNum);
             auto &thisConstructNewSh = state.dataConstruction->Construct(ConstrNewSh);
             if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntShade ||
                 state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntBlind) {
@@ -13806,26 +13807,21 @@ namespace SurfaceGeometry {
                 thisConstructNewSh.LayerPoint({1, TotLayersOld}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
                 thisConstructNewSh.LayerPoint(TotLayersNew) = ShDevNum;
                 thisConstructNewSh.InsideAbsorpSolar = thisMaterialSh->AbsorpSolar;
-                auto const *thisMaterialShLayer1 = dynamic_cast<const Material::MaterialChild *>(
-                    s_mat->materials(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(1)));
+                auto const *thisMaterialShLayer1 = s_mat->materials(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(1));
                 thisConstructNewSh.OutsideAbsorpSolar = thisMaterialShLayer1->AbsorpSolar;
                 thisConstructNewSh.OutsideAbsorpThermal = thisMaterialShLayer1->AbsorpThermalFront;
             } else {
                 // Exterior shading device
                 thisConstructNewSh.LayerPoint(1) = ShDevNum;
                 thisConstructNewSh.LayerPoint({2, TotLayersNew}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
-                auto const *thisMaterialShInside = dynamic_cast<const Material::MaterialChild *>(
-                    s_mat->materials(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew)));
+                auto const *thisMaterialShInside = s_mat->materials(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew));
                 thisConstructNewSh.InsideAbsorpSolar = thisMaterialShInside->AbsorpSolar;
                 thisConstructNewSh.OutsideAbsorpSolar = thisMaterialSh->AbsorpSolar;
                 thisConstructNewSh.OutsideAbsorpThermal = thisMaterialSh->AbsorpThermalFront;
             }
             // The following InsideAbsorpThermal applies only to inside glass; it is corrected
             //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
-            thisConstructNewSh.InsideAbsorpThermal =
-                dynamic_cast<Material::MaterialChild *>(
-                    s_mat->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld)))
-                    ->AbsorpThermalBack;
+            thisConstructNewSh.InsideAbsorpThermal = s_mat->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld))->AbsorpThermalBack;
             thisConstructNewSh.OutsideRoughness = Material::SurfaceRoughness::VerySmooth;
             thisConstructNewSh.DayltPropPtr = 0;
             thisConstructNewSh.CTFCross.fill(0.0);
@@ -13934,11 +13930,11 @@ namespace SurfaceGeometry {
                 if (TotLayers == 5) MatBetweenGlassSh = state.dataConstruction->Construct(curConstruction).LayerPoint(3);
                 if (state.dataConstruction->Construct(curConstruction).TotGlassLayers <= 3 &&
                     (s_mat->materials(MatIntSh)->group == Material::Group::Shade ||
-                     s_mat->materials(MatIntSh)->group == Material::Group::WindowBlind))
+                     s_mat->materials(MatIntSh)->group == Material::Group::Blind))
                     ShAndSt = true;
                 if (MatBetweenGlassSh > 0) {
                     if (s_mat->materials(MatBetweenGlassSh)->group == Material::Group::Shade ||
-                        s_mat->materials(MatBetweenGlassSh)->group == Material::Group::WindowBlind) {
+                        s_mat->materials(MatBetweenGlassSh)->group == Material::Group::Blind) {
                         ShAndSt = true;
                     } else {
                         ShowContinueError(state, format("Window={} has a shaded construction to which a storm window cannot be applied.", surf.Name));
@@ -13973,9 +13969,8 @@ namespace SurfaceGeometry {
             newAirMaterial = state.dataMaterial->TotMaterials;
             auto *thisMaterial = new Material::MaterialGasMix;
             s_mat->materials.push_back(thisMaterial);
-            state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials);
             thisMaterial->Name = MatNameStAir;
-            thisMaterial->group = Material::Group::WindowGas;
+            thisMaterial->group = Material::Group::Gas;
             thisMaterial->Roughness = Material::SurfaceRoughness::MediumRough;
             thisMaterial->Conductivity = 0.0;
             thisMaterial->Density = 0.0;
@@ -14057,8 +14052,7 @@ namespace SurfaceGeometry {
             thisConstruct.InsideAbsorpSolar = 0.0;
             thisConstruct.OutsideAbsorpSolar = 0.0;
             thisConstruct.InsideAbsorpThermal = state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
-            thisConstruct.OutsideAbsorpThermal =
-                dynamic_cast<Material::MaterialChild *>(s_mat->materials(stormMaterial))->AbsorpThermalFront;
+            thisConstruct.OutsideAbsorpThermal = s_mat->materials(stormMaterial)->AbsorpThermalFront;
             thisConstruct.OutsideRoughness = Material::SurfaceRoughness::VerySmooth;
             thisConstruct.DayltPropPtr = 0;
             thisConstruct.CTFCross.fill(0.0);
@@ -15903,75 +15897,78 @@ namespace SurfaceGeometry {
 
             int thisConstLayer = state.dataConstruction->Construct(ConstrNum).LayerPoint(LayerNo);
             int revConstLayer = state.dataConstruction->Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1);
+            if (thisConstLayer == revConstLayer) continue;
 
-            auto *thisMatLay = dynamic_cast<Material::MaterialChild *>(s_mat->materials(thisConstLayer));
-            assert(thisMatLay != nullptr);
-            auto *revMatLay = dynamic_cast<Material::MaterialChild *>(s_mat->materials(revConstLayer));
-            assert(revMatLay != nullptr);
-            if ((thisConstLayer != revConstLayer) ||                   // Not pointing to the same layer
-                (thisMatLay->group == Material::Group::WindowGlass) || // Not window glass or glass equivalent layer which have
-                (revMatLay->group == Material::Group::WindowGlass) ||  // to have certain properties flipped from front to back
-                (thisMatLay->group == Material::Group::GlassEquivalentLayer) || (revMatLay->group == Material::Group::GlassEquivalentLayer)) {
-                // If not point to the same layer, check to see if this is window glass which might need to have
-                // front and back material properties reversed.
-                Real64 constexpr SmallDiff = 0.0001;
-                if ((thisMatLay->group == Material::Group::WindowGlass) && (revMatLay->group == Material::Group::WindowGlass)) {
-                    // Both layers are window glass, so need to check to see if the properties are reversed
-                    if ((abs(thisMatLay->Thickness - revMatLay->Thickness) > SmallDiff) ||
-                        (abs(thisMatLay->ReflectSolBeamBack - revMatLay->ReflectSolBeamFront) > SmallDiff) ||
-                        (abs(thisMatLay->ReflectSolBeamFront - revMatLay->ReflectSolBeamBack) > SmallDiff) ||
-                        (abs(thisMatLay->TransVis - revMatLay->TransVis) > SmallDiff) ||
-                        (abs(thisMatLay->ReflectVisBeamBack - revMatLay->ReflectVisBeamFront) > SmallDiff) ||
-                        (abs(thisMatLay->ReflectVisBeamFront - revMatLay->ReflectVisBeamBack) > SmallDiff) ||
-                        (abs(thisMatLay->TransThermal - revMatLay->TransThermal) > SmallDiff) ||
-                        (abs(thisMatLay->AbsorpThermalBack - revMatLay->AbsorpThermalFront) > SmallDiff) ||
-                        (abs(thisMatLay->AbsorpThermalFront - revMatLay->AbsorpThermalBack) > SmallDiff) ||
-                        (abs(thisMatLay->Conductivity - revMatLay->Conductivity) > SmallDiff) ||
-                        (abs(thisMatLay->GlassTransDirtFactor - revMatLay->GlassTransDirtFactor) > SmallDiff) ||
-                        (thisMatLay->SolarDiffusing != revMatLay->SolarDiffusing) ||
-                        (abs(thisMatLay->YoungModulus - revMatLay->YoungModulus) > SmallDiff) ||
-                        (abs(thisMatLay->PoissonsRatio - revMatLay->PoissonsRatio) > SmallDiff)) {
-                        RevLayerDiffs = true;
-                        break; // exit when diff
-                    }          // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
-                } else if ((thisMatLay->group == Material::Group::GlassEquivalentLayer) &&
-                           (revMatLay->group == Material::Group::GlassEquivalentLayer)) {
-                    if ((abs(thisMatLay->TAR.Sol.Bk.Bm[0].BmTra - revMatLay->TAR.Sol.Ft.Bm[0].BmTra) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Sol.Ft.Bm[0].BmTra - revMatLay->TAR.Sol.Bk.Bm[0].BmTra) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Sol.Bk.Bm[0].BmRef - revMatLay->TAR.Sol.Ft.Bm[0].BmRef) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Sol.Ft.Bm[0].BmRef - revMatLay->TAR.Sol.Bk.Bm[0].BmRef) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Vis.Bk.Bm[0].BmTra - revMatLay->TAR.Vis.Ft.Bm[0].BmTra) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Vis.Ft.Bm[0].BmTra - revMatLay->TAR.Vis.Bk.Bm[0].BmTra) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Vis.Bk.Bm[0].BmRef - revMatLay->TAR.Vis.Ft.Bm[0].BmRef) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Vis.Ft.Bm[0].BmRef - revMatLay->TAR.Vis.Bk.Bm[0].BmRef) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Sol.Bk.Bm[0].DfTra - revMatLay->TAR.Sol.Ft.Bm[0].DfTra) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Sol.Ft.Bm[0].DfTra - revMatLay->TAR.Sol.Bk.Bm[0].DfTra) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Sol.Bk.Bm[0].DfRef - revMatLay->TAR.Sol.Ft.Bm[0].DfRef) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Sol.Ft.Bm[0].DfRef - revMatLay->TAR.Sol.Bk.Bm[0].DfRef) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Vis.Bk.Bm[0].DfTra - revMatLay->TAR.Vis.Ft.Bm[0].DfTra) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Vis.Ft.Bm[0].DfTra - revMatLay->TAR.Vis.Bk.Bm[0].DfTra) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Vis.Bk.Bm[0].DfRef - revMatLay->TAR.Vis.Ft.Bm[0].DfRef) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Vis.Ft.Bm[0].DfRef - revMatLay->TAR.Vis.Bk.Bm[0].DfRef) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Sol.Ft.Df.Tra - revMatLay->TAR.Sol.Ft.Df.Tra) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Sol.Bk.Df.Ref - revMatLay->TAR.Sol.Ft.Df.Ref) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Sol.Ft.Df.Ref - revMatLay->TAR.Sol.Bk.Df.Ref) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Vis.Ft.Df.Tra - revMatLay->TAR.Vis.Ft.Df.Tra) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Vis.Bk.Df.Ref - revMatLay->TAR.Vis.Ft.Df.Ref) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.Vis.Ft.Df.Ref - revMatLay->TAR.Vis.Bk.Df.Ref) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.IR.Ft.Tra - revMatLay->TAR.IR.Ft.Tra) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.IR.Bk.Emi - revMatLay->TAR.IR.Ft.Emi) > SmallDiff) ||
-                        (abs(thisMatLay->TAR.IR.Ft.Emi - revMatLay->TAR.IR.Bk.Emi) > SmallDiff) ||
-                        (abs(thisMatLay->Resistance - revMatLay->Resistance) > SmallDiff)) {
-                        RevLayerDiffs = true;
-                        break; // exit when diff
-                    }          // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
-                } else {
-                    // Other material types do not have reversed constructions so if they are not the same layer there is a problem
-                    // (RevLayersDiffs = true)
+            auto const *mat = s_mat->materials(thisConstLayer);
+            auto const *matRev = s_mat->materials(revConstLayer);
+
+            // If not point to the same layer, check to see if this is window glass which might need to have
+            // front and back material properties reversed.
+            Real64 constexpr SmallDiff = 0.0001;
+            if ((mat->group == Material::Group::Glass) && (matRev->group == Material::Group::Glass)) {
+                auto const *matGlass = dynamic_cast<Material::MaterialGlass const *>(mat);
+                auto const *matGlassRev = dynamic_cast<Material::MaterialGlass const *>(matRev);
+                assert(matGlass != nullptr);
+                assert(matGlassRev != nullptr);
+                    
+                // Both layers are window glass, so need to check to see if the properties are reversed
+                if ((abs(matGlass->Thickness - matGlassRev->Thickness) > SmallDiff) ||
+                    (abs(matGlass->ReflectSolBeamBack - matGlassRev->ReflectSolBeamFront) > SmallDiff) ||
+                    (abs(matGlass->ReflectSolBeamFront - matGlassRev->ReflectSolBeamBack) > SmallDiff) ||
+                    (abs(matGlass->TransVis - matGlassRev->TransVis) > SmallDiff) ||
+                    (abs(matGlass->ReflectVisBeamBack - matGlassRev->ReflectVisBeamFront) > SmallDiff) ||
+                    (abs(matGlass->ReflectVisBeamFront - matGlassRev->ReflectVisBeamBack) > SmallDiff) ||
+                    (abs(matGlass->TransThermal - matGlassRev->TransThermal) > SmallDiff) ||
+                    (abs(matGlass->AbsorpThermalBack - matGlassRev->AbsorpThermalFront) > SmallDiff) ||
+                    (abs(matGlass->AbsorpThermalFront - matGlassRev->AbsorpThermalBack) > SmallDiff) ||
+                    (abs(matGlass->Conductivity - matGlassRev->Conductivity) > SmallDiff) ||
+                    (abs(matGlass->GlassTransDirtFactor - matGlassRev->GlassTransDirtFactor) > SmallDiff) ||
+                    (matGlass->SolarDiffusing != matGlassRev->SolarDiffusing) ||
+                    (abs(matGlass->YoungModulus - matGlassRev->YoungModulus) > SmallDiff) ||
+                    (abs(matGlass->PoissonsRatio - matGlassRev->PoissonsRatio) > SmallDiff)) {
                     RevLayerDiffs = true;
                     break; // exit when diff
-                }          // End check of whether or not these are WindowGlass
-            }              // else: thisConstLayer is the same as revConstLayer--so there is no problem (RevLayersDiffs = false)
+                }          // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
+            } else if ((mat->group == Material::Group::GlassEQL) && (matRev->group == Material::Group::GlassEQL)) {
+                auto const *matGlass = dynamic_cast<Material::MaterialGlassEQL const *>(mat);
+                auto const *matGlassRev = dynamic_cast<Material::MaterialGlassEQL const *>(matRev);
+                    
+                if ((abs(matGlass->TAR.Sol.Bk.Bm[0].BmTra - matGlassRev->TAR.Sol.Ft.Bm[0].BmTra) > SmallDiff) ||
+                    (abs(matGlass->TAR.Sol.Ft.Bm[0].BmTra - matGlassRev->TAR.Sol.Bk.Bm[0].BmTra) > SmallDiff) ||
+                    (abs(matGlass->TAR.Sol.Bk.Bm[0].BmRef - matGlassRev->TAR.Sol.Ft.Bm[0].BmRef) > SmallDiff) ||
+                    (abs(matGlass->TAR.Sol.Ft.Bm[0].BmRef - matGlassRev->TAR.Sol.Bk.Bm[0].BmRef) > SmallDiff) ||
+                    (abs(matGlass->TAR.Vis.Bk.Bm[0].BmTra - matGlassRev->TAR.Vis.Ft.Bm[0].BmTra) > SmallDiff) ||
+                    (abs(matGlass->TAR.Vis.Ft.Bm[0].BmTra - matGlassRev->TAR.Vis.Bk.Bm[0].BmTra) > SmallDiff) ||
+                    (abs(matGlass->TAR.Vis.Bk.Bm[0].BmRef - matGlassRev->TAR.Vis.Ft.Bm[0].BmRef) > SmallDiff) ||
+                    (abs(matGlass->TAR.Vis.Ft.Bm[0].BmRef - matGlassRev->TAR.Vis.Bk.Bm[0].BmRef) > SmallDiff) ||
+                    (abs(matGlass->TAR.Sol.Bk.Bm[0].DfTra - matGlassRev->TAR.Sol.Ft.Bm[0].DfTra) > SmallDiff) ||
+                    (abs(matGlass->TAR.Sol.Ft.Bm[0].DfTra - matGlassRev->TAR.Sol.Bk.Bm[0].DfTra) > SmallDiff) ||
+                    (abs(matGlass->TAR.Sol.Bk.Bm[0].DfRef - matGlassRev->TAR.Sol.Ft.Bm[0].DfRef) > SmallDiff) ||
+                    (abs(matGlass->TAR.Sol.Ft.Bm[0].DfRef - matGlassRev->TAR.Sol.Bk.Bm[0].DfRef) > SmallDiff) ||
+                    (abs(matGlass->TAR.Vis.Bk.Bm[0].DfTra - matGlassRev->TAR.Vis.Ft.Bm[0].DfTra) > SmallDiff) ||
+                    (abs(matGlass->TAR.Vis.Ft.Bm[0].DfTra - matGlassRev->TAR.Vis.Bk.Bm[0].DfTra) > SmallDiff) ||
+                    (abs(matGlass->TAR.Vis.Bk.Bm[0].DfRef - matGlassRev->TAR.Vis.Ft.Bm[0].DfRef) > SmallDiff) ||
+                    (abs(matGlass->TAR.Vis.Ft.Bm[0].DfRef - matGlassRev->TAR.Vis.Bk.Bm[0].DfRef) > SmallDiff) ||
+                    (abs(matGlass->TAR.Sol.Ft.Df.Tra - matGlassRev->TAR.Sol.Ft.Df.Tra) > SmallDiff) ||
+                    (abs(matGlass->TAR.Sol.Bk.Df.Ref - matGlassRev->TAR.Sol.Ft.Df.Ref) > SmallDiff) ||
+                    (abs(matGlass->TAR.Sol.Ft.Df.Ref - matGlassRev->TAR.Sol.Bk.Df.Ref) > SmallDiff) ||
+                    (abs(matGlass->TAR.Vis.Ft.Df.Tra - matGlassRev->TAR.Vis.Ft.Df.Tra) > SmallDiff) ||
+                    (abs(matGlass->TAR.Vis.Bk.Df.Ref - matGlassRev->TAR.Vis.Ft.Df.Ref) > SmallDiff) ||
+                    (abs(matGlass->TAR.Vis.Ft.Df.Ref - matGlassRev->TAR.Vis.Bk.Df.Ref) > SmallDiff) ||
+                    (abs(matGlass->TAR.IR.Ft.Tra - matGlassRev->TAR.IR.Ft.Tra) > SmallDiff) ||
+                    (abs(matGlass->TAR.IR.Bk.Emi - matGlassRev->TAR.IR.Ft.Emi) > SmallDiff) ||
+                    (abs(matGlass->TAR.IR.Ft.Emi - matGlassRev->TAR.IR.Bk.Emi) > SmallDiff) ||
+                    (abs(matGlass->Resistance - matGlassRev->Resistance) > SmallDiff)) {
+                    RevLayerDiffs = true;
+                    break; // exit when diff
+                }          // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
+
+            } else {
+                // Other material types do not have reversed constructions so if they are not the same layer there is a problem
+                // (RevLayersDiffs = true)
+                RevLayerDiffs = true;
+                break; // exit when diff
+            }          // End check of whether or not these are WindowGlass
         }
     }
 

@@ -286,16 +286,29 @@ namespace HeatBalanceHAMTManager {
                 continue;
             }
 
-            auto *mat = dynamic_cast<Material::MaterialChild *>(s_mat->materials(matNum));
-            assert(mat != nullptr);
+            auto *mat = s_mat->materials(matNum);
+
+            if (mat->group != Material::Group::Regular) {
+                ShowSevereCustomMessage(state, eoh, format("{} = \"{}\" is not a regular material.", cAlphaFieldNames(1), AlphaArray(1)));
+                ErrorsFound = true;
+                continue;
+            }
+            
             if (mat->ROnly) {
                 ShowWarningError(state,
                                  format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject1, cAlphaFieldNames(1), AlphaArray(1)));
                 continue;
             }
 
-            mat->Porosity = NumArray(1);
-            mat->iwater = NumArray(2);
+            auto *matHAMT = new MaterialHAMT;
+            matHAMT->Material::MaterialBase::operator=(*mat); // deep copy
+
+            delete mat;
+            s_mat->materials(matNum) = matHAMT;
+
+            matHAMT->hasHAMT = true;
+            matHAMT->Porosity = NumArray(1);
+            matHAMT->iwater = NumArray(2);
         }
 
         HAMTitems = s_ip->getNumObjectsFound(state, cHAMTObject2); // MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
@@ -322,80 +335,73 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(s_mat->materials(matNum));
-            assert(thisMaterial != nullptr);
-            if (thisMaterial->ROnly) {
-                ShowWarningError(state,
-                                 format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject2, cAlphaFieldNames(1), AlphaArray(1)));
+
+            auto *mat = s_mat->materials(matNum);
+            if (!mat->hasHAMT) {
+                ShowSevereCustomMessage(state, eoh, format("{} is not defined for {} = \"{}\"", cHAMTObject1, cAlphaFieldNames(1), AlphaArray(1)));
+                ErrorsFound = true;
                 continue;
             }
+            
+            auto *matHAMT = dynamic_cast<MaterialHAMT *>(mat);
+            assert(matHAMT != nullptr);
 
             Numid = 1;
 
-            thisMaterial->niso = int(NumArray(Numid));
+            matHAMT->niso = int(NumArray(Numid));
 
-            for (int iso = 1; iso <= thisMaterial->niso; ++iso) {
-                ++Numid;
-                thisMaterial->isorh(iso) = NumArray(Numid);
-                ++Numid;
-                thisMaterial->isodata(iso) = NumArray(Numid);
+            for (int iso = 1; iso <= matHAMT->niso; ++iso) {
+                matHAMT->isorh(iso) = NumArray(++Numid);
+                matHAMT->isodata(iso) = NumArray(++Numid);
             }
 
-            ++thisMaterial->niso;
-            thisMaterial->isorh(thisMaterial->niso) = rhmax;
-            thisMaterial->isodata(thisMaterial->niso) = thisMaterial->Porosity * wdensity;
+            ++matHAMT->niso;
+            matHAMT->isorh(matHAMT->niso) = rhmax;
+            matHAMT->isodata(matHAMT->niso) = matHAMT->Porosity * wdensity;
 
-            ++thisMaterial->niso;
-            thisMaterial->isorh(thisMaterial->niso) = 0.0;
-            thisMaterial->isodata(thisMaterial->niso) = 0.0;
-        }
+            ++matHAMT->niso;
+            matHAMT->isorh(matHAMT->niso) = 0.0;
+            matHAMT->isodata(matHAMT->niso) = 0.0;
 
-        // check the isotherm
-        for (int matid = 1; matid <= s_mat->TotMaterials; ++matid) {
-            auto *mat = s_mat->materials(matid);
-            if (mat->group != Material::Group::Regular) continue;
-
-            auto *matReg = dynamic_cast<Material::MaterialChild *>(mat);
-            assert(matReg != nullptr);
-
-            if (matReg->niso == 0) continue;
+            // check the isotherm
 
             // - First sort
-            for (int jj = 1; jj <= matReg->niso - 1; ++jj) {
-                for (int ii = jj + 1; ii <= matReg->niso; ++ii) {
-                    if (matReg->isorh(jj) > matReg->isorh(ii)) {
+            for (int jj = 1; jj <= matHAMT->niso - 1; ++jj) {
+                for (int ii = jj + 1; ii <= matHAMT->niso; ++ii) {
+                    if (matHAMT->isorh(jj) > matHAMT->isorh(ii)) {
 
-                        dumrh = matReg->isorh(jj);
-                        dumdata = matReg->isodata(jj);
+                        Real64 dumrh = matHAMT->isorh(jj);
+                        Real64 dumdata = matHAMT->isodata(jj);
 
-                        matReg->isorh(jj) = matReg->isorh(ii);
-                        matReg->isodata(jj) = matReg->isodata(ii);
+                        matHAMT->isorh(jj) = matHAMT->isorh(ii);
+                        matHAMT->isodata(jj) = matHAMT->isodata(ii);
 
-                        matReg->isorh(ii) = dumrh;
-                        matReg->isodata(ii) = dumdata;
+                        matHAMT->isorh(ii) = dumrh;
+                        matHAMT->isodata(ii) = dumdata;
                     }
                 }
             }
+
             //- Now make sure the data rises
-            isoerrrise = false;
+            bool isoerrrise = false;
             for (int ii = 1; ii <= 100; ++ii) {
-                avflag = true;
-                for (int jj = 1; jj <= matReg->niso - 1; ++jj) {
-                    if (matReg->isodata(jj) > matReg->isodata(jj + 1)) {
+                bool avflag = true;
+                for (int jj = 1; jj <= matHAMT->niso - 1; ++jj) {
+                    if (matHAMT->isodata(jj) > matHAMT->isodata(jj + 1)) {
                         isoerrrise = true;
-                        avdata = (matReg->isodata(jj) + matReg->isodata(jj + 1)) / 2.0;
-                        matReg->isodata(jj) = avdata;
-                        matReg->isodata(jj + 1) = avdata;
+                        avdata = (matHAMT->isodata(jj) + matHAMT->isodata(jj + 1)) / 2.0;
+                        matHAMT->isodata(jj) = avdata;
+                        matHAMT->isodata(jj + 1) = avdata;
                         avflag = false;
                     }
                 }
                 if (avflag) break;
             }
             if (isoerrrise) {
-                ShowWarningError(state, format("{} data not rising - Check material {}", cHAMTObject2, matReg->Name));
+                ShowWarningError(state, format("{}: data not rising - Check material {}", cHAMTObject2, matHAMT->Name));
                 ShowContinueError(state, "Isotherm data has been fixed, and the simulation continues.");
             }
-        } // for (matid)
+        } 
 
         HAMTitems = s_ip->getNumObjectsFound(state, cHAMTObject3); // MaterialProperty:HeatAndMoistureTransfer:Suction
         for (int item = 1; item <= HAMTitems; ++item) {
@@ -421,27 +427,28 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(s_mat->materials(matNum));
-            assert(thisMaterial != nullptr);
-            if (thisMaterial->ROnly) {
-                ShowWarningError(state,
-                                 format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject3, cAlphaFieldNames(1), AlphaArray(1)));
+            
+            auto *mat = s_mat->materials(matNum);
+            if (!mat->hasHAMT) {
+                ShowSevereCustomMessage(state, eoh, format("{} is not defined for {} = \"{}\"", cHAMTObject1, cAlphaFieldNames(1), AlphaArray(1)));
+                ErrorsFound = true;
                 continue;
             }
+            
+            auto *matHAMT = dynamic_cast<MaterialHAMT *>(mat);
+            assert(matHAMT != nullptr);
 
             Numid = 1;
 
-            thisMaterial->nsuc = NumArray(Numid);
-            for (int suc = 1; suc <= thisMaterial->nsuc; ++suc) {
-                ++Numid;
-                thisMaterial->sucwater(suc) = NumArray(Numid);
-                ++Numid;
-                thisMaterial->sucdata(suc) = NumArray(Numid);
+            matHAMT->nsuc = NumArray(Numid);
+            for (int suc = 1; suc <= matHAMT->nsuc; ++suc) {
+                matHAMT->sucwater(suc) = NumArray(++Numid);
+                matHAMT->sucdata(suc) = NumArray(++Numid);
             }
 
-            ++thisMaterial->nsuc;
-            thisMaterial->sucwater(thisMaterial->nsuc) = thisMaterial->isodata(thisMaterial->niso);
-            thisMaterial->sucdata(thisMaterial->nsuc) = thisMaterial->sucdata(thisMaterial->nsuc - 1);
+            ++matHAMT->nsuc;
+            matHAMT->sucwater(matHAMT->nsuc) = matHAMT->isodata(matHAMT->niso);
+            matHAMT->sucdata(matHAMT->nsuc) = matHAMT->sucdata(matHAMT->nsuc - 1);
         }
 
         HAMTitems = s_ip->getNumObjectsFound(state, cHAMTObject4); // MaterialProperty:HeatAndMoistureTransfer:Redistribution
@@ -467,26 +474,28 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(s_mat->materials(matNum));
-            assert(thisMaterial != nullptr);
-            if (thisMaterial->ROnly) {
-                ShowWarningError(state,
-                                 format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject4, cAlphaFieldNames(1), AlphaArray(1)));
+
+            auto *mat = s_mat->materials(matNum);
+            if (!mat->hasHAMT) {
+                ShowSevereCustomMessage(state, eoh, format("{} is not defined for {} = \"{}\"", cHAMTObject1, cAlphaFieldNames(1), AlphaArray(1)));
+                ErrorsFound = true;
                 continue;
             }
+            
+            auto *matHAMT = dynamic_cast<MaterialHAMT *>(mat);
+            assert(matHAMT != nullptr);
+
             Numid = 1;
 
-            thisMaterial->nred = NumArray(Numid);
-            for (int red = 1; red <= thisMaterial->nred; ++red) {
-                ++Numid;
-                thisMaterial->redwater(red) = NumArray(Numid);
-                ++Numid;
-                thisMaterial->reddata(red) = NumArray(Numid);
+            matHAMT->nred = NumArray(Numid);
+            for (int red = 1; red <= matHAMT->nred; ++red) {
+                matHAMT->redwater(red) = NumArray(++Numid);
+                matHAMT->reddata(red) = NumArray(++Numid);
             }
 
-            ++thisMaterial->nred;
-            thisMaterial->redwater(thisMaterial->nred) = thisMaterial->isodata(thisMaterial->niso);
-            thisMaterial->reddata(thisMaterial->nred) = thisMaterial->reddata(thisMaterial->nred - 1);
+            ++matHAMT->nred;
+            matHAMT->redwater(matHAMT->nred) = matHAMT->isodata(matHAMT->niso);
+            matHAMT->reddata(matHAMT->nred) = matHAMT->reddata(matHAMT->nred - 1);
         }
 
         HAMTitems = s_ip->getNumObjectsFound(state, cHAMTObject5); // MaterialProperty:HeatAndMoistureTransfer:Diffusion
@@ -512,28 +521,29 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(s_mat->materials(matNum));
-            assert(thisMaterial != nullptr);
-            if (thisMaterial->ROnly) {
-                ShowWarningError(state,
-                                 format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject5, cAlphaFieldNames(1), AlphaArray(1)));
+
+            auto *mat = s_mat->materials(matNum);
+            if (!mat->hasHAMT) {
+                ShowSevereCustomMessage(state, eoh, format("{} is not defined for {} = \"{}\"", cHAMTObject1, cAlphaFieldNames(1), AlphaArray(1)));
+                ErrorsFound = true;
                 continue;
             }
+            
+            auto *matHAMT = dynamic_cast<MaterialHAMT *>(mat);
+            assert(matHAMT != nullptr);
 
             Numid = 1;
 
-            thisMaterial->nmu = NumArray(Numid);
-            if (thisMaterial->nmu > 0) {
-                for (int mu = 1; mu <= thisMaterial->nmu; ++mu) {
-                    ++Numid;
-                    thisMaterial->murh(mu) = NumArray(Numid);
-                    ++Numid;
-                    thisMaterial->mudata(mu) = NumArray(Numid);
+            matHAMT->nmu = NumArray(Numid);
+            if (matHAMT->nmu > 0) {
+                for (int mu = 1; mu <= matHAMT->nmu; ++mu) {
+                    matHAMT->murh(mu) = NumArray(++Numid);
+                    matHAMT->mudata(mu) = NumArray(++Numid);
                 }
 
-                ++thisMaterial->nmu;
-                thisMaterial->murh(thisMaterial->nmu) = thisMaterial->isorh(thisMaterial->niso);
-                thisMaterial->mudata(thisMaterial->nmu) = thisMaterial->mudata(thisMaterial->nmu - 1);
+                ++matHAMT->nmu;
+                matHAMT->murh(matHAMT->nmu) = matHAMT->isorh(matHAMT->niso);
+                matHAMT->mudata(matHAMT->nmu) = matHAMT->mudata(matHAMT->nmu - 1);
             }
         }
 
@@ -560,27 +570,31 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            auto *mat = dynamic_cast<Material::MaterialChild *>(s_mat->materials(matNum));
-            assert(mat != nullptr);
-            if (mat->ROnly) {
-                ShowWarningError(state,
-                                 format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject6, cAlphaFieldNames(1), AlphaArray(1)));
+
+            auto *mat = s_mat->materials(matNum);
+            if (!mat->hasHAMT) {
+                ShowSevereCustomMessage(state, eoh, format("{} is not defined for {} = \"{}\"", cHAMTObject1, cAlphaFieldNames(1), AlphaArray(1)));
+                ErrorsFound = true;
                 continue;
             }
+            
+            auto *matHAMT = dynamic_cast<MaterialHAMT *>(mat);
+            assert(matHAMT != nullptr);
+
             Numid = 1;
 
-            mat->ntc = NumArray(Numid);
-            if (mat->ntc > 0) {
-                for (int tc = 1; tc <= mat->ntc; ++tc) {
+            matHAMT->ntc = NumArray(Numid);
+            if (matHAMT->ntc > 0) {
+                for (int tc = 1; tc <= matHAMT->ntc; ++tc) {
                     ++Numid;
-                    mat->tcwater(tc) = NumArray(Numid);
+                    matHAMT->tcwater(tc) = NumArray(Numid);
                     ++Numid;
-                    mat->tcdata(tc) = NumArray(Numid);
+                    matHAMT->tcdata(tc) = NumArray(Numid);
                 }
 
-                ++mat->ntc;
-                mat->tcwater(mat->ntc) = mat->isodata(mat->niso);
-                mat->tcdata(mat->ntc) = mat->tcdata(mat->ntc - 1);
+                ++matHAMT->ntc;
+                matHAMT->tcwater(matHAMT->ntc) = matHAMT->isodata(matHAMT->niso);
+                matHAMT->tcdata(matHAMT->ntc) = matHAMT->tcdata(matHAMT->ntc - 1);
             }
         }
 
@@ -600,9 +614,10 @@ namespace HeatBalanceHAMTManager {
                               cAlphaFieldNames,
                               cNumericFieldNames);
             
+            ErrorObjectHeader eoh{routineName, cHAMTObject7, AlphaArray(1)};
             vtcsid = Util::FindItemInList(AlphaArray(1), state.dataSurface->Surface);
             if (vtcsid == 0) {
-                ShowSevereError(state, format("{} {}=\"{}\" is invalid (undefined).", cHAMTObject7, cAlphaFieldNames(1), AlphaArray(1)));
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(1), AlphaArray(1));
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
@@ -666,94 +681,95 @@ namespace HeatBalanceHAMTManager {
         errorCount = 0;
         s_hbh->TotCellsMax = 0;
         for (int sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
-            if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::HAMT) continue;
-            int conid = state.dataSurface->Surface(sid).Construction;
-            if (conid == 0) continue;
-            for (int lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
-                int matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
-                auto *mat = dynamic_cast<Material::MaterialChild *>(s_mat->materials(matid));
-                assert(mat != nullptr);
+            auto const &surf = state.dataSurface->Surface(sid);
+            if (surf.Class == SurfaceClass::Window) continue;
+            if (surf.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::HAMT) continue;
+
+            if (surf.Construction == 0) continue;
+            auto const &constr = state.dataConstruction->Construct(surf.Construction);
+
+            for (int lid = 1; lid <= constr.TotLayers; ++lid) {
+                auto *mat = s_mat->materials(constr.LayerPoint(lid));
                 if (mat->ROnly) {
-                    ShowSevereError(state,
-                                    format("{}Construction={} cannot contain R-only value materials.",
-                                           RoutineName,
-                                           state.dataConstruction->Construct(conid).Name));
+                    ShowSevereError(state, format("{}Construction={} cannot contain R-only value materials.", RoutineName, constr.Name));
                     ShowContinueError(state, format("Reference Material=\"{}\".", mat->Name));
                     ++errorCount;
                     continue;
                 }
 
-                if (mat->nmu < 0) {
-                    ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
+                auto *matHAMT = dynamic_cast<MaterialHAMT *>(mat);
+                assert(matHAMT != nullptr);
+                
+                if (matHAMT->nmu < 0) {
+                    ShowSevereError(state, format("{}Construction={}", constr.Name));
                     ShowContinueError(state,
                                       format("Reference Material=\"{}\" does not have required Water Vapor Diffusion Resistance Factor (mu) data.",
-                                             mat->Name));
+                                             matHAMT->Name));
                     ++errorCount;
                 }
 
-                if (mat->niso < 0) {
-                    ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
-                    ShowContinueError(state, format("Reference Material=\"{}\" does not have required isotherm data.", mat->Name));
+                if (matHAMT->niso < 0) {
+                    ShowSevereError(state, format("{}Construction={}", RoutineName, constr.Name));
+                    ShowContinueError(state, format("Reference Material=\"{}\" does not have required isotherm data.", matHAMT->Name));
                     ++errorCount;
                 }
-                if (mat->nsuc < 0) {
+                if (matHAMT->nsuc < 0) {
                     ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
                     ShowContinueError(
                         state,
                         format("Reference Material=\"{}\" does not have required liquid transport coefficient (suction) data.", mat->Name));
                     ++errorCount;
                 }
-                if (mat->nred < 0) {
+                if (matHAMT->nred < 0) {
                     ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
                     ShowContinueError(state,
                                       format("Reference Material=\"{}\" does not have required liquid transport coefficient (redistribution) data.",
                                              mat->Name));
                     ++errorCount;
                 }
-                if (mat->ntc < 0) {
+                if (matHAMT->ntc < 0) {
                     if (mat->Conductivity > 0) {
-                        ShowWarningError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
+                        ShowWarningError(state, format("{}Construction={}", RoutineName, constr.Name));
                         ShowContinueError(
                             state,
-                            format("Reference Material=\"{}\" does not have thermal conductivity data. Using fixed value.", mat->Name));
-                        mat->ntc = 2;
-                        mat->tcwater(1) = 0.0;
-                        mat->tcdata(1) = mat->Conductivity;
-                        mat->tcwater(2) = mat->isodata(mat->niso);
-                        mat->tcdata(2) = mat->Conductivity;
+                            format("Reference Material=\"{}\" does not have thermal conductivity data. Using fixed value.", matHAMT->Name));
+                        matHAMT->ntc = 2;
+                        matHAMT->tcwater(1) = 0.0;
+                        matHAMT->tcdata(1) = matHAMT->Conductivity;
+                        matHAMT->tcwater(2) = matHAMT->isodata(matHAMT->niso);
+                        matHAMT->tcdata(2) = matHAMT->Conductivity;
                     } else {
-                        ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
+                        ShowSevereError(state, format("{}Construction={}", RoutineName, constr.Name));
                         ShowContinueError(state,
-                                          format("Reference Material=\"{}\" does not have required thermal conductivity data.", mat->Name));
+                                          format("Reference Material=\"{}\" does not have required thermal conductivity data.", matHAMT->Name));
                         ++errorCount;
                     }
                 }
 
                 // convert material water content to RH
 
-                waterd = mat->iwater * mat->Density;
-                interp(mat->niso, mat->isodata, mat->isorh, waterd, mat->irh);
+                waterd = matHAMT->iwater * matHAMT->Density;
+                interp(matHAMT->niso, matHAMT->isodata, matHAMT->isorh, waterd, matHAMT->irh);
 
-                mat->divs = int(mat->Thickness / mat->divsize) + mat->divmin;
-                if (mat->divs > mat->divmax) {
-                    mat->divs = mat->divmax;
+                matHAMT->divs = int(matHAMT->Thickness / matHAMT->divsize) + matHAMT->divmin;
+                if (matHAMT->divs > matHAMT->divmax) {
+                    matHAMT->divs = matHAMT->divmax;
                 }
                 // Check length of cell - reduce number of divisions if necessary
                 Real64 const sin_negPIOvr2 = std::sin(-Constant::Pi / 2.0);
                 while (true) {
-                    testlen = mat->Thickness *
-                              ((std::sin(Constant::Pi * (-1.0 / double(mat->divs)) - Constant::Pi / 2.0) / 2.0) - (sin_negPIOvr2 / 2.0));
+                    testlen = matHAMT->Thickness *
+                              ((std::sin(Constant::Pi * (-1.0 / double(matHAMT->divs)) - Constant::Pi / 2.0) / 2.0) - (sin_negPIOvr2 / 2.0));
                     if (testlen > adjdist) break;
-                    --mat->divs;
-                    if (mat->divs < 1) {
-                        ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
-                        ShowContinueError(state, format("Reference Material=\"{}\" is too thin.", mat->Name));
+                    --matHAMT->divs;
+                    if (matHAMT->divs < 1) {
+                        ShowSevereError(state, format("{}Construction={}", RoutineName, constr.Name));
+                        ShowContinueError(state, format("Reference Material=\"{}\" is too thin.", matHAMT->Name));
                         ++errorCount;
                         break;
                     }
                 }
-                s_hbh->TotCellsMax += mat->divs;
+                s_hbh->TotCellsMax += matHAMT->divs;
             }
             s_hbh->TotCellsMax += 7;
         }
@@ -773,9 +789,10 @@ namespace HeatBalanceHAMTManager {
 
         // Set up surface cell structure
         for (int sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
-            if (!state.dataSurface->Surface(sid).HeatTransSurf) continue;
-            if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::HAMT) continue;
+            auto &surf = state.dataSurface->Surface(sid);
+            if (!surf.HeatTransSurf) continue;
+            if (surf.Class == SurfaceClass::Window) continue;
+            if (surf.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::HAMT) continue;
             // Boundary Cells
             runor = -0.02;
             // Air Convection Cell
@@ -827,17 +844,16 @@ namespace HeatBalanceHAMTManager {
             runor += extVirtCell.length(1);
 
             // Material Cells
-            conid = state.dataSurface->Surface(sid).Construction;
-            for (int lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
-                int matNum = state.dataConstruction->Construct(conid).LayerPoint(lid);
-                auto const *mat = dynamic_cast<const Material::MaterialChild *>(s_mat->materials(matNum));
+            auto const &constr = state.dataConstruction->Construct(surf.Construction);
+            for (int lid = 1; lid <= constr.TotLayers; ++lid) {
+                auto const *mat = dynamic_cast<const MaterialHAMT *>(s_mat->materials(constr.LayerPoint(lid)));
                 assert(mat != nullptr);
 
                 for (int did = 1; did <= mat->divs; ++did) {
                     ++cid;
 
                     auto &matCell = s_hbh->cells(cid);
-                    matCell.matid = matNum;
+                    matCell.matid = mat->Num;
                     matCell.sid = sid;
 
                     matCell.temp = mat->itemp;
@@ -1033,10 +1049,9 @@ namespace HeatBalanceHAMTManager {
             static constexpr std::string_view Format_108("! <Material Nominal Resistance>, Material Name,  Nominal R\n");
             print(state.files.eio, Format_108);
 
-            for (int MaterNum = 1; MaterNum <= s_mat->TotMaterials; ++MaterNum) {
-
+            for (auto const *mat : s_mat->materials) {
                 static constexpr std::string_view Format_111("Material Nominal Resistance,{},{:.4R}\n");
-                print(state.files.eio, Format_111, s_mat->materials(MaterNum)->Name, state.dataHeatBal->NominalR(MaterNum));
+                print(state.files.eio, Format_111, mat->Name, mat->NominalR);
             }
         }
     }
@@ -1114,9 +1129,7 @@ namespace HeatBalanceHAMTManager {
 
             for (int cid = s_hbh->Extcell(sid) + 1; cid <= s_hbh->Intcell(sid) - 1; ++cid) {
                 auto &cell = s_hbh->cells(cid);
-                int matNum = cell.matid;
-
-                auto const *mat = dynamic_cast<const Material::MaterialChild *>(s_mat->materials(matNum));
+                auto const *mat = dynamic_cast<const MaterialHAMT *>(s_mat->materials(cell.matid));
                 assert(mat != nullptr);
                 cell.temp = mat->itemp;
                 cell.tempp1 = mat->itemp;
@@ -1238,7 +1251,7 @@ namespace HeatBalanceHAMTManager {
                 cell.vpp1 = RHtoVP(state, cell.rhp1, cell.tempp1);
                 cell.vpsat = PsyPsatFnTemp(state, cell.tempp1);
                 if (cell.matid > 0) {
-                    auto const *mat = dynamic_cast<const Material::MaterialChild *>(s_mat->materials(cell.matid));
+                    auto const *mat = dynamic_cast<const MaterialHAMT *>(s_mat->materials(cell.matid));
                     assert(mat != nullptr);
                     interp(mat->niso, mat->isorh, mat->isodata, cell.rhp1, cell.water, cell.dwdphi);
                     if (state.dataEnvrn->IsRain && s_hbh->rainswitch) {

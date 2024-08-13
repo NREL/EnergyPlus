@@ -68,7 +68,6 @@ namespace Construction {
     // Note Sync with SurfaceGroundHeatExchanger::local::MaxCTFTerms
     // ** has to be big enough to hold no matter what window model
     //    each window model should validate layers individually
-    int constexpr MaxSpectralDataElements(800); // Maximum number in Spectral Data arrays.
 
      // Nested one-field structs just to keep overall structure
      // consistent with Material::BlindTAR.  See Material.hh for
@@ -101,6 +100,12 @@ namespace Construction {
                 } Df;
             } Bk; // Back
         } Sol;
+    };
+
+    struct TCLayer
+    {
+        int constrNum;
+        Real64 specTemp;
     };
         
     // This needs to get broken up too
@@ -241,13 +246,17 @@ namespace Construction {
         bool TypeIsIRT = false;          // -- true for construction with IRT material
         bool TypeIsCfactorWall = false;  // -- true for construction with Construction:CfactorUndergroundWall
         bool TypeIsFfactorFloor = false; // -- true for construction with Construction:FfactorGroundFloor
+
         // Added TH 12/22/2008 for thermochromic windows
-        int TCFlag = 0; // 0: this construction is not a thermochromic window construction
-        // 1: it is a TC window construction
-        int TCLayer = 0;       // Reference to the TC glazing material layer in the Material array
-        int TCMasterConst = 0; // The master TC construction referenced by its slave constructions
-        int TCLayerID = 0;     // Which material layer is the TC glazing, counting all material layers.
-        int TCGlassID = 0;     // Which glass layer is the TC glazing, counting from glass layers only.
+        bool isTCWindow = false;
+        bool isTCMaster = false;
+        int TCMasterConstrNum = 0; // The master TC construction referenced by its slave constructions
+        int TCLayerNum = 0;     // Which material layer is the TC glazing, counting all material layers.
+        int TCGlassNum = 0;     // Which glass layer is the TC glazing, counting from glass layers only.
+        int numTCChildConstrs;
+        Array1D<TCLayer> TCChildConstrs;
+        Real64 specTemp;
+            
         // For CFactor underground walls
         Real64 CFactor = 0.0;
         Real64 Height = 0.0;

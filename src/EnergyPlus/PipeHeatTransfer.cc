@@ -659,8 +659,8 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
             ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(6), s_ipsc->cAlphaArgs(6));
             ErrorsFound = true;
         } else {
-            auto const *matSoil = dynamic_cast<const Material::MaterialChild *>(s_mat->materials(state.dataPipeHT->PipeHT(Item).SoilMaterialNum));
-            assert(matSoil != nullptr);
+            auto const *matSoil = s_mat->materials(state.dataPipeHT->PipeHT(Item).SoilMaterialNum);
+
             state.dataPipeHT->PipeHT(Item).SoilDensity = matSoil->Density;
             state.dataPipeHT->PipeHT(Item).SoilDepth = matSoil->Thickness;
             state.dataPipeHT->PipeHT(Item).SoilCp = matSoil->SpecHeat;

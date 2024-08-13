@@ -99,8 +99,6 @@ namespace HeatBalanceManager {
 
     void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
-
     void GetConstructData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void GetBuildingData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
@@ -174,8 +172,6 @@ namespace HeatBalanceManager {
     void CheckScheduledSurfaceGains(EnergyPlusData &state, int const ZoneNum); // Zone number for which error check will be performed
 
     void CreateTCConstructions(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
-
-    void SetupSimpleWindowGlazingSystem(EnergyPlusData &state, int MaterNum);
 
     void SetupComplexFenestrationMaterialInput(EnergyPlusData &state,
                                                int MaterNum, // num of material items thus far

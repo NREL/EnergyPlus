@@ -210,7 +210,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
         // Obtain thermal properties from the Material derived type
 
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->materials(CurrentLayer));
+        auto *thisMaterial = state.dataMaterial->materials(CurrentLayer);
         assert(thisMaterial != nullptr);
 
         dl(Layer) = thisMaterial->Thickness;
@@ -1877,7 +1877,7 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
         int Layer = this->LayerPoint(I);
         auto const *thisMaterial = state.dataMaterial->materials(Layer);
         switch (thisMaterial->group) {
-        case Material::Group::Air: {
+        case Material::Group::AirGap: {
             static constexpr std::string_view Format_702(" Material:Air,{},{:12.4N}\n");
             print(state.files.eio, Format_702, thisMaterial->Name, thisMaterial->Resistance);
         } break;
@@ -1943,9 +1943,9 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     // Commonly used routine in several places in EnergyPlus which examines if current
     // construction is glazing construction
     const Material::Group group = state.dataMaterial->materials(LayerPoint(1))->group;
-    return (group == Material::Group::WindowGlass) || (group == Material::Group::Shade) ||
-           (group == Material::Group::Screen) || (group == Material::Group::WindowBlind) ||
-           (group == Material::Group::WindowSimpleGlazing);
+    return (group == Material::Group::Glass) || (group == Material::Group::Shade) ||
+           (group == Material::Group::Screen) || (group == Material::Group::Blind) ||
+           (group == Material::Group::GlassSimple);
 }
 
 Real64 ConstructionProps::setThicknessPerpendicular(EnergyPlusData &state, Real64 userValue)

@@ -58,7 +58,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -96,7 +95,6 @@ namespace WindowComplexManager {
     // PURPOSE OF THIS MODULE:
     //  Initialize data for solar and thermal calculations and also performs thermal calculations for BSDF window
 
-    using namespace DataComplexFenestration;
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
     using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
@@ -2866,73 +2864,65 @@ namespace WindowComplexManager {
         IGap = 0;
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
-            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(s_mat->materials(LayPtr));
-            assert(thisMaterial != nullptr);
+            auto const *mat = s_mat->materials(LayPtr);
 
-            if ((thisMaterial->group == Material::Group::WindowGlass) || (thisMaterial->group == Material::Group::WindowSimpleGlazing)) {
+            if ((mat->group == Material::Group::Glass) || (mat->group == Material::Group::GlassSimple)) {
+                auto const *matGlass = dynamic_cast<Material::MaterialGlass const *>(mat);
+                assert(matGlass != nullptr);
+                
                 ++IGlass;
                 LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
-                thick(IGlass) = thisMaterial->Thickness;
-                scon(IGlass) = thisMaterial->Conductivity;
-                emis(2 * IGlass - 1) = thisMaterial->AbsorpThermalFront;
-                emis(2 * IGlass) = thisMaterial->AbsorpThermalBack;
-                tir(2 * IGlass - 1) = thisMaterial->TransThermal;
-                tir(2 * IGlass) = thisMaterial->TransThermal;
-                YoungsMod(IGlass) = thisMaterial->YoungModulus;
-                PoissonsRat(IGlass) = thisMaterial->PoissonsRatio;
-            } else if (thisMaterial->group == Material::Group::ComplexWindowShade) {
-                ++IGlass;
-                TempInt = thisMaterial->ComplexShadePtr;
-                LayerType(IGlass) = state.dataMaterial->ComplexShade(TempInt).LayerType;
+                thick(IGlass) = matGlass->Thickness;
+                scon(IGlass) = matGlass->Conductivity;
+                emis(2 * IGlass - 1) = matGlass->AbsorpThermalFront;
+                emis(2 * IGlass) = matGlass->AbsorpThermalBack;
+                tir(2 * IGlass - 1) = matGlass->TransThermal;
+                tir(2 * IGlass) = matGlass->TransThermal;
+                YoungsMod(IGlass) = matGlass->YoungModulus;
+                PoissonsRat(IGlass) = matGlass->PoissonsRatio;
 
-                thick(IGlass) = state.dataMaterial->ComplexShade(TempInt).Thickness;
-                scon(IGlass) = state.dataMaterial->ComplexShade(TempInt).Conductivity;
-                emis(2 * IGlass - 1) = state.dataMaterial->ComplexShade(TempInt).FrontEmissivity;
-                emis(2 * IGlass) = state.dataMaterial->ComplexShade(TempInt).BackEmissivity;
-                tir(2 * IGlass - 1) = state.dataMaterial->ComplexShade(TempInt).IRTransmittance;
-                tir(2 * IGlass) = state.dataMaterial->ComplexShade(TempInt).IRTransmittance;
+            } else if (mat->group == Material::Group::ComplexShade) {
+                auto const *matShade = dynamic_cast<Material::MaterialComplexShade const *>(mat);
+                ++IGlass;
+                LayerType(IGlass) = matShade->LayerType;
+
+                thick(IGlass) = matShade->Thickness;
+                scon(IGlass) = matShade->Conductivity;
+                emis(2 * IGlass - 1) = matShade->FrontEmissivity;
+                emis(2 * IGlass) = matShade->BackEmissivity;
+                tir(2 * IGlass - 1) = matShade->TransThermal;
+                tir(2 * IGlass) = matShade->TransThermal;
 
                 // This needs to be converted into correct areas. That can be done only after loading complete window data
-                Atop(IGlass) = state.dataMaterial->ComplexShade(TempInt).TopOpeningMultiplier;
-                Abot(IGlass) = state.dataMaterial->ComplexShade(TempInt).BottomOpeningMultiplier;
-                Al(IGlass) = state.dataMaterial->ComplexShade(TempInt).LeftOpeningMultiplier;
-                Ar(IGlass) = state.dataMaterial->ComplexShade(TempInt).RightOpeningMultiplier;
-                Ah(IGlass) = state.dataMaterial->ComplexShade(TempInt).FrontOpeningMultiplier;
+                Atop(IGlass) = matShade->topOpeningMult;
+                Abot(IGlass) = matShade->bottomOpeningMult;
+                Al(IGlass) = matShade->leftOpeningMult;
+                Ar(IGlass) = matShade->rightOpeningMult;
+                Ah(IGlass) = matShade->frontOpeningMult;
 
-                SlatThick(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatThickness;
-                SlatWidth(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatWidth;
-                SlatAngle(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatAngle;
-                SlatCond(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatConductivity;
-                SlatSpacing(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatSpacing;
-                SlatCurve(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatCurve;
-            } else if (thisMaterial->group == Material::Group::ComplexWindowGap) {
+                SlatThick(IGlass) = matShade->SlatThickness;
+                SlatWidth(IGlass) = matShade->SlatWidth;
+                SlatAngle(IGlass) = matShade->SlatAngle;
+                SlatCond(IGlass) = matShade->SlatConductivity;
+                SlatSpacing(IGlass) = matShade->SlatSpacing;
+                SlatCurve(IGlass) = matShade->SlatCurve;
+                
+            } else if (mat->group == Material::Group::ComplexWindowGap) {
+                auto const *matGap = dynamic_cast<Material::MaterialComplexWindowGap const *>(mat);
                 ++IGap;
-                gap(IGap) = thisMaterial->Thickness;
-                presure(IGap) = thisMaterial->Pressure;
+                gap(IGap) = matGap->Thickness;
+                presure(IGap) = matGap->Pressure;
 
-                DeflectionPtr = thisMaterial->DeflectionStatePtr;
-                if (DeflectionPtr != 0) {
-                    GapDefMax(IGap) = state.dataHeatBal->DeflectionState(DeflectionPtr).DeflectedThickness;
-                } else {
-                    GapDefMax(IGap) = gap(IGap);
-                }
+                GapDefMax(IGap) = matGap->deflectedThickness;
 
-                PillarPtr = thisMaterial->SupportPillarPtr;
+                PillarSpacing(IGap) = matGap->pillarSpacing;
+                PillarRadius(IGap) = matGap->pillarRadius;
+                SupportPlr(IGap) = matGap->pillarSpacing != 0.0 && matGap->pillarRadius != 0.0;
 
-                if (PillarPtr != 0) {
-                    SupportPlr(IGap) = 1;
-                    PillarSpacing(IGap) = state.dataHeatBal->SupportPillar(PillarPtr).Spacing;
-                    PillarRadius(IGap) = state.dataHeatBal->SupportPillar(PillarPtr).Radius;
-                }
-
-                GasPointer = thisMaterial->GasPointer;
-
-                auto const *thisMaterialGas = dynamic_cast<Material::MaterialGasMix const *>(s_mat->materials(GasPointer));
-                assert(thisMaterialGas != nullptr);
-                nmix(IGap + 1) = thisMaterialGas->numGases;
+                nmix(IGap + 1) = matGap->numGases;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    auto const &gas = thisMaterialGas->gases[IMix - 1];
-                    frct(IMix, IGap + 1) = thisMaterialGas->gasFracts[IMix - 1];
+                    auto const &gas = matGap->gases[IMix - 1];
+                    frct(IMix, IGap + 1) = matGap->gasFracts[IMix - 1];
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
                     // to be correctly referenced by gap arrays

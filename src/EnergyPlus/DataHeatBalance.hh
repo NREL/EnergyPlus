@@ -58,7 +58,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionConstants.hh>
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -76,9 +75,6 @@ struct EnergyPlusData;
 namespace DataHeatBalance {
 
     // Using/Aliasing
-    using namespace DataComplexFenestration;
-    using DataComplexFenestration::GapDeflectionState;
-    using DataComplexFenestration::GapSupportPillar;
     using DataVectorTypes::Vector;
 
     // Parameters for Interior and Exterior Solar Distribution
@@ -426,27 +422,6 @@ namespace DataHeatBalance {
     constexpr Real64 ZoneInitialTemp(23.0);       // Zone temperature for initialization
     constexpr Real64 SurfInitialTemp(23.0);       // Surface temperature for initialization
     constexpr Real64 SurfInitialConvCoeff(3.076); // Surface convective coefficient for initialization
-
-    struct TCGlazingsType
-    {
-        // Members
-        std::string Name;         // Name
-        int NumGlzMat = 0;        // Number of TC glazing materials
-        Array1D_int LayerPoint;   // Layer pointer
-        Array1D<Real64> SpecTemp; // Temperature corresponding to the specified TC glazing optical data
-        Array1D_string LayerName; // Name of the referenced WindowMaterial:Glazing object
-    };
-
-    struct SpectralDataProperties
-    {
-        // Members
-        std::string Name;           // Name of spectral data set
-        int NumOfWavelengths = 0;   // Number of wavelengths in the data set
-        Array1D<Real64> WaveLength; // Wavelength (microns)
-        Array1D<Real64> Trans;      // Transmittance at normal incidence
-        Array1D<Real64> ReflFront;  // Front reflectance at normal incidence
-        Array1D<Real64> ReflBack;   // Back reflectance at normal incidence
-    };
 
     struct ZoneSpaceData
     {
@@ -1852,26 +1827,6 @@ struct HeatBalanceData : BaseGlobalStruct
     int TotBBHeat = 0;          // Total BBHeat Statements instances after expansion to spaces
     int TotConstructs = 0;      // Total number of unique constructions in this simulation
     int TotSpectralData = 0;    // Total window glass spectral data sets
-    int W5GlsMat = 0;           // Window5 Glass Materials, specified by transmittance and front and back reflectance
-    int W5GlsMatAlt = 0;        // Window5 Glass Materials, specified by index of refraction and extinction coeff
-    int W5GasMat = 0;           // Window5 Single-Gas Materials
-    int W5GasMatMixture = 0;    // Window5 Gas Mixtures
-    int W7SupportPillars = 0;   // Complex fenestration support pillars
-    int W7DeflectionStates = 0; // Complex fenestration deflection states
-    int W7MaterialGaps = 0;     // Complex fenestration material gaps
-    int TotBlinds = 0;          // Total number of blind materials
-    int TotScreens = 0;         // Total number of exterior window screen materials
-    int TotTCGlazings = 0;      // Number of TC glazing object - WindowMaterial:Glazing:Thermochromic found in the idf file
-    int NumScreens = 0;         // Total number of screens on exterior windows
-    int TotShades = 0;          // Total number of shade materials
-    int TotComplexGaps = 0;     // Total number of window gaps for complex fenestrations
-    int TotSimpleWindow = 0;    // number of simple window systems.
-    int W5GlsMatEQL = 0;        // Window5 Single-Gas Materials for Equivalent Layer window model
-    int TotShadesEQL = 0;       // Total number of shade materials for Equivalent Layer window model
-    int TotDrapesEQL = 0;       // Total number of drape materials for Equivalent Layer window model
-    int TotBlindsEQL = 0;       // Total number of blind materials for Equivalent Layer window model
-    int TotScreensEQL = 0;      // Total number of exterior window screen materials for Equivalent Layer window model
-    int W5GapMatEQL = 0;        // Window5 Equivalent Layer Single-Gas Materials
     int TotZoneAirBalance = 0;  // Total Zone Air Balance Statements in input
     int TotFrameDivider = 0;    // Total number of window frame/divider objects
     bool AirFlowFlag = false;
@@ -1968,7 +1923,6 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> SurfTempEffBulkAir;                 // air temperature adjacent to the surface used for inside surface heat balances
 
     // Material
-    Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
     Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
     Array1D<Real64> NominalUBeforeAdjusted;         // Nominal U value for glazing system only
@@ -2011,9 +1965,6 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::SpaceZoneSimData> ZoneIntGain;
     EPVector<DataHeatBalance::SpaceZoneSimData> spaceIntGain;
     EPVector<DataHeatBalance::SpaceIntGainDeviceData> spaceIntGainDevices;
-    EPVector<DataHeatBalance::GapSupportPillar> SupportPillar;
-    EPVector<DataHeatBalance::GapDeflectionState> DeflectionState;
-    EPVector<DataHeatBalance::SpectralDataProperties> SpectralData;
     EPVector<DataHeatBalance::SpaceData> space;
     EPVector<DataHeatBalance::SpaceListData> spaceList;
     EPVector<DataHeatBalance::ZoneData> Zone;
@@ -2045,7 +1996,6 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
     EPVector<DataHeatBalance::AirReportVars> ZnAirRpt;
     EPVector<DataHeatBalance::AirReportVars> spaceAirRpt;
-    EPVector<DataHeatBalance::TCGlazingsType> TCGlazings;
     EPVector<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
     EPVector<DataHeatBalance::ZoneReportVars> ZoneRpt;
     EPVector<DataHeatBalance::ZoneReportVars> spaceRpt;

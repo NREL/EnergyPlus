@@ -5210,9 +5210,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     auto &s_mat = state->dataMaterial;
     
     s_mat->TotMaterials = 1;
-    auto *mat1 = new Material::MaterialChild;
+    auto *mat1 = new Material::MaterialGlass;
     mat1->Name = "GLASS";
-    mat1->group = Material::Group::WindowGlass;
+    mat1->group = Material::Group::Glass;
     s_mat->materials.push_back(mat1);
     mat1->Num = s_mat->materials.isize();
     s_mat->materialMap.insert_or_assign(mat1->Name, mat1->Num);
