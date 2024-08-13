@@ -700,10 +700,15 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
         if ((int)dl->illumMaps.size() > 0) {
             for (int MapNum = 1; MapNum <= (int)dl->illumMaps.size(); ++MapNum) {
                 int mapZoneNum = dl->illumMaps(MapNum).zoneIndex;
+                std::string name = format("Zone={}", state.dataHeatBal->Zone(mapZoneNum).Name);
+                int mapSpaceNum = dl->illumMaps(MapNum).spaceIndex;
+                if (mapSpaceNum > 0) {
+                    name = format("Space={}", state.dataHeatBal->space(mapSpaceNum).Name);
+                }
                 if (state.dataGlobal->WarmupFlag) {
-                    DisplayString(state, "Calculating Daylighting Coefficients (Map Points), Zone=" + state.dataHeatBal->Zone(mapZoneNum).Name);
+                    DisplayString(state, format("Calculating Daylighting Coefficients (Map Points), {}", name));
                 } else {
-                    DisplayString(state, "Updating Daylighting Coefficients (Map Points), Zone=" + state.dataHeatBal->Zone(mapZoneNum).Name);
+                    DisplayString(state, format("Updating Daylighting Coefficients (Map Points), {}", name));
                 }
                 CalcDayltgCoeffsMapPoints(state, MapNum);
             }
@@ -4033,37 +4038,46 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
 
             auto &illumMap = dl->illumMaps(MapNum);
             illumMap.Name = ipsc->cAlphaArgs(1);
-            illumMap.zoneIndex = Util::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone);
-
-            if (illumMap.zoneIndex == 0) {
-                ShowSevereError(state,
-                                format("{}=\"{}\", invalid {}=\"{}\".",
-                                       ipsc->cCurrentModuleObject,
-                                       ipsc->cAlphaArgs(1),
-                                       ipsc->cAlphaFieldNames(2),
-                                       ipsc->cAlphaArgs(2)));
-                ErrorsFound = true;
+            int const spaceNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->space);
+            if (spaceNum > 0) {
+                illumMap.spaceIndex = spaceNum;
+                illumMap.zoneIndex = state.dataHeatBal->space(spaceNum).zoneNum;
+                illumMap.enclIndex = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
+                assert(illumMap.enclIndex > 0);
             } else {
-                // set enclosure index for first space in zone
-                int zoneNum = illumMap.zoneIndex;
-                int enclNum = state.dataHeatBal->space(state.dataHeatBal->Zone(zoneNum).spaceIndexes(1)).solarEnclosureNum;
-                illumMap.enclIndex = enclNum;
-                // check that all spaces in the zone are in the same enclosure
-                for (int spaceCounter = 2; spaceCounter <= state.dataHeatBal->Zone(zoneNum).numSpaces; ++spaceCounter) {
-                    int spaceNum = state.dataHeatBal->Zone(zoneNum).spaceIndexes(spaceCounter);
-                    if (enclNum != state.dataHeatBal->space(spaceNum).solarEnclosureNum) {
-                        ShowSevereError(state,
-                                        format("{}=\"{}\" All spaces in the zone must be in the same enclosure for daylighting illuminance maps.",
-                                               ipsc->cCurrentModuleObject,
-                                               ipsc->cAlphaArgs(1)));
-                        ErrorsFound = true;
-                        break;
+                illumMap.zoneIndex = Util::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone);
+                if (illumMap.zoneIndex == 0) {
+                    ShowSevereError(state,
+                                    format("{}=\"{}\", invalid {}=\"{}\".",
+                                           ipsc->cCurrentModuleObject,
+                                           ipsc->cAlphaArgs(1),
+                                           ipsc->cAlphaFieldNames(2),
+                                           ipsc->cAlphaArgs(2)));
+                    ErrorsFound = true;
+                } else {
+                    // set enclosure index for first space in zone
+                    int zoneNum = illumMap.zoneIndex;
+                    int enclNum = state.dataHeatBal->space(state.dataHeatBal->Zone(zoneNum).spaceIndexes(1)).solarEnclosureNum;
+                    illumMap.enclIndex = enclNum;
+                    // check that all spaces in the zone are in the same enclosure
+                    for (int spaceCounter = 2; spaceCounter <= state.dataHeatBal->Zone(zoneNum).numSpaces; ++spaceCounter) {
+                        int spaceNum = state.dataHeatBal->Zone(zoneNum).spaceIndexes(spaceCounter);
+                        if (enclNum != state.dataHeatBal->space(spaceNum).solarEnclosureNum) {
+                            ShowSevereError(state,
+                                            format("{}=\"{}\" All spaces in the zone must be in the same enclosure for daylighting illuminance maps.",
+                                                   ipsc->cCurrentModuleObject,
+                                                   ipsc->cAlphaArgs(1)));
+                            ShowContinueError(
+                                state,
+                                format("Zone=\"{}\" spans multiple enclosures. Use a Space Name instead.", state.dataHeatBal->Zone(zoneNum).Name));
+                            ErrorsFound = true;
+                            break;
+                        }
                     }
                 }
             }
 
             illumMap.Z = ipsc->rNumericArgs(1);
-
             illumMap.Xmin = ipsc->rNumericArgs(2);
             illumMap.Xmax = ipsc->rNumericArgs(3);
             if (ipsc->rNumericArgs(2) > ipsc->rNumericArgs(3)) {
@@ -4308,6 +4322,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
         }
     }
     ZoneMsgDone.deallocate();
+    if (ErrorsFound) return;
 
     if (TotIllumMaps > 0) {
         print(state.files.eio,
@@ -4330,7 +4345,6 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
               illumMap.Z);
     }
 
-    if (ErrorsFound) return;
 } // GetInputIlluminanceMap()
 
 void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
