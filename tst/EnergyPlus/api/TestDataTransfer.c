@@ -79,7 +79,7 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
         char **surfaceNames = getObjectNames(state, "BuildingSurface:Detailed", &arraySize);
 
         if (arraySize == 0) {
-            printf("Encountered a file with no BuildingSurface:Detailed, can't run this script on that file! Aborting!");
+            printf("Encountered a file with no BuildingSurface:Detailed, can't run this script on that file! Aborting!\n");
             exit(1);
         }
 
@@ -91,7 +91,23 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
         wallConstruction = getConstructionHandle(state, "R13WALL");
         floorConstruction = getConstructionHandle(state, "FLOOR");
 
-        // don't forget to free memory from the API!
+        // checking for EMS globals
+        int const emsGlobalValid = getEMSGlobalVariableHandle(state, "MaximumEffort");
+        int const emsGlobalInvalid = getEMSGlobalVariableHandle(state, "4or5moments");
+        int const emsGlobalBuiltIn = getEMSGlobalVariableHandle(state, "WARMUPFLAG");
+        if (emsGlobalValid > 0 && emsGlobalInvalid == 0 && emsGlobalBuiltIn == 0) {
+            printf("EMS Global handle lookups worked just fine!\n");
+        } else {
+            printf("EMS Global handle lookup failed.  Make sure to call this with _1ZoneUncontrolled_ForAPITesting.idf\n");
+            exit(1);
+        }
+        setEMSGlobalVariableValue(state, emsGlobalValid, 2.0);
+        Real64 const val = getEMSGlobalVariableValue(state, emsGlobalValid);
+        if (val < 1.9999 || val > 2.0001) {
+            printf("EMS Global assignment/lookup didn't seem to work, odd\n");
+            exit(1);
+        }
+
         freeAPIData(data, arraySize);
         freeObjectNames(surfaceNames, arraySize);
 
@@ -107,9 +123,11 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
             exit(1);
         }
 
-        char *filePath = inputFilePath(state);
-        printf("Input file path accessed via API: %s\n", filePath);
-        free(filePath);
+        char *idfPath = inputFilePath(state);
+        char *epwPath = epwFilePath(state);
+        printf("Got an input file path of: %s, and weather file path of: %s\n", idfPath, epwPath);
+        free(idfPath);
+        free(epwPath);
 
         handlesRetrieved = 1;
     }

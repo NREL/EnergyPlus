@@ -141,6 +141,8 @@ class DataExchange:
         self.api.resetErrorFlag.restype = c_void_p
         self.api.inputFilePath.argtypes = [c_void_p]
         self.api.inputFilePath.restype = c_char_p
+        self.api.epwFilePath.argtypes = [c_void_p]
+        self.api.epwFilePath.restype = c_char_p
         self.api.requestVariable.argtypes = [c_void_p, c_char_p, c_char_p]
         self.api.getNumNodesInCondFDSurfaceLayer.argtypes = [c_void_p, c_char_p, c_char_p]
         self.api.requestVariable.restype = c_void_p
@@ -370,7 +372,18 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Returns a raw bytes representation of the input file path
         """
-        return self.api.inputFilePath(state)
+        return self.api.inputFilePath(state)  # TODO: Need to call free for the underlying char *?
+
+    def get_weather_file_path(self, state: c_void_p) -> bytes:
+        """
+        Provides the weather file path back to the client. In most circumstances the client will know the path to the
+        weather file, but there are some cases where code is generalized in unexpected workflows.  Users have requested
+        a way to get the weather file path back from the running instance.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: Returns a raw bytes representation of the weather file path
+        """
+        return self.api.epwFilePath(state)
 
     def get_object_names(self, state: c_void_p, object_type_name: Union[str, bytes]) -> List[str]:
         """

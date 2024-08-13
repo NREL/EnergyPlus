@@ -127,6 +127,12 @@ ENERGYPLUSLIB_API void resetErrorFlag(EnergyPlusState state);
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \return A char * of the input file path.  This allocates a new char *, and calling clients must free this when done with it!
 ENERGYPLUSLIB_API char *inputFilePath(EnergyPlusState state);
+/// \brief Provides the weather file path back to the user
+/// \details In most circumstances the client will know the path to the weather file, but there are some cases where code
+///          is generalized in unexpected workflows.  Users have requested a way to get the weather file path back from the running instance.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \return A char * of the weather file path.  This allocates a new char *, and calling clients must free this when done with it!
+ENERGYPLUSLIB_API char *epwFilePath(EnergyPlusState state);
 
 // ----- DATA TRANSFER HELPER FUNCTIONS
 

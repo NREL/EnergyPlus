@@ -248,6 +248,14 @@ char *inputFilePath(EnergyPlusState state)
     return p;
 }
 
+char *epwFilePath(EnergyPlusState state)
+{
+    const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
+    char *p = new char[std::strlen(thisState->files.inputWeatherFilePath.filePath.c_str()) + 1];
+    std::strcpy(p, thisState->files.inputWeatherFilePath.filePath.c_str());
+    return p;
+}
+
 char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
 {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
@@ -588,6 +596,9 @@ int getEMSGlobalVariableHandle(EnergyPlusState state, const char *name)
     int index = 0;
     for (auto const &erlVar : thisState->dataRuntimeLang->ErlVariable) {
         index++;
+        if (index <= thisState->dataRuntimeLang->NumBuiltInErlVariables) {
+            continue; // don't return handles to the built-in EMS variables, they can be accessed via API endpoints
+        }
         if (EnergyPlus::Util::SameString(name, erlVar.Name)) {
             return index;
         }
@@ -598,7 +609,7 @@ int getEMSGlobalVariableHandle(EnergyPlusState state, const char *name)
 Real64 getEMSGlobalVariableValue(EnergyPlusState state, int handle)
 {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    if (handle < 0 || handle > thisState->dataRuntimeLang->NumErlVariables) {
+    if (handle < thisState->dataRuntimeLang->NumBuiltInErlVariables || handle > thisState->dataRuntimeLang->NumErlVariables) {
         // need to fatal out once the process is done
         // throw an error, set the fatal flag, and then return 0
         EnergyPlus::ShowSevereError(
@@ -614,7 +625,7 @@ Real64 getEMSGlobalVariableValue(EnergyPlusState state, int handle)
 void setEMSGlobalVariableValue(EnergyPlusState state, int handle, Real64 value)
 {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    if (handle < 0 || handle > thisState->dataRuntimeLang->NumErlVariables) {
+    if (handle < thisState->dataRuntimeLang->NumBuiltInErlVariables || handle > thisState->dataRuntimeLang->NumErlVariables) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(

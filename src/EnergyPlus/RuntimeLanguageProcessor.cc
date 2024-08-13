@@ -160,6 +160,9 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
         state.dataRuntimeLangProcessor->ActualTimeNum = NewEMSVariable(state, "ACTUALTIME", 0);
         state.dataRuntimeLangProcessor->WarmUpFlagNum = NewEMSVariable(state, "WARMUPFLAG", 0);
 
+        // this ensures we stay in sync with the number of skipped built-ins for API calls
+        assert(state.dataRuntimeLang->NumErlVariables == state.dataRuntimeLang->NumBuiltInErlVariables);
+
         GetRuntimeLanguageUserInput(state); // Load and parse all runtime language objects
 
         date_and_time(datestring, _, _, datevalues);
