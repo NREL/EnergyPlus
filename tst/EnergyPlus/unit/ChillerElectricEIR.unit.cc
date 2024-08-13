@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -159,7 +160,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
         "  Air cooled CentCapFT,               !- Cooling Capacity Function of Temperature Curve Name",
         "  Air cooled CentEIRFT,               !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name",
         "  Air cooled CentEIRFPLR,             !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name",
-        "  0.10,                               !- Minimum Part Load Ratio",
+        "  0.25,                               !- Minimum Part Load Ratio",
         "  1.00,                               !- Maximum Part Load Ratio",
         "  1.00,                               !- Optimum Part Load Ratio",
         "  0.25,                               !- Minimum Unloading Ratio",
@@ -181,8 +182,15 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
         "  ,                                   !- Basin Heater Operating Schedule Name",
         "  1.00,                               !- Condenser Heat Recovery Relative Capacity Fraction",
         "  ,                                   !- Heat Recovery Inlet High Temperature Limit Schedule Name",
-        "  ;                                   !- Heat Recovery Leaving Temperature Setpoint Node Name",
+        "  ,                                   !- Heat Recovery Leaving Temperature Setpoint Node Name",
+        "  ,                                   !- End-Use Subcategory",
+        "  ,                                   !- Condenser Flow Control",
+        "  ,                                   !- Condenser Loop Flow Rate Fraction Function of Loop Part Load Ratio Curve Name",
+        "  ,                                   !- Temperature Difference Across Condenser Schedule Name",
+        "  ,                                   !- Condenser Minimum Flow Fraction",
+        "  ThermoCapFracCurve;                 !- Thermosiphon Capacity Fraction Curve Name",
 
+        "Curve:Linear, ThermoCapFracCurve, 0.0, 0.06, 0.0, 10.0, 0.0, 1.0, Dimensionless, Dimensionless;",
         "Curve:Biquadratic, Air cooled CentCapFT, 0.257896, 0.0389016, -0.00021708, 0.0468684, -0.00094284, -0.00034344, 5, 10, 24, 35, , , , , ;",
         "Curve:Biquadratic, Air cooled CentEIRFT, 0.933884, -0.058212,  0.00450036, 0.00243,    0.000486,   -0.001215,   5, 10, 24, 35, , , , , ;",
         "Curve:Quadratic, Air cooled CentEIRFPLR, 0.222903,  0.313387,  0.46371,    0, 1, , , , ;",
@@ -217,6 +225,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
         DataPlant::PlantEquipmentType::Chiller_ElectricEIR;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = thisEIR.EvapInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = thisEIR.EvapOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).TempSetPointNodeNum = thisEIR.EvapOutletNodeNum;
 
     state->dataSize->PlantSizData.allocate(1);
     state->dataSize->PlantSizData(1).DesVolFlowRate = 0.001;
@@ -241,6 +251,36 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     EXPECT_EQ(CalcCondVolFlow, thisEIR.CondVolFlowRate);
     EXPECT_NEAR(thisEIR.CondVolFlowRate, 2.3925760323498, 0.0000001);
     EXPECT_NEAR(thisEIR.CondMassFlowRateMax, 2.7918772761695, 0.0000001);
+
+    // test thermosiphon model
+    state->dataLoopNodes->Node(thisEIR.EvapInletNodeNum).Temp = 10.0;
+    state->dataLoopNodes->Node(thisEIR.EvapOutletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(thisEIR.EvapOutletNodeNum).TempSetPoint = 6.0;
+    state->dataLoopNodes->Node(thisEIR.CondInletNodeNum).OutAirDryBulb = 12.0; // condenser inlet temp > evap outlet temp
+
+    thisEIR.initialize(*state, RunFlag, MyLoad);
+    thisEIR.calculate(*state, MyLoad, RunFlag);
+    EXPECT_GT(thisEIR.ChillerPartLoadRatio, 0.4); // load is large
+    EXPECT_EQ(thisEIR.thermosiphonStatus, 0);     // thermosiphon is off
+    EXPECT_GT(thisEIR.Power, 1500.0);             // power is non-zero
+
+    state->dataLoopNodes->Node(thisEIR.CondInletNodeNum).OutAirDryBulb = 5.0; // condenser inlet temp < evap outlet temp
+
+    thisEIR.initialize(*state, RunFlag, MyLoad);
+    thisEIR.calculate(*state, MyLoad, RunFlag);
+    EXPECT_GT(thisEIR.ChillerPartLoadRatio, 0.4); // load is large
+    EXPECT_EQ(thisEIR.thermosiphonStatus, 0);     // thermosiphon is off
+    EXPECT_GT(thisEIR.Power, 1500.0);             // power is non-zero
+
+    MyLoad /= 25.0; // reduce load such that thermosiphon can meet load
+    thisEIR.initialize(*state, RunFlag, MyLoad);
+    thisEIR.calculate(*state, MyLoad, RunFlag);
+    Real64 dT = thisEIR.EvapOutletTemp - thisEIR.CondInletTemp;
+    Real64 thermosiphonCapFrac = Curve::CurveValue(*state, thisEIR.thermosiphonTempCurveIndex, dT);
+    EXPECT_LT(thisEIR.ChillerPartLoadRatio, 0.3);                 // load is small
+    EXPECT_GT(thermosiphonCapFrac, thisEIR.ChillerPartLoadRatio); // thermosiphon capacity can meet load
+    EXPECT_EQ(thisEIR.thermosiphonStatus, 1);                     // thermosiphon is on
+    EXPECT_EQ(thisEIR.Power, 0.0);                                // power is zero
 }
 
 TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)

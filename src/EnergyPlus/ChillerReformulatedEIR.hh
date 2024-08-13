@@ -221,6 +221,11 @@ namespace ChillerReformulatedEIR {
         bool VSBranchPumpFoundCond = false;
         bool VSLoopPumpFoundCond = false;
 
+        // thermosiphon model
+        int thermosiphonTempCurveIndex = 0;
+        Real64 thermosiphonMinTempDiff = 0.0;
+        int thermosiphonStatus = 0;
+
         static ReformulatedEIRChillerSpecs *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
@@ -255,6 +260,8 @@ namespace ChillerReformulatedEIR {
         void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
 
         void checkMinMaxCurveBoundaries(EnergyPlusData &state, bool FirstIteration);
+
+        bool thermosiphonDisabled(EnergyPlusData &state);
     };
 
     void GetElecReformEIRChillerInput(EnergyPlusData &state);

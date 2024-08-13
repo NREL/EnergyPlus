@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.5.1)
+
+if(POLICY CMP0087)
+  cmake_policy(SET CMP0087 NEW) # install(CODE) and install(SCRIPT) support generator expressions.
+endif()
+
 project(ConvertInputFormat)
 
 if(APPLE OR UNIX)
@@ -28,6 +33,11 @@ set_target_properties(ConvertInputFormat PROPERTIES VERSION ${ENERGYPLUS_VERSION
 set_target_properties(ConvertInputFormat PROPERTIES FOLDER Auxiliary)
 
 install(TARGETS ConvertInputFormat DESTINATION ./)
+
+if(APPLE AND CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/CodeSigning.cmake")
+  register_install_codesign_target(ConvertInputFormat ".")
+endif()
 
 if(BUILD_TESTING)
 
