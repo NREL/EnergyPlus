@@ -137,16 +137,16 @@ namespace CondenserLoopTowers {
         this->initialize(state);
         switch (this->TowerType) {
         case DataPlant::PlantEquipmentType::CoolingTower_SingleSpd:
-            this->calculateSingleSpeedTower(state, CurLoad);
+            this->calculateSingleSpeedTower(state, CurLoad, RunFlag);
             break;
         case DataPlant::PlantEquipmentType::CoolingTower_TwoSpd:
-            this->calculateTwoSpeedTower(state, CurLoad);
+            this->calculateTwoSpeedTower(state, CurLoad, RunFlag);
             break;
         case DataPlant::PlantEquipmentType::CoolingTower_VarSpd:
-            this->calculateVariableSpeedTower(state, CurLoad);
+            this->calculateVariableSpeedTower(state, CurLoad, RunFlag);
             break;
         case DataPlant::PlantEquipmentType::CoolingTower_VarSpdMerkel:
-            this->calculateMerkelVariableSpeedTower(state, CurLoad);
+            this->calculateMerkelVariableSpeedTower(state, CurLoad, RunFlag);
             break;
         default:
             ShowFatalError(state, format("Plant Equipment Type specified for {} is not a Cooling Tower.", this->Name));
@@ -4535,7 +4535,7 @@ namespace CondenserLoopTowers {
         }
     } // namespace CondenserLoopTowers
 
-    void CoolingTower::calculateSingleSpeedTower(EnergyPlusData &state, Real64 &MyLoad)
+    void CoolingTower::calculateSingleSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4696,7 +4696,7 @@ namespace CondenserLoopTowers {
         // Do not RETURN here if flow rate is less than SmallMassFlow. Check basin heater and then RETURN.
 
         bool returnFlagSet = false;
-        this->checkMassFlowAndLoad(state, MyLoad, returnFlagSet);
+        this->checkMassFlowAndLoad(state, MyLoad, RunFlag, returnFlagSet);
         if (returnFlagSet) return;
 
         bool IncrNumCellFlag = true; // determine if yes or no we increase the number of cells // set value to true to enter in the loop
@@ -4843,7 +4843,7 @@ namespace CondenserLoopTowers {
         this->airFlowRateRatio = (AirFlowRate * this->NumCell) / this->HighSpeedAirFlowRate;
     }
 
-    void CoolingTower::calculateTwoSpeedTower(EnergyPlusData &state, Real64 &MyLoad)
+    void CoolingTower::calculateTwoSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4971,7 +4971,7 @@ namespace CondenserLoopTowers {
         if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
             return; // TODO: WTF
         bool returnFlagSet = false;
-        this->checkMassFlowAndLoad(state, MyLoad, returnFlagSet);
+        this->checkMassFlowAndLoad(state, MyLoad, RunFlag, returnFlagSet);
         if (returnFlagSet) return;
 
         // Added for multi-cell. Determine the number of cells operating
@@ -5082,7 +5082,7 @@ namespace CondenserLoopTowers {
         this->airFlowRateRatio = (AirFlowRate * this->NumCell) / this->HighSpeedAirFlowRate;
     }
 
-    void CoolingTower::calculateVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad)
+    void CoolingTower::calculateVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5204,7 +5204,7 @@ namespace CondenserLoopTowers {
             return; // TODO: WTF
 
         bool returnFlagSet = false;
-        this->checkMassFlowAndLoad(state, MyLoad, returnFlagSet);
+        this->checkMassFlowAndLoad(state, MyLoad, RunFlag, returnFlagSet);
         if (returnFlagSet) return;
 
         // loop to increment NumCell if we cannot meet the setpoint with the actual number of cells calculated above
@@ -5418,7 +5418,7 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CoolingTower::calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad)
+    void CoolingTower::calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5504,20 +5504,17 @@ namespace CondenserLoopTowers {
 
         WaterMassFlowRatePerCell = this->WaterMassFlowRate / this->NumCellOn;
 
-        // MassFlowTolerance is a parameter to indicate a no flow condition
-        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || (MyLoad > HVAC::SmallLoad)) {
-            // for multiple cells, we assume that it's a common basin
-            CalcBasinHeaterPower(
-                state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
-            return;
-        }
-
-        if (std::abs(MyLoad) <= HVAC::SmallLoad) {
+        if ((std::abs(MyLoad) <= HVAC::SmallLoad) || !RunFlag) {
             // tower doesn't need to do anything
             this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
             this->FanPower = 0.0;
             this->airFlowRateRatio = 0.0;
             this->Qactual = 0.0;
+            CalcBasinHeaterPower(
+                state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
+            return;
+        } else if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || (MyLoad > HVAC::SmallLoad)) {
+            // for multiple cells, we assume that it's a common basin
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
@@ -6455,24 +6452,21 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CoolingTower::checkMassFlowAndLoad(EnergyPlusData &state, Real64 const MyLoad, bool &returnFlagSet)
+    void CoolingTower::checkMassFlowAndLoad(EnergyPlusData &state, Real64 const MyLoad, bool RunFlag, bool &returnFlagSet)
     {
-        // MassFlowTolerance is a parameter to indicate a no flow condition
-        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
-            // for multiple cells, we assume that it's a common basin
-            CalcBasinHeaterPower(
-                state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
-            returnFlagSet = true;
-        }
-
-        // Also check to see if the tower is not running (zero MyLoad)
-        if (std::abs(MyLoad) <= HVAC::SmallLoad) {
+        if ((MyLoad > -HVAC::SmallLoad) || !RunFlag) {
             // tower doesn't need to do anything
             this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
-            this->WaterMassFlowRate = 0.0;
             this->FanPower = 0.0;
             this->airFlowRateRatio = 0.0;
             this->Qactual = 0.0;
+            this->WaterMassFlowRate = 0.0;
+            PlantUtilities::SetComponentFlowRate(state, this->WaterMassFlowRate, this->WaterInletNodeNum, this->WaterOutletNodeNum, this->plantLoc);
+            CalcBasinHeaterPower(
+                state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
+            returnFlagSet = true;
+        } else if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
+            // for multiple cells, we assume that it's a common basin
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             returnFlagSet = true;
