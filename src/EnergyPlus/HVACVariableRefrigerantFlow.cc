@@ -11506,9 +11506,9 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
         // Key outputs of this subroutine
         this->CompActSpeed = max(CompSpdActual, 0.0);
-        this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter; // 0.95 is the efficiency of the compressor inverter, can come from IDF //@minor
-        this->OUFanPower = this->RatedOUFanPower * CyclingRatio;              //@ * pow_3( CondFlowRatio )
-        this->VRFCondCyclingRatio = CyclingRatio;              // report variable for cycling rate
+        this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter;   // 0.95 is the efficiency of the compressor inverter, can come from IDF //@minor
+        this->OUFanPower = this->RatedOUFanPower * CyclingRatio; //@ * pow_3( CondFlowRatio )
+        this->VRFCondCyclingRatio = CyclingRatio;                // report variable for cycling rate
 
         Tdischarge = this->CondensingTemp; // outdoor unit condensing temperature
         this->CoolingCapacity =
