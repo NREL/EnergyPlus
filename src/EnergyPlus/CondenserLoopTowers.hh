@@ -387,13 +387,13 @@ namespace CondenserLoopTowers {
 
         void SizeVSMerkelTower(EnergyPlusData &state);
 
-        void calculateSingleSpeedTower(EnergyPlusData &state, Real64 &MyLoad);
+        void calculateSingleSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void calculateTwoSpeedTower(EnergyPlusData &state, Real64 &MyLoad);
+        void calculateTwoSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad);
+        void calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void calculateVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad);
+        void calculateVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
         Real64 calculateSimpleTowerOutletTemp(EnergyPlusData &state, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
 
@@ -427,7 +427,7 @@ namespace CondenserLoopTowers {
 
         void report(EnergyPlusData &state, bool RunFlag);
 
-        void checkMassFlowAndLoad(EnergyPlusData &state, Real64 MyLoad, bool &returnFlagSet);
+        void checkMassFlowAndLoad(EnergyPlusData &state, Real64 MyLoad, bool RunFlag, bool &returnFlagSet);
 
         static CoolingTower *factory(EnergyPlusData &state, std::string_view objectName);
     };
