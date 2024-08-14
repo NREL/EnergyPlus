@@ -596,11 +596,11 @@ int getEMSGlobalVariableHandle(EnergyPlusState state, const char *name)
     int index = 0;
     for (auto const &erlVar : thisState->dataRuntimeLang->ErlVariable) {
         index++;
-        if (index <= thisState->dataRuntimeLang->NumBuiltInErlVariables) {
-            continue; // don't return handles to the built-in EMS variables, they can be accessed via API endpoints
-        }
-        if (EnergyPlus::Util::SameString(name, erlVar.Name)) {
-            return index;
+        // only respond if we are outside of the built-in EMS var range
+        if (index < thisState->dataRuntimeLang->emsVarBuiltInStart || index > thisState->dataRuntimeLang->emsVarBuiltInEnd) {
+            if (EnergyPlus::Util::SameString(name, erlVar.Name)) {
+                return index;
+            }
         }
     }
     return 0;
@@ -609,7 +609,9 @@ int getEMSGlobalVariableHandle(EnergyPlusState state, const char *name)
 Real64 getEMSGlobalVariableValue(EnergyPlusState state, int handle)
 {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    if (handle < thisState->dataRuntimeLang->NumBuiltInErlVariables || handle > thisState->dataRuntimeLang->NumErlVariables) {
+    auto const &erl = thisState->dataRuntimeLang;
+    bool const insideBuiltInRange = index >= erl->emsVarBuiltInStart && index <= erl->emsVarBuiltInEnd;
+    if (insideBuiltInRange || handle > thisState->dataRuntimeLang->NumErlVariables) {
         // need to fatal out once the process is done
         // throw an error, set the fatal flag, and then return 0
         EnergyPlus::ShowSevereError(
@@ -619,13 +621,15 @@ Real64 getEMSGlobalVariableValue(EnergyPlusState state, int handle)
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
-    return thisState->dataRuntimeLang->ErlVariable(handle).Value.Number;
+    return erl->ErlVariable(handle).Value.Number;
 }
 
 void setEMSGlobalVariableValue(EnergyPlusState state, int handle, Real64 value)
 {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    if (handle < thisState->dataRuntimeLang->NumBuiltInErlVariables || handle > thisState->dataRuntimeLang->NumErlVariables) {
+    auto const &erl = thisState->dataRuntimeLang;
+    bool const insideBuiltInRange = index >= erl->emsVarBuiltInStart && index <= erl->emsVarBuiltInEnd;
+    if (insideBuiltInRange || handle > erl->NumErlVariables) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError(
@@ -634,7 +638,7 @@ void setEMSGlobalVariableValue(EnergyPlusState state, int handle, Real64 value)
                                       "The setEMSGlobalVariableValue function will return to allow the plugin to finish, then EnergyPlus will abort");
         thisState->dataPluginManager->apiErrorFlag = true;
     }
-    thisState->dataRuntimeLang->ErlVariable(handle).Value.Number = value;
+    erl->ErlVariable(handle).Value.Number = value;
 }
 
 int getPluginGlobalVariableHandle(EnergyPlusState state, const char *name)

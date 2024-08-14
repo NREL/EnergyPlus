@@ -738,9 +738,9 @@ struct RuntimeLanguageData : BaseGlobalStruct
 {
 
     // In the API, we allow the user to manipulate user-defined EMS globals, but we skip the built-in ones to avoid
-    // problems.  This constexpr should be incremented if we ever add more built-ins so that we skip the right amount
-    // in the API calls.
-    static int constexpr NumBuiltInErlVariables = 27;
+    // problems.  The built-in ones will not always start at zero, so we keep a start/end to ignore that specific range.
+    int emsVarBuiltInStart = 0;
+    int emsVarBuiltInEnd = 0;
 
     int NumProgramCallManagers = 0;       // count of Erl program managers with calling points
     int NumSensors = 0;                   // count of EMS sensors used in model (data from output variables)
