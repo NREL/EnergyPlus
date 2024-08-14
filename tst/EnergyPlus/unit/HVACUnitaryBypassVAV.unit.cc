@@ -1715,7 +1715,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
     // set sizing variables
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
-    state->dataGlobal->SysSizingCalc = true;  // disable sizing calculation
+    state->dataGlobal->SysSizingCalc = true; // disable sizing calculation
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     // set local variables for convenience
