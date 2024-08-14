@@ -87,7 +87,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     state->dataHeatBalSurf->SurfMovInsulExtPresent(1) = true;
     state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
-    auto *mat1 = new Material::MaterialBase;
+    auto *mat1 = new Material::MaterialShade;
     s_mat->materials.push_back(mat1);
     mat1->Resistance = 1.25;
     mat1->Roughness = Material::SurfaceRoughness::VeryRough;
@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
-    auto *mat = new Material::MaterialBase;
+    auto *mat = new Material::MaterialShade;
     state->dataMaterial->materials.push_back(mat);
     mat->Resistance = 1.25;
     mat->Roughness = Material::SurfaceRoughness::VeryRough;

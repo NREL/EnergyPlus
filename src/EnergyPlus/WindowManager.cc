@@ -460,7 +460,8 @@ namespace Window {
 
             if (IntShade || ExtShade || ExtScreen) {
                 ShadeLayPtr = thisConstruct.LayerPoint(ShadeLayNum);
-                auto const *matShade = s_mat->materials(ShadeLayPtr);
+                auto const *matShade = dynamic_cast<Material::MaterialShade const *>(s_mat->materials(ShadeLayPtr));
+                assert(matShade != nullptr);
                 if (ExtScreen) {
                     auto const *matScreen = dynamic_cast<Material::MaterialScreen const *>(matShade);
                     assert(matScreen != nullptr);
@@ -1516,12 +1517,14 @@ namespace Window {
             auto &surfShade = s_surf->surfShades(SurfNum);
             
             auto const *mat = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay));
+            auto const *matFen = dynamic_cast<Material::MaterialFen const *>(mat);
+            assert(matFen != nullptr);
 
             if (mat->group == Material::Group::Shade) {
                 Real64 EpsGlIR = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
                 Real64 RhoGlIR = 1 - EpsGlIR;
-                Real64 TauShIR = mat->TransThermal;
-                Real64 EpsShIR = mat->AbsorpThermal;
+                Real64 TauShIR = matFen->TransThermal;
+                Real64 EpsShIR = matFen->AbsorpThermal;
                 Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                 surfShade.effShadeEmi = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
                 surfShade.effGlassEmi = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
@@ -2299,17 +2302,18 @@ namespace Window {
                 LayPtr = state.dataConstruction->Construct(IConst).LayerPoint(Lay);
                 auto const *mat = s_mat->materials(LayPtr);
 
-                if ((mat->group == Material::Group::Glass) || (mat->group == Material::Group::GlassSimple)) {
+                if (mat->group == Material::Group::Glass || mat->group == Material::Group::GlassSimple) {
                     ++IGlass;
-                    wm->thick[IGlass - 1] = mat->Thickness;
-                    wm->scon[IGlass - 1] = mat->Conductivity / mat->Thickness;
-                    wm->emis[2 * IGlass - 2] = mat->AbsorpThermalFront;
-                    wm->emis[2 * IGlass - 1] = mat->AbsorpThermalBack;
-                    wm->tir[2 * IGlass - 2] = mat->TransThermal;
-                    wm->tir[2 * IGlass - 1] = mat->TransThermal;
-                }
+                    auto const *matGlass = dynamic_cast<Material::MaterialFen const *>(mat);
+                    assert(matGlass != nullptr);
+                    wm->thick[IGlass - 1] = matGlass->Thickness;
+                    wm->scon[IGlass - 1] = matGlass->Conductivity / matGlass->Thickness;
+                    wm->emis[2 * IGlass - 2] = matGlass->AbsorpThermalFront;
+                    wm->emis[2 * IGlass - 1] = matGlass->AbsorpThermalBack;
+                    wm->tir[2 * IGlass - 2] = matGlass->TransThermal;
+                    wm->tir[2 * IGlass - 1] = matGlass->TransThermal;
 
-                if (mat->group == Material::Group::Shade || mat->group == Material::Group::Blind || mat->group == Material::Group::Screen) {
+                } else if (mat->group == Material::Group::Shade || mat->group == Material::Group::Blind || mat->group == Material::Group::Screen) {
                     if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag))
                         ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(state.dataConstruction->Construct(IConst).TotLayers);
                     if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(1);
@@ -2317,12 +2321,13 @@ namespace Window {
                         ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(3);
                         if (TotGlassLay == 3) ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(5);
                     }
-                    auto const *matShade = s_mat->materials(ShadeLayPtr);
+                    auto const *matShade = dynamic_cast<Material::MaterialFen const *>(s_mat->materials(ShadeLayPtr));
                     assert(matShade != nullptr);
+
                     if (ANY_SHADE_SCREEN(ShadeFlag)) {
                         // Shade or screen on
-                        if (state.dataGlobal
-                                ->AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
+                        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { 
+                            // check to make sure the user hasn't messed up the shade control values
                             if (matShade->group == Material::Group::Blind) {
                                 ShowSevereError(
                                     state,
@@ -2333,6 +2338,7 @@ namespace Window {
                         }
                         wm->thick[TotGlassLay] = matShade->Thickness;
                         wm->scon[TotGlassLay] = matShade->Conductivity / matShade->Thickness;
+
                         if (ShadeFlag == WinShadingType::ExtScreen) {
                             auto const *matScreen = dynamic_cast<Material::MaterialScreen const *>(matShade);
                             assert(matScreen != nullptr);
@@ -2347,8 +2353,8 @@ namespace Window {
                         wm->emis[wm->nglface + 1] = matShade->AbsorpThermal;
 
                     } else {
-                        if (state.dataGlobal
-                                ->AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
+                        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { 
+                            // check to make sure the user hasn't messed up the shade control values
                             if (matShade->group == Material::Group::Shade || matShade->group == Material::Group::Screen) {
                                 ShowSevereError(state,
                                                 format("CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"{}\" is being used.",
@@ -2357,7 +2363,7 @@ namespace Window {
                                 ShowFatalError(state, "Preceding condition terminates program.");
                             }
                         }
-                        
+
                         // Blind on
                         auto &surfShade = s_surf->surfShades(SurfNum);
                         auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfShade.blind.matNum));
@@ -2370,9 +2376,8 @@ namespace Window {
                         wm->tir[wm->nglface] = surfShade.blind.TAR.IR.Ft.Tra;
                         wm->tir[wm->nglface + 1] = surfShade.blind.TAR.IR.Bk.Tra;
                     }
-                }
-
-                if (mat->group == Material::Group::Gas || mat->group == Material::Group::GasMixture) {
+                    
+                } else if (mat->group == Material::Group::Gas || mat->group == Material::Group::GasMixture) {
                     ++IGap;
                     auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(s_mat->materials(LayPtr));
                     assert(matGas != nullptr);

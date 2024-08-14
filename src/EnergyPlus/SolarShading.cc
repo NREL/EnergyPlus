@@ -7573,19 +7573,22 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 }
 
                                 // Interior beam absorbed by INTERIOR SHADE of back exterior window
-
                                 if (ShadeFlagBack == WinShadingType::IntShade) {
                                     state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade /
                                         (s_surf->Surface(BackSurfNum).Area + s_surf->SurfWinDividerArea(BackSurfNum));
                                     BABSZone += BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade;
                                     backSurfBeamSolInTrans += BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade;
-                                } else if (ShadeFlagBack ==
-                                           WinShadingType::ExtShade) { // Interior beam absorbed by EXTERIOR SHADE of back exterior window
+
+                                // Interior beam absorbed by EXTERIOR SHADE of back exterior window
+                                } else if (ShadeFlagBack == WinShadingType::ExtShade) { 
                                     Real64 RGlFront = state.dataConstruction->Construct(ConstrNumBack).ReflectSolDiffFront;
-                                    auto const *thisMaterial = s_mat->materials(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(1));
-                                    Real64 AbsSh = thisMaterial->AbsorpSolar;
-                                    Real64 RhoSh = 1.0 - AbsSh - thisMaterial->Trans;
+                                    auto const *matSh = s_mat->materials(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(1));
+                                    auto const *matFenSh = dynamic_cast<Material::MaterialFen const *>(matSh);
+                                    assert(matFenSh != nullptr);
+                                    
+                                    Real64 AbsSh = matFenSh->AbsorpSolar;
+                                    Real64 RhoSh = 1.0 - AbsSh - matFenSh->Trans;
                                     Real64 AShBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef) * AbsSh /
                                                      (1.0 - RGlFront * RhoSh);
                                     BABSZone += BOverlap * AShBack;
@@ -7593,8 +7596,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * AShBack /
                                         (s_surf->Surface(BackSurfNum).Area + s_surf->SurfWinDividerArea(BackSurfNum));
-                                } else if (ShadeFlagBack ==
-                                           WinShadingType::BGShade) { // Interior beam absorbed by BETWEEN-GLASS SHADE of back exterior window
+
+                                // Interior beam absorbed by BETWEEN-GLASS SHADE of back exterior window
+                                } else if (ShadeFlagBack == WinShadingType::BGShade) { 
                                     Real64 rbd1k = state.dataConstruction->Construct(ConstrNumBack).rbBareSolDiff(1);
                                     Real64 rfd2k = state.dataConstruction->Construct(ConstrNumBack).rfBareSolDiff(2);
                                     Real64 AShBack; // System shade absorptance for interior beam solar
@@ -11647,8 +11651,11 @@ void ComputeWinShadeAbsorpFactors(EnergyPlusData &state)
                                 MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(5);
                             }
                         }
-                        auto const *thisMaterialSh = s_mat->materials(MatNumSh);
-                        AbsorpEff = thisMaterialSh->AbsorpSolar / (thisMaterialSh->AbsorpSolar + thisMaterialSh->Trans + 0.0001);
+
+                        auto const *matSh = s_mat->materials(MatNumSh);
+                        auto const *matFenSh = dynamic_cast<Material::MaterialFen const *>(matSh);
+                        assert(matFenSh != nullptr);
+                        AbsorpEff = matFenSh->AbsorpSolar / (matFenSh->AbsorpSolar + matFenSh->Trans + 0.0001);
                         AbsorpEff = min(max(AbsorpEff, 0.0001),
                                         0.999); // Constrain to avoid problems with following log eval
                         s_surf->SurfWinShadeAbsFacFace1(SurfNum) = (1.0 - std::exp(0.5 * std::log(1.0 - AbsorpEff))) / AbsorpEff;

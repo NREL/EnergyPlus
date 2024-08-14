@@ -3859,23 +3859,21 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
 {
-    state->dataMaterial->TotMaterials = 0;
+    auto &s_mat = state->dataMaterial;
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    auto *thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->materials(state->dataMaterial->TotMaterials));
-    EXPECT_EQ(state->dataMaterial->TotMaterials, 1);
-    EXPECT_EQ(thisMaterial->Name, "test_air_8MM");
-    EXPECT_EQ(thisMaterial->Thickness, 0.008);
-    EXPECT_EQ(thisMaterial->gases[0].con.c0, 2.873e-3);
-    EXPECT_EQ(thisMaterial->gases[0].con.c1, 7.760e-5);
+    auto const *mat1 = dynamic_cast<Material::MaterialGasMix const *>(s_mat->materials(1));
+    EXPECT_EQ(mat1->Name, "test_air_8MM");
+    EXPECT_EQ(mat1->Thickness, 0.008);
+    EXPECT_EQ(mat1->gases[0].con.c0, 2.873e-3);
+    EXPECT_EQ(mat1->gases[0].con.c1, 7.760e-5);
 
     createAirMaterialFromDistance(*state, 0.012, "test_air_");
-    thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->materials(state->dataMaterial->TotMaterials));
-    EXPECT_EQ(state->dataMaterial->TotMaterials, 2);
-    EXPECT_EQ(thisMaterial->Name, "test_air_12MM");
-    EXPECT_EQ(thisMaterial->Thickness, 0.012);
+    auto const *mat2 = dynamic_cast<Material::MaterialGasMix const *>(s_mat->materials(2));
+    EXPECT_EQ(mat2->Name, "test_air_12MM");
+    EXPECT_EQ(mat2->Thickness, 0.012);
 
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    EXPECT_EQ(state->dataMaterial->TotMaterials, 2);
+    EXPECT_EQ(s_mat->materials.isize(), 2);
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createConstructionWithStorm_Test)

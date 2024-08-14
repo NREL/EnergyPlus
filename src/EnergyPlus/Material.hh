@@ -179,19 +179,20 @@ namespace Material {
     //    | MaterialGasMix: WindowMaterial:Gas, WindowMaterial:GasMixture
     //    |    | MaterialComplexGap: WindowMaterial:Gap (includes WindowGap:DeflectionState and WindowGap:SupportPillar)              
     //    |
-    //    | MaterialGlass: WindowMaterial:Glazing, WindowMaterial:Glazing:RefractionExtinctionMethod
-    //    |    | MaterialGlassEQL: WindowMaterial:Glazing:EquivalentLayer
-    //    |    | MaterialGlassTCParent: WindowMaterial:GlazingGroup:Thermochromic
-    //    |
-    //    | MaterialShadingDevice: abstract
-    //    |    | MaterialShade: WindowMaterial:Shade
-    //    |    | MaterialBlind: WindowMaterial:Blind
-    //    |    | MaterialScreen: WindowMaterial:Screen
-    //    |    | MaterialComplexShade: WindowMaterial:ComplexShade
-    //    |    | MaterialShadeEQL: WindowMaterial:Shade:EquivalentLayer
-    //    |    |    | MaterialBlindEQL: WindowMaterial:Blind:EquivalentLayer
-    //    |    |    | MaterialDrapeEQL: WindowMaterial:Drape:EquivalentLayer
-    //    |    |    | MaterialScreenEQL: WindowMaterial:Screen:EquivalentLayer
+    //    | MaterialFen: abstract
+    //    |    | MaterialGlass: WindowMaterial:Glazing, WindowMaterial:Glazing:RefractionExtinctionMethod
+    //    |    |    | MaterialGlassEQL: WindowMaterial:Glazing:EquivalentLayer
+    //    |    |    | MaterialGlassTCParent: WindowMaterial:GlazingGroup:Thermochromic
+    //    |    |
+    //    |    | MaterialShadingDevice: abstract
+    //    |    |    | MaterialShade: WindowMaterial:Shade
+    //    |    |    | MaterialBlind: WindowMaterial:Blind
+    //    |    |    | MaterialScreen: WindowMaterial:Screen
+    //    |    |    | MaterialComplexShade: WindowMaterial:ComplexShade
+    //    |    |    |    | MaterialShadeEQL: WindowMaterial:Shade:EquivalentLayer
+    //    |    |    |    | MaterialBlindEQL: WindowMaterial:Blind:EquivalentLayer
+    //    |    |    |    | MaterialDrapeEQL: WindowMaterial:Drape:EquivalentLayer
+    //    |    |    |    | MaterialScreenEQL: WindowMaterial:Screen:EquivalentLayer
     //    |
     //    | MaterialEcoRoof: Material:RoofVegeration
     //    |
@@ -259,14 +260,6 @@ namespace Material {
         int absorpSolarVarSchedIdx = 0;
         int absorpSolarVarFuncIdx = 0;
 
-        // Are these just for windows?
-        Real64 Trans = 0.0;        // Transmittance of layer (glass, shade)
-        Real64 TransVis = 0.0;     // Visible transmittance (at normal incidence)
-        Real64 TransThermal = 0.0; // Infrared radiation transmittance
-
-        Real64 ReflectSolBeamBack = 0.0;  // Solar back reflectance (beam to everything)
-        Real64 ReflectSolBeamFront = 0.0; // Solar front reflectance (beam to everything)
-
         bool hasEMPD = false;
         bool hasHAMT = false;
         bool hasPCM = false;
@@ -283,8 +276,23 @@ namespace Material {
         virtual ~MaterialBase() = default;
     };
 
+    struct MaterialFen : public MaterialBase
+    {
+        // Are these just for windows?
+        Real64 Trans = 0.0;        // Transmittance of layer (glass, shade)
+        Real64 TransVis = 0.0;     // Visible transmittance (at normal incidence)
+        Real64 TransThermal = 0.0; // Infrared radiation transmittance
+
+        Real64 ReflectSolBeamBack = 0.0;  // Solar back reflectance (beam to everything)
+        Real64 ReflectSolBeamFront = 0.0; // Solar front reflectance (beam to everything)
+
+        MaterialFen() : MaterialBase() { group = Group::Invalid; }
+        ~MaterialFen() = default;
+        virtual bool can_instantiate() = 0;
+    };
+        
     // Abstract parent class for all WindowMaterial:X shading device materials (including Equivalent Layer). 
-    struct MaterialShadingDevice : public MaterialBase
+    struct MaterialShadingDevice : public MaterialFen
     {
         // Some characteristics for blind thermal calculation
         Real64 toGlassDist = 0.0;    // Distance between window shade and adjacent glass (m)
@@ -300,7 +308,7 @@ namespace Material {
 
         Real64 airFlowPermeability = 0.0; // The effective area of openings in the shade itself, expressed as a
         //  fraction of the shade area      
-        MaterialShadingDevice() : MaterialBase() {}
+        MaterialShadingDevice() : MaterialFen() { group = Group::Invalid; }
         ~MaterialShadingDevice() = default;
         virtual bool can_instantiate() = 0;  // Prevents this class from being instantiated
     };
@@ -723,7 +731,7 @@ namespace Material {
         Array1D<Real64> ReflBack;   // Back reflectance at normal incidence
     };
 
-    struct MaterialGlass : public MaterialBase
+    struct MaterialGlass : public MaterialFen
     {
         // Window-related radiation parameters
         Real64 GlassTransDirtFactor = 1.0; // Multiplier on glass transmittance due to dirt
@@ -761,20 +769,21 @@ namespace Material {
 
         Window::OpticalDataModel windowOpticalData = Window::OpticalDataModel::SpectralAverage;
             
-        MaterialGlass() : MaterialBase() { group = Group::Glass; }
-
+        MaterialGlass() : MaterialFen() { group = Group::Glass; }
         ~MaterialGlass() = default;
+        bool can_instantiate() { return true; }
 
         void SetupSimpleWindowGlazingSystem(EnergyPlusData &state);
     };
 
-    struct MaterialGlassEQL : public MaterialBase
+    struct MaterialGlassEQL : public MaterialFen
     {
         BlindTraAbsRef<1> TAR;
         Window::OpticalDataModel windowOpticalData = Window::OpticalDataModel::SpectralAverage;
 
-        MaterialGlassEQL() : MaterialBase() { group = Group::GlassEQL; }
+        MaterialGlassEQL() : MaterialFen() { group = Group::GlassEQL; }
         ~MaterialGlassEQL() = default;
+        bool can_instantiate() { return true; }
     };
 
     struct MaterialRefSpecTemp
@@ -790,6 +799,7 @@ namespace Material {
         Array1D<MaterialRefSpecTemp> matRefs;
 
         MaterialGlassTC() : MaterialBase() { group = Group::GlassTCParent; }
+        ~MaterialGlassTC() = default;
     };
 
     int GetMaterialNum(EnergyPlusData &state, std::string const &matName);

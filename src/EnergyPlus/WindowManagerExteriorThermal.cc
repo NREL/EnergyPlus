@@ -542,12 +542,15 @@ namespace Window {
         Real64 Afront = 0.0;
 
         if (mat->group == Material::Group::Glass || mat->group == Material::Group::GlassSimple) {
-            emissFront = mat->AbsorpThermalFront;
-            emissBack = mat->AbsorpThermalBack;
-            transThermalFront = mat->TransThermal;
-            transThermalBack = mat->TransThermal;
-            thickness = mat->Thickness;
-            conductivity = mat->Conductivity;
+            auto const *matGlass = dynamic_cast<Material::MaterialGlass const *>(mat);
+            assert(matGlass != nullptr);
+            
+            emissFront = matGlass->AbsorpThermalFront;
+            emissBack = matGlass->AbsorpThermalBack;
+            transThermalFront = matGlass->TransThermal;
+            transThermalBack = matGlass->TransThermal;
+            thickness = matGlass->Thickness;
+            conductivity = matGlass->Conductivity;
 
         } else if (mat->group == Material::Group::Blind) {
             auto const &surfShade = state.dataSurface->surfShades(m_SurfNum);
@@ -570,15 +573,16 @@ namespace Window {
             }
 
         } else if (mat->group == Material::Group::Shade) {
-            emissFront = mat->AbsorpThermal;
-            emissBack = mat->AbsorpThermal;
-            transThermalFront = mat->TransThermal;
-            transThermalBack = mat->TransThermal;
-            thickness = mat->Thickness;
-            conductivity = mat->Conductivity;
-
             auto const *matShade = dynamic_cast<Material::MaterialShade const *>(mat);
             assert(matShade != nullptr);
+            
+            emissFront = matShade->AbsorpThermal;
+            emissBack = matShade->AbsorpThermal;
+            transThermalFront = matShade->TransThermal;
+            transThermalBack = matShade->TransThermal;
+            thickness = matShade->Thickness;
+            conductivity = matShade->Conductivity;
+
             Atop = matShade->topOpeningMult;
             Abot = matShade->bottomOpeningMult;
             Aleft = matShade->leftOpeningMult;
@@ -589,17 +593,18 @@ namespace Window {
             }
 
         } else if (mat->group == Material::Group::Screen) {
-            // Simon: Existing code already takes into account geometry of Woven and scales down
-            // emissivity for openning area.
-            emissFront = mat->AbsorpThermal;
-            emissBack = mat->AbsorpThermal;
-            transThermalFront = mat->TransThermal;
-            transThermalBack = mat->TransThermal;
-            thickness = mat->Thickness;
-            conductivity = mat->Conductivity;
-
             auto const *matScreen = dynamic_cast<Material::MaterialScreen const *>(mat);
             assert(matScreen != nullptr);
+            
+            // Simon: Existing code already takes into account geometry of Woven and scales down
+            // emissivity for openning area.
+            emissFront = matScreen->AbsorpThermal;
+            emissBack = matScreen->AbsorpThermal;
+            transThermalFront = matScreen->TransThermal;
+            transThermalBack = matScreen->TransThermal;
+            thickness = matScreen->Thickness;
+            conductivity = matScreen->Conductivity;
+
             Atop = matScreen->topOpeningMult;
             Abot = matScreen->bottomOpeningMult;
             Aleft = matScreen->leftOpeningMult;
@@ -612,6 +617,7 @@ namespace Window {
         } else if (mat->group == Material::Group::ComplexShade) {
             auto const *matShade = dynamic_cast<Material::MaterialComplexShade const *>(mat);
             assert(matShade != nullptr);
+            
             thickness = matShade->Thickness;
             conductivity = matShade->Conductivity;
             emissFront = matShade->FrontEmissivity;

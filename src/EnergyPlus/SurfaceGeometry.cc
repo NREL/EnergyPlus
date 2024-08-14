@@ -13962,59 +13962,31 @@ namespace SurfaceGeometry {
             
         int mmDistance = int(1000 * distance); // Thickness of air gap in mm (usually between storm window and rest of window)
         std::string MatNameStAir = format("{}{}MM", namePrefix, mmDistance); // Name of created air layer material
-        int newAirMaterial = Util::FindItemInPtrList(MatNameStAir, s_mat->materials, state.dataMaterial->TotMaterials);
-        if (newAirMaterial == 0) {
-            // Create new material
-            state.dataMaterial->TotMaterials = state.dataMaterial->TotMaterials + 1;
-            newAirMaterial = state.dataMaterial->TotMaterials;
-            auto *thisMaterial = new Material::MaterialGasMix;
-            s_mat->materials.push_back(thisMaterial);
-            thisMaterial->Name = MatNameStAir;
-            thisMaterial->group = Material::Group::Gas;
-            thisMaterial->Roughness = Material::SurfaceRoughness::MediumRough;
-            thisMaterial->Conductivity = 0.0;
-            thisMaterial->Density = 0.0;
-            // thisMaterial->IsoMoistCap = 0.0;
-            // thisMaterial->Porosity = 0.0;
-            thisMaterial->Resistance = 0.0;
-            thisMaterial->SpecHeat = 0.0;
-            // thisMaterial->ThermGradCoef = 0.0;
-            thisMaterial->Thickness = distance;
-            // thisMaterial->VaporDiffus = 0.0;
-            // thisMaterial->GlassSpectralDataPtr = 0;
-            thisMaterial->numGases = 1;
-            thisMaterial->gases[0] = Material::gases[(int)Material::GasType::Air];
-            thisMaterial->gasFracts[0] = 1.0;
-            thisMaterial->AbsorpSolar = 0.0;
-            thisMaterial->AbsorpThermal = 0.0;
-            thisMaterial->AbsorpVisible = 0.0;
-            thisMaterial->Trans = 0.0;
-            thisMaterial->TransVis = 0.0;
-            // thisMaterial->GlassTransDirtFactor = 0.0;
-            // thisMaterial->ReflectShade = 0.0;
-            // thisMaterial->ReflectShadeVis = 0.0;
-            // thisMaterial->AbsorpThermalBack = 0.0;
-            // thisMaterial->AbsorpThermalFront = 0.0;
-            // thisMaterial->ReflectSolBeamBack = 0.0;
-            // thisMaterial->ReflectSolBeamFront = 0.0;
-            // thisMaterial->ReflectSolDiffBack = 0.0;
-            // thisMaterial->ReflectSolDiffFront = 0.0;
-            // thisMaterial->ReflectVisBeamBack = 0.0;
-            // thisMaterial->ReflectVisBeamFront = 0.0;
-            // thisMaterial->ReflectVisDiffBack = 0.0;
-            // thisMaterial->ReflectVisDiffFront = 0.0;
-            // thisMaterial->TransSolBeam = 0.0;
-            // thisMaterial->TransThermal = 0.0;
-            // thisMaterial->TransVisBeam = 0.0;
-            // thisMaterial->BlindDataPtr = 0;
-            // thisMaterial->WinShadeToGlassDist = 0.0;
-            // thisMaterial->WinShadeTopOpeningMult = 0.0;
-            // thisMaterial->WinShadeBottomOpeningMult = 0.0;
-            // thisMaterial->WinShadeLeftOpeningMult = 0.0;
-            // thisMaterial->WinShadeRightOpeningMult = 0.0;
-            // thisMaterial->WinShadeAirFlowPermeability = 0.0;
-        }
-        return (newAirMaterial);
+        int matNum = Material::GetMaterialNum(state, MatNameStAir);
+        if (matNum != 0) return matNum;
+
+        // Create new material
+        auto *mat = new Material::MaterialGasMix;
+        mat->Name = MatNameStAir;
+        mat->group = Material::Group::Gas;
+        
+        s_mat->materials.push_back(mat);
+        mat->Num = s_mat->materials.isize();
+        s_mat->materialMap.insert_or_assign(Util::makeUPPER(mat->Name), mat->Num);
+        
+        mat->Roughness = Material::SurfaceRoughness::MediumRough;
+        mat->Conductivity = 0.0;
+        mat->Density = 0.0;
+        mat->Resistance = 0.0;
+        mat->SpecHeat = 0.0;
+        mat->Thickness = distance;
+        mat->numGases = 1;
+        mat->gases[0] = Material::gases[(int)Material::GasType::Air];
+        mat->gasFracts[0] = 1.0;
+        mat->AbsorpSolar = 0.0;
+        mat->AbsorpThermal = 0.0;
+        mat->AbsorpVisible = 0.0;
+        return mat->Num;
     }
 
     // create a new construction with storm based on an old construction and storm and gap materials

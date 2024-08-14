@@ -220,13 +220,14 @@ namespace Window {
             if (!state.dataConstruction->Construct(surf.Construction).TypeIsWindow) continue;
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::BSDF) continue; // Irrelevant for Complex Fen
             if (state.dataConstruction->Construct(surf.Construction).WindowTypeEQL) continue; // not required
-            int ConstrNumSh = surf.activeShadedConstruction;
-            if (ConstrNumSh == 0) continue;
-            int TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
-            auto const *mat = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay));
 
+            if (surf.activeShadedConstruction == 0) continue;
+            auto &constrSh = state.dataConstruction->Construct(surf.activeShadedConstruction);
+            int TotLay = constrSh.TotLayers;
+            auto const *mat = dynamic_cast<Material::MaterialShade const *>(s_mat->materials(constrSh.LayerPoint(TotLay)));
+            
             if (mat->group == Material::Group::Shade) {
-                Real64 EpsGlIR = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
+                Real64 EpsGlIR = s_mat->materials(constrSh.LayerPoint(TotLay - 1))->AbsorpThermalBack;
                 Real64 RhoGlIR = 1 - EpsGlIR;
                 Real64 TauShIR = mat->TransThermal;
                 Real64 EpsShIR = mat->AbsorpThermal;
@@ -235,7 +236,6 @@ namespace Window {
                 surfShade.effGlassEmi = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
 
             } else if (mat->group == Material::Group::Blind) {
-                auto &constrSh = state.dataConstruction->Construct(ConstrNumSh);
                 Real64 EpsGlIR = s_mat->materials(constrSh.LayerPoint(TotLay - 1))->AbsorpThermalBack;
                 Real64 RhoGlIR = 1 - EpsGlIR;
 
@@ -255,7 +255,7 @@ namespace Window {
                                                constrSh.effGlassEmi[surfShade.blind.slatAngIdxHi], surfShade.blind.slatAngInterpFac);
             }     // End of check if interior shade or interior blind
         }         // End of surface loop
-    }
+    } // InitWCE_SimplifiedOpticalData()
 
     Real64 GetSolarTransDirectHemispherical(EnergyPlusData &state, int ConstrNum)
     {
@@ -537,7 +537,7 @@ namespace Window {
     {
         Real64 diameter = m_Material->Thickness; // Thickness in this case is diameter
         // ratio is not saved withing material but rather calculated from transmittance
-        const Real64 ratio = 1.0 - sqrt(m_Material->Trans);
+        const Real64 ratio = 1.0 - sqrt(dynamic_cast<Material::MaterialScreen const *>(m_Material)->Trans);
         Real64 spacing = diameter / ratio;
         return std::make_shared<CWovenCellDescription>(diameter, spacing);
     }

@@ -2353,7 +2353,9 @@ void EvalOutsideMovableInsulation(EnergyPlusData &state)
         state.dataHeatBalSurf->SurfMovInsulExtPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHExt(SurfNum) = 1.0 / (MovInsulSchedVal * mat->Resistance);
         if (mat->group == Material::Group::Glass || mat->group == Material::Group::GlassEQL) {
-            state.dataHeatBalSurf->SurfAbsSolarExt(SurfNum) = max(0.0, 1.0 - mat->Trans - mat->ReflectSolBeamFront);
+            auto const *matGlass = dynamic_cast<Material::MaterialFen const *>(mat);
+            assert(matGlass != nullptr);
+            state.dataHeatBalSurf->SurfAbsSolarExt(SurfNum) = max(0.0, 1.0 - matGlass->Trans - matGlass->ReflectSolBeamFront);
         } else {
             state.dataHeatBalSurf->SurfAbsSolarExt(SurfNum) = mat->AbsorpSolar;
         }
@@ -2383,7 +2385,9 @@ void EvalInsideMovableInsulation(EnergyPlusData &state)
         state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHInt(SurfNum) = 1.0 / (MovInsulSchedVal * mat->Resistance);
         if (mat->group == Material::Group::Glass || mat->group == Material::Group::GlassEQL) { // Glass is insulating?
-            state.dataHeatBalSurf->SurfAbsSolarInt(SurfNum) = max(0.0, 1.0 - mat->Trans - mat->ReflectSolBeamFront);
+            auto const *matGlass = dynamic_cast<Material::MaterialFen const *>(mat);
+            assert(matGlass != nullptr);
+            state.dataHeatBalSurf->SurfAbsSolarInt(SurfNum) = max(0.0, 1.0 - matGlass->Trans - matGlass->ReflectSolBeamFront);
         } else {
             state.dataHeatBalSurf->SurfAbsSolarInt(SurfNum) = mat->AbsorpSolar;
         }
@@ -3381,7 +3385,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     // Suspended (between-glass) divider; account for effect glass on outside of divider
                                     // (note that outside and inside projection for this type of divider are both zero)
                                     int MatNumGl = thisConstruct.LayerPoint(1); // Outer glass layer material number
-                                    auto const *thisMaterial = dynamic_cast<Material::MaterialGlass *>(s_mat->materials(MatNumGl));
+                                    auto const *thisMaterial = dynamic_cast<Material::MaterialFen *>(s_mat->materials(MatNumGl));
                                     assert(thisMaterial != nullptr);
                                     Real64 TransGl = thisMaterial->Trans; // Outer glass layer material number, switched construction
                                     Real64 ReflGl = thisMaterial->ReflectSolBeamFront;
@@ -3391,8 +3395,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     if (ShadeFlag == DataSurfaces::WinShadingType::SwitchableGlazing) { // Switchable glazing
                                         auto const &constructionSh = state.dataConstruction->Construct(ConstrNumSh);
                                         Real64 MatNumGlSh = constructionSh.LayerPoint(1);
-                                        auto const *thisMaterialSh =
-                                            dynamic_cast<Material::MaterialGlass *>(s_mat->materials(MatNumGlSh));
+                                        auto const *thisMaterialSh = dynamic_cast<Material::MaterialGlass *>(s_mat->materials(MatNumGlSh));
                                         assert(thisMaterialSh != nullptr);
                                         Real64 TransGlSh = thisMaterialSh->Trans;
                                         Real64 ReflGlSh = thisMaterialSh->ReflectSolBeamFront;
@@ -3496,11 +3499,12 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 } else if (ShadeFlag == DataSurfaces::WinShadingType::ExtShade) { // Exterior shade
                                     int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                                     auto const &constructionSh = state.dataConstruction->Construct(ConstrNumSh);
-                                    auto const *mat = s_mat->materials(constructionSh.LayerPoint(1));
+                                    auto const *matFen = dynamic_cast<Material::MaterialFen const *>(s_mat->materials(constructionSh.LayerPoint(1)));
+                                    assert(matFen != nullptr);
                                     state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum) =
-                                        DividerAbs * mat->Trans * (DivIncSolarOutBm + DivIncSolarOutDif);
+                                        DividerAbs * matFen->Trans * (DivIncSolarOutBm + DivIncSolarOutDif);
                                     state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) =
-                                        DividerAbs * mat->Trans * (DivIncSolarInBm + DivIncSolarInDif);
+                                        DividerAbs * matFen->Trans * (DivIncSolarInBm + DivIncSolarInDif);
 
                                 } else if (ShadeFlag == DataSurfaces::WinShadingType::ExtScreen) { // Exterior screen
                                     int screenNum = surfWin.screenNum;
@@ -3781,7 +3785,11 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                     // The equation below is derived by taking what is transmitted through the layer and applying
                     // the fraction that is absorbed plus the back reflected portion (first order reflection only)
                     // to the plane between the transparent insulation and the exterior surface face.
-                    state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) = s_mat->materials(state.dataSurface->SurfMaterialMovInsulExt(SurfNum))->Trans *
+                    auto const *matMovInsul = s_mat->materials(state.dataSurface->SurfMaterialMovInsulExt(SurfNum));
+                    auto const *matFenMovInsul = dynamic_cast<Material::MaterialFen const *>(matMovInsul);
+                    Real64 transMovInsul = (matFenMovInsul != nullptr) ? matFenMovInsul->Trans : 0.0;
+                    
+                    state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) = transMovInsul *
                         state.dataHeatBalSurf->SurfQRadSWOutMvIns(SurfNum) * ((thisMaterial->AbsorpSolar / AbsExt) + (1 - thisMaterial->AbsorpSolar));
                 }
                 // RJH 08/30/07 - Add SurfWinInitialDifSolInAbs, SurfWinInitialDifSolwinAbs, and SurfWinInitialDifSolAbsByShade
@@ -3919,7 +3927,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                         if (ShadeFlag == DataSurfaces::WinShadingType::IntShade) {
                             auto const &constructionSh = state.dataConstruction->Construct(ConstrNumSh);
                             int MatNumSh = constructionSh.LayerPoint(constructionSh.TotLayers); // Shade layer material number
-                            auto const *matSh = s_mat->materials(MatNumSh);
+                            auto const *matSh = dynamic_cast<Material::MaterialFen const *>(s_mat->materials(MatNumSh));
+                            assert(matSh != nullptr);
                             DividerSolAbs *= matSh->Trans;
                             DividerThermAbs *= matSh->TransThermal;
                             
@@ -4123,8 +4132,10 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
                         auto const &surfShade = state.dataSurface->surfShades(SurfNum);
                         // Shade layer material number
                         int MatNumSh = constructionSh.LayerPoint(constructionSh.TotLayers);
+                        auto const *matSh = dynamic_cast<Material::MaterialFen const *>(s_mat->materials(MatNumSh));
+                        assert(matSh != nullptr);
                         // Shade or blind IR transmittance
-                        Real64 TauShIR = s_mat->materials(MatNumSh)->TransThermal;
+                        Real64 TauShIR = matSh->TransThermal;
                         // Effective emissivity of shade or blind
                         Real64 EffShDevEmiss = surfShade.effShadeEmi;
 
