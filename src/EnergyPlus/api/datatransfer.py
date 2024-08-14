@@ -56,7 +56,7 @@
 from ctypes import cdll, c_int, c_char_p, c_void_p, POINTER, Structure, byref
 from pyenergyplus.common import RealEP, EnergyPlusException, is_number
 from typing import List, Union
-
+from pathlib import Path
 
 class DataExchange:
     """
@@ -363,27 +363,32 @@ class DataExchange:
         """
         self.api.resetErrorFlag(state)
 
-    def get_input_file_path(self, state: c_void_p) -> bytes:
+    def get_input_file_path(self, state: c_void_p) -> Path:
         """
         Provides the input file path back to the client. In most circumstances the client will know the path to the
         input file, but there are some cases where code is generalized in unexpected workflows.  Users have requested
         a way to get the input file path back from the running instance.
 
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
-        :return: Returns a raw bytes representation of the input file path
+        :return: A pathlib.Path of the input file path
         """
-        return self.api.inputFilePath(state)  # TODO: Need to call free for the underlying char *?
+        c_string = self.api.inputFilePath(state)
+        res = Path(c_string.decode('utf-8'))
+        return res
 
-    def get_weather_file_path(self, state: c_void_p) -> bytes:
+    def get_weather_file_path(self, state: c_void_p) -> Path:
         """
         Provides the weather file path back to the client. In most circumstances the client will know the path to the
         weather file, but there are some cases where code is generalized in unexpected workflows.  Users have requested
         a way to get the weather file path back from the running instance.
 
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
-        :return: Returns a raw bytes representation of the weather file path
+        :return: A pathlib.Path of the weather file
         """
-        return self.api.epwFilePath(state)
+        c_string = self.api.epwFilePath(state)
+        res = Path(c_string.decode('utf-8'))
+        return res
+
 
     def get_object_names(self, state: c_void_p, object_type_name: Union[str, bytes]) -> List[str]:
         """

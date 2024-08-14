@@ -243,16 +243,18 @@ void resetErrorFlag(EnergyPlusState state)
 char *inputFilePath(EnergyPlusState state)
 {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    char *p = new char[std::strlen(thisState->dataStrGlobals->inputFilePath.string().c_str()) + 1];
-    std::strcpy(p, thisState->dataStrGlobals->inputFilePath.string().c_str());
+    std::string const path_utf8 = EnergyPlus::FileSystem::toGenericString(thisState->dataStrGlobals->inputFilePath);
+    char *p = new char[std::strlen(path_utf8.c_str()) + 1];
+    std::strcpy(p, path_utf8.c_str());
     return p;
 }
 
 char *epwFilePath(EnergyPlusState state)
 {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
-    char *p = new char[std::strlen(thisState->files.inputWeatherFilePath.filePath.c_str()) + 1];
-    std::strcpy(p, thisState->files.inputWeatherFilePath.filePath.c_str());
+    std::string const path_utf8 = EnergyPlus::FileSystem::toGenericString(thisState->files.inputWeatherFilePath.filePath);
+    char *p = new char[std::strlen(path_utf8.c_str()) + 1];
+    std::strcpy(p, path_utf8.c_str());
     return p;
 }
 
