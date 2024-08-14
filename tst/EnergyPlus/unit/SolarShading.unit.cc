@@ -1880,6 +1880,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SolarShading::SkyDifSolarShading(*state);
     state->dataSolarShading->CalcSkyDifShading = false;
 
+    state->dataBSDFWindow->SUNCOSTS(state->dataGlobal->TimeStep, state->dataGlobal->HourOfDay)(1) = 0.20531446332266728;
+    state->dataBSDFWindow->SUNCOSTS(state->dataGlobal->TimeStep, state->dataGlobal->HourOfDay)(2) = -0.84761109808931534;
+    state->dataBSDFWindow->SUNCOSTS(state->dataGlobal->TimeStep, state->dataGlobal->HourOfDay)(3) = 0.48928662105799514;
+
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
     int surfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_NEAR(0.6504, state->dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
@@ -4698,9 +4702,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap2)
     shade2SchedEMSOn = true;
     shade1SchedEMSValue = 1.0;
     shade2SchedEMSValue = 1.0;
-    state->dataBSDFWindow->SUNCOSTS(4, 12)(1) = 0.2;
-    state->dataBSDFWindow->SUNCOSTS(4, 12)(2) = 0.2;
-    state->dataBSDFWindow->SUNCOSTS(4, 12)(3) = 0.2;
+
+    // Gotten from running 1ZoneUncontrolled.idf with chicago weather on Jan 1 at 12
+    state->dataBSDFWindow->SUNCOSTS(state->dataGlobal->TimeStep, state->dataGlobal->HourOfDay)(1) = 0.20531446332266728;
+    state->dataBSDFWindow->SUNCOSTS(state->dataGlobal->TimeStep, state->dataGlobal->HourOfDay)(2) = -0.84761109808931534;
+    state->dataBSDFWindow->SUNCOSTS(state->dataGlobal->TimeStep, state->dataGlobal->HourOfDay)(3) = 0.48928662105799514;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
     ReportSurfaceShading(*state);
 
@@ -5048,9 +5054,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
 
     // Use the base transmittance schedules (no EMS override)
     // shade1 transmittance = 0.5, shade2 transmittance = 0.8
-    state->dataBSDFWindow->SUNCOSTS(4, 12)(1) = 0.2;
-    state->dataBSDFWindow->SUNCOSTS(4, 12)(2) = 0.2;
-    state->dataBSDFWindow->SUNCOSTS(4, 12)(3) = 0.2;
+    state->dataBSDFWindow->SUNCOSTS(state->dataGlobal->TimeStep, state->dataGlobal->HourOfDay)(1) = 0.20531446332266728;
+    state->dataBSDFWindow->SUNCOSTS(state->dataGlobal->TimeStep, state->dataGlobal->HourOfDay)(2) = -0.84761109808931534;
+    state->dataBSDFWindow->SUNCOSTS(state->dataGlobal->TimeStep, state->dataGlobal->HourOfDay)(3) = 0.48928662105799514;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
     ReportSurfaceShading(*state);
 
