@@ -612,7 +612,7 @@ Real64 getEMSGlobalVariableValue(EnergyPlusState state, int handle)
 {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     auto const &erl = thisState->dataRuntimeLang;
-    bool const insideBuiltInRange = index >= erl->emsVarBuiltInStart && index <= erl->emsVarBuiltInEnd;
+    bool const insideBuiltInRange = handle >= erl->emsVarBuiltInStart && handle <= erl->emsVarBuiltInEnd;
     if (insideBuiltInRange || handle > thisState->dataRuntimeLang->NumErlVariables) {
         // need to fatal out once the process is done
         // throw an error, set the fatal flag, and then return 0
@@ -630,7 +630,7 @@ void setEMSGlobalVariableValue(EnergyPlusState state, int handle, Real64 value)
 {
     auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     auto const &erl = thisState->dataRuntimeLang;
-    bool const insideBuiltInRange = index >= erl->emsVarBuiltInStart && index <= erl->emsVarBuiltInEnd;
+    bool const insideBuiltInRange = handle >= erl->emsVarBuiltInStart && handle <= erl->emsVarBuiltInEnd;
     if (insideBuiltInRange || handle > erl->NumErlVariables) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
