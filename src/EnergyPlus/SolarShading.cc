@@ -3947,11 +3947,11 @@ void CLIPLINE(Real64 &x1, Real64 &x2, Real64 &y1, Real64 &y2, Real64 maxX, Real6
                 else if (c2 == 3) {
                     visible = true;
                     x1 = minX;
-                    y1 = maxY + e / dx;
+                    y1 = maxY + General::SafeDivide(e, dx);
                     if (x2 <= maxX && y2 <= maxY) return;
                 } else if (c2 == 4) {
                     x2 = maxX;
-                    y2 = maxY + e / dx;
+                    y2 = maxY + General::SafeDivide(e, dx);
                     return;
                 }
                 if (needX) {
@@ -3965,11 +3965,11 @@ void CLIPLINE(Real64 &x1, Real64 &x2, Real64 &y1, Real64 &y2, Real64 maxX, Real6
                     return;
                 else if (c2 == 1) {
                     visible = true;
-                    x1 = maxX - e / dy;
+                    x1 = maxX - General::SafeDivide(e, dy);
                     y1 = minY;
                     if (x2 <= maxX && y2 <= maxY) return;
                 } else if (c2 == 4) {
-                    x2 = maxX - e / dy;
+                    x2 = maxX - General::SafeDivide(e, dy);
                     y2 = maxY;
                     return;
                 }
@@ -3989,11 +3989,11 @@ void CLIPLINE(Real64 &x1, Real64 &x2, Real64 &y1, Real64 &y2, Real64 maxX, Real6
                 else if (c2 == 3) {
                     visible = true;
                     x1 = minX;
-                    y1 = minY + e / dx;
+                    y1 = minY + General::SafeDivide(e, dx);
                     if (x2 <= maxX && y2 >= minY) return;
                 } else if (c2 == 4) {
                     x2 = maxX;
-                    y2 = minY + e / dx;
+                    y2 = minY + General::SafeDivide(e, dx);
                     return;
                 }
                 if (needX) {
@@ -4007,11 +4007,11 @@ void CLIPLINE(Real64 &x1, Real64 &x2, Real64 &y1, Real64 &y2, Real64 maxX, Real6
                     return;
                 else if (c2 == 7) {
                     visible = true;
-                    x1 = maxX - e / dy;
+                    x1 = maxX - General::SafeDivide(e, dy);
                     y1 = maxY;
                     if (x2 <= maxX && y2 >= minY) return;
                 } else if (c2 == 4) {
-                    x2 = maxX - e / dy;
+                    x2 = maxX - General::SafeDivide(e, dy);
                     y2 = minY;
                     return;
                 }

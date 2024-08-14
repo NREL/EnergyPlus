@@ -4674,6 +4674,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap2)
     state->dataGlobal->BeginSimFlag = false;
     state->dataGlobal->BeginEnvrnFlag = false;
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state); // prevents crash in GetDaylightingParametersInput
+    state->dataSolarShading->ShadowingDaysLeft = 20;
     SolarShading::PerformSolarCalculations(*state);
 
     // Get surface nums
@@ -4697,6 +4698,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap2)
     shade2SchedEMSOn = true;
     shade1SchedEMSValue = 1.0;
     shade2SchedEMSValue = 1.0;
+    state->dataBSDFWindow->SUNCOSTS(4, 12)(1) = 0.2;
+    state->dataBSDFWindow->SUNCOSTS(4, 12)(2) = 0.2;
+    state->dataBSDFWindow->SUNCOSTS(4, 12)(3) = 0.2;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
     ReportSurfaceShading(*state);
 
@@ -5035,6 +5039,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
     state->dataGlobal->BeginSimFlag = false;
     state->dataGlobal->BeginEnvrnFlag = false;
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state); // prevents crash in GetDaylightingParametersInput
+    state->dataSolarShading->ShadowingDaysLeft = 20;
     SolarShading::PerformSolarCalculations(*state);
 
     // Get surface nums
@@ -5043,6 +5048,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
 
     // Use the base transmittance schedules (no EMS override)
     // shade1 transmittance = 0.5, shade2 transmittance = 0.8
+    state->dataBSDFWindow->SUNCOSTS(4, 12)(1) = 0.2;
+    state->dataBSDFWindow->SUNCOSTS(4, 12)(2) = 0.2;
+    state->dataBSDFWindow->SUNCOSTS(4, 12)(3) = 0.2;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
     ReportSurfaceShading(*state);
 
@@ -5196,7 +5204,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     surf2.Area = 2.0;
     state->dataSurface->SurfWinFrameArea(1) = 0.64;
     state->dataSurface->SurfWinFrameArea(2) = 0.64;
-
 
     state->dataSurface->SurfActiveConstruction(1) = 1;
     state->dataSurface->SurfActiveConstruction(2) = 1;
