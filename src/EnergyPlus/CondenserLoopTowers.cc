@@ -6344,6 +6344,7 @@ namespace CondenserLoopTowers {
         // This subroutine is for passing results to the outlet water node.
 
         // set node information
+        PlantUtilities::SafeCopyPlantNode(state, this->WaterInletNodeNum, this->WaterOutletNodeNum);
         state.dataLoopNodes->Node(this->WaterOutletNodeNum).Temp = this->OutletWaterTemp;
 
         if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked ||
