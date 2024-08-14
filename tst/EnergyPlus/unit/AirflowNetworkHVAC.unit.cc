@@ -19667,7 +19667,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_ZoneOrderTest)
 
         "  NodeList,",
         "    Zone Inlet Nodes_unit1,  !- Name",
-        "    Zone Inlet Node_unit1;   !- Node 1 Name",
+        "    Dehumidifier Outlet Node,",
+        "    Zone Inlet Node_unit1;",
 
         "  ZoneHVAC:EquipmentList,",
         "    ZoneEquipment_unit1,     !- Name",
@@ -19683,13 +19684,19 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_ZoneOrderTest)
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
         "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
         "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
-        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
+        "    ,                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
+        "    ZoneHVAC:Dehumidifier:DX,         !- Zone Equipment 3 Object Type",
+        "    North Zone Dehumidifier  !- Zone Equipment 3 Name",
+        "    3,                       !- Zone Equipment 3 Cooling Sequence",
+        "    3,                       !- Zone Equipment 3 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 3 Sequential Cooling Fraction Schedule Name",
+        "    ;                        !- Zone Equipment 3 Sequential Heating Fraction Schedule Name",
 
         "  ZoneHVAC:EquipmentConnections,",
         "    living_unit1,            !- Zone Name",
         "    ZoneEquipment_unit1,     !- Zone Conditioning Equipment List Name",
         "    zone inlet nodes_unit1,  !- Zone Air Inlet Node or NodeList Name",
-        "    Zone Exhaust Node_unit1, !- Zone Air Exhaust Node or NodeList Name",
+        "    Zone Exhaust Node_unit1 Nodes, !- Zone Air Exhaust Node or NodeList Name",
         "    Zone Node_unit1,         !- Zone Air Node Name",
         "    Zone Outlet Node_unit1;  !- Zone Return Air Node or NodeList Name",
 
@@ -19752,6 +19759,60 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_ZoneOrderTest)
         "    CommaAndHTML,            !- Column Separator",
         "    InchPound;               !- Unit Conversion",
 
+        "  NodeList,",
+        "  Zone Exhaust Node_unit1 Nodes,",
+        "  Zone3DehumidifierInlet,",
+        "  Zone Exhaust Node_unit1;",
+
+        "  ZoneHVAC:Dehumidifier:DX,",
+        "    North Zone Dehumidifier, !- Name",
+        "    always_avail,            !- Availability Schedule Name",
+        "    Zone3DehumidifierInlet,  !- Air Inlet Node Name",
+        "    Dehumidifier Outlet Node,!- Air Outlet Node Name",
+        "    50.16,                   !- Rated Water Removal {L/day}",
+        "    3.412,                   !- Rated Energy Factor {L/kWh}",
+        "    0.12036,                 !- Rated Air Flow Rate {m3/s}",
+        "    ZoneDehumidWaterRemoval, !- Water Removal Curve Name",
+        "    ZoneDehumidEnergyFactor, !- Energy Factor Curve Name",
+        "    ZoneDehumidPLFFPLR,      !- Part Load Fraction Correlation Curve Name",
+        "    10.0,                    !- Minimum Dry-Bulb Temperature for Dehumidifier Operation {C}",
+        "    32.0,                    !- Maximum Dry-Bulb Temperature for Dehumidifier Operation {C}",
+        "    0.0;                     !- Off-Cycle Parasitic Electric Load {W}",
+
+        "  Curve:Biquadratic,",
+        "    ZoneDehumidWaterRemoval, !- Name",
+        "    -2.724878664080,         !- Coefficient1 Constant",
+        "    0.100711983591,          !- Coefficient2 x",
+        "    -0.000990538285,         !- Coefficient3 x**2",
+        "    0.050053043874,          !- Coefficient4 y",
+        "    -0.000203629282,         !- Coefficient5 y**2",
+        "    -0.000341750531,         !- Coefficient6 x*y",
+        "    21.0,                    !- Minimum Value of x",
+        "    32.22,                   !- Maximum Value of x",
+        "    40.0,                    !- Minimum Value of y",
+        "    80.0;                    !- Maximum Value of y",
+
+        "  Curve:Biquadratic,",
+        "    ZoneDehumidEnergyFactor, !- Name",
+        "    -2.388319068955,         !- Coefficient1 Constant",
+        "    0.093047739452,          !- Coefficient2 x",
+        "    -0.001369700327,         !- Coefficient3 x**2",
+        "    0.066533716758,          !- Coefficient4 y",
+        "    -0.000343198063,         !- Coefficient5 y**2",
+        "    -0.000562490295,         !- Coefficient6 x*y",
+        "    21.0,                    !- Minimum Value of x",
+        "    32.22,                   !- Maximum Value of x",
+        "    40.0,                    !- Minimum Value of y",
+        "    80.0;                    !- Maximum Value of y",
+
+        "  Curve:Quadratic,",
+        "    ZoneDehumidPLFFPLR,      !- Name",
+        "    0.95,                    !- Coefficient1 Constant",
+        "    0.05,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0;                     !- Maximum Value of x",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -19766,6 +19827,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_ZoneOrderTest)
     state->afn->AirflowNetworkNodeData(2).EPlusNodeNum = 4;
     // Attic_Unit1
     state->afn->AirflowNetworkNodeData(3).EPlusNodeNum = 0;
+
+    // Check that the validation fails if the AFN exhaust fan is not well setup
+    int exhaustFanInletNodeIndex = state->afn->MultizoneCompExhaustFanData(1).InletNode;
+    state->afn->MultizoneCompExhaustFanData(1).InletNode = 6;
+    state->afn->ValidateExhaustFanInputOneTimeFlag = true;
+    EXPECT_THROW(state->afn->validate_exhaust_fan_input(), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneWindowAC)
