@@ -320,6 +320,7 @@ add_simulation_test(IDF_FILE FluidCooler.idf EPW_FILE USA_IL_Chicago-OHare.Intl.
 add_simulation_test(IDF_FILE FluidCoolerTwoSpeed.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE FourPipeBeamLargeOffice.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE FreeCoolingChiller.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE FreeCoolingChiller_wWaterSideEconomizer.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE Furnace.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE FurnaceFuelOil.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE FurnacePLRHeatingCoil.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

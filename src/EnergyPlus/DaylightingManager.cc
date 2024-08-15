@@ -8998,7 +8998,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
 
         auto openMapFile = [&](const fs::path &filePath) -> InputOutputFile & {
             auto &outputFile = *illumMap.mapFile;
-            outputFile.filePath = fs::path(filePath.string() + fmt::to_string(MapNum));
+            outputFile.filePath = FileSystem::appendSuffixToPath(filePath, fmt::to_string(MapNum));
             outputFile.ensure_open(state, "ReportIllumMap");
             return outputFile;
         };

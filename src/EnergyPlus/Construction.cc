@@ -51,6 +51,7 @@
 #include <EnergyPlus/DataConversions.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/Material.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus::Construction {
@@ -130,15 +131,15 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
     // greater than this, then the coefficients will not yield a valid steady
     // state solution.
 
-    constexpr Real64 MaxAllowedTimeStep(4.0); // Sets the maximum allowed time step
-    // for CTF calculations to be 4 hours.  This is done in response to some
+    constexpr Real64 MaxAllowedTimeStep = 7.0; // Sets the maximum allowed time step
+    // for CTF calculations to be 7 hours.  This is done in response to some
     // rare situations where odd or faulty input will cause the routine to
     // go off and get some huge time step (in excess of 20 hours).  This value
     // is a compromise that does not really solve any input problems.  One run
     // indicated that 2 meters of concrete will result in a time step of slightly
-    // more than 3 hours.  So, 4 hours was arbitrarily picked as a ceiling for
+    // more than 3 hours.  So, 7 hours was arbitrarily picked as a ceiling for
     // time steps so that an error message can be produced to warn the user
-    // that something isn't right.  Note that the 4 hour limit does not guarantee
+    // that something isn't right.  Note that the 7 hour limit does not guarantee
     // that problems won't exist and it does not necessarily avoid any problems
     // that interpolated temperature histories might cause.
 
@@ -1915,6 +1916,19 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
                 static constexpr std::string_view Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
                 print(state.files.eio, Format_707, I, this->CTFTUserOut[I], this->CTFTUserIn[I], this->CTFTUserSource[I]);
             }
+        }
+    }
+}
+
+void ConstructionProps::reportLayers(EnergyPlusData &state)
+{
+    // Report the layers for each opaque construction in predefined tabular report
+    // J. Glazer March 2024
+    if (state.dataOutRptPredefined->pdchOpqConsLayCol.size() > 0) {
+        for (int i = 1; i <= this->TotLayers; ++i) {
+            int layerIndex = this->LayerPoint(i);
+            auto &thisMaterial = state.dataMaterial->Material(layerIndex);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpqConsLayCol[i - 1], this->Name, thisMaterial->Name);
         }
     }
 }

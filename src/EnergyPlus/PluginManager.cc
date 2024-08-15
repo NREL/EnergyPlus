@@ -407,17 +407,16 @@ void initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
 
         status = PyConfig_SetString(&config, &config.home, wcharPath);
         if (PyStatus_Exception(status)) {
-            ShowFatalError(state, fmt::format("Could not set home to {} on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+            ShowFatalError(state, fmt::format("Could not set home to {:g} on PyConfig... {}", pathToPythonPackages, status));
         }
         status = PyConfig_SetString(&config, &config.base_prefix, wcharPath);
         if (PyStatus_Exception(status)) {
-            ShowFatalError(state, fmt::format("Could not set base_prefix to {} on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+            ShowFatalError(state, fmt::format("Could not set base_prefix to {:g} on PyConfig... {}", pathToPythonPackages, status));
         }
         config.module_search_paths_set = 1;
         status = PyWideStringList_Append(&config.module_search_paths, wcharPath);
         if (PyStatus_Exception(status)) {
-            ShowFatalError(state,
-                           fmt::format("Could not add {} to module_search_paths on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+            ShowFatalError(state, fmt::format("Could not add {:g} to module_search_paths on PyConfig... {}", pathToPythonPackages, status));
         }
 
     } else {
@@ -428,17 +427,16 @@ void initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
 
         status = PyConfig_SetString(&config, &config.home, wcharPath);
         if (PyStatus_Exception(status)) {
-            ShowFatalError(state, fmt::format("Could not set home to {} on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+            ShowFatalError(state, fmt::format("Could not set home to {:g} on PyConfig... {}", pathToPythonPackages, status));
         }
         status = PyConfig_SetString(&config, &config.base_prefix, wcharPath);
         if (PyStatus_Exception(status)) {
-            ShowFatalError(state, fmt::format("Could not set base_prefix to {} on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+            ShowFatalError(state, fmt::format("Could not set base_prefix to {:g} on PyConfig... {}", pathToPythonPackages, status));
         }
         config.module_search_paths_set = 1;
         status = PyWideStringList_Append(&config.module_search_paths, wcharPath);
         if (PyStatus_Exception(status)) {
-            ShowFatalError(state,
-                           fmt::format("Could not add {} to module_search_paths on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+            ShowFatalError(state, fmt::format("Could not add {:g} to module_search_paths on PyConfig... {}", pathToPythonPackages, status));
         }
 
         PyMem_RawFree(wcharPath);
@@ -697,6 +695,12 @@ PluginManager::~PluginManager()
 #endif // LINK_WITH_PYTHON
 }
 
+PluginInstance::PluginInstance(const fs::path &_modulePath, const std::string &_className, std::string emsName, bool runPluginDuringWarmup)
+    : modulePath(_modulePath), className(_className), emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup),
+      stringIdentifier(FileSystem::toString(_modulePath) + "." + _className)
+{
+}
+
 void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
 {
 #if LINK_WITH_PYTHON
@@ -786,13 +790,13 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
         pModuleName = PyUnicode_FromString(s.c_str()); // New reference
     }
     if (pModuleName == nullptr) {
-        EnergyPlus::ShowFatalError(state, format("Failed to convert the Module Path \"{}\" for import", this->modulePath.generic_string()));
+        EnergyPlus::ShowFatalError(state, format("Failed to convert the Module Path \"{:g}\" for import", this->modulePath));
     }
     this->pModule = PyImport_Import(pModuleName);
     Py_DECREF(pModuleName);
 
     if (!this->pModule) {
-        EnergyPlus::ShowSevereError(state, format("Failed to import module \"{}\"", this->modulePath.generic_string()));
+        EnergyPlus::ShowSevereError(state, format("Failed to import module \"{:g}\"", this->modulePath));
         EnergyPlus::ShowContinueError(state, format("Current sys.path={}", PluginManager::currentPythonPath()));
         // ONLY call PyErr_Print if PyErr has occurred, otherwise it will cause other problems
         if (PyErr_Occurred()) {
@@ -804,7 +808,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     }
     PyObject *pModuleDict = PyModule_GetDict(this->pModule);
     if (!pModuleDict) {
-        EnergyPlus::ShowSevereError(state, format("Failed to read module dictionary from module \"{}\"", this->modulePath.generic_string()));
+        EnergyPlus::ShowSevereError(state, format("Failed to read module dictionary from module \"{:g}\"", this->modulePath));
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
         } else {
@@ -826,7 +830,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     PyObject *pClass = PyDict_GetItemString(pModuleDict, className.c_str());
     // Py_DECREF(pModuleDict);  // PyModule_GetDict returns a borrowed reference, DO NOT decrement
     if (!pClass) {
-        EnergyPlus::ShowSevereError(state, format(R"(Failed to get class type "{}" from module "{}")", className, modulePath.generic_string()));
+        EnergyPlus::ShowSevereError(state, format(R"(Failed to get class type "{}" from module "{:g}")", className, modulePath));
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
         } else {
@@ -863,11 +867,9 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     std::string const detectOverriddenFunctionName = "_detect_overridden";
     PyObject *detectFunction = PyObject_GetAttrString(this->pClassInstance, detectOverriddenFunctionName.c_str());
     if (!detectFunction || !PyCallable_Check(detectFunction)) {
-        EnergyPlus::ShowSevereError(state,
-                                    format(R"(Could not find or call function "{}" on class "{}.{}")",
-                                           detectOverriddenFunctionName,
-                                           this->modulePath.generic_string(),
-                                           this->className));
+        EnergyPlus::ShowSevereError(
+            state,
+            format(R"(Could not find or call function "{}" on class "{:g}.{}")", detectOverriddenFunctionName, this->modulePath, this->className));
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
         } else {
@@ -1177,8 +1179,7 @@ void PluginManager::addToPythonPath(EnergyPlusData &state, const fs::path &inclu
         unicodeIncludePath = PyUnicode_FromString(s.c_str()); // New reference
     }
     if (unicodeIncludePath == nullptr) {
-        EnergyPlus::ShowFatalError(state,
-                                   format("ERROR converting the path \"{}\" for addition to the sys.path in Python", includePath.generic_string()));
+        EnergyPlus::ShowFatalError(state, format("ERROR converting the path \"{:g}\" for addition to the sys.path in Python", includePath));
     }
 
     PyObject *sysPath = PySys_GetObject("path"); // Borrowed reference
@@ -1189,11 +1190,11 @@ void PluginManager::addToPythonPath(EnergyPlusData &state, const fs::path &inclu
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
         }
-        EnergyPlus::ShowFatalError(state, format("ERROR adding \"{}\" to the sys.path in Python", includePath.generic_string()));
+        EnergyPlus::ShowFatalError(state, format("ERROR adding \"{:g}\" to the sys.path in Python", includePath));
     }
 
     if (userDefinedPath) {
-        EnergyPlus::ShowMessage(state, format("Successfully added path \"{}\" to the sys.path in Python", includePath.generic_string()));
+        EnergyPlus::ShowMessage(state, format("Successfully added path \"{:g}\" to the sys.path in Python", includePath));
     }
 
     // PyRun_SimpleString)("print(' EPS : ' + str(sys.path))");

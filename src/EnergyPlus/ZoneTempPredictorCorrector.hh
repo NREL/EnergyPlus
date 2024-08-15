@@ -390,6 +390,8 @@ namespace ZoneTempPredictorCorrector {
 
     void FillPredefinedTableOnThermostatSetpoints(EnergyPlusData &state);
 
+    void FillPredefinedTableOnThermostatSchedules(EnergyPlusData &state);
+
     std::tuple<Real64, int, std::string>
     temperatureAndCountInSch(EnergyPlusData &state, int scheduleIndex, bool isSummer, int dayOfWeek, int hourOfDay);
 

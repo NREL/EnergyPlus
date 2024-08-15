@@ -1924,7 +1924,7 @@ namespace HeatBalanceManager {
                 DisplayString(state, "--Construction not found");
                 ErrorsFound = true;
                 ShowSevereError(state, format("No match on WINDOW5 data file for Construction={}, or error in data file.", ConstructAlphas(0)));
-                ShowContinueError(state, format("...Looking on file={}", window5DataFilePath.string())); // TODO: call getAbsolutePath maybe?
+                ShowContinueError(state, format("...Looking on file={}", window5DataFilePath)); // TODO: call getAbsolutePath maybe?
                 continue;
             }
 
@@ -1966,6 +1966,8 @@ namespace HeatBalanceManager {
 
         // METHODOLOGY EMPLOYED:
         // The GetObjectItem routines are employed to retrieve the data.
+
+        SolarShading::GetShadowingInput(state);
 
         GetZoneData(state, ErrorsFound); // Read Zone data from input file
 
@@ -3854,9 +3856,9 @@ namespace HeatBalanceManager {
         if (endcol > 0) {
             if (int(NextLine.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
                 ShowSevereError(state,
-                                format("SearchWindow5DataFile: For \"{}\" in {} fiile, appears to be a Unicode or binary file.",
+                                format("SearchWindow5DataFile: For \"{}\" in {} file, appears to be a Unicode or binary file.",
                                        DesiredConstructionName,
-                                       DesiredFilePath.string()));
+                                       DesiredFilePath));
                 ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                 ShowFatalError(state, "Program terminates due to previous condition.");
             }
@@ -3868,7 +3870,7 @@ namespace HeatBalanceManager {
         if (NextLine.eof) goto Label1000;
         ++FileLineCount;
         if (!has_prefixi(NextLine.data, "WINDOW5")) {
-            ShowSevereError(state, format("HeatBalanceManager: SearchWindow5DataFile: Error in Data File={}", DesiredFilePath.string()));
+            ShowSevereError(state, format("HeatBalanceManager: SearchWindow5DataFile: Error in Data File={}", DesiredFilePath));
             ShowFatalError(
                 state,
                 format("Error reading Window5 Data File: first word of window entry is \"{}\", should be Window5.", NextLine.data.substr(0, 7)));
@@ -7114,6 +7116,11 @@ namespace HeatBalanceManager {
         }
         if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
             state.dataHeatBal->SimpleCTFOnly = false;
+        }
+
+        for (auto &construction : state.dataConstruction->Construct) {
+            if (!construction.IsUsedCTF) continue;
+            construction.reportLayers(state);
         }
 
         bool InitCTFDoReport;

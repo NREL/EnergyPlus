@@ -102,6 +102,7 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WindowAC.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
@@ -10143,6 +10144,7 @@ namespace AirflowNetwork {
         using SplitterComponent::GetSplitterNodeNumbers;
         using SplitterComponent::GetSplitterOutletNumber;
         using WaterThermalTanks::GetHeatPumpWaterHeaterNodeNumber;
+        using WindowAC::GetWindowACNodeNumber;
         using ZoneDehumidifier::GetZoneDehumidifierNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -10161,6 +10163,7 @@ namespace AirflowNetwork {
 
         bool HPWHFound(false);          // Flag for HPWH identification
         bool StandaloneERVFound(false); // Flag for Standalone ERV (ZoneHVAC:EnergyRecoveryVentilator) identification
+        bool WindowACFound(false);      // Flag for Window AC (ZoneHVAC:WindowAirConditioner) identification
 
         // Validate supply and return connections
         NodeFound.dimension(m_state.dataLoopNodes->NumOfNodes, false);
@@ -10272,6 +10275,12 @@ namespace AirflowNetwork {
                 if (GetStandAloneERVNodeNumber(m_state, i)) {
                     NodeFound(i) = true;
                     StandaloneERVFound = true;
+                }
+
+                // Skip Window AC with no OA
+                if (GetWindowACNodeNumber(m_state, i)) {
+                    NodeFound(i) = true;
+                    WindowACFound = true;
                 }
             }
 
@@ -10413,6 +10422,11 @@ namespace AirflowNetwork {
                              format(RoutineName) + "A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an AirflowNetwork but is not "
                                                    "included in the AirflowNetwork.");
         }
+        if (WindowACFound) {
+            ShowWarningError(m_state,
+                             format(RoutineName) + "A ZoneHVAC:WindowAirConditioner is simulated along with an AirflowNetwork but is not "
+                                                   "included in the AirflowNetwork.");
+        }
         NodeFound.deallocate();
 
         // Assign AirLoop Number to every node and linkage
@@ -10475,8 +10489,13 @@ namespace AirflowNetwork {
                         ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
                                    .FanIndex)
                         ->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans
+                        ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
+                                   .FanIndex)
+                        ->isAFNFan = true;
                 } else {
                     m_state.dataFans->fans(n)->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans->fans(n)->isAFNFan = true;
                 }
             }
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == iEPlusComponentType::COI) {

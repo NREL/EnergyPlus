@@ -113,6 +113,8 @@ namespace FourPipeBeam {
 
         int getTermUnitSizingIndex();
 
+        void reportTerminalUnit(EnergyPlusData &state);
+
     private: // Methods
         void
         init(EnergyPlusData &state,

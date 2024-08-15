@@ -75,6 +75,7 @@
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
@@ -115,7 +116,6 @@ using namespace ScheduleManager;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyHFnTdbW;
 using SteamCoils::SimulateSteamCoilComponents;
-using namespace FluidProperties;
 
 constexpr const char *fluidNameSteam("STEAM");
 constexpr const char *fluidNameWater("WATER");
@@ -232,7 +232,6 @@ void GetPIUs(EnergyPlusData &state)
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
 
-    using FluidProperties::FindRefrigerant;
     using NodeInputManager::GetOnlySingleNode;
     using SteamCoils::GetCoilSteamInletNode;
     using WaterCoils::GetCoilWaterInletNode;
@@ -324,7 +323,7 @@ void GetPIUs(EnergyPlusData &state)
                 }
                 case HtgCoilType::SteamAirHeating: {
                     thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
-                    thisPIU.HCoil_FluidIndex = FindRefrigerant(state, "Steam");
+                    thisPIU.HCoil_FluidIndex = FluidProperties::GetRefrigNum(state, "STEAM");
                     if (thisPIU.HCoil_FluidIndex == 0) {
                         ShowSevereError(state, format("{} Steam Properties for {} not found.", RoutineName, thisPIU.Name));
                         if (SteamMessageNeeded) {
@@ -724,11 +723,11 @@ void InitPIU(EnergyPlusData &state,
         if (thisPIU.HotControlNode > 0) {
             // plant upgrade note? why no separate handling of steam coil? add it ?
             // local plant fluid density
-            Real64 const rho = GetDensityGlycol(state,
-                                                state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidName,
-                                                Constant::HWInitConvTemp,
-                                                state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidIndex,
-                                                RoutineName);
+            Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidName,
+                                                                 Constant::HWInitConvTemp,
+                                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidIndex,
+                                                                 RoutineName);
 
             thisPIU.MaxHotWaterFlow = rho * thisPIU.MaxVolHotWaterFlow;
             thisPIU.MinHotWaterFlow = rho * thisPIU.MinVolHotWaterFlow;
@@ -1309,12 +1308,12 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                             DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                             Real64 constexpr TempSteamIn = 100.00;
                             Real64 const EnthSteamInDry =
-                                GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, thisPIU.HCoil_FluidIndex, RoutineName);
+                                FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, thisPIU.HCoil_FluidIndex, RoutineName);
                             Real64 const EnthSteamOutWet =
-                                GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, thisPIU.HCoil_FluidIndex, RoutineName);
+                                FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, thisPIU.HCoil_FluidIndex, RoutineName);
                             Real64 const LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
                             Real64 const SteamDensity =
-                                GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, thisPIU.HCoil_FluidIndex, RoutineName);
+                                FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, thisPIU.HCoil_FluidIndex, RoutineName);
                             int DummyWaterIndex = 1;
                             Real64 const Cp = GetSpecificHeatGlycol(
                                 state, fluidNameWater, state.dataSize->PlantSizData(PltSizHeatNum).ExitTemp, DummyWaterIndex, RoutineName);
@@ -2577,6 +2576,32 @@ void PowIndUnitData::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     } else {
         this->OutdoorAirFlowRate = 0.0;
     }
+}
+
+void PowIndUnitData::reportTerminalUnit(EnergyPlusData &state)
+{
+    // populate the predefined equipment summary report related to air terminals
+    auto &orp = state.dataOutRptPredefined;
+    auto &adu = state.dataDefineEquipment->AirDistUnit(this->ADUNum);
+    if (!state.dataSize->TermUnitFinalZoneSizing.empty()) {
+        auto &sizing = state.dataSize->TermUnitFinalZoneSizing(adu.TermUnitSizingNum);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinFlow, adu.Name, sizing.DesCoolVolFlowMin);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinOutdoorFlow, adu.Name, sizing.MinOA);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSupCoolingSP, adu.Name, sizing.CoolDesTemp);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSupHeatingSP, adu.Name, sizing.HeatDesTemp);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatingCap, adu.Name, sizing.DesHeatLoad);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolingCap, adu.Name, sizing.DesCoolLoad);
+    }
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermTypeInp, adu.Name, this->UnitType);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermPrimFlow, adu.Name, this->MaxPriAirVolFlow);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSecdFlow, adu.Name, this->MaxSecAirVolFlow);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinFlowSch, adu.Name, "n/a");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMaxFlowReh, adu.Name, "n/a");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinOAflowSch, adu.Name, "n/a");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatCoilType, adu.Name, HCoilNamesUC[(int)this->HCoilType]);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolCoilType, adu.Name, "n/a");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanType, adu.Name, HVAC::fanTypeNames[(int)this->fanType]);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanName, adu.Name, this->FanName);
 }
 
 } // namespace EnergyPlus::PoweredInductionUnits

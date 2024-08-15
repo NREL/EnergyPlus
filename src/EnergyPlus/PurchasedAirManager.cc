@@ -3318,6 +3318,22 @@ int GetPurchasedAirReturnAirNode(EnergyPlusData &state, int const PurchAirNum)
     return GetPurchasedAirReturnAirNode;
 }
 
+int getPurchasedAirIndex(EnergyPlusData &state, std::string_view PurchAirName)
+{
+    if (state.dataPurchasedAirMgr->GetPurchAirInputFlag) {
+        GetPurchasedAir(state);
+        state.dataPurchasedAirMgr->GetPurchAirInputFlag = false;
+    }
+
+    for (int PurchAirNum = 1; PurchAirNum <= state.dataPurchasedAirMgr->NumPurchAir; ++PurchAirNum) {
+        if (Util::SameString(state.dataPurchasedAirMgr->PurchAir(PurchAirNum).Name, PurchAirName)) {
+            return PurchAirNum;
+        }
+    }
+
+    return 0;
+}
+
 Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int const PurchAirNum)
 {
 
