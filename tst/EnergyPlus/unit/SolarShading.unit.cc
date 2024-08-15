@@ -6204,3 +6204,285 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
     }
 #endif
 }
+
+TEST_F(EnergyPlusFixture, CLIPLINE_Throw)
+{
+    Real64 constexpr minX = 2.0;
+    Real64 constexpr maxX = 8.0;
+    Real64 constexpr minY = 3.0;
+    Real64 constexpr maxY = 6.0;
+
+    Real64 x0 = maxX;
+    Real64 x1 = maxX;
+    Real64 y0 = 4.5;
+    Real64 y1 = 1.0;
+    bool visible = false;
+
+    EXPECT_NO_THROW(CLIPLINE(x0, x1, y0, y1, maxX, minX, maxY, minY, visible));
+
+    EXPECT_DOUBLE_EQ(maxX, x0);
+    EXPECT_DOUBLE_EQ(4.5, y0);
+    EXPECT_DOUBLE_EQ(maxX, x1);
+    EXPECT_DOUBLE_EQ(minY, y1); // This is NaN
+}
+
+TEST_F(EnergyPlusFixture, CLIPLINE_Full)
+{
+    Real64 constexpr minX = 2.0;
+    Real64 constexpr maxX = 8.0;
+    Real64 constexpr minY = 3.0;
+    Real64 constexpr maxY = 6.0;
+
+    Real64 constexpr below_x = 0.0;
+    Real64 constexpr center_x = 5.0;
+    Real64 constexpr greater_x = 10.0;
+
+    Real64 constexpr below_y = 1.0;
+    Real64 constexpr center_y = 4.5;
+    Real64 constexpr greater_y = 9.0;
+
+    struct Point
+    {
+        Real64 x = 0.0;
+        Real64 y = 0.0;
+    };
+
+    struct Line
+    {
+        Point p0{};
+        Point p1{};
+    };
+
+    struct TestCase
+    {
+        Line line_ori;
+        bool visible = false;
+        Line line_new{}; // Only defined if visible
+    };
+
+    auto testclipline = [&maxX, &minX, &maxY, &minY](const TestCase &t) {
+        Real64 x0 = t.line_ori.p0.x;
+        Real64 y0 = t.line_ori.p0.y;
+
+        Real64 x1 = t.line_ori.p1.x;
+        Real64 y1 = t.line_ori.p1.y;
+        bool is_rev = x0 > x1;
+
+        std::string const msg = fmt::format("From ({}, {}) to ({}, {})", t.line_ori.p0.x, t.line_ori.p0.y, t.line_ori.p1.x, t.line_ori.p1.y);
+
+        bool visible = false;
+        CLIPLINE(x0, x1, y0, y1, maxX, minX, maxY, minY, visible);
+        if (t.visible) {
+            EXPECT_TRUE(visible) << msg;
+            EXPECT_DOUBLE_EQ(t.line_new.p0.x, x0) << msg;
+            EXPECT_DOUBLE_EQ(t.line_new.p0.y, y0) << msg;
+            EXPECT_DOUBLE_EQ(t.line_new.p1.x, x1) << msg;
+            EXPECT_DOUBLE_EQ(t.line_new.p1.y, y1) << msg;
+        } else {
+            EXPECT_FALSE(visible) << msg;
+            if (is_rev) {
+                std::swap(x0, x1);
+                std::swap(y0, y1);
+            }
+            EXPECT_DOUBLE_EQ(t.line_ori.p0.x, x0) << msg;
+            EXPECT_DOUBLE_EQ(t.line_ori.p0.y, y0) << msg;
+            EXPECT_DOUBLE_EQ(t.line_ori.p1.x, x1) << msg;
+            EXPECT_DOUBLE_EQ(t.line_ori.p1.y, y1) << msg;
+        }
+    };
+
+    constexpr std::array<TestCase, 72> test_cases{{
+        // From 0 to 3
+        TestCase{Line{Point{below_x, below_y}, Point{below_x, center_y}}, false},
+        // From 0 to 6
+        TestCase{Line{Point{below_x, below_y}, Point{below_x, greater_y}}, false},
+        // From 0 to 1
+        TestCase{Line{Point{below_x, below_y}, Point{center_x, below_y}}, false},
+        // From 0 to 4
+        TestCase{Line{Point{below_x, below_y}, Point{center_x, center_y}}, true, Line{Point{2.8571428571428568, minY}, Point{center_x, center_y}}},
+        // From 0 to 7
+        TestCase{Line{Point{below_x, below_y}, Point{center_x, greater_y}}, true, Line{Point{minX, 4.2}, Point{3.125, maxY}}},
+        // From 0 to 2
+        TestCase{Line{Point{below_x, below_y}, Point{greater_x, below_y}}, false},
+        // From 0 to 5
+        TestCase{
+            Line{Point{below_x, below_y}, Point{greater_x, center_y}}, true, Line{Point{5.7142857142857135, minY}, Point{maxX, 3.8000000000000003}}},
+        // From 0 to 8
+        TestCase{Line{Point{below_x, below_y}, Point{greater_x, greater_y}}, true, Line{Point{2.5, minY}, Point{6.25, maxY}}},
+        // From 3 to 0
+        TestCase{Line{Point{below_x, center_y}, Point{below_x, below_y}}, false},
+        // From 3 to 6
+        TestCase{Line{Point{below_x, center_y}, Point{below_x, greater_y}}, false},
+        // From 3 to 1
+        TestCase{
+            Line{Point{below_x, center_y}, Point{center_x, below_y}}, true, Line{Point{minX, 3.0999999999999996}, Point{2.142857142857143, minY}}},
+        // From 3 to 4
+        TestCase{Line{Point{below_x, center_y}, Point{center_x, center_y}}, true, Line{Point{minX, center_y}, Point{center_x, center_y}}},
+        // From 3 to 7
+        TestCase{Line{Point{below_x, center_y}, Point{center_x, greater_y}}, false},
+        // From 3 to 2
+        TestCase{Line{Point{below_x, center_y}, Point{greater_x, below_y}}, true, Line{Point{minX, 3.8}, Point{4.285714285714286, minY}}},
+        // From 3 to 5
+        TestCase{Line{Point{below_x, center_y}, Point{greater_x, center_y}}, true, Line{Point{minX, center_y}, Point{maxX, center_y}}},
+        // From 3 to 8
+        TestCase{Line{Point{below_x, center_y}, Point{greater_x, greater_y}}, true, Line{Point{minX, 5.4}, Point{3.333333333333333, maxY}}},
+        // From 6 to 0
+        TestCase{Line{Point{below_x, greater_y}, Point{below_x, below_y}}, false},
+        // From 6 to 3
+        TestCase{Line{Point{below_x, greater_y}, Point{below_x, center_y}}, false},
+        // From 6 to 1
+        TestCase{Line{Point{below_x, greater_y}, Point{center_x, below_y}}, true, Line{Point{minX, 5.8}, Point{3.75, minY}}},
+        // From 6 to 4
+        TestCase{Line{Point{below_x, greater_y}, Point{center_x, center_y}}, true, Line{Point{3.333333333333333, maxY}, Point{center_x, center_y}}},
+        // From 6 to 7
+        TestCase{Line{Point{below_x, greater_y}, Point{center_x, greater_y}}, false},
+        // From 6 to 2
+        TestCase{Line{Point{below_x, greater_y}, Point{greater_x, below_y}}, true, Line{Point{3.75, maxY}, Point{7.5, minY}}},
+        // From 6 to 5
+        TestCase{Line{Point{below_x, greater_y}, Point{greater_x, center_y}}, true, Line{Point{6.666666666666666, maxY}, Point{maxX, 5.4}}},
+        // From 6 to 8
+        TestCase{Line{Point{below_x, greater_y}, Point{greater_x, greater_y}}, false},
+        // From 1 to 0
+        TestCase{Line{Point{center_x, below_y}, Point{below_x, below_y}}, false},
+        // From 1 to 3
+        TestCase{Line{Point{center_x, below_y}, Point{below_x, center_y}}, true, Line{Point{2.1428571428571432, minY}, Point{minX, 3.1}}},
+        // From 1 to 6
+        TestCase{Line{Point{center_x, below_y}, Point{below_x, greater_y}}, true, Line{Point{3.75, minY}, Point{minX, 5.8}}},
+        // From 1 to 4
+        TestCase{Line{Point{center_x, below_y}, Point{center_x, center_y}}, true, Line{Point{center_x, minY}, Point{center_x, center_y}}},
+        // From 1 to 7
+        TestCase{Line{Point{center_x, below_y}, Point{center_x, greater_y}}, true, Line{Point{center_x, minY}, Point{center_x, maxY}}},
+        // From 1 to 2
+        TestCase{Line{Point{center_x, below_y}, Point{greater_x, below_y}}, false},
+        // From 1 to 5
+        TestCase{Line{Point{center_x, below_y}, Point{greater_x, center_y}}, true, Line{Point{7.857142857142857, minY}, Point{maxX, 3.1}}},
+        // From 1 to 8
+        TestCase{Line{Point{center_x, below_y}, Point{greater_x, greater_y}}, true, Line{Point{6.25, minY}, Point{maxX, 5.8}}},
+        // From 4 to 0
+        TestCase{Line{Point{center_x, center_y}, Point{below_x, below_y}}, true, Line{Point{center_x, center_y}, Point{2.857142857142857, minY}}},
+        // From 4 to 3
+        TestCase{Line{Point{center_x, center_y}, Point{below_x, center_y}}, true, Line{Point{center_x, center_y}, Point{minX, center_y}}},
+        // From 4 to 6
+        TestCase{Line{Point{center_x, center_y}, Point{below_x, greater_y}}, true, Line{Point{center_x, center_y}, Point{3.3333333333333335, maxY}}},
+        // From 4 to 1
+        TestCase{Line{Point{center_x, center_y}, Point{center_x, below_y}}, true, Line{Point{center_x, center_y}, Point{center_x, minY}}},
+        // From 4 to 7
+        TestCase{Line{Point{center_x, center_y}, Point{center_x, greater_y}}, true, Line{Point{center_x, center_y}, Point{center_x, maxY}}},
+        // From 4 to 2
+        TestCase{Line{Point{center_x, center_y}, Point{greater_x, below_y}}, true, Line{Point{center_x, center_y}, Point{7.142857142857142, minY}}},
+        // From 4 to 5
+        TestCase{Line{Point{center_x, center_y}, Point{greater_x, center_y}}, true, Line{Point{center_x, center_y}, Point{maxX, center_y}}},
+        // From 4 to 8
+        TestCase{Line{Point{center_x, center_y}, Point{greater_x, greater_y}}, true, Line{Point{center_x, center_y}, Point{6.666666666666666, maxY}}},
+        // From 7 to 0
+        TestCase{Line{Point{center_x, greater_y}, Point{below_x, below_y}}, true, Line{Point{3.125, maxY}, Point{minX, 4.2}}},
+        // From 7 to 3
+        TestCase{Line{Point{center_x, greater_y}, Point{below_x, center_y}}, false},
+        // From 7 to 6
+        TestCase{Line{Point{center_x, greater_y}, Point{below_x, greater_y}}, false},
+        // From 7 to 1
+        TestCase{Line{Point{center_x, greater_y}, Point{center_x, below_y}}, true, Line{Point{center_x, maxY}, Point{center_x, minY}}},
+        // From 7 to 4
+        TestCase{Line{Point{center_x, greater_y}, Point{center_x, center_y}}, true, Line{Point{center_x, maxY}, Point{center_x, center_y}}},
+        // From 7 to 2
+        TestCase{Line{Point{center_x, greater_y}, Point{greater_x, below_y}}, true, Line{Point{6.875, maxY}, Point{maxX, 4.2}}},
+        // From 7 to 5
+        TestCase{Line{Point{center_x, greater_y}, Point{greater_x, center_y}}, false},
+        // From 7 to 8
+        TestCase{Line{Point{center_x, greater_y}, Point{greater_x, greater_y}}, false},
+        // From 2 to 0
+        TestCase{Line{Point{greater_x, below_y}, Point{below_x, below_y}}, false},
+        // From 2 to 3
+        TestCase{
+            Line{Point{greater_x, below_y}, Point{below_x, center_y}}, true, Line{Point{4.2857142857142865, minY}, Point{minX, 3.8000000000000003}}},
+        // From 2 to 6
+        TestCase{Line{Point{greater_x, below_y}, Point{below_x, greater_y}}, true, Line{Point{7.5, minY}, Point{3.75, maxY}}},
+        // From 2 to 1
+        TestCase{Line{Point{greater_x, below_y}, Point{center_x, below_y}}, false},
+        // From 2 to 4
+        TestCase{Line{Point{greater_x, below_y}, Point{center_x, center_y}}, true, Line{Point{7.142857142857143, minY}, Point{center_x, center_y}}},
+        // From 2 to 7
+        TestCase{Line{Point{greater_x, below_y}, Point{center_x, greater_y}}, true, Line{Point{maxX, 4.2}, Point{6.875, maxY}}},
+        // From 2 to 5
+        TestCase{Line{Point{greater_x, below_y}, Point{greater_x, center_y}}, false},
+        // From 2 to 8
+        TestCase{Line{Point{greater_x, below_y}, Point{greater_x, greater_y}}, false},
+        // From 5 to 0
+        TestCase{Line{Point{greater_x, center_y}, Point{below_x, below_y}}, true, Line{Point{maxX, 3.8}, Point{5.714285714285714, minY}}},
+        // From 5 to 3
+        TestCase{Line{Point{greater_x, center_y}, Point{below_x, center_y}}, true, Line{Point{maxX, center_y}, Point{minX, center_y}}},
+        // From 5 to 6
+        TestCase{Line{Point{greater_x, center_y}, Point{below_x, greater_y}}, true, Line{Point{maxX, 5.4}, Point{6.666666666666667, maxY}}},
+        // From 5 to 1
+        TestCase{
+            Line{Point{greater_x, center_y}, Point{center_x, below_y}}, true, Line{Point{maxX, 3.0999999999999996}, Point{7.857142857142858, minY}}},
+        // From 5 to 4
+        TestCase{Line{Point{greater_x, center_y}, Point{center_x, center_y}}, true, Line{Point{maxX, center_y}, Point{center_x, center_y}}},
+        // From 5 to 7
+        TestCase{Line{Point{greater_x, center_y}, Point{center_x, greater_y}}, false},
+        // From 5 to 2
+        TestCase{Line{Point{greater_x, center_y}, Point{greater_x, below_y}}, false},
+        // From 5 to 8
+        TestCase{Line{Point{greater_x, center_y}, Point{greater_x, greater_y}}, false},
+        // From 8 to 0
+        TestCase{Line{Point{greater_x, greater_y}, Point{below_x, below_y}}, true, Line{Point{6.25, maxY}, Point{2.5, minY}}},
+        // From 8 to 3
+        TestCase{Line{Point{greater_x, greater_y}, Point{below_x, center_y}}, true, Line{Point{3.333333333333334, maxY}, Point{minX, 5.4}}},
+        // From 8 to 6
+        TestCase{Line{Point{greater_x, greater_y}, Point{below_x, greater_y}}, false},
+        // From 8 to 1
+        TestCase{Line{Point{greater_x, greater_y}, Point{center_x, below_y}}, true, Line{Point{maxX, 5.8}, Point{6.25, minY}}},
+        // From 8 to 4
+        TestCase{Line{Point{greater_x, greater_y}, Point{center_x, center_y}}, true, Line{Point{6.666666666666667, maxY}, Point{center_x, center_y}}},
+        // From 8 to 7
+        TestCase{Line{Point{greater_x, greater_y}, Point{center_x, greater_y}}, false},
+        // From 8 to 2
+        TestCase{Line{Point{greater_x, greater_y}, Point{greater_x, below_y}}, false},
+        // From 8 to 5
+        TestCase{Line{Point{greater_x, greater_y}, Point{greater_x, center_y}}, false},
+    }};
+
+    size_t i = 0;
+    for (const auto &t : test_cases) {
+        ++i;
+        std::string const msg =
+            fmt::format("test_case {}: From ({}, {}) to ({}, {})", i, t.line_ori.p0.x, t.line_ori.p0.y, t.line_ori.p1.x, t.line_ori.p1.y);
+        SCOPED_TRACE(msg);
+        testclipline(t);
+    }
+
+    constexpr std::array<TestCase, 24> boundary_lines{
+        TestCase{Line{Point{minX, below_y}, Point{minX, center_y}}, true, Line{Point{minX, minY}, Point{minX, center_y}}},
+        TestCase{Line{Point{minX, below_y}, Point{minX, greater_y}}, true, Line{Point{minX, minY}, Point{minX, maxY}}},
+        TestCase{Line{Point{minX, center_y}, Point{minX, below_y}}, true, Line{Point{minX, center_y}, Point{minX, minY}}},
+        TestCase{Line{Point{minX, center_y}, Point{minX, greater_y}}, true, Line{Point{minX, center_y}, Point{minX, maxY}}},
+        TestCase{Line{Point{minX, greater_y}, Point{minX, below_y}}, true, Line{Point{minX, maxY}, Point{minX, minY}}},
+        TestCase{Line{Point{minX, greater_y}, Point{minX, center_y}}, true, Line{Point{minX, maxY}, Point{minX, center_y}}},
+        TestCase{Line{Point{maxX, below_y}, Point{maxX, center_y}}, true, Line{Point{maxX, minY}, Point{maxX, center_y}}},
+        TestCase{Line{Point{maxX, below_y}, Point{maxX, greater_y}}, true, Line{Point{maxX, minY}, Point{maxX, maxY}}},
+        TestCase{Line{Point{maxX, center_y}, Point{maxX, below_y}}, true, Line{Point{maxX, center_y}, Point{maxX, minY}}},
+        TestCase{Line{Point{maxX, center_y}, Point{maxX, greater_y}}, true, Line{Point{maxX, center_y}, Point{maxX, maxY}}},
+        TestCase{Line{Point{maxX, greater_y}, Point{maxX, below_y}}, true, Line{Point{maxX, maxY}, Point{maxX, minY}}},
+        TestCase{Line{Point{maxX, greater_y}, Point{maxX, center_y}}, true, Line{Point{maxX, maxY}, Point{maxX, center_y}}},
+        TestCase{Line{Point{below_x, minY}, Point{center_x, minY}}, true, Line{Point{minX, minY}, Point{center_x, minY}}},
+        TestCase{Line{Point{below_x, minY}, Point{greater_x, minY}}, true, Line{Point{minX, minY}, Point{maxX, minY}}},
+        TestCase{Line{Point{center_x, minY}, Point{below_x, minY}}, true, Line{Point{center_x, minY}, Point{minX, minY}}},
+        TestCase{Line{Point{center_x, minY}, Point{greater_x, minY}}, true, Line{Point{center_x, minY}, Point{maxX, minY}}},
+        TestCase{Line{Point{greater_x, minY}, Point{below_x, minY}}, true, Line{Point{maxX, minY}, Point{minX, minY}}},
+        TestCase{Line{Point{greater_x, minY}, Point{center_x, minY}}, true, Line{Point{maxX, minY}, Point{center_x, minY}}},
+        TestCase{Line{Point{below_x, maxY}, Point{center_x, maxY}}, true, Line{Point{minX, maxY}, Point{center_x, maxY}}},
+        TestCase{Line{Point{below_x, maxY}, Point{greater_x, maxY}}, true, Line{Point{minX, maxY}, Point{maxX, maxY}}},
+        TestCase{Line{Point{center_x, maxY}, Point{below_x, maxY}}, true, Line{Point{center_x, maxY}, Point{minX, maxY}}},
+        TestCase{Line{Point{center_x, maxY}, Point{greater_x, maxY}}, true, Line{Point{center_x, maxY}, Point{maxX, maxY}}},
+        TestCase{Line{Point{greater_x, maxY}, Point{below_x, maxY}}, true, Line{Point{maxX, maxY}, Point{minX, maxY}}},
+        TestCase{Line{Point{greater_x, maxY}, Point{center_x, maxY}}, true, Line{Point{maxX, maxY}, Point{center_x, maxY}}},
+    };
+    i = 0;
+    for (const auto &t : boundary_lines) {
+        ++i;
+        std::string const msg =
+            fmt::format("Boundary Line {}: From ({}, {}) to ({}, {})", i, t.line_ori.p0.x, t.line_ori.p0.y, t.line_ori.p1.x, t.line_ori.p1.y);
+        SCOPED_TRACE(msg);
+        testclipline(t);
+    }
+}

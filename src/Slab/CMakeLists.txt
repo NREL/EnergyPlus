@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 3.5.1)
 
 cmake_policy(SET CMP0012 NEW) # if() recognizes boolean constants
 
+if(POLICY CMP0087)
+  cmake_policy(SET CMP0087 NEW) # install(CODE) and install(SCRIPT) support generator expressions.
+endif()
+
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products")
@@ -46,3 +50,8 @@ if(NOT ${FORTRAN_STATIC_EXE})
   install_target_prereqs(Slab PreProcess/GrndTempCalc)
 endif()
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../idd/SlabGHT.idd" DESTINATION "PreProcess/GrndTempCalc/")
+
+if(APPLE AND CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/CodeSigning.cmake")
+  register_install_codesign_target(Slab PreProcess/GrndTempCalc)
+endif()
