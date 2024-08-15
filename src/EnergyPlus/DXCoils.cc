@@ -17346,7 +17346,7 @@ void ControlVRFIUCoil(EnergyPlusData &state,
     MaxSC = 20;
     Garate = state.dataDXCoils->DXCoil(CoilIndex).RatedAirMassFlowRate(1);
     // why always limit the minimum fan speed ratio to 0.65?
-    FanSpdRatioMin = min(max(OAMassFlow / Garate, 0.65), 1.0); // ensure that coil flow rate is higher than OA flow rate
+    FanSpdRatioMin = min(max(OAMassFlow / Garate, 0.0), 1.0); // ensure that coil flow rate is higher than OA flow rate
 
     if (QCoil == 0) {
         // No Heating or Cooling
@@ -17488,7 +17488,13 @@ void ControlVRFIUCoil(EnergyPlusData &state,
             };
             General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, f, FanSpdRatioMin, FanSpdRatioMax);
             // this will likely cause problems eventually, -1 and -2 mean different things
-            if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
+            if (SolFla < 0) {
+                if (f(FanSpdRatioMin) <= 0) { // capacity <= demand
+                    Ratio1 = FanSpdRatioMax;  // over capacity
+                } else {                      // capacity > demand even for the minimum fan speed
+                    Ratio1 = FanSpdRatioMin;
+                }
+            }
             FanSpdRatio = Ratio1;
             CoilOnOffRatio = 1.0;
 

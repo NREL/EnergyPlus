@@ -11740,12 +11740,14 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         this->VRFCondCyclingRatio = CyclingRatio;
 
         Tsuction = this->EvaporatingTemp; // Outdoor unit evaporating temperature
+        this->HeatingCapacityPrev = this->HeatingCapacity;
         this->HeatingCapacity =
             this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(NumOfCompSpdInput), Tdischarge, Tsuction) +
             this->RatedCompPower * CurveValue(state,
                                               this->OUCoolingPWRFT(NumOfCompSpdInput),
                                               Tdischarge,
                                               Tsuction); // Include the piping loss, at the highest compressor speed
+        this->PipingCorrectionHeatingPrev = this->PipingCorrectionHeating;
         this->PipingCorrectionHeating = TU_HeatingLoad / (TU_HeatingLoad + Pipe_Q_h);
         state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) =
             this->HeatingCapacity; // for report, maximum condensing capacity the system can provide
@@ -12235,7 +12237,14 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     }
 
     this->TotalCoolingCapacity = TotalCondCoolingCapacity * CoolingPLR;
-    this->TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR;
+    // adjustment for matching HP heating rate and coil heating rate
+    this->TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR * (this->RatedEvapCapacity / (this->RatedEvapCapacity + Pipe_Q_h));
+    if (this->VRFCondPLR < 1.0) {
+        this->TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR * this->PipingCorrectionHeating;
+    }
+    if (this->TUHeatingLoad / this->PipingCorrectionHeating > TotalCondHeatingCapacity) {
+        this->TotalHeatingCapacity = this->HeatingCapacityPrev * HeatingPLR * this->PipingCorrectionHeatingPrev;
+    }
 
     if (this->MinPLR > 0.0) {
         bool const plrTooLow = this->VRFCondPLR < this->MinPLR;

@@ -173,6 +173,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 OperatingCoolingCOP;            // Operating VRF heat pump cooling COP (W/W)
         Real64 RatedCoolingPower;              // Rated cooling power = Rated Cooling Capacity / Rated COP (W)
         Real64 HeatingCapacity;                // Nominal VRF heat pump heating capacity (W)
+        Real64 HeatingCapacityPrev;            // Nominal VRF heat pump heating capacity (W)
         Real64 HeatingCapacitySizeRatio;       // Ratio of heating to cooling when autosizing
         bool LockHeatingCapacity;              // used in sizing to size VRF heat cap to VRF cool cap
         Real64 TotalHeatingCapacity;           // Nominal VRF heat pump heating capacity (W)
@@ -219,6 +220,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 PCFHeightHeat;                                             // piping correction factor for height in heating mode
         Real64 EquivPipeLngthHeat;                                        // equivalent piping length for heating
         Real64 PipingCorrectionHeating;                                   // piping correction factor for heating
+        Real64 PipingCorrectionHeatingPrev;                               // piping correction factor for heating
         Real64 CCHeaterPower;                                             // crankcase heater power per compressor (W)
         Real64 CompressorSizeRatio;                                       // ratio of min compressor size to total capacity
         int NumCompressors;                                               // number of compressors in VRF condenser
@@ -394,7 +396,7 @@ namespace HVACVariableRefrigerantFlow {
               WaterCondenserDesignMassFlow(0.0), WaterCondenserMassFlow(0.0), QCondenser(0.0), QCondEnergy(0.0), CondenserSideOutletTemp(0.0),
               SchedPtr(-1), CoolingCapacity(0.0), TotalCoolingCapacity(0.0), CoolingCombinationRatio(1.0), VRFCondPLR(0.0), VRFCondRTF(0.0),
               VRFCondCyclingRatio(0.0), CondenserInletTemp(0.0), CoolingCOP(0.0), OperatingCoolingCOP(0.0), RatedCoolingPower(0.0),
-              HeatingCapacity(0.0), HeatingCapacitySizeRatio(1.0), LockHeatingCapacity(false), TotalHeatingCapacity(0.0),
+              HeatingCapacity(0.0), HeatingCapacityPrev(0.0), HeatingCapacitySizeRatio(1.0), LockHeatingCapacity(false), TotalHeatingCapacity(0.0),
               HeatingCombinationRatio(1.0), HeatingCOP(0.0), OperatingHeatingCOP(0.0), RatedHeatingPower(0.0), MinOATCooling(0.0), MaxOATCooling(0.0),
               MinOATHeating(0.0), MaxOATHeating(0.0), CoolCapFT(0), CoolEIRFT(0), HeatCapFT(0), HeatEIRFT(0), CoolBoundaryCurvePtr(0),
               HeatBoundaryCurvePtr(0), EIRCoolBoundaryCurvePtr(0), CoolEIRFPLR1(0), CoolEIRFPLR2(0), CoolCapFTHi(0), CoolEIRFTHi(0), HeatCapFTHi(0),
@@ -402,10 +404,10 @@ namespace HVACVariableRefrigerantFlow {
               MasterZonePtr(0), MasterZoneTUIndex(0), ThermostatPriority(ThermostatCtrlType::Invalid), SchedPriorityPtr(0), ZoneTUListPtr(0),
               HeatRecoveryUsed(false), VertPipeLngth(0.0), PCFLengthCoolPtr(0), PCFHeightCool(0.0), EquivPipeLngthCool(0.0),
               PipingCorrectionCooling(1.0), PCFLengthHeatPtr(0), PCFHeightHeat(0.0), EquivPipeLngthHeat(0.0), PipingCorrectionHeating(1.0),
-              CCHeaterPower(0.0), CompressorSizeRatio(0.0), NumCompressors(0), MaxOATCCHeater(0.0), DefrostEIRPtr(0), DefrostFraction(0.0),
-              DefrostStrategy(StandardRatings::DefrostStrat::Invalid), DefrostControl(StandardRatings::HPdefrostControl::Invalid),
-              DefrostCapacity(0.0), DefrostPower(0.0), DefrostConsumption(0.0), MaxOATDefrost(0.0),
-              CondenserType(DataHeatBalance::RefrigCondenserType::Invalid), CondenserNodeNum(0), SkipCondenserNodeNumCheck(false),
+              PipingCorrectionHeatingPrev(1.0), CCHeaterPower(0.0), CompressorSizeRatio(0.0), NumCompressors(0), MaxOATCCHeater(0.0),
+              DefrostEIRPtr(0), DefrostFraction(0.0), DefrostStrategy(StandardRatings::DefrostStrat::Invalid),
+              DefrostControl(StandardRatings::HPdefrostControl::Invalid), DefrostCapacity(0.0), DefrostPower(0.0), DefrostConsumption(0.0),
+              MaxOATDefrost(0.0), CondenserType(DataHeatBalance::RefrigCondenserType::Invalid), CondenserNodeNum(0), SkipCondenserNodeNumCheck(false),
               CondenserOutletNodeNum(0), WaterCondVolFlowRate(0.0), EvapCondEffectiveness(0.0), EvapCondAirVolFlowRate(0.0), EvapCondPumpPower(0.0),
               CoolCombRatioPTR(0), HeatCombRatioPTR(0), OperatingMode(0), ElecPower(0.0), ElecCoolingPower(0.0), ElecHeatingPower(0.0),
               CoolElecConsumption(0.0), HeatElecConsumption(0.0), CrankCaseHeaterPower(0.0), CrankCaseHeaterElecConsumption(0.0),
