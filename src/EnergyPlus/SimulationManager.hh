@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -104,6 +105,7 @@ struct SimulationManagerData : BaseGlobalStruct
     {
         SimulationManager::OpenOutputFiles(state);
         SimulationManager::GetProjectData(state);
+        EMSManager::CheckIfAnyEMS(state);                             // required prior to ProcessScheduleInput
         HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     }
 

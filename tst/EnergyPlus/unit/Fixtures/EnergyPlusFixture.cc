@@ -183,15 +183,6 @@ bool EnergyPlusFixture::compare_eio_stream(std::string const &expected_string, b
     return are_equal;
 }
 
-bool EnergyPlusFixture::compare_eio_stream_substring(std::string const &search_string, bool reset_stream)
-{
-    auto const stream_str = state->files.eio.get_output();
-    bool const found = stream_str.find(search_string) != std::string::npos;
-    EXPECT_TRUE(found);
-    if (reset_stream) state->files.eio.open_as_stringstream();
-    return found;
-}
-
 bool EnergyPlusFixture::compare_mtr_stream(std::string const &expected_string, bool reset_stream)
 {
     auto const stream_str = state->files.mtr.get_output();
@@ -359,7 +350,8 @@ bool EnergyPlusFixture::process_idf(std::string_view const idf_snippet, bool use
 
     inputProcessor->initializeMaps();
     SimulationManager::PostIPProcessing(*state);
-    state->init_state(*state);
+
+    FluidProperties::GetFluidPropertiesData(*state);
 
     if (state->dataSQLiteProcedures->sqlite) {
         bool writeOutputToSQLite = false;

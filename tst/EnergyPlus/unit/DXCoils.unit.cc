@@ -4633,7 +4633,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
  DX Cooling Coil AHRI 2023 Standard Rating Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, 31156.1, 3.73, 12.72, 15.17, 15.98, 15.0
 )EIO";
     replace_pipes_with_spaces(clg_coil_eio_output);
-    EXPECT_TRUE(compare_eio_stream_substring(clg_coil_eio_output, true));
+    EXPECT_TRUE(compare_eio_stream(clg_coil_eio_output, true));
 
     // check multi-speed DX heating coil
     EXPECT_EQ("ASHP HTG COIL", state->dataDXCoils->DXCoil(2).Name);

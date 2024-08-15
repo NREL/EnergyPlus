@@ -61,7 +61,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -653,6 +652,7 @@ namespace Curve {
         // initialize the array
 
         int CurveNum = 0; // keep track of the current curve index in the main curve array
+        state.dataCurveManager->UniqueCurveNames.clear();
 
         // Loop over biquadratic curves and load data
         CurrentModuleObject = "Curve:Biquadratic";

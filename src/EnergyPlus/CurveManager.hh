@@ -65,6 +65,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
@@ -469,8 +470,11 @@ struct CurveManagerData : BaseGlobalStruct
             this->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
     }
 
-    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    void init_state(EnergyPlusData &state) override
     {
+        Curve::GetCurveInput(state);
+        Curve::GetPressureSystemInput(state);
+        state.dataCurveManager->GetCurvesInputFlag = false;
     }
 
     void clear_state() override
