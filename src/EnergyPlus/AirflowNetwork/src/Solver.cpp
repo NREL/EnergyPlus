@@ -269,12 +269,6 @@ namespace AirflowNetwork {
         // VAV terminal set only
         if (present(FirstHVACIteration) && FirstHVACIteration) VAVTerminalRatio = 0.0;
 
-        // Set AirLoop Number for fans
-        if (FirstHVACIteration && AssignFanAirLoopNumFlag) {
-            assign_fan_airloop();
-            AssignFanAirLoopNumFlag = false;
-        }
-
         if (AirflowNetworkFanActivated && distribution_simulated) {
             if (ValidateDistributionSystemFlag) {
                 validate_distribution();
@@ -10095,24 +10089,6 @@ namespace AirflowNetwork {
         if (VentCtrlNum == VentControlType::NoVent) { // Novent
             OpenFactor = 0.0;
             m_state.dataSurface->SurfWinVentingOpenFactorMultRep(SurfNum) = -1.0;
-        }
-    }
-
-    void Solver::assign_fan_airloop()
-    {
-        // Assign the system Fan AirLoop Number based on the zone inlet node
-
-        for (int i = 1; i <= AirflowNetworkNumOfZones; i++) {
-            for (int j = 1; j <= m_state.dataGlobal->NumOfZones; j++) {
-                if (!m_state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
-                if ((MultizoneZoneData(i).ZoneNum == j) && (m_state.dataZoneEquip->ZoneEquipConfig(j).NumInletNodes > 0)) {
-                    for (int k = 1; k <= DisSysNumOfCVFs; k++) {
-                        if (DisSysCompCVFData(k).AirLoopNum == 0) {
-                            DisSysCompCVFData(k).AirLoopNum = m_state.dataZoneEquip->ZoneEquipConfig(j).InletNodeAirLoopNum(1);
-                        }
-                    }
-                }
-            }
         }
     }
 
