@@ -98,7 +98,7 @@ if __name__ == "__main__":
     p = multiprocessing.Process(target=generate_epJSON_schema, args=(sys.argv[1], ))
     p.start()
 
-    timeout_seconds = 30
+    timeout_seconds = 60
     p.join(timeout=timeout_seconds)
 
     # If thread is still active

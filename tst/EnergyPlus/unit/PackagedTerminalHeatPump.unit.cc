@@ -4613,7 +4613,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     // set sizing parameters
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
-    state->dataGlobal->SysSizingCalc = true;
+    state->dataGlobal->SysSizingCalc = true; // disable sizing calculation
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
@@ -4653,6 +4653,10 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     auto &dxClgCoilMain = state->dataDXCoils->DXCoil(1);
     auto &dxHtgCoilMain = state->dataDXCoils->DXCoil(2);
     auto &elecHtgCoilSupp = state->dataHeatingCoils->HeatingCoil(1);
+
+    // We disabled sizing calculation, so we must initialize these
+    dxClgCoilMain.RatedAirMassFlowRate(1) = dxClgCoilMain.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
+    dxHtgCoilMain.RatedAirMassFlowRate(1) = dxHtgCoilMain.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
 
     state->dataGlobal->BeginEnvrnFlag = true;
     mySys->simulate(*state,

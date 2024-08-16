@@ -54,6 +54,7 @@
 
 // I should not have to import these, but I do, the headers don't declare them
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -385,6 +386,7 @@ Schedule:Compact,
     ASSERT_TRUE(process_idf(fmt::format("{}\n{}", oneZoneBuildingWithIdealLoads, idf_objects))); // read idf objects
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -479,6 +481,7 @@ Refrigeration:WalkIn,
     ASSERT_TRUE(process_idf(fmt::format("{}\n{}", oneZoneBuildingWithIdealLoads, idf_objects))); // read idf objects
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -576,6 +579,7 @@ Refrigeration:WalkIn,
     ASSERT_TRUE(process_idf(fmt::format("{}\n{}", oneZoneBuildingWithIdealLoads, idf_objects))); // read idf objects
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -733,6 +737,7 @@ Schedule:Compact,
     ASSERT_TRUE(process_idf(fmt::format("{}\n{}", oneZoneBuildingWithIdealLoads, idf_objects))); // read idf objects
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
