@@ -952,6 +952,7 @@ namespace UnitarySystems {
 
     int getDesignSpecMSHPIndex(EnergyPlusData &state, std::string_view objectName);
     int getUnitarySystemIndex(EnergyPlusData &state, std::string_view objectName);
+    bool getUnitarySystemNodeNumber(EnergyPlusData &state, int const nodeNumber);
 
     bool searchZoneInletNodes(EnergyPlusData &state, int nodeToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
