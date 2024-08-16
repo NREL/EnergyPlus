@@ -548,8 +548,10 @@ int AbortEnergyPlus(EnergyPlusData &state)
     CloseMiscOpenFiles(state);
     NumWarnings = fmt::to_string(state.dataErrTracking->TotalWarningErrors);
     NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
-    NumWarningsDuringWarmup = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup);
-    NumSevereDuringWarmup = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup);
+    NumWarningsDuringWarmup =
+        fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup + state.dataErrTracking->TotalWarningErrorsDuringInputs);
+    NumSevereDuringWarmup =
+        fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup + state.dataErrTracking->TotalSevereErrorsDuringInputs);
     NumWarningsDuringSizing = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing);
     NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
 
@@ -928,6 +930,7 @@ void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, Opt
     }
 
     ++state.dataErrTracking->TotalSevereErrors;
+    if (state.dataGlobal->InputsFlag) ++state.dataErrTracking->TotalSevereErrorsDuringInputs;
     if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation &&
         !state.dataErrTracking->AbortProcessing)
         ++state.dataErrTracking->TotalSevereErrorsDuringWarmup;
@@ -1129,6 +1132,7 @@ void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, Op
     }
 
     ++state.dataErrTracking->TotalWarningErrors;
+    if (state.dataGlobal->InputsFlag) ++state.dataErrTracking->TotalWarningErrorsDuringInputs;
     if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation &&
         !state.dataErrTracking->AbortProcessing)
         ++state.dataErrTracking->TotalWarningErrorsDuringWarmup;

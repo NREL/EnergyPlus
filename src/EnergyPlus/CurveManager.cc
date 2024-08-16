@@ -571,7 +571,6 @@ namespace Curve {
         bool GetInputErrorsFound = false;
 
         GetCurveInputData(state, GetInputErrorsFound);
-        state.dataCurveManager->GetCurvesInputFlag = false;
 
         if (GetInputErrorsFound) {
             ShowFatalError(state, "GetCurveInput: Errors found in getting Curve Objects.  Preceding condition(s) cause termination.");
@@ -610,6 +609,8 @@ namespace Curve {
         int IOStatus;                    // Used in GetObjectItem
         std::string CurrentModuleObject; // for ease in renaming.
 
+        if (!state.dataCurveManager->GetCurvesInputFlag) return;
+        state.dataCurveManager->GetCurvesInputFlag = false;
         // Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
         int const NumBiQuad = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Biquadratic");
