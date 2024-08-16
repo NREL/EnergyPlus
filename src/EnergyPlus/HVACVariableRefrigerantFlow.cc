@@ -7950,7 +7950,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         EqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
         if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
             CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-            if (CapSizingMethod == HeatingDesignCapacity) {
+            if (CapSizingMethod == CoolingDesignCapacity) {
                 if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0) {
                     EqSizing.CoolingCapacity = true;
                     EqSizing.DesCoolingLoad = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
