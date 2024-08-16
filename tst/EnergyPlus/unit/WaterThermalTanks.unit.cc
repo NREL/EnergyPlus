@@ -54,6 +54,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
@@ -1046,6 +1047,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     ASSERT_FALSE(ErrorsFound);
     state->dataHVACGlobal->TimeStepSys = 1;
     state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    state->dataEnvrn->OutBaroPress = 101325;
 
     SetPredefinedTables(*state);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
