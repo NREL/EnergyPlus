@@ -12850,16 +12850,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         auto *fan = state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex);
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::SystemModel) {
             if (OnOffAirFlowRatio > 0.0) {
-                fan->simulate(state,
-                              FirstHVACIteration,
-                              _,
-                              _,
-                              _,
-                              fan->inletAirMassFlowRate,
-                              OnOffFanPartLoadFraction,
-                              0,
-                              0,
-                              _);
+                fan->simulate(state, FirstHVACIteration, _, _, _, fan->inletAirMassFlowRate, OnOffFanPartLoadFraction, 0, 0, _);
             } else {
                 fan->simulate(state, FirstHVACIteration, _, _, PartLoadRatio);
             }
