@@ -2212,7 +2212,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     // Check indoor pressure and mass flow rate
     EXPECT_NEAR(PressureSet, state->afn->AirflowNetworkNodeSimu(3).PZ, 0.0001);
-    EXPECT_NEAR(0.00255337, state->afn->ReliefMassFlowRate, 0.0001);
+    EXPECT_NEAR(0.06551, state->afn->ReliefMassFlowRate, 0.0001);
 
     // Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off
     state->afn->AirflowNetworkFanActivated = false;

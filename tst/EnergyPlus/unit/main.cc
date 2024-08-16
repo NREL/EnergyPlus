@@ -54,6 +54,10 @@
 #include <EnergyPlus/fenv_missing.h>
 #endif
 
+#ifdef DEBUG_ARITHM_MSVC
+#include <cfloat>
+#endif
+
 // Google Test main
 int main(int argc, char **argv)
 {
@@ -68,5 +72,17 @@ int main(int argc, char **argv)
 #ifdef DEBUG_ARITHM_GCC_OR_CLANG
     feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
+
+#ifdef DEBUG_ARITHM_MSVC
+    // Note: what you need to pass to the _controlfp_s is actually the opposite
+    // By default all bits are 1, and the exceptions are turned off, so you need to turn off the bits for the exceptions you want to enable
+    // > For the _MCW_EM mask, clearing it sets the exception, which allows the hardware exception; setting it hides the exception.
+    unsigned int fpcntrl = 0;
+    _controlfp_s(&fpcntrl, 0, 0);
+    unsigned int new_exceptions = _EM_ZERODIVIDE | _EM_INVALID | _EM_OVERFLOW;
+    unsigned int new_control = fpcntrl & ~new_exceptions;
+    _controlfp_s(&fpcntrl, new_control, _MCW_EM);
+#endif
+
     return RUN_ALL_TESTS();
 }

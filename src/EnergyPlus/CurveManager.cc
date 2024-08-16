@@ -2498,6 +2498,7 @@ namespace Curve {
                         ShowSevereError(
                             state, format("Table:Lookup named \"{}\": Normalization divisor entered as zero, which is invalid", thisCurve->Name));
                         ErrorsFound = true;
+                        continue;
                     }
                 }
 

@@ -415,7 +415,6 @@ void GetShadowingInput(EnergyPlusData &state)
     int NumNumbers;
     int NumAlphas;
     int IOStat;
-    int Found = 0;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     state.dataIPShortCut->rNumericArgs({1, 4}) = 0.0; // so if nothing gotten, defaults will be maintained.
     state.dataIPShortCut->cAlphaArgs(1) = "";
@@ -2587,7 +2586,6 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
     Real64 Epsilon;                // Sky clearness parameter
     Real64 Delta;                  // Sky brightness parameter
     Real64 CosIncAngBeamOnSurface; // Cosine of incidence angle of beam solar on surface
-    Real64 IncAng;                 // Incidence angle of beam solar on surface (radians)
     int EpsilonBin;                // Sky clearness (Epsilon) bin index
     Real64 AirMass;                // Relative air mass
     Real64 AirMassH;               // Intermediate variable for relative air mass calculation
@@ -2651,8 +2649,6 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
             }
             CosIncAngBeamOnSurface = -1.0;
         }
-
-        IncAng = std::acos(CosIncAngBeamOnSurface);
 
         ViewFactorSkyGeom = state.dataSurface->Surface(SurfNum).ViewFactorSky;
         state.dataSolarShading->SurfMultIsoSky(SurfNum) = ViewFactorSkyGeom * (1.0 - F1);
@@ -3141,19 +3137,17 @@ bool polygon_contains_point(int const nsides,            // number of sides (ver
     // Using/Aliasing
     using namespace DataVectorTypes;
 
-    // Return value
-    bool inside; // return value, true=inside, false = not inside
+    // return value, true=inside, false = not inside
 
     EP_SIZE_CHECK(polygon_3d, nsides);
 
-    int i;
     int ip1;
 
     // Object Data
     Array1D<Vector_2d> polygon(nsides);
     Vector_2d point;
 
-    inside = false;
+    bool inside = false;
     if (ignorex) {
         for (int i = 1; i <= nsides; ++i) {
             polygon(i).x = polygon_3d(i).y;
@@ -3180,7 +3174,7 @@ bool polygon_contains_point(int const nsides,            // number of sides (ver
         point.x = point.y = 0.0; // Elim possibly used uninitialized warnings
     }
 
-    for (i = 1; i <= nsides; ++i) {
+    for (int i = 1; i <= nsides; ++i) {
 
         if (i < nsides) {
             ip1 = i + 1;

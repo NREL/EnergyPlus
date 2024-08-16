@@ -378,11 +378,8 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 FlagCheckVolFlowPerRatedTotCap = false;
             }
 
-            if (this->dataIsDXCoil && FlagCheckVolFlowPerRatedTotCap) {
-                Real64 RatedVolFlowPerRatedTotCap = 0.0;
-                if (this->autoSizedValue > 0.0) {
-                    RatedVolFlowPerRatedTotCap = DesVolFlow / this->autoSizedValue;
-                }
+            if (this->dataIsDXCoil && FlagCheckVolFlowPerRatedTotCap && this->autoSizedValue > 0.0) {
+                Real64 RatedVolFlowPerRatedTotCap = DesVolFlow / this->autoSizedValue;
                 if (RatedVolFlowPerRatedTotCap < HVAC::MinRatedVolFlowPerRatedTotCap[(int)state.dataHVACGlobal->DXCT]) {
                     if ((this->dataEMSOverride == 0.0) && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
                         ShowWarningError(state, this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
