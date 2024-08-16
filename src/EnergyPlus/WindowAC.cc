@@ -359,6 +359,7 @@ namespace WindowAC {
                 } else {
                     state.dataWindowAC->WindAC(WindACNum).OutsideAirNode = OANodeNums(1);
                     state.dataWindowAC->WindAC(WindACNum).AirReliefNode = OANodeNums(2);
+                    state.dataWindowAC->WindAC(WindACNum).ReturnAirNode = OANodeNums(3);
                     state.dataWindowAC->WindAC(WindACNum).MixedAirNode = OANodeNums(4);
                 }
             }
@@ -1499,30 +1500,22 @@ namespace WindowAC {
         } // WindAC(WindACNum)%DXCoilType_Num == CoilDX_CoolingHXAssisted && *
     }
 
-    bool GetWindowACNodeNumber(EnergyPlusData &state, int const NodeNumber)
+    bool getWindowACNodeNumber(EnergyPlusData &state, int const nodeNumber)
     {
         if (state.dataWindowAC->GetWindowACInputFlag) {
             GetWindowAC(state);
             state.dataWindowAC->GetWindowACInputFlag = false;
         }
 
-        bool windowACOutdoorAir = false;
-
         for (int windowACIndex = 1; windowACIndex <= state.dataWindowAC->NumWindAC; ++windowACIndex) {
             auto &windowAC = state.dataWindowAC->WindAC(windowACIndex);
-            if (windowAC.OutAirVolFlow == 0) {
-                windowACOutdoorAir = true;
-            } else {
-                windowACOutdoorAir = false;
-            }
-            int FanInletNodeIndex = 0;
-            int FanOutletNodeIndex = 0;
-            FanInletNodeIndex = state.dataFans->fans(windowAC.FanIndex)->inletNodeNum;
-            FanOutletNodeIndex = state.dataFans->fans(windowAC.FanIndex)->outletNodeNum;
+            int FanInletNodeIndex = state.dataFans->fans(windowAC.FanIndex)->inletNodeNum;
+            int FanOutletNodeIndex = state.dataFans->fans(windowAC.FanIndex)->outletNodeNum;
 
-            if (windowACOutdoorAir &&
-                (NodeNumber == windowAC.OutsideAirNode || NodeNumber == windowAC.MixedAirNode || NodeNumber == windowAC.AirReliefNode ||
-                 NodeNumber == FanInletNodeIndex || NodeNumber == FanOutletNodeIndex || NodeNumber == windowAC.AirInNode)) {
+            if (windowAC.OutAirVolFlow == 0 &&
+                (nodeNumber == windowAC.OutsideAirNode || nodeNumber == windowAC.MixedAirNode || nodeNumber == windowAC.AirReliefNode ||
+                 nodeNumber == FanInletNodeIndex || nodeNumber == FanOutletNodeIndex || nodeNumber == windowAC.AirInNode ||
+                 nodeNumber == windowAC.CoilOutletNodeNum || nodeNumber == windowAC.AirOutNode || nodeNumber == windowAC.ReturnAirNode)) {
                 return true;
             }
         }
