@@ -2204,6 +2204,14 @@ TEST_F(EnergyPlusFixture, HVACMSHP_UnitarySystemElectricityRateTest)
     state->dataEnvrn->OutHumRat = 0.005;
     state->dataEnvrn->StdBaroPress = 101325.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
+
+    for (int Mode = 1; Mode <= dxClgCoilMain.NumOfSpeeds; ++Mode) {
+        dxClgCoilMain.MSRatedAirMassFlowRate(Mode) = dxClgCoilMain.MSRatedAirVolFlowRate(Mode) * state->dataEnvrn->StdRhoAir;
+    }
+    for (int Mode = 1; Mode <= dxHtgCoilMain.NumOfSpeeds; ++Mode) {
+        dxHtgCoilMain.MSRatedAirMassFlowRate(Mode) = dxHtgCoilMain.MSRatedAirVolFlowRate(Mode) * state->dataEnvrn->StdRhoAir;
+    }
+
     // set zone air conditions
     auto &zoneAirNode =
         state->dataLoopNodes->Node(Util::FindItemInList("Z401 AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
