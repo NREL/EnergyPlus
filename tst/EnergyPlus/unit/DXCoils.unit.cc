@@ -7175,7 +7175,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXHeatingCoilsHSPF2Test)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = -1;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = -1;
-    
+
     // set companion dx cooling coil
     state->dataDXCoils->DXCoil(1).CompanionUpstreamDXCoil = 0;
     auto thisHtgDXCoil = state->dataDXCoils->DXCoil(1);
