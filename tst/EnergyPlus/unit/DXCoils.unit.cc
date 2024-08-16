@@ -7161,6 +7161,11 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXHeatingCoilsHSPF2Test)
     state->dataSize->FinalSysSizing.allocate(1);
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 0.580;
+    // set heating sizing parameters
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp = 14.4064;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutHumRat = 0.005;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupTemp = 35.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.005;
     state->dataSize->SysSizInput.allocate(1);
     state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
     state->dataSize->NumSysSizInput = 1;
@@ -7170,7 +7175,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXHeatingCoilsHSPF2Test)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = -1;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = -1;
-
+    
     // set companion dx cooling coil
     state->dataDXCoils->DXCoil(1).CompanionUpstreamDXCoil = 0;
     auto thisHtgDXCoil = state->dataDXCoils->DXCoil(1);
@@ -7416,6 +7421,11 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXHeatingCoilsHSPF2Test1)
     state->dataSize->FinalSysSizing.allocate(1);
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 0.580;
+    // set heating sizing parameters
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp = 14.4064;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutHumRat = 0.005;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupTemp = 35.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.005;
     state->dataSize->SysSizInput.allocate(1);
     state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
     state->dataSize->NumSysSizInput = 1;
@@ -7673,6 +7683,11 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXHeatingCoilsHSPF2Test2)
     state->dataSize->FinalSysSizing.allocate(1);
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 0.580;
+    // set heating sizing parameters
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp = 14.4064;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutHumRat = 0.005;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupTemp = 35.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.005;
     state->dataSize->SysSizInput.allocate(1);
     state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
     state->dataSize->NumSysSizInput = 1;
