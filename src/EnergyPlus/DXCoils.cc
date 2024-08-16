@@ -7534,7 +7534,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [W]";
             } else if (thisDXCoil.DXCoilType_Num == HVAC::CoilDX_MultiSpeedHeating) {
                 CompName = thisDXCoil.Name;
-                FieldNum = 10 + (thisDXCoil.NumOfSpeeds - 1) * 5;
+                FieldNum = 10 + (thisDXCoil.NumOfSpeeds - 1) * 6;
                 state.dataSize->DataTotCapCurveIndex = thisDXCoil.MSCCapFTemp(thisDXCoil.NumOfSpeeds);
                 TempSize = thisDXCoil.MSRatedTotCap(thisDXCoil.NumOfSpeeds);
                 PrintFlag = false;
