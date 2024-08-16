@@ -548,12 +548,14 @@ int AbortEnergyPlus(EnergyPlusData &state)
     CloseMiscOpenFiles(state);
     NumWarnings = fmt::to_string(state.dataErrTracking->TotalWarningErrors);
     NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
-    NumWarningsDuringWarmup = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup);
-    NumSevereDuringWarmup = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup);
+    NumWarningsDuringWarmup =
+        fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup + state.dataErrTracking->TotalWarningErrorsDuringInputsWarmup);
+    NumSevereDuringWarmup =
+        fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup + state.dataErrTracking->TotalSevereErrorsDuringInputsWarmup);
     NumWarningsDuringSizing =
-        fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing + state.dataErrTracking->TotalWarningErrorsDuringInputs);
+        fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing + state.dataErrTracking->TotalWarningErrorsDuringInputsSizing);
     NumSevereDuringSizing =
-        fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing + state.dataErrTracking->TotalSevereErrorsDuringInputs);
+        fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing + state.dataErrTracking->TotalSevereErrorsDuringInputsSizing);
 
     // catch up with timings if in middle
     state.dataSysVars->runtimeTimer.tock();
@@ -678,15 +680,17 @@ int EndEnergyPlus(EnergyPlusData &state)
     strip(NumWarnings);
     NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
     strip(NumSevere);
-    NumWarningsDuringWarmup = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup);
+    NumWarningsDuringWarmup =
+        fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup + state.dataErrTracking->TotalWarningErrorsDuringInputsWarmup);
     strip(NumWarningsDuringWarmup);
-    NumSevereDuringWarmup = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup);
+    NumSevereDuringWarmup =
+        fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup + state.dataErrTracking->TotalSevereErrorsDuringInputsWarmup);
     strip(NumSevereDuringWarmup);
     NumWarningsDuringSizing =
-        fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing + state.dataErrTracking->TotalWarningErrorsDuringInputs);
+        fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing + state.dataErrTracking->TotalWarningErrorsDuringInputsSizing);
     strip(NumWarningsDuringSizing);
     NumSevereDuringSizing =
-        fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing + state.dataErrTracking->TotalSevereErrorsDuringInputs);
+        fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing + state.dataErrTracking->TotalSevereErrorsDuringInputsSizing);
     strip(NumSevereDuringSizing);
 
     state.dataSysVars->runtimeTimer.tock();
@@ -932,7 +936,13 @@ void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, Opt
     }
 
     ++state.dataErrTracking->TotalSevereErrors;
-    if (state.dataGlobal->InputsFlag) ++state.dataErrTracking->TotalSevereErrorsDuringInputs;
+    if (state.dataGlobal->InputsFlag) {
+        if (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) {
+            ++state.dataErrTracking->TotalWarningErrorsDuringInputsSizing;
+        } else {
+            ++state.dataErrTracking->TotalWarningErrorsDuringInputsWarmup;
+        }
+    }
     if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation &&
         !state.dataErrTracking->AbortProcessing)
         ++state.dataErrTracking->TotalSevereErrorsDuringWarmup;
@@ -1134,7 +1144,16 @@ void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, Op
     }
 
     ++state.dataErrTracking->TotalWarningErrors;
-    if (state.dataGlobal->InputsFlag) ++state.dataErrTracking->TotalWarningErrorsDuringInputs;
+    bool reportWarning = true;
+    std::size_t found = ErrorMessage.find("Timestep: Requested number");
+    if (found != ErrorMessage.npos) reportWarning = false;
+    if (state.dataGlobal->InputsFlag && reportWarning) {
+        if (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) {
+            ++state.dataErrTracking->TotalWarningErrorsDuringInputsSizing;
+        } else {
+            ++state.dataErrTracking->TotalWarningErrorsDuringInputsWarmup;
+        }
+    }
     if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation &&
         !state.dataErrTracking->AbortProcessing)
         ++state.dataErrTracking->TotalWarningErrorsDuringWarmup;
