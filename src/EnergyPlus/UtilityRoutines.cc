@@ -548,12 +548,12 @@ int AbortEnergyPlus(EnergyPlusData &state)
     CloseMiscOpenFiles(state);
     NumWarnings = fmt::to_string(state.dataErrTracking->TotalWarningErrors);
     NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
-    NumWarningsDuringWarmup =
-        fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup + state.dataErrTracking->TotalWarningErrorsDuringInputs);
-    NumSevereDuringWarmup =
-        fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup + state.dataErrTracking->TotalSevereErrorsDuringInputs);
-    NumWarningsDuringSizing = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing);
-    NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
+    NumWarningsDuringWarmup = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup);
+    NumSevereDuringWarmup = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup);
+    NumWarningsDuringSizing =
+        fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing + state.dataErrTracking->TotalWarningErrorsDuringInputs);
+    NumSevereDuringSizing =
+        fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing + state.dataErrTracking->TotalSevereErrorsDuringInputs);
 
     // catch up with timings if in middle
     state.dataSysVars->runtimeTimer.tock();
@@ -682,9 +682,11 @@ int EndEnergyPlus(EnergyPlusData &state)
     strip(NumWarningsDuringWarmup);
     NumSevereDuringWarmup = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup);
     strip(NumSevereDuringWarmup);
-    NumWarningsDuringSizing = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing);
+    NumWarningsDuringSizing =
+        fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing + state.dataErrTracking->TotalWarningErrorsDuringInputs);
     strip(NumWarningsDuringSizing);
-    NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
+    NumSevereDuringSizing =
+        fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing + state.dataErrTracking->TotalSevereErrorsDuringInputs);
     strip(NumSevereDuringSizing);
 
     state.dataSysVars->runtimeTimer.tock();
