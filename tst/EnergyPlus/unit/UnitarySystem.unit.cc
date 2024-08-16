@@ -24208,8 +24208,10 @@ TEST_F(ZoneUnitarySysTest, ZeroCoolingSpeedTest)
     thisSys->m_CoolingSpeedNum = 0;
     thisSys->m_SingleMode = 0;
     thisSys->m_CoolingPartLoadFrac = 0.5;
-    thisSys->calcUnitaryCoolingSystem(*state, AirLoopNum, FirstHVACIteration, thisSys->m_CoolingPartLoadFrac, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
+    thisSys->calcUnitaryCoolingSystem(
+        *state, AirLoopNum, FirstHVACIteration, thisSys->m_CoolingPartLoadFrac, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
     EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp);
     EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).HumRat, state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).HumRat);
-    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Enthalpy, state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Enthalpy);
+    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Enthalpy,
+              state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Enthalpy);
 }
