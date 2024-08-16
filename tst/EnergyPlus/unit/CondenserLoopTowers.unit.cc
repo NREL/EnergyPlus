@@ -515,7 +515,8 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     state->dataCondenserLoopTowers->towers(1).SizeVSMerkelTower(*state);
     state->dataCondenserLoopTowers->towers(1).initialize(*state);
     Real64 MyLoad = 0.0;
-    state->dataCondenserLoopTowers->towers(1).calculateMerkelVariableSpeedTower(*state, MyLoad);
+    bool RunFlag = false;
+    state->dataCondenserLoopTowers->towers(1).calculateMerkelVariableSpeedTower(*state, MyLoad, RunFlag);
     state->dataCondenserLoopTowers->towers(1).update(*state);
     state->dataCondenserLoopTowers->towers(1).report(*state, true);
 
@@ -904,10 +905,12 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(*state);
 
+    Real64 MyLoad = 0.0;
+    bool RunFlag = false;
     state->dataCondenserLoopTowers->towers(1).initialize(*state);
     state->dataCondenserLoopTowers->towers(1).SizeTower(*state);
     state->dataCondenserLoopTowers->towers(1).initialize(*state);
-    state->dataCondenserLoopTowers->towers(1).calculateSingleSpeedTower(*state);
+    state->dataCondenserLoopTowers->towers(1).calculateSingleSpeedTower(*state, MyLoad, RunFlag);
     state->dataCondenserLoopTowers->towers(1).update(*state);
     state->dataCondenserLoopTowers->towers(1).report(*state, true);
 
@@ -926,9 +929,8 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     if (outletNode != state->dataLoopNodes->NodeID.end()) {
         outletNodeIndex = std::distance(state->dataLoopNodes->NodeID.begin(), outletNode);
     }
-    // TODO: FIXME: This is failing. Actual is -10.409381032746095, expected is 30.
-    EXPECT_GT(state->dataLoopNodes->Node(inletNodeIndex).Temp, 30.0);         // inlet node temperature
-    EXPECT_DOUBLE_EQ(30.0, state->dataLoopNodes->Node(outletNodeIndex).Temp); // outlet node temperature
+    EXPECT_GT(state->dataLoopNodes->Node(inletNodeIndex).Temp, 30.0);                                                    // inlet node temperature
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(inletNodeIndex).Temp, state->dataLoopNodes->Node(outletNodeIndex).Temp); // outlet node temperature
 
     // input not needed for sizing (WasAutoSized = false) using NominalCapacity method but this variable should still size
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUAWasAutoSized);
@@ -3967,7 +3969,9 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     state->dataPlnt->PlantLoop(VSTower.plantLoc.loopNum).LoopSide(VSTower.plantLoc.loopSideNum).TempSetPoint = 30.0;
     VSTower.WaterMassFlowRate = VSTower.DesWaterMassFlowRate * WaterFlowRateRatio;
 
-    VSTower.calculateVariableSpeedTower(*state);
+    Real64 myLoad = -1000.0;
+    bool RunFlag = true;
+    VSTower.calculateVariableSpeedTower(*state, myLoad, RunFlag);
     EXPECT_DOUBLE_EQ(30.0, VSTower.OutletWaterTemp);
     EXPECT_DOUBLE_EQ(1.0, VSTower.FanCyclingRatio);
     Real64 TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(*state, WaterFlowRateRatio, VSTower.airFlowRateRatio, AirWetBulbTemp);
@@ -3985,7 +3989,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     VSTower.AirWetBulb = state->dataEnvrn->OutWetBulbTemp;
     VSTower.AirHumRat = state->dataEnvrn->OutHumRat;
 
-    VSTower.calculateVariableSpeedTower(*state);
+    VSTower.calculateVariableSpeedTower(*state, myLoad, RunFlag);
     EXPECT_DOUBLE_EQ(30.0, VSTower.OutletWaterTemp);
     EXPECT_NEAR(0.5424, VSTower.FanCyclingRatio, 0.0001);
     // outside air condition is favorable that fan only needs to cycle at min flow to meet the setpoint
@@ -4303,6 +4307,83 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CalculateVariableTowerOutletTemp)
     // calculate outlet temperature
     Real64 tOutlet = tower.calculateVariableTowerOutletTemp(*state, 0.25, 1.0, 14.1);
     EXPECT_NEAR(tower.WaterTemp - 22.2222, tOutlet, 0.01);
+}
+
+TEST_F(EnergyPlusFixture, CondenserLoopTowers_checkMassFlowAndLoadTest)
+{
+    bool flagToReturn;
+    bool runFlag;
+    Real64 myLoad;
+    Real64 constexpr allowedTolerance = 0.0001;
+    Real64 expectedPower;
+    Real64 expectedTemp;
+
+    state->dataCondenserLoopTowers->towers.allocate(1);
+    auto &tower = state->dataCondenserLoopTowers->towers(1);
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
+    state->dataLoopNodes->Node.allocate(2);
+    tower.WaterInletNodeNum = 1;
+    tower.WaterOutletNodeNum = 2;
+    tower.plantLoc.loopNum = 1;
+    tower.plantLoc.loopSideNum = DataPlant::LoopSideLocation::Supply;
+    tower.plantLoc.branchNum = 1;
+    tower.plantLoc.compNum = 1;
+
+    // Test 1: Mass flow rate is low but myLoad is ok--flag should be set to true
+    flagToReturn = false;
+    runFlag = true;
+    myLoad = -1000.0;
+    state->dataEnvrn->OutDryBulbTemp = 27.0;
+    tower.WaterMassFlowRate = 0.0;
+    tower.BasinHeaterPowerFTempDiff = 1.0;
+    tower.BasinHeaterSchedulePtr = 0;
+    tower.BasinHeaterSetPointTemp = 26.0;
+    tower.BasinHeaterPower = 1.0;
+    expectedPower = 0.0;
+    tower.checkMassFlowAndLoad(*state, myLoad, runFlag, flagToReturn);
+    EXPECT_TRUE(flagToReturn);
+    EXPECT_NEAR(expectedPower, tower.BasinHeaterPower, allowedTolerance);
+
+    // Test 2: Mass flow rate is ok but myLoad is zero--flag should be set to true
+    flagToReturn = false;
+    runFlag = false;
+    myLoad = 0.0;
+    state->dataEnvrn->OutDryBulbTemp = 27.0;
+    tower.WaterMassFlowRate = 0.5;
+    tower.BasinHeaterPowerFTempDiff = 1.0;
+    tower.BasinHeaterSchedulePtr = 0;
+    tower.BasinHeaterSetPointTemp = 25.0;
+    tower.BasinHeaterPower = 2.0;
+    tower.FanPower = 1.0;
+    tower.airFlowRateRatio = 1.0;
+    tower.Qactual = 1.0;
+    expectedPower = 0.0;
+    expectedTemp = 23.0;
+    state->dataLoopNodes->Node(tower.WaterInletNodeNum).Temp = 23.0;
+    tower.checkMassFlowAndLoad(*state, myLoad, runFlag, flagToReturn);
+    EXPECT_TRUE(flagToReturn);
+    EXPECT_NEAR(expectedPower, tower.BasinHeaterPower, allowedTolerance);
+    EXPECT_NEAR(expectedTemp, tower.OutletWaterTemp, allowedTolerance);
+    EXPECT_NEAR(0.0, tower.FanPower, allowedTolerance);
+    EXPECT_NEAR(0.0, tower.airFlowRateRatio, allowedTolerance);
+    EXPECT_NEAR(0.0, tower.Qactual, allowedTolerance);
+
+    // Test 3: Mass flow rate and myLoad are both ok--nothing changes, power does not get calculated here
+    flagToReturn = false;
+    runFlag = true;
+    myLoad = -1000.0;
+    state->dataEnvrn->OutDryBulbTemp = 27.0;
+    tower.WaterMassFlowRate = 0.5;
+    tower.BasinHeaterPowerFTempDiff = 1.0;
+    tower.BasinHeaterSchedulePtr = 0;
+    tower.BasinHeaterSetPointTemp = 25.0;
+    tower.BasinHeaterPower = 3.0;
+    expectedPower = 3.0;
+    tower.checkMassFlowAndLoad(*state, myLoad, runFlag, flagToReturn);
+    EXPECT_FALSE(flagToReturn);
+    EXPECT_NEAR(expectedPower, tower.BasinHeaterPower, allowedTolerance);
 }
 
 } // namespace EnergyPlus

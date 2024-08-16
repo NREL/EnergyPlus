@@ -554,7 +554,7 @@ struct SetPointManagerData : BaseGlobalStruct
         InitSetPointManagersOneTimeFlag2 = true;
 
         for (int iSPM = 1; iSPM <= (int)spms.size(); ++iSPM) {
-            delete spms[iSPM];
+            delete spms(iSPM);
         }
         spms.deallocate();
         spmMap.clear();

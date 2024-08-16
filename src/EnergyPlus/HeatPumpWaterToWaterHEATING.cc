@@ -349,7 +349,7 @@ void GetGshpInput(EnergyPlusData &state)
         ShowFatalError(state, format("Errors Found in getting {} Input", ModuleCompNameUC));
     }
 
-    state.dataHPWaterToWaterHtg->GSHPRefrigIndex = FluidProperties::FindRefrigerant(state, GSHPRefrigerant);
+    state.dataHPWaterToWaterHtg->GSHPRefrigIndex = FluidProperties::GetRefrigNum(state, GSHPRefrigerant);
     if (state.dataHPWaterToWaterHtg->GSHPRefrigIndex == 0) {
         ShowFatalError(state, format("Refrigerant for {} not found, should have been={}", ModuleCompName, GSHPRefrigerant));
     }

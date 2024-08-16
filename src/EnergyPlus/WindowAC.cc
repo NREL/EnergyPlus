@@ -359,6 +359,7 @@ namespace WindowAC {
                 } else {
                     state.dataWindowAC->WindAC(WindACNum).OutsideAirNode = OANodeNums(1);
                     state.dataWindowAC->WindAC(WindACNum).AirReliefNode = OANodeNums(2);
+                    state.dataWindowAC->WindAC(WindACNum).ReturnAirNode = OANodeNums(3);
                     state.dataWindowAC->WindAC(WindACNum).MixedAirNode = OANodeNums(4);
                 }
             }
@@ -1499,6 +1500,28 @@ namespace WindowAC {
         } // WindAC(WindACNum)%DXCoilType_Num == CoilDX_CoolingHXAssisted && *
     }
 
+    bool getWindowACNodeNumber(EnergyPlusData &state, int const nodeNumber)
+    {
+        if (state.dataWindowAC->GetWindowACInputFlag) {
+            GetWindowAC(state);
+            state.dataWindowAC->GetWindowACInputFlag = false;
+        }
+
+        for (int windowACIndex = 1; windowACIndex <= state.dataWindowAC->NumWindAC; ++windowACIndex) {
+            auto &windowAC = state.dataWindowAC->WindAC(windowACIndex);
+            int FanInletNodeIndex = state.dataFans->fans(windowAC.FanIndex)->inletNodeNum;
+            int FanOutletNodeIndex = state.dataFans->fans(windowAC.FanIndex)->outletNodeNum;
+
+            if (windowAC.OutAirVolFlow == 0 &&
+                (nodeNumber == windowAC.OutsideAirNode || nodeNumber == windowAC.MixedAirNode || nodeNumber == windowAC.AirReliefNode ||
+                 nodeNumber == FanInletNodeIndex || nodeNumber == FanOutletNodeIndex || nodeNumber == windowAC.AirInNode ||
+                 nodeNumber == windowAC.CoilOutletNodeNum || nodeNumber == windowAC.AirOutNode || nodeNumber == windowAC.ReturnAirNode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     int GetWindowACZoneInletAirNode(EnergyPlusData &state, int const WindACNum)
     {
 
@@ -1617,6 +1640,22 @@ namespace WindowAC {
         }
 
         return GetWindowACMixedAirNode;
+    }
+
+    int getWindowACIndex(EnergyPlusData &state, std::string_view CompName)
+    {
+        if (state.dataWindowAC->GetWindowACInputFlag) {
+            GetWindowAC(state);
+            state.dataWindowAC->GetWindowACInputFlag = false;
+        }
+
+        for (int WindACIndex = 1; WindACIndex <= state.dataWindowAC->NumWindAC; ++WindACIndex) {
+            if (Util::SameString(state.dataWindowAC->WindAC(WindACIndex).Name, CompName)) {
+                return WindACIndex;
+            }
+        }
+
+        return 0;
     }
 
 } // namespace WindowAC

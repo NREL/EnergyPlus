@@ -208,7 +208,26 @@ Built on Platform: {}
             ->required(false)
             ->check(CLI::ExistingFile);
 
-        bool debugCLI = false;
+        // Catching it myself, so I can print the arguments vector before it's mutated
+        bool debugCLI = std::any_of(args.begin(), args.end(), [](const auto &arg) { return arg == "--debug-cli"; });
+        if (debugCLI) {
+            {
+                fmt::print("ProcessArgs: received args\n");
+                int na = 0;
+                for (const auto &a : args) {
+                    fmt::print("* {}: '{}'\n", na++, a);
+                }
+            }
+            {
+                fmt::print("\nAfter massaging/expanding of args\n");
+                int na = 0;
+                for (const auto &a : arguments) {
+                    fmt::print("* {}: '{}'\n", na++, a);
+                }
+            }
+            fmt::print("\n");
+        }
+        // bool debugCLI = false;
         app.add_flag("--debug-cli", debugCLI, "Print the result of the CLI assignments to the console and exit")->group(""); // Empty group to hide it
 
         app.footer("Example: energyplus -w weather.epw -r input.idf");
@@ -242,8 +261,8 @@ Built on Platform: {}
                        R"debug(
 state.dataGlobal->AnnualSimulation = {},
 state.dataGlobal->DDOnlySimulation = {},
-state.dataStrGlobals->outDirPath = '{}',
-state.dataStrGlobals->inputIddFilePath= '{}',
+state.dataStrGlobals->outDirPath = '{:g}',
+state.dataStrGlobals->inputIddFilePath= '{:g}',
 
 runEPMacro = {},
 prefixOutName = {},
@@ -255,13 +274,13 @@ state.dataGlobal->outputEpJSONConversionOnly={},
 suffixType={},
 
 state.dataGlobal->numThread={},
-state.files.inputWeatherFilePath.filePath='{}',
-state.dataStrGlobals->inputFilePath='{}',
+state.files.inputWeatherFilePath.filePath='{:g}',
+state.dataStrGlobals->inputFilePath='{:g}',
 )debug",
                        state.dataGlobal->AnnualSimulation,
                        state.dataGlobal->DDOnlySimulation,
-                       state.dataStrGlobals->outDirPath.generic_string(),
-                       state.dataStrGlobals->inputIddFilePath.generic_string(),
+                       state.dataStrGlobals->outDirPath,
+                       state.dataStrGlobals->inputIddFilePath,
 
                        runEPMacro,
                        prefixOutName,
@@ -270,8 +289,11 @@ state.dataStrGlobals->inputFilePath='{}',
                        state.dataGlobal->outputEpJSONConversionOnly,
                        suffixType,
                        state.dataGlobal->numThread,
-                       state.files.inputWeatherFilePath.filePath.generic_string(),
-                       state.dataStrGlobals->inputFilePath.generic_string());
+                       state.files.inputWeatherFilePath.filePath,
+                       state.dataStrGlobals->inputFilePath);
+
+            fmt::print(stderr, "--debug-cli passed: exiting early\n");
+
             exit(0);
         }
 
@@ -307,8 +329,7 @@ state.dataStrGlobals->inputFilePath='{}',
                 break;
             default:
                 DisplayString(state,
-                              fmt::format("ERROR: Input file must have IDF, IMF, or epJSON extension: {}",
-                                          state.dataStrGlobals->inputFilePath.generic_string()));
+                              fmt::format("ERROR: Input file must have IDF, IMF, or epJSON extension: {:g}", state.dataStrGlobals->inputFilePath));
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
                 } else {
@@ -390,7 +411,7 @@ state.dataStrGlobals->inputFilePath='{}',
 
         // Helper to construct output file path
         auto composePath = [&outputFilePrefixFullPath](const std::string &suffix) -> fs::path {
-            return fs::path(outputFilePrefixFullPath.string() + suffix);
+            return FileSystem::appendSuffixToPath(outputFilePrefixFullPath, suffix);
         };
 
         // EnergyPlus files
@@ -505,7 +526,7 @@ state.dataStrGlobals->inputFilePath='{}',
         if (FileSystem::fileExists(state.files.iniFile.filePath)) {
             EnergyPlus::InputFile iniFile = state.files.iniFile.try_open();
             if (!iniFile.good()) {
-                DisplayString(state, "ERROR: Could not open file " + iniFile.filePath.string() + " for input (read).");
+                DisplayString(state, fmt::format("ERROR: Could not open file {} for input (read).", iniFile.filePath));
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
                 } else {
@@ -532,7 +553,7 @@ state.dataStrGlobals->inputFilePath='{}',
         // Check if specified files exist
         if (!FileSystem::fileExists(state.dataStrGlobals->inputFilePath)) {
             DisplayString(
-                state, "ERROR: Could not find input data file: " + FileSystem::getAbsolutePath(state.dataStrGlobals->inputFilePath).string() + ".");
+                state, fmt::format("ERROR: Could not find input data file: {}.", FileSystem::getAbsolutePath(state.dataStrGlobals->inputFilePath)));
             DisplayString(state, errorFollowUp);
             if (eplusRunningViaAPI) {
                 return static_cast<int>(ReturnCodes::Failure);
@@ -545,7 +566,7 @@ state.dataStrGlobals->inputFilePath='{}',
             if (!FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
                 DisplayString(
                     state,
-                    "ERROR: Could not find weather file: " + FileSystem::getAbsolutePath(state.files.inputWeatherFilePath.filePath).string() + ".");
+                    fmt::format("ERROR: Could not find weather file: {}.", FileSystem::getAbsolutePath(state.files.inputWeatherFilePath.filePath)));
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
@@ -561,14 +582,14 @@ state.dataStrGlobals->inputFilePath='{}',
         if (runEPMacro) {
             fs::path epMacroPath = (state.dataStrGlobals->exeDirectoryPath / "EPMacro").replace_extension(FileSystem::exeExtension);
             if (!FileSystem::fileExists(epMacroPath)) {
-                DisplayString(state, "ERROR: Could not find EPMacro executable: " + FileSystem::getAbsolutePath(epMacroPath).string() + ".");
+                DisplayString(state, fmt::format("ERROR: Could not find EPMacro executable: {}.", FileSystem::getAbsolutePath(epMacroPath)));
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
                 } else {
                     exit(EXIT_FAILURE);
                 }
             }
-            std::string epMacroCommand = "\"" + epMacroPath.string() + "\"";
+            std::string epMacroCommand = "\"" + FileSystem::toString(epMacroPath) + "\"";
             bool inputFilePathdIn = (FileSystem::getAbsolutePath(state.dataStrGlobals->inputFilePath) == FileSystem::getAbsolutePath("in.imf"));
 
             if (!inputFilePathdIn) {
@@ -589,21 +610,21 @@ state.dataStrGlobals->inputFilePath='{}',
                 (state.dataStrGlobals->exeDirectoryPath / fs::path("ExpandObjects")).replace_extension(FileSystem::exeExtension);
             if (!FileSystem::fileExists(expandObjectsPath)) {
                 DisplayString(state,
-                              "ERROR: Could not find ExpandObjects executable: " + FileSystem::getAbsolutePath(expandObjectsPath).string() + ".");
+                              fmt::format("ERROR: Could not find ExpandObjects executable: {}.", FileSystem::getAbsolutePath(expandObjectsPath)));
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
                 } else {
                     exit(EXIT_FAILURE);
                 }
             }
-            std::string expandObjectsCommand = "\"" + expandObjectsPath.string() + "\"";
+            std::string expandObjectsCommand = "\"" + FileSystem::toString(expandObjectsPath) + "\"";
             bool inputFilePathdIn = (FileSystem::getAbsolutePath(state.dataStrGlobals->inputFilePath) == FileSystem::getAbsolutePath("in.idf"));
 
             // check if IDD actually exists since ExpandObjects still requires it
             if (!FileSystem::fileExists(state.dataStrGlobals->inputIddFilePath)) {
                 DisplayString(state,
-                              "ERROR: Could not find input data dictionary: " +
-                                  FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFilePath).string() + ".");
+                              fmt::format("ERROR: Could not find input data dictionary: {}.",
+                                          FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFilePath)));
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
@@ -797,7 +818,7 @@ state.dataStrGlobals->inputFilePath='{}',
                         state,
                         "ERROR: Could not find ReadVarsESO executable.  When calling through C API, make sure to call setEnergyPlusRootDirectory");
                 } else {
-                    DisplayString(state, "ERROR: Could not find ReadVarsESO executable: " + FileSystem::getAbsolutePath(readVarsPath).string() + ".");
+                    DisplayString(state, fmt::format("ERROR: Could not find ReadVarsESO executable: {}.", FileSystem::getAbsolutePath(readVarsPath)));
                 }
                 return static_cast<int>(ReturnCodes::Failure);
             }
@@ -810,10 +831,10 @@ state.dataStrGlobals->inputFilePath='{}',
         if (!rviFileExists) {
             std::ofstream ofs{RVIfile};
             if (!ofs.good()) {
-                ShowFatalError(state, format("EnergyPlus: Could not open file \"{}\" for output (write).", RVIfile.string()));
+                ShowFatalError(state, format("EnergyPlus: Could not open file \"{}\" for output (write).", RVIfile));
             } else {
-                ofs << state.files.eso.filePath.string() << '\n';
-                ofs << state.files.csv.filePath.string() << '\n';
+                ofs << FileSystem::toString(state.files.eso.filePath) << '\n';
+                ofs << FileSystem::toString(state.files.csv.filePath) << '\n';
             }
         }
 
@@ -821,17 +842,17 @@ state.dataStrGlobals->inputFilePath='{}',
         if (!mviFileExists) {
             std::ofstream ofs{MVIfile};
             if (!ofs.good()) {
-                ShowFatalError(state, format("EnergyPlus: Could not open file \"{}\" for output (write).", RVIfile.string()));
+                ShowFatalError(state, format("EnergyPlus: Could not open file \"{}\" for output (write).", RVIfile));
             } else {
-                ofs << state.files.mtr.filePath.string() << '\n';
-                ofs << state.files.mtr_csv.filePath.string() << '\n';
+                ofs << FileSystem::toString(state.files.mtr.filePath) << '\n';
+                ofs << FileSystem::toString(state.files.mtr_csv.filePath) << '\n';
             }
         }
 
         // We quote the paths in case we have spaces
         // "/Path/to/ReadVarEso" "/Path/to/folder with spaces/file.rvi" unlimited
-        std::string const readVarsRviCommand = "\"" + readVarsPath.string() + "\" \"" + RVIfile.string() + "\" unlimited";
-        std::string const readVarsMviCommand = "\"" + readVarsPath.string() + "\" \"" + MVIfile.string() + "\" unlimited";
+        std::string const readVarsRviCommand = "\"" + FileSystem::toString(readVarsPath) + "\" \"" + FileSystem::toString(RVIfile) + "\" unlimited";
+        std::string const readVarsMviCommand = "\"" + FileSystem::toString(readVarsPath) + "\" \"" + FileSystem::toString(MVIfile) + "\" unlimited";
 
         // systemCall will be responsible to handle to above command on Windows versus Unix
         FileSystem::systemCall(readVarsRviCommand);
