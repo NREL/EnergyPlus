@@ -1715,13 +1715,21 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
     // set sizing variables
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
-    state->dataGlobal->SysSizingCalc = true;
+    state->dataGlobal->SysSizingCalc = true; // disable sizing calculation
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     // set local variables for convenience
     auto *supplyFan = state->dataFans->fans(1);
     auto &dxClgCoilMain = state->dataVariableSpeedCoils->VarSpeedCoil(1);
     auto &dxHtgCoilMain = state->dataVariableSpeedCoils->VarSpeedCoil(2);
+
+    for (int Mode = 1; Mode <= dxClgCoilMain.NumOfSpeeds; ++Mode) {
+        dxClgCoilMain.MSRatedAirMassFlowRate(Mode) = dxClgCoilMain.MSRatedAirVolFlowRate(Mode) * state->dataEnvrn->StdRhoAir;
+    }
+    for (int Mode = 1; Mode <= dxHtgCoilMain.NumOfSpeeds; ++Mode) {
+        dxHtgCoilMain.MSRatedAirMassFlowRate(Mode) = dxHtgCoilMain.MSRatedAirVolFlowRate(Mode) * state->dataEnvrn->StdRhoAir;
+    }
+
     // initialize priority control
     BypassVAV.PriorityControl = HVACUnitaryBypassVAV::PriorityCtrlMode::HeatingPriority;
     BypassVAV.AirFlowControl = HVACUnitaryBypassVAV::AirFlowCtrlMode::UseCompressorOnFlow;
