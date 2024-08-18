@@ -76,15 +76,19 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Ob0>) # Disable inlining
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/RTCsu>) # Runtime checks
   target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:/fp:strict>) # Floating point model
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/DMSVC_DEBUG>) # Triggers code in main.cc to catch floating point NaNs
-
   target_compile_options(turn_off_warnings INTERFACE /W0)
+
+  option(FORCE_DEBUG_ARITHM_MSVC "Enable trapping floating point exceptions in non Debug mode" OFF)
+  mark_as_advanced(FORCE_DEBUG_ARITHM_MSVC)
+
+  set(need_arithm_debug_genex "$<OR:$<BOOL:${FORCE_DEBUG_ARITHM_MSVC}>,$<CONFIG:Debug>>")
+
+  # in main.cc for E+ (actual: api/EnergyPlusPgm.cc) and gtest: will catch _EM_ZERODIVIDE | _EM_INVALID | _EM_OVERFLOW
+  target_compile_definitions(project_fp_options INTERFACE $<${need_arithm_debug_genex}:DEBUG_ARITHM_MSVC>)
 
 elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") # g++/Clang
 
-  # TODO: after we fix all test, enable this by default on Debug builds
-  # option(FORCE_DEBUG_ARITHM_GCC_OR_CLANG "Enable trapping floating point exceptions in non Debug mode" OFF)
-  option(FORCE_DEBUG_ARITHM_GCC_OR_CLANG "Enable trapping floating point exceptions" OFF)
+  option(FORCE_DEBUG_ARITHM_GCC_OR_CLANG "Enable trapping floating point exceptions in non Debug mode" OFF)
   mark_as_advanced(FORCE_DEBUG_ARITHM_GCC_OR_CLANG)
 
   # COMPILER FLAGS
@@ -126,16 +130,13 @@ elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" O
 
   set(need_arithm_debug_genex "$<OR:$<BOOL:${FORCE_DEBUG_ARITHM_GCC_OR_CLANG}>,$<CONFIG:Debug>>")
 
-  # TODO: after we fix all tests, remove this if statement (keeping the block to always execute) to enable this by default on Debug builds
-  if (FORCE_DEBUG_ARITHM_GCC_OR_CLANG)
-    # in main.cc for E+ and gtest: feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW)
-    target_compile_definitions(project_fp_options INTERFACE $<${need_arithm_debug_genex}:DEBUG_ARITHM_GCC_OR_CLANG>)
-    include(CheckCXXSymbolExists)
-    check_cxx_symbol_exists(feenableexcept "fenv.h" HAVE_FEENABLEEXCEPT)
-    message(VERBOSE "HAVE_FEENABLEEXCEPT=${HAVE_FEENABLEEXCEPT}")
-    if(HAVE_FEENABLEEXCEPT)
-      target_compile_definitions(project_fp_options INTERFACE HAVE_FEENABLEEXCEPT)
-    endif()
+  # in main.cc for E+ (actual: api/EnergyPlusPgm.cc) and gtest: feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW)
+  target_compile_definitions(project_fp_options INTERFACE $<${need_arithm_debug_genex}:DEBUG_ARITHM_GCC_OR_CLANG>)
+  include(CheckCXXSymbolExists)
+  check_cxx_symbol_exists(feenableexcept "fenv.h" HAVE_FEENABLEEXCEPT)
+  message(VERBOSE "HAVE_FEENABLEEXCEPT=${HAVE_FEENABLEEXCEPT}")
+  if(HAVE_FEENABLEEXCEPT)
+    target_compile_definitions(project_fp_options INTERFACE HAVE_FEENABLEEXCEPT)
   endif()
 
   # ADDITIONAL GCC-SPECIFIC FLAGS

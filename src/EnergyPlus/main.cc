@@ -50,16 +50,8 @@
 
 #include <CLI/CLI11.hpp>
 
-#ifdef DEBUG_ARITHM_GCC_OR_CLANG
-#include <EnergyPlus/fenv_missing.h>
-#endif
-
 int main(int argc, char **argv)
 {
-#ifdef DEBUG_ARITHM_GCC_OR_CLANG
-    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
-#endif
-
 #ifdef _WIN32
     const std::vector<std::string> args = CLI::detail::compute_win32_argv();
 #else

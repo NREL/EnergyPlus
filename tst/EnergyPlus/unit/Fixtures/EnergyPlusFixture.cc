@@ -120,6 +120,7 @@ void EnergyPlusFixture::SetUp()
 
     Psychrometrics::InitializePsychRoutines(*state);
     createCoilSelectionReportObj(*state);
+    state->dataEnvrn->StdRhoAir = 1.2;
 }
 
 void EnergyPlusFixture::TearDown()
