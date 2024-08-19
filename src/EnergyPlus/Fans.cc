@@ -1556,6 +1556,7 @@ void FanComponent::set_size(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, Name, deltaPress);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, Name, _volFlow);
     Real64 _ratedPower = _volFlow * deltaPress / totalEff; // total fan power
+    BaseSizer::reportSizerOutput(state, HVAC::fanTypeNames[(int)type], Name, "Design Electric Power Consumption [W]", _ratedPower);
     if (type != HVAC::FanType::ComponentModel) {
         designPointFEI = FanSystem::report_fei(state, _volFlow, _ratedPower, deltaPress);
     }

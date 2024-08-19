@@ -4099,6 +4099,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.MSRatedCOP.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSRatedAirVolFlowRate.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSRatedAirMassFlowRate.allocate(thisDXCoil.NumOfSpeeds);
+        thisDXCoil.MSRatedAirMassFlowRate = 1.0; // avoid divide by 0, will get overwritten in InitDXCoil
         thisDXCoil.MSCCapFTemp.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSCCapFFlow.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSEIRFTemp.allocate(thisDXCoil.NumOfSpeeds);
@@ -4613,6 +4614,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.MSRatedCOP.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSRatedAirVolFlowRate.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSRatedAirMassFlowRate.allocate(thisDXCoil.NumOfSpeeds);
+        thisDXCoil.MSRatedAirMassFlowRate = 1.0; // avoid divide by 0, will get overwritten in InitDXCoil
         thisDXCoil.MSCCapFTemp.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSCCapFFlow.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSEIRFTemp.allocate(thisDXCoil.NumOfSpeeds);

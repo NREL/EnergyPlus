@@ -308,8 +308,8 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfTra;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfTra;
 
-            CFS(EQLNum).L(sLayer).S = thisMaterial->PleatedDrapeLength;
-            CFS(EQLNum).L(sLayer).W = thisMaterial->PleatedDrapeWidth;
+            CFS(EQLNum).L(sLayer).S = thisMaterial->pleatedLength;
+            CFS(EQLNum).L(sLayer).W = thisMaterial->pleatedWidth;
             // init diffuse SWP to force default derivation
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = -1.0;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = -1.0;
@@ -335,8 +335,8 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TAR.Sol.Ft.Bm[0].DfTra;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TAR.Sol.Bk.Bm[0].DfTra;
             // wire geometry
-            CFS(EQLNum).L(sLayer).S = thisMaterial->ScreenWireSpacing;
-            CFS(EQLNum).L(sLayer).W = thisMaterial->ScreenWireDiameter;
+            CFS(EQLNum).L(sLayer).S = thisMaterial->wireSpacing;
+            CFS(EQLNum).L(sLayer).W = thisMaterial->wireDiameter;
             
         } else if (mat->group == Material::Group::WindowGapEQL) {
             auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(mat);

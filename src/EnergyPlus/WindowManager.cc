@@ -7198,8 +7198,8 @@ namespace Window {
                                   matEQL->TAR.IR.Ft.Tra,
                                   matEQL->TAR.IR.Ft.Emi,
                                   matEQL->TAR.IR.Bk.Emi,
-                                  matEQL->PleatedDrapeWidth,
-                                  matEQL->PleatedDrapeLength);
+                                  matEQL->pleatedWidth,
+                                  matEQL->pleatedLength);
                         } break;
                                 
                         case Material::Group::ScreenEQL: {
@@ -7219,8 +7219,8 @@ namespace Window {
                                   matEQL->TAR.IR.Ft.Tra,
                                   matEQL->TAR.IR.Ft.Emi,
                                   matEQL->TAR.IR.Bk.Emi,
-                                  matEQL->ScreenWireSpacing,
-                                  matEQL->ScreenWireDiameter);
+                                  matEQL->wireSpacing,
+                                  matEQL->wireDiameter);
                         } break;
                                 
                         case Material::Group::BlindEQL: {

@@ -197,6 +197,11 @@ namespace ChillerElectricEIR {
         bool VSBranchPumpFoundCond = false;
         bool VSLoopPumpFoundCond = false;
 
+        // thermosiphon model
+        int thermosiphonTempCurveIndex = 0;
+        Real64 thermosiphonMinTempDiff = 0.0;
+        int thermosiphonStatus = 0;
+
         static ElectricEIRChillerSpecs *factory(EnergyPlusData &state, std::string const &objectName);
 
         void setupOutputVars(EnergyPlusData &state);
@@ -234,6 +239,8 @@ namespace ChillerElectricEIR {
         );
 
         virtual void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
+
+        bool thermosiphonDisabled(EnergyPlusData &state);
     };
 
     void GetElectricEIRChillerInput(EnergyPlusData &state);

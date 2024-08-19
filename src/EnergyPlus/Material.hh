@@ -574,7 +574,20 @@ namespace Material {
         MaterialComplexWindowGap() : MaterialGasMix() { group = Group::ComplexWindowGap; }
         ~MaterialComplexWindowGap() = default;
     };
+        
+    struct ScreenBmTraAbsRef
+    {
+        struct { Real64 Tra = 0.0; } Bm;
+        struct { Real64 Tra = 0.0; } Df;
+        Real64 Abs = 0.0;
+        Real64 Ref = 0.0;
+    };
 
+    struct ScreenBmTAR {
+        struct { ScreenBmTraAbsRef Ft, Bk; } Sol;
+        struct { ScreenBmTraAbsRef Ft, Bk; } Vis;
+    };
+        
     // Screen Beam Transmittance, Absorptance, Reflectance (TAR) properties
     struct ScreenBmTransAbsRef
     {
@@ -640,7 +653,7 @@ namespace Material {
         // Shading properties are profile-angle independent in EQL model
         BlindTraAbsRef<1> TAR;
 
-        MaterialShadeEQL() : MaterialShadingDevice() { } // Can be any number of 'group' types, so don't set it here
+        MaterialShadeEQL() : MaterialShadingDevice() { group = Group:: ShadeEQL; } 
         virtual ~MaterialShadeEQL() = default;
         bool can_instantiate() override { return true; } // Allows this class to be instantiated
     };
@@ -648,8 +661,8 @@ namespace Material {
     // Class for Material:Screen:EquivalentLayer
     struct MaterialScreenEQL : public MaterialShadeEQL
     {
-        Real64 ScreenWireSpacing = 0.0;  // insect screen wire spacing
-        Real64 ScreenWireDiameter = 0.0; // insect screen wire diameter
+        Real64 wireSpacing = 0.0;  // insect screen wire spacing
+        Real64 wireDiameter = 0.0; // insect screen wire diameter
 
         MaterialScreenEQL() : MaterialShadeEQL() { group = Group::ScreenEQL; } 
         virtual ~MaterialScreenEQL() = default;
@@ -657,9 +670,9 @@ namespace Material {
 
     struct MaterialDrapeEQL : public MaterialShadeEQL
     {
-        bool ISPleatedDrape = false;                                 // if pleated drape= true, if nonpleated drape = false
-        Real64 PleatedDrapeWidth = 0.0;                              // width of the pleated drape fabric section
-        Real64 PleatedDrapeLength = 0.0;                             // length of the pleated drape fabric section
+        bool isPleated = false;                                 // if pleated drape= true, if nonpleated drape = false
+        Real64 pleatedWidth = 0.0;                              // width of the pleated drape fabric section
+        Real64 pleatedLength = 0.0;                             // length of the pleated drape fabric section
 
         MaterialDrapeEQL() : MaterialShadeEQL() { group = Group::DrapeEQL; } // Can be any number of 'group' types, so don't set it here
         virtual ~MaterialDrapeEQL() = default;
@@ -747,7 +760,6 @@ namespace Material {
         // Complex fenestration parameters
         Real64 YoungModulus = 0.0;       // Young's modulus (Pa) - used in window deflection calculations
         Real64 PoissonsRatio = 0.0;      // Poisson's ratio - used in window deflection calculations
-        int ComplexShadePtr = 0;         // Pointer to complex shade data
 
         // Added 12/22/2008 for thermochromic window glazing material
         Real64 SpecTemp = 0.0; // Temperature corresponding to the specified material properties

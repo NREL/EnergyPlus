@@ -480,11 +480,16 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 3600.0;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 100000;
+
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    SolarShading::AllocateModuleArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone";
@@ -535,7 +540,6 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBalSurf->SurfHConvInt.allocate(3);
     state->dataHeatBalSurf->SurfHConvInt(surfNum1) = 0.5;
     state->dataHeatBalSurf->SurfHConvInt(surfNum2) = 0.5;
     state->dataHeatBalSurf->SurfHConvInt(surfNum3) = 0.5;
@@ -549,47 +553,12 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRatAvg = 0.011;
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRat = 0.011;
 
-    state->dataHeatBalSurf->SurfQdotRadHVACInPerArea.allocate(3);
-    state->dataHeatBalSurf->SurfWinInitialDifSolInTrans.allocate(3);
-    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
-    state->dataHeatBal->SurfQdotRadIntGainsInPerArea.allocate(3);
-    state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
-    state->dataSurface->SurfWinTransSolar.allocate(3);
-    state->dataHeatBal->ZoneWinHeatGain.allocate(1);
-    state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
-    state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
-    state->dataSurface->SurfWinHeatGain.allocate(3);
-    state->dataSurface->SurfWinGainConvGlazToZoneRep.allocate(3);
-    state->dataSurface->SurfWinGainIRGlazToZoneRep.allocate(3);
-    state->dataSurface->SurfWinGapConvHtFlowRep.allocate(3);
-    state->dataSurface->SurfWinGapConvHtFlowRepEnergy.allocate(3);
-    state->dataHeatBal->EnclSolQSWRad.allocate(1);
-    state->dataSurface->SurfWinLossSWZoneToOutWinRep.allocate(3);
-    state->dataSurface->SurfWinSysSolTransmittance.allocate(3);
-    state->dataSurface->SurfWinSysSolAbsorptance.allocate(3);
-    state->dataSurface->SurfWinSysSolReflectance.allocate(3);
-    state->dataSurface->SurfWinInsideGlassCondensationFlag.allocate(3);
-    state->dataSurface->SurfWinGainFrameDividerToZoneRep.allocate(3);
-    state->dataSurface->SurfWinInsideFrameCondensationFlag.allocate(3);
-    state->dataSurface->SurfWinInsideDividerCondensationFlag.allocate(3);
-
     state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
 
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(3);
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio(surfNum2) = 1.0;
-
-    state->dataHeatBalSurf->SurfQdotConvOutRep.allocate(3);
-    state->dataHeatBalSurf->SurfQdotConvOutPerArea.allocate(3);
-    state->dataHeatBalSurf->SurfQConvOutReport.allocate(3);
-    state->dataHeatBalSurf->SurfQdotRadOutRep.allocate(3);
-    state->dataHeatBalSurf->SurfQdotRadOutRepPerArea.allocate(3);
-    state->dataHeatBalSurf->SurfQRadOutReport.allocate(3);
-    state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs.allocate(3);
-    state->dataHeatBalSurf->SurfQAirExtReport.allocate(3);
-    state->dataHeatBalSurf->SurfQHeatEmiReport.allocate(3);
-    state->dataHeatBalSurf->SurfWinInitialBeamSolInTrans.dimension(3, 0.0);
 
     state->dataHeatBal->SurfQRadSWOutIncident = 0.0;
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;

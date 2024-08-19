@@ -1429,12 +1429,12 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         if (!s_ipsc->lNumericFieldBlanks(12) && !s_ipsc->lNumericFieldBlanks(13)) {
             if (s_ipsc->rNumericArgs(12) != 0.0 && s_ipsc->rNumericArgs(13) != 0.0) {
-                mat->PleatedDrapeWidth = s_ipsc->rNumericArgs(12);
-                mat->PleatedDrapeLength = s_ipsc->rNumericArgs(13);
-                mat->ISPleatedDrape = true;
+                mat->pleatedWidth = s_ipsc->rNumericArgs(12);
+                mat->pleatedLength = s_ipsc->rNumericArgs(13);
+                mat->isPleated = true;
             }
         } else {
-            mat->ISPleatedDrape = false;
+            mat->isPleated = false;
         }
         if (s_ipsc->rNumericArgs(1) + s_ipsc->rNumericArgs(2) + s_ipsc->rNumericArgs(4) >= 1.0) {
             ErrorsFound = true;
@@ -1708,34 +1708,34 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         if (!s_ipsc->lNumericFieldBlanks(9)) {
             if (s_ipsc->rNumericArgs(9) > 0.00001) {
-                matScreen->ScreenWireSpacing = s_ipsc->rNumericArgs(9); // screen wire spacing
+                matScreen->wireSpacing = s_ipsc->rNumericArgs(9); // screen wire spacing
             } else {
                 ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", Illegal value.");
                 ShowContinueError(state, s_ipsc->cNumericFieldNames(9) + " must be > 0.");
                 ShowContinueError(state, "...Setting screen wire spacing to a default value of 0.025m and simulation continues.");
-                matScreen->ScreenWireSpacing = 0.025;
+                matScreen->wireSpacing = 0.025;
             }
         }
 
         if (!s_ipsc->lNumericFieldBlanks(10)) {
-            if (s_ipsc->rNumericArgs(10) > 0.00001 && s_ipsc->rNumericArgs(10) < matScreen->ScreenWireSpacing) {
-                matScreen->ScreenWireDiameter = s_ipsc->rNumericArgs(10); // screen wire spacing
+            if (s_ipsc->rNumericArgs(10) > 0.00001 && s_ipsc->rNumericArgs(10) < matScreen->wireSpacing) {
+                matScreen->wireDiameter = s_ipsc->rNumericArgs(10); // screen wire spacing
             } else {
                 ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", Illegal value.");
                 ShowContinueError(state, s_ipsc->cNumericFieldNames(10) + " must be > 0.");
                 ShowContinueError(state, "...Setting screen wire diameter to a default value of 0.005m and simulation continues.");
-                matScreen->ScreenWireDiameter = 0.005;
+                matScreen->wireDiameter = 0.005;
             }
         }
 
-        if (matScreen->ScreenWireSpacing > 0.0) {
-            if (matScreen->ScreenWireDiameter / matScreen->ScreenWireSpacing >= 1.0) {
+        if (matScreen->wireSpacing > 0.0) {
+            if (matScreen->wireDiameter / matScreen->wireSpacing >= 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", Illegal value combination.");
                 ShowContinueError(state, s_ipsc->cNumericFieldNames(10) + " must be less than " + s_ipsc->cNumericFieldNames(9));
             } else {
                 //  Calculate direct normal transmittance (open area fraction)
-                Openness = pow_2(1.0 - matScreen->ScreenWireDiameter / matScreen->ScreenWireSpacing);
+                Openness = pow_2(1.0 - matScreen->wireDiameter / matScreen->wireSpacing);
                 if ((matScreen->TAR.Sol.Ft.Bm[0].BmTra - Openness) / Openness > 0.01) {
                     ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", screen openness specified.");
                     ShowContinueError(state, s_ipsc->cNumericFieldNames(1) + " is > 1.0% of the value calculated from input fields:");
@@ -1743,8 +1743,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                     ShowContinueError(state, " using the formula (1-diameter/spacing)**2");
                     ShowContinueError(state, " ...the screen diameter is recalculated from the material openness specified ");
                     ShowContinueError(state, " ...and wire spacing using the formula = wire spacing * (1.0 - SQRT(Opennes))");
-                    matScreen->ScreenWireDiameter = matScreen->ScreenWireSpacing * (1.0 - std::sqrt(matScreen->TAR.Sol.Ft.Bm[0].BmTra));
-                    ShowContinueError(state, format(" ...Recalculated {}={:.4R} m", s_ipsc->cNumericFieldNames(10), matScreen->ScreenWireDiameter));
+                    matScreen->wireDiameter = matScreen->wireSpacing * (1.0 - std::sqrt(matScreen->TAR.Sol.Ft.Bm[0].BmTra));
+                    ShowContinueError(state, format(" ...Recalculated {}={:.4R} m", s_ipsc->cNumericFieldNames(10), matScreen->wireDiameter));
                 }
             }
         }
