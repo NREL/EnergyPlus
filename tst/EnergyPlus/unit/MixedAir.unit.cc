@@ -840,6 +840,13 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
 
     state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+    state->dataEnvrn->StdBaroPress = StdPressureSeaLevel;
+    state->dataEnvrn->OutDryBulbTemp = 13.0;
+    state->dataEnvrn->OutBaroPress = StdPressureSeaLevel;
+    state->dataEnvrn->OutHumRat = 0.008;
+    state->dataEnvrn->StdRhoAir =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+
     ScheduleManager::ProcessScheduleInput(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     GetOAControllerInputs(*state);
@@ -873,7 +880,6 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     state->dataLoopNodes->Node(10).Temp = 13.00;
     state->dataLoopNodes->Node(10).HumRat = 0.008;
     state->dataLoopNodes->Node(10).MassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
-    state->dataEnvrn->OutBaroPress = 101325;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
     oaRequirements.OAFlowMethod = OAFlowCalcMethod::PCDesOcc;
@@ -914,7 +920,6 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     EXPECT_EQ("ProportionalControlBasedOnDesignOccupancy",
               DataSizing::OAFlowCalcMethodNames[static_cast<int>(ventMechanical.VentMechZone(1).ZoneOAFlowMethod)]);
 
-    state->dataEnvrn->StdRhoAir = 1.2;
     oaController.MixMassFlow = 1.7 * state->dataEnvrn->StdRhoAir;
     oaController.MaxOAMassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
     state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.7 * state->dataEnvrn->StdRhoAir;
@@ -925,25 +930,32 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
 
     // Case 1 - Zone CO2 greater than CO2 Max, so OA flow is flow/area+flow/person
     state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
-    Real64 expectedOAMassFlow = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
-                                 oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants) *
-                                state->dataEnvrn->StdRhoAir;
+    Real64 ZoneOA = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
+                     oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants);
+    Real64 ZoneOAFrac = ZoneOA / 1.7;
+    Real64 Evz = 1.0 - ZoneOAFrac; // SysEv == Evz
+    Real64 expectedOAMassFlow = ZoneOA * state->dataEnvrn->StdRhoAir / Evz;
     oaController.CalcOAController(*state, 1, true);
     EXPECT_NEAR(expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
     EXPECT_NEAR(expectedOAMassFlow / oaController.MixMassFlow, oaController.MinOAFracLimit, 0.00001);
 
     // Case 2 - Zone CO2 greater than CO2 Min, so OA flow is flow/area
     state->dataContaminantBalance->ZoneAirCO2(1) = 200.0;
-    expectedOAMassFlow = oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea * state->dataEnvrn->StdRhoAir;
+    ZoneOA = oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    ZoneOAFrac = ZoneOA / 1.7;
+    Evz = 1.0 - ZoneOAFrac;
+    expectedOAMassFlow = ZoneOA * state->dataEnvrn->StdRhoAir / Evz;
     oaController.CalcOAController(*state, 1, true);
     EXPECT_NEAR(expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
     EXPECT_NEAR(expectedOAMassFlow / oaController.MixMassFlow, oaController.MinOAFracLimit, 0.00001);
 
     // Case 3 - Zone CO2 in between CO2 Max and Min, so OA flow is flow/area + proportionate flow/person
     state->dataContaminantBalance->ZoneAirCO2(1) = zoneCO2Min + 0.3 * (zoneCO2Max - zoneCO2Min);
-    expectedOAMassFlow = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
-                          0.3 * oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants) *
-                         state->dataEnvrn->StdRhoAir;
+    ZoneOA = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
+              0.3 * oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants);
+    ZoneOAFrac = ZoneOA / 1.7;
+    Evz = 1.0 - ZoneOAFrac;
+    expectedOAMassFlow = ZoneOA * state->dataEnvrn->StdRhoAir / Evz;
     oaController.CalcOAController(*state, 1, true);
     EXPECT_NEAR(expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
     EXPECT_NEAR(expectedOAMassFlow / oaController.MixMassFlow, oaController.MinOAFracLimit, 0.00001);
@@ -1117,6 +1129,13 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest3Zone)
 
     state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+    state->dataEnvrn->StdBaroPress = StdPressureSeaLevel;
+    state->dataEnvrn->OutDryBulbTemp = 13.0;
+    state->dataEnvrn->OutBaroPress = StdPressureSeaLevel;
+    state->dataEnvrn->OutHumRat = 0.008;
+    state->dataEnvrn->StdRhoAir =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+
     ScheduleManager::ProcessScheduleInput(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     GetOAControllerInputs(*state);
@@ -1174,7 +1193,6 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest3Zone)
     state->dataLoopNodes->Node(10).MassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
     state->dataLoopNodes->Node(11) = state->dataLoopNodes->Node(10);
     state->dataLoopNodes->Node(12) = state->dataLoopNodes->Node(10);
-    state->dataEnvrn->OutBaroPress = 101325;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(3);
 
     oaRequirements.OAFlowMethod = OAFlowCalcMethod::PCDesOcc;
@@ -1223,7 +1241,6 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest3Zone)
     EXPECT_EQ("ProportionalControlBasedOnDesignOccupancy",
               DataSizing::OAFlowCalcMethodNames[static_cast<int>(ventMechanical.VentMechZone(3).ZoneOAFlowMethod)]);
 
-    state->dataEnvrn->StdRhoAir = 1.2;
     oaController.MixMassFlow = 1.7 * state->dataEnvrn->StdRhoAir;
     oaController.MaxOAMassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
     state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.7 * state->dataEnvrn->StdRhoAir;
@@ -1236,9 +1253,11 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest3Zone)
     state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
     state->dataContaminantBalance->ZoneAirCO2(2) = 600.0;
     state->dataContaminantBalance->ZoneAirCO2(3) = 600.0;
-    Real64 expectedOAMassFlow = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
-                                 oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants) *
-                                state->dataEnvrn->StdRhoAir;
+    Real64 ZoneOA = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
+                     oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants);
+    Real64 ZoneOAFrac = ZoneOA / 1.7;
+    Real64 Evz = 1.0 - ZoneOAFrac; // SysEv == Evz
+    Real64 expectedOAMassFlow = ZoneOA * state->dataEnvrn->StdRhoAir / Evz;
     oaController.CalcOAController(*state, 1, true);
     // 3 identical zones should produce 3x OA flow
     EXPECT_NEAR(3 * expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
@@ -1248,7 +1267,10 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest3Zone)
     state->dataContaminantBalance->ZoneAirCO2(1) = 200.0;
     state->dataContaminantBalance->ZoneAirCO2(2) = 200.0;
     state->dataContaminantBalance->ZoneAirCO2(3) = 200.0;
-    expectedOAMassFlow = oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea * state->dataEnvrn->StdRhoAir;
+    ZoneOA = oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    ZoneOAFrac = ZoneOA / 1.7;
+    Evz = 1.0 - ZoneOAFrac;
+    expectedOAMassFlow = ZoneOA * state->dataEnvrn->StdRhoAir / Evz;
     oaController.CalcOAController(*state, 1, true);
     // 3 identical zones should produce 3x OA flow
     EXPECT_NEAR(3 * expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
@@ -1258,9 +1280,11 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest3Zone)
     state->dataContaminantBalance->ZoneAirCO2(1) = zoneCO2Min + 0.3 * (zoneCO2Max - zoneCO2Min);
     state->dataContaminantBalance->ZoneAirCO2(2) = zoneCO2Min + 0.3 * (zoneCO2Max - zoneCO2Min);
     state->dataContaminantBalance->ZoneAirCO2(3) = zoneCO2Min + 0.3 * (zoneCO2Max - zoneCO2Min);
-    expectedOAMassFlow = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
-                          0.3 * oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants) *
-                         state->dataEnvrn->StdRhoAir;
+    ZoneOA = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
+              0.3 * oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants);
+    ZoneOAFrac = ZoneOA / 1.7;
+    Evz = 1.0 - ZoneOAFrac;
+    expectedOAMassFlow = ZoneOA * state->dataEnvrn->StdRhoAir / Evz;
     oaController.CalcOAController(*state, 1, true);
     // 3 identical zones should produce 3x OA flow
     EXPECT_NEAR(3 * expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
