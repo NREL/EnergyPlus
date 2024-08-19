@@ -123,6 +123,12 @@ namespace ResultsFramework {
         RunTime = elapsedTime;
     }
 
+    void SimInfo::setNumErrorsInputs(const std::string &numWarningsDuringInputs, const std::string &numSevereDuringInputs)
+    {
+        NumWarningsDuringInputs = numWarningsDuringInputs;
+        NumSevereDuringInputs = numSevereDuringInputs;
+    }
+
     void SimInfo::setNumErrorsWarmup(const std::string &numWarningsDuringWarmup, const std::string &numSevereDuringWarmup)
     {
         NumWarningsDuringWarmup = numWarningsDuringWarmup;
@@ -149,6 +155,7 @@ namespace ResultsFramework {
                      {"StartDateTimeStamp", StartDateTimeStamp},
                      {"RunTime", RunTime},
                      {"ErrorSummary", {{"NumWarnings", NumWarnings}, {"NumSevere", NumSevere}}},
+                     {"ErrorSummaryInputs", {{"NumWarnings", NumWarningsDuringInputs}, {"NumSevere", NumSevereDuringInputs}}},
                      {"ErrorSummaryWarmup", {{"NumWarnings", NumWarningsDuringWarmup}, {"NumSevere", NumSevereDuringWarmup}}},
                      {"ErrorSummarySizing", {{"NumWarnings", NumWarningsDuringSizing}, {"NumSevere", NumSevereDuringSizing}}}};
         return root;

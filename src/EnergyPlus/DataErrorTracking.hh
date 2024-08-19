@@ -206,29 +206,27 @@ struct ErrorTrackingData : BaseGlobalStruct
 {
     Array1D<DataErrorTracking::RecurringErrorData> RecurringErrors;
     Array1D_int MatchCounts;
-    bool AbortProcessing = false;                 // Flag used to if currently in "abort processing"
-    int NumRecurringErrors = 0;                   // Number of stored recurring error messages
-    int TotalSevereErrors = 0;                    // Counter
-    int TotalWarningErrors = 0;                   // Counter
-    int TotalSevereErrorsDuringInputsSizing = 0;  // Counter
-    int TotalWarningErrorsDuringInputsSizing = 0; // Counter
-    int TotalSevereErrorsDuringInputsWarmup = 0;  // Counter
-    int TotalWarningErrorsDuringInputsWarmup = 0; // Counter
-    int TotalSevereErrorsDuringWarmup = 0;        // Counter
-    int TotalWarningErrorsDuringWarmup = 0;       // Counter
-    int TotalSevereErrorsDuringSizing = 0;        // Counter
-    int TotalWarningErrorsDuringSizing = 0;       // Counter
-    int TotalMultipliedWindows = 0;               // Counter
-    int TotalCoincidentVertices = 0;              // Counter
-    int TotalDegenerateSurfaces = 0;              // Counter
-    int TotalReceivingNonConvexSurfaces = 0;      // Counter
-    int TotalCastingNonConvexSurfaces = 0;        // Counter
-    int TotalRoomAirPatternTooLow = 0;            // Counter
-    int TotalRoomAirPatternTooHigh = 0;           // Counter
-    bool AskForConnectionsReport = false;         // Flag used to tell when connections should be reported
-    bool AskForSurfacesReport = false;            // Flag used to tell when surfaces should be reported
-    bool AskForPlantCheckOnAbort = false;         // flag used to tell if plant structure can be checked
-    bool ExitDuringSimulations = false;           // flag used to tell if program is in simulation mode when fatal occurs
+    bool AbortProcessing = false;            // Flag used to if currently in "abort processing"
+    int NumRecurringErrors = 0;              // Number of stored recurring error messages
+    int TotalSevereErrors = 0;               // Counter
+    int TotalWarningErrors = 0;              // Counter
+    int TotalSevereErrorsDuringInputs = 0;   // Counter
+    int TotalWarningErrorsDuringInputs = 0;  // Counter
+    int TotalSevereErrorsDuringWarmup = 0;   // Counter
+    int TotalWarningErrorsDuringWarmup = 0;  // Counter
+    int TotalSevereErrorsDuringSizing = 0;   // Counter
+    int TotalWarningErrorsDuringSizing = 0;  // Counter
+    int TotalMultipliedWindows = 0;          // Counter
+    int TotalCoincidentVertices = 0;         // Counter
+    int TotalDegenerateSurfaces = 0;         // Counter
+    int TotalReceivingNonConvexSurfaces = 0; // Counter
+    int TotalCastingNonConvexSurfaces = 0;   // Counter
+    int TotalRoomAirPatternTooLow = 0;       // Counter
+    int TotalRoomAirPatternTooHigh = 0;      // Counter
+    bool AskForConnectionsReport = false;    // Flag used to tell when connections should be reported
+    bool AskForSurfacesReport = false;       // Flag used to tell when surfaces should be reported
+    bool AskForPlantCheckOnAbort = false;    // flag used to tell if plant structure can be checked
+    bool ExitDuringSimulations = false;      // flag used to tell if program is in simulation mode when fatal occurs
     std::string LastSevereError;
 
     ErrorTrackingData()

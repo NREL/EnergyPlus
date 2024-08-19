@@ -97,6 +97,7 @@ namespace ResultsFramework {
         void setInputModelURI(const std::string &inputModelURI);
         void setStartDateTimeStamp(const std::string &startDateTimeStamp);
         void setRunTime(const std::string &elapsedTime);
+        void setNumErrorsInputs(const std::string &numWarningsDuringInputs, const std::string &numSevereDuringInputs);
         void setNumErrorsWarmup(const std::string &numWarningsDuringWarmup, const std::string &numSevereDuringWarmup);
         void setNumErrorsSizing(const std::string &numWarningsDuringSizing, const std::string &numSevereDuringSizing);
         void setNumErrorsSummary(const std::string &numWarnings, const std::string &numSevere);
@@ -108,7 +109,8 @@ namespace ResultsFramework {
         std::string InputModelURI;
         std::string StartDateTimeStamp;
         std::string RunTime;
-        std::string NumWarningsDuringWarmup, NumSevereDuringWarmup, NumWarningsDuringSizing, NumSevereDuringSizing, NumWarnings, NumSevere;
+        std::string NumWarningsDuringInputs, NumSevereDuringInputs, NumWarningsDuringWarmup, NumSevereDuringWarmup, NumWarningsDuringSizing,
+            NumSevereDuringSizing, NumWarnings, NumSevere;
     };
 
     class Variable : public BaseResultObject

@@ -68,7 +68,6 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -676,6 +675,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
 
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
@@ -759,6 +759,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -825,6 +826,7 @@ namespace Curve {
                                                                      _,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataCurveManager->UniqueCurveNames,
@@ -895,6 +897,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -959,6 +962,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1023,6 +1027,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1104,6 +1109,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1185,6 +1191,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1249,6 +1256,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1330,6 +1338,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1452,6 +1461,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1531,6 +1541,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1611,6 +1622,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1664,6 +1676,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1732,6 +1745,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1798,6 +1812,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1864,6 +1879,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1930,6 +1946,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -1996,6 +2013,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -2062,6 +2080,7 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
             ++CurveNum;
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
@@ -2122,6 +2141,7 @@ namespace Curve {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
+                state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
                 std::string wpcName = Alphas(1); // Name of CP array
                 int numWindDir = NumNumbers;
                 std::vector<Real64> windDirs(numWindDir);
@@ -2172,6 +2192,7 @@ namespace Curve {
                                                                              _,
                                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                                              state.dataIPShortCut->cNumericFieldNames);
+                    state.dataInputProcessing->inputProcessor->unusedInputs.emplace(CurrentModuleObject, Alphas(1));
                     ++CurveNum;
                     GlobalNames::VerifyUniqueInterObjectName(state,
                                                              state.dataCurveManager->UniqueCurveNames,
@@ -3072,7 +3093,10 @@ namespace Curve {
 
         if (state.dataCurveManager->NumCurves > 0) {
             for (int Count = 1; Count <= (int)state.dataCurveManager->PerfCurve.size(); ++Count) {
-                if (CurveName == state.dataCurveManager->PerfCurve(Count)->Name) return Count;
+                if (CurveName == state.dataCurveManager->PerfCurve(Count)->Name) {
+                    state.dataCurveManager->PerfCurve(Count)->markUsed(state);
+                    return Count;
+                }
             }
             return 0; // Not found
         } else {
