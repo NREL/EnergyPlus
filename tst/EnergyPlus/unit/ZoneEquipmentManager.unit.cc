@@ -5357,3 +5357,181 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_GetZoneEquipmentTest)
     EXPECT_FALSE(state->dataZoneEquipmentManager->GetZoneEquipmentInputFlag);
     EXPECT_EQ(state->dataZoneEquipmentManager->NumOfTimeStepInDay, 24);
 }
+TEST_F(EnergyPlusFixture, SpaceReturnMixerTest)
+{
+    state->dataZoneEquip->zoneReturnMixer.resize(1);
+    auto &thisMixer = state->dataZoneEquip->zoneReturnMixer[0];
+    // Assume 3 spaces are served by this mixter
+    int numSpaces = 3;
+    thisMixer.spaces.resize(numSpaces);
+    auto &mixSpace1 = thisMixer.spaces[0];
+    auto &mixSpace2 = thisMixer.spaces[1];
+    auto &mixSpace3 = thisMixer.spaces[2];
+    mixSpace1.spaceIndex = 1;
+    mixSpace2.spaceIndex = 3;
+    mixSpace3.spaceIndex = 2;
+    mixSpace1.spaceNodeNum = 11;
+    mixSpace2.spaceNodeNum = 13;
+    mixSpace3.spaceNodeNum = 12;
+    state->dataLoopNodes->Node.allocate(13);
+    thisMixer.outletNodeNum = 10;
+    auto &outletNode = state->dataLoopNodes->Node(thisMixer.outletNodeNum);
+    auto &mixSpace1Node = state->dataLoopNodes->Node(mixSpace1.spaceNodeNum);
+    auto &mixSpace2Node = state->dataLoopNodes->Node(mixSpace2.spaceNodeNum);
+    auto &mixSpace3Node = state->dataLoopNodes->Node(mixSpace3.spaceNodeNum);
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
+    state->dataZoneEquip->spaceEquipConfig.allocate(numSpaces);
+    auto &spaceEquipConfig1 = state->dataZoneEquip->spaceEquipConfig(1);
+    auto &spaceEquipConfig2 = state->dataZoneEquip->spaceEquipConfig(2);
+    auto &spaceEquipConfig3 = state->dataZoneEquip->spaceEquipConfig(3);
+    spaceEquipConfig1.NumReturnNodes = 1;
+    spaceEquipConfig2.NumReturnNodes = 1;
+    spaceEquipConfig3.NumReturnNodes = 1;
+    spaceEquipConfig1.ReturnNode.allocate(1);
+    spaceEquipConfig2.ReturnNode.allocate(1);
+    spaceEquipConfig3.ReturnNode.allocate(1);
+    spaceEquipConfig1.ReturnNode(1) = 11;
+    spaceEquipConfig2.ReturnNode(1) = 12;
+    spaceEquipConfig3.ReturnNode(1) = 13;
+    spaceEquipConfig1.ReturnNodeInletNum.allocate(1);
+    spaceEquipConfig2.ReturnNodeInletNum.allocate(1);
+    spaceEquipConfig3.ReturnNodeInletNum.allocate(1);
+    spaceEquipConfig1.ReturnNodeInletNum(1) = 1;
+    spaceEquipConfig2.ReturnNodeInletNum(1) = 1;
+    spaceEquipConfig3.ReturnNodeInletNum(1) = 1;
+    spaceEquipConfig1.InletNodeADUNum.allocate(1);
+    spaceEquipConfig2.InletNodeADUNum.allocate(1);
+    spaceEquipConfig3.InletNodeADUNum.allocate(1);
+    spaceEquipConfig1.InletNodeADUNum(1) = 0;
+    spaceEquipConfig2.InletNodeADUNum(1) = 0;
+    spaceEquipConfig3.InletNodeADUNum(1) = 0;
+    spaceEquipConfig1.ReturnNodeAirLoopNum.allocate(1);
+    spaceEquipConfig2.ReturnNodeAirLoopNum.allocate(1);
+    spaceEquipConfig3.ReturnNodeAirLoopNum.allocate(1);
+    spaceEquipConfig1.ReturnNodeAirLoopNum(1) = 1;
+    spaceEquipConfig2.ReturnNodeAirLoopNum(1) = 1;
+    spaceEquipConfig3.ReturnNodeAirLoopNum(1) = 1;
+    spaceEquipConfig1.InletNode.allocate(1);
+    spaceEquipConfig2.InletNode.allocate(1);
+    spaceEquipConfig3.InletNode.allocate(1);
+    spaceEquipConfig1.InletNode(1) = 1;
+    spaceEquipConfig2.InletNode(1) = 2;
+    spaceEquipConfig3.InletNode(1) = 3;
+    auto &space1InletNode = state->dataLoopNodes->Node(spaceEquipConfig1.InletNode(1));
+    auto &space2InletNode = state->dataLoopNodes->Node(spaceEquipConfig2.InletNode(1));
+    auto &space3InletNode = state->dataLoopNodes->Node(spaceEquipConfig3.InletNode(1));
+    spaceEquipConfig1.FixedReturnFlow.allocate(1);
+    spaceEquipConfig2.FixedReturnFlow.allocate(1);
+    spaceEquipConfig3.FixedReturnFlow.allocate(1);
+
+    spaceEquipConfig1.ZoneNode = 5;
+    spaceEquipConfig2.ZoneNode = 6;
+    spaceEquipConfig3.ZoneNode = 7;
+    auto &space1Node = state->dataLoopNodes->Node(spaceEquipConfig1.ZoneNode);
+    auto &space2Node = state->dataLoopNodes->Node(spaceEquipConfig2.ZoneNode);
+    auto &space3Node = state->dataLoopNodes->Node(spaceEquipConfig3.ZoneNode);
+
+    // Note that spaces are not in numerical order
+    // mixSpace1.spaceIndex = 1;
+    // mixSpace2.spaceIndex = 3;
+    // mixSpace3.spaceIndex = 2;
+    space1InletNode.MassFlowRate = 0.2;
+    space3InletNode.MassFlowRate = 0.5;
+    space2InletNode.MassFlowRate = 0.3;
+
+    state->dataAirLoop->AirLoopFlow.allocate(1);
+    auto &thisAirLoopFlow = state->dataAirLoop->AirLoopFlow(1);
+    thisAirLoopFlow.SysRetFlow = 1.0;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+
+    // Set flow rates/fractions
+    outletNode.MassFlowRate = 1.0;
+    thisMixer.setInletFlows(*state);
+    EXPECT_NEAR(mixSpace1.fraction, 0.2, 0.001);
+    EXPECT_NEAR(mixSpace2.fraction, 0.5, 0.001);
+    EXPECT_NEAR(mixSpace3.fraction, 0.3, 0.001);
+
+    // Case 1
+    space1Node.Temp = 15.0;
+    space3Node.Temp = 15.0;
+    space2Node.Temp = 15.0;
+
+    space1Node.HumRat = 0.004;
+    space3Node.HumRat = 0.001;
+    space2Node.HumRat = 0.080;
+
+    space1Node.Press = 100000.0;
+    space3Node.Press = 100020.0;
+    space2Node.Press = 99400.0;
+
+    space1Node.GenContam = 10.0;
+    space3Node.GenContam = 20.0;
+    space2Node.GenContam = 30.0;
+
+    space1Node.Enthalpy = Psychrometrics::PsyHFnTdbW(space1Node.Temp, space1Node.HumRat);
+    space2Node.Enthalpy = Psychrometrics::PsyHFnTdbW(space2Node.Temp, space2Node.HumRat);
+    space3Node.Enthalpy = Psychrometrics::PsyHFnTdbW(space3Node.Temp, space3Node.HumRat);
+
+    thisMixer.setInletConditions(*state);
+
+    EXPECT_NEAR(mixSpace1Node.Temp, space1Node.Temp, 0.01);
+    EXPECT_NEAR(mixSpace2Node.Temp, space3Node.Temp, 0.01);
+    EXPECT_NEAR(mixSpace3Node.Temp, space2Node.Temp, 0.01);
+
+    EXPECT_NEAR(mixSpace1Node.HumRat, space1Node.HumRat, 0.01);
+    EXPECT_NEAR(mixSpace2Node.HumRat, space3Node.HumRat, 0.01);
+    EXPECT_NEAR(mixSpace3Node.HumRat, space2Node.HumRat, 0.01);
+
+    EXPECT_NEAR(mixSpace1Node.Enthalpy, space1Node.Enthalpy, 0.001);
+    EXPECT_NEAR(mixSpace2Node.Enthalpy, space3Node.Enthalpy, 0.001);
+    EXPECT_NEAR(mixSpace3Node.Enthalpy, space2Node.Enthalpy, 0.001);
+
+    EXPECT_NEAR(mixSpace1Node.Press, space1Node.Press, 0.001);
+    EXPECT_NEAR(mixSpace2Node.Press, space3Node.Press, 0.001);
+    EXPECT_NEAR(mixSpace3Node.Press, space2Node.Press, 0.001);
+
+    EXPECT_NEAR(mixSpace1Node.GenContam, space1Node.GenContam, 0.001);
+    EXPECT_NEAR(mixSpace2Node.GenContam, space3Node.GenContam, 0.001);
+    EXPECT_NEAR(mixSpace3Node.GenContam, space2Node.GenContam, 0.001);
+
+    outletNode.Temp = 19.2;
+    outletNode.HumRat = 0.005;
+    outletNode.CO2 = 100.0;
+
+    thisMixer.setOutletConditions(*state);
+    Real64 expectedInletEnthalpy =
+        mixSpace1Node.Enthalpy * mixSpace1.fraction + mixSpace2Node.Enthalpy * mixSpace2.fraction + mixSpace3Node.Enthalpy * mixSpace3.fraction;
+    Real64 expectedInletHumRat =
+        mixSpace1Node.HumRat * mixSpace1.fraction + mixSpace2Node.HumRat * mixSpace2.fraction + mixSpace3Node.HumRat * mixSpace3.fraction;
+    Real64 expectedInletCO2 =
+        mixSpace1Node.CO2 * mixSpace1.fraction + mixSpace2Node.CO2 * mixSpace2.fraction + mixSpace3Node.CO2 * mixSpace3.fraction;
+    Real64 expectedInletGenContam =
+        mixSpace1Node.GenContam * mixSpace1.fraction + mixSpace2Node.GenContam * mixSpace2.fraction + mixSpace3Node.GenContam * mixSpace3.fraction;
+    Real64 expectedInletPress =
+        mixSpace1Node.Press * mixSpace1.fraction + mixSpace2Node.Press * mixSpace2.fraction + mixSpace3Node.Press * mixSpace3.fraction;
+    Real64 expectedInletTemp = Psychrometrics::PsyTdbFnHW(expectedInletEnthalpy, expectedInletHumRat);
+
+    EXPECT_NEAR(expectedInletEnthalpy, outletNode.Enthalpy, 0.0001);
+    EXPECT_NEAR(expectedInletTemp, outletNode.Temp, 0.0001);
+    EXPECT_NEAR(expectedInletHumRat, outletNode.HumRat, 0.0001);
+    EXPECT_NEAR(expectedInletCO2, outletNode.CO2, 0.0001);
+    EXPECT_NEAR(expectedInletGenContam, outletNode.GenContam, 0.0001);
+    EXPECT_NEAR(expectedInletPress, outletNode.Press, 0.0001);
+
+    outletNode.MassFlowRate = 0.1;
+    outletNode.MassFlowRateMinAvail = 0.0;
+    outletNode.MassFlowRateMaxAvail = 0.15;
+
+    thisMixer.setInletFlows(*state);
+
+    EXPECT_NEAR(mixSpace1Node.MassFlowRate, outletNode.MassFlowRate * mixSpace1.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace2Node.MassFlowRate, outletNode.MassFlowRate * mixSpace2.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace3Node.MassFlowRate, outletNode.MassFlowRate * mixSpace3.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace1Node.MassFlowRateMinAvail, outletNode.MassFlowRateMinAvail * mixSpace1.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace2Node.MassFlowRateMinAvail, outletNode.MassFlowRateMinAvail * mixSpace2.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace3Node.MassFlowRateMinAvail, outletNode.MassFlowRateMinAvail * mixSpace3.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace1Node.MassFlowRateMaxAvail, outletNode.MassFlowRateMaxAvail * mixSpace1.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace2Node.MassFlowRateMaxAvail, outletNode.MassFlowRateMaxAvail * mixSpace2.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace3Node.MassFlowRateMaxAvail, outletNode.MassFlowRateMaxAvail * mixSpace3.fraction, 0.0001);
+}
