@@ -842,8 +842,6 @@ struct MaterialData : BaseGlobalStruct
     Array1D<Material::MaterialBase *> materials;
     std::map<std::string, int> materialMap;
 
-    int TotMaterials = 0;     // Total number of unique materials (layers) in this simulation
-        
     int NumRegulars = 0;
     int NumNoMasses = 0;
     int NumIRTs = 0;
@@ -881,8 +879,8 @@ struct MaterialData : BaseGlobalStruct
 
     void clear_state() override
     {
-        for (int i = 0; i < TotMaterials; ++i) {
-            delete materials[i]; //
+        for (int i = 0; i < materials.isize(); ++i) {
+            delete materials[i];
         }
         materials.clear();
         materialMap.clear();

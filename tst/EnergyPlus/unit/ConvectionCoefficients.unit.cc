@@ -3756,7 +3756,6 @@ TEST_F(ConvectionCoefficientsFixture, RoofExtConvectionCoefficient)
     state->dataConstruction->Construct(1).LayerPoint(1) = 1;
 
     // define material
-    s_mat->TotMaterials = 1;
     auto *mat1 = new Material::MaterialBase;
     s_mat->materials.push_back(mat1);
     mat1->AbsorpThermalFront = 0.1;

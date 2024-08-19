@@ -343,9 +343,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     
     bool ErrorsFound(false); // If errors detected in input
 
-    s_mat->TotMaterials = 2;
-
-
     auto *mat1 = new Material::MaterialGlass;
     mat1->group = Material::Group::Glass;
     mat1->Name = "GLASS";
@@ -1860,7 +1857,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
     // skip call to get material data since this doesn't use IRT
     ErrorsFound = false;
-    EXPECT_EQ(state->dataMaterial->TotMaterials, 0);
+    EXPECT_EQ(state->dataMaterial->materials.size(), 0);
 
     // get constructions
     ErrorsFound = false;

@@ -70,7 +70,6 @@ TEST_F(EnergyPlusFixture, Construction_reportLayers)
 
     SetPredefinedTables(*state);
 
-    m->TotMaterials = 8;
     auto *mata = new Material::MaterialBase; mata->Name = "mat a"; m->materials.push_back(mata);
     auto *matb = new Material::MaterialBase; matb->Name = "mat b"; m->materials.push_back(matb);
     auto *matc = new Material::MaterialBase; matc->Name = "mat c"; m->materials.push_back(matc);

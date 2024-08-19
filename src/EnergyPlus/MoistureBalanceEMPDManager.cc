@@ -762,7 +762,7 @@ void ReportMoistureBalanceEMPD(EnergyPlusData &state)
         assert(matEMPD != nullptr);
 
         static constexpr std::string_view Format_700(
-            " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
+            " Construction EMPD, {}, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
         print(state.files.eio,
               Format_700,
               constr.Name,

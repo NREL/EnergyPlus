@@ -5227,7 +5227,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
 
     auto &s_mat = state->dataMaterial;
     
-    s_mat->TotMaterials = 1;
     auto *mat1 = new Material::MaterialGlass;
     mat1->Name = "GLASS";
     mat1->group = Material::Group::Glass;

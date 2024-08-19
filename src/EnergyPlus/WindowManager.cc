@@ -460,7 +460,7 @@ namespace Window {
 
             if (IntShade || ExtShade || ExtScreen) {
                 ShadeLayPtr = thisConstruct.LayerPoint(ShadeLayNum);
-                auto const *matShade = dynamic_cast<Material::MaterialShade const *>(s_mat->materials(ShadeLayPtr));
+                auto const *matShade = dynamic_cast<Material::MaterialShadingDevice const *>(s_mat->materials(ShadeLayPtr));
                 assert(matShade != nullptr);
                 if (ExtScreen) {
                     auto const *matScreen = dynamic_cast<Material::MaterialScreen const *>(matShade);

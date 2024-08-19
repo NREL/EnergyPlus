@@ -2466,7 +2466,12 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             }
 
             auto const &instances = itInstances.value();
-            auto const itObj = instances.find(s_ipsc->cAlphaArgs(3));
+            auto itObj = instances.begin();
+            // Can't use find here because epJSON keys are not upper-cased
+            for (; itObj != instances.end(); ++itObj) {
+               if (Util::makeUPPER(itObj.key()) == s_ipsc->cAlphaArgs(3)) break;
+            }
+                            
             if (itObj == instances.end()) {
                 ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(3), s_ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
@@ -2488,7 +2493,13 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             }
 
             auto const &instances = itInstances.value();
-            auto const itObj = instances.find(s_ipsc->cAlphaArgs(4));
+            
+            auto itObj = instances.begin();
+            // Can't use find here because epJSON keys are not upper-cased
+            for (; itObj != instances.end(); ++itObj) {
+               if (Util::makeUPPER(itObj.key()) == s_ipsc->cAlphaArgs(4)) break;
+            }
+
             if (itObj == instances.end()) {
                 ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(4), s_ipsc->cAlphaArgs(4));
                 ErrorsFound = true;

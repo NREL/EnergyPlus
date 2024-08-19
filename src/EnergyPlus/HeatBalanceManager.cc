@@ -1497,6 +1497,7 @@ namespace HeatBalanceManager {
                     thisConstruct.isTCWindow = true;
                     thisConstruct.isTCMaster = true;
                     thisConstruct.TCMasterConstrNum = ConstrNum;
+                    thisConstruct.TCMasterMatNum = matGlassTC->Num;
                     thisConstruct.TCGlassNum = GlassLayer; // the TC glass layer ID
                     thisConstruct.TCLayerNum = Layer;
                     thisConstruct.TypeIsWindow = true;
@@ -3615,7 +3616,6 @@ namespace HeatBalanceManager {
         Array2D_int NumGases(4, 2);         // Number of gases in each gap of a glazing system
         Array2D_int MaterNumSysGlass(5, 2); // Material numbers for glazing system / glass combinations
         Array2D_int MaterNumSysGap(4, 2);   // Material numbers for glazing system / gap combinations
-        int TotMaterialsPrev;               // Number of materials before adding ones from W5DataFile
         int TotFrameDividerPrev;            // Number of FrameAndDivider objects before adding ones from W5DataFile
         Array1D_int NGaps(2);               // Number of gaps in window construction
         int NGlSys;                         // Number of glazing systems (normally 1, but 2 for mullioned window
@@ -4009,14 +4009,10 @@ namespace HeatBalanceManager {
                                       "of above errors",
                                       DesiredConstructionName));
 
-            TotMaterialsPrev = s_mat->TotMaterials;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 NGaps(IGlSys) = NGlass(IGlSys) - 1;
-                s_mat->TotMaterials += NGlass(IGlSys) + NGaps(IGlSys);
             }
-
-            // Create Material objects
-
+            
             // Glass objects
             NextLine = W5DataFile.readLine();
             if (NextLine.eof) goto Label1000;
@@ -4227,8 +4223,8 @@ namespace HeatBalanceManager {
                 }
 
                 thisConstruct.OutsideRoughness = Material::SurfaceRoughness::VerySmooth;
-                thisConstruct.InsideAbsorpThermal = s_mat->materials(TotMaterialsPrev + NGlass(IGlSys))->AbsorpThermalBack;
-                thisConstruct.OutsideAbsorpThermal = s_mat->materials(TotMaterialsPrev + 1)->AbsorpThermalFront;
+                thisConstruct.InsideAbsorpThermal = s_mat->materials(thisConstruct.LayerPoint(thisConstruct.TotLayers))->AbsorpThermalBack;
+                thisConstruct.OutsideAbsorpThermal = s_mat->materials(thisConstruct.LayerPoint(1))->AbsorpThermalFront;
                 thisConstruct.TypeIsWindow = true;
                 thisConstruct.FromWindow5DataFile = true;
                 thisConstruct.W5FileGlazingSysHeight = WinHeight(IGlSys);
@@ -5188,7 +5184,7 @@ namespace HeatBalanceManager {
                 
             if (!constr.isTCMaster) continue;
             
-            auto const *matGlassTC = dynamic_cast<Material::MaterialGlassTC const *>(s_mat->materials(constr.LayerPoint(constr.TCLayerNum)));
+            auto const *matGlassTC = dynamic_cast<Material::MaterialGlassTC const *>(s_mat->materials(constr.TCMasterMatNum));
             assert(matGlassTC != nullptr);
             NumNewConst += matGlassTC->numMatRefs;
         }
@@ -5207,7 +5203,7 @@ namespace HeatBalanceManager {
             auto &constr = state.dataConstruction->Construct(Loop);
             if (!constr.isTCMaster) continue;
             
-            auto const *matGlassTC = dynamic_cast<Material::MaterialGlassTC *>(s_mat->materials(constr.LayerPoint(constr.TCLayerNum)));
+            auto const *matGlassTC = dynamic_cast<Material::MaterialGlassTC *>(s_mat->materials(constr.TCMasterMatNum));
             assert(matGlassTC != nullptr);
 
             constr.numTCChildConstrs = matGlassTC->numMatRefs;

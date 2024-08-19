@@ -224,13 +224,14 @@ namespace Window {
             if (surf.activeShadedConstruction == 0) continue;
             auto &constrSh = state.dataConstruction->Construct(surf.activeShadedConstruction);
             int TotLay = constrSh.TotLayers;
-            auto const *mat = dynamic_cast<Material::MaterialShade const *>(s_mat->materials(constrSh.LayerPoint(TotLay)));
+            auto const *mat = s_mat->materials(constrSh.LayerPoint(TotLay));
             
             if (mat->group == Material::Group::Shade) {
+                auto const *matShade = dynamic_cast<Material::MaterialShade const *>(mat);
                 Real64 EpsGlIR = s_mat->materials(constrSh.LayerPoint(TotLay - 1))->AbsorpThermalBack;
                 Real64 RhoGlIR = 1 - EpsGlIR;
-                Real64 TauShIR = mat->TransThermal;
-                Real64 EpsShIR = mat->AbsorpThermal;
+                Real64 TauShIR = matShade->TransThermal;
+                Real64 EpsShIR = matShade->AbsorpThermal;
                 Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                 surfShade.effShadeEmi = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
                 surfShade.effGlassEmi = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);

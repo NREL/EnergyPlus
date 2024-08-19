@@ -208,7 +208,7 @@ namespace HeatBalFiniteDiffManager {
         int numProps = setSizeMaxProperties(state);
         MaterialProps.allocate(numProps);
 
-        s_hbfd->MaterialFD.allocate(state.dataMaterial->TotMaterials);
+        s_hbfd->MaterialFD.allocate(s_mat->materials.size());
 
         // Load the additional CondFD Material properties
         s_ipsc->cCurrentModuleObject = "MaterialProperty:PhaseChange"; // Phase Change Information First

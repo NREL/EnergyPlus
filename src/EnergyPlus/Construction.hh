@@ -251,6 +251,7 @@ namespace Construction {
         bool isTCWindow = false;
         bool isTCMaster = false;
         int TCMasterConstrNum = 0; // The master TC construction referenced by its slave constructions
+        int TCMasterMatNum = 0; // The master TC material
         int TCLayerNum = 0;     // Which material layer is the TC glazing, counting all material layers.
         int TCGlassNum = 0;     // Which glass layer is the TC glazing, counting from glass layers only.
         int numTCChildConstrs;
