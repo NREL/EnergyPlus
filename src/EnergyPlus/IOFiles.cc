@@ -376,6 +376,9 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
             { // "output_audit"
                 audit = boolean_choice(find_input(fields, "output_audit"));
             }
+            { // "output_space_sizing"
+                spsz = boolean_choice(find_input(fields, "output_space_sizing"));
+            }
             { // "output_zone_sizing"
                 zsz = boolean_choice(find_input(fields, "output_zone_sizing"));
             }
@@ -484,6 +487,7 @@ void IOFiles::flushAll()
     eio.flush();
     eso.flush();
     zsz.flush();
+    spsz.flush();
     ssz.flush();
     map.flush();
     mtr.flush();

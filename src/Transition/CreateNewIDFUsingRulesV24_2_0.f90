@@ -553,6 +553,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with N, insert the rules here
 
               ! If your original object starts with O, insert the rules here
+             CASE('OUTPUTCONTROL:FILES')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:8)=InArgs(1:8)
+                 OutArgs(9) = InArgs(9) ! Set new Output Space Sizing the same as old Output Zone Sizing
+                 OutArgs(10:CurArgs+1)=InArgs(9:CurArgs)
+                 CurArgs = CurArgs + 1
 
               ! If your original object starts with P, insert the rules here
 
