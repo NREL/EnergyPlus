@@ -213,7 +213,7 @@ namespace Curve {
 
         void markUsed(EnergyPlusData &state)
         {
-            if (!this->used) return;
+            if (!this->used || this->curveType == CurveType::Invalid) return;
             auto const find_unused =
                 state.dataInputProcessing->inputProcessor->unusedInputs.find({std::string(objectNames[int(this->curveType)]), this->Name});
             if (find_unused != state.dataInputProcessing->inputProcessor->unusedInputs.end()) {
