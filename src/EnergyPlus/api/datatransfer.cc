@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -237,6 +238,24 @@ void resetErrorFlag(EnergyPlusState state)
 {
     const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
     thisState->dataPluginManager->apiErrorFlag = false;
+}
+
+char *inputFilePath(EnergyPlusState state)
+{
+    const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
+    std::string const path_utf8 = EnergyPlus::FileSystem::toGenericString(thisState->dataStrGlobals->inputFilePath);
+    char *p = new char[std::strlen(path_utf8.c_str()) + 1];
+    std::strcpy(p, path_utf8.c_str());
+    return p;
+}
+
+char *epwFilePath(EnergyPlusState state)
+{
+    const auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
+    std::string const path_utf8 = EnergyPlus::FileSystem::toGenericString(thisState->files.inputWeatherFilePath.filePath);
+    char *p = new char[std::strlen(path_utf8.c_str()) + 1];
+    std::strcpy(p, path_utf8.c_str());
+    return p;
 }
 
 char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
@@ -571,6 +590,57 @@ Real64 getInternalVariableValue(EnergyPlusState state, int handle)
     }
     thisState->dataPluginManager->apiErrorFlag = true;
     return 0;
+}
+
+int getEMSGlobalVariableHandle(EnergyPlusState state, const char *name)
+{
+    auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
+    int index = 0;
+    for (auto const &erlVar : thisState->dataRuntimeLang->ErlVariable) {
+        index++;
+        // only respond if we are outside of the built-in EMS var range
+        if (index < thisState->dataRuntimeLang->emsVarBuiltInStart || index > thisState->dataRuntimeLang->emsVarBuiltInEnd) {
+            if (EnergyPlus::Util::SameString(name, erlVar.Name)) {
+                return index;
+            }
+        }
+    }
+    return 0;
+}
+
+Real64 getEMSGlobalVariableValue(EnergyPlusState state, int handle)
+{
+    auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto const &erl = thisState->dataRuntimeLang;
+    bool const insideBuiltInRange = handle >= erl->emsVarBuiltInStart && handle <= erl->emsVarBuiltInEnd;
+    if (insideBuiltInRange || handle > thisState->dataRuntimeLang->NumErlVariables) {
+        // need to fatal out once the process is done
+        // throw an error, set the fatal flag, and then return 0
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in getEMSGlobalVariableValue; received handle: {}", handle));
+        EnergyPlus::ShowContinueError(
+            *thisState, "The getEMSGlobalVariableValue function will return 0 for now to allow the process to finish, then EnergyPlus will abort");
+        thisState->dataPluginManager->apiErrorFlag = true;
+        return 0;
+    }
+    return erl->ErlVariable(handle).Value.Number;
+}
+
+void setEMSGlobalVariableValue(EnergyPlusState state, int handle, Real64 value)
+{
+    auto *thisState = static_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto const &erl = thisState->dataRuntimeLang;
+    bool const insideBuiltInRange = handle >= erl->emsVarBuiltInStart && handle <= erl->emsVarBuiltInEnd;
+    if (insideBuiltInRange || handle > erl->NumErlVariables) {
+        // need to fatal out once the plugin is done
+        // throw an error, set the fatal flag, and then return
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in setEMSGlobalVariableValue; received handle: {}", handle));
+        EnergyPlus::ShowContinueError(*thisState,
+                                      "The setEMSGlobalVariableValue function will return to allow the plugin to finish, then EnergyPlus will abort");
+        thisState->dataPluginManager->apiErrorFlag = true;
+    }
+    erl->ErlVariable(handle).Value.Number = value;
 }
 
 int getPluginGlobalVariableHandle(EnergyPlusState state, const char *name)
