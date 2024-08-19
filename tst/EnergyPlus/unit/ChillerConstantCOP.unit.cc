@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -90,7 +91,11 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
         "    ConstantFlow,            !- Chiller Flow Mode",
         "    1,                       !- Sizing Factor",
         "    ,                        !- Basin Heater Capacity {W/K}",
-        "    2;                       !- Basin Heater Setpoint Temperature {C}",
+        "    2,                       !- Basin Heater Setpoint Temperature {C}",
+        "    ,                        !- temperature difference described above",
+        "    ThermoCapFracCurve;      !- Thermosiphon Capacity Fraction Curve Name",
+
+        "Curve:Linear, ThermoCapFracCurve, 0.0, 0.06, 0.0, 10.0, 0.0, 1.0, Dimensionless, Dimensionless;",
     });
 
     EXPECT_TRUE(process_idf(idf_objects, false));
@@ -162,6 +167,37 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
     // check autocalculate chiller side cond water flow rate
     EXPECT_NEAR(thisChiller.CondVolFlowRate, 0.0012606164769923673, 0.0000001);
     EXPECT_NEAR(thisChiller.CondMassFlowRateMax, 1.2604878941117141, 0.0000001);
+
+    // test thermosiphon model
+    DataBranchAirLoopPlant::ControlType const EquipFlowCtrl = DataBranchAirLoopPlant::ControlType::SeriesActive;
+    state->dataLoopNodes->Node(thisChiller.EvapInletNodeNum).Temp = 10.0;
+    state->dataLoopNodes->Node(thisChiller.EvapOutletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(thisChiller.EvapOutletNodeNum).TempSetPoint = 6.0;
+    state->dataLoopNodes->Node(thisChiller.CondInletNodeNum).Temp = 12.0; // condenser inlet temp > evap outlet temp
+
+    thisChiller.initialize(*state, RunFlag, MyLoad);
+    thisChiller.calculate(*state, MyLoad, RunFlag, EquipFlowCtrl);
+    EXPECT_GT(thisChiller.partLoadRatio, 0.95);   // load is large
+    EXPECT_EQ(thisChiller.thermosiphonStatus, 0); // thermosiphon is off
+    EXPECT_GT(thisChiller.Power, 4000.0);         // power is non-zero
+
+    state->dataLoopNodes->Node(thisChiller.CondInletNodeNum).Temp = 5.0; // condenser inlet temp < evap outlet temp
+
+    thisChiller.initialize(*state, RunFlag, MyLoad);
+    thisChiller.calculate(*state, MyLoad, RunFlag, EquipFlowCtrl);
+    EXPECT_GT(thisChiller.partLoadRatio, 0.95);   // load is large
+    EXPECT_EQ(thisChiller.thermosiphonStatus, 0); // thermosiphon is off
+    EXPECT_GT(thisChiller.Power, 4000.0);         // power is non-zero
+
+    MyLoad /= 15.0; // reduce load such that thermosiphon can meet load
+    thisChiller.initialize(*state, RunFlag, MyLoad);
+    thisChiller.calculate(*state, MyLoad, RunFlag, EquipFlowCtrl);
+    Real64 dT = thisChiller.EvapOutletTemp - thisChiller.CondInletTemp;
+    Real64 thermosiphonCapFrac = Curve::CurveValue(*state, thisChiller.thermosiphonTempCurveIndex, dT);
+    EXPECT_LT(thisChiller.partLoadRatio, 0.065);               // load is small
+    EXPECT_GT(thermosiphonCapFrac, thisChiller.partLoadRatio); // thermosiphon capacity can meet load
+    EXPECT_EQ(thisChiller.thermosiphonStatus, 1);              // thermosiphon is on
+    EXPECT_EQ(thisChiller.Power, 0.0);                         // power is zero
 }
 
 TEST_F(EnergyPlusFixture, ChillerConstantCOP_Default_Des_Cond_Evap_Temps)

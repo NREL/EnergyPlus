@@ -596,10 +596,6 @@ elseif(UNIX)
   install(FILES "${PROJECT_SOURCE_DIR}/doc/man/energyplus.1" DESTINATION "./" COMPONENT Symlinks)
 endif()
 
-# TODO: Unused now
-configure_file("${PROJECT_SOURCE_DIR}/cmake/CMakeCPackOptions.cmake.in" "${PROJECT_BINARY_DIR}/CMakeCPackOptions.cmake" @ONLY)
-set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CMakeCPackOptions.cmake")
-
 ##########################################################   D O C U M E N T A T I O N   #############################################################
 
 if(BUILD_DOCS)
@@ -691,6 +687,48 @@ if(WIN32 AND NOT UNIX)
     install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
   endif()
 endif()
+
+if(APPLE)
+
+  include(${CMAKE_CURRENT_LIST_DIR}/CodeSigning.cmake)
+
+  # Defines CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION and CPACK_CODESIGNING_NOTARY_PROFILE_NAME
+  setup_macos_codesigning_variables()
+
+  if(CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
+    set(FILES_TO_SIGN
+      # Targets are signed already via register_install_codesign_target
+      #$<TARGET_FILE_NAME:ConvertInputFormat>
+      #$<TARGET_FILE_NAME:energyplus>
+      #$<TARGET_FILE_NAME:energyplusapi>
+
+      # Bash scripts, not sure if needed or not
+      "runenergyplus"
+      "runepmacro"
+      "runreadvars"
+      # Copied-verbatim apps: Already signed because just copied from bin to package
+      # "EPMacro"
+      # "PreProcess/EP-Launch-Lite.app"
+      # "PreProcess/IDFVersionUpdater/IDFVersionUpdater.app"
+      # "PostProcess/EP-Compare/EP-Compare.app"
+    )
+
+    # Codesign inner binaries and libraries, in the CPack staging area for the EnergyPlus project, component Unspecified
+    # Define some required variables for the script in the scope of the install(SCRIPT) first
+    install(CODE "set(CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION \"${CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION}\")" COMPONENT Unspecified)
+    install(CODE "set(FILES_TO_SIGN \"${FILES_TO_SIGN}\")" COMPONENT Unspecified)
+    # call the script
+    install(SCRIPT "${CMAKE_CURRENT_LIST_DIR}/install_codesign_script.cmake" COMPONENT Unspecified)
+
+    # Register the CPACK_POST_BUILD_SCRIPTS
+    set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/CPackSignAndNotarizeDmg.cmake")
+
+  endif()
+endif()
+
+# TODO: Unused now
+configure_file("${PROJECT_SOURCE_DIR}/cmake/CMakeCPackOptions.cmake.in" "${PROJECT_BINARY_DIR}/CMakeCPackOptions.cmake" @ONLY)
+set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CMakeCPackOptions.cmake")
 
 ######################################################################################################################################################
 #                                                    P A C K A G I N G   &   C O M P O N E N T S                                                     #
