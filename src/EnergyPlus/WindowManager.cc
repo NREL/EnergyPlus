@@ -7458,11 +7458,11 @@ namespace Window {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Array1D<Real64> bld_pr(15);     // Slat properties
-        Array1D<Real64> st_lay(16);     // Solar-optical blind/glazing system properties
-        Real64 sun_el;                  // Solar profile angle (radians)
+        Array1D<Real64> bld_pr(15);                        // Slat properties
+        Array1D<Real64> st_lay(16);                        // Solar-optical blind/glazing system properties
+        Real64 sun_el;                                     // Solar profile angle (radians)
         Array1D<Real64> sun_el_deg(Material::MaxProfAngs); // Solar profile angle (deg) corresponding to sun_el values
-        Real64 bld_el;                  // Slat angle (elevation of slat normal vector in plane
+        Real64 bld_el;                                     // Slat angle (elevation of slat normal vector in plane
         //  perpendicular to window and containing the slat normal vector) (radians)
         int IProfAng; // Profile angle index
 
@@ -7584,17 +7584,17 @@ namespace Window {
                 if (ISolVis == 1) {
                     for (int ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
                         blind.SolFrontDiffDiffTransGnd(ISlatAng) =
-                                DiffuseAverageProfAngGnd(blind.SolFrontBeamBeamTrans(ISlatAng, {1, Material::MaxProfAngs})) +
-                                DiffuseAverageProfAngGnd(blind.SolFrontBeamDiffTrans(ISlatAng, {1, Material::MaxProfAngs}));
+                            DiffuseAverageProfAngGnd(blind.SolFrontBeamBeamTrans(ISlatAng, {1, Material::MaxProfAngs})) +
+                            DiffuseAverageProfAngGnd(blind.SolFrontBeamDiffTrans(ISlatAng, {1, Material::MaxProfAngs}));
                         blind.SolFrontDiffDiffTransSky(ISlatAng) =
-                                DiffuseAverageProfAngSky(blind.SolFrontBeamBeamTrans(ISlatAng, {1, Material::MaxProfAngs})) +
-                                DiffuseAverageProfAngSky(blind.SolFrontBeamDiffTrans(ISlatAng, {1, Material::MaxProfAngs}));
+                            DiffuseAverageProfAngSky(blind.SolFrontBeamBeamTrans(ISlatAng, {1, Material::MaxProfAngs})) +
+                            DiffuseAverageProfAngSky(blind.SolFrontBeamDiffTrans(ISlatAng, {1, Material::MaxProfAngs}));
                         blind.SolFrontDiffAbsGnd(ISlatAng) = DiffuseAverageProfAngGnd(blind.SolFrontBeamAbs(ISlatAng, {1, Material::MaxProfAngs}));
                         blind.SolFrontDiffAbsSky(ISlatAng) = DiffuseAverageProfAngSky(blind.SolFrontBeamAbs(ISlatAng, {1, Material::MaxProfAngs}));
                         blind.SolFrontDiffDiffReflGnd(ISlatAng) =
-                                DiffuseAverageProfAngGnd(blind.SolFrontBeamDiffRefl(ISlatAng, {1, Material::MaxProfAngs}));
+                            DiffuseAverageProfAngGnd(blind.SolFrontBeamDiffRefl(ISlatAng, {1, Material::MaxProfAngs}));
                         blind.SolFrontDiffDiffReflSky(ISlatAng) =
-                                DiffuseAverageProfAngSky(blind.SolFrontBeamDiffRefl(ISlatAng, {1, Material::MaxProfAngs}));
+                            DiffuseAverageProfAngSky(blind.SolFrontBeamDiffRefl(ISlatAng, {1, Material::MaxProfAngs}));
 
                         // TH 2/17/2010. Added. Loop only for movable slat blinds
                         if (blind.SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
