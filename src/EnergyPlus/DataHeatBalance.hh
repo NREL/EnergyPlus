@@ -472,7 +472,6 @@ namespace DataHeatBalance {
         int spaceTypeNum = 0;                                  // Points to spaceType for this space
         EPVector<std::string> tags;                            // Optional tags for reporting
         EPVector<int> surfaces;                                // Pointers to surfaces in this space
-        Real64 calcFloorArea = 0.0;                            // Calculated floor area used for this space
         bool hasFloor = false;                                 // Has "Floor" surface
         Real64 fracZoneFloorArea = 0.0;                        // fraction of total floor area for all spaces in zone
         Real64 fracZoneVolume = 0.0;                           // fraction of total volume for all spaces in zone
@@ -586,7 +585,6 @@ namespace DataHeatBalance {
         // 2=Plenum Zone, 11=Solar Wall, 12=Roof Pond
         Real64 UserEnteredFloorArea = Constant::AutoCalculate; // User input floor area for this zone
         // Calculated after input
-        Real64 CalcFloorArea = 0.0;        // Calculated floor area excluding air boundary surfaces
         Real64 geometricFloorArea = 0.0;   // Calculated floor area including air boundary surfaces
         Real64 CeilingArea = 0.0;          // Ceiling area excluding air boundary surfaces
         Real64 geometricCeilingArea = 0.0; // Ceiling area area including air boundary surfaces
