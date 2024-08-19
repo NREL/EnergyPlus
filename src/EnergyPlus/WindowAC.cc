@@ -1011,7 +1011,7 @@ namespace WindowAC {
                 zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
                 if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                     CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-                    if (CapSizingMethod == HeatingDesignCapacity) {
+                    if (CapSizingMethod == CoolingDesignCapacity) {
                         if (zoneHVACSizing.ScaledCoolingCapacity > 0.0) {
                             zoneEqSizing.CoolingCapacity = true;
                             zoneEqSizing.DesCoolingLoad = zoneHVACSizing.ScaledCoolingCapacity;
