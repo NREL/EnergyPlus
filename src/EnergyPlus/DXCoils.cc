@@ -16882,7 +16882,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
         }
 
         // If cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
-        if (fanOp == HVAC::FanOp::Cycling) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
+        if (fanOp == HVAC::FanOp::Cycling) state.dataHVACGlobal->OnOffFanPartLoadFraction = thisDXCoil.CoolingCoilRuntimeFraction;
 
         // Check for saturation error and modify temperature at constant enthalpy
         if (OutletAirTemp < PsyTsatFnHPb(state, OutletAirEnthalpy, OutdoorPressure)) {
