@@ -7328,11 +7328,11 @@ namespace Window {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Array1D<Real64> bld_pr(15);     // Slat properties
-        Array1D<Real64> st_lay(16);     // Solar-optical blind/glazing system properties
-        Real64 sun_el;                  // Solar profile angle (radians)
-        Array1D<Real64> sun_el_deg(37); // Solar profile angle (deg) corresponding to sun_el values
-        Real64 bld_el;                  // Slat angle (elevation of slat normal vector in plane
+        Array1D<Real64> bld_pr(15);                        // Slat properties
+        Array1D<Real64> st_lay(16);                        // Solar-optical blind/glazing system properties
+        Real64 sun_el;                                     // Solar profile angle (radians)
+        Array1D<Real64> sun_el_deg(Material::MaxProfAngs); // Solar profile angle (deg) corresponding to sun_el values
+        Real64 bld_el;                                     // Slat angle (elevation of slat normal vector in plane
         //  perpendicular to window and containing the slat normal vector) (radians)
 
         auto &s_mat = state.dataMaterial;
@@ -7405,7 +7405,7 @@ namespace Window {
                     }
 
 
-                    // Calculate beam properties of matBlind-> Vary profile angle from -90 to +90 deg in 5-deg steps.
+
                     // If blind has variable slat angle, vary slat angle from 0 to 180 deg in 10-deg steps
                     // (for Material::MaxSlatAngs = 19). If blind has fixed slat angle, calculate properties at that angle only.
                     
@@ -7443,6 +7443,7 @@ namespace Window {
                 }     // End of loop over profile angles
 
                 if (ISolVis == 1) {
+
                     for (int iSlatAng = 0; iSlatAng < Material::MaxSlatAngs; ++iSlatAng) {
                         auto &btar = matBlind->TARs[iSlatAng];
                         
@@ -8376,7 +8377,7 @@ namespace Window {
         // Linear interpolation.
 
         // Argument array dimensioning
-        PropArray.dim(Material::MaxSlatAngs, 37);
+        PropArray.dim(Material::MaxSlatAngs, Material::MaxProfAngs);
 
         Real64 SlatAng1 = std::clamp(SlatAng, 0.0, Constant::Pi);
 
@@ -8396,14 +8397,14 @@ namespace Window {
             Real64 SlatAngRatio = (SlatAng1 - (IBeta - 1) * DeltaSlatAng) / DeltaSlatAng; // Slat angle interpolation factor
             Val1 = PropArray(IBeta, IAlpha); // Property values at points enclosing the given ProfAngle and SlatAngle
             Val2 = PropArray(min(Material::MaxSlatAngs, IBeta + 1), IAlpha);
-            Real64 Val3 = PropArray(IBeta, min(37, IAlpha + 1));
-            Real64 Val4 = PropArray(min(Material::MaxSlatAngs, IBeta + 1), min(37, IAlpha + 1));
+            Real64 Val3 = PropArray(IBeta, min(Material::MaxProfAngs, IAlpha + 1));
+            Real64 Val4 = PropArray(min(Material::MaxSlatAngs, IBeta + 1), min(Material::MaxProfAngs, IAlpha + 1));
             Real64 ValA = Val1 + SlatAngRatio * (Val2 - Val1); // Property values at given SlatAngle to be interpolated in profile angle
             Real64 ValB = Val3 + SlatAngRatio * (Val4 - Val3);
             return ValA + ProfAngRatio * (ValB - ValA);
         } else { // Fixed-angle slats: interpolate only in profile angle
             Val1 = PropArray(1, IAlpha);
-            Val2 = PropArray(1, min(37, IAlpha + 1));
+            Val2 = PropArray(1, min(Material::MaxProfAngs, IAlpha + 1));
             return Val1 + ProfAngRatio * (Val2 - Val1);
         }
     } // InterpProfSlatAng()

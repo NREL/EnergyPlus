@@ -2816,7 +2816,8 @@ namespace SurfaceGeometry {
 
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
             auto &thisSurf = Surfaces(surfNum);
-            if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
+            if (!thisSurf.HeatTransSurf) continue;                               // ignore shading surfaces
+            if (thisSurf.Class == DataSurfaces::SurfaceClass::IntMass) continue; // skip internal mass surfaces for this check
             if (thisSurf.BaseSurf != surfNum) {
                 // Set space for subsurfaces
                 thisSurf.spaceNum = Surfaces(thisSurf.BaseSurf).spaceNum;
@@ -7176,7 +7177,8 @@ namespace SurfaceGeometry {
                 state.dataSurface->IntMassObjects(Item).NumOfZones = state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
                 state.dataSurface->IntMassObjects(Item).ZoneListActive = true;
                 state.dataSurface->IntMassObjects(Item).ZoneOrZoneListPtr = ZLItem;
-            } else {
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                // If Space or SpaceList Name is blank, then throw error.
                 ShowSevereError(state,
                                 format("{}=\"{}\" invalid {}=\"{}\" not found.",
                                        s_ipsc->cCurrentModuleObject,
@@ -7201,19 +7203,9 @@ namespace SurfaceGeometry {
                     state.dataSurface->IntMassObjects(Item).numOfSpaces = 1;
                     state.dataSurface->IntMassObjects(Item).spaceListActive = false;
                     state.dataSurface->IntMassObjects(Item).spaceOrSpaceListPtr = Item1;
-                    if (!state.dataSurface->IntMassObjects(Item).ZoneListActive) {
-                        if (state.dataHeatBal->space(Item1).zoneNum != state.dataSurface->IntMassObjects(Item).ZoneOrZoneListPtr) {
-                            ShowSevereError(state,
-                                            format("{}=\"{}\" invalid {}=\"{}\" is not part of Zone =\"{}\".",
-                                                   s_ipsc->cCurrentModuleObject,
-                                                   s_ipsc->cAlphaArgs(1),
-                                                   s_ipsc->cAlphaFieldNames(4),
-                                                   s_ipsc->cAlphaArgs(4),
-                                                   s_ipsc->cAlphaArgs(3)));
-                            ErrorsFound = true;
-                            errFlag = true;
-                        }
-                    }
+                    state.dataSurface->IntMassObjects(Item).NumOfZones = 1;
+                    state.dataSurface->IntMassObjects(Item).ZoneListActive = false;
+                    state.dataSurface->IntMassObjects(Item).ZoneOrZoneListPtr = state.dataHeatBal->space(Item1).zoneNum;
                 } else if (SLItem > 0) {
                     int numOfSpaces = int(state.dataHeatBal->spaceList(SLItem).numListSpaces);
                     NumIntMassSurfaces += numOfSpaces;

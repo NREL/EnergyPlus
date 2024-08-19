@@ -3917,7 +3917,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
 
 #ifdef EP_NO_OPENGL
     EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
-    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0;
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
     EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
 #else
     if (!Penumbra::Penumbra::is_valid_context()) {
@@ -6204,7 +6204,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
 #ifdef EP_NO_OPENGL
     std::string const error_string = delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
                                                        "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate.",
-                                                       "   ** Warning ** No GPU found (required for PixelCounting)",
+                                                       "   ** Warning ** ShadowCalculation: invalid Shading Calculation Method",
+                                                       "   **   ~~~   ** Value entered=\"PixelCounting\"",
+                                                       "   **   ~~~   ** This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)",
                                                        "   **   ~~~   ** PolygonClipping will be used instead"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
