@@ -952,6 +952,7 @@ namespace UnitarySystems {
 
     int getDesignSpecMSHPIndex(EnergyPlusData &state, std::string_view objectName);
     int getUnitarySystemIndex(EnergyPlusData &state, std::string_view objectName);
+    bool getUnitarySystemNodeNumber(EnergyPlusData &state, int const nodeNumber);
 
     bool searchZoneInletNodes(EnergyPlusData &state, int nodeToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
@@ -965,6 +966,9 @@ namespace UnitarySystems {
                                int &airLoopIndex);
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
     void isWaterCoilHeatRecoveryType(EnergyPlusData const &state, int const waterCoilNodeNum, bool &nodeNotFound);
+
+    int
+    getZoneEqIndex(EnergyPlusData &state, std::string const &UnitarySysName, DataZoneEquipment::ZoneEquipType zoneEquipType, int const OAUnitNum = 0);
 
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct

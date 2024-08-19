@@ -117,7 +117,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataFans = std::make_unique<FansData>();
     this->dataFaultsMgr = std::make_unique<FaultsManagerData>();
     this->dataFluidCoolers = std::make_unique<FluidCoolersData>();
-    this->dataFluidProps = std::make_unique<FluidPropertiesData>();
+    this->dataFluidProps = std::make_unique<FluidData>();
     this->dataFourPipeBeam = std::make_unique<FourPipeBeamData>();
     this->dataFuelCellElectGen = std::make_unique<FuelCellElectricGeneratorData>();
     this->dataFurnaces = std::make_unique<FurnacesData>();
@@ -567,6 +567,7 @@ void EnergyPlusData::clear_state()
     this->files.shade.close();
     this->files.ssz.close();
     this->files.zsz.close();
+    this->files.spsz.close();
 }
 
 void EnergyPlusData::init_state(EnergyPlusData &state)

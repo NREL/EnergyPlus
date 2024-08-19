@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/SingleDuct.hh>
@@ -319,47 +320,48 @@ namespace HVACVariableRefrigerantFlow {
         int HeatEIRFPLRErrorIndex = 0; // warning message index
         int CoolEIRFPLRErrorIndex = 0; // warning message index
         // The following are for the Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
-        int AlgorithmIUCtrl;              // VRF indoor unit contrl algorithm, 1-High sensible, 2-Te/Tc constant
-        Array1D<Real64> CompressorSpeed;  // compressor speed array [rps]
-        Real64 CondensingTemp;            // VRV system outdoor unit condensing temperature [C]
-        Real64 CondTempFixed;             // Inddor unit condensing temperature, fixed, for AlgorithmIUCtrl is 2-Te/Tc constant [C]
-        Real64 CoffEvapCap;               // Evaporative Capacity Correction Factor
-        Real64 CompActSpeed;              // Compressor speed [rps]
-        Real64 CompMaxDeltaP;             // maximum compressor pressure rise [Pa]
-        Real64 C1Te;                      // VRF Outdoor Unit Coefficient 1 to calculate Te,req [--]
-        Real64 C2Te;                      // VRF Outdoor Unit Coefficient 2 to calculate Te,req [--]
-        Real64 C3Te;                      // VRF Outdoor Unit Coefficient 3 to calculate Te,req [--]
-        Real64 C1Tc;                      // VRF Outdoor Unit Coefficient 1 to calculate Tc,req [--]
-        Real64 C2Tc;                      // VRF Outdoor Unit Coefficient 2 to calculate Tc,req [--]
-        Real64 C3Tc;                      // VRF Outdoor Unit Coefficient 3 to calculate Tc,req [--]
-        Real64 DiffOUTeTo;                // Difference between Outdoor Unit Te and OAT during Simultaneous Heating and Cooling operations
-        Real64 EffCompInverter;           // Compressor Inverter Efficiency
-        Real64 EvaporatingTemp;           // VRV system outdoor unit evaporating temperature [C]
-        Real64 EvapTempFixed;             // Indoor unit evaporating temperature, fixed, for AlgorithmIUCtrl is 2-Te/Tc constant [C]
-        Real64 HROUHexRatio;              // HR OU Heat Exchanger Capacity Ratio [--]
-        Real64 IUEvaporatingTemp;         // VRV system indoor unit evaporating temperature, min among all indoor units [C]
-        Real64 IUCondensingTemp;          // VRV system indoor unit condensing temperature, max among all indoor units [C]
-        Real64 IUEvapTempLow;             // VRV system indoor unit evaporating temperature, lower bound[C]
-        Real64 IUEvapTempHigh;            // VRV system indoor unit evaporating temperature, higher bound [C]
-        Real64 IUCondTempLow;             // VRV system indoor unit condensing temperature, lower bound [C]
-        Real64 IUCondTempHigh;            // VRV system indoor unit condensing temperature, higher bound [C]
-        Real64 IUCondHeatRate;            // Indoor Unit Condensers Total Heat Release Rate, excluding piping loss  [W]
-        Real64 IUEvapHeatRate;            // Outdoor Unit Evaporators Total Heat Extract Rate, excluding piping loss  [W]
-        Real64 Ncomp;                     // compressor electric power [W]
-        Real64 NcompCooling;              // compressor electric power at cooling mode [W]
-        Real64 NcompHeating;              // compressor electric power at heating mode [W]
-        Array1D_int OUCoolingCAPFT;       // index to outdoor unit cooling capacity function of temperature at different compressor speed
-        Array1D_int OUCoolingPWRFT;       // index to outdoor unit cooling power function of temperature at different compressor speed
-        Real64 OUEvapTempLow;             // VRV system outdoor unit evaporating temperature, lower bound[C]
-        Real64 OUEvapTempHigh;            // VRV system outdoor unit evaporating temperature, higher bound [C]
-        Real64 OUCondTempLow;             // VRV system outdoor unit condensing temperature, lower bound [C]
-        Real64 OUCondTempHigh;            // VRV system outdoor unit condensing temperature, higher bound [C]
-        Real64 OUAirFlowRate;             // Max condenser air flow rate [m3/s]
-        Real64 OUAirFlowRatePerCapcity;   // Max condenser air flow rate per Evaporative Capacity [m3/s]
-        Real64 OUCondHeatRate;            // Outdoor Unit Condenser Heat Release Rate, excluding piping loss [W]
-        Real64 OUEvapHeatRate;            // Outdoor Unit Evaporator Heat Extract Rate, excluding piping loss  [W]
-        Real64 OUFanPower;                // Outdoor unit fan power at real conditions[W]
-        std::string RefrigerantName;      // Name of refrigerant, must match name in FluidName (see fluidpropertiesrefdata.idf)
+        int AlgorithmIUCtrl;             // VRF indoor unit contrl algorithm, 1-High sensible, 2-Te/Tc constant
+        Array1D<Real64> CompressorSpeed; // compressor speed array [rps]
+        Real64 CondensingTemp;           // VRV system outdoor unit condensing temperature [C]
+        Real64 CondTempFixed;            // Inddor unit condensing temperature, fixed, for AlgorithmIUCtrl is 2-Te/Tc constant [C]
+        Real64 CoffEvapCap;              // Evaporative Capacity Correction Factor
+        Real64 CompActSpeed;             // Compressor speed [rps]
+        Real64 CompMaxDeltaP;            // maximum compressor pressure rise [Pa]
+        Real64 C1Te;                     // VRF Outdoor Unit Coefficient 1 to calculate Te,req [--]
+        Real64 C2Te;                     // VRF Outdoor Unit Coefficient 2 to calculate Te,req [--]
+        Real64 C3Te;                     // VRF Outdoor Unit Coefficient 3 to calculate Te,req [--]
+        Real64 C1Tc;                     // VRF Outdoor Unit Coefficient 1 to calculate Tc,req [--]
+        Real64 C2Tc;                     // VRF Outdoor Unit Coefficient 2 to calculate Tc,req [--]
+        Real64 C3Tc;                     // VRF Outdoor Unit Coefficient 3 to calculate Tc,req [--]
+        Real64 DiffOUTeTo;               // Difference between Outdoor Unit Te and OAT during Simultaneous Heating and Cooling operations
+        Real64 EffCompInverter;          // Compressor Inverter Efficiency
+        Real64 EvaporatingTemp;          // VRV system outdoor unit evaporating temperature [C]
+        Real64 EvapTempFixed;            // Indoor unit evaporating temperature, fixed, for AlgorithmIUCtrl is 2-Te/Tc constant [C]
+        Real64 HROUHexRatio;             // HR OU Heat Exchanger Capacity Ratio [--]
+        Real64 IUEvaporatingTemp;        // VRV system indoor unit evaporating temperature, min among all indoor units [C]
+        Real64 IUCondensingTemp;         // VRV system indoor unit condensing temperature, max among all indoor units [C]
+        Real64 IUEvapTempLow;            // VRV system indoor unit evaporating temperature, lower bound[C]
+        Real64 IUEvapTempHigh;           // VRV system indoor unit evaporating temperature, higher bound [C]
+        Real64 IUCondTempLow;            // VRV system indoor unit condensing temperature, lower bound [C]
+        Real64 IUCondTempHigh;           // VRV system indoor unit condensing temperature, higher bound [C]
+        Real64 IUCondHeatRate;           // Indoor Unit Condensers Total Heat Release Rate, excluding piping loss  [W]
+        Real64 IUEvapHeatRate;           // Outdoor Unit Evaporators Total Heat Extract Rate, excluding piping loss  [W]
+        Real64 Ncomp;                    // compressor electric power [W]
+        Real64 NcompCooling;             // compressor electric power at cooling mode [W]
+        Real64 NcompHeating;             // compressor electric power at heating mode [W]
+        Array1D_int OUCoolingCAPFT;      // index to outdoor unit cooling capacity function of temperature at different compressor speed
+        Array1D_int OUCoolingPWRFT;      // index to outdoor unit cooling power function of temperature at different compressor speed
+        Real64 OUEvapTempLow;            // VRV system outdoor unit evaporating temperature, lower bound[C]
+        Real64 OUEvapTempHigh;           // VRV system outdoor unit evaporating temperature, higher bound [C]
+        Real64 OUCondTempLow;            // VRV system outdoor unit condensing temperature, lower bound [C]
+        Real64 OUCondTempHigh;           // VRV system outdoor unit condensing temperature, higher bound [C]
+        Real64 OUAirFlowRate;            // Max condenser air flow rate [m3/s]
+        Real64 OUAirFlowRatePerCapcity;  // Max condenser air flow rate per Evaporative Capacity [m3/s]
+        Real64 OUCondHeatRate;           // Outdoor Unit Condenser Heat Release Rate, excluding piping loss [W]
+        Real64 OUEvapHeatRate;           // Outdoor Unit Evaporator Heat Extract Rate, excluding piping loss  [W]
+        Real64 OUFanPower;               // Outdoor unit fan power at real conditions[W]
+        std::string refrigName;          // Name of refrigerant, must match name in FluidName (see fluidpropertiesrefdata.idf)
+        FluidProperties::RefrigProps *refrig;
         Real64 RatedEvapCapacity;         // Rated Evaporative Capacity [W]
         Real64 RatedHeatCapacity;         // Rated Heating Capacity [W]
         Real64 RatedCompPower;            // Rated Compressor Power [W]
@@ -929,6 +931,8 @@ namespace HVACVariableRefrigerantFlow {
     void getVRFTUZoneLoad(
         EnergyPlusData &state, int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP, bool const InitFlag);
 
+    bool getVRFTUNodeNumber(EnergyPlusData &state, int const nodeNumber);
+
     void ReportVRFTerminalUnit(EnergyPlusData &state, int VRFTUNum); // index to VRF terminal unit
 
     void ReportVRFCondenser(EnergyPlusData &state, int VRFCond); // index to VRF condensing unit
@@ -973,6 +977,8 @@ namespace HVACVariableRefrigerantFlow {
                                    int CAPFT,
                                    Real64 const T_suc // Compressor suction temperature Te' [C]
     );
+
+    int getEqIndex(EnergyPlusData &state, std::string_view VRFTUName);
 
 } // namespace HVACVariableRefrigerantFlow
 

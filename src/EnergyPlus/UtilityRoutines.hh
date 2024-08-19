@@ -196,6 +196,12 @@ void ShowWarningMessage(EnergyPlusData &state,
                         OptionalOutputFileRef OutUnit1 = {},
                         OptionalOutputFileRef OutUnit2 = {});
 
+void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
+                                   std::string const &Message, // Message automatically written to "error file" at end of simulation
+                                   int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                   Real64 const val,           // Track and report the max of the values passed to this argument
+                                   std::string const &units);
+
 void ShowRecurringSevereErrorAtEnd(
     EnergyPlusData &state,
     std::string const &Message,                        // Message automatically written to "error file" at end of simulation
@@ -206,6 +212,13 @@ void ShowRecurringSevereErrorAtEnd(
     std::string const &ReportMaxUnits = "",            // optional char string (<=15 length) of units for max value
     std::string const &ReportMinUnits = "",            // optional char string (<=15 length) of units for min value
     std::string const &ReportSumUnits = ""             // optional char string (<=15 length) of units for sum value
+);
+
+void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
+                                    std::string const &Message, // Message automatically written to "error file" at end of simulation
+                                    int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                    Real64 const val,
+                                    std::string const &units // optional char string (<=15 length) of units for sum value
 );
 
 void ShowRecurringWarningErrorAtEnd(
@@ -252,6 +265,12 @@ void ShowErrorMessage(EnergyPlusData &state,
 void SummarizeErrors(EnergyPlusData &state);
 
 void ShowRecurringErrors(EnergyPlusData &state);
+
+struct ErrorCountIndex
+{
+    int index = 0;
+    int count = 0;
+};
 
 struct ErrorObjectHeader
 {

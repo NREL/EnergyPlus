@@ -991,7 +991,7 @@ if(BUILD_TESTING)
                    -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw -P ${PROJECT_SOURCE_DIR}/cmake/RunCallbackTest.cmake)
 
   set(EPW_FILE "${PROJECT_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
-  set(IDF_FILE "${PROJECT_SOURCE_DIR}/testfiles/1ZoneUncontrolled.idf")
+  set(IDF_FILE "${PROJECT_SOURCE_DIR}/testfiles/_1ZoneUncontrolled_ForAPITesting.idf")
 
   add_executable(TestAPI_Functional_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.c)
   #  project_warnings is essentially a C++ interface, and not included here because this is C, not C++
@@ -1149,4 +1149,10 @@ if(UNIX AND NOT APPLE)
       COMMAND size $<TARGET_FILE:energyplusapi> > "${PROJECT_BINARY_DIR}/performance_tests/size.energyplusapi"
       )
   endif()
+endif()
+
+if(APPLE AND CPACK_CODESIGNING_DEVELOPPER_ID_APPLICATION)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/CodeSigning.cmake")
+  register_install_codesign_target(energyplus ".")
+  register_install_codesign_target(energyplusapi ".")
 endif()
