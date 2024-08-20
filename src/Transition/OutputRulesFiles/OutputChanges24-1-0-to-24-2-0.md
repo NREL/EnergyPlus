@@ -50,11 +50,12 @@ Temperature
 
 The EIO and html tabular output files now have a seprate heading and data stream for DX Heating Coils with the AHRI 2023 and prior versions.
 
+```
 ! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number
 ! <DX Heating Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF2 {Btu/W-h}, Region Number
+```
 
-
-### Euipment Summary Report 
+### Equipment Summary Report 
 
 Renamed a table name in the Equipment Summary report:
 
@@ -115,8 +116,12 @@ In the Demand Controlled Ventilation table added the "type"
 
 Added an entirely new table called Thermostat Schedules
 
-## New HVAC Topology report in Tabular Reports
+### New HVAC Topology report in Tabular Reports
 
 The HVAC Topology report provides information about the arrangement of HVAC components in the supply and demand side of the airloop, zone equipment, and plant loop. Each row shows the additional component, sub-component, or sub-sub-component being added to the arrangement. 
 
+### New Space Sizing Output File (spsz)
+When space sizing is active (ZoneAirHeatBalanceAlgorithm, "Do Space Heat Balance for Sizing=Yes") a new space sizing (spsz) output file is created, similar to the existing zone sizing (zsz) output. A new field "Output Space Sizing" has been added to OutputControl:Files to control this file.
+
+See pull request [#10566](https://github.com/NREL/EnergyPlus/pull/10566) for more details.
 
