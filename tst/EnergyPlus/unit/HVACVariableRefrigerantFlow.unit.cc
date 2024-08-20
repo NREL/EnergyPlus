@@ -25525,4 +25525,204 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_HeatRecoveryCheck)
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(vrf3).HeatRecoveryUsed);
 }
 
+TEST_F(EnergyPlusFixture, VRFTest_initCapSizingVars)
+{
+    // Test for #10638
+    using namespace DataSizing;
+    using HVAC::AutoCalculateSizing;
+    using HVAC::CoolingCapacitySizing;
+    using HVAC::HeatingCapacitySizing;
+
+    int testSizingMethod;
+    int testCapSizingMethod;
+    int testEqSizingMethod;
+    Real64 testScaledCapacity;
+    bool testModeCapacity;
+    Real64 testDesignLoad;
+    bool testScalableCapSizingOn;
+    Real64 testFracOfAutosizedCapacity;
+    Real64 allowedTolerance = 0.0001;
+    int expectedEqSizingMethod;
+    Real64 expectedScaledCapacity;
+    Real64 expectedDesignLoad;
+    Real64 expectedFracOfAutosizedCapacity;
+
+    state->dataSize->DataZoneNumber = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).FloorArea = 2.0;
+
+    // Test 1: no valid sizing chosen--nothing changes from what things are previously set to
+    testSizingMethod = AutoCalculateSizing;
+    testCapSizingMethod = None;
+    testEqSizingMethod = -1;
+    testScaledCapacity = 12.0;
+    testModeCapacity = false;
+    testDesignLoad = 123.0;
+    testScalableCapSizingOn = false;
+    testFracOfAutosizedCapacity = 1234.0;
+    expectedScaledCapacity = 12.0;
+    expectedDesignLoad = 123.0;
+    expectedFracOfAutosizedCapacity = 1234.0;
+    initCapSizingVars(*state,
+                      testSizingMethod,
+                      testCapSizingMethod,
+                      testEqSizingMethod,
+                      testScaledCapacity,
+                      testModeCapacity,
+                      testDesignLoad,
+                      testScalableCapSizingOn,
+                      testFracOfAutosizedCapacity);
+    EXPECT_FALSE(testModeCapacity);
+    EXPECT_FALSE(testScalableCapSizingOn);
+    EXPECT_EQ(testEqSizingMethod, None);
+    EXPECT_NEAR(testScaledCapacity, expectedScaledCapacity, allowedTolerance);
+    EXPECT_NEAR(testDesignLoad, expectedDesignLoad, allowedTolerance);
+    EXPECT_NEAR(testFracOfAutosizedCapacity, expectedFracOfAutosizedCapacity, allowedTolerance);
+
+    // Test 2a: CoolingCapacitySizing with CoolingDesignCapacity--set ModeCapacity to true and DesignLoad to ScaledCapacity
+    testSizingMethod = CoolingCapacitySizing;
+    testCapSizingMethod = CoolingDesignCapacity;
+    testEqSizingMethod = -1;
+    testScaledCapacity = 12.0;
+    testModeCapacity = false;
+    testDesignLoad = 123.0;
+    testScalableCapSizingOn = false;
+    testFracOfAutosizedCapacity = 1234.0;
+    expectedScaledCapacity = 12.0;
+    expectedDesignLoad = 12.0;
+    expectedFracOfAutosizedCapacity = 1234.0;
+    expectedEqSizingMethod = CoolingDesignCapacity;
+    initCapSizingVars(*state,
+                      testSizingMethod,
+                      testCapSizingMethod,
+                      testEqSizingMethod,
+                      testScaledCapacity,
+                      testModeCapacity,
+                      testDesignLoad,
+                      testScalableCapSizingOn,
+                      testFracOfAutosizedCapacity);
+    EXPECT_TRUE(testModeCapacity);
+    EXPECT_FALSE(testScalableCapSizingOn);
+    EXPECT_EQ(testEqSizingMethod, expectedEqSizingMethod);
+    EXPECT_NEAR(testScaledCapacity, expectedScaledCapacity, allowedTolerance);
+    EXPECT_NEAR(testDesignLoad, expectedDesignLoad, allowedTolerance);
+    EXPECT_NEAR(testFracOfAutosizedCapacity, expectedFracOfAutosizedCapacity, allowedTolerance);
+
+    // Test 2b: HeatingCapacitySizing with HeatingDesignCapacity--set ModeCapacity to true and DesignLoad to ScaledCapacity
+    testSizingMethod = HeatingCapacitySizing;
+    testCapSizingMethod = HeatingDesignCapacity;
+    testEqSizingMethod = -1;
+    testScaledCapacity = 12.0;
+    testModeCapacity = false;
+    testDesignLoad = 123.0;
+    testScalableCapSizingOn = false;
+    testFracOfAutosizedCapacity = 1234.0;
+    expectedScaledCapacity = 12.0;
+    expectedDesignLoad = 12.0;
+    expectedFracOfAutosizedCapacity = 1234.0;
+    expectedEqSizingMethod = HeatingDesignCapacity;
+    initCapSizingVars(*state,
+                      testSizingMethod,
+                      testCapSizingMethod,
+                      testEqSizingMethod,
+                      testScaledCapacity,
+                      testModeCapacity,
+                      testDesignLoad,
+                      testScalableCapSizingOn,
+                      testFracOfAutosizedCapacity);
+    EXPECT_TRUE(testModeCapacity);
+    EXPECT_FALSE(testScalableCapSizingOn);
+    EXPECT_EQ(testEqSizingMethod, expectedEqSizingMethod);
+    EXPECT_NEAR(testScaledCapacity, expectedScaledCapacity, allowedTolerance);
+    EXPECT_NEAR(testDesignLoad, expectedDesignLoad, allowedTolerance);
+    EXPECT_NEAR(testFracOfAutosizedCapacity, expectedFracOfAutosizedCapacity, allowedTolerance);
+
+    // Test 3: CapacityPerFloorArea (both heating and cooling are the same)--set ModeCapacity and scalable to true and DesignLoad to ScaledCapacity
+    testSizingMethod = HeatingCapacitySizing;
+    testCapSizingMethod = CapacityPerFloorArea;
+    testEqSizingMethod = -1;
+    testScaledCapacity = 12.0;
+    testModeCapacity = false;
+    testDesignLoad = 123.0;
+    testScalableCapSizingOn = false;
+    testFracOfAutosizedCapacity = 1234.0;
+    expectedScaledCapacity = 12.0;
+    expectedDesignLoad = 24.0;
+    expectedFracOfAutosizedCapacity = 1234.0;
+    expectedEqSizingMethod = CapacityPerFloorArea;
+    initCapSizingVars(*state,
+                      testSizingMethod,
+                      testCapSizingMethod,
+                      testEqSizingMethod,
+                      testScaledCapacity,
+                      testModeCapacity,
+                      testDesignLoad,
+                      testScalableCapSizingOn,
+                      testFracOfAutosizedCapacity);
+    EXPECT_TRUE(testModeCapacity);
+    EXPECT_TRUE(testScalableCapSizingOn);
+    EXPECT_EQ(testEqSizingMethod, expectedEqSizingMethod);
+    EXPECT_NEAR(testScaledCapacity, expectedScaledCapacity, allowedTolerance);
+    EXPECT_NEAR(testDesignLoad, expectedDesignLoad, allowedTolerance);
+    EXPECT_NEAR(testFracOfAutosizedCapacity, expectedFracOfAutosizedCapacity, allowedTolerance);
+
+    // Test 4a: CoolingCapacitySizing with FractionOfAutosizedCoolingCapacity--set ModeCapacity to true and DesignLoad to ScaledCapacity
+    testSizingMethod = CoolingCapacitySizing;
+    testCapSizingMethod = FractionOfAutosizedCoolingCapacity;
+    testEqSizingMethod = -1;
+    testScaledCapacity = 12.0;
+    testModeCapacity = false;
+    testDesignLoad = 123.0;
+    testScalableCapSizingOn = false;
+    testFracOfAutosizedCapacity = 1234.0;
+    expectedScaledCapacity = 12.0;
+    expectedDesignLoad = 123.0;
+    expectedFracOfAutosizedCapacity = 12.0;
+    expectedEqSizingMethod = FractionOfAutosizedCoolingCapacity;
+    initCapSizingVars(*state,
+                      testSizingMethod,
+                      testCapSizingMethod,
+                      testEqSizingMethod,
+                      testScaledCapacity,
+                      testModeCapacity,
+                      testDesignLoad,
+                      testScalableCapSizingOn,
+                      testFracOfAutosizedCapacity);
+    EXPECT_FALSE(testModeCapacity);
+    EXPECT_TRUE(testScalableCapSizingOn);
+    EXPECT_EQ(testEqSizingMethod, expectedEqSizingMethod);
+    EXPECT_NEAR(testScaledCapacity, expectedScaledCapacity, allowedTolerance);
+    EXPECT_NEAR(testDesignLoad, expectedDesignLoad, allowedTolerance);
+    EXPECT_NEAR(testFracOfAutosizedCapacity, expectedFracOfAutosizedCapacity, allowedTolerance);
+
+    // Test 4b: HeatingCapacitySizing with FractionOfAutosizedHeatingCapacity--set ModeCapacity to true and DesignLoad to ScaledCapacity
+    testSizingMethod = HeatingCapacitySizing;
+    testCapSizingMethod = FractionOfAutosizedHeatingCapacity;
+    testEqSizingMethod = -1;
+    testScaledCapacity = 12.0;
+    testModeCapacity = false;
+    testDesignLoad = 123.0;
+    testScalableCapSizingOn = false;
+    testFracOfAutosizedCapacity = 1234.0;
+    expectedScaledCapacity = 12.0;
+    expectedDesignLoad = 123.0;
+    expectedFracOfAutosizedCapacity = 12.0;
+    expectedEqSizingMethod = FractionOfAutosizedHeatingCapacity;
+    initCapSizingVars(*state,
+                      testSizingMethod,
+                      testCapSizingMethod,
+                      testEqSizingMethod,
+                      testScaledCapacity,
+                      testModeCapacity,
+                      testDesignLoad,
+                      testScalableCapSizingOn,
+                      testFracOfAutosizedCapacity);
+    EXPECT_FALSE(testModeCapacity);
+    EXPECT_TRUE(testScalableCapSizingOn);
+    EXPECT_EQ(testEqSizingMethod, expectedEqSizingMethod);
+    EXPECT_NEAR(testScaledCapacity, expectedScaledCapacity, allowedTolerance);
+    EXPECT_NEAR(testDesignLoad, expectedDesignLoad, allowedTolerance);
+    EXPECT_NEAR(testFracOfAutosizedCapacity, expectedFracOfAutosizedCapacity, allowedTolerance);
+}
+
 } // end of namespace EnergyPlus
