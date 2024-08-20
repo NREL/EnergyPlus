@@ -2641,8 +2641,6 @@ namespace WindowComplexManager {
 
         int ZoneNum; // Zone number corresponding to SurfNum
 
-        int i;
-
         int TotLay; // Total number of layers in a construction
         //   (sum of solid layers and gap layers)
         int Lay;                  // Layer number
@@ -2692,18 +2690,12 @@ namespace WindowComplexManager {
         int CalcSHGC(0);              // SHGC calculations are not necessary for E+ run
         int NumOfIterations(0);
 
-        int ICoeff;
-
         std::string tarcogErrorMessage; // store error text from tarcog
 
         // Simon: locally used variables
         int ngllayer;
         int nglface;
         int nglfacep;
-        int TempInt;
-        int PillarPtr;
-        int DeflectionPtr;
-        int GasPointer;
         int ThermalModelNum;
         Real64 rmir; // IR radiance of window's interior surround (W/m2)
         Real64 outir;

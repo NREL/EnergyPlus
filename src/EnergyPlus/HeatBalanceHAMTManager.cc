@@ -174,8 +174,6 @@ namespace HeatBalanceHAMTManager {
 
         Array1D<Real64> NumArray;
 
-        Real64 dumrh;
-        Real64 dumdata;
         Real64 avdata;
 
         int MaxNums;
@@ -189,8 +187,6 @@ namespace HeatBalanceHAMTManager {
         int HAMTitems;
         int vtcsid;
 
-        bool avflag;
-        bool isoerrrise;
         bool ErrorsFound;
 
         auto &s_ip = state.dataInputProcessing->inputProcessor;
@@ -714,14 +710,14 @@ namespace HeatBalanceHAMTManager {
                     ++errorCount;
                 }
                 if (matHAMT->nsuc < 0) {
-                    ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
+                    ShowSevereError(state, format("{}Construction={}", RoutineName, constr.Name));
                     ShowContinueError(
                         state,
                         format("Reference Material=\"{}\" does not have required liquid transport coefficient (suction) data.", mat->Name));
                     ++errorCount;
                 }
                 if (matHAMT->nred < 0) {
-                    ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
+                    ShowSevereError(state, format("{}Construction={}", RoutineName, constr.Name));
                     ShowContinueError(state,
                                       format("Reference Material=\"{}\" does not have required liquid transport coefficient (redistribution) data.",
                                              mat->Name));

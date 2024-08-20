@@ -7658,8 +7658,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfShade.blind.matNum));
                     assert(matBlind != nullptr);
                     
-                    Real64 ProfAng = ProfileAngle(state, IWin, s_surf->SurfSunCosHourly(IHR), matBlind->SlatOrientation);
-                    // Are these really cached?
+                    // These are "cached" in the surfShade struct
                     auto &btar = surfShade.blind.TAR;
                     int idxLo = surfShade.blind.profAngIdxLo;
                     int idxHi = surfShade.blind.profAngIdxHi;

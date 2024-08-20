@@ -1359,7 +1359,6 @@ namespace HeatBalanceManager {
         //  Window5 data file
         bool EOFonW5File;                   // True if EOF encountered reading Window5 data file
 
-        int iMatGlass; // number of glass layers
         Array1D_string WConstructNames;
 
         auto &s_ipsc = state.dataIPShortCut;
@@ -1493,7 +1492,6 @@ namespace HeatBalanceManager {
                     assert(matGlassTC != nullptr);
                     
                     thisConstruct.LayerPoint(Layer) = matGlassTC->matRefs(1).matNum;
-                    if (s_mat->materials(thisConstruct.LayerPoint(Layer))->group == Material::Group::Glass) ++iMatGlass;
                     thisConstruct.isTCWindow = true;
                     thisConstruct.isTCMaster = true;
                     thisConstruct.TCMasterConstrNum = ConstrNum;

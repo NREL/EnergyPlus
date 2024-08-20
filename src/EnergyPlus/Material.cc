@@ -135,11 +135,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     int NumAlphas;              // Number of material alpha names being passed
     int NumNums;               // Number of material properties being passed
 
-    int EcoRoofMat;                     // Materials for ecoRoof
     int NumGas;                         // Index for loop over gap gases in a mixture
     int NumGases;                       // Number of gasses in a mixture
     GasType gasType = GasType::Invalid; // Gas type index: 1=air, 2=argon, 3=krypton, 4=xenon
-    int Loop;
     int ICoeff;            // Gas property coefficient index
     Real64 MinSlatAngGeom; // Minimum and maximum slat angle allowed by slat geometry (deg)
     Real64 MaxSlatAngGeom;
@@ -155,8 +153,6 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     Real64 maxLamValue;       // maximum value of wavelength
 
     // Added TH 1/9/2009 to read the thermochromic glazings
-    int iTC(0);
-    int iMat(0);
 
     // Added TH 7/27/2009 for constructions defined with F or C factor method
     int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
@@ -2876,8 +2872,6 @@ void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound) // set
     int IOStat;                      // IO Status when calling get input subroutine
     int NumAlphas;            // Number of spectral data alpha names being passed
     int NumNums;             // Number of spectral data properties being passed
-    int Loop;
-    int LamNum; // Wavelength number
     Real64 Lam; // Wavelength (microns)
     Real64 Tau; // Transmittance, front reflectance, back reflectance
     Real64 RhoF;

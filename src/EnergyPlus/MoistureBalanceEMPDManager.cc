@@ -151,18 +151,12 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IOStat;                       // IO Status when calling get input subroutine
     Array1D_string MaterialNames(3);  // Number of Material Alpha names defined
-    int MaterNum;                     // Counter to keep track of the material number
     int MaterialNumAlpha;             // Number of material alpha names being passed
     int MaterialNumProp;              // Number of material properties being passed
     Array1D<Real64> MaterialProps(9); // Temporary array to transfer material properties
     bool ErrorsFound(false);          // If errors detected in input
 
     int EMPDMat; // EMPD Moisture Material additional properties for each base material
-    int Loop;
-    int Layer;
-    int SurfNum;           // Surface number
-    int MatNum;            // Material number at interior layer
-    int ConstrNum;         // Construction number
     Array1D_bool EMPDzone; // EMPD property check for each zone
 
     auto &s_ip = state.dataInputProcessing->inputProcessor;
@@ -475,8 +469,6 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NOFITR;           // Number of iterations
-    int MatNum;           // Material number at interior layer
-    int ConstrNum;        // Construction number
     Real64 hm_deep_layer; // Overall deep-layer transfer coefficient
     Real64 RSurfaceLayer; // Mass transfer resistance between actual surface and surface layer node
     Real64 Taver;         // Average zone temperature between current time and previous time
@@ -758,7 +750,7 @@ void ReportMoistureBalanceEMPD(EnergyPlusData &state)
         auto const *mat = s_mat->materials(constr.LayerPoint(constr.TotLayers));
         if (!mat->hasEMPD) continue;
 
-        auto const *matEMPD = dynamic_cast<const MaterialEMPD const *>(mat);
+        auto const *matEMPD = dynamic_cast<MaterialEMPD const *>(mat);
         assert(matEMPD != nullptr);
 
         static constexpr std::string_view Format_700(

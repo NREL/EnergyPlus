@@ -371,7 +371,7 @@ namespace Window {
     {
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createVisibleRangeMaterial(EnergyPlusData &state)
+    std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createVisibleRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(m_MaterialProperties);
         assert(matBlind != nullptr);

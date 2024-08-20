@@ -323,7 +323,7 @@ namespace Material {
         ~MaterialShade() = default;
         bool can_instantiate() override { return true; } // Allows this class to be instantiated
     };
-        
+         
     // This may seem like an overly complicated way to handle a set of
     // multi-dimensional variables, but I think that it is actually
     // cleaner than either a multi-dimensional array (and certaily

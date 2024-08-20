@@ -695,7 +695,6 @@ namespace Window {
         Real64 thickness = 0.0;
 
         auto &s_mat = state.dataMaterial;
-        auto &surf = state.dataSurface->Surface(m_SurfNum);
         auto &surfWin = state.dataSurface->SurfaceWindow(m_SurfNum);
         auto const &surfShade = state.dataSurface->surfShades(m_SurfNum);
         
@@ -715,7 +714,7 @@ namespace Window {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(EnergyPlusData &state,
+    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer([[maybe_unused]] EnergyPlusData &state,
                                                                                                  Material::MaterialBase const *materialBase) const
     {
         // SUBROUTINE INFORMATION:
