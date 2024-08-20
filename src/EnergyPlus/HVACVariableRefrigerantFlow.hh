@@ -908,6 +908,16 @@ namespace HVACVariableRefrigerantFlow {
 
     void SizeVRF(EnergyPlusData &state, int const VRFTUNum);
 
+    void initCapSizingVars(EnergyPlusData &state,
+                           int sizingMethod,
+                           int capSizingMethod,
+                           int &eqSizingMethod,
+                           Real64 scaledCapacity,
+                           bool &modeCapacity,
+                           Real64 &designLoad,
+                           bool &scalableCapSizingOn,
+                           Real64 &fracOfAutosizedCapacity);
+
     void SimVRF(EnergyPlusData &state,
                 int VRFTUNum,
                 bool FirstHVACIteration,

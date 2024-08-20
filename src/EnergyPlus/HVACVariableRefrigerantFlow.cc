@@ -7945,48 +7945,27 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         }
 
         // initialize capacity sizing variables: cooling
-        SizingMethod = CoolingCapacitySizing;
-        CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
-        EqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
-        if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-            CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-            if (CapSizingMethod == CoolingDesignCapacity) {
-                if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0) {
-                    EqSizing.CoolingCapacity = true;
-                    EqSizing.DesCoolingLoad = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
-                }
-            } else if (CapSizingMethod == CapacityPerFloorArea) {
-                EqSizing.CoolingCapacity = true;
-                EqSizing.DesCoolingLoad = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity *
-                                          state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
-                state.dataSize->DataScalableCapSizingON = true;
-            } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-                state.dataSize->DataFracOfAutosizedCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
-                state.dataSize->DataScalableCapSizingON = true;
-            }
-        }
+        initCapSizingVars(state,
+                          CoolingCapacitySizing,
+                          state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod,
+                          EqSizing.SizingMethod(SizingMethod),
+                          state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity,
+                          EqSizing.CoolingCapacity,
+                          EqSizing.DesCoolingLoad,
+                          state.dataSize->DataScalableCapSizingON,
+                          state.dataSize->DataFracOfAutosizedCoolingCapacity);
 
         // initialize capacity sizing variables: heating
-        SizingMethod = HeatingCapacitySizing;
-        CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
-        EqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
-        if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-            CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-            if (CapSizingMethod == HeatingDesignCapacity) {
-                if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity > 0.0) {
-                    EqSizing.HeatingCapacity = true;
-                    EqSizing.DesHeatingLoad = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
-                }
-            } else if (CapSizingMethod == CapacityPerFloorArea) {
-                EqSizing.HeatingCapacity = true;
-                EqSizing.DesHeatingLoad = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity *
-                                          state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
-                state.dataSize->DataScalableCapSizingON = true;
-            } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                state.dataSize->DataFracOfAutosizedHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
-                state.dataSize->DataScalableCapSizingON = true;
-            }
-        }
+        initCapSizingVars(state,
+                          HeatingCapacitySizing,
+                          state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod,
+                          EqSizing.SizingMethod(SizingMethod),
+                          state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity,
+                          EqSizing.HeatingCapacity,
+                          EqSizing.DesHeatingLoad,
+                          state.dataSize->DataScalableCapSizingON,
+                          state.dataSize->DataFracOfAutosizedHeatingCapacity);
+
     } else {
         // no scalable sizing method has been specified. Sizing proceeds using the method
         // specified in the zoneHVAC object
@@ -8877,6 +8856,41 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     }
 
     state.dataSize->DataScalableCapSizingON = false;
+}
+
+void initCapSizingVars(EnergyPlusData &state,
+                       int sizingMethod,
+                       int capSizingMethod,
+                       int &eqSizingMethod,
+                       Real64 scaledCapacity,
+                       bool &modeCapacity,
+                       Real64 &designLoad,
+                       bool &scalableCapSizingOn,
+                       Real64 &fracOfAutosizedCapacity)
+{
+    using namespace DataSizing;
+    using HVAC::CoolingCapacitySizing;
+    using HVAC::HeatingCapacitySizing;
+
+    eqSizingMethod = capSizingMethod;
+    if (capSizingMethod == CoolingDesignCapacity || capSizingMethod == HeatingDesignCapacity || capSizingMethod == CapacityPerFloorArea ||
+        capSizingMethod == FractionOfAutosizedCoolingCapacity || capSizingMethod == FractionOfAutosizedHeatingCapacity) {
+        if ((capSizingMethod == CoolingDesignCapacity && sizingMethod == CoolingCapacitySizing) ||
+            (capSizingMethod == HeatingDesignCapacity && sizingMethod == HeatingCapacitySizing)) {
+            if (scaledCapacity > 0.0) {
+                modeCapacity = true;
+                designLoad = scaledCapacity;
+            }
+        } else if (capSizingMethod == CapacityPerFloorArea) {
+            modeCapacity = true;
+            designLoad = scaledCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+            scalableCapSizingOn = true;
+        } else if ((capSizingMethod == FractionOfAutosizedCoolingCapacity && sizingMethod == CoolingCapacitySizing) ||
+                   (capSizingMethod == FractionOfAutosizedHeatingCapacity && sizingMethod == HeatingCapacitySizing)) {
+            fracOfAutosizedCapacity = scaledCapacity;
+            scalableCapSizingOn = true;
+        }
+    }
 }
 
 void VRFCondenserEquipment::SizeVRFCondenser(EnergyPlusData &state)
