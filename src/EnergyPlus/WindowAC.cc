@@ -1058,6 +1058,9 @@ namespace WindowAC {
 
             zoneEqSizing.OAVolFlow = windowAC.OutAirVolFlow;
             zoneEqSizing.AirVolFlow = windowAC.MaxAirVolFlow;
+            // Make the Fan be sized by this
+            zoneEqSizing.CoolingAirFlow = true;
+            zoneEqSizing.CoolingAirVolFlow = windowAC.MaxAirVolFlow;
         }
 
         state.dataSize->DataScalableCapSizingON = false;
