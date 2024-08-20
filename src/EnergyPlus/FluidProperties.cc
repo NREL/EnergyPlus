@@ -2039,7 +2039,6 @@ namespace FluidProperties {
         // for the refrigerant properties.
         // Most properties requested (e.g., Specific Heat) must be > 0 but the tables may
         // be set up for symmetry and not be limited to just valid values.
-
         auto const &df = state.dataFluidProps;
 
         for (auto *refrig : df->refrigs) {
@@ -2811,7 +2810,6 @@ namespace FluidProperties {
     )
     {
         // Wrapper for RefrigProps::getSatPressure()
-
         auto &df = state.dataFluidProps;
 
         if (RefrigIndex == 0) {
@@ -2906,7 +2904,6 @@ namespace FluidProperties {
     )
     {
         // Wrapper for RefrigProps::getSatTemperature()
-
         auto &df = state.dataFluidProps;
 
         if (RefrigIndex == 0) {
@@ -2957,7 +2954,6 @@ namespace FluidProperties {
     )
     {
         // Wrapper for RefrigProps::getSatEnthalpy()
-
         auto &df = state.dataFluidProps;
 
         if (RefrigIndex == 0) {
@@ -3081,7 +3077,6 @@ namespace FluidProperties {
     )
     {
         // Wrapper for RefrigProps::getSatDensity()
-
         auto &df = state.dataFluidProps;
 
         if (RefrigIndex == 0) {
@@ -3142,7 +3137,6 @@ namespace FluidProperties {
     {
 
         // Wrapper for RefrigProps::getSpecificHeat()
-
         auto &df = state.dataFluidProps;
 
         if (RefrigIndex == 0) {
@@ -4613,8 +4607,9 @@ namespace FluidProperties {
 
     GlycolRawProps *GetGlycolRaw(EnergyPlusData &state, std::string_view const glycolRawName)
     {
+        auto &df = state.dataFluidProps;
         int glycolRawNum = GetGlycolRawNum(state, glycolRawName);
-        return (glycolRawNum > 0) ? state.dataFluidProps->glycolsRaw(glycolRawNum) : nullptr;
+        return (glycolRawNum > 0) ? df->glycolsRaw(glycolRawNum) : nullptr;
     }
 
     //*****************************************************************************
@@ -4640,8 +4635,9 @@ namespace FluidProperties {
         // Check to see if this glycol shows up in the glycol data
         //  ArrayLength = SIZE(GlycolData)
 
-        if (Idx > 0 && Idx <= state.dataFluidProps->glycols.isize()) {
-            return state.dataFluidProps->glycols(Idx)->Name;
+        auto &df = state.dataFluidProps;
+        if (Idx > 0 && Idx <= df->glycols.isize()) {
+            return df->glycols(Idx)->Name;
         } else { // return blank - error checking in calling proceedure
             return "";
         }
@@ -4871,7 +4867,9 @@ namespace FluidProperties {
         bool NeedOrphanMessage = true;
         int NumUnusedRefrig = 0;
 
-        for (auto const *refrig : state.dataFluidProps->refrigs) {
+        auto const &df = state.dataFluidProps;
+
+        for (auto const *refrig : df->refrigs) {
             if (refrig->used) continue;
             if (refrig->Name == "STEAM") continue;
             if (NeedOrphanMessage && state.dataGlobal->DisplayUnusedObjects) {
@@ -4888,7 +4886,7 @@ namespace FluidProperties {
 
         int NumUnusedGlycol = 0;
 
-        for (auto const *glycol : state.dataFluidProps->glycols) {
+        for (auto const *glycol : df->glycols) {
             if (glycol->used) continue;
             if (glycol->Name == "WATER") continue;
             if (glycol->Name == "ETHYLENEGLYCOL") continue;
