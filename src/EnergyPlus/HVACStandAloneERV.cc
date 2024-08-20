@@ -275,7 +275,6 @@ void GetStandAloneERV(EnergyPlusData &state)
             ShowContinueError(state, format("... occurs in {} \"{}\"", CurrentModuleObject, standAloneERV.Name));
             ErrorsFound = true;
         }
-
         standAloneERV.DesignHXVolFlowRate = HXSupAirFlowRate;
 
         standAloneERV.SupplyAirFanName = Alphas(4);

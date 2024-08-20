@@ -1936,7 +1936,9 @@ namespace FluidProperties {
         // Most properties requested (e.g., Specific Heat) must be > 0 but the tables may
         // be set up for symmetry and not be limited to just valid values.
 
-        for (auto *glycol : state.dataFluidProps->glycols) {
+        auto const &df = state.dataFluidProps;
+
+        for (auto *glycol : df->glycols) {
             if (glycol->CpDataPresent) {
                 // check for lowest non-zero value by referencing temp data
                 for (int IndexNum = 1; IndexNum <= glycol->NumCpTempPoints; ++IndexNum) {
@@ -2038,7 +2040,9 @@ namespace FluidProperties {
         // Most properties requested (e.g., Specific Heat) must be > 0 but the tables may
         // be set up for symmetry and not be limited to just valid values.
 
-        for (auto *refrig : state.dataFluidProps->refrigs) {
+        auto const &df = state.dataFluidProps;
+
+        for (auto *refrig : df->refrigs) {
             for (int IndexNum = 1; IndexNum <= refrig->NumPsPoints; ++IndexNum) {
                 if (refrig->PsValues(IndexNum) <= 0.0) continue;
                 refrig->PsLowPresIndex = IndexNum;
@@ -2178,7 +2182,9 @@ namespace FluidProperties {
         Real64 Temperature; // Temperature to drive values
         Real64 ReturnValue; // Values returned from glycol functions
 
-        for (auto *glycol : state.dataFluidProps->glycols) {
+        auto const &df = state.dataFluidProps;
+
+        for (auto *glycol : df->glycols) {
 
             int GlycolIndex = 0; // used in routine calls -- value is returned when first 0
             // Lay out the basic values:
@@ -2418,7 +2424,9 @@ namespace FluidProperties {
         Real64 Temperature; // Temperature to drive values
         Real64 ReturnValue; // Values returned from refrigerant functions
 
-        for (auto *refrig : state.dataFluidProps->refrigs) {
+        auto const &df = state.dataFluidProps;
+
+        for (auto *refrig : df->refrigs) {
             // Lay out the basic values:
             if (!refrig->Name.empty()) {
                 print(state.files.debug, "Refrigerant={}", refrig->Name);
@@ -2769,8 +2777,10 @@ namespace FluidProperties {
 
         if (!state.dataGlobal->WarmupFlag && ErrorFlag) {
             ++this->errors[(int)RefrigError::SatTemp].count;
+            auto &df = state.dataFluidProps;
+
             // send warning
-            if (this->errors[(int)RefrigError::SatTemp].count <= state.dataFluidProps->RefrigErrorLimitTest) {
+            if (this->errors[(int)RefrigError::SatTemp].count <= df->RefrigErrorLimitTest) {
                 ShowSevereMessage(
                     state, format("{}: Saturation temperature is out of range for refrigerant [{}] supplied data: **", routineName, this->Name));
                 ShowContinueError(state,
@@ -2802,6 +2812,8 @@ namespace FluidProperties {
     {
         // Wrapper for RefrigProps::getSatPressure()
 
+        auto &df = state.dataFluidProps;
+
         if (RefrigIndex == 0) {
             if ((RefrigIndex = GetRefrigNum(state, refrigName)) == 0) {
                 ShowSevereError(state, format("Refrigerant \"{}\" not found, called from: {}", refrigName, CalledFrom));
@@ -2810,7 +2822,7 @@ namespace FluidProperties {
             }
         }
 
-        return state.dataFluidProps->refrigs(RefrigIndex)->getSatPressure(state, Temperature, CalledFrom);
+        return df->refrigs(RefrigIndex)->getSatPressure(state, Temperature, CalledFrom);
     }
 
     //*****************************************************************************
@@ -2861,8 +2873,10 @@ namespace FluidProperties {
 
         if (!state.dataGlobal->WarmupFlag && ErrorFlag) {
             ++this->errors[(int)RefrigError::SatPress].count;
+            auto &df = state.dataFluidProps;
+
             // send warning
-            if (this->errors[(int)RefrigError::SatPress].count <= state.dataFluidProps->RefrigErrorLimitTest) {
+            if (this->errors[(int)RefrigError::SatPress].count <= df->RefrigErrorLimitTest) {
                 ShowSevereMessage(state,
                                   format("{}: Saturation pressure is out of range for refrigerant [{}] supplied data: **", routineName, this->Name));
                 ShowContinueError(state,
@@ -2893,6 +2907,8 @@ namespace FluidProperties {
     {
         // Wrapper for RefrigProps::getSatTemperature()
 
+        auto &df = state.dataFluidProps;
+
         if (RefrigIndex == 0) {
             if ((RefrigIndex = GetRefrigNum(state, refrigName)) == 0) {
                 ShowSevereError(state, format("Refrigerant \"{}\" not found, called from: {}", refrigName, CalledFrom));
@@ -2901,7 +2917,7 @@ namespace FluidProperties {
             }
         }
 
-        return state.dataFluidProps->refrigs(RefrigIndex)->getSatTemperature(state, Pressure, CalledFrom);
+        return df->refrigs(RefrigIndex)->getSatTemperature(state, Pressure, CalledFrom);
     }
 
     //*****************************************************************************
@@ -2942,6 +2958,8 @@ namespace FluidProperties {
     {
         // Wrapper for RefrigProps::getSatEnthalpy()
 
+        auto &df = state.dataFluidProps;
+
         if (RefrigIndex == 0) {
             if ((RefrigIndex = GetRefrigNum(state, refrigName)) == 0) {
                 ShowSevereError(state, format("Refrigerant \"{}\" not found, called from: {}", refrigName, CalledFrom));
@@ -2949,7 +2967,7 @@ namespace FluidProperties {
                 return 0.0;
             }
         }
-        return state.dataFluidProps->refrigs(RefrigIndex)->getSatEnthalpy(state, Temperature, Quality, CalledFrom);
+        return df->refrigs(RefrigIndex)->getSatEnthalpy(state, Temperature, Quality, CalledFrom);
     }
 
     //*****************************************************************************
@@ -3029,8 +3047,10 @@ namespace FluidProperties {
 
         if (!state.dataGlobal->WarmupFlag && ErrorFlag) {
             ++this->errors[(int)RefrigError::SatTempDensity].count;
+            auto &df = state.dataFluidProps;
+
             // send warning
-            if (this->errors[(int)RefrigError::SatTempDensity].count <= state.dataFluidProps->RefrigErrorLimitTest) {
+            if (this->errors[(int)RefrigError::SatTempDensity].count <= df->RefrigErrorLimitTest) {
                 ShowSevereMessage(
                     state, format("{}: Saturation temperature is out of range for refrigerant [{}] supplied data: **", routineName, this->Name));
                 ShowContinueError(state,
@@ -3062,6 +3082,8 @@ namespace FluidProperties {
     {
         // Wrapper for RefrigProps::getSatDensity()
 
+        auto &df = state.dataFluidProps;
+
         if (RefrigIndex == 0) {
             if ((RefrigIndex = GetRefrigNum(state, refrigName)) == 0) {
                 ShowSevereError(state, format("Refrigerant \"{}\" not found, called from: {}", refrigName, CalledFrom));
@@ -3070,7 +3092,7 @@ namespace FluidProperties {
             }
         }
 
-        return state.dataFluidProps->refrigs(RefrigIndex)->getSatDensity(state, Temperature, Quality, CalledFrom);
+        return df->refrigs(RefrigIndex)->getSatDensity(state, Temperature, Quality, CalledFrom);
     }
 
     //*****************************************************************************
@@ -3121,6 +3143,8 @@ namespace FluidProperties {
 
         // Wrapper for RefrigProps::getSpecificHeat()
 
+        auto &df = state.dataFluidProps;
+
         if (RefrigIndex == 0) {
             if ((RefrigIndex = GetRefrigNum(state, refrigName)) == 0) {
                 ShowSevereError(state, format("Refrigerant \"{}\" not found, called from: {}", refrigName, CalledFrom));
@@ -3129,7 +3153,7 @@ namespace FluidProperties {
             }
         }
 
-        return state.dataFluidProps->refrigs(RefrigIndex)->getSatSpecificHeat(state, Temperature, Quality, CalledFrom);
+        return df->refrigs(RefrigIndex)->getSatSpecificHeat(state, Temperature, Quality, CalledFrom);
     }
 
     //*****************************************************************************

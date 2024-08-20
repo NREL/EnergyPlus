@@ -3428,7 +3428,7 @@ namespace HVACUnitaryBypassVAV {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoad = 0.0; // Total load in controlled zone [W]
-        int lastDayOfSim(0);  // used during warmup to reset changeOverTimer since need to do same thing next warmup day
+        int lastDayOfSim(0);   // used during warmup to reset changeOverTimer since need to do same thing next warmup day
 
         auto &cBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
 
