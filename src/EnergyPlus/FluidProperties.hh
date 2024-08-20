@@ -564,7 +564,7 @@ namespace FluidProperties {
                                   int UpperBound                    // Valid values upper bound (set by calling program)
     );
 
-    bool CheckFluidPropertyName(EnergyPlusData &state,
+    bool CheckFluidPropertyName(EnergyPlusData const &state,
                                 std::string const &NameToCheck); // Name from input(?) to be checked against valid FluidPropertyNames
 
     void ReportOrphanFluids(EnergyPlusData &state);

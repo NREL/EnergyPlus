@@ -2768,8 +2768,6 @@ namespace Furnaces {
             // Get fan data
             FanName = Alphas(7);
 
-            errFlag = false;
-
             thisFurnace.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(6)));
 
             if (thisFurnace.fanType == HVAC::FanType::OnOff || thisFurnace.fanType == HVAC::FanType::Constant) {
@@ -4739,11 +4737,7 @@ namespace Furnaces {
 
         if (!state.dataGlobal->DoingSizing && state.dataFurnaces->MySecondOneTimeFlag(FurnaceNum)) {
             // sizing all done.  check fan air flow rates
-            errFlag = false;
             thisFurnace.ActualFanVolFlowRate = state.dataFans->fans(thisFurnace.FanIndex)->maxAirFlowRate;
-            if (errFlag) {
-                ShowContinueError(state, format("...occurs in {} ={}", HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name));
-            }
             if (thisFurnace.ActualFanVolFlowRate != DataSizing::AutoSize) {
                 if (thisFurnace.DesignFanVolFlowRate > thisFurnace.ActualFanVolFlowRate) {
                     ShowWarningError(state,
@@ -5001,11 +4995,11 @@ namespace Furnaces {
                     thisFurnace.CoolingSpeedRatio = thisFurnace.MaxCoolAirVolFlow / thisFurnace.ActualFanVolFlowRate;
                     thisFurnace.NoHeatCoolSpeedRatio = thisFurnace.MaxNoCoolHeatAirVolFlow / thisFurnace.ActualFanVolFlowRate;
                 }
-                std::string FanName; // used in warning messages
                 if (dynamic_cast<Fans::FanComponent *>(state.dataFans->fans(thisFurnace.FanIndex))->powerRatioAtSpeedRatioCurveNum > 0) {
                     if (thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxHeatAirVolFlow &&
                         thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxCoolAirVolFlow &&
                         thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxNoCoolHeatAirVolFlow) {
+                        std::string FanName = state.dataFans->fans(thisFurnace.FanIndex)->Name;
                         ShowWarningError(state, format("{} \"{}\"", HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name));
                         ShowContinueError(state,
                                           format("...For fan type and name = {} \"{}\"", HVAC::fanTypeNames[(int)thisFurnace.fanType], FanName));

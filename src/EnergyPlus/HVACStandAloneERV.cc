@@ -281,8 +281,6 @@ void GetStandAloneERV(EnergyPlusData &state)
         GlobalNames::IntraObjUniquenessCheck(
             state, Alphas(4), CurrentModuleObject, cAlphaFields(4), state.dataHVACStandAloneERV->SupplyAirFanUniqueNames, ErrorsFound);
 
-        errFlag = false;
-
         if ((standAloneERV.SupplyAirFanIndex = Fans::GetFanIndex(state, standAloneERV.SupplyAirFanName)) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFields(4), standAloneERV.SupplyAirFanName);
             ErrorsFound = true;
@@ -297,7 +295,6 @@ void GetStandAloneERV(EnergyPlusData &state)
         standAloneERV.ExhaustAirFanName = Alphas(5);
         GlobalNames::IntraObjUniquenessCheck(
             state, Alphas(5), CurrentModuleObject, cAlphaFields(5), state.dataHVACStandAloneERV->ExhaustAirFanUniqueNames, ErrorsFound);
-        errFlag = false;
 
         if ((standAloneERV.ExhaustAirFanIndex = Fans::GetFanIndex(state, standAloneERV.ExhaustAirFanName)) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFields(5), standAloneERV.ExhaustAirFanName);
@@ -1695,7 +1692,6 @@ int getEqIndex(EnergyPlusData &state, std::string_view CompName)
     for (int StandAloneERVNum = 1; StandAloneERVNum <= state.dataHVACStandAloneERV->NumStandAloneERVs; StandAloneERVNum++) {
         if (Util::SameString(CompName, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name)) {
             return StandAloneERVNum;
-            break;
         }
     }
     return 0;
