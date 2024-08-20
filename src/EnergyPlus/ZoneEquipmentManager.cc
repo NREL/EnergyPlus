@@ -5815,11 +5815,17 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         Real64 HumRatZM = 0.0; // HumRat of From Zone/Space
         if (state.dataHeatBal->doSpaceHeatBalance) {
             auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisMixing.spaceIndex);
-            auto &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisMixing.fromSpaceIndex);
             TZN = thisSpaceHB.MixingMAT;         // Temperature of this Space
-            TZM = fromSpaceHB.MixingMAT;         // Temperature of From Space
             HumRatZN = thisSpaceHB.MixingHumRat; // HumRat of this Space
-            HumRatZM = fromSpaceHB.MixingHumRat; // HumRat of From Space
+            if (thisMixing.fromSpaceIndex == 0) {
+                auto &fromZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(fromZoneNum);
+                TZM = fromZoneHB.MixingMAT;         // Temperature of From Zone
+                HumRatZM = fromZoneHB.MixingHumRat; // HumRat of From Zone
+            } else {
+                auto &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisMixing.fromSpaceIndex);
+                TZM = fromSpaceHB.MixingMAT;         // Temperature of From Space
+                HumRatZM = fromSpaceHB.MixingHumRat; // HumRat of From Space
+            }
         } else {
             auto &fromZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(fromZoneNum);
             TZN = thisZoneHB.MixingMAT;         // Temperature of this zone
@@ -6068,11 +6074,16 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             Real64 HumRatZM = 0.0; // HumRat of From Zone/Space
             if (state.dataHeatBal->doSpaceHeatBalance) {
                 auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.spaceIndex);
-                auto &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.fromSpaceIndex);
                 TZN = thisSpaceHB.MixingMAT;         // Temperature of this Space
-                TZM = fromSpaceHB.MixingMAT;         // Temperature of From Space
                 HumRatZN = thisSpaceHB.MixingHumRat; // HumRat of this Space
-                HumRatZM = fromSpaceHB.MixingHumRat; // HumRat of From Space
+                if (thisCrossMixing.fromSpaceIndex == 0) {
+                    TZM = fromZoneHB.MixingMAT;         // Temperature of From Zone
+                    HumRatZM = fromZoneHB.MixingHumRat; // HumRat of From Zone
+                } else {
+                    auto &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.fromSpaceIndex);
+                    TZM = fromSpaceHB.MixingMAT;         // Temperature of From Space
+                    HumRatZM = fromSpaceHB.MixingHumRat; // HumRat of From Space
+                }
             } else {
                 TZN = thisZoneHB.MixingMAT;         // Temperature of this zone
                 TZM = fromZoneHB.MixingMAT;         // Temperature of From Zone
@@ -6225,15 +6236,27 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         fromZoneHB.MixingMassFlowXHumRat += fromXMixingMassFlowXHumRat;
         if (state.dataHeatBal->doSpaceHeatBalance) {
             auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.spaceIndex);
-            auto &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.fromSpaceIndex);
             thisSpaceHB.MCPM += thisMCPxM;
             thisSpaceHB.MCPTM += thisMCPTxM;
             thisSpaceHB.MixingMassFlowZone += thisXMixingMassFlow;
             thisSpaceHB.MixingMassFlowXHumRat += thisXMixingMassFlowXHumRat;
-            fromSpaceHB.MCPM += fromMCPxM;
-            fromSpaceHB.MCPTM += fromMCPTxM;
-            fromSpaceHB.MixingMassFlowZone += thisXMixingMassFlow;
-            fromSpaceHB.MixingMassFlowXHumRat += fromXMixingMassFlowXHumRat;
+            if (thisCrossMixing.fromSpaceIndex > 0) {
+                auto &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.fromSpaceIndex);
+                fromSpaceHB.MCPM += fromMCPxM;
+                fromSpaceHB.MCPTM += fromMCPTxM;
+                fromSpaceHB.MixingMassFlowZone += thisXMixingMassFlow;
+                fromSpaceHB.MixingMassFlowXHumRat += fromXMixingMassFlowXHumRat;
+            } else {
+                // Allocate mixing flows by space volume fraction of zone volume
+                for (int spaceNum : state.dataHeatBal->Zone(fromZoneNum).spaceIndexes) {
+                    Real64 spaceFrac = state.dataHeatBal->space(spaceNum).fracZoneVolume;
+                    auto &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
+                    fromSpaceHB.MCPM += fromMCPxM * spaceFrac;
+                    fromSpaceHB.MCPTM += fromMCPTxM * spaceFrac;
+                    fromSpaceHB.MixingMassFlowZone += thisXMixingMassFlow * spaceFrac;
+                    fromSpaceHB.MixingMassFlowXHumRat += fromXMixingMassFlowXHumRat * spaceFrac;
+                }
+            }
         }
     }
 
