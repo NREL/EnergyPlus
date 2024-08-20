@@ -15354,7 +15354,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                 }
                 for (int SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
                     if (state.dataSize->SysSizInput(SysSizIndex).AirLoopNum != iAirLoop) continue;
-                    if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::Coincident) {
+                    if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::SizingConcurrence::Coincident) {
                         airLoopCoolTable.peakDesSensLoad = finalSysSizing.SysCoolCoinSpaceSens;
                         airLoopCoolTable.designPeakLoad = finalSysSizing.SysDesCoolLoad;
 
@@ -15970,7 +15970,7 @@ void CollectPeakZoneConditions(
 
         if (isCooling) {
             // Time of Peak Load
-            if ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size()) {
+            if ((desDaySelected > 0) && ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size())) {
                 compLoad.peakDateHrMin = format("{}/{} {}",
                                                 state.dataWeather->DesDayInput(desDaySelected).Month,
                                                 state.dataWeather->DesDayInput(desDaySelected).DayOfMonth,

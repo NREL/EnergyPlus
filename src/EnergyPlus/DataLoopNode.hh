@@ -427,6 +427,7 @@ namespace DataLoopNode {
         SpaceHVACEquipmentConnections,
         SpaceHVACZoneEquipmentSplitter,
         SpaceHVACZoneEquipmentMixer,
+        SpaceHVACZoneReturnMixer,
         Num,
     };
 

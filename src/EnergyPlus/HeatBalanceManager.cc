@@ -1622,7 +1622,7 @@ namespace HeatBalanceManager {
                         ShowSevereError(
                             state,
                             format("Invalid material layer type in window {} = {}", state.dataHeatBalMgr->CurrentModuleObject, thisConstruct.Name));
-                        ShowSevereError(
+                        ShowContinueError(
                             state,
                             format("Equivalent Layer material type = {} is allowed only in Construction:WindowEquivalentLayer window object.",
                                    ConstructAlphas(Layer)));

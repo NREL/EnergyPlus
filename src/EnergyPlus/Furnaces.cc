@@ -937,7 +937,7 @@ namespace Furnaces {
                 }
                 if (!AirNodeFound) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                    ShowSevereError(state, "Did not find Air Node (Zone with Thermostat).");
+                    ShowContinueError(state, "Did not find Air Node (Zone with Thermostat).");
                     ShowContinueError(state, format("Specified {} = {}", cAlphaFields(6), Alphas(6)));
                     ShowContinueError(
                         state, "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.");
@@ -945,7 +945,7 @@ namespace Furnaces {
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                    ShowSevereError(state, "Did not find correct Primary Air Loop.");
+                    ShowContinueError(state, "Did not find correct Primary Air Loop.");
                     ShowContinueError(state, format("Specified {} = {} is not served by this AirLoopHVAC equipment.", cAlphaFields(6), Alphas(6)));
                     ErrorsFound = true;
                 }
@@ -1478,7 +1478,7 @@ namespace Furnaces {
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                    ShowSevereError(state, "Did not find correct AirLoopHVAC.");
+                    ShowContinueError(state, "Did not find correct AirLoopHVAC.");
                     ShowContinueError(state, format("Specified {} = {}", cAlphaFields(6), Alphas(6)));
                     ErrorsFound = true;
                 }
@@ -2759,7 +2759,7 @@ namespace Furnaces {
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                    ShowSevereError(state, "Did not find correct AirLoopHVAC.");
+                    ShowContinueError(state, "Did not find correct AirLoopHVAC.");
                     ShowContinueError(state, format("Specified {} = {}", cAlphaFields(5), Alphas(5)));
                     ErrorsFound = true;
                 }
@@ -3680,7 +3680,7 @@ namespace Furnaces {
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                    ShowSevereError(state, "Did not find correct AirLoopHVAC.");
+                    ShowContinueError(state, "Did not find correct AirLoopHVAC.");
                     ShowContinueError(state, format("Specified {} = {}", cAlphaFields(5), Alphas(5)));
                     ErrorsFound = true;
                 }

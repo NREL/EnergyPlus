@@ -5494,7 +5494,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
         if (fanOutletNode != VRFTUOutletNodeNum) {
             ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
             ShowContinueError(state,
-                              "... For blow through fan and no supplemental heating coil the fan outlet node name must "
+                              "... For draw through fan and no supplemental heating coil the fan outlet node name must "
                               "match the terminal unit outlet node name.");
             if (fanOutletNode > 0 && VRFTUOutletNodeNum > 0) {
                 ShowContinueError(state, format("... Fan outlet node name = {}.", nodeID(fanOutletNode)));
@@ -12855,12 +12855,16 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = 0.0;
     }
 
+    Real64 OnOffFanPartLoadFraction = 1.0;
+    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp == HVAC::FanOp::Cycling) {
+        OnOffFanPartLoadFraction = state.dataHVACGlobal->OnOffFanPartLoadFraction;
+    }
     // if draw through, simulate coils then fan
     if (this->fanPlace == HVAC::FanPlace::DrawThru) {
         auto *fan = state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex);
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::SystemModel) {
             if (OnOffAirFlowRatio > 0.0) {
-                fan->simulate(state, FirstHVACIteration, _, _);
+                fan->simulate(state, FirstHVACIteration, _, _, _, fan->inletAirMassFlowRate, OnOffFanPartLoadFraction, 0, 0, _);
             } else {
                 fan->simulate(state, FirstHVACIteration, _, _, PartLoadRatio);
             }
