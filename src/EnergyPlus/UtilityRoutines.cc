@@ -866,6 +866,60 @@ bool env_var_on(std::string const &env_var_str)
     return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
 }
 
+void emitErrorMessage(EnergyPlusData &state, [[maybe_unused]] ErrorMessageCategory category, std::string const &msg, bool shouldFatal)
+{
+    if (!shouldFatal) {
+        ShowSevereError(state, msg);
+    } else { // should fatal
+        ShowFatalError(state, msg);
+    }
+}
+void emitErrorMessages(EnergyPlusData &state,
+                       [[maybe_unused]] ErrorMessageCategory category,
+                       std::initializer_list<std::string> const &msgs,
+                       bool const shouldFatal,
+                       int const zeroBasedTimeStampIndex)
+{
+    for (auto msg = msgs.begin(); msg != msgs.end(); ++msg) {
+        if (msg - msgs.begin() == zeroBasedTimeStampIndex) {
+            ShowContinueErrorTimeStamp(state, *msg);
+            continue;
+        }
+        if (msg == msgs.begin()) {
+            ShowSevereError(state, *msg);
+        } else if (std::next(msg) == msgs.end() && shouldFatal) {
+            ShowFatalError(state, *msg);
+        } else { // should be an intermediate message, or a final one where there is no fatal
+            ShowContinueError(state, *msg);
+        }
+    }
+}
+void emitWarningMessage(EnergyPlusData &state, [[maybe_unused]] ErrorMessageCategory category, std::string const &msg, bool const countAsError)
+{
+    if (countAsError) { // ideally this path goes away and we just have distinct warnings and errors
+        ShowWarningError(state, msg);
+    } else {
+        ShowWarningMessage(state, msg);
+    }
+}
+void emitWarningMessages(EnergyPlusData &state,
+                         [[maybe_unused]] ErrorMessageCategory category,
+                         std::initializer_list<std::string> const &msgs,
+                         bool const countAsError)
+{
+    for (auto msg = msgs.begin(); msg != msgs.end(); ++msg) {
+        if (msg == msgs.begin()) {
+            if (countAsError) { // ideally this path goes away and we just have distinct warnings and errors
+                ShowWarningError(state, *msg);
+            } else {
+                ShowWarningMessage(state, *msg);
+            }
+        } else {
+            ShowContinueError(state, *msg);
+        }
+    }
+}
+
 void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
