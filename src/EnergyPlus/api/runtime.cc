@@ -98,17 +98,17 @@ void setEnergyPlusRootDirectory(EnergyPlusState state, const char *path)
 void issueWarning(EnergyPlusState state, const char *message)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    EnergyPlus::ShowWarningError(*thisState, message);
+    ShowWarningError(*thisState, message);
 }
 void issueSevere(EnergyPlusState state, const char *message)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    EnergyPlus::ShowSevereError(*thisState, message);
+    ShowSevereError(*thisState, message);
 }
 void issueText(EnergyPlusState state, const char *message)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    EnergyPlus::ShowContinueError(*thisState, message);
+    ShowContinueError(*thisState, message);
 }
 
 void registerProgressCallback([[maybe_unused]] EnergyPlusState state, std::function<void(int const)> f)

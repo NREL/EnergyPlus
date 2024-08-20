@@ -481,17 +481,18 @@ void GetControllerInput(EnergyPlusData &state)
             controllerProps.ControlVar = static_cast<EnergyPlus::HVACControllers::CtrlVarType>(getEnumValue(ctrlVarNamesUC, AlphArray(2)));
             if (controllerProps.ControlVar == HVACControllers::CtrlVarType::Invalid) {
                 ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, AlphArray(1)));
-                ShowSevereError(state,
-                                format("...Invalid {}=\"{}\", must be Temperature, HumidityRatio, or TemperatureAndHumidityRatio.",
-                                       cAlphaFields(2),
-                                       AlphArray(2)));
+                ShowContinueError(state,
+                                  format("...Invalid {}=\"{}\", must be Temperature, HumidityRatio, or TemperatureAndHumidityRatio.",
+                                         cAlphaFields(2),
+                                         AlphArray(2)));
                 ErrorsFound = true;
             }
 
             controllerProps.Action = static_cast<ControllerAction>(getEnumValue(actionNamesUC, AlphArray(3)));
             if (controllerProps.Action == ControllerAction::Invalid) {
                 ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, AlphArray(1)));
-                ShowSevereError(state, format("...Invalid {}=\"{}{}", cAlphaFields(3), AlphArray(3), R"(", must be "Normal", "Reverse" or blank.)"));
+                ShowContinueError(state,
+                                  format("...Invalid {}=\"{}{}", cAlphaFields(3), AlphArray(3), R"(", must be "Normal", "Reverse" or blank.)"));
                 ErrorsFound = true;
             }
 
