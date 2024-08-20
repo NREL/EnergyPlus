@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -60,6 +61,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WindowAC.hh>
 
 using namespace EnergyPlus;
@@ -215,9 +217,9 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
         "    HPCoolingEIRFTemp4,      !- Name",
         "    0.0001514017,            !- Coefficient1 Constant",
         "    0.0655062896,            !- Coefficient2 x",
-        "	-0.0020370821,           !- Coefficient3 x**2",
-        "	0.0067823041,            !- Coefficient4 y",
-        "	0.0004087196,            !- Coefficient5 y**2",
+        "    -0.0020370821,           !- Coefficient3 x**2",
+        "    0.0067823041,            !- Coefficient4 y",
+        "    0.0004087196,            !- Coefficient5 y**2",
         "    -0.0003552302,           !- Coefficient6 x*y",
         "    13.89,                   !- Minimum Value of x",
         "    22.22,                   !- Maximum Value of x",
@@ -467,9 +469,36 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // check input processing
     EXPECT_EQ(compIndex, 1);
 
-    EXPECT_EQ(state->dataWindowAC->WindAC(1).DXCoilType_Num, HVAC::Coil_CoolingAirToAirVariableSpeed);
+    // MixTemp = 24.00, MixHumRat = 0.008, SupTemp = 12, SupHumRat = 0.008
+    double constexpr expected_full_airflow = 0.041484382187390034;
+    double constexpr expected_full_cap = 622.50474573886743;
+
+    auto const &windowAC = state->dataWindowAC->WindAC(compIndex);
+
+    ASSERT_GT(windowAC.FanIndex, 0);
+    auto const &fan = state->dataFans->fans(windowAC.FanIndex);
+
+    auto const &finalZoneSizing = state->dataSize->FinalZoneSizing(1);
+
+    EXPECT_NEAR(expected_full_airflow, finalZoneSizing.DesCoolVolFlow, 0.0001);
+
+    EXPECT_EQ(windowAC.HVACSizingIndex, 0);
+
+    EXPECT_EQ(windowAC.DXCoilType_Num, HVAC::Coil_CoolingAirToAirVariableSpeed);
+    ASSERT_GT(windowAC.DXCoilIndex, 0);
+    auto const &varSpeedCoil = state->dataVariableSpeedCoils->VarSpeedCoil(windowAC.DXCoilIndex);
+
     // check Sizing
-    EXPECT_NEAR(state->dataWindowAC->WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
+    EXPECT_NEAR(expected_full_airflow, windowAC.MaxAirVolFlow, 0.0001);
+    EXPECT_NEAR(expected_full_airflow, fan->maxAirFlowRate, 0.0001);
+    EXPECT_NEAR(expected_full_cap, varSpeedCoil.RatedCapCoolTotal, 0.001);
+
+    // VSD Sizing forces it back to Catalog data based on Nominal Speed Level
+    double constexpr vsd_coil_norm_speed_tot_cap = 36991.44197; // Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    double constexpr vsd_coil_norm_speed_airflow = 3.776;       // Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    double constexpr vsd_coil_norm_speed_airflow_per_cap = vsd_coil_norm_speed_airflow / vsd_coil_norm_speed_tot_cap;
+    EXPECT_NEAR(vsd_coil_norm_speed_airflow_per_cap, varSpeedCoil.MSRatedAirVolFlowPerRatedTotCap(1), 0.0001);
+    EXPECT_NEAR(expected_full_cap * vsd_coil_norm_speed_airflow_per_cap, varSpeedCoil.RatedAirVolFlowRate, 0.0001);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -295.0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
