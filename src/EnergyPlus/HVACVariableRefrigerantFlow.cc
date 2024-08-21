@@ -174,13 +174,6 @@ void SimulateVRF(EnergyPlusData &state,
         }
         CompIndex = VRFTUNum;
 
-        // suppress unused warnings temporarily until VRF inherits HVACSystemData
-        if (OAUnitNum > 0) {
-            bool tmpFlag = false;
-            if (OAUCoilOutTemp > 0.0) tmpFlag = true;
-            if (ZoneEquipment) tmpFlag = true;
-        }
-
     } else {
         VRFTUNum = CompIndex;
         if (VRFTUNum > state.dataHVACVarRefFlow->NumVRFTU || VRFTUNum < 1) {
@@ -7593,7 +7586,6 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     EqSizing.OAVolFlow = 0.0;
 
     VRFCond = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;
-    IsAutoSize = false;
     MaxCoolAirVolFlowDes = 0.0;
     MaxCoolAirVolFlowUser = 0.0;
     MaxHeatAirVolFlowDes = 0.0;
