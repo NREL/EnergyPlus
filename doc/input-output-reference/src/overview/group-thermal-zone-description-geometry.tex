@@ -2772,11 +2772,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-14}
 
-This field is the name of the \hyperref[zone]{Zone} or \hyperref[zonelist]{ZoneList} in which the internal mass will be added. When the ZoneList option is used then this internal mass object is applied to each of zone in the list. The name of the actual internal mass object in each zone becomes <Zone Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
+This field is the name of the \hyperref[zone]{Zone} or \hyperref[zonelist]{ZoneList} in which the internal mass will be added. When the ZoneList option is used then this internal mass object is applied to each zone in the list. The name of the actual internal mass object in each zone becomes <Zone Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run. This field is ignored when a Space or SpaceList Name is specified.
 
 \paragraph{Field: Space or SpaceList Name}\label{field-space-or-spacelist-name-14}
 
-This field is the name of the \hyperref[space]{Space} or \hyperref[spacelist]{SpaceList} in which the internal mass will be added. When the SpaceList option is used then this internal mass object is applied to each space in the list. The name of the actual internal mass object in each space becomes <Space Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run. This field is ignored when a ZoneList Name is specified for Zone or ZoneList Name. If a Space Name is used, then the Space must be part of Zone Name. If a SpaceList Name is used, then the Zone Name is ignored (even though it is a required field), and the surface is assigned to the corresponding Zone(s) for each Space in the SpaceList.
+This field is the name of the \hyperref[space]{Space} or \hyperref[spacelist]{SpaceList} in which the internal mass will be added. If this field is blank (or a ZoneList Name is specified), the internal mass will be added to the last space attached to the zone. When the SpaceList option is used then this internal mass object is applied to each space in the list. The name of the actual internal mass object in each space becomes <Space Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run. This field is ignored when a ZoneList Name is specified for Zone or ZoneList Name. If this field is entered, then the Zone or ZoneList Name is ignored, and the surface is assigned to the corresponding Zone(s) for the Space(s).
 
 \paragraph{Field: Surface Area}\label{field-surface-area}
 
@@ -2789,13 +2789,15 @@ InternalMass,
   Zn002:IntM001,                !- Surface Name
   INTERIOR,                     !- Construction Name
   DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
-  408.7734;                     !- Total area exposed to Zone {m2}
+  ,                             !- Space or SpaceList Name
+  408.7734;                     !- Surface Area {m2}
 
 InternalMass,
   Zn002:IntM002,                !- Surface Name
   PARTITION02,                  !- Construction Name
   DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
-  371.6122;                     !- Total area exposed to Zone {m2}
+  ,                             !- Space or SpaceList Name
+  371.6122;                     !- Surface Area {m2}
 \end{lstlisting}
 
 \subsection{Surface Output Variables/Reports}\label{surface-output-variablesreports}

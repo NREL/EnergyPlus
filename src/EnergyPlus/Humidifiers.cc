@@ -417,7 +417,7 @@ namespace Humidifiers {
             } else if (!lAlphaBlanks(3)) {
                 ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, CurrentModuleObject, Alphas(1)));
                 ShowContinueError(state, format("Invalid {}={}", cAlphaFields(3), Alphas(3)));
-                ShowSevereError(state, format("...{} not found.", cAlphaFields(3)));
+                ShowContinueError(state, format("...{} not found.", cAlphaFields(3)));
                 ErrorsFound = true;
             }
 

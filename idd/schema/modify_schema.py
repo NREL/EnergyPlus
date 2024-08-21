@@ -139,6 +139,7 @@ extension_renaming = {
     'ZoneHVAC:EquipmentList': 'equipment',
     'SpaceHVAC:ZoneEquipmentSplitter': 'spaces',
     'SpaceHVAC:ZoneEquipmentMixer': 'spaces',
+    'SpaceHVAC:ZoneReturnMixer': 'spaces',
     'AvailabilityManagerAssignmentList': 'managers',
     'Table:IndependentVariable': 'values',
     'Table:IndependentVariableList': 'independent_variables',

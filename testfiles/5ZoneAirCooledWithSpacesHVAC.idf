@@ -2536,8 +2536,19 @@ ZoneAirHeatBalanceAlgorithm,
     Zone 5 Exhaust Fan Inlet,!- Zone Equipment Inlet Node Name
     DesignCoolingLoad,       !- Space Fraction Method
     Space 5 Conference,      !- Space 1 Name
-    autosize,                       !- Space 1 Fraction {dimensionless}
+    autosize,                !- Space 1 Fraction {dimensionless}
     Space 5 Conference Exhaust Fan Inlet;  !- Space 1 Node Name
+
+  SpaceHVAC:ZoneReturnMixer,
+    Zone 5 Return Mixer,     !- Name
+    Zone 5,                  !- Zone Name
+    Zone 5 Out Node,         !- Zone Return Air Node Name
+    Space 5 Office,          !- Space 1 Name
+    Space 5 Office Return Node,  !- Space 1 Return Air Node Name
+    Space 5 Conference,      !- Space 2 Name
+    Space 5 Conference Return Node,  !- Space 2 Return Air Node Name
+    Zone 5-Remainder,        !- Space 3 Name
+    Zone 5-Remainder Return Node;  !- Space 3 Return Air Node Name
 
   SpaceHVAC:EquipmentConnections,
     Space 5 Office,          !- Space Name
@@ -3827,6 +3838,20 @@ Output:Variable,*,Space Predicted Sensible Load to Setpoint Heat Transfer Rate,h
   Output:Variable,Space 5 Office In Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
   Output:Variable,Space 5 Conference In Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
   Output:Variable,Zone 5-Remainder In Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+
+  Output:Variable,Zone 5 Out Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Zone 5 Exhaust Fan Inlet,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Office Return Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Conference Return Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Conference Exhaust Fan Inlet,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Zone 5-Remainder Return Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+
+  Output:Variable,Zone 5 Out Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Zone 5 Exhaust Fan Inlet,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Office Return Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Conference Return Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Conference Exhaust Fan Inlet,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Zone 5-Remainder Return Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
 
   Output:Variable,*,EMS Zone Wetbulb Globe Temperature,hourly;
   Output:Variable,*,EMS Space Wetbulb Globe Temperature,hourly;
