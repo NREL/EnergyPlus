@@ -680,6 +680,7 @@ public:
         bool eso = true;
         bool eio = true;
         bool audit = true;
+        bool spsz = true;
         bool zsz = true;
         bool ssz = true;
         bool dxf = true;
@@ -718,6 +719,11 @@ public:
     fs::path outputZszCsvFilePath{"epluszsz.csv"};
     fs::path outputZszTabFilePath{"epluszsz.tab"};
     fs::path outputZszTxtFilePath{"epluszsz.txt"};
+
+    InputOutputFile spsz{""};
+    fs::path outputSpszCsvFilePath{"eplusspsz.csv"};
+    fs::path outputSpszTabFilePath{"eplusspsz.tab"};
+    fs::path outputSpszTxtFilePath{"eplusspsz.txt"};
 
     InputOutputFile ssz{""};
     fs::path outputSszCsvFilePath{"eplusssz.csv"};

@@ -289,7 +289,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFTempCurveNum == 0) {
             ShowSevereError(
                 state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
-            ShowSevereError(state, format("{} not found = {}", state.dataIPShortCut->cAlphaFieldNames(3), AlphArray(3)));
+            ShowContinueError(state, format("{} not found = {}", state.dataIPShortCut->cAlphaFieldNames(3), AlphArray(3)));
             ErrorsFound = true;
         } else {
             // Verify curve object, only legal types are Quadratic and Cubic
@@ -319,7 +319,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFPLRCurveNum == 0) {
             ShowSevereError(
                 state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
-            ShowSevereError(state, format("{} not found = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
+            ShowContinueError(state, format("{} not found = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
             ErrorsFound = true;
         } else {
             // Verify curve object, only legal types are Quadratic and Cubic
@@ -352,7 +352,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType == Constant::eFuel::Invalid) {
             ShowSevereError(
                 state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
-            ShowSevereError(state, format("Invalid {}  = {}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
+            ShowContinueError(state, format("Invalid {}  = {}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
             ErrorsFound = true;
         }
 

@@ -1295,11 +1295,15 @@ Enter the zone relative humidity schedule used for zone latent heating calculati
 Sizing Method = Sensible Load Only No Latent Load or a zone humidistat is present. A default of 50.0 will be used if no schedule is provided and no humidistat is 
 associated with this zone.
 
+\paragraph{Field: Type of Space Sum to Use}\label{field-type-of-space-sum-to-use}
+
+If the input is \emph{coincident} the zone equipment will be sized on the coincident zone load across all spaces in the zone. If the input is \emph{noncoincident} the zone equipment will be sized on the sum of the noncoincident space loads. The default is \emph{coincident}. This field is ignored unless \hyperref[zoneairheatbalancealgorithm]{ZoneAirHeatBalanceAlgorithm} ``Do Space Heat Balance for Sizing'' is Yes.
+
 An IDF example:
 
 \begin{lstlisting}
 
-Sizing:Zone,
+  Sizing:Zone,
       SPACE5-1,                !- Name of a zone
       14.,                     !- Zone cooling design supply air temperature {C}
       50.,                     !- Zone heating design supply air temperature {C}
@@ -1331,16 +1335,17 @@ Sizing:Zone,
       ,                        !- Zone Humidification Design Supply Air Humidity Ratio
       0.005,                   !- Zone Heating Design Supply Air Humidity Ratio Difference
       ,                        !- Zone Humidistat Dehumidification Set Point Schedule Name
-      ;                        !- Zone Humidistat Humidification Set Point Schedule Name
-
+      ,                        !- Zone Humidistat Humidification Set Point Schedule Name
+      Coincident;              !- Type of Space Sum to Use
+      
   DesignSpecification:OutdoorAir,
-  DSOA1,                   !- Name
-  SUM,                     !- Outdoor Air Method
-  0.00236,                 !- Outdoor Air Flow per Person
-  0.000305,                !- Outdoor Air Flow per Zone Floor Area
-  0.0,                     !- Outdoor Air Flow per Zone
-  0.0,                     !- Outdoor Air Flow Air Changes per Hour
-  ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+      DSOA1,                   !- Name
+      SUM,                     !- Outdoor Air Method
+      0.00236,                 !- Outdoor Air Flow per Person
+      0.000305,                !- Outdoor Air Flow per Zone Floor Area
+      0.0,                     !- Outdoor Air Flow per Zone
+      0.0,                     !- Outdoor Air Flow Air Changes per Hour
+      ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
 
   DesignSpecification:ZoneAirDistribution,
       DSZADO1,                 !- Name
