@@ -14655,7 +14655,6 @@ void VRFCondenserEquipment::VRFHR_OU_HR_Mode(EnergyPlusData &state,
         Real64 Ncomp_new;
         Real64 Q_c_tot_temp;
         Real64 Q_c_OU_temp;
-        Real64 Tsuction_new;
         Real64 Tsuction_LB = state.dataEnvrn->OutDryBulbTemp - this->DiffOUTeTo;
         Real64 Tsuction_HB = Tsuction;
 
