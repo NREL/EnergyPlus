@@ -356,7 +356,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
 
     static constexpr std::string_view RoutineName("VRFCondenser");
 
-    int NumTU;         // loop counter
+    int NumTU; // loop counter
 
     Real64 TotCoolCapTempModFac;      // cooling CAPFT curve output
     Real64 TotHeatCapTempModFac;      // heating CAPFT curve output
@@ -7542,8 +7542,6 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                             // HeatingCapacitySizing, etc.)
     bool PrintFlag = true;  // TRUE when sizing information is reported in the eio file
     int zoneHVACIndex;      // index of zoneHVAC equipment sizing specification
-    int SAFMethod(0);       // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
-                            // FractionOfAutosizedHeatingAirflow ...)
     int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                             // FractionOfAutosizedHeatingCapacity )
 
@@ -7662,7 +7660,9 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         SizingMethod = CoolingAirflowSizing;
         PrintFlag = true;
         bool errorsFound = false;
-        SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
+        // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
+        // FractionOfAutosizedHeatingAirflow ...)
+        int SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
         EqSizing.SizingMethod(SizingMethod) = SAFMethod;
         if (SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow) {
             if (SAFMethod == SupplyAirFlowRate) {
@@ -7772,7 +7772,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             } else {
                 TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
             }
-            bool errorsFound = false;
+            errorsFound = false;
             HeatingAirFlowSizer sizingHeatingAirFlow;
             sizingHeatingAirFlow.overrideSizingString(SizingString);
             // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
@@ -7787,7 +7787,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                 state.dataSize->DataFracOfAutosizedHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
             }
-            bool errorsFound = false;
+            errorsFound = false;
             HeatingCapacitySizer sizerHeatingCapacity;
             sizerHeatingCapacity.overrideSizingString(SizingString);
             sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -7913,7 +7913,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             } else {
                 TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
             }
-            bool errorsFound = false;
+            errorsFound = false;
             HeatingAirFlowSizer sizingNoHeatingAirFlow;
             sizingNoHeatingAirFlow.overrideSizingString(SizingString);
             // sizingNoHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
