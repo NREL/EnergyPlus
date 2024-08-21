@@ -580,7 +580,7 @@ namespace IndoorGreen {
                 ZoneNewTemp = Twb;
                 ZoneNewHum = ZoneSatHum;
             }
-            HMid = Psychrometrics::PsyHFnTdbW(ZoneNewTemp, ZoneNewHum);
+            HMid = Psychrometrics::PsyHFnTdbW(ZoneNewTemp, ZonePreHum);
             ig.SensibleRate = (1 - ig.LEDRadFraction) * ig.LEDActualEleP; // convective heat gain from LED lights when LED is on; heat convection from
                                                                           // plants was considered and counted from plant surface heat balance.
             ig.LatentRate = ZoneAirVol * rhoair * (HCons - HMid) / Timestep; // unit W
