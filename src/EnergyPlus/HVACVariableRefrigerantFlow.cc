@@ -357,9 +357,6 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     static constexpr std::string_view RoutineName("VRFCondenser");
 
     int NumTU;         // loop counter
-    int TUIndex;       // Index to terminal unit
-    int CoolCoilIndex; // index to cooling coil in terminal unit
-    int HeatCoilIndex; // index to heating coil in terminal unit
 
     Real64 TotCoolCapTempModFac;      // cooling CAPFT curve output
     Real64 TotHeatCapTempModFac;      // heating CAPFT curve output
@@ -376,7 +373,6 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     Real64 CoolOABoundary;            // output of cooling boundary curve (outdoor temperature, C)
     Real64 HeatOABoundary;            // output of heating boundary curve (outdoor temperature, C)
     Real64 EIRFPLRModFac;             // EIRFPLR curve output
-    int Stage;                        // used for crankcase heater power calculation
     Real64 UpperStageCompressorRatio; // used for crankcase heater power calculation
     Real64 RhoAir;                    // Density of air [kg/m3]
     Real64 RhoWater;                  // Density of water [kg/m3]
@@ -392,11 +388,9 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     Real64 InputPowerMultiplier;      // Multiplier for power when system is in defrost
     Real64 LoadDueToDefrost;          // Additional load due to defrost
     Real64 DefrostEIRTempModFac;      // EIR modifier for defrost (function of entering drybulb, outside wetbulb)
-    int HRCAPFT;                      // index to heat recovery CAPFTCool curve
     Real64 HRCAPFTConst;              // stead-state capacity fraction
     Real64 HRInitialCapFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
     Real64 HRCapTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
-    int HREIRFT;                      // Index to cool EIR as a function of temperature curve for heat recovery
     Real64 HREIRFTConst;              // stead-state EIR fraction
     Real64 HRInitialEIRFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
     Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
@@ -549,9 +543,9 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
 
     // loop through TU's and calculate average inlet conditions for active coils
     for (NumTU = 1; NumTU <= NumTUInList; ++NumTU) {
-        TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
-        CoolCoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex;
-        HeatCoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatCoilIndex;
+        int TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
+        int CoolCoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex;
+        int HeatCoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatCoilIndex;
         TUParasiticPower +=
             state.dataHVACVarRefFlow->VRFTU(TUIndex).ParasiticCoolElecPower + state.dataHVACVarRefFlow->VRFTU(TUIndex).ParasiticHeatElecPower;
         TUFanPower += state.dataHVACVarRefFlow->VRFTU(TUIndex).FanPower;
@@ -948,7 +942,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 }
                 vrf.HRCoolingActive = true;
                 vrf.HRHeatingActive = false;
-                HRCAPFT = vrf.HRCAPFTCool; // Index to cool capacity as a function of temperature\PLR curve for heat recovery
+                int HRCAPFT = vrf.HRCAPFTCool; // Index to cool capacity as a function of temperature\PLR curve for heat recovery
                 if (HRCAPFT > 0) {
                     //         VRF(VRFCond)%HRCAPFTCoolConst = 0.9d0 ! initialized to 0.9
                     if (state.dataCurveManager->PerfCurve(vrf.HRCAPFTCool)->numDims == 2) { // Curve type for HRCAPFTCool
@@ -961,7 +955,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 HRInitialCapFrac = vrf.HRInitialCoolCapFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
                 HRCapTC = vrf.HRCoolCapTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
 
-                HREIRFT = vrf.HREIRFTCool; // Index to cool EIR as a function of temperature curve for heat recovery
+                int HREIRFT = vrf.HREIRFTCool; // Index to cool EIR as a function of temperature curve for heat recovery
                 if (HREIRFT > 0) {
                     //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
                     if (state.dataCurveManager->PerfCurve(vrf.HREIRFTCool)->numDims == 2) { // Curve type for HREIRFTCool
@@ -979,7 +973,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 }
                 vrf.HRCoolingActive = false;
                 vrf.HRHeatingActive = true;
-                HRCAPFT = vrf.HRCAPFTHeat; // Index to heat capacity as a function of temperature\PLR curve for heat recovery
+                int HRCAPFT = vrf.HRCAPFTHeat; // Index to heat capacity as a function of temperature\PLR curve for heat recovery
                 if (HRCAPFT > 0) {
                     //         VRF(VRFCond)%HRCAPFTHeatConst = 1.1d0 ! initialized to 1.1
                     if (state.dataCurveManager->PerfCurve(vrf.HRCAPFTHeat)->numDims == 2) { // Curve type for HRCAPFTCool
@@ -1002,7 +996,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 HRInitialCapFrac = vrf.HRInitialHeatCapFrac; // Fractional heating degradation at the start of heat recovery from cooling mode
                 HRCapTC = vrf.HRHeatCapTC;                   // Time constant used to recover from initial degradation in heating heat recovery
 
-                HREIRFT = vrf.HREIRFTHeat; // Index to cool EIR as a function of temperature curve for heat recovery
+                int HREIRFT = vrf.HREIRFTHeat; // Index to cool EIR as a function of temperature curve for heat recovery
                 if (HREIRFT > 0) {
                     //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
                     if (state.dataCurveManager->PerfCurve(vrf.HREIRFTHeat)->numDims == 2) { // Curve type for HREIRFTHeat
@@ -1210,7 +1204,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         vrf.CrankCaseHeaterPower = vrf.CCHeaterPower * (1.0 - VRFRTF);
         if (vrf.NumCompressors > 1) {
             UpperStageCompressorRatio = (1.0 - vrf.CompressorSizeRatio) / (vrf.NumCompressors - 1);
-            for (Stage = 1; Stage <= vrf.NumCompressors - 2; ++Stage) {
+            for (int Stage = 1; Stage <= vrf.NumCompressors - 2; ++Stage) {
                 if (vrf.VRFCondPLR < (vrf.CompressorSizeRatio + Stage * UpperStageCompressorRatio)) {
                     vrf.CrankCaseHeaterPower += vrf.CCHeaterPower;
                 }
