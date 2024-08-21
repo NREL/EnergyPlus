@@ -7531,9 +7531,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
     Real64 TempSize;          // autosized value of coil input field
     int FieldNum = 2;         // IDD numeric field number where input field description is found
-    int SizingMethod;      // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
-                           // HeatingCapacitySizing, etc.)
-    bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
+    bool PrintFlag = true;    // TRUE when sizing information is reported in the eio file
 
     auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
 
@@ -7647,7 +7645,9 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
 
         int zoneHVACIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HVACSizingIndex;
 
-        SizingMethod = CoolingAirflowSizing;
+        // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
+        // HeatingCapacitySizing, etc.)
+        int SizingMethod = CoolingAirflowSizing;
         PrintFlag = true;
         bool errorsFound = false;
         // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
@@ -8011,7 +8011,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
 
         FieldNum = 3; // N3, \field Supply Air Flow Rate During Heating Operation
         SizingString = state.dataHVACVarRefFlow->VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
-        SizingMethod = HeatingAirflowSizing;
+        int SizingMethod = HeatingAirflowSizing;
         TempSize = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow;
         errorsFound = false;
         HeatingAirFlowSizer sizingHeatingAirFlow;
@@ -8364,7 +8364,6 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSuppHeatingCapacity = sizerWaterHeatingCapacity.size(state, TempSize, ErrorsFound);
             }
         } else {
-            SizingMethod = HVAC::HeatingCapacitySizing;
             SizingString = "Supplemental Heating Coil Nominal Capacity [W]";
             if (TempSize == DataSizing::AutoSize) {
                 IsAutoSize = true;
