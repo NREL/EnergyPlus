@@ -3258,8 +3258,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     for (int VRFTUNum = 1; VRFTUNum <= state.dataHVACVarRefFlow->NumVRFTU; ++VRFTUNum) {
 
         //     initialize local node number variables
-        int FanInletNodeNum = 0;
-        int FanOutletNodeNum = 0;
         int CCoilInletNodeNum = 0;
         int CCoilOutletNodeNum = 0;
         int HCoilInletNodeNum = 0;
@@ -3422,8 +3420,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
             Real64 FanVolFlowRate = fan->maxAirFlowRate;
             thisVrfTU.ActualFanVolFlowRate = FanVolFlowRate;
-            FanInletNodeNum = fan->inletNodeNum;
-            FanOutletNodeNum = fan->outletNodeNum;
+            int FanInletNodeNum = fan->inletNodeNum;
+            int FanOutletNodeNum = fan->outletNodeNum;
             thisVrfTU.FanAvailSchedPtr = fan->availSchedNum;
 
             // Check fan's schedule for cycling fan operation if constant volume fan is used
@@ -7497,13 +7495,9 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     static constexpr std::string_view RoutineName("SizeVRF: "); // include trailing blank space
 
     auto &CheckVRFCombinationRatio = state.dataHVACVarRefFlow->CheckVRFCombinationRatio;
-    bool FoundAll;                      // temporary variable used to check all terminal units
-    bool errFlag;                       // temporary variable used for error checking
     Real64 TUCoolingCapacity;           // total terminal unit cooling capacity
     Real64 TUHeatingCapacity;           // total terminal unit heating capacity
     int VRFCond;                        // index to VRF condenser
-    int TUListNum;                      // index to terminal unit list
-    int TUIndex;                        // index to terminal unit
     int NumTU;                          // DO Loop index counter
     Real64 OnOffAirFlowRat;             // temporary variable used when sizing coils
     Real64 DXCoilCap;                   // capacity of DX cooling coil (W)
@@ -8420,10 +8414,11 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         //    ZoneEqDXCoil = .FALSE.
         TUCoolingCapacity = 0.0;
         TUHeatingCapacity = 0.0;
-        FoundAll = true;
-        TUListNum = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).TUListIndex;
+        bool FoundAll = true;
+        bool errFlag; // temporary variable used for error checking
+        int TUListNum = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).TUListIndex;
         for (NumTU = 1; NumTU <= state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).NumTUInList; ++NumTU) {
-            TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
+            int TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
             if (state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex > 0) {
                 DXCoilCap = DXCoils::GetCoilCapacityByIndexType(state,
                                                                 state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex,
