@@ -13810,7 +13810,6 @@ void VRFCondenserEquipment::VRFOU_CompCap(
     int CompSpdLB;                         // index for Compressor speed low bound [-]
     int CompSpdUB;                         // index for Compressor speed up bound [-]
     int NumOfCompSpdInput;                 // Number of compressor speed input by the user [-]
-    int NumTUInList;                       // number of terminal units is list
     int TUListNum;                         // index to TU List
     Real64 C_cap_operation;                // Compressor capacity modification algorithm_modified Cap [-]
     Real64 P_suction;                      // Compressor suction pressure Pe' [Pa]
@@ -13826,7 +13825,6 @@ void VRFCondenserEquipment::VRFOU_CompCap(
 
     // variable initializations: component index
     TUListNum = this->ZoneTUListPtr;
-    NumTUInList = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).NumTUInList;
     RefPLow = this->refrig->PsLowPresValue;
     RefPHigh = this->refrig->PsHighPresValue;
 
