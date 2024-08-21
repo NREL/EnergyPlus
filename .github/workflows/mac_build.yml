@@ -15,7 +15,7 @@ env:
   Python_REQUIRED_VERSION: 3.12.2
 
 jobs:
-  build_installer_artifact:
+  mac_build_and_test:
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     strategy:
@@ -72,7 +72,7 @@ jobs:
               -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }} \
               -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
               -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/ \
-              -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=OFF \
+              -DBUILD_TESTING:BOOL=ON -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=OFF \
               -DDOCUMENTATION_BUILD:STRING=DoNotBuild \
               -DENABLE_OPENMP:BOOL=OFF -DUSE_OpenMP:BOOL=OFF \
               ../
