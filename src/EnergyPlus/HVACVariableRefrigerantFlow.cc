@@ -4346,7 +4346,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             vrfTU.DesignSpecMultispeedHPType = cAlphaArgs(20);
             vrfTU.DesignSpecMultispeedHPName = cAlphaArgs(21);
             vrfTU.DesignSpecMSHPIndex = UnitarySystems::getDesignSpecMSHPIndex(state, cAlphaArgs(21));
-            auto &designSpecFan = state.dataUnitarySystems->designSpecMSHP[vrfTU.DesignSpecMSHPIndex];
+            auto const &designSpecFan = state.dataUnitarySystems->designSpecMSHP[vrfTU.DesignSpecMSHPIndex];
             if (vrfTU.DXCoolCoilType_Num == HVAC::CoilVRF_Cooling) {
                 int NumSpeeds = designSpecFan.numOfSpeedCooling;
                 vrfTU.NumOfSpeedCooling = NumSpeeds;
@@ -5256,7 +5256,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
 {
 
     constexpr static std::string_view cTerminalUnitType("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow");
-    auto &nodeID = state.dataLoopNodes->NodeID;
+    auto const &nodeID = state.dataLoopNodes->NodeID;
     auto &vrfTU = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
     std::string const cTUName(vrfTU.Name);
     bool const CoolingCoilPresent = vrfTU.CoolingCoilPresent;
@@ -9153,7 +9153,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
     // set supplemental heating coil calculation if the condition requires
     if (this->SuppHeatingCoilPresent) {
         if (this->isSetPointControlled) {
-            auto &thisSuppHeatCoilAirInletNode = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode);
+            auto const &thisSuppHeatCoilAirInletNode = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode);
             if (this->suppTempSetPoint > thisSuppHeatCoilAirInletNode.Temp) {
                 Real64 mDot = thisSuppHeatCoilAirInletNode.MassFlowRate;
                 Real64 Tin = thisSuppHeatCoilAirInletNode.Temp;
@@ -10187,7 +10187,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
             if (state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority == ThermostatCtrlType::ThermostatOffsetPriority) {
                 //         for TSTATPriority, just check difference between zone temp and thermostat setpoint
                 if (ThisZoneNum > 0) {
-                    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ThisZoneNum);
+                    auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ThisZoneNum);
                     SPTempHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ThisZoneNum);
                     SPTempLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ThisZoneNum);
 
@@ -10844,7 +10844,7 @@ void getVRFTUZoneLoad(
 bool getVRFTUNodeNumber(EnergyPlusData &state, int const nodeNumber)
 {
     for (int vrfTUIndex = 1; vrfTUIndex <= state.dataHVACVarRefFlow->NumVRFTU; ++vrfTUIndex) {
-        auto &vrfTU = state.dataHVACVarRefFlow->VRFTU(vrfTUIndex);
+        auto const &vrfTU = state.dataHVACVarRefFlow->VRFTU(vrfTUIndex);
 
         bool noVrfTUOutdoorAir = false;
         if (vrfTU.CoolOutAirVolFlow == 0 && vrfTU.HeatOutAirVolFlow == 0 && vrfTU.NoCoolHeatOutAirVolFlow == 0) {
@@ -12493,18 +12493,18 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     if (!DXCoolingCoilOprCtrl) PartLoadRatio = 0.0;
     this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
     if (this->CoolingCoilPresent) {
-        auto &thisAirInNode = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->CoolCoilIndex).AirInNode);
+        auto const &thisAirInNode = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->CoolCoilIndex).AirInNode);
         this->coilInNodeT = thisAirInNode.Temp;
         this->coilInNodeW = thisAirInNode.HumRat;
     } else {
-        auto &thisAirInNode = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->HeatCoilIndex).AirInNode);
+        auto const &thisAirInNode = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->HeatCoilIndex).AirInNode);
         this->coilInNodeT = thisAirInNode.Temp;
         this->coilInNodeW = thisAirInNode.HumRat;
     }
 
     // set supplemental heating coil calculation if the condition requires
     if (this->SuppHeatingCoilPresent) {
-        auto &thisSuppHeatCoilAirInletNode = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode);
+        auto const &thisSuppHeatCoilAirInletNode = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode);
         if (((QZnReq > HVAC::SmallLoad && QZnReq > FullOutput) || (((QZnReq - NoCompOutput) > HVAC::SmallLoad) && QZnReq <= 0.0)) ||
             (this->isSetPointControlled && this->suppTempSetPoint > thisSuppHeatCoilAirInletNode.Temp)) {
             Real64 ZoneLoad = 0.0;
@@ -13004,7 +13004,6 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
         using SingleDuct::SimATMixer;
 
         int constexpr Mode(1);  // Performance mode for MultiMode DX coil. Always 1 for other coil types
-        int OAMixNode;          // index to the mix node of OA mixer
         int VRFCond;            // index to VRF condenser
         int VRFInletNode;       // VRF inlet node number
         Real64 FanSpdRatioBase; // baseline FanSpdRatio for VRFTUAirFlowResidual
@@ -13038,7 +13037,7 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
             MixedAir::SimOAMixer(
                 state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
-            OAMixNode = state.dataMixedAir->OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
+            int OAMixNode = state.dataMixedAir->OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
             Tin = state.dataLoopNodes->Node(OAMixNode).Temp;
             Win = state.dataLoopNodes->Node(OAMixNode).HumRat;
         }
@@ -13668,7 +13667,6 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
     int CompSpdLB;                         // index for Compressor speed low bound [-]
     int CompSpdUB;                         // index for Compressor speed up bound [-]
     int NumOfCompSpdInput;                 // Number of compressor speed input by the user [-]
-    int NumTUInList;                       // number of terminal units is list
     int TUListNum;                         // index to TU List
     Real64 C_cap_operation;                // Compressor capacity modification algorithm_modified Cap [-]
     Real64 P_suction;                      // Compressor suction pressure Pe' [Pa]
@@ -13685,7 +13683,6 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
 
     // variable initializations: component index
     TUListNum = this->ZoneTUListPtr;
-    NumTUInList = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).NumTUInList;
     RefPLow = this->refrig->PsLowPresValue;
     RefPHigh = this->refrig->PsHighPresValue;
 
