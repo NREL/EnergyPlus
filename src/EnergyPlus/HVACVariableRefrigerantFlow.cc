@@ -11793,7 +11793,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         // Evaporator (IU side) operational parameters
         Pevap = this->refrig->getSatPressure(state, this->IUEvaporatingTemp, RoutineName);
         Psuction = Pevap;
-        Tsuction = this->IUEvaporatingTemp;
         this->EvaporatingTemp = this->IUEvaporatingTemp;
 
         // Condenser (OU side) operation ranges
