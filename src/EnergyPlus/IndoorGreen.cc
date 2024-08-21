@@ -584,7 +584,8 @@ namespace IndoorGreen {
             ig.SensibleRate = (1 - ig.LEDRadFraction) * ig.LEDActualEleP; // convective heat gain from LED lights when LED is on; heat convection from
                                                                           // plants was considered and counted from plant surface heat balance.
             ig.LatentRate = ZoneAirVol * rhoair * (HCons - HMid) / Timestep; // unit W
-            state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(ig.SurfPtr) = -1.0 * ig.LambdaET;
+            state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(ig.SurfPtr) =
+                -1.0 * ig.LambdaET+ ig.LEDRadFraction * 0.9 * ig.LEDActualEleP / state.dataSurface->Surface(ig.SurfPtr).Area; //assume the energy from radiation for photosynthesis is only 10%. 
         }
     }
 
