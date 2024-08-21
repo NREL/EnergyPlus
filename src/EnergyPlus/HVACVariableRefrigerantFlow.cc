@@ -12421,10 +12421,8 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     Real64 FullOutput;     // unit full output when compressor is operating [W]
     Real64 TempOutput;     // unit output when iteration limit exceeded [W]
     Real64 NoCompOutput;   // output when no active compressor [W]
-    int SolFla;            // Flag of RegulaFalsi solver
     Real64 TempMinPLR;     // min PLR used in Regula Falsi call
     Real64 TempMaxPLR;     // max PLR used in Regula Falsi call
-    bool ContinueIter;     // used when convergence is an issue
     int VRFCond;           // index to VRF condenser
     int IndexToTUInTUList; // index to TU in specific list for the VRF system
     int TUListIndex;       // index to TU list for this VRF system
@@ -12607,6 +12605,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     // The coil will not operate at PLR=0 or PLR=1, calculate the operating part-load ratio
 
     if ((VRFHeatingMode || HRHeatingMode) || ((VRFCoolingMode && DXCoolingCoilOprCtrl) || HRCoolingMode)) {
+        int SolFla; // Flag of RegulaFalsi solver
         auto f = [&state, VRFTUNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio](Real64 const PartLoadRatio) {
             Real64 QZnReqTemp = QZnReq;    // denominator representing zone load (W)
             Real64 ActualOutput;           // delivered capacity of VRF terminal unit
@@ -12636,7 +12635,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
         if (SolFla == -1) {
             //     Very low loads may not converge quickly. Tighten PLR boundary and try again.
             TempMaxPLR = -0.1;
-            ContinueIter = true;
+            bool ContinueIter = true;
             while (ContinueIter && TempMaxPLR < 1.0) {
                 TempMaxPLR += 0.1;
 
@@ -13667,7 +13666,6 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
     int CompSpdLB;                         // index for Compressor speed low bound [-]
     int CompSpdUB;                         // index for Compressor speed up bound [-]
     int NumOfCompSpdInput;                 // Number of compressor speed input by the user [-]
-    int TUListNum;                         // index to TU List
     Real64 C_cap_operation;                // Compressor capacity modification algorithm_modified Cap [-]
     Real64 P_suction;                      // Compressor suction pressure Pe' [Pa]
     Real64 Q_evap_req;                     // Required evaporative capacity [W]
@@ -13682,7 +13680,6 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
     static constexpr std::string_view RoutineName("VRFOU_CompSpd");
 
     // variable initializations: component index
-    TUListNum = this->ZoneTUListPtr;
     RefPLow = this->refrig->PsLowPresValue;
     RefPHigh = this->refrig->PsHighPresValue;
 
@@ -13807,7 +13804,6 @@ void VRFCondenserEquipment::VRFOU_CompCap(
     int CompSpdLB;                         // index for Compressor speed low bound [-]
     int CompSpdUB;                         // index for Compressor speed up bound [-]
     int NumOfCompSpdInput;                 // Number of compressor speed input by the user [-]
-    int TUListNum;                         // index to TU List
     Real64 C_cap_operation;                // Compressor capacity modification algorithm_modified Cap [-]
     Real64 P_suction;                      // Compressor suction pressure Pe' [Pa]
     Real64 Q_evap_sys;                     // evaporative capacity [W]
@@ -13821,7 +13817,6 @@ void VRFCondenserEquipment::VRFOU_CompCap(
     static constexpr std::string_view RoutineName("VRFOU_CompCap");
 
     // variable initializations: component index
-    TUListNum = this->ZoneTUListPtr;
     RefPLow = this->refrig->PsLowPresValue;
     RefPHigh = this->refrig->PsHighPresValue;
 
