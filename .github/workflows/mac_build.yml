@@ -1,0 +1,90 @@
+name: Mac Build
+
+on:
+  push:
+    branches: [ develop ]
+    tags:
+      - 'v*' # Push events matching v*, i.e. v1.0, v20.15.10
+  pull_request:
+    branches: [ develop ]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  FC: gfortran-13
+  SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+  Python_REQUIRED_VERSION: 3.12.2
+
+jobs:
+  build_installer_artifact:
+    runs-on: ${{ matrix.os }}
+    continue-on-error: false
+    strategy:
+      fail-fast: false
+      matrix:
+        macos_dev_target: [12.1, 13.0]
+        include:
+        - macos_dev_target: 12.1
+          os: macos-12
+          arch: x86_64
+          python-arch: x64
+        - macos_dev_target: 13.0
+          os: macos-14
+          arch: arm64
+          python-arch: arm64
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # TODO: I assume since we aren't doing any packaging here, we can just use actions/setup-python...but leaving this for now
+    - name: Remove python ${{ env.Python_REQUIRED_VERSION }} from the toolcache
+      run: |
+        ls $RUNNER_TOOL_CACHE/Python || true
+        rm -Rf "$RUNNER_TOOL_CACHE/Python/${{ env.Python_REQUIRED_VERSION }}"
+        rm -Rf "$RUNNER_TOOL_CACHE/Python/${{ env.Python_REQUIRED_VERSION }}*/"
+
+    - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
+      id: setup-python
+      uses: jmarrec/setup-python@v5
+      with:
+        python-version: ${{ env.Python_REQUIRED_VERSION }}
+
+    - name: Install System dependencies
+      shell: bash
+      run: |
+        set -x
+        brew update
+        # The MACOSX_DEPLOYMENT_TARGET environment variable sets the default value for the CMAKE_OSX_DEPLOYMENT_TARGET variable.
+        # We use cmake commands to build some subprojects, so setting it globally
+        echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
+        echo "Installing gcc@13 for gfortran support of -static-libquadmath"
+        brew list gcc@13 || brew install gcc@13
+        which gfortran-13 || echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
+        brew install ninja
+
+    - name: Create Build Directory
+      run: cmake -E make_directory ./build/
+
+    - name: Configure CMake
+      working-directory: ./build
+      shell: bash
+      run: |
+        cmake -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release \
+              -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }} \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/ \
+              -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=OFF \
+              -DDOCUMENTATION_BUILD:STRING=DoNotBuild \
+              -DENABLE_OPENMP:BOOL=OFF -DUSE_OpenMP:BOOL=OFF \
+              ../
+
+    - name: Build Default
+      working-directory: ./build
+      shell: bash
+      run: ninja
+
+    - name: Run Tests
+      working-directory: ./build
+      shell: bash
+      run: ctest -E Basement -j 3
+
+    # TODO: Add regression builds, as well as use GHA caching to store baseline branch results for efficiency
