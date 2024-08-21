@@ -10028,7 +10028,6 @@ void InitializeOperatingMode(EnergyPlusData &state,
     Real64 SPTempLo;         // thermostat setpoint low
     int NumTU;               // loop counter, number of TU's in list
     int TUIndex;             // index to TU
-    int ThisZoneNum;         // index to zone number where TU is located
     Real64 ZoneLoad;         // current zone load (W)
     Real64 LoadToCoolingSP;  // thermostat load to cooling setpoint (W)
     Real64 LoadToHeatingSP;  // thermostat load to heating setpoint (W)
@@ -10059,7 +10058,6 @@ void InitializeOperatingMode(EnergyPlusData &state,
         // make sure TU's have been sized before looping through each one of them to determine operating mode
         if (any(state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TerminalUnitNotSizedYet)) break;
         TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
-        ThisZoneNum = state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum;
 
         //       check to see if coil is present
         if (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).CoolingCoilPresent(NumTU)) {
@@ -10174,6 +10172,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
             //     Constant fan systems are tested for ventilation load to determine if load to be met changes.
             //     more logic may be needed here, what is the OA flow rate, was last mode heating or cooling, what control is used, etc...
 
+            int ThisZoneNum = state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum;
             getVRFTUZoneLoad(state, TUIndex, ZoneLoad, LoadToHeatingSP, LoadToCoolingSP, true);
 
             if (state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority == ThermostatCtrlType::ThermostatOffsetPriority) {
@@ -10936,7 +10935,6 @@ void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(EnergyPlusData &state,
     int TUListIndex;             // index to TU list for this VRF system
     int VRFNum;                  // index to VRF that the VRF Terminal Unit serves
     int VRFInletNode;            // VRF inlet node number
-    int ZoneIndex;               // index to zone where the VRF Terminal Unit resides
     Real64 BFC;                  // Bypass factor at the cooling mode (-)
     Real64 BFH;                  // Bypass factor at the heating mode (-)
     Real64 C1Tevap;              // Coefficient for indoor unit coil evaporating temperature curve (-)
@@ -10967,7 +10965,6 @@ void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(EnergyPlusData &state,
     // Get the equipment/zone index corresponding to the VRFTU
     CoolCoilNum = this->CoolCoilIndex;
     HeatCoilNum = this->HeatCoilIndex;
-    ZoneIndex = this->ZoneNum;
     VRFNum = this->VRFSysNum;
     TUListIndex = state.dataHVACVarRefFlow->VRF(VRFNum).ZoneTUListPtr;
     IndexToTUInTUList = this->IndexToTUInTUList;
