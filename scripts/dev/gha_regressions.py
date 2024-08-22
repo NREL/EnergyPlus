@@ -44,8 +44,8 @@ def single_file_regressions(baseline: Path, modified: Path) -> [bool, bool, bool
     entry = TestEntry(idf, "")
     entry, message = SuiteRunner.process_diffs_for_one_case(
         entry,
-        str(baseline),
-        str(modified),
+        {'build_dir': str(baseline)},
+        {'build_dir': str(modified)},
         "",
         str(thresholds),
         ci_mode=True
