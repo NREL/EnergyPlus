@@ -1487,6 +1487,7 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                     continue;
                 } else if (mat->group == Material::Group::GlassTCParent) {
+                    ++GlassLayer;
                     // reset layer pointer to the first glazing in the TC GlazingGroup
                     auto const *matGlassTC = dynamic_cast<Material::MaterialGlassTC const *>(mat);
                     assert(matGlassTC != nullptr);
@@ -5207,6 +5208,10 @@ namespace HeatBalanceManager {
             constr.numTCChildConstrs = matGlassTC->numMatRefs;
             constr.TCChildConstrs.allocate(constr.numTCChildConstrs);
 
+            // The master thermochromic construction uses the first (i.e., lowest temp) glazing
+            constr.LayerPoint(constr.TCLayerNum) = matGlassTC->matRefs(1).matNum;
+            constr.specTemp = matGlassTC->matRefs(1).specTemp;
+
             for (int iTC = 1; iTC <= constr.numTCChildConstrs; ++iTC) {
                 ++NumNewConst;
                 auto &constrNew = state.dataConstruction->Construct(NumNewConst);
@@ -5214,13 +5219,15 @@ namespace HeatBalanceManager {
                 constrNew = constr; // This should be a deep copy
                 constrNew.Name =  format("{}_TC_{:.0R}", constr.Name, matGlassTC->matRefs(iTC).specTemp);
                 constrNew.LayerPoint(constrNew.TCLayerNum) = matGlassTC->matRefs(iTC).matNum;
-
-                constr.TCChildConstrs(iTC).specTemp = matGlassTC->matRefs(iTC).specTemp;
-                constr.TCChildConstrs(iTC).constrNum = NumNewConst;
-
+                constrNew.specTemp = matGlassTC->matRefs(iTC).specTemp;
+                
                 constrNew.isTCWindow = true;
                 constrNew.isTCMaster = false;
                 constrNew.TCMasterConstrNum = Loop;
+                
+                constr.TCChildConstrs(iTC).specTemp = matGlassTC->matRefs(iTC).specTemp;
+                constr.TCChildConstrs(iTC).constrNum = NumNewConst;
+
             }
         }
         state.dataHeatBal->TotConstructs = NumNewConst;

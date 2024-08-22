@@ -365,13 +365,13 @@ namespace Material {
             }
 
             if (mat->hasEMPD) {
-                ShowSevereCustomMessage(state, eoh, format("Material {} already has EMPD properties defined.", mat->Name, s_ipsc->cCurrentModuleObject));
+                ShowSevereCustomMessage(state, eoh, format("Material {} already has EMPD properties defined.", mat->Name));
                 ErrorsFound = true;
                 continue;
             }
 
             if (mat->hasHAMT) {
-                ShowSevereCustomMessage(state, eoh, format("Material {} already has HAMT properties defined.", mat->Name, s_ipsc->cCurrentModuleObject));
+                ShowSevereCustomMessage(state, eoh, format("Material {} already has HAMT properties defined.", mat->Name));
                 ErrorsFound = true;
                 continue;
             }
@@ -399,6 +399,7 @@ namespace Material {
             matPC->deltaTempFreezingLow = s_ipsc->rNumericArgs(13);
             matPC->specHeatTransition = (matPC->specificHeatSolid + matPC->specificHeatLiquid) / 2.0;
             matPC->CpOld = matPC->specificHeatSolid;
+            matPC->hasPCM = true;
         }
     }
 

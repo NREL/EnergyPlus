@@ -73,7 +73,7 @@ namespace Material {
         Num
     };
 
-    static constexpr std::array<int, (int)Phase::Num> stateInts = {-2, -1, 0, 1, 2};
+    static constexpr std::array<int, (int)Phase::Num> phaseInts = {-2, -1, 0, 1, 2};
         
     struct MaterialPhaseChange : public MaterialBase 
     {

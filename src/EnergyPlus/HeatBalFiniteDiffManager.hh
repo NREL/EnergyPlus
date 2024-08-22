@@ -151,6 +151,9 @@ namespace HeatBalFiniteDiffManager {
         Array1D<Material::Phase> PhaseChangeState;
         Array1D<Material::Phase> PhaseChangeStateOld;
         Array1D<Material::Phase> PhaseChangeStateOldOld;
+        Array1D<int> PhaseChangeStateRep;
+        Array1D<int> PhaseChangeStateOldRep;
+        Array1D<int> PhaseChangeStateOldOldRep;
         Array1D<Real64> PhaseChangeTemperatureReverse;
         Array1D<MaterialActuatorData> condMaterialActuators;
         Array1D<MaterialActuatorData> specHeatMaterialActuators;

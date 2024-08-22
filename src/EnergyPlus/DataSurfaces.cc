@@ -730,16 +730,13 @@ Real64 AbsBackSide(EnergyPlusData &state, int SurfNum)
 
 void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
 {
-    if (!state.dataHeatBal->AnyVariableAbsorptance) return;
+    if (!state.dataMaterial->AnyVariableAbsorptance) return;
     for (int surfNum : state.dataSurface->AllHTSurfaceList) {
         auto const &thisSurface = state.dataSurface->Surface(surfNum);
-        int ConstrNum = thisSurface.Construction;
-        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-        int TotLayers = thisConstruct.TotLayers;
-        if (TotLayers == 0) continue;
-        int materNum = thisConstruct.LayerPoint(1);
-        if (materNum == 0) continue; // error finding material number
-        auto const *mat = state.dataMaterial->materials(materNum);
+        auto const &thisConstruct = state.dataConstruction->Construct(thisSurface.Construction);
+        if (thisConstruct.TotLayers == 0) continue;
+        if (thisConstruct.LayerPoint(1) == 0) continue; // error finding material number
+        auto const *mat = state.dataMaterial->materials(thisConstruct.LayerPoint(1));
         if (mat->group != Material::Group::Regular) continue;
 
         if (mat->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
@@ -768,7 +765,7 @@ void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
             }
         }
     }
-}
+} // GetVariableAbsorptanceSurfaceList()
 
 Compass4 AzimuthToCompass4(Real64 azimuth)
 {

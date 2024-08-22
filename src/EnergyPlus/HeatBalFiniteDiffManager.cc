@@ -486,6 +486,9 @@ namespace HeatBalFiniteDiffManager {
                 thisSurface.PhaseChangeState = Material::Phase::Transition;
                 thisSurface.PhaseChangeStateOld = Material::Phase::Transition;
                 thisSurface.PhaseChangeStateOldOld = Material::Phase::Transition;
+                thisSurface.PhaseChangeStateRep = Material::phaseInts[(int)Material::Phase::Transition];
+                thisSurface.PhaseChangeStateOldRep = Material::phaseInts[(int)Material::Phase::Transition];
+                thisSurface.PhaseChangeStateOldOldRep = Material::phaseInts[(int)Material::Phase::Transition];
                 thisSurface.PhaseChangeTemperatureReverse = 50;
 
                 state.dataMstBal->TempOutsideAirFD(SurfNum) = 0.0;
@@ -831,6 +834,9 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeState.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeStateOld.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeStateOldOld.allocate(TotNodes + 1);
+            SurfaceFD(Surf).PhaseChangeStateRep.allocate(TotNodes + 1);
+            SurfaceFD(Surf).PhaseChangeStateOldRep.allocate(TotNodes + 1);
+            SurfaceFD(Surf).PhaseChangeStateOldOldRep.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeTemperatureReverse.allocate(TotNodes + 1);
             SurfaceFD(Surf).condMaterialActuators.allocate(TotLayers);
             SurfaceFD(Surf).specHeatMaterialActuators.allocate(TotLayers);
@@ -866,6 +872,9 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeState = Material::Phase::Transition;
             SurfaceFD(Surf).PhaseChangeStateOld = Material::Phase::Transition;
             SurfaceFD(Surf).PhaseChangeStateOldOld = Material::Phase::Transition;
+            SurfaceFD(Surf).PhaseChangeStateRep = Material::phaseInts[(int)Material::Phase::Transition];
+            SurfaceFD(Surf).PhaseChangeStateOldRep = Material::phaseInts[(int)Material::Phase::Transition];
+            SurfaceFD(Surf).PhaseChangeStateOldOldRep = Material::phaseInts[(int)Material::Phase::Transition];
             SurfaceFD(Surf).PhaseChangeTemperatureReverse = 50;
             SurfaceFD(Surf).condNodeReport = 0.0;
             SurfaceFD(Surf).specHeatNodeReport = 0.0;
@@ -993,14 +1002,14 @@ namespace HeatBalFiniteDiffManager {
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change State {}", node),
                                     Constant::Units::None,
-                                    (int&)SurfaceFD(SurfNum).PhaseChangeState(node),
+                                    (int&)SurfaceFD(SurfNum).PhaseChangeStateRep(node),
                                     OutputProcessor::TimeStepType::Zone,
                                     OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Previous State {}", node),
                                     Constant::Units::None,
-                                    (int&)SurfaceFD(SurfNum).PhaseChangeStateOld(node),
+                                    (int&)SurfaceFD(SurfNum).PhaseChangeStateOldRep(node),
                                     OutputProcessor::TimeStepType::Zone,
                                     OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
@@ -1267,6 +1276,8 @@ namespace HeatBalFiniteDiffManager {
             surfaceFD.PhaseChangeStateOldOld = surfaceFD.PhaseChangeStateOld;
             surfaceFD.PhaseChangeStateOld = surfaceFD.PhaseChangeState;
 
+            surfaceFD.PhaseChangeStateOldOldRep = surfaceFD.PhaseChangeStateOldRep;
+            surfaceFD.PhaseChangeStateOldRep = surfaceFD.PhaseChangeStateRep;
         } // Time Loop  //PT solving time steps
 
         TempSurfOutTmp = surfaceFD.TDT(1);
@@ -2681,6 +2692,8 @@ namespace HeatBalFiniteDiffManager {
             surfFD.PhaseChangeTemperatureReverse(finiteDifferenceLayerIndex),
             surfFD.PhaseChangeStateOld(finiteDifferenceLayerIndex),
             surfFD.PhaseChangeState(finiteDifferenceLayerIndex));
+
+        surfFD.PhaseChangeStateRep(finiteDifferenceLayerIndex) = Material::phaseInts[(int)surfFD.PhaseChangeState(finiteDifferenceLayerIndex)];
         updatedDensity = mat->getDensity(temperaturePrevious);
         updatedThermalConductivity = mat->getConductivity(temperatureUpdated);
     }
