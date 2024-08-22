@@ -2053,7 +2053,7 @@ Real64 CalcZoneSupplyAirTemp(EnergyPlusData &state, int const ZoneNum)
         zoneInletNodeNum = equipData.OutletNodeNums(1);
         if (zoneInletNodeNum == 0) continue;
 
-        auto &zoneInletNode = state.dataLoopNodes->Node(zoneInletNodeNum);
+        auto const &zoneInletNode = state.dataLoopNodes->Node(zoneInletNodeNum);
         if (zoneInletNode.MassFlowRate > 0.0) {
             SumMdotTemp += zoneInletNode.MassFlowRate * zoneInletNode.Temp;
             SumMdot += zoneInletNode.MassFlowRate;
@@ -2315,7 +2315,7 @@ void CalcTrombeWallIntConvCoeff(EnergyPlusData &state,
     // are assumed to have exactly equal widths AND must have a greater
     // width than the side surfaces.
 
-    auto &zone = state.dataHeatBal->Zone(ZoneNum);
+    auto const &zone = state.dataHeatBal->Zone(ZoneNum);
     Real64 H = zone.CeilingHeight; // height of enclosure
     Real64 minorW = 100000.0;      // width of enclosure (narrow dimension) // An impossibly big width
     Real64 majorW = 0.0;           // width of major surface
@@ -3049,7 +3049,7 @@ void SetupAdaptiveConvRadiantSurfaceData(EnergyPlusData &state)
         int activeFloorCount = 0;
         Real64 activeFloorArea = 0.0;
 
-        auto &zone = state.dataHeatBal->Zone(ZoneLoop);
+        auto const &zone = state.dataHeatBal->Zone(ZoneLoop);
         for (int spaceNum : zone.spaceIndexes) {
             auto const &thisSpace = state.dataHeatBal->space(spaceNum);
             for (int SurfLoop = thisSpace.HTSurfaceFirst; SurfLoop <= thisSpace.HTSurfaceLast; ++SurfLoop) {
@@ -3985,7 +3985,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     } else { // is controlled, lets see by how and if that means is currently active
 
         auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(surface.Zone);
-        auto &zoneNode = state.dataLoopNodes->Node(zone.SystemZoneNodeNumber);
+        auto const &zoneNode = state.dataLoopNodes->Node(zone.SystemZoneNodeNumber);
 
         if (!(zoneEquipConfig.EquipListIndex > 0) || state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc ||
             !state.dataZoneEquip->ZoneEquipSimulatedOnce) {
@@ -4062,7 +4062,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                             for (int SurfLoop = thisSpace.HTSurfaceFirst; SurfLoop <= thisSpace.HTSurfaceLast; ++SurfLoop) {
 
                                 if (!state.dataSurface->surfIntConv(SurfLoop).hasActiveInIt) continue;
-                                auto &surface = state.dataSurface->Surface(SurfLoop);
+                                auto const &surface = state.dataSurface->Surface(SurfLoop);
                                 if (surface.Class != SurfaceClass::Floor) continue;
 
                                 Real64 DeltaTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfLoop) -
@@ -4688,7 +4688,7 @@ Real64 CalcUserDefinedIntHcModel(EnergyPlusData &state, int const SurfNum, int c
     }
 
     auto &userCurve = state.dataConvect->hcIntUserCurve(UserCurveNum);
-    auto &surfIntConv = state.dataSurface->surfIntConv(SurfNum);
+    auto const &surfIntConv = state.dataSurface->surfIntConv(SurfNum);
 
     switch (userCurve.refTempType) {
     case RefTemp::MeanAirTemp:
@@ -6544,7 +6544,7 @@ Real64 SurroundingSurfacesRadCoeffAverage(EnergyPlusData &state, int const SurfN
     // compute exterior surfaces LW radiation transfer coefficient to surrounding surfaces
     // the surface.SrdSurfTemp is weighed by surrounding surfaces view factor
     Real64 HSrdSurf = 0.0;
-    auto &surface = state.dataSurface->Surface(SurfNum);
+    auto const &surface = state.dataSurface->Surface(SurfNum);
     Real64 SrdSurfsTK = surface.SrdSurfTemp + Constant::Kelvin;
     if (TSurfK != SrdSurfsTK) {
         HSrdSurf = Constant::StefanBoltzmann * AbsExt * surface.ViewFactorSrdSurfs * (pow_4(TSurfK) - pow_4(SrdSurfsTK)) / (TSurfK - SrdSurfsTK);
