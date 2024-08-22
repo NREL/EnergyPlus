@@ -11942,10 +11942,17 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         //* Update h_comp_out in iteration (Label230)
         h_comp_out_new = Ncomp / (m_ref_IU_evap + m_ref_OU_evap) + h_comp_in;
 
-        if ((std::abs(h_comp_out - h_comp_out_new) > Tolerance * h_comp_out) && (h_IU_cond_in < h_IU_cond_in_up)) {
-            h_IU_cond_in = h_IU_cond_in + 0.1 * (h_IU_cond_in_up - h_IU_cond_in_low);
+        if ((std::abs(h_comp_out - h_comp_out_new) > Tolerance * h_comp_out) && (h_IU_cond_in < h_IU_cond_in_up) &&
+            (h_IU_cond_in_low < h_IU_cond_in)) {
+            Real64 h_IU_cond_in_old = h_IU_cond_in;
+            if (h_comp_out < h_comp_out_new) {
+                h_IU_cond_in = h_IU_cond_in + 0.1 * (h_IU_cond_in_up - h_IU_cond_in_low);
+            } else {
+                h_IU_cond_in = h_IU_cond_in - 0.1 * (h_IU_cond_in_up - h_IU_cond_in_low);
+            }
             goto Label230;
         }
+
         if (h_IU_cond_in > h_IU_cond_in_up) {
             h_IU_cond_in = 0.5 * (h_IU_cond_in_up + h_IU_cond_in_low);
         }
@@ -13288,7 +13295,7 @@ Real64 VRFCondenserEquipment::VRFOU_FlowRate(EnergyPlusData &state,
         deltaT = this->C3Tc * pow_2(SHSC) + this->C2Tc * SHSC + this->C1Tc;
         T_coil_surf = TeTc - deltaT;
         T_coil_out = T_coil_in + (T_coil_surf - T_coil_in) * (1 - BF);
-        m_air = abs(Q_coil) / (T_coil_out - T_coil_in) / 1005.0;
+        m_air = Q_coil / (T_coil_out - T_coil_in) / 1005.0;
 
     } else if (OperationMode == HXOpMode::EvapMode) {
         // IU Heating: OperationMode 1
@@ -13727,7 +13734,7 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
             CompEvaporatingCAPSpd(CounterCompSpdTemp) =
                 this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
 
-            Q_evap_req = Q_cond_req - CompEvaporatingPWRSpd(CounterCompSpdTemp);
+            Q_evap_req = max(0.0, Q_cond_req - CompEvaporatingPWRSpd(CounterCompSpdTemp));
 
             if (Q_evap_req * C_cap_operation <= CompEvaporatingCAPSpd(CounterCompSpdTemp)) {
                 // Compressor speed stage CounterCompSpdTemp need not to be increased, finish Iteration DoName1
