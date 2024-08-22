@@ -4508,7 +4508,7 @@ namespace StandardRatings {
                                 p_int, q_int, q_low, bl, n, Q_E_Int(spnum), q_full, P_E_Int(spnum), p_full, p_low);
                             speedsUsed.push_back(spnum);
                             goto SpeedLoop3_exit;
-                        } else if (bl < q_full) {
+                        } else { // bl < q_full
                             // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
                             // full Speed
                             std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2B(
@@ -4606,7 +4606,7 @@ namespace StandardRatings {
                             std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2A(
                                 p_int, q_int, q_low, bl, n, Q_E_Int(spnum), q_full, P_E_Int(spnum), p_full, p_low);
                             goto SpeedLoop3_exit;
-                        } else if (bl < q_full) {
+                        } else { // bl < q_full
                             // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
                             // full Speed
                             std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2B(
@@ -4647,7 +4647,7 @@ namespace StandardRatings {
                             std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2A(
                                 p_int, q_int, q_low, bl, n, Q_E_Int(spnum), q_full, P_E_Int(spnum), p_full, p_low);
                             goto SpeedLoop3_exit;
-                        } else if (bl < q_full) {
+                        } else { // bl < q_full
                             // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
                             // full Speed
                             std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2B(
@@ -4691,7 +4691,7 @@ namespace StandardRatings {
                         std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
                             IntermediateCapacityAndPowerSEER2Case2A(p_int, q_int, q_low, bl, n, Q_E_Int(1), q_full, P_E_Int(1), p_full, p_low);
                         goto SpeedLoop3_exit;
-                    } else if (bl < q_full) {
+                    } else { // bl < q_full
                         // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
                         // full Speed
                         std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
@@ -6469,7 +6469,7 @@ namespace StandardRatings {
                 } else if (bl >= q_full) {
                     // CASE 3 : 11.2.2.3.3 AHRI-2023
                     // Building Load is greater than the capacity of the unit at the Full Compressor Speed, q_full <= bl or (bl >= q_full:)
-                    if (t > (-15) || t <= (-8.33)) {
+                    if (t > (-15) || t <= (-8.33)) { // Logical disjunction always evaluates to true: t > -15 || t <= -8.33
                         Real64 t_ratio = (t - (-15)) / ((-8.33) - (-15));
                         // Equation 11.203 AHRI-2023
                         q_full = q_H4_full + (q_H3_full - q_H4_full) * t_ratio;
