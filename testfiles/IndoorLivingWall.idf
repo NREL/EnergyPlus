@@ -2911,6 +2911,8 @@ Output:Table:SummaryReports,
 OutputControl:Table:Style,
     HTML;                    !- Column Separator
 
+OutputControl:Files,
+    Yes;                     !- Output CSV
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
 
@@ -3210,90 +3212,6 @@ Output:Variable,
     *,                       !- Key Value
     Indoor Living Wall LED Electricity Energy ,  !- Variable Name
     Timestep;                !- Reporting Frequency
-
-
-!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
-
-Output:Meter:MeterFileOnly,
-    Electricity:Facility,    !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:Building,    !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    InteriorLights:Electricity,  !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:HVAC,        !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:Plant,       !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    NaturalGas:Facility,     !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    NaturalGas:Plant,        !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:Facility,    !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:Building,    !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    InteriorLights:Electricity,  !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:HVAC,        !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:Plant,       !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    NaturalGas:Facility,     !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    NaturalGas:Plant,        !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyGeneralLights,         !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyGeneralLights,         !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyBuildingElectric,      !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyBuildingElectric,      !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyBuildingOther,         !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyBuildingOther,         !- Key Name
-    runperiod;               !- Reporting Frequency
-
 
 !-   ===========  ALL OBJECTS IN CLASS: METER:CUSTOM ===========
 
