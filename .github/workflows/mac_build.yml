@@ -61,16 +61,16 @@ jobs:
 
     # BUILD AND TEST INTEGRATION FILES ON THE BASELINE BRANCH
 
-    - name: [Baseline] Checkout
+    - name: Baseline Checkout
       uses: actions/checkout@v4
       with:
         ref: develop
         path: baseline
 
-    - name: [Baseline] Create Build Directory
+    - name: Baseline Create Build Directory
       run: cmake -E make_directory ./baseline/build/
 
-    - name: [Baseline] Configure CMake
+    - name: Baseline Configure CMake
       working-directory: ./baseline/build
       shell: bash
       run: |
@@ -83,27 +83,27 @@ jobs:
               -DENABLE_OPENMP:BOOL=OFF -DUSE_OpenMP:BOOL=OFF \
               ../
 
-    - name: [Baseline] Build
+    - name: Baseline Build
       working-directory: ./baseline/build
       shell: bash
       run: ninja
 
-    - name: [Baseline] Test
+    - name: Baseline Test
       working-directory: ./baseline/build
       shell: bash
       run: ctest -E Basement -R integration -j 3  # TODO: Speed up basement so we don't have to skip it.
 
     # BUILD AND TEST EVERYTHING ON THE CURRENT BRANCH
 
-    - name: [Branch] Checkout
+    - name: Branch Checkout
       uses: actions/checkout@v4
       with:
         path: branch
 
-    - name: [Branch] Create Build Directory
+    - name: Branch Create Build Directory
       run: cmake -E make_directory ./branch/build/
 
-    - name: [Branch] Configure CMake
+    - name: Branch Configure CMake
       working-directory: ./branch/build
       shell: bash
       run: |
@@ -116,12 +116,12 @@ jobs:
               -DENABLE_OPENMP:BOOL=OFF -DUSE_OpenMP:BOOL=OFF \
               ../
 
-    - name: [Branch] Build
+    - name: Branch Build
       working-directory: ./branch/build
       shell: bash
       run: ninja
 
-    - name: [Branch] Test
+    - name: Branch Test
       working-directory: ./branch/build
       shell: bash
       run: ctest -E Basement -j 3
