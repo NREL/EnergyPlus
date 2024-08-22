@@ -4056,18 +4056,18 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                 case DataZoneEquipment::ZoneEquipType::VentilatedSlab:
                 case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiant: {
                     if (zoneEquipConfig.InFloorActiveElement) {
-                        for (int spaceNum : zone.spaceIndexes) {
-                            auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+                        for (int spaceNumLoop : zone.spaceIndexes) {
+                            auto const &thisSpace = state.dataHeatBal->space(spaceNumLoop);
 
                             for (int SurfLoop = thisSpace.HTSurfaceFirst; SurfLoop <= thisSpace.HTSurfaceLast; ++SurfLoop) {
 
                                 if (!state.dataSurface->surfIntConv(SurfLoop).hasActiveInIt) continue;
-                                auto const &surface = state.dataSurface->Surface(SurfLoop);
-                                if (surface.Class != SurfaceClass::Floor) continue;
+                                auto const &surfaceLoop = state.dataSurface->Surface(SurfLoop);
+                                if (surfaceLoop.Class != SurfaceClass::Floor) continue;
 
-                                Real64 DeltaTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfLoop) -
-                                                   state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
-                                if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with floor
+                                Real64 DeltaTempLoop = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfLoop) -
+                                                       state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNumLoop).MAT;
+                                if (DeltaTempLoop > ActiveDelTempThreshold) { // assume heating with floor
                                     // system ON is not enough because floor surfaces can continue to heat because of thermal capacity
                                     EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
                                     FlowRegimeStack[EquipOnCount] = InConvFlowRegime::A1;
@@ -4076,43 +4076,43 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                     break;
                                 } // if (DeltaTemp)
                             }     // for (SurfLoop)
-                        }         // for (spaceNum)
+                        }         // for (spaceNumLoop)
                     }             // if (InFloorActiveElement)
 
                     if (zoneEquipConfig.InCeilingActiveElement) {
-                        for (int spaceNum : zone.spaceIndexes) {
-                            auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+                        for (int spaceNumLoop : zone.spaceIndexes) {
+                            auto const &thisSpace = state.dataHeatBal->space(spaceNumLoop);
 
                             for (int SurfLoop = thisSpace.HTSurfaceFirst; SurfLoop <= thisSpace.HTSurfaceLast; ++SurfLoop) {
                                 if (!state.dataSurface->surfIntConv(SurfLoop).hasActiveInIt) continue;
-                                auto const &surface = state.dataSurface->Surface(SurfLoop);
-                                if (surface.Class != SurfaceClass::Roof) continue;
+                                auto const &surfaceLoop = state.dataSurface->Surface(SurfLoop);
+                                if (surfaceLoop.Class != SurfaceClass::Roof) continue;
 
-                                Real64 DeltaTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfLoop) -
-                                                   state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
-                                if (DeltaTemp < ActiveDelTempThreshold) { // assume cooling with ceiling
+                                Real64 DeltaTempLoop = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfLoop) -
+                                                       state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNumLoop).MAT;
+                                if (DeltaTempLoop < ActiveDelTempThreshold) { // assume cooling with ceiling
                                     // system ON is not enough because  surfaces can continue to cool because of thermal capacity
                                     EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
                                     FlowRegimeStack[EquipOnCount] = InConvFlowRegime::A1;
                                     HeatingPriorityStack[EquipOnCount] = zoneEquipList.HeatingPriority(EquipNum);
                                     CoolingPriorityStack[EquipOnCount] = zoneEquipList.CoolingPriority(EquipNum);
                                     break;
-                                } // if (DeltaTemp)
+                                } // if (DeltaTempLoop)
                             }     // for (SurfLoop)
-                        }         // for (spaceNum)
+                        }         // for (spaceNumLoop)
                     }             // if (InCeilingActiveElement)
 
                     if (zoneEquipConfig.InWallActiveElement) {
-                        for (int spaceNum : zone.spaceIndexes) {
-                            auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+                        for (int spaceNumLoop : zone.spaceIndexes) {
+                            auto const &thisSpace = state.dataHeatBal->space(spaceNumLoop);
 
                             for (int SurfLoop = thisSpace.HTSurfaceFirst; SurfLoop <= thisSpace.HTSurfaceLast; ++SurfLoop) {
                                 if (!state.dataSurface->surfIntConv(SurfLoop).hasActiveInIt) continue;
-                                auto const &surface = state.dataSurface->Surface(SurfLoop);
-                                if (surface.Class != SurfaceClass::Wall && surface.Class != SurfaceClass::Door) continue;
+                                auto const &surface_test = state.dataSurface->Surface(SurfLoop);
+                                if (surface_test.Class != SurfaceClass::Wall && surface_test.Class != SurfaceClass::Door) continue;
 
                                 DeltaTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfLoop) -
-                                            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
+                                            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNumLoop).MAT;
                                 if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with wall panel
                                     // system ON is not enough because  surfaces can continue to heat because of thermal capacity
                                     EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
@@ -4126,7 +4126,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                     CoolingPriorityStack[EquipOnCount] = zoneEquipList.CoolingPriority(EquipNum);
                                 } // else (DeltaTemp)
                             }     // for (SurfLoop)
-                        }         // for (spaceNum)
+                        }         // for (spaceNumLoop)
                     }             // if (InWallActiveElement)
                 } break;
                 default:; // nothing
@@ -4167,8 +4167,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         auto const &zoneNode = state.dataLoopNodes->Node(zone.SystemZoneNodeNumber);
         // Calculate Grashof, Reynolds, and Richardson numbers for the zone
         // Grashof for zone air based on largest delta T between surfaces and zone height
-        for (int spaceNum : zone.spaceIndexes) {
-            auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+        for (int spaceNumLoop : zone.spaceIndexes) {
+            auto const &thisSpace = state.dataHeatBal->space(spaceNumLoop);
             for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; ++surfNum) {
                 Real64 SurfTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(surfNum);
                 if (SurfTemp < Tmin)
