@@ -381,7 +381,7 @@ namespace IndoorGreen {
                 state,
                 "Indoor Living Wall Sensible Heat Gain Rate",
                 Constant::Units::W,
-                state.dataHeatBalSurf->SurfQConvInRep(ig.SurfPtr), // positive sign: heat loss from plants; negative sign: heat gain from plants
+                state.dataHeatBalSurf->SurfQConvInRep(ig.SurfPtr), // positive sign: heat loss from plants; negative sign: heat gain to plants
                 OutputProcessor::TimeStepType::Zone,
                 OutputProcessor::StoreType::Average,
                 ig.Name);
@@ -400,7 +400,7 @@ namespace IndoorGreen {
                                 OutputProcessor::StoreType::Average,
                                 ig.Name);
             SetupOutputVariable(state,
-                                "Indoor Living Wall Energy Required For Evapotranspiration Per Unit Area",
+                                "Indoor Living Wall Energy Rate Required For Evapotranspiration Per Unit Area",
                                 Constant::Units::W_m2,
                                 ig.LambdaET,
                                 OutputProcessor::TimeStepType::Zone,
