@@ -33,8 +33,6 @@ jobs:
           python-arch: arm64
 
     steps:
-    - uses: actions/checkout@v4
-
     # TODO: I assume since we aren't doing any packaging here, we can just use actions/setup-python...but leaving this for now
     - name: Remove python ${{ env.Python_REQUIRED_VERSION }} from the toolcache
       run: |
@@ -61,11 +59,19 @@ jobs:
         which gfortran-13 || echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
         brew install ninja
 
-    - name: Create Build Directory
-      run: cmake -E make_directory ./build/
+    # BUILD AND TEST INTEGRATION FILES ON THE BASELINE BRANCH
 
-    - name: Configure CMake
-      working-directory: ./build
+    - name: [Baseline] Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: develop
+        path: baseline
+
+    - name: [Baseline] Create Build Directory
+      run: cmake -E make_directory ./baseline/build/
+
+    - name: [Baseline] Configure CMake
+      working-directory: ./baseline/build
       shell: bash
       run: |
         cmake -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release \
@@ -77,16 +83,55 @@ jobs:
               -DENABLE_OPENMP:BOOL=OFF -DUSE_OpenMP:BOOL=OFF \
               ../
 
-    - name: Build Default
-      working-directory: ./build
+    - name: [Baseline] Build
+      working-directory: ./baseline/build
       shell: bash
       run: ninja
 
-    - uses: lhotari/action-upterm@v1
+    - name: [Baseline] Test
+      working-directory: ./baseline/build
+      shell: bash
+      run: ctest -E Basement -R integration -j 3  # TODO: Speed up basement so we don't have to skip it.
 
-    - name: Run Tests
-      working-directory: ./build
+    # BUILD AND TEST EVERYTHING ON THE CURRENT BRANCH
+
+    - name: [Branch] Checkout
+      uses: actions/checkout@v4
+      with:
+        path: branch
+
+    - name: [Branch] Create Build Directory
+      run: cmake -E make_directory ./branch/build/
+
+    - name: [Branch] Configure CMake
+      working-directory: ./branch/build
+      shell: bash
+      run: |
+        cmake -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release \
+              -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }} \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/ \
+              -DBUILD_TESTING:BOOL=ON -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=OFF \
+              -DDOCUMENTATION_BUILD:STRING=DoNotBuild \
+              -DENABLE_OPENMP:BOOL=OFF -DUSE_OpenMP:BOOL=OFF \
+              ../
+
+    - name: [Branch] Build
+      working-directory: ./branch/build
+      shell: bash
+      run: ninja
+
+    - name: [Branch] Test
+      working-directory: ./branch/build
       shell: bash
       run: ctest -E Basement -j 3
+      # TODO: Allow this to fail temporarily but continue so that we also get regression results
 
+    - name: Install Regression Tool
+      run: pip install energyplus-regressions # TODO: Not sure if we need to use a different python path here, and we could pip it or clone it
+
+    - name: Run Regressions
+      run: python ./branch/scripts/dev/gha_regressions.py ./baseline/build/testfiles ./branch/build/testfiles/
+
+    # NOW INSTALL THE REGRESSION TOOL AND DO COMPARISONS OF THE INTEGRATION RESULTS
     # TODO: Add regression builds, as well as use GHA caching to store baseline branch results for efficiency

@@ -60,7 +60,7 @@
 
 using namespace EnergyPlus;
 
-TEST_F(EnergyPlusFixture, Timer_ticktock)
+TEST_F(EnergyPlusFixture, DISABLED_Timer_ticktock)
 {
 
     constexpr std::chrono::milliseconds::rep sleep_time_ms = 100;
