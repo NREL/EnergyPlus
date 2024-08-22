@@ -129,7 +129,6 @@ namespace Humidifiers {
 
         auto &Humidifier = state.dataHumidifiers->Humidifier;
         int NumHumidifiers = state.dataHumidifiers->NumHumidifiers;
-        auto &CheckEquipName = state.dataHumidifiers->CheckEquipName;
 
         if (state.dataHumidifiers->GetInputFlag) {
             GetHumidifierInput(state);
@@ -150,6 +149,7 @@ namespace Humidifiers {
                     state,
                     format("SimHumidifier: Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", HumNum, NumHumidifiers, CompName));
             }
+            auto &CheckEquipName = state.dataHumidifiers->CheckEquipName;
             if (CheckEquipName(HumNum)) {
                 if (CompName != Humidifier(HumNum).Name) {
                     ShowFatalError(state,
@@ -742,31 +742,27 @@ namespace Humidifiers {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string ModuleObjectType; // for ease in getting objects
-        int RefrigerantIndex;         // refrigerant index
-        int WaterIndex;               // fluid type index
-        Real64 NominalPower;          // Nominal power input to humidifier, W
-        Real64 WaterSpecHeatAvg;      // specific heat of water, J/kgK
-        Real64 SteamSatEnthalpy;      // enthalpy of saturated steam at 100C, J/kg
-        Real64 WaterSatEnthalpy;      // enthalpy of saturated water at 100C, J/kg
-        bool IsAutoSize;              // Indicator to autosize
-        bool HardSizeNoDesRun;        // Indicator to a hard-sized field with no design sizing data
-        bool ErrorsFound(false);      // TRUE if errors detected in input
-        Real64 NomPowerDes;           // Autosized nominal power for reporting
-        Real64 NomPowerUser;          // Hardsized nominal power for reporting
-        Real64 MassFlowDes;           // Design air mass flow rate
-        Real64 InletHumRatDes;        // Design inlet humidity ratio
-        Real64 OutletHumRatDes;       // Design outlet humidity ratio
-        Real64 NomCapVolDes;          // Autosized Nominal capacity volume for reporting
-        Real64 NomCapVolUser;         // HardSized nominal capacity volume for reporting
-        Real64 AirVolFlow;            // Design air volume flow rate
-        Real64 AirDensity;            // Density of air
+        Real64 NominalPower;     // Nominal power input to humidifier, W
+        Real64 WaterSpecHeatAvg; // specific heat of water, J/kgK
+        Real64 SteamSatEnthalpy; // enthalpy of saturated steam at 100C, J/kg
+        Real64 WaterSatEnthalpy; // enthalpy of saturated water at 100C, J/kg
+        bool ErrorsFound(false); // TRUE if errors detected in input
+        Real64 NomPowerDes;      // Autosized nominal power for reporting
+        Real64 NomPowerUser;     // Hardsized nominal power for reporting
+        Real64 MassFlowDes;      // Design air mass flow rate
+        Real64 InletHumRatDes;   // Design inlet humidity ratio
+        Real64 OutletHumRatDes;  // Design outlet humidity ratio
+        Real64 NomCapVolDes;     // Autosized Nominal capacity volume for reporting
+        Real64 NomCapVolUser;    // HardSized nominal capacity volume for reporting
+        Real64 AirVolFlow;       // Design air volume flow rate
+        Real64 AirDensity;       // Density of air
 
         if (HumType == HumidType::Electric || HumType == HumidType::Gas) {
-            IsAutoSize = false;
-            HardSizeNoDesRun = false;
+            bool IsAutoSize = false;
+            bool HardSizeNoDesRun = false;
             NomPowerDes = 0.0;
             NomPowerUser = 0.0;
+            std::string ModuleObjectType; // for ease in getting objects
 
             if (HumType == HumidType::Electric) {
                 ModuleObjectType = "electric";
@@ -878,8 +874,8 @@ namespace Humidifiers {
             }
 
             NomCap = RhoH2O(Constant::InitConvTemp) * NomCapVol;
-            RefrigerantIndex = FluidProperties::GetRefrigNum(state, format(fluidNameSteam));
-            WaterIndex = FluidProperties::GetGlycolNum(state, format(fluidNameWater));
+            int RefrigerantIndex = FluidProperties::GetRefrigNum(state, format(fluidNameSteam));
+            int WaterIndex = FluidProperties::GetGlycolNum(state, format(fluidNameWater));
             SteamSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 1.0, RefrigerantIndex, CalledFrom);
             WaterSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 0.0, RefrigerantIndex, CalledFrom);
             WaterSpecHeatAvg = 0.5 * (GetSpecificHeatGlycol(state, format(fluidNameWater), TSteam, WaterIndex, CalledFrom) +
@@ -1189,8 +1185,6 @@ namespace Humidifiers {
         Real64 SteamSatEnthalpy;        // enthalpy of saturated steam at 100C [J/kg]
         Real64 WaterSatEnthalpy;        // enthalpy of saturated water at 100C [J/kg]
         Real64 Tref;                    // humidifier entering water temperature [C]
-        int RefrigerantIndex;           // refiferant index
-        int WaterIndex;                 // fluid type index
 
         HumRatSatIn = PsyWFnTdbRhPb(state, AirInTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
         HumRatSatOut = 0.0;
@@ -1252,8 +1246,8 @@ namespace Humidifiers {
                     CurMakeupWaterTemp = state.dataEnvrn->WaterMainsTemp;
                 }
                 Tref = CurMakeupWaterTemp;
-                RefrigerantIndex = FluidProperties::GetRefrigNum(state, format(fluidNameSteam));
-                WaterIndex = FluidProperties::GetGlycolNum(state, format(fluidNameWater));
+                int RefrigerantIndex = FluidProperties::GetRefrigNum(state, format(fluidNameSteam));
+                int WaterIndex = FluidProperties::GetGlycolNum(state, format(fluidNameWater));
                 SteamSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 1.0, RefrigerantIndex, RoutineName);
                 WaterSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 0.0, RefrigerantIndex, RoutineName);
                 WaterSpecHeatAvg = 0.5 * (GetSpecificHeatGlycol(state, format(fluidNameWater), TSteam, WaterIndex, RoutineName) +
