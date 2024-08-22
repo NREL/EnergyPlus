@@ -751,10 +751,8 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                                Array1D_int &NodeNums)
 {
     static constexpr std::string_view RoutineName("processZoneEquipmentInput: "); // include trailing blank space
-    std::string_view zsString = "Zone";
     int spaceFieldShift = 0;
     if (isSpace) {
-        zsString = "Space";
         spaceFieldShift = -1;
     }
 
