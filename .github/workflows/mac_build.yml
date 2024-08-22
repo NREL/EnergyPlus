@@ -82,6 +82,8 @@ jobs:
       shell: bash
       run: ninja
 
+    - uses: lhotari/action-upterm@v1
+
     - name: Run Tests
       working-directory: ./build
       shell: bash
