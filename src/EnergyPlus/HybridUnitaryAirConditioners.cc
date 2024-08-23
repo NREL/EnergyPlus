@@ -1317,8 +1317,8 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
 }
 int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const CompNum)
 {
-    bool errorsfound = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errorsfound = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
@@ -1334,8 +1334,8 @@ int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const CompNum)
 
 int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int const CompNum)
 {
-    bool errorsfound = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errorsfound = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
@@ -1351,8 +1351,8 @@ int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int const CompNum)
 
 int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const CompNum)
 {
-    bool errorsfound = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errorsfound = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
@@ -1368,8 +1368,8 @@ int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const CompNum)
 
 int getHybridUnitaryACIndex(EnergyPlusData &state, std::string_view CompName)
 {
-    bool errFlag = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errFlag = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errFlag);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
