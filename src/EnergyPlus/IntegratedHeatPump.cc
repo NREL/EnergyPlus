@@ -1961,7 +1961,7 @@ int GetLowSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum)
                               state.dataIntegratedHP->IntegratedHeatPumps.size()));
     }
 
-    auto &ihp = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum);
+    auto const &ihp = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum);
 
     switch (ihp.CurMode) {
     case IHPOperationMode::Idle:
@@ -2164,7 +2164,7 @@ Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state, int const DXCoilNum, int co
                               state.dataIntegratedHP->IntegratedHeatPumps.size()));
     }
 
-    auto &ihp = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum);
+    auto const &ihp = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum);
 
     if (!ihp.IHPCoilsSized) SizeIHP(state, DXCoilNum);
 
