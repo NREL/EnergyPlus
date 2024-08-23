@@ -11,7 +11,7 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   FC: gfortran-13
-  Python_REQUIRED_VERSION: 3.12.2
+  Python_REQUIRED_VERSION: 3.12.3  # 3.12.2 not available on Ubuntu 24 GHA
   shell: bash
 
 jobs:
