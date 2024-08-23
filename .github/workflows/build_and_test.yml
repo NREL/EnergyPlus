@@ -120,7 +120,7 @@ jobs:
 
     - name: Baseline Test
       working-directory: ./baseline/build
-      run: ctest -E Basement -R integration -j 3  # TODO: Speed up basement so we don't have to skip it.
+      run: ctest -C Release -E Basement -R integration -j 3  # TODO: Speed up basement so we don't have to skip it.
 
     # BUILD AND TEST EVERYTHING ON THE CURRENT BRANCH
 
@@ -156,7 +156,7 @@ jobs:
 
     - name: Branch Test
       working-directory: ./branch/build
-      run: ctest -E Basement -j 3
+      run: ctest -C Release -E Basement -j 3
       continue-on-error: true  # allow unit tests to fail but still try to run regressions next
 
     - name: Install Regression Tool
