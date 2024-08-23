@@ -416,8 +416,6 @@ void GetIHPInput(EnergyPlusData &state)
     int NumParams;                   // Total number of input fields
     int MaxNums(0);                  // Maximum number of numeric input fields
     int MaxAlphas(0);                // Maximum number of alpha input fields
-    std::string InNodeName;          // Name of coil inlet node
-    std::string OutNodeName;         // Name of coil outlet node
     std::string CurrentModuleObject; // for ease in getting objects
     std::string sIHPType;            // specify IHP type
     Array1D_string AlphArray;        // Alpha input items for object
@@ -431,9 +429,6 @@ void GetIHPInput(EnergyPlusData &state)
     bool IsNotOK;            // Flag to verify name
     bool errFlag;
     int IOStat;
-    int InNode(0);         // inlet air or water node
-    int OutNode(0);        // outlet air or water node
-    int ChildCoilIndex(0); // refer to a child coil
 
     int NumASIHPs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE");
 
@@ -647,11 +642,11 @@ void GetIHPInput(EnergyPlusData &state)
         //     using OverrideNodeConnectionType
 
         // cooling coil air node connections
-        ChildCoilIndex = ihp.SCCoilIndex;
-        InNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirInletNodeNum;
-        OutNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
-        InNodeName = state.dataLoopNodes->NodeID(InNode);
-        OutNodeName = state.dataLoopNodes->NodeID(OutNode);
+        int ChildCoilIndex = ihp.SCCoilIndex;
+        int InNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirInletNodeNum;
+        int OutNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
+        std::string InNodeName = state.dataLoopNodes->NodeID(InNode);
+        std::string OutNodeName = state.dataLoopNodes->NodeID(OutNode);
 
         ihp.AirCoolInletNodeNum = InNode;
         ihp.AirHeatInletNodeNum = OutNode;
