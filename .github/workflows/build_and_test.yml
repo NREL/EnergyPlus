@@ -11,7 +11,6 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   FC: gfortran-13
-  SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
   Python_REQUIRED_VERSION: 3.12.2
   shell: bash
 
@@ -22,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-12, macos-14, ubuntu-latest, windows-2019, windows-latest]
+        os: [macos-12, macos-14, ubuntu-latest, windows-2019, windows-2022]
         include:
         - os: macos-12
           macos_dev_target: 12.1
@@ -65,19 +64,27 @@ jobs:
       with:
         python-version: ${{ env.Python_REQUIRED_VERSION }}
 
-    - name: Set MacOS Dev Target
-      run: echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
+    - name: Install Dependencies for Mac
+      if: ${{ runner.os == 'macOS' }}
+      run: >
+        brew update
+        brew install gcc@13
+        echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
+        echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
 
-#    - name: Install System dependencies
-#      run: |
-#        set -x
-#        brew update
-#        # The MACOSX_DEPLOYMENT_TARGET environment variable sets the default value for the CMAKE_OSX_DEPLOYMENT_TARGET variable.
-#        # We use cmake commands to build some subprojects, so setting it globally
-#        echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
-#        echo "Installing gcc@13 for gfortran support of -static-libquadmath"
-#        brew list gcc@13 || brew install gcc@13
-#        which gfortran-13 || echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
+    - name: Install Dependencies for Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: >
+        sudo apt-get update
+        sudo apt-get install libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
+        if [[ "${{ matrix.os }}" == "ubuntu-24.04" ]]; then
+          # https://github.com/actions/runner-images/issues/10025
+          echo "FC=gfortran-13" >> $GITHUB_ENV
+        fi
+
+#    - name: Install Dependencies for Windows
+#      if: ${{ runner.os == 'Windows' }}
+#      run: choco install cmake --version=3.28.4 --installargs 'ADD_CMAKE_TO_PATH=System'
 
     # BUILD AND TEST INTEGRATION FILES ON THE BASELINE BRANCH
 
