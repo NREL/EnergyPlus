@@ -90,20 +90,13 @@ namespace HybridModel {
 
         using ScheduleManager::GetScheduleIndex;
 
-        bool ErrorsFound(false); // If errors detected in input
         Array1D_bool lAlphaFieldBlanks(16, false);
         Array1D_bool lNumericFieldBlanks(4, false);
-        int NumAlphas;  // Number of Alphas for each GetobjectItem call
-        int NumNumbers; // Number of Numbers for each GetobjectItem call
-        int IOStatus;
-        int ZonePtr;                     // Pointer to the zone
         std::string CurrentModuleObject; // to assist in getting input
         Array1D_string cAlphaArgs(16);   // Alpha input items for object
         Array1D_string cAlphaFieldNames(16);
         Array1D_string cNumericFieldNames(16);
         Array1D<Real64> rNumericArgs(4); // Numeric input items for object
-        int HMStartDay = 0;
-        int HMEndDay = 0;
 
         // Read hybrid model input
         CurrentModuleObject = "HybridModel:Zone";
@@ -111,6 +104,11 @@ namespace HybridModel {
 
         if (state.dataHybridModel->NumOfHybridModelZones > 0) {
             state.dataHybridModel->HybridModelZone.allocate(state.dataGlobal->NumOfZones);
+            bool ErrorsFound = false; // If errors detected in input
+            int NumAlphas = 0;           // Number of Alphas for each GetobjectItem call
+            int NumNumbers = 0;          // Number of Numbers for each GetobjectItem call
+            int IOStatus = 0;
+            int ZonePtr = 0;
             for (int HybridModelNum = 1; HybridModelNum <= state.dataHybridModel->NumOfHybridModelZones; ++HybridModelNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -396,13 +394,15 @@ namespace HybridModel {
                         state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndMonth = rNumericArgs(3);
                         state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndDate = rNumericArgs(4);
                         {
-                            int HMDayArr[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+                            int const HMDayArr[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
                             int HybridModelStartMonth = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureStartMonth;
                             int HybridModelStartDate = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureStartDate;
                             int HybridModelEndMonth = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndMonth;
                             int HybridModelEndDate = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndDate;
 
+                            int HMStartDay = 0;
+                            int HMEndDay = 0;
                             if (HybridModelStartMonth >= 1 && HybridModelStartMonth <= 12) {
                                 HMStartDay = HMDayArr[HybridModelStartMonth - 1];
                             }
