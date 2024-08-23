@@ -417,7 +417,6 @@ void GetIHPInput(EnergyPlusData &state)
     int MaxNums(0);                  // Maximum number of numeric input fields
     int MaxAlphas(0);                // Maximum number of alpha input fields
     std::string CurrentModuleObject; // for ease in getting objects
-    std::string sIHPType;            // specify IHP type
     Array1D_string AlphArray;        // Alpha input items for object
     Array1D_string cAlphaFields;     // Alpha field names
     Array1D_string cNumericFields;   // Numeric field names
@@ -451,7 +450,6 @@ void GetIHPInput(EnergyPlusData &state)
 
     // Get the data for air-source IHPs
     CurrentModuleObject = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE"; // for reporting
-    sIHPType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";            // for checking
 
     for (int CoilCounter = 1; CoilCounter <= NumASIHPs; ++CoilCounter) {
 
