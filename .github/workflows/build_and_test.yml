@@ -17,11 +17,9 @@ env:
 jobs:
   build_and_test:
     runs-on: ${{ matrix.os }}
-    continue-on-error: false
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-12, macos-14, ubuntu-latest, windows-2019, windows-2022]
         include:
         - os: macos-12
           macos_dev_target: 12.1
@@ -37,7 +35,7 @@ jobs:
           generator: "Unix Makefiles"
           nproc: 3
           targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
-        - os: ubuntu-latest
+        - os: ubuntu-24.04
           arch: x86_64
           python-arch: x64
           generator: "Unix Makefiles"
