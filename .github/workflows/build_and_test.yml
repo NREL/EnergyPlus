@@ -48,13 +48,13 @@ jobs:
           python-arch: x64
           generator: "Visual Studio 16 2019"
           nproc: 4
-          targets: energyplus ExpandObjects_build ReadVarsESO_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
+          targets: energyplus ExpandObjects_build ReadVars_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
         - os: windows-2022
           arch: x86_64
           python-arch: x64
           generator: "Visual Studio 17 2022"
           nproc: 4
-          targets: energyplus ExpandObjects_build ReadVarsESO_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
+          targets: energyplus ExpandObjects_build ReadVars_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
 
     steps:
 
