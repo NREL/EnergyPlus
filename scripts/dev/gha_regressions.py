@@ -244,9 +244,7 @@ def single_file_regressions(baseline: Path, modified: Path) -> [bool, bool, bool
         has_small_diffs = True
         print_warning(idf, "StdErr diffs.")
 
-    print(f"*** Regressions for file {idf}: {success=}, {has_small_diffs=}, {has_diffs=}")
-    print(f"{json.dumps(entry.to_dict(), indent=4)}\n")
-    return success, has_small_diffs, has_diffs
+    return success, has_small_diffs, has_diffs, entry
 
 
 def check_all_regressions(base_testfiles: Path, mod_testfiles: Path) -> bool:
@@ -258,11 +256,16 @@ def check_all_regressions(base_testfiles: Path, mod_testfiles: Path) -> bool:
         modified = mod_testfiles / baseline.name
         if not modified.exists():
             continue  # TODO: Should we warn that it is missing?
-        success, small_diffs, big_diffs = single_file_regressions(baseline, modified)
+        success, small_diffs, big_diffs, entry = single_file_regressions(baseline, modified)
         if small_diffs or big_diffs:
             any_diffs = True
+            print(f"*** Regressions for file {baseline.name}: {success=}, {small_diffs=}, {big_diffs=}")
+            print(f"{json.dumps(entry.to_dict(), indent=4)}\n")
         if not success:
             any_failures = True
+            print(f"*** FAILURE for file {baseline.name}\n")
+        if success and not any_diffs:
+            print(f"*** No regressions or failures found for {baseline.name}\n")
     return any_diffs or any_failures
 
 
