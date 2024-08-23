@@ -105,8 +105,8 @@ namespace HybridModel {
         if (state.dataHybridModel->NumOfHybridModelZones > 0) {
             state.dataHybridModel->HybridModelZone.allocate(state.dataGlobal->NumOfZones);
             bool ErrorsFound = false; // If errors detected in input
-            int NumAlphas = 0;           // Number of Alphas for each GetobjectItem call
-            int NumNumbers = 0;          // Number of Numbers for each GetobjectItem call
+            int NumAlphas = 0;        // Number of Alphas for each GetobjectItem call
+            int NumNumbers = 0;       // Number of Numbers for each GetobjectItem call
             int IOStatus = 0;
             int ZonePtr = 0;
             for (int HybridModelNum = 1; HybridModelNum <= state.dataHybridModel->NumOfHybridModelZones; ++HybridModelNum) {
