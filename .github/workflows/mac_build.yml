@@ -13,6 +13,7 @@ env:
   FC: gfortran-13
   SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
   Python_REQUIRED_VERSION: 3.12.2
+  shell: bash
 
 jobs:
   mac_build_and_test:
@@ -27,37 +28,50 @@ jobs:
           os: macos-12
           arch: x86_64
           python-arch: x64
+          generator: "Unix Makefiles"
+          nproc: 3
+          targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
         - macos_dev_target: 13.0
           os: macos-14
           arch: arm64
           python-arch: arm64
+          generator: "Unix Makefiles"
+          nproc: 3
+          targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
+        - os: ubuntu-latest
+          generator: "Unix Makefiles"
+          nproc: 4
+          targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
+        - os: windows-2019
+          generator: "Visual Studio 16 2019"
+          nproc: 4
+          targets: energyplus ExpandObjects_build ReadVarsESO_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
+        - os: windows-2022
+          generator: "Visual Studio 17 2022"
+          nproc: 4
+          targets: energyplus ExpandObjects_build ReadVarsESO_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
 
     steps:
-    # TODO: I assume since we aren't doing any packaging here, we can just use actions/setup-python...but leaving this for now
-    - name: Remove python ${{ env.Python_REQUIRED_VERSION }} from the toolcache
-      run: |
-        ls $RUNNER_TOOL_CACHE/Python || true
-        rm -Rf "$RUNNER_TOOL_CACHE/Python/${{ env.Python_REQUIRED_VERSION }}"
-        rm -Rf "$RUNNER_TOOL_CACHE/Python/${{ env.Python_REQUIRED_VERSION }}*/"
 
     - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
       id: setup-python
-      uses: jmarrec/setup-python@v5
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ env.Python_REQUIRED_VERSION }}
 
-    - name: Install System dependencies
-      shell: bash
-      run: |
-        set -x
-        brew update
-        # The MACOSX_DEPLOYMENT_TARGET environment variable sets the default value for the CMAKE_OSX_DEPLOYMENT_TARGET variable.
-        # We use cmake commands to build some subprojects, so setting it globally
-        echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
-        echo "Installing gcc@13 for gfortran support of -static-libquadmath"
-        brew list gcc@13 || brew install gcc@13
-        which gfortran-13 || echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
-        brew install ninja
+    - name: Set MacOS Dev Target
+      run: echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
+
+#    - name: Install System dependencies
+#      run: |
+#        set -x
+#        brew update
+#        # The MACOSX_DEPLOYMENT_TARGET environment variable sets the default value for the CMAKE_OSX_DEPLOYMENT_TARGET variable.
+#        # We use cmake commands to build some subprojects, so setting it globally
+#        echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
+#        echo "Installing gcc@13 for gfortran support of -static-libquadmath"
+#        brew list gcc@13 || brew install gcc@13
+#        which gfortran-13 || echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
 
     # BUILD AND TEST INTEGRATION FILES ON THE BASELINE BRANCH
 
@@ -72,25 +86,28 @@ jobs:
 
     - name: Baseline Configure CMake
       working-directory: ./baseline/build
-      shell: bash
       run: |
-        cmake -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release \
+        cmake -G "${{ matrix.generator }}" \
+              -DCMAKE_BUILD_TYPE:STRING=Release \
               -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }} \
-              -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DLINK_WITH_PYTHON:BOOL=ON \
+              -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
               -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/ \
-              -DBUILD_TESTING:BOOL=ON -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=OFF \
+              -DBUILD_TESTING:BOOL=ON \
+              -DBUILD_FORTRAN:BOOL=ON \ 
+              -DBUILD_PACKAGE:BOOL=OFF \
               -DDOCUMENTATION_BUILD:STRING=DoNotBuild \
-              -DENABLE_OPENMP:BOOL=OFF -DUSE_OpenMP:BOOL=OFF \
+              -DENABLE_OPENMP:BOOL=OFF \ 
+              -DUSE_OpenMP:BOOL=OFF \
               ../
 
     - name: Baseline Build
       working-directory: ./baseline/build
-      shell: bash
-      run: ninja
+      # Building specific target list so that we don't waste time building the unit test binary
+      run: cmake --build . -j ${{ matrix.nproc }} --config Release --target ${{ matrix.targets }}
 
     - name: Baseline Test
       working-directory: ./baseline/build
-      shell: bash
       run: ctest -E Basement -R integration -j 3  # TODO: Speed up basement so we don't have to skip it.
 
     # BUILD AND TEST EVERYTHING ON THE CURRENT BRANCH
@@ -105,25 +122,27 @@ jobs:
 
     - name: Branch Configure CMake
       working-directory: ./branch/build
-      shell: bash
       run: |
-        cmake -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release \
+        cmake -G "${{ matrix.generator }}" \
+              -DCMAKE_BUILD_TYPE:STRING=Release \
               -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }} \
-              -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DLINK_WITH_PYTHON:BOOL=ON \
+              -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
               -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/ \
-              -DBUILD_TESTING:BOOL=ON -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=OFF \
+              -DBUILD_TESTING:BOOL=ON \ 
+              -DBUILD_FORTRAN:BOOL=ON \
+              -DBUILD_PACKAGE:BOOL=OFF \
               -DDOCUMENTATION_BUILD:STRING=DoNotBuild \
-              -DENABLE_OPENMP:BOOL=OFF -DUSE_OpenMP:BOOL=OFF \
+              -DENABLE_OPENMP:BOOL=OFF \
+              -DUSE_OpenMP:BOOL=OFF \
               ../
 
     - name: Branch Build
       working-directory: ./branch/build
-      shell: bash
-      run: ninja
+      run: cmake --build . -j ${{ matrix.nproc }} --config Release
 
     - name: Branch Test
       working-directory: ./branch/build
-      shell: bash
       run: ctest -E Basement -j 3
       # TODO: Allow this to fail temporarily but continue so that we also get regression results
 
@@ -132,6 +151,3 @@ jobs:
 
     - name: Run Regressions
       run: python ./branch/scripts/dev/gha_regressions.py ./baseline/build/testfiles ./branch/build/testfiles/
-
-    # NOW INSTALL THE REGRESSION TOOL AND DO COMPARISONS OF THE INTEGRATION RESULTS
-    # TODO: Add regression builds, as well as use GHA caching to store baseline branch results for efficiency
