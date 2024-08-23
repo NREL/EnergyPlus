@@ -1,4 +1,4 @@
-name: Mac Build
+name: Build And Test
 
 on:
   push:
@@ -16,37 +16,43 @@ env:
   shell: bash
 
 jobs:
-  mac_build_and_test:
+  build_and_test:
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     strategy:
       fail-fast: false
       matrix:
-        macos_dev_target: [12.1, 13.0]
+        os: [macos-12, macos-14, ubuntu-latest, windows-2019, windows-latest]
         include:
-        - macos_dev_target: 12.1
-          os: macos-12
+        - os: macos-12
+          macos_dev_target: 12.1
           arch: x86_64
           python-arch: x64
           generator: "Unix Makefiles"
           nproc: 3
           targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
-        - macos_dev_target: 13.0
-          os: macos-14
+        - os: macos-14
+          macos_dev_target: 13.0
           arch: arm64
           python-arch: arm64
           generator: "Unix Makefiles"
           nproc: 3
           targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
         - os: ubuntu-latest
+          arch: x86_64
+          python-arch: x64
           generator: "Unix Makefiles"
           nproc: 4
           targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
         - os: windows-2019
+          arch: x86_64
+          python-arch: x64
           generator: "Visual Studio 16 2019"
           nproc: 4
           targets: energyplus ExpandObjects_build ReadVarsESO_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
         - os: windows-2022
+          arch: x86_64
+          python-arch: x64
           generator: "Visual Studio 17 2022"
           nproc: 4
           targets: energyplus ExpandObjects_build ReadVarsESO_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
@@ -86,20 +92,21 @@ jobs:
 
     - name: Baseline Configure CMake
       working-directory: ./baseline/build
-      run: |
-        cmake -G "${{ matrix.generator }}" \
-              -DCMAKE_BUILD_TYPE:STRING=Release \
-              -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }} \
-              -DLINK_WITH_PYTHON:BOOL=ON \
-              -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
-              -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/ \
-              -DBUILD_TESTING:BOOL=ON \
-              -DBUILD_FORTRAN:BOOL=ON \ 
-              -DBUILD_PACKAGE:BOOL=OFF \
-              -DDOCUMENTATION_BUILD:STRING=DoNotBuild \
-              -DENABLE_OPENMP:BOOL=OFF \ 
-              -DUSE_OpenMP:BOOL=OFF \
-              ../
+      run: >
+        cmake 
+        -G "${{ matrix.generator }}"
+        -DCMAKE_BUILD_TYPE:STRING=Release
+        -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }}
+        -DLINK_WITH_PYTHON:BOOL=ON
+        -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }}
+        -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/
+        -DBUILD_TESTING:BOOL=ON
+        -DBUILD_FORTRAN:BOOL=ON 
+        -DBUILD_PACKAGE:BOOL=OFF
+        -DDOCUMENTATION_BUILD:STRING=DoNotBuild
+        -DENABLE_OPENMP:BOOL=OFF
+        -DUSE_OpenMP:BOOL=OFF
+        ../
 
     - name: Baseline Build
       working-directory: ./baseline/build
@@ -122,20 +129,21 @@ jobs:
 
     - name: Branch Configure CMake
       working-directory: ./branch/build
-      run: |
-        cmake -G "${{ matrix.generator }}" \
-              -DCMAKE_BUILD_TYPE:STRING=Release \
-              -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }} \
-              -DLINK_WITH_PYTHON:BOOL=ON \
-              -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
-              -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/ \
-              -DBUILD_TESTING:BOOL=ON \ 
-              -DBUILD_FORTRAN:BOOL=ON \
-              -DBUILD_PACKAGE:BOOL=OFF \
-              -DDOCUMENTATION_BUILD:STRING=DoNotBuild \
-              -DENABLE_OPENMP:BOOL=OFF \
-              -DUSE_OpenMP:BOOL=OFF \
-              ../
+      run: >
+        cmake 
+        -G "${{ matrix.generator }}"
+        -DCMAKE_BUILD_TYPE:STRING=Release
+        -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }}
+        -DLINK_WITH_PYTHON:BOOL=ON
+        -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }}
+        -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/
+        -DBUILD_TESTING:BOOL=ON
+        -DBUILD_FORTRAN:BOOL=ON
+        -DBUILD_PACKAGE:BOOL=OFF
+        -DDOCUMENTATION_BUILD:STRING=DoNotBuild
+        -DENABLE_OPENMP:BOOL=OFF
+        -DUSE_OpenMP:BOOL=OFF
+        ../
 
     - name: Branch Build
       working-directory: ./branch/build
@@ -144,7 +152,7 @@ jobs:
     - name: Branch Test
       working-directory: ./branch/build
       run: ctest -E Basement -j 3
-      # TODO: Allow this to fail temporarily but continue so that we also get regression results
+      continue-on-error: true  # allow unit tests to fail but still try to run regressions next
 
     - name: Install Regression Tool
       run: pip install energyplus-regressions # TODO: Not sure if we need to use a different python path here, and we could pip it or clone it
