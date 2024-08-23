@@ -80,10 +80,6 @@ jobs:
           echo "FC=gfortran-13" >> $GITHUB_ENV
         fi
 
-#    - name: Install Dependencies for Windows
-#      if: ${{ runner.os == 'Windows' }}
-#      run: choco install cmake --version=3.28.4 --installargs 'ADD_CMAKE_TO_PATH=System'
-
     # BUILD AND TEST INTEGRATION FILES ON THE BASELINE BRANCH
 
     - name: Baseline Checkout
