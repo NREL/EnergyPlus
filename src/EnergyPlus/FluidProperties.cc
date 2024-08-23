@@ -1035,7 +1035,7 @@ namespace FluidProperties {
                 continue;
             }
 
-            auto &supTempArray = FluidTemps(supTempArrayNum);
+            auto const &supTempArray = FluidTemps(supTempArrayNum);
             refrig->NumSupTempPoints = supTempArray.NumOfTemps;
             refrig->SupTemps.allocate(refrig->NumSupTempPoints);
             refrig->SupTemps = supTempArray.Temps;
@@ -1441,7 +1441,7 @@ namespace FluidProperties {
 
             if (!glycolRaw->CpTempArrayName.empty()) {
                 int cpTempArrayNum = Util::FindItemInList(glycolRaw->CpTempArrayName, FluidTemps);
-                auto &cpTempArray = FluidTemps(cpTempArrayNum);
+                auto const &cpTempArray = FluidTemps(cpTempArrayNum);
                 glycolRaw->NumCpTempPoints = cpTempArray.NumOfTemps;
                 glycolRaw->CpTemps.allocate(glycolRaw->NumCpTempPoints);
                 glycolRaw->CpTemps = cpTempArray.Temps;
@@ -1452,7 +1452,7 @@ namespace FluidProperties {
 
             if (!glycolRaw->RhoTempArrayName.empty()) {
                 int rhoTempArrayNum = Util::FindItemInList(glycolRaw->RhoTempArrayName, FluidTemps);
-                auto &rhoTempArray = FluidTemps(rhoTempArrayNum);
+                auto const &rhoTempArray = FluidTemps(rhoTempArrayNum);
                 glycolRaw->NumRhoTempPoints = rhoTempArray.NumOfTemps;
                 glycolRaw->RhoTemps.allocate(glycolRaw->NumRhoTempPoints);
                 glycolRaw->RhoTemps = rhoTempArray.Temps;
@@ -1463,7 +1463,7 @@ namespace FluidProperties {
 
             if (!glycolRaw->CondTempArrayName.empty()) {
                 int condTempArrayNum = Util::FindItemInList(glycolRaw->CondTempArrayName, FluidTemps);
-                auto &condTempArray = FluidTemps(condTempArrayNum);
+                auto const &condTempArray = FluidTemps(condTempArrayNum);
                 glycolRaw->NumCondTempPoints = condTempArray.NumOfTemps;
                 glycolRaw->CondTemps.allocate(glycolRaw->NumCondTempPoints);
                 glycolRaw->CondTemps = condTempArray.Temps;
@@ -1474,7 +1474,7 @@ namespace FluidProperties {
 
             if (!glycolRaw->ViscTempArrayName.empty()) {
                 int viscTempArrayNum = Util::FindItemInList(glycolRaw->ViscTempArrayName, FluidTemps);
-                auto &viscTempArray = FluidTemps(viscTempArrayNum);
+                auto const &viscTempArray = FluidTemps(viscTempArrayNum);
                 glycolRaw->NumViscTempPoints = viscTempArray.NumOfTemps;
                 glycolRaw->ViscTemps.allocate(glycolRaw->NumViscTempPoints);
                 glycolRaw->ViscTemps = viscTempArray.Temps;
@@ -1936,7 +1936,7 @@ namespace FluidProperties {
         // Most properties requested (e.g., Specific Heat) must be > 0 but the tables may
         // be set up for symmetry and not be limited to just valid values.
 
-        auto &df = state.dataFluidProps;
+        auto const &df = state.dataFluidProps;
 
         for (auto *glycol : df->glycols) {
             if (glycol->CpDataPresent) {
@@ -2039,7 +2039,7 @@ namespace FluidProperties {
         // for the refrigerant properties.
         // Most properties requested (e.g., Specific Heat) must be > 0 but the tables may
         // be set up for symmetry and not be limited to just valid values.
-        auto &df = state.dataFluidProps;
+        auto const &df = state.dataFluidProps;
 
         for (auto *refrig : df->refrigs) {
             for (int IndexNum = 1; IndexNum <= refrig->NumPsPoints; ++IndexNum) {
@@ -2181,7 +2181,7 @@ namespace FluidProperties {
         Real64 Temperature; // Temperature to drive values
         Real64 ReturnValue; // Values returned from glycol functions
 
-        auto &df = state.dataFluidProps;
+        auto const &df = state.dataFluidProps;
 
         for (auto *glycol : df->glycols) {
 
@@ -2423,7 +2423,7 @@ namespace FluidProperties {
         Real64 Temperature; // Temperature to drive values
         Real64 ReturnValue; // Values returned from refrigerant functions
 
-        auto &df = state.dataFluidProps;
+        auto const &df = state.dataFluidProps;
 
         for (auto *refrig : df->refrigs) {
             // Lay out the basic values:
@@ -2759,8 +2759,6 @@ namespace FluidProperties {
 
         int LoTempIndex = FindArrayIndex(Temperature, this->PsTemps, this->PsLowTempIndex, this->PsHighTempIndex);
 
-        auto &df = state.dataFluidProps;
-
         // check for out of data bounds problems
         if (LoTempIndex == 0) {
             ReturnValue = this->PsValues(this->PsLowTempIndex);
@@ -2778,6 +2776,8 @@ namespace FluidProperties {
 
         if (!state.dataGlobal->WarmupFlag && ErrorFlag) {
             ++this->errors[(int)RefrigError::SatTemp].count;
+            auto &df = state.dataFluidProps;
+
             // send warning
             if (this->errors[(int)RefrigError::SatTemp].count <= df->RefrigErrorLimitTest) {
                 ShowSevereMessage(
@@ -2851,8 +2851,6 @@ namespace FluidProperties {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         bool ErrorFlag = false; // error flag for current call
 
-        auto &df = state.dataFluidProps;
-
         // get the array indices
         int LoPresIndex = FindArrayIndex(Pressure, this->PsValues, this->PsLowPresIndex, this->PsHighPresIndex);
 
@@ -2873,6 +2871,8 @@ namespace FluidProperties {
 
         if (!state.dataGlobal->WarmupFlag && ErrorFlag) {
             ++this->errors[(int)RefrigError::SatPress].count;
+            auto &df = state.dataFluidProps;
+
             // send warning
             if (this->errors[(int)RefrigError::SatPress].count <= df->RefrigErrorLimitTest) {
                 ShowSevereMessage(state,
@@ -2995,8 +2995,6 @@ namespace FluidProperties {
         // FUNCTION PARAMETER DEFINITIONS:
         static constexpr std::string_view routineName = "RefrigProps::getSatDensity";
 
-        auto &df = state.dataFluidProps;
-
         if ((Quality < 0.0) || (Quality > 1.0)) {
             ShowSevereError(state, fmt::format("{}Refrigerant \"{}\", invalid quality, called from {}", routineName, this->Name, CalledFrom));
             ShowContinueError(state, format("Saturated density quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
@@ -3045,6 +3043,8 @@ namespace FluidProperties {
 
         if (!state.dataGlobal->WarmupFlag && ErrorFlag) {
             ++this->errors[(int)RefrigError::SatTempDensity].count;
+            auto &df = state.dataFluidProps;
+
             // send warning
             if (this->errors[(int)RefrigError::SatTempDensity].count <= df->RefrigErrorLimitTest) {
                 ShowSevereMessage(
@@ -3403,8 +3403,6 @@ namespace FluidProperties {
         // the enthalpy calculated from the pressure found
         static constexpr std::string_view routineName = "RefrigProps::getSupHeatPressure";
 
-        auto &df = state.dataFluidProps;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 EnthalpyCheck;   // recalculates enthalpy based on calculated pressure
         Real64 EnthalpyHigh;    // Enthalpy value at interpolated pressure and high temperature
@@ -3542,6 +3540,8 @@ namespace FluidProperties {
         }
 
         if (ErrCount > 0 && !state.dataGlobal->WarmupFlag) {
+            auto &df = state.dataFluidProps;
+
             // send near saturation warning if flagged
             this->errors[(int)RefrigError::SatSupPress].count += CurSatErrCount;
             // send warning
@@ -4593,7 +4593,7 @@ namespace FluidProperties {
 
     int GetGlycolRawNum(EnergyPlusData &state, std::string_view const glycolRawName) // carries in substance name
     {
-        auto &df = state.dataFluidProps;
+        auto const &df = state.dataFluidProps;
 
         auto found = std::find_if(df->glycolsRaw.begin(), df->glycolsRaw.end(), [glycolRawName](GlycolRawProps const *glycolRaw) {
             return glycolRaw->Name == glycolRawName;
@@ -4779,8 +4779,6 @@ namespace FluidProperties {
         // Return value
         Real64 ReturnValue;
 
-        auto &df = state.dataFluidProps;
-
         // error counters and dummy string
         bool ErrorFlag(false); // error flag for current call
 
@@ -4811,6 +4809,8 @@ namespace FluidProperties {
         }
 
         if (ErrorFlag && (CalledFrom != "ReportAndTestRefrigerants")) {
+            auto &df = state.dataFluidProps;
+
             ++df->TempRangeErrCountGetInterpolatedSatProp;
             // send warning
             if (df->TempRangeErrCountGetInterpolatedSatProp <= df->RefrigErrorLimitTest) {
@@ -4832,7 +4832,7 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    bool CheckFluidPropertyName(EnergyPlusData &state,
+    bool CheckFluidPropertyName(EnergyPlusData const &state,
                                 std::string const &name) // Name from input(?) to be checked against valid FluidPropertyNames
     {
 
@@ -4842,7 +4842,7 @@ namespace FluidProperties {
 
         // PURPOSE OF THIS FUNCTION:
         // This function checks on an input fluid property to make sure it is valid.
-        auto &df = state.dataFluidProps;
+        auto const &df = state.dataFluidProps;
 
         auto foundRefrig = std::find_if(df->refrigs.begin(), df->refrigs.end(), [name](RefrigProps const *refrig) { return refrig->Name == name; });
         if (foundRefrig != df->refrigs.end()) return true;
@@ -4867,7 +4867,7 @@ namespace FluidProperties {
         bool NeedOrphanMessage = true;
         int NumUnusedRefrig = 0;
 
-        auto &df = state.dataFluidProps;
+        auto const &df = state.dataFluidProps;
 
         for (auto const *refrig : df->refrigs) {
             if (refrig->used) continue;
@@ -4913,18 +4913,18 @@ namespace FluidProperties {
     void GetFluidDensityTemperatureLimits(EnergyPlusData &state, int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
         if (FluidIndex > 0) {
-            auto &df = state.dataFluidProps;
-            MinTempLimit = df->glycols(FluidIndex)->RhoLowTempValue;
-            MaxTempLimit = df->glycols(FluidIndex)->RhoHighTempValue;
+            auto const &df = state.dataFluidProps->glycols(FluidIndex);
+            MinTempLimit = df->RhoLowTempValue;
+            MaxTempLimit = df->RhoHighTempValue;
         }
     }
 
     void GetFluidSpecificHeatTemperatureLimits(EnergyPlusData &state, int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
         if (FluidIndex > 0) {
-            auto &df = state.dataFluidProps;
-            MinTempLimit = df->glycols(FluidIndex)->CpLowTempValue;
-            MaxTempLimit = df->glycols(FluidIndex)->CpHighTempValue;
+            auto const &df = state.dataFluidProps->glycols(FluidIndex);
+            MinTempLimit = df->CpLowTempValue;
+            MaxTempLimit = df->CpHighTempValue;
         }
     }
 
