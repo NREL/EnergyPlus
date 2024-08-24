@@ -350,8 +350,6 @@ void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const Firs
     // Simulate the controllers and components in the outside air system.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool FatalErrorFlag(false);
-
     state.dataSize->CurOASysNum = OASysNum;
     auto &CurrentOASystem(state.dataAirLoop->OutsideAirSys(OASysNum));
     if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
@@ -360,6 +358,7 @@ void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const Firs
     SimOASysComponents(state, OASysNum, FirstHVACIteration, AirLoopNum);
 
     if (state.dataMixedAir->MyOneTimeErrorFlag(OASysNum)) {
+        bool FatalErrorFlag(false);
         if (CurrentOASystem.NumControllers - CurrentOASystem.NumSimpleControllers > 1) {
             ShowWarningError(
                 state,
