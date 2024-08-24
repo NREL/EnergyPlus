@@ -209,13 +209,11 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
 
     static constexpr std::string_view RoutineName("SizeCGSHPChillerHeater");
 
-    bool ErrorsFound; // If errors detected in input
-
     // auto-size the chiller heater components
     if (this->ControlMode == CondenserType::SmartMixing) {
 
         for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
-            ErrorsFound = false;
+            bool ErrorsFound = false;
 
             // find the appropriate Plant Sizing object
             int PltSizNum = state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).PlantSizNum;
@@ -588,7 +586,6 @@ void GetWrapperInput(EnergyPlusData &state)
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
         // initialize nth chiller heater index (including identical units) for current wrapper
-        int NumChHtrPerWrapper = 0;
         if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound)) {
             continue;
         }
@@ -697,6 +694,7 @@ void GetWrapperInput(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             int Comp = 0;
+            int NumChHtrPerWrapper = 0;
             for (int loop = 10; loop <= NumAlphas; loop += 3) {
                 ++Comp;
                 state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType =
@@ -1169,7 +1167,6 @@ void GetChillerHeaterInput(EnergyPlusData &state)
     //  This routine will get the input required by the ChillerHeaterPerformance:Electric:EIR model.
 
     bool CHErrorsFound(false);         // True when input errors are found
-    bool FoundNegValue(false);         // Used to evaluate PLFFPLR curve objects
     int NumAlphas;                     // Number of elements in the alpha array
     int NumNums;                       // Number of elements in the numeric array
     int IOStat;                        // IO Status when calling get input subroutine
@@ -1433,7 +1430,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX > 0) {
-            FoundNegValue = false;
+            bool FoundNegValue = false;
             for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
                 Real64 CurveValTmp = Curve::CurveValue(
                     state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, double(CurveCheck / 10.0));
@@ -1496,7 +1493,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX > 0) {
-            FoundNegValue = false;
+            bool FoundNegValue = false;
             for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
                 Real64 CurveValTmp = Curve::CurveValue(
                     state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, double(CurveCheck / 10.0));
