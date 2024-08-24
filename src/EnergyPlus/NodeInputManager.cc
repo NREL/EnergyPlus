@@ -812,12 +812,10 @@ void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)
     // This subroutine begins a process of checking for unique node names
     // in a sequence of nodes.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool errFlag(false);
-
     // Begin set up of Uniqueness context
 
     if (state.dataNodeInputMgr->GetNodeInputFlag) {
+        bool errFlag(false);
         GetNodeListsInput(state, errFlag);
         state.dataNodeInputMgr->GetNodeInputFlag = false;
     }
@@ -862,11 +860,8 @@ void CheckUniqueNodeNames(
     // METHODOLOGY EMPLOYED:
     // checks the current list of items for this (again)
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Found;
-
     if (!CheckName.empty()) {
-        Found = Util::FindItemInList(CheckName, state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
+        int Found = Util::FindItemInList(CheckName, state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
         if (Found != 0) {
             ShowSevereError(state, format("{}=\"{}\", duplicate node names found.", state.dataNodeInputMgr->CurCheckContextName, ObjectName));
             ShowContinueError(state, format("...for Node Type(s)={}, duplicate node name=\"{}\".", NodeTypes, CheckName));
@@ -905,11 +900,8 @@ void CheckUniqueNodeNumbers(
     // METHODOLOGY EMPLOYED:
     // checks the current list of items for this (again)
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Found;
-
     if (CheckNumber != 0) {
-        Found = Util::FindItemInList(
+        int Found = Util::FindItemInList(
             state.dataLoopNodes->NodeID(CheckNumber), state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
         if (Found != 0) {
             ShowSevereError(state, format("{}=\"{}\", duplicate node names found.", state.dataNodeInputMgr->CurCheckContextName, ObjectName));
@@ -1000,10 +992,6 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
     auto &NodeSpecificHeatSchedPtr = state.dataNodeInputMgr->NodeSpecificHeatSchedPtr;
     auto &nodeReportingStrings = state.dataNodeInputMgr->nodeReportingStrings;
     auto &nodeFluidNames = state.dataNodeInputMgr->nodeFluidNames;
-    bool ReportWetBulb;
-    bool ReportRelHumidity;
-    bool ReportDewPoint;
-    bool ReportSpecificHeat;
     Real64 SteamDensity;
     Real64 EnthSteamInDry;
     Real64 RhoAirCurrent; // temporary value for current air density f(baro, db , W)
@@ -1075,10 +1063,10 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
     }
 
     for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) {
-        ReportWetBulb = false;
-        ReportRelHumidity = false;
-        ReportDewPoint = false;
-        ReportSpecificHeat = false;
+        bool ReportWetBulb = false;
+        bool ReportRelHumidity = false;
+        bool ReportDewPoint = false;
+        bool ReportSpecificHeat = false;
         if (state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) > 0) {
             ReportWetBulb = (GetCurrentScheduleValue(state, NodeWetBulbSchedPtr(iNode)) > 0.0);
         } else if (state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) == 0) {
