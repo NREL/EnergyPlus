@@ -1871,7 +1871,6 @@ void GetOAMixerInputs(EnergyPlusData &state)
     int NumNums;   // Number of REAL(r64) numbers returned by GetObjectItem
     int NumAlphas; // Number of alphanumerics returned by GetObjectItem
     int NumArg;    // Number of arguments from GetObjectDefMaxArgs call
-    int IOStat;
     Array1D<Real64> NumArray;      // array that holds numeric input values
     Array1D_string AlphArray;      // array that holds alpha input values
     Array1D_string cAlphaFields;   // Alpha field names
@@ -1899,6 +1898,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
     if (state.dataMixedAir->NumOAMixers > 0) {
 
         state.dataMixedAir->OAMixer.allocate(state.dataMixedAir->NumOAMixers);
+        int IOStat;
 
         for (int OutAirNum = 1; OutAirNum <= state.dataMixedAir->NumOAMixers; ++OutAirNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2460,7 +2460,6 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
     // PURPOSE OF THIS SUBROUTINE
     // Initialize the OAController data structure with input node data
 
-    std::string airloopName; // Temporary equipment name
     bool ErrorsFound = false;
 
     auto &thisOAController(state.dataMixedAir->OAController(OAControllerNum));
@@ -2827,7 +2826,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 bool FoundAreaZone = false;
                 bool FoundPeopleZone = false;
                 for (int NumMechVentZone = 1; NumMechVentZone <= vent_mech.NumofVentMechZones; ++NumMechVentZone) {
-                    auto &thisMechVentZone = vent_mech.VentMechZone(NumMechVentZone);
+                    auto const &thisMechVentZone = vent_mech.VentMechZone(NumMechVentZone);
                     int ZoneNum = thisMechVentZone.zoneNum;
                     if (ZoneNum == NumZone) {
                         FoundAreaZone = true;
@@ -2906,6 +2905,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
         if (AirLoopNum > 0) {
             // Added code to report (TH, 10/20/2008):
             //   air economizer status (1 = on, 0 = off or does not exist), and actual and minimum outside air fraction (0 to 1)
+            std::string airloopName; // Temporary equipment name
             for (int OAControllerLoop = 1; OAControllerLoop <= state.dataMixedAir->NumOAControllers; ++OAControllerLoop) {
                 auto &loopOAController(state.dataMixedAir->OAController(OAControllerLoop));
 
