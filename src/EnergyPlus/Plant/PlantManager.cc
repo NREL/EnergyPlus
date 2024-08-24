@@ -2544,7 +2544,6 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
     int BranchNum;                    // branch loop counter
     int OpNum;                        // operation scheme counter
     int CompNum;                      // plant side component counter
-    int BranchInlet;                  // branch inlet node number
     int ComponentInlet;               // component inlet node number
     int ComponentOutlet;              // component outlet node number
 
@@ -2656,7 +2655,7 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
                          ++CompNum) {
                         ComponentInlet = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
                         ComponentOutlet = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
-                        BranchInlet = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn;
+                        int BranchInlet = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn;
 
                         state.dataLoopNodes->Node(ComponentInlet).Temp = LoopSetPointTemp;
                         state.dataLoopNodes->Node(ComponentInlet).TempMin = LoopMinTemp;
@@ -2905,9 +2904,8 @@ void CheckPlantOnAbort(EnergyPlusData &state)
     int ParalBranchNum;    // used to search for active control branches in parallel with bypass branches
     int ParalBranchNum2;   // used to search for active control branches in parallel with bypass branches
     int BranchNum2;        // used to search for active control branches in parallel with bypass branches
-    int numLoopSides;
-    int BranchNum; // DO loop counter for branches
-    int CompNum;   // do loop for multiple components on a branch
+    int BranchNum;         // DO loop counter for branches
+    int CompNum;           // do loop for multiple components on a branch
     bool ShouldBeACTIVE;
 
     if (!(state.dataErrTracking->AskForPlantCheckOnAbort)) {
@@ -2918,7 +2916,7 @@ void CheckPlantOnAbort(EnergyPlusData &state)
     if (!(allocated(state.dataPlnt->PlantLoop))) return;
 
     for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-        numLoopSides = 2;
+        int constexpr numLoopSides = 2;
         for (DataPlant::LoopSideLocation SideNum : DataPlant::LoopSideKeys) {
             if (!(state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Splitter.Exists)) continue;
 
