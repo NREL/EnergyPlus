@@ -4305,7 +4305,6 @@ namespace StandardRatings {
         Array1D<Real64> P_F_Low(nsp);                         // Outdoor Unit electric power at F1 test condition | p_F_Low
         Array1D<Real64> P_E_Int(nsp);                         // Outdoor Unit electric power at Eint (Ev) test conditon | p_E_Int
 
-        int spnum;                                    // compressor speed number
         Array1D<Real64> TotCapFlowModFac(nsp);        // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
         Array1D<Real64> EIRFlowModFac(nsp);           // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
         Array1D<Real64> NetCoolingCapRated_2023(nsp); // net cooling capacity at each speed
@@ -4337,7 +4336,7 @@ namespace StandardRatings {
         }
 
         // Calculate the capacity and power for each speed
-        for (spnum = 1; spnum <= nsp; ++spnum) {
+        for (int spnum = 1; spnum <= nsp; ++spnum) {
             TotCapFlowModFac(spnum) = Curve::CurveValue(state, CapFFlowCurveIndex(spnum), AirMassFlowRatioRated);
 
             Q_A_Full(spnum) =
@@ -4522,7 +4521,7 @@ namespace StandardRatings {
                     // << ",, BIN NUMBER (C3), " << BN + 1 << ", NO SPEEDS MATCHED ??, " << spnum << std::endl;
                 }
             } else if (nsp == 4) {
-                for (spnum = 1; spnum <= nsp; ++spnum) {
+                for (int spnum = 1; spnum <= nsp; ++spnum) {
                     // # Intermediate Capacity
                     Real64 q_E_int;
                     if (spnum == 2 || spnum == 3) {
@@ -4575,7 +4574,7 @@ namespace StandardRatings {
                     }
                 }
             } else if (nsp == 3) {
-                for (spnum = 1; spnum <= nsp; ++spnum) {
+                for (int spnum = 1; spnum <= nsp; ++spnum) {
                     // # Intermediate Capacity
                     Real64 q_E_int = Q_E_Int(spnum);
                     std::tie(N_Cq, M_Cq) = CapacityAdjustmentFactorsInCoolingModeSEER2(q_F_low, q_B_low, BN, q_B_full, q_A_full, q_E_int);
@@ -4616,7 +4615,7 @@ namespace StandardRatings {
                     }
                 }
             } else if (nsp == 2) {
-                for (spnum = 1; spnum <= nsp; ++spnum) {
+                for (int spnum = 1; spnum <= nsp; ++spnum) {
                     // # Intermediate Capacity
                     Real64 q_E_int = Q_E_Int(1);
                     std::tie(N_Cq, M_Cq) = CapacityAdjustmentFactorsInCoolingModeSEER2(q_F_low, q_B_low, BN, q_B_full, q_A_full, q_E_int);
@@ -7058,24 +7057,6 @@ namespace StandardRatings {
         using namespace OutputReportPredefined;
         using HVAC::CoilDX_CoolingSingleSpeed;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ClassNum; // class number (Class I, II, II, IV)
-        int Num;      // text number counter
-
-        // Formats
-
         if (CompTypeNum == CoilDX_CoolingSingleSpeed) {
             if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag3) {
                 static constexpr std::string_view Format_101(
@@ -7087,8 +7068,8 @@ namespace StandardRatings {
                 print(state.files.eio, "{}", Format_101);
                 state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag3 = false;
             }
-            for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
-                Num = (ClassNum - 1) * 4;
+            for (int ClassNum = 1; ClassNum <= 4; ++ClassNum) {
+                int Num = (ClassNum - 1) * 4;
                 std::string ClassName = format("Class {}", ClassNum);
                 std::string CompNameNew = fmt::format("{}({})", CompName, ClassName);
                 static constexpr std::string_view Format_102(
