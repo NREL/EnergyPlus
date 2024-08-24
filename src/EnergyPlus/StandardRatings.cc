@@ -1631,8 +1631,7 @@ namespace StandardRatings {
         Real64 IEER_2022(0.0); // Integerated Energy Efficiency Ratio in SI [W/W]
         Real64 NetCoolingCapRated2022(0.0);
 
-        int ns = 2;
-        Array1D<Real64> NetCoolingCapRated_2023(ns);    // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
+        int constexpr ns = 2;
         Array1D<Real64> NetTotCoolingCapRated_2023(16); // net total cooling capacity of DX Coils for the sixteen ASHRAE Std 127 Test conditions
         Array1D<Real64> TotElectricPowerRated_2023(16); // total electric power of DX Coils for the sixteen ASHRAE Std 127 Test conditions
 
@@ -1716,8 +1715,6 @@ namespace StandardRatings {
                                                                                             TSEIRFTemp,
                                                                                             TSRatedCOP,
                                                                                             EIRFFlowCurveIndex);
-            NetCoolingCapRated_2023(ns) = NetCoolingCapRated2022;
-
         } else {
             ShowSevereError(state,
                             "Standard Ratings: Coil:Cooling:DX:TwoSpeed either has a zero rated total cooling capacity or zero air flow rate. "
@@ -1894,7 +1891,6 @@ namespace StandardRatings {
                                    ObjexxFCL::Optional<const HPdefrostControl> DefrostControl)
     {
         Real64 DesignHeatingRequirement2023(0.0);   // HSPF2 minimum design heating requirement [W]
-        int BinNum2023;                             // HSPF2 bin number counter
         Real64 FractionalBinHours2023(0.0);         // HSPF2 Fractional bin hours for the heating season  [-]
         Real64 BuildingLoad2023(0.0);               // HSPF2 Building space conditioning load corresponding to an outdoor bin temperature [W]
         Real64 NetHeatingCapReduced2023(0.0);       // HSPF2 Net Heating Coil capacity corresponding to an outdoor bin temperature [W]
@@ -1920,7 +1916,7 @@ namespace StandardRatings {
         DesignHeatingRequirement2023 = NetHeatingCapRated_2023;
         Int64 RN = static_cast<int64_t>(RegionNum);
 
-        for (BinNum2023 = 0; BinNum2023 < TotalNumOfTemperatureBinsHSPF2[RN - 1]; ++BinNum2023) {
+        for (int BinNum2023 = 0; BinNum2023 < TotalNumOfTemperatureBinsHSPF2[RN - 1]; ++BinNum2023) {
 
             FractionalBinHours2023 = FracBinHoursAtOutdoorBinTempHSPF2[RN - 1][BinNum2023];
 
@@ -2462,7 +2458,7 @@ namespace StandardRatings {
         Array1D<int> MSEIRAirFFlow;
         Array1D<int> MSPLRFPLF;
 
-        int nsp = operatingMode.speeds.size();
+        int const nsp = operatingMode.speeds.size();
 
         for (int i = 0; i < nsp; ++i) {
             CoilCoolingDXCurveFitSpeed speed = operatingMode.speeds[i];
@@ -2515,7 +2511,7 @@ namespace StandardRatings {
         Array1D<Real64> MSRatedCOP;
         Array1D<int> MSEIRAirFFlow;
 
-        int nsp = operatingMode.speeds.size();
+        int const nsp = operatingMode.speeds.size();
 
         for (int i = 0; i < nsp; ++i) {
             CoilCoolingDXCurveFitSpeed speed = operatingMode.speeds[i];
@@ -5699,10 +5695,6 @@ namespace StandardRatings {
         Real64 NetHeatingCapRatedHighTemp(0.0);
         Real64 NetHeatingCapRatedLowTemp(0.0);
 
-        int BinNum;         // bin number counter
-        int spnum;          // compressor speed number
-        int StandardDHRNum; // Integer counter for standardized DHRs
-
         Array1D<Real64> FanPowerPerEvapAirFlowRate(nsp); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
         Array1D<Real64> TotHeatCapTestH0(nsp);           // Total cooling capacity at A2 test condition (High speed)
         Array1D<Real64> TotHeatCapTestH1(nsp);           // Total cooling capacity at B2 test condition (High speed)
@@ -5758,7 +5750,7 @@ namespace StandardRatings {
         NetHeatingCapWeighted = 0.0;
         TotHeatingElecPowerWeighted = 0.0;
 
-        for (spnum = 1; spnum <= nsp; ++spnum) {
+        for (int spnum = 1; spnum <= nsp; ++spnum) {
             FanPowerPerEvapAirFlowRate(spnum) = 0.0;
             if (MSFanPowerPerEvapAirFlowRateInput(spnum) <= 0.0) {
                 FanPowerPerEvapAirFlowRate(spnum) = DefaultFanPowerPerEvapAirFlowRate;
@@ -5768,7 +5760,7 @@ namespace StandardRatings {
         }
 
         // Proceed withe HSPF value calculation
-        for (spnum = 1; spnum <= nsp; ++spnum) {
+        for (int spnum = 1; spnum <= nsp; ++spnum) {
             TotCapFlowModFac(spnum) = Curve::CurveValue(state, CapFFlowCurveIndex(spnum), AirMassFlowRatioRated);
             {
                 if (state.dataCurveManager->PerfCurve(CapFTempCurveIndex(spnum))->numDims == 1) {
@@ -5841,7 +5833,7 @@ namespace StandardRatings {
             DesignHeatingRequirementMax = 2.20 * DesignHeatingRequirementMin;
         }
         // Set the Design Heating Requirement to nearest standard value (From Table 18, AHRI/ANSI Std 210/240)
-        for (StandardDHRNum = 0; StandardDHRNum < TotalNumOfStandardDHRs - 1; ++StandardDHRNum) {
+        for (int StandardDHRNum = 0; StandardDHRNum < TotalNumOfStandardDHRs - 1; ++StandardDHRNum) {
             if (DesignHeatingRequirementMin < StandardDesignHeatingRequirement[0]) {
 
                 DesignHeatingRequirement = min(StandardDesignHeatingRequirement[0], DesignHeatingRequirementMax);
@@ -5862,7 +5854,7 @@ namespace StandardRatings {
         // The minimum temperature below which the compressor is turned off
         OATempCompressorOff = MinOATCompressor;
 
-        for (BinNum = 0; BinNum < TotalNumOfTemperatureBins[RegionNum - 1]; ++BinNum) { // NumOfOATempBins
+        for (int BinNum = 0; BinNum < TotalNumOfTemperatureBins[RegionNum - 1]; ++BinNum) { // NumOfOATempBins
 
             FractionalBinHours = FracBinHoursAtOutdoorBinTemp[RegionNum - 1][BinNum];
 
@@ -5889,7 +5881,7 @@ namespace StandardRatings {
             }
 
             // determine the speed number
-            for (spnum = 1; spnum <= nsp - 1; ++spnum) {
+            for (int spnum = 1; spnum <= nsp - 1; ++spnum) {
                 // Low Speed
                 if (OutdoorBinTemperature[BinNum] < -8.33) {
                     HeatingCapacityLS = TotHeatCapTestH3(spnum) + ((TotHeatCapTestH1(spnum) - TotHeatCapTestH3(spnum)) *
