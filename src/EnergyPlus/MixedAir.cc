@@ -3398,7 +3398,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
 
     Real64 OutAirMinFrac = 0.0; // Local variable used to calculate min OA fraction
     if (AirLoopNum > 0) {
-        auto &curAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
+        auto const &curAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
         if (curAirLoopFlow.DesSupply >= HVAC::SmallAirVolFlow) {
             OutAirMinFrac = this->MinOAMassFlowRate / curAirLoopFlow.DesSupply;
         }
@@ -3418,8 +3418,8 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
     // Get outside air mass flow rate calculated by mechanical ventilation object [kg/s]
     Real64 MechVentOutsideAirMinFrac = 0.0; // fraction of OA specified by mechanical ventilation object
     if (AirLoopNum > 0 && this->VentMechObjectNum != 0) {
-        auto &curAirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo(AirLoopNum));
-        auto &curAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
+        auto const &curAirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo(AirLoopNum));
+        auto const &curAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
 
         // Get system supply air flow rate
         Real64 SysSA = 0.0; // System supply air mass flow rate [kg/s]
@@ -4255,7 +4255,6 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
     Real64 EconomizerAirFlowScheduleValue; // value of economizer operation schedule (push-button type control schedule)
     Real64 MaximumOAFracBySetPoint;        // The maximum OA fraction due to freezing cooling coil check
     Real64 OutAirSignal;                   // Used to set OA mass flow rate
-    int SolFla;                            // Flag of solver
     Real64 minOAFrac;
 
     if (AirLoopNum > 0) {
@@ -4270,7 +4269,6 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
                     // this->OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
                     // AirLoopFlow( AirLoopNum ).OAFrac = this->OAMassFlow / this->MixMassFlow;
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoLockout = true;
-                    EconomizerOperationFlag = false;
                 } else {
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconomizerFlowLocked = false;
                     this->HRHeatingCoilActive = 0;
@@ -4427,6 +4425,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
     // accurate result using a full mass, enthalpy and moisture balance and iteration.
     if (OutAirSignal > OutAirMinFrac && OutAirSignal < 1.0 && this->MixMassFlow > HVAC::VerySmallMassFlow &&
         this->ControllerType == MixedAirControllerType::ControllerOutsideAir && !AirLoopNightVent) {
+        int SolFla; // Flag of solver
 
         if (AirLoopNum > 0) {
 
@@ -4710,9 +4709,6 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
     static std::string_view const &CurrentModuleObject(CurrentModuleObjects[static_cast<int>(CMO::OAController)]);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string CoilName;
-    std::string CoilType;
-
     bool ErrorsFound = false;
     if (this->MaxOA == AutoSize) {
 
@@ -4802,6 +4798,9 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
             std::string const &CompName = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentName(CompNum);
             if (Util::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") || Util::SameString(CompType, "COIL:HEATING:WATER") ||
                 Util::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
+                std::string CoilName;
+                std::string CoilType;
+
                 if (Util::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
                     CoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, CompType, CompName, ErrorsFound);
                     CoilType = HVACHXAssistedCoolingCoil::GetHXCoilType(state, CompType, CompName, ErrorsFound);
@@ -5390,7 +5389,6 @@ void CheckControllerLists(EnergyPlusData &state, bool &ErrFound)
     int NumAlphas;
     int NumNumbers;
     int IOStat;
-    int Count;
 
     if (state.dataMixedAir->GetOASysInputFlag) {
         GetOutsideAirSysInputs(state);
@@ -5406,7 +5404,7 @@ void CheckControllerLists(EnergyPlusData &state, bool &ErrFound)
         state.dataInputProcessing->inputProcessor->getObjectItem(
             state, CurrentModuleObject, Item, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStat);
         std::string const ControllerListName = state.dataIPShortCut->cAlphaArgs(1);
-        Count = 0;
+        int Count = 0;
 
         // Check AirLoopHVAC -- brute force, get each AirLoopHVAC
 
