@@ -459,13 +459,12 @@ void SimOAComponent(EnergyPlusData &state,
     OACoolingCoil = false;
     OAHX = false;
     HVAC::FanOp fanOp;
-    bool HeatingActive = false;
-    bool CoolingActive = false;
     Real64 sensOut = 0.0;
-    Real64 latOut = 0.0;
     int constexpr zoneOAUnitNum = -1;
     Real64 constexpr OAUCoilOutTemp = 0.0;
     bool constexpr ZoneEquipFlag = false;
+    bool HeatingActive = false; // why isn't this returning that a coil is active?
+    bool CoolingActive = false;
 
     switch (CompTypeNum) {
     case SimAirServingZones::CompType::OAMixer_Num: { // OutdoorAir:Mixer
@@ -597,6 +596,7 @@ void SimOAComponent(EnergyPlusData &state,
     case SimAirServingZones::CompType::CoilSystemWater:      // CoilSystem:Cooling:Water
     case SimAirServingZones::CompType::UnitarySystemModel: { // AirloopHVAC:UnitarySystem
         if (Sim) {
+            Real64 latOut = 0.0;     // does the air loop not need to know what the latent capacity is?
             int compNum = CompIndex; // use local so return value of compNum from simulate call does not overwrite CompIndex
             state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[compNum]->simulate(state,
                                                                                       CompName,
@@ -702,8 +702,6 @@ void SimOAComponent(EnergyPlusData &state,
     case SimAirServingZones::CompType::ZoneVRFasAirLoopEquip: { // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
         if (Sim) {
             int ControlledZoneNum = 0;
-            bool HeatingActive = false;
-            bool CoolingActive = false;
             int constexpr OAUnitNum = 0;
             Real64 constexpr OAUCoilOutTemp = 0.0;
             bool constexpr ZoneEquipment = false;
@@ -789,10 +787,10 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
     // check that the economizer staging operation EconomizerFirst is only used with an sensible load-based controlled AirLoopHVAC:UnitarySystem
     if (AirLoopNum > 0) {
         auto &primaryAirSystems = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
-        bool sensLoadCtrlUnitarySystemFound = false;
         if (primaryAirSystems.EconomizerStagingCheckFlag == false) {
             OAControllerNum = Util::FindItemInList(CtrlName, state.dataMixedAir->OAController);
             if (state.dataMixedAir->OAController(OAControllerNum).EconomizerStagingType == HVAC::EconomizerStagingType::EconomizerFirst) {
+                bool sensLoadCtrlUnitarySystemFound = false;
                 for (int BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
                     for (int CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
                         if (primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num == SimAirServingZones::CompType::UnitarySystemModel) {
@@ -869,8 +867,8 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFound(false);
-    int NumNums;   // Number of real numbers returned by GetObjectItem
-    int NumAlphas; // Number of alphanumerics returned by GetObjectItem
+    int NumNums;      // Number of real numbers returned by GetObjectItem
+    int NumAlphas;    // Number of alphanumerics returned by GetObjectItem
     int TotalArgs(0); // Total number of alpha and numeric arguments (max) for a
     int IOStat;
     Array1D<Real64> NumArray;
@@ -1867,9 +1865,9 @@ void GetOAMixerInputs(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    int NumNums;   // Number of REAL(r64) numbers returned by GetObjectItem
-    int NumAlphas; // Number of alphanumerics returned by GetObjectItem
-    int NumArg;    // Number of arguments from GetObjectDefMaxArgs call
+    int NumNums;                   // Number of REAL(r64) numbers returned by GetObjectItem
+    int NumAlphas;                 // Number of alphanumerics returned by GetObjectItem
+    int NumArg;                    // Number of arguments from GetObjectDefMaxArgs call
     Array1D<Real64> NumArray;      // array that holds numeric input values
     Array1D_string AlphArray;      // array that holds alpha input values
     Array1D_string cAlphaFields;   // Alpha field names
