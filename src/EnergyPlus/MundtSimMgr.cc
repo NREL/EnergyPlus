@@ -461,7 +461,6 @@ namespace RoomAir {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum; // index for air nodes
-        int SurfNum; // index for surfaces
 
         // set up air node ID
         state.dataMundtSimMgr->NumRoomNodes = 0;
@@ -507,7 +506,7 @@ namespace RoomAir {
                 e.Area = 0.0;
             }
             // get floor surface data
-            for (SurfNum = 1; SurfNum <= state.dataMundtSimMgr->NumFloorSurfs; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= state.dataMundtSimMgr->NumFloorSurfs; ++SurfNum) {
                 state.dataMundtSimMgr->FloorSurf(SurfNum).Temp =
                     state.dataMundtSimMgr->MundtAirSurf(state.dataMundtSimMgr->FloorSurfSetIDs(SurfNum), state.dataMundtSimMgr->MundtZoneNum).Temp;
                 state.dataMundtSimMgr->FloorSurf(SurfNum).Hc =
@@ -728,7 +727,6 @@ namespace RoomAir {
         //     map data from air domain back to surface domain for each particular zone
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNodeNum;  // index number of the zone node
         Real64 DeltaTemp; // dummy variable for temperature difference
 
         // get surface info
@@ -753,7 +751,7 @@ namespace RoomAir {
                 // TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
                 // ZT(ZoneNum) = TRoomAverage
                 // c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
-                ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+                int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
                 state.dataLoopNodes->Node(ZoneNodeNum).Temp =
                     state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Temp;
                 // d) Thermostat air temperature -> TempTstatAir(ZoneNum)
@@ -777,7 +775,7 @@ namespace RoomAir {
                 // DeltaTemp = TRoomAverage - LineNode( TstatNodeID, MundtZoneNum ).Temp;
                 // ZT(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp
                 // c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
-                ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+                int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
                 DeltaTemp = state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Temp -
                             state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->TstatNodeID, state.dataMundtSimMgr->MundtZoneNum).Temp;
                 state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
