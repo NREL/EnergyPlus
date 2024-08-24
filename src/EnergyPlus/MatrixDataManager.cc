@@ -67,8 +67,6 @@ namespace MatrixDataManager {
     // MODULE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   June 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // Process user input for Matrix: input data objects
