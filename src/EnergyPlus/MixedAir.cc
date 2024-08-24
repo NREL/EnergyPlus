@@ -871,7 +871,6 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     bool ErrorsFound(false);
     int NumNums;   // Number of real numbers returned by GetObjectItem
     int NumAlphas; // Number of alphanumerics returned by GetObjectItem
-    int AlphaNum;
     int TotalArgs(0); // Total number of alpha and numeric arguments (max) for a
     int IOStat;
     Array1D<Real64> NumArray;
@@ -928,7 +927,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         thisControllerList.NumControllers = (NumAlphas - 1) / 2;
         thisControllerList.ControllerType.dimension(thisControllerList.NumControllers, ControllerKind::Invalid);
         thisControllerList.ControllerName.allocate(thisControllerList.NumControllers);
-        AlphaNum = 2;
+        int AlphaNum = 2;
         for (int CompNum = 1; CompNum <= thisControllerList.NumControllers; ++CompNum) {
             // Json will catch any object types that are not the correct key choice of Controller:OutdoorAir or Controller:WaterCoil
             thisControllerList.ControllerType(CompNum) =
