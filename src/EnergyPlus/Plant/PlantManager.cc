@@ -804,7 +804,6 @@ void GetPlantInput(EnergyPlusData &state)
             auto &loopSide = plantLoop.LoopSide(LoopSideNum);
             ASeriesBranchHasPump = false;
             AParallelBranchHasPump = false;
-            int NumOfPipesInLoop = 0; // Initialization
             ++HalfLoopNum;
             loopSide.BypassExists = false;
             if (plantLoop.TypeOfLoop == LoopType::Plant && LoopSideNum == LoopSideLocation::Demand) {
@@ -2108,17 +2107,18 @@ void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData 
         if (thisLoopSide.TotalBranches >= 3) {
             // parallel branches
             for (int branchNum = 2; branchNum <= thisLoopSide.TotalBranches - 1; ++branchNum) {
-                auto &thisBranch = thisLoopSide.Branch(branchNum);
+                auto &thisBranchNext = thisLoopSide.Branch(branchNum);
                 // splitter
                 if (thisLoopSide.Splitter.Exists) {
                     fillPlantToplogySplitterRow2(state, loopType, thisLoop.Name, loopSide, thisLoopSide.Splitter.Name, rowCounter);
                 }
 
-                for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
-                    auto const &thisComp = thisBranch.Comp(compNum);
-                    // fillPlantToplogyRow(state, thisComp.Name, thisComp.TypeOf, loopSide, branch, thisBranch.Name, thisLoop.FluidName, repOffset);
+                for (int compNum = 1; compNum <= thisBranchNext.TotalComponents; ++compNum) {
+                    auto const &thisComp = thisBranchNext.Comp(compNum);
+                    // fillPlantToplogyRow(state, thisComp.Name, thisComp.TypeOf, loopSide, branch, thisBranchNext.Name, thisLoop.FluidName,
+                    // repOffset);
                     fillPlantToplogyComponentRow2(
-                        state, loopType, thisLoop.Name, loopSide, thisBranch.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
+                        state, loopType, thisLoop.Name, loopSide, thisBranchNext.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
                 }
                 // mixer
                 if (thisLoopSide.Mixer.Exists) {
@@ -2130,10 +2130,11 @@ void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData 
             }
 
             // Outlet Branch
-            auto &thisBranch = thisLoopSide.Branch(thisLoopSide.TotalBranches);
-            for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
-                auto const &thisComp = thisBranch.Comp(compNum);
-                fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
+            auto &thisBranchLast = thisLoopSide.Branch(thisLoopSide.TotalBranches);
+            for (int compNum = 1; compNum <= thisBranchLast.TotalComponents; ++compNum) {
+                auto const &thisComp = thisBranchLast.Comp(compNum);
+                fillPlantToplogyComponentRow2(
+                    state, loopType, thisLoop.Name, loopSide, thisBranchLast.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
             }
         }
     }
