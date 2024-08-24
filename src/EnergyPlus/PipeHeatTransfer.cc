@@ -218,15 +218,12 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     bool ErrorsFound(false); // Set to true if errors in input,
 
     // fatal at end of routine
-    int IOStatus; // Used in GetObjectItem
-    int Item;     // Item to be "gotten"
-    int PipeItem;
+    int IOStatus;       // Used in GetObjectItem
     int NumAlphas;      // Number of Alphas for each GetObjectItem call
     int NumNumbers;     // Number of Numbers for each GetObjectItem call
     int NumOfPipeHTInt; // Number of Pipe Heat Transfer objects
     int NumOfPipeHTExt; // Number of Pipe Heat Transfer objects
     int NumOfPipeHTUG;  // Number of Pipe Heat Transfer objects
-    int NumSections;    // total number of sections in pipe
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     // Initializations and allocations
     cCurrentModuleObject = "Pipe:Indoor";
@@ -242,10 +239,10 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
     state.dataPipeHT->PipeHT.allocate(state.dataPipeHT->nsvNumOfPipeHT);
     state.dataPipeHT->PipeHTUniqueNames.reserve(static_cast<unsigned>(state.dataPipeHT->nsvNumOfPipeHT));
-    Item = 0;
+    int Item = 0;
 
     cCurrentModuleObject = "Pipe:Indoor";
-    for (PipeItem = 1; PipeItem <= NumOfPipeHTInt; ++PipeItem) {
+    for (int PipeItem = 1; PipeItem <= NumOfPipeHTInt; ++PipeItem) {
         ++Item;
         // get the object name
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -399,7 +396,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     } // end of input loop
 
     cCurrentModuleObject = "Pipe:Outdoor";
-    for (PipeItem = 1; PipeItem <= NumOfPipeHTExt; ++PipeItem) {
+    for (int PipeItem = 1; PipeItem <= NumOfPipeHTExt; ++PipeItem) {
         ++Item;
         // get the object name
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -534,7 +531,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     } // end of input loop
 
     cCurrentModuleObject = "Pipe:Underground";
-    for (PipeItem = 1; PipeItem <= NumOfPipeHTUG; ++PipeItem) {
+    for (int PipeItem = 1; PipeItem <= NumOfPipeHTUG; ++PipeItem) {
 
         ++Item;
         // get the object name
@@ -693,7 +690,6 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
             GetGroundTempModelAndInit(state, state.dataIPShortCut->cAlphaArgs(7), state.dataIPShortCut->cAlphaArgs(8));
 
         // Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
-        NumSections = NumPipeSections;
         state.dataPipeHT->PipeHT(Item).NumSections = NumPipeSections;
 
         // For buried pipes, we need to allocate the cartesian finite difference array
@@ -707,7 +703,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
     for (Item = 1; Item <= state.dataPipeHT->nsvNumOfPipeHT; ++Item) {
         // Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
-        NumSections = NumPipeSections;
+        int NumSections = NumPipeSections;
         state.dataPipeHT->PipeHT(Item).NumSections = NumPipeSections;
 
         // We need to allocate the Hanby model arrays for all pipes, including buried
@@ -1191,9 +1187,6 @@ void PipeHTData::CalcPipesHeatTransfer(EnergyPlusData &state, ObjexxFCL::Optiona
     Real64 EnvHeatTransCoef(0.0);      // external convection coefficient (outside pipe)
     Real64 FluidNodeHeatCapacity(0.0); // local var for MCp for single node of pipe
 
-    int PipeDepth(0);
-    int PipeWidth(0);
-    int curnode;
     Real64 TempBelow;
     Real64 TempBeside;
     Real64 TempAbove;
@@ -1274,8 +1267,8 @@ void PipeHTData::CalcPipesHeatTransfer(EnergyPlusData &state, ObjexxFCL::Optiona
 
     if (present(LengthIndex)) { // Just simulate the single section if being called from Pipe:Underground
 
-        PipeDepth = this->PipeNodeDepth;
-        PipeWidth = this->PipeNodeWidth;
+        int PipeDepth = this->PipeNodeDepth;
+        int PipeWidth = this->PipeNodeWidth;
         TempBelow = this->T(PipeWidth, PipeDepth + 1, LengthIndex, TimeIndex::Current);
         TempBeside = this->T(PipeWidth - 1, PipeDepth, LengthIndex, TimeIndex::Current);
         TempAbove = this->T(PipeWidth, PipeDepth - 1, LengthIndex, TimeIndex::Current);
@@ -1301,7 +1294,7 @@ void PipeHTData::CalcPipesHeatTransfer(EnergyPlusData &state, ObjexxFCL::Optiona
 
         // start loop along pipe
         // b1 must not be zero but this should have been checked on input
-        for (curnode = 1; curnode <= this->NumSections; ++curnode) {
+        for (int curnode = 1; curnode <= this->NumSections; ++curnode) {
             this->TentativeFluidTemp(curnode) = (A2 * this->TentativeFluidTemp(curnode - 1) +
                                                  A3 / B1 * (B3 * state.dataPipeHT->nsvEnvironmentTemp + B4 * this->PreviousPipeTemp(curnode)) +
                                                  A4 * this->PreviousFluidTemp(curnode)) /
@@ -1356,7 +1349,6 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IterationIndex(0);    // Index when stepping through equations
-    int LengthIndex(0);       // Index for nodes along length of pipe
     int DepthIndex(0);        // Index for nodes in the depth direction
     int WidthIndex(0);        // Index for nodes in the width direction
     Real64 ConvCoef(0.0);     // Current convection coefficient = f(Wind Speed,Roughness)
@@ -1394,7 +1386,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
         }
 
         // Store computed values in T_O array
-        for (LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex) {
+        for (int LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex) {
             for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes - 1; ++DepthIndex) {
                 for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                     T_O(WidthIndex, DepthIndex, LengthIndex) = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative);
@@ -1403,7 +1395,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
         }
 
         // Loop along entire length of pipe, analyzing cross sects
-        for (LengthIndex = 1; LengthIndex <= this->NumSections; ++LengthIndex) {
+        for (int LengthIndex = 1; LengthIndex <= this->NumSections; ++LengthIndex) {
             for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes - 1; ++DepthIndex) {
                 for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
 
@@ -1479,7 +1471,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                             //-Update node for cartesian system
                             this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) = this->PipeTemp(LengthIndex);
 
-                        } else if (DepthIndex != 1) { // Not surface node
+                        } else { // Not surface node
 
                             //-Coefficients and Temperatures
                             NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, TimeIndex::Current);
@@ -1515,7 +1507,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
         }
 
         // Check for convergence
-        for (LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex) {
+        for (int LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex) {
             for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes - 1; ++DepthIndex) {
                 for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                     Ttemp = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative);
