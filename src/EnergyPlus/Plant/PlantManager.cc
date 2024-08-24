@@ -254,8 +254,8 @@ void ManagePlantLoops(EnergyPlusData &state,
     // add check for non-plant system sim flag updates
     //  could set SimAirLoops, SimElecCircuits, SimZoneEquipment flags for now
     for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-        for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
-            auto const &this_loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide));
+        for (DataPlant::LoopSideLocation LoopSideChk : DataPlant::LoopSideKeys) {
+            auto const &this_loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideChk));
             if (this_loop_side.SimAirLoopsNeeded) SimAirLoops = true;
             if (this_loop_side.SimZoneEquipNeeded) SimZoneEquipment = true;
             //  IF (this_loop_side.SimNonZoneEquipNeeded) SimNonZoneEquipment = .TRUE.
