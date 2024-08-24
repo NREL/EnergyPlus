@@ -637,10 +637,6 @@ void GetPlantLoopData(EnergyPlusData &state)
                     this_loop.PressureSimType = DataPlant::PressSimType::NoPressure;
                     break;
                 }
-            }
-
-            // if we made it this far, there was no match, and it wasn't blank
-            if (!MatchedPressureString) {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                 ShowContinueError(
                     state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) + "\".");
