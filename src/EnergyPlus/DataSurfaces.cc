@@ -239,7 +239,7 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
         Real64 SumSysMCp = 0;
         Real64 SumSysMCpT = 0;
         auto const &inletNodes = (state.dataHeatBal->doSpaceHeatBalance) ? state.dataZoneEquip->spaceEquipConfig(this->spaceNum).InletNode
-                                                                   : state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode;
+                                                                         : state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode;
         for (int nodeNum : inletNodes) {
             auto const &inNode = state.dataLoopNodes->Node(nodeNum);
             Real64 CpAir = PsyCpAirFnW(thisSpaceHB.airHumRat);
