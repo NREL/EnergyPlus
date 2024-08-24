@@ -127,8 +127,6 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     // appropriate type of control algorithm (setpoint, load range based,
     // or uncontrolled) for the component
 
-    int ListNum;    // DO loop index in PlantLoop()%LoopSide()%Branch()%Comp()%OpScheme()%EquipList(ListNum)
-    int CurListNum; // Current list...= ListNum,  used for error checking only
     // Indices in PlantLoop.LoopSide.Branch.Comp data structure
     int CurCompLevelOpNum; // This is set by the init routine at each FirstHVACIteration.
     // It tells which scheme for this component is currently scheduled
@@ -138,7 +136,6 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     // Used as indices in PlantLoop.OpScheme() data structure
     int CurSchemePtr; // set by PlantLoop.LoopSide.Branch.Comp.OpScheme.OpSchemePtr
     // used to locate data in PL()%OpScheme(CurSchemePtr)
-    int ListPtr; // !set by PL()%LoopSide()%Branch()%Comp()%OpScheme(CurCompLevelOpNum)%EquipList(CurListNum)ListPtr
     // used to locate data in PL()%OpScheme(CurSchemePtr)%EquipList(ListPtr)
     // Local values from the PlantLoop()%OpScheme() data structure
     Real64 RangeVariable(0.0); // holds the 'loop demand', wetbulb temp, etc.
@@ -268,8 +265,9 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
         break;
     }
     default: { // it's a range based control type with multiple equipment lists
-        CurListNum = 0;
-        for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
+        int ListPtr = 0;
+        int CurListNum = 0;
+        for (int ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
             // setpointers to 'PlantLoop()%OpScheme()...'structure
             ListPtr = this_component.OpScheme(CurCompLevelOpNum).EquipList(ListNum).ListPtr;
             RangeHiLimit = this_op_scheme.EquipList(ListPtr).RangeUpperLimit;
@@ -299,7 +297,7 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
 
         if (CurListNum > 0) {
             // there could be equipment on another list that needs to be nulled out, it may have a load from earlier iteration
-            for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
+            for (int ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
                 if (ListNum == CurListNum) continue; // leave current one alone
                 NumCompsOnList = this_op_scheme.EquipList(ListNum).NumComps;
                 for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
