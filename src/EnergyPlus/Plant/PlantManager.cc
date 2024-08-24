@@ -2486,13 +2486,13 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
         // Just clear away any trailing MyLoad for now...
         // This could likely be moved into InitLoadDistribution also...
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-            for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
-                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents;
+            for (DataPlant::LoopSideLocation ResetLoopNum : DataPlant::LoopSideKeys) {
+                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(ResetLoopNum).TotalBranches; ++BranchNum) {
+                    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(ResetLoopNum).Branch(BranchNum).TotalComponents;
                          ++CompNum) {
-                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).MyLoad = 0.0;
-                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).FreeCoolCntrlShutDown = false;
-                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Available = false;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(ResetLoopNum).Branch(BranchNum).Comp(CompNum).MyLoad = 0.0;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(ResetLoopNum).Branch(BranchNum).Comp(CompNum).FreeCoolCntrlShutDown = false;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(ResetLoopNum).Branch(BranchNum).Comp(CompNum).Available = false;
                     }
                 }
             }
@@ -2829,27 +2829,6 @@ void UpdateNodeThermalHistory(EnergyPlusData &state)
 
     // METHODOLOGY EMPLOYED:
     // copy current values into "LastTimestep" values
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
 
     // array assignment
     if (state.dataLoopNodes->NumOfNodes > 0) {
@@ -3596,23 +3575,20 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
     using PlantUtilities::ShiftPlantLoopSideCallingOrder;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int HalfLoopNum;
-    int LoopNum;
     DataPlant::LoopSideLocation LoopSideNum;
-    int OtherLoopNum;
     DataPlant::LoopSideLocation OtherLoopSideNum;
 
     bool thisLoopPutsDemandOnAnother;
     int ConnctNum;
 
-    for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
+    for (int HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
-        LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+        int LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
         LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
 
         if (allocated(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected)) {
             for (ConnctNum = 1; ConnctNum <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected); ++ConnctNum) {
-                OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopNum;
+                int OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopNum;
                 OtherLoopSideNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopSideNum;
                 state.dataPlantMgr->OtherLoopCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum, OtherLoopSideNum);
 
