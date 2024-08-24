@@ -350,9 +350,6 @@ void InitMoistureBalanceEMPD(EnergyPlusData &state)
     using Psychrometrics::PsyRhovFnTdbRh;
     using Psychrometrics::PsyRhovFnTdbWPb_fast;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int SurfNum;
-
     if (state.dataMoistureBalEMPD->InitEnvrnFlag) {
         state.dataMstBalEMPD->RVSurfaceOld.allocate(state.dataSurface->TotSurfaces);
         state.dataMstBalEMPD->RVSurface.allocate(state.dataSurface->TotSurfaces);
