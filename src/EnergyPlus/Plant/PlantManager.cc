@@ -305,8 +305,6 @@ void GetPlantLoopData(EnergyPlusData &state)
     Array1D_string Alpha(18); // dimension to num of alpha fields in input
     Array1D<Real64> Num(30);  // dimension to num of numeric data fields in input
     bool ErrorsFound(false);
-    std::string LoadingScheme;
-    bool ErrFound;
     std::string CurrentModuleObject; // for ease in renaming.
     bool MatchedPressureString;
     int PressSimAlphaIndex;
@@ -498,7 +496,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                           ObjectIsParent);
 
         // Load the load distribution scheme.
-        LoadingScheme = Alpha(14);
+        std::string LoadingScheme = Alpha(14);
         if (Util::SameString(LoadingScheme, "Optimal")) {
             this_loop.LoadDistribution = DataPlant::LoadingScheme::Optimal;
         } else if (Util::SameString(LoadingScheme, "SequentialLoad")) {
@@ -644,7 +642,7 @@ void GetPlantLoopData(EnergyPlusData &state)
             }
         }
 
-        ErrFound = false;
+        bool ErrFound = false;
 
         if (this_loop.TypeOfLoop == LoopType::Plant) {
             Avail::GetPlantAvailabilityManager(state, Alpha(15), LoopNum, state.dataPlnt->TotNumLoops, ErrFound);
@@ -757,7 +755,6 @@ void GetPlantInput(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int LoopNum; // DO loop counter for loops
     int HalfLoopNum;
-    int NumOfPipesInLoop;
     int BranchNum; // DO loop counter for branches
     int CompNum;   // DO loop counter for components
     int NodeNum;   // DO loop counter for nodes
@@ -792,7 +789,6 @@ void GetPlantInput(EnergyPlusData &state)
     Array1D_bool SplitOutBranch;
     Array1D_bool MixerInBranch;
     bool errFlag;
-    int LoopNumInArray;
 
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Connector:Splitter", NumParams, NumAlphas, NumNumbers);
     MaxNumAlphas = NumAlphas;
@@ -808,7 +804,7 @@ void GetPlantInput(EnergyPlusData &state)
             auto &loopSide = plantLoop.LoopSide(LoopSideNum);
             ASeriesBranchHasPump = false;
             AParallelBranchHasPump = false;
-            NumOfPipesInLoop = 0; // Initialization
+            int NumOfPipesInLoop = 0; // Initialization
             ++HalfLoopNum;
             loopSide.BypassExists = false;
             if (plantLoop.TypeOfLoop == LoopType::Plant && LoopSideNum == LoopSideLocation::Demand) {
@@ -1750,7 +1746,7 @@ void GetPlantInput(EnergyPlusData &state)
 
     for (LoopNum = 1; LoopNum <= state.dataHVACGlobal->NumCondLoops; ++LoopNum) {
 
-        LoopNumInArray = LoopNum + state.dataHVACGlobal->NumPlantLoops;
+        int LoopNumInArray = LoopNum + state.dataHVACGlobal->NumPlantLoops;
 
         // set up references for this loop
         auto &this_cond_loop(state.dataPlnt->PlantLoop(LoopNumInArray));
@@ -2217,17 +2213,11 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
     using PlantUtilities::SetAllFlowLocks;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int LoopNum; // plant loop counter
     DataPlant::LoopSideLocation LoopSideNum;
     int BranchNum; // branch loop counter
     int CompNum;   // plant side component counter
-    int SensedNode;
 
     bool ErrorsFound(false);
-    bool FinishSizingFlag;
-
-    int HalfLoopNum;
-    int passNum;
 
     if (!allocated(state.dataPlantMgr->PlantLoopSetPointInitFlag)) {
         state.dataPlantMgr->PlantLoopSetPointInitFlag.allocate(state.dataPlnt->TotNumLoops);
@@ -2257,9 +2247,9 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
     if (state.dataPlantMgr->MySetPointCheckFlag && state.dataHVACGlobal->DoSetPointTest) {
 
         // check for missing setpoints
-        for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+        for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
 
-            SensedNode = state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum;
+            int SensedNode = state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum;
             if (SensedNode > 0) {
                 if (state.dataLoopNodes->Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -2293,16 +2283,16 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
     if (!state.dataPlnt->PlantFirstSizeCompleted) {
 
         SetAllFlowLocks(state, DataPlant::FlowLock::Unlocked);
-        FinishSizingFlag = false;
+        bool FinishSizingFlag = false;
         state.dataPlnt->PlantFirstSizesOkayToFinalize = false; // set global flag for when it ready to store final sizes
         state.dataPlnt->PlantFirstSizesOkayToReport = false;
         state.dataPlnt->PlantFinalSizesOkayToReport = false;
         state.dataPlantMgr->GetCompSizFac = true;
-        for (passNum = 1; passNum <= 4; ++passNum) { // begin while loop to iterate over the next calls sequentially
+        for (int passNum = 1; passNum <= 4; ++passNum) { // begin while loop to iterate over the next calls sequentially
 
             // Step 2, call component models it  using PlantCallingOrderInfo for sizing
-            for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
-                LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+            for (int HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
+                int LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                 LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                 state.dataSize->CurLoopNum = LoopNum;
 
@@ -2326,9 +2316,9 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
 
             // Step 4: Simulate plant loop components so their design flows are included
 
-            for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
+            for (int HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
-                LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                int LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                 LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                 state.dataSize->CurLoopNum = LoopNum;
                 if (LoopSideNum == LoopSideLocation::Supply) {
@@ -2339,7 +2329,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
         } // iterative passes thru sizing related routines.  end while?
 
         // Step 5 now one more time for the final
-        for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
+        for (int HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
             if (state.dataGlobal->DoHVACSizingSimulation) {
                 state.dataPlnt->PlantFirstSizesOkayToFinalize = true;
                 FinishSizingFlag = true;
@@ -2351,7 +2341,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                 state.dataPlnt->PlantFirstSizesOkayToReport = false;
                 state.dataPlnt->PlantFinalSizesOkayToReport = true;
             }
-            LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+            int LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
             LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
             state.dataSize->CurLoopNum = LoopNum;
             if (LoopSideNum == LoopSideLocation::Supply) {
@@ -2386,8 +2376,8 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
 
         // cycle through plant equipment calling with InitLoopEquip true
         state.dataPlantMgr->GetCompSizFac = false;
-        for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
-            LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+        for (int HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
+            int LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
             LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
             state.dataSize->CurLoopNum = LoopNum;
 
@@ -2406,13 +2396,13 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
 
         // reset loop level
         state.dataPlnt->PlantFinalSizesOkayToReport = true;
-        for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+        for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             ResizePlantLoopLevelSizes(state, LoopNum);
         }
 
         // now call everything again to reporting turned on
-        for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
-            LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+        for (int HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
+            int LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
             LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
             state.dataSize->CurLoopNum = LoopNum;
 
@@ -2441,7 +2431,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
     //*****************************************************************
     if (state.dataPlantMgr->SupplyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
-        for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+        for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             // check if setpoints being placed on node properly
             if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi == SensedNodeFlagValue) {
@@ -2494,7 +2484,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
         // Any per-environment load distribution init should be OK here
         // Just clear away any trailing MyLoad for now...
         // This could likely be moved into InitLoadDistribution also...
-        for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+        for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
                 for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                     for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents;
