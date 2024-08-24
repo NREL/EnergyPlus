@@ -145,10 +145,6 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     // Local values from the PlantLoop()%LoopSide()%Branch()%Comp() data structure
     int NumEquipLists; // number of equipment lists
     // Error control flags
-    int NumCompsOnList;
-    int CompIndex;
-    int EquipBranchNum;
-    int EquipCompNum;
 
     // Shut down equipment and return if so instructed by LoopShutDownFlag
     if (LoopShutDownFlag) {
@@ -299,10 +295,10 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
             // there could be equipment on another list that needs to be nulled out, it may have a load from earlier iteration
             for (int ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
                 if (ListNum == CurListNum) continue; // leave current one alone
-                NumCompsOnList = this_op_scheme.EquipList(ListNum).NumComps;
-                for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
-                    EquipBranchNum = this_op_scheme.EquipList(ListNum).Comp(CompIndex).BranchNumPtr;
-                    EquipCompNum = this_op_scheme.EquipList(ListNum).Comp(CompIndex).CompNumPtr;
+                int NumCompsOnList = this_op_scheme.EquipList(ListNum).NumComps;
+                for (int CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
+                    int EquipBranchNum = this_op_scheme.EquipList(ListNum).Comp(CompIndex).BranchNumPtr;
+                    int EquipCompNum = this_op_scheme.EquipList(ListNum).Comp(CompIndex).CompNumPtr;
                     loop_side.Branch(EquipBranchNum).Comp(EquipCompNum).MyLoad = 0.0;
                 }
             }
@@ -353,7 +349,6 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
     int NumAlphas;         // Number of alpha items in the input object
     int NumNums;           // Number of numeric items in the input object
     int IOStat;
-    std::string PlantOpSchemeName;   // Name of the plant or condenser operating scheme
     std::string CurrentModuleObject; // for ease in renaming
     std::string PlantLoopObject;     // for ease in renaming
     bool ErrorsFound;                // Passed in from OpSchemeInput
@@ -386,7 +381,7 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
 
     // Load the Plant data structure
     for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-        PlantOpSchemeName = state.dataPlnt->PlantLoop(LoopNum).OperationScheme;
+        std::string PlantOpSchemeName = state.dataPlnt->PlantLoop(LoopNum).OperationScheme;
         if (LoopNum <= state.dataHVACGlobal->NumPlantLoops) {
             CurrentModuleObject = "PlantEquipmentOperationSchemes";
             PlantLoopObject = "PlantLoop";
@@ -801,7 +796,6 @@ void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlphas;
     int NumNums;
-    int IOStat;
     Array1D_string AlphArray;      // Alpha input items for object
     Array1D_string cAlphaFields;   // Alpha field names
     Array1D_string cNumericFields; // Numeric field names
@@ -810,12 +804,9 @@ void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
     Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
     int TotalArgs(0);              // Total number of alpha and numeric arguments (max) for a
     //   certain object in the input file
-    int Num;
-    int NumEquipLists;
     int ListNum;
     std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
     bool SchemeNameFound;        // Set to FALSE if a match of OpScheme object and OpScheme name is not found
-    int InnerListNum;            // inner loop list number
     Real64 OuterListNumLowerLimit;
     Real64 OuterListNumUpperLimit;
     Real64 InnerListNumLowerLimit;
@@ -840,7 +831,8 @@ void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
     }
 
     if (NumSchemes > 0) {
-        for (Num = 1; Num <= NumSchemes; ++Num) {
+        int IOStat;
+        for (int Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
             if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
@@ -863,7 +855,7 @@ void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
             } else {
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList.allocate(
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists);
-                NumEquipLists = state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists;
+                int NumEquipLists = state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists;
                 if (NumNums <= 0) {          // Uncontrolled OpScheme type
                     ListNum = NumEquipLists; // NumEquipLists is always 1 for Uncontrolled OpScheme type
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name = AlphArray(2);
@@ -931,7 +923,7 @@ void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
                     for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
                         OuterListNumLowerLimit = state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeLowerLimit;
                         OuterListNumUpperLimit = state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeUpperLimit;
-                        for (InnerListNum = 1; InnerListNum <= NumEquipLists; ++InnerListNum) {
+                        for (int InnerListNum = 1; InnerListNum <= NumEquipLists; ++InnerListNum) {
                             if (InnerListNum == ListNum) continue; // don't check against self.
                             InnerListNumLowerLimit = state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(InnerListNum).RangeLowerLimit;
                             InnerListNumUpperLimit = state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(InnerListNum).RangeUpperLimit;
