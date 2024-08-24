@@ -79,10 +79,6 @@ namespace HybridModel {
     // Using/Aliasing
     using namespace DataHeatBalance;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    // Object Data
-
     // Functions
 
     void GetHybridModelZone(EnergyPlusData &state)
