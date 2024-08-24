@@ -350,10 +350,6 @@ void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const Firs
     // Simulate the controllers and components in the outside air system.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int OAMixerNum;
-    int OAControllerNum;                           // OA controller index in OAController
-    auto &CompType = state.dataMixedAir->CompType; // Tuned Made static
-    auto &CompName = state.dataMixedAir->CompName; // Tuned Made static
     bool FatalErrorFlag(false);
 
     state.dataSize->CurOASysNum = OASysNum;
@@ -370,11 +366,11 @@ void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const Firs
                 format("AirLoopHVAC:OutdoorAirSystem {} has more than 1 outside air controller; only the 1st will be used", CurrentOASystem.Name));
         }
         for (int CompNum = 1; CompNum <= CurrentOASystem.NumComponents; ++CompNum) {
-            CompType = CurrentOASystem.ComponentType(CompNum);
-            CompName = CurrentOASystem.ComponentName(CompNum);
+            auto &CompType = CurrentOASystem.ComponentType(CompNum);
+            auto &CompName = CurrentOASystem.ComponentName(CompNum);
             if (Util::SameString(CompType, "OutdoorAir:Mixer")) {
-                OAMixerNum = Util::FindItemInList(CompName, state.dataMixedAir->OAMixer);
-                OAControllerNum = CurrentOASystem.OAControllerIndex;
+                int OAMixerNum = Util::FindItemInList(CompName, state.dataMixedAir->OAMixer);
+                int OAControllerNum = CurrentOASystem.OAControllerIndex;
                 if (state.dataMixedAir->OAController(OAControllerNum).MixNode != state.dataMixedAir->OAMixer(OAMixerNum).MixNode) {
                     ShowSevereError(
                         state, format("The mixed air node of Controller:OutdoorAir=\"{}\"", state.dataMixedAir->OAController(OAControllerNum).Name));
