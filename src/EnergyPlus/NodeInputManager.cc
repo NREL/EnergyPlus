@@ -675,9 +675,8 @@ int AssignNodeNumber(EnergyPlusData &state,
         ShowFatalError(state, "AssignNodeNumber: Preceding issue causes termination.");
     }
 
-    int NumNode = 0;
     if (state.dataNodeInputMgr->NumOfUniqueNodeNames > 0) {
-        NumNode = Util::FindItemInList(
+        int NumNode = Util::FindItemInList(
             Name, state.dataLoopNodes->NodeID({1, state.dataNodeInputMgr->NumOfUniqueNodeNames}), state.dataNodeInputMgr->NumOfUniqueNodeNames);
         if (NumNode > 0) {
             AssignNodeNumber = NumNode;
@@ -758,13 +757,13 @@ int GetOnlySingleNode(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("GetOnlySingleNode: ");
 
     int NumNodes;
-    int NumParams;
-    int NumAlphas;
-    int NumNums;
 
     std::string_view const objTypeStr = BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)];
 
     if (state.dataNodeInputMgr->GetOnlySingleNodeFirstTime) {
+        int NumParams;
+        int NumAlphas;
+        int NumNums;
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
         state.dataNodeInputMgr->GetOnlySingleNodeNodeNums.dimension(NumParams, 0);
         state.dataNodeInputMgr->GetOnlySingleNodeFirstTime = false;
