@@ -1842,7 +1842,7 @@ namespace StandardRatings {
                 if (!OATempCompressorOnOffBlank) {
                     if (OutdoorBinTemperature[BinNum] <= OATempCompressorOff) {
                         LowTempCutOutFactor = 0.0;
-                    } else if (OutdoorBinTemperature[BinNum] > OATempCompressorOff && OutdoorBinTemperature[BinNum] <= OATempCompressorOn) {
+                    } else if (OutdoorBinTemperature[BinNum] <= OATempCompressorOn) {
                         LowTempCutOutFactor = 0.5;
                     } else {
                         LowTempCutOutFactor = 1.0;
@@ -1956,8 +1956,7 @@ namespace StandardRatings {
                 if (!OATempCompressorOnOffBlank) {
                     if (OutdoorBinTemperature[BinNum2023] <= OATempCompressorOff2023) {
                         LowTempCutOutFactor2023 = 0.0;
-                    } else if (OutdoorBinTemperature[BinNum2023] > OATempCompressorOff2023 &&
-                               OutdoorBinTemperature[BinNum2023] <= OATempCompressorOn) {
+                    } else if (OutdoorBinTemperature[BinNum2023] <= OATempCompressorOn) {
                         LowTempCutOutFactor2023 = 0.5;
                     } else {
                         LowTempCutOutFactor2023 = 1.0;
@@ -3753,7 +3752,6 @@ namespace StandardRatings {
                                                                         EIRFlowModFac);
 
             StandarRatingResults["IEER"] = IEER;
-            StandarRatingResults["IEER"] = IEER;
             StandarRatingResults["NetCoolingCapRated"] = NetCoolingCapRated;
 
             // IEER 2022 Calculations
@@ -4063,7 +4061,7 @@ namespace StandardRatings {
                     TotCoolElecPowerBinned = (PartLoadRatio / PartLoadFactorUser) * CoolingElecPowerLS;
                     TotCoolElecPowerBinnedDefault = (PartLoadRatio / PartLoadFactorStandard) * CoolingElecPowerLS;
                     goto SpeedLoop_exit;
-                } else if ((BuildingCoolingLoad > CoolingCapacityLS) && (BuildingCoolingLoad < CoolingCapacityHS)) {
+                } else if (BuildingCoolingLoad < CoolingCapacityHS) {
                     // cycle between speed "spnum" and "spnum + 1"
                     LoadFactor = min(1.0, (CoolingCapacityHS - BuildingCoolingLoad) / (CoolingCapacityHS - CoolingCapacityLS));
                     LoadFactor = max(0.0, LoadFactor);
@@ -4493,7 +4491,7 @@ namespace StandardRatings {
                             IntermediateCapacityAndPowerSEER2Case1(state, bl, q_low, n, p_low, PLFFPLRCurveIndex(spnum));
                         speedsUsed.push_back(spnum);
                         goto SpeedLoop3_exit;
-                    } else if (BuildingCoolingLoad_2023 > q_low && BuildingCoolingLoad_2023 < q_full) {
+                    } else if (BuildingCoolingLoad_2023 < q_full) {
                         // Case 2A:
                         if (bl < q_int) {
                             // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
@@ -4509,7 +4507,7 @@ namespace StandardRatings {
                             speedsUsed.push_back(spnum);
                             goto SpeedLoop3_exit;
                         }
-                    } else if (BuildingCoolingLoad_2023 >= q_full) {
+                    } else {
                         // Case 3:
                         // Section 11.2.1.3.3 CASE 3 - Building load is equal to or greater than unit capacity at full stage
                         std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
@@ -4675,7 +4673,7 @@ namespace StandardRatings {
                         IntermediateCapacityAndPowerSEER2Case1(state, bl, q_low, n, p_low, PLFFPLRCurveIndex(1));
                     goto SpeedLoop3_exit;
 
-                } else if (BuildingCoolingLoad_2023 > q_low && BuildingCoolingLoad_2023 < q_full) {
+                } else if (BuildingCoolingLoad_2023 < q_full) {
                     // Case 2:
                     // Case 2A:
                     if (bl < q_int) {
@@ -4692,7 +4690,7 @@ namespace StandardRatings {
                         goto SpeedLoop3_exit;
                     }
                     // Case 2B:
-                } else if (BuildingCoolingLoad_2023 >= q_full) {
+                } else {
                     // Case 3:
                     // Section 11.2.1.3.3 CASE 3 - Building load is equal to or greater than unit capacity at full stage
                     std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
@@ -5943,7 +5941,7 @@ namespace StandardRatings {
                 if (!OATempCompressorOnOffBlank) {
                     if (OutdoorBinTemperature[BinNum] <= OATempCompressorOff) {
                         LowTempCutOutFactor = 0.0;
-                    } else if (OutdoorBinTemperature[BinNum] > OATempCompressorOff && OutdoorBinTemperature[BinNum] <= OATempCompressorOn) {
+                    } else if (OutdoorBinTemperature[BinNum] <= OATempCompressorOn) {
                         LowTempCutOutFactor = 0.5;
                     } else {
                         LowTempCutOutFactor = 1.0;
@@ -5960,7 +5958,7 @@ namespace StandardRatings {
                     TotHeatElecPowerBinnedRH = BuildingHeatingLoad * (1.0 - LowTempCutOutFactor);
                     goto HeatSpeedLoop_exit;
 
-                } else if ((BuildingHeatingLoad > HeatingCapacityLS) && (BuildingHeatingLoad < HeatingCapacityHS)) {
+                } else if (BuildingHeatingLoad < HeatingCapacityHS) {
                     // cycle between speed "spnum" and "spnum + 1"
                     LoadFactor = min(1.0, (HeatingCapacityHS - BuildingHeatingLoad) / (HeatingCapacityHS - HeatingCapacityLS));
                     LoadFactor = max(0.0, LoadFactor);
@@ -5976,8 +5974,7 @@ namespace StandardRatings {
                     if (!OATempCompressorOnOffBlank && HeatingElecPowerMax > 0.0) {
                         if ((OutdoorBinTemperature[BinNum] <= OATempCompressorOff) || (HeatingCapacityMax / HeatingElecPowerMax < 1.0)) {
                             LowTempCutOutFactor = 0.0;
-                        } else if ((OutdoorBinTemperature[BinNum] > OATempCompressorOff && OutdoorBinTemperature[BinNum] <= OATempCompressorOn) &&
-                                   (HeatingCapacityMax / HeatingElecPowerMax > 1.0)) {
+                        } else if ((OutdoorBinTemperature[BinNum] <= OATempCompressorOn) && (HeatingCapacityMax / HeatingElecPowerMax > 1.0)) {
                             LowTempCutOutFactor = 0.5;
                         } else if ((OutdoorBinTemperature[BinNum] > OATempCompressorOn) && (HeatingCapacityMax / HeatingElecPowerMax > 1.0)) {
                             LowTempCutOutFactor = 1.0;
@@ -7200,20 +7197,10 @@ namespace StandardRatings {
         Real64 HeatingEIRIDBTempMin(0.0); // EIR modifier Min value (indoor dry bulb temperature)
         Real64 HeatingEIRIDBTempMax(0.0); // EIR modifier Max value (indoor dry bulb temperature)
 
-        bool CapCurveOATLimitsExceeded(false);     // Logical for capacity curve OD temp. limits being exceeded (low and High)
         bool CapCurveHighOATLimitsExceeded(false); // Logical for capacity curve temperature limits being exceeded (high temp)
         bool CapCurveFlowLimitsExceeded(false);    // Logical for capacity curve flow fraction limits being exceeded
         bool EIRCurveHighOATLimitsExceeded(false); // Logical for EIR curve temperature limits being exceeded (high temp)
         bool EIRCurveFlowLimitsExceeded(false);    // Logical for EIR curve flow fraction limits being exceeded
-
-        bool CapCurveMidOATLimitsExceeded(false); // Logical for capacity curve temperature limits being exceeded (mid temp)
-        bool EIRCurveMidOATLimitsExceeded(false); // Logical for EIR curve temperature limits being exceeded (mid temp)
-        bool CapCurveLowOATLimitsExceeded(false); // Logical for capacity curve temperature limits being exceeded (low temp)
-        bool EIRCurveLowOATLimitsExceeded(false); // Logical for EIR curve temperature limits being exceeded (Low temp)
-        bool PLFfPLRforSEERLimitsExceeded(false); // Logical for PLF function of PLR limits being exceeded
-
-        bool CapCurveIEERLimitsExceeded(false); // Logical for capacity curve temperature limits being exceeded (IEER calcs)
-        bool EIRCurveIEERLimitsExceeded(false); // Logical for EIR temperature limits being exceeded (IEER calcs)
 
         bool HeatingCapCurveHSPFLimitsExceeded(false); // Logical for capacity curve temperature limits being exceeded
         // (HSPF calcs)
@@ -7223,6 +7210,12 @@ namespace StandardRatings {
         switch (DXCoilTypeNum) {
 
         case CoilDX_CoolingSingleSpeed: {
+            bool CapCurveMidOATLimitsExceeded = false; // Logical for capacity curve temperature limits being exceeded (mid temp)
+            bool EIRCurveMidOATLimitsExceeded = false; // Logical for EIR curve temperature limits being exceeded (mid temp)
+            bool PLFfPLRforSEERLimitsExceeded = false; // Logical for PLF function of PLR limits being exceeded
+            bool CapCurveIEERLimitsExceeded = false;   // Logical for capacity curve temperature limits being exceeded (IEER calcs)
+            bool EIRCurveIEERLimitsExceeded = false;   // Logical for EIR temperature limits being exceeded (IEER calcs)
+
             GetCurveMinMaxValues(state, CapFTempCurveIndex, CapacityWBTempMin, CapacityWBTempMax, CapacityDBTempMin, CapacityDBTempMax);
             GetCurveMinMaxValues(state, EIRFTempCurveIndex, EIRWBTempMin, EIRWBTempMax, EIRDBTempMin, EIRDBTempMax);
             GetCurveMinMaxValues(state, CapFFlowCurveIndex, CapacityFlowRatioMin, CapacityFlowRatioMax);
@@ -7521,6 +7514,9 @@ namespace StandardRatings {
             break;
         }
         case CoilDX_MultiSpeedCooling: {
+            bool CapCurveLowOATLimitsExceeded = false; // Logical for capacity curve temperature limits being exceeded (low temp)
+            bool EIRCurveLowOATLimitsExceeded = false; // Logical for EIR curve temperature limits being exceeded (Low temp)
+
             GetCurveMinMaxValues(state, CapFTempCurveIndex, CapacityWBTempMin, CapacityWBTempMax, CapacityDBTempMin, CapacityDBTempMax);
             GetCurveMinMaxValues(state, EIRFTempCurveIndex, EIRWBTempMin, EIRWBTempMax, EIRDBTempMin, EIRDBTempMax);
             GetCurveMinMaxValues(state, CapFFlowCurveIndex, CapacityFlowRatioMin, CapacityFlowRatioMax);
@@ -7642,6 +7638,7 @@ namespace StandardRatings {
         }
         case CoilDX_MultiSpeedHeating: {
 
+            bool CapCurveOATLimitsExceeded = false; // Logical for capacity curve OD temp. limits being exceeded (low and High)
             {
                 if (state.dataCurveManager->PerfCurve(CapFTempCurveIndex)->numDims == 1) {
                     GetCurveMinMaxValues(state, CapFTempCurveIndex, HeatingCapODBTempMin, HeatingCapODBTempMax);
