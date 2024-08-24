@@ -1824,7 +1824,7 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
     static constexpr std::string_view RoutineName("CalcChillerHeaterModel");
     static constexpr std::string_view RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
 
-    bool IsLoadCoolRemaining(true);
+    bool IsLoadCoolRemaining;
     bool NextCompIndicator(false);       // Component indicator when identical chiller heaters exist
     int CompNum = 0;                     // Component number in the loop  REAL(r64) :: FRAC
     int IdenticalUnitCounter = 0;        // Pointer to count number of identical unit passed
@@ -2191,7 +2191,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
     static constexpr std::string_view RoutineName("CalcChillerHeaterModel");
     static constexpr std::string_view RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
 
-    bool IsLoadHeatRemaining(true);     // Ture if heating load remains for this chiller heater
+    bool IsLoadHeatRemaining;           // Ture if heating load remains for this chiller heater
     bool NextCompIndicator(false);      // Component indicator when identical chiller heaters exist
     int CompNum(0);                     // Component number
     int IdenticalUnitCounter = 0;       // Pointer to count number of identical unit passed
