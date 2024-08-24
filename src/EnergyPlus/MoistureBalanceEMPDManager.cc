@@ -157,7 +157,6 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IOStat;                       // IO Status when calling get input subroutine
     Array1D_string MaterialNames(3);  // Number of Material Alpha names defined
-    int MaterNum;                     // Counter to keep track of the material number
     int MaterialNumAlpha;             // Number of material alpha names being passed
     int MaterialNumProp;              // Number of material properties being passed
     Array1D<Real64> MaterialProps(9); // Temporary array to transfer material properties
@@ -199,7 +198,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         // Load the material derived type from the input data.
-        MaterNum = Util::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
+        int MaterNum = Util::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
         if (MaterNum == 0) {
             ShowSevereError(state,
                             format("{}: invalid {} entered={}, must match to a valid Material name.",
