@@ -2105,7 +2105,7 @@ void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData 
         constexpr std::string_view branch = "Branch";
 
         for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
-            auto &thisComp = thisBranch.Comp(compNum);
+            auto const &thisComp = thisBranch.Comp(compNum);
             fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
         }
 
@@ -2119,7 +2119,7 @@ void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData 
                 }
 
                 for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
-                    auto &thisComp = thisBranch.Comp(compNum);
+                    auto const &thisComp = thisBranch.Comp(compNum);
                     // fillPlantToplogyRow(state, thisComp.Name, thisComp.TypeOf, loopSide, branch, thisBranch.Name, thisLoop.FluidName, repOffset);
                     fillPlantToplogyComponentRow2(
                         state, loopType, thisLoop.Name, loopSide, thisBranch.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
@@ -2136,7 +2136,7 @@ void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData 
             // Outlet Branch
             auto &thisBranch = thisLoopSide.Branch(thisLoopSide.TotalBranches);
             for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
-                auto &thisComp = thisBranch.Comp(compNum);
+                auto const &thisComp = thisBranch.Comp(compNum);
                 fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
             }
         }
