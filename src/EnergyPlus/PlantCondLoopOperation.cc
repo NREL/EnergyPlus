@@ -1391,8 +1391,6 @@ void FindCompSPInput(EnergyPlusData &state,
     if (NumSchemes > 0) {
         int NumAlphas;
         int NumNums;
-        int CompNum;
-        int CompInNode;
         int IOStat;
         int OnPeakSchedPtr;
         std::string ChargeSchedName;
@@ -1417,6 +1415,7 @@ void FindCompSPInput(EnergyPlusData &state,
             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList.allocate(1);
             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps = (NumAlphas - 1) / 5;
             int ChargeSchedPtr;
+            int OnPeakSchedPtr;
 
             if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
                 // Read all of the additional parameters for ice storage control scheme and error check various parameters
@@ -1449,7 +1448,7 @@ void FindCompSPInput(EnergyPlusData &state,
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps);
                 int CompNumA;
                 int CompNumN;
-                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps; ++CompNum) {
+                for (int CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps; ++CompNum) {
                     if (CurrentModuleObject == "PlantEquipmentOperation:ComponentSetPoint") {
                         CompNumA = CompNum * 5;
                         CompNumN = CompNum;
@@ -1491,7 +1490,7 @@ void FindCompSPInput(EnergyPlusData &state,
                     if (state.dataIPShortCut->rNumericArgs(CompNumN) == AutoSize) {
                         int Num = 1;
                         for (; Num <= state.dataSize->SaveNumPlantComps; ++Num) {
-                            CompInNode = state.dataSize->CompDesWaterFlow(Num).SupNode;
+                            int CompInNode = state.dataSize->CompDesWaterFlow(Num).SupNode;
                             CompFlowRate = state.dataSize->CompDesWaterFlow(Num).DesVolFlowRate;
                             if (CompInNode == state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).DemandNodeNum) {
                                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate = CompFlowRate;
