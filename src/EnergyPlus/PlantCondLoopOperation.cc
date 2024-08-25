@@ -1155,9 +1155,7 @@ void LoadEquipList(EnergyPlusData &state,
     int NumAlphas;
     int NumNums;
     int IOStat;
-    bool IsNotOK;
     std::string CurrentModuleObject;
-    int iIndex;
     bool firstblank;
 
     if (state.dataPlantCondLoopOp->LoadEquipListOneTimeFlag) {
@@ -1165,6 +1163,7 @@ void LoadEquipList(EnergyPlusData &state,
         int PELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
         int CELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
         state.dataPlantCondLoopOp->TotNumLists = PELists + CELists;
+        bool IsNotOK;
         if (state.dataPlantCondLoopOp->TotNumLists > 0) {
             state.dataPlantCondLoopOp->EquipListsNameList.allocate(state.dataPlantCondLoopOp->TotNumLists);
             state.dataPlantCondLoopOp->EquipListsTypeList.allocate(state.dataPlantCondLoopOp->TotNumLists);
@@ -1174,7 +1173,7 @@ void LoadEquipList(EnergyPlusData &state,
             if (PELists > 0) {
                 CurrentModuleObject = "PlantEquipmentList";
                 for (Num = 1; Num <= PELists; ++Num) {
-                    iIndex = Num;
+                   int  iIndex = Num;
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                              CurrentModuleObject,
                                                                              Num,
@@ -1230,7 +1229,7 @@ void LoadEquipList(EnergyPlusData &state,
             if (CELists > 0) {
                 CurrentModuleObject = "CondenserEquipmentList";
                 for (Num = 1; Num <= CELists; ++Num) {
-                    iIndex = Num + PELists;
+                    int iIndex = Num + PELists;
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                              CurrentModuleObject,
                                                                              Num,
