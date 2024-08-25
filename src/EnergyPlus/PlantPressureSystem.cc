@@ -224,7 +224,6 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
 
         if (loop.HasPressureComponents) {
             bool SeriesPressureComponentFound = false;
-            int BranchPressureTally = 0;
             state.dataPlantPressureSys->FullParallelBranchSetFound[static_cast<int>(DataPlant::LoopSideLocation::Demand)] =
                 state.dataPlantPressureSys->FullParallelBranchSetFound[static_cast<int>(DataPlant::LoopSideLocation::Supply)] = false;
 
@@ -242,6 +241,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
             for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
                 // Check for illegal parallel branch setups
                 auto &loop_side(loop.LoopSide(LoopSideNum));
+                int BranchPressureTally = 0;
                 int NumBranches = size(loop_side.Branch);
                 if (NumBranches > 2) {
                     for (int BranchNum = 2; BranchNum <= NumBranches - 1; ++BranchNum) {
