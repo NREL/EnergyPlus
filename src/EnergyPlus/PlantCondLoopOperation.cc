@@ -1413,7 +1413,7 @@ void FindCompSPInput(EnergyPlusData &state,
             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList.allocate(1);
             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps = (NumAlphas - 1) / 5;
             int ChargeSchedPtr;
-        int OnPeakSchedPtr;
+            int OnPeakSchedPtr;
 
             if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
                 // Read all of the additional parameters for ice storage control scheme and error check various parameters
