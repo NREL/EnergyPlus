@@ -1373,10 +1373,6 @@ void FindCompSPInput(EnergyPlusData &state,
     Real64 CompFlowRate(0.0);
     std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
     bool SchemeNameFound;        // Set to FALSE if a match of OpScheme object and OpScheme name is not found
-    bool NodeEMSSetPointMissing;
-    std::string OnPeakSchedName;
-    int OnPeakSchedPtr;
-    std::string ChargeSchedName;
     int ChargeSchedPtr;
     Real64 NonChargCHWTemp;
     Real64 OffPeakCHWTemp;
@@ -1401,6 +1397,8 @@ void FindCompSPInput(EnergyPlusData &state,
         int CompNum;
         int CompInNode;
         int IOStat;
+        int OnPeakSchedPtr;
+        std::string ChargeSchedName;
         for (int Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, CurrentModuleObject, Num, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
@@ -1424,7 +1422,7 @@ void FindCompSPInput(EnergyPlusData &state,
 
             if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
                 // Read all of the additional parameters for ice storage control scheme and error check various parameters
-                OnPeakSchedName = state.dataIPShortCut->cAlphaArgs(2);
+                std::string OnPeakSchedName = state.dataIPShortCut->cAlphaArgs(2);
                 OnPeakSchedPtr = GetScheduleIndex(state, OnPeakSchedName);
                 if (OnPeakSchedPtr == 0) {
                     ShowSevereError(state,
@@ -1607,7 +1605,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                 ErrorsFound = true;
                             } else {
                                 // need call to EMS to check node
-                                NodeEMSSetPointMissing = false;
+                                bool NodeEMSSetPointMissing = false;
                                 CheckIfNodeSetPointManagedByEMS(
                                     state,
                                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
@@ -1662,7 +1660,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     ErrorsFound = true;
                                 } else {
                                     // need call to EMS to check node
-                                    NodeEMSSetPointMissing = false;
+                                    bool NodeEMSSetPointMissing = false;
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
@@ -1716,7 +1714,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     ErrorsFound = true;
                                 } else {
                                     // need call to EMS to check node
-                                    NodeEMSSetPointMissing = false;
+                                    bool NodeEMSSetPointMissing = false;
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
@@ -1777,7 +1775,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     ErrorsFound = true;
                                 } else {
                                     // need call to EMS to check node
-                                    NodeEMSSetPointMissing = false;
+                                    bool NodeEMSSetPointMissing = false;
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
