@@ -1393,7 +1393,6 @@ void FindCompSPInput(EnergyPlusData &state,
         int NumNums;
         int IOStat;
         int OnPeakSchedPtr;
-        std::string ChargeSchedName;
         for (int Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, CurrentModuleObject, Num, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
@@ -1429,7 +1428,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name));
                     ErrorsFound = true;
                 }
-                ChargeSchedName = state.dataIPShortCut->cAlphaArgs(3);
+                std::string ChargeSchedName = state.dataIPShortCut->cAlphaArgs(3);
                 ChargeSchedPtr = GetScheduleIndex(state, ChargeSchedName);
                 if (ChargeSchedPtr == 0) {
                     ShowSevereError(state,
@@ -2384,14 +2383,8 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
     using namespace DataPlant;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumAlphas;
-    int NumNums;
-    int Num;
-    int CompNum;
-    int IOStat;
     bool SchemeNameFound;        // Set to FALSE if a match of OpScheme object and OpScheme name is not found
     std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
-    int StackMngrNum;            // local temporary for Erl program calling manager index
 
     SchemeNameFound = true;
 
@@ -2402,6 +2395,7 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
     }
 
     if (NumSchemes > 0) {
+        int NumAlphas, NumNums, Num, IOStat;
 
         for (Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2437,7 +2431,7 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
             if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps > 0) {
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp.allocate(
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps);
-                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps; ++CompNum) {
+                for (int CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps; ++CompNum) {
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).TypeOf =
                         state.dataIPShortCut->cAlphaArgs(CompNum * 2 + 2);
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name =
@@ -2463,7 +2457,7 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).EMSIntVarRemainingLoadValue);
                 }
             }
-            StackMngrNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
+            int StackMngrNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
             if (StackMngrNum > 0) { // found it
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).ErlSimProgramMngr = StackMngrNum;
             } else {
