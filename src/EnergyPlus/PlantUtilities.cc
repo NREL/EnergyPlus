@@ -525,22 +525,16 @@ void CheckPlantMixerSplitterConsistency(EnergyPlusData &state,
     using DataPlant::CriteriaDelta_MassFlowRate;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int MixerOutletNode;
-    int SplitterInletNode;
     Real64 AbsDifference;
-    int NumSplitterOutlets;
     Real64 SumOutletFlow;
-    int OutletNum;
-    int BranchNum;
-    int LastNodeOnBranch;
 
     if (!state.dataPlnt->PlantLoop(LoopNum).LoopHasConnectionComp) {
         if (!state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag &&
             state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists && !FirstHVACIteration) {
             // Find mixer outlet node number
-            MixerOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut;
+            int MixerOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut;
             // Find splitter inlet node number
-            SplitterInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
+            int SplitterInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
 
             AbsDifference =
                 std::abs(state.dataLoopNodes->Node(SplitterInletNode).MassFlowRate - state.dataLoopNodes->Node(MixerOutletNode).MassFlowRate);
@@ -588,12 +582,12 @@ void CheckPlantMixerSplitterConsistency(EnergyPlusData &state,
             // now check inside s/m to see if there are problems
 
             // loop across branch outlet nodes and check mass continuity
-            NumSplitterOutlets = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
+            int NumSplitterOutlets = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
             SumOutletFlow = 0.0;
             //  SumInletFlow = 0.0;
-            for (OutletNum = 1; OutletNum <= NumSplitterOutlets; ++OutletNum) {
-                BranchNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.BranchNumOut(OutletNum);
-                LastNodeOnBranch = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut;
+            for (int OutletNum = 1; OutletNum <= NumSplitterOutlets; ++OutletNum) {
+                int BranchNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.BranchNumOut(OutletNum);
+                int LastNodeOnBranch = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut;
                 SumOutletFlow += state.dataLoopNodes->Node(LastNodeOnBranch).MassFlowRate;
                 //  FirstNodeOnBranch= PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%NodeNumIn
                 //  SumInletFlow = SumInletFlow + Node(FirstNodeOnBranch)%MassFlowRate
