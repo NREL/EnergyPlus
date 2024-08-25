@@ -1373,11 +1373,8 @@ void FindCompSPInput(EnergyPlusData &state,
     Real64 CompFlowRate(0.0);
     std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
     bool SchemeNameFound;        // Set to FALSE if a match of OpScheme object and OpScheme name is not found
-    int ChargeSchedPtr;
     Real64 NonChargCHWTemp;
     Real64 OffPeakCHWTemp;
-    int CompNumA;
-    int CompNumN;
     CtrlType CompOpType; // 1=cooling, 2=dual(or other)
 
     SchemeNameFound = true;
@@ -1419,6 +1416,7 @@ void FindCompSPInput(EnergyPlusData &state,
             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists = 1;
             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList.allocate(1);
             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps = (NumAlphas - 1) / 5;
+            int ChargeSchedPtr;
 
             if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
                 // Read all of the additional parameters for ice storage control scheme and error check various parameters
@@ -1449,6 +1447,8 @@ void FindCompSPInput(EnergyPlusData &state,
             if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps > 0) {
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp.allocate(
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps);
+                int CompNumA;
+                int CompNumN;
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps; ++CompNum) {
                     if (CurrentModuleObject == "PlantEquipmentOperation:ComponentSetPoint") {
                         CompNumA = CompNum * 5;
