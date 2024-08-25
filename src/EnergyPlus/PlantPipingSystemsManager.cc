@@ -285,7 +285,7 @@ namespace PlantPipingSystemsManager {
                     Real64 ZoneTemp = 0.0;
 
                     // Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
-                    for (auto &z : thisDomain.ZoneCoupledSurfaces) {
+                    for (auto const &z : thisDomain.ZoneCoupledSurfaces) {
                         int ZoneNum = z.Zone;
                         ZoneTemp += state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTAV;
                     }
@@ -428,7 +428,7 @@ namespace PlantPipingSystemsManager {
         for (int DomainNum = 0; DomainNum < TotalNumDomains; ++DomainNum) {
 
             // Convenience
-            auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum];
+            auto const &thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum];
 
             // validate pipe domain-circuit name-to-index references
             for (auto &thisCircuit : thisDomain.circuits) {
@@ -437,7 +437,7 @@ namespace PlantPipingSystemsManager {
 
             // correct segment locations for: INTERNAL DATA STRUCTURE Y VALUE MEASURED FROM BOTTOM OF DOMAIN,
             //                                INPUT WAS MEASURED FROM GROUND SURFACE
-            for (auto &thisCircuit : thisDomain.circuits) {
+            for (auto const &thisCircuit : thisDomain.circuits) {
                 for (auto &thisSegment : thisCircuit->pipeSegments) {
                     thisSegment->PipeLocation.Y = thisDomain.Extents.yMax - thisSegment->PipeLocation.Y;
                 }
@@ -445,7 +445,7 @@ namespace PlantPipingSystemsManager {
 
             // correct segment locations for: BASEMENT X SHIFT
             if (thisDomain.HasBasement && thisDomain.BasementZone.ShiftPipesByWidth) {
-                for (auto &thisCircuit : thisDomain.circuits) {
+                for (auto const &thisCircuit : thisDomain.circuits) {
                     for (auto &thisSegment : thisCircuit->pipeSegments) {
                         thisSegment->PipeLocation.X += thisDomain.BasementZone.Width;
                     }
@@ -453,9 +453,9 @@ namespace PlantPipingSystemsManager {
             }
 
             // now we will have good values of pipe segment locations, we can validate them
-            for (auto &thisCircuit : thisDomain.circuits) {
+            for (auto const &thisCircuit : thisDomain.circuits) {
                 // check to make sure it isn't outside the domain
-                for (auto &thisSegment : thisCircuit->pipeSegments) {
+                for (auto const &thisSegment : thisCircuit->pipeSegments) {
                     if ((thisSegment->PipeLocation.X > thisDomain.Extents.xMax) || (thisSegment->PipeLocation.X < 0.0) ||
                         (thisSegment->PipeLocation.Y > thisDomain.Extents.yMax) || (thisSegment->PipeLocation.Y < 0.0)) {
                         ShowSevereError(state,
@@ -1106,7 +1106,6 @@ namespace PlantPipingSystemsManager {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
-        int CurIndex;
 
         // initialize these counters properly so they can be incremented within the DO loop
         int DomainNum = StartingDomainNumForBasement - 1;
@@ -1173,7 +1172,7 @@ namespace PlantPipingSystemsManager {
             }
 
             // Basement zone depth
-            CurIndex = 11;
+            int CurIndex = 11;
             thisDomain.BasementZone.Depth = state.dataIPShortCut->rNumericArgs(CurIndex);
             if (thisDomain.BasementZone.Depth >= thisDomain.Extents.yMax || thisDomain.BasementZone.Depth <= 0.0) {
                 ShowSevereError(state, format("Invalid {}", state.dataIPShortCut->cNumericFieldNames(CurIndex)));
@@ -3142,13 +3141,13 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        int cellCountUpToNow = 0;
         std::vector<Real64> tempCellWidths;
 
         if (PartitionsExist) {
 
             for (int i = 0; i < (int)ThesePartitionRegions.size(); ++i) {
                 auto &thisPartition = ThesePartitionRegions[i];
+                int cellCountUpToNow = 0;
 
                 if (i == 0) { // First partition
                     // Create region to left of partition
@@ -3472,7 +3471,7 @@ namespace PlantPipingSystemsManager {
                         } else if (CellYIndex == this->y_max_index) { // Surface cells
                             cellType = CellType::GroundSurface;
                             ++NumGroundSurfaceCells;
-                        } else if (CellYIndex == 0 || CellXIndex == 0 || CellZIndex == 0) { // Farfield boundary
+                        } else if (CellXIndex == 0 || CellZIndex == 0) { // Farfield boundary
                             cellType = CellType::FarfieldBoundary;
                         }
                     } else if (CellXIndex == MaxBasementXNodeIndex && CellYIndex == MinBasementYNodeIndex) {
