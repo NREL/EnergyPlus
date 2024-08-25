@@ -2535,10 +2535,6 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     DataPlant::LoopSideLocation LoopSidePtr;
     PlantLocation plantLoc{};
 
-    bool FoundScheme;
-    bool FoundSchemeMatch;
-    //  LOGICAL, SAVE                     :: FirstHVACInitsDone = .FALSE.
-    //  LOGICAL, SAVE                     :: MyEnvrnFlag = .TRUE.
     DataPlant::PlantEquipmentType Type;
     int CompOpNum;
     int OldNumOpSchemes;
@@ -2685,7 +2681,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                             OldNumOpSchemes = dummy_loop_equip.NumOpSchemes;
 
                             // could be new list on existing scheme or new scheme with new list.  Check and see
-                            FoundSchemeMatch = false;
+                            bool FoundSchemeMatch = false;
                             for (thisSchemeNum = 1; thisSchemeNum <= OldNumOpSchemes; ++thisSchemeNum) { // Loop index used below
                                 // compare the OpScheme index, 'opnum', in the PlantLoop()%OpScheme()data structure
                                 // with the OpSchemePtr in the PlantLoop()%LoopSide()%Branch()%Comp() data structure.
@@ -2828,7 +2824,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
         }
         // Update the OpScheme schedules
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-            FoundScheme = false;
+            bool FoundScheme = false;
             auto &this_loop = state.dataPlnt->PlantLoop(LoopNum);
             for (int OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum) {
                 auto &this_op_scheme = this_loop.OpScheme(OpNum);
