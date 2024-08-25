@@ -3459,15 +3459,13 @@ namespace PlantPipingSystemsManager {
                                 // Check if vertical insulation present
                                 if (this->VertInsPresentFlag) {
                                     if (InsulationYIndex != 0) { // Partial vertical insulation
-                                        if (CellYIndex <= this->y_max_index && CellYIndex > InsulationYIndex) {
+                                        if (CellYIndex > InsulationYIndex) {
                                             cellType = CellType::VertInsulation;
                                             ++NumInsulationCells;
                                         }
                                     } else { // Vertical insulation extends to depth of basement floor
-                                        if (CellYIndex <= this->y_max_index && CellYIndex > YFloorIndex) {
-                                            cellType = CellType::VertInsulation;
-                                            ++NumInsulationCells;
-                                        }
+                                        cellType = CellType::VertInsulation;
+                                        ++NumInsulationCells;
                                     }
                                 }
                             }
@@ -5858,12 +5856,12 @@ namespace PlantPipingSystemsManager {
         //'calculate this cell's new Cp value based on the cell temperature
         if (CellTemp <= frzAllIce) { // totally frozen
             rhoCp = this->Moisture.rhoCP_soil_ice;
-        } else if ((CellTemp > frzAllIce) && (CellTemp < frzIceTrans)) { // in between totally frozen and ice transition
+        } else if (CellTemp < frzIceTrans) { // in between totally frozen and ice transition
             rhoCp = this->Moisture.rhoCP_soil_ice +
                     (this->Moisture.rhoCP_soil_transient - this->Moisture.rhoCP_soil_ice) / (frzIceTrans - frzAllIce) * (CellTemp - frzAllIce);
-        } else if ((CellTemp >= frzIceTrans) && (CellTemp <= frzLiqTrans)) { // in between ice transition and liquid transition
+        } else if (CellTemp <= frzLiqTrans) { // in between ice transition and liquid transition
             rhoCp = this->Moisture.rhoCP_soil_transient;
-        } else if ((CellTemp > frzLiqTrans) && (CellTemp < frzAllLiq)) { // in between liquid transition and all liquid
+        } else if (CellTemp < frzAllLiq) { // in between liquid transition and all liquid
             rhoCp = this->Moisture.rhoCp_soil_liq_1 +
                     (this->Moisture.rhoCP_soil_transient - this->Moisture.rhoCP_soil_liq) / (frzAllLiq - frzLiqTrans) * (frzAllLiq - CellTemp);
         } else { // ( CellTemp >= frzAllLiq ) --- greater than or equal to all liquid
