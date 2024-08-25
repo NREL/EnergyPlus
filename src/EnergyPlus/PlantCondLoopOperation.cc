@@ -1392,7 +1392,6 @@ void FindCompSPInput(EnergyPlusData &state,
         int NumAlphas;
         int NumNums;
         int IOStat;
-        int OnPeakSchedPtr;
         for (int Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, CurrentModuleObject, Num, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
@@ -1414,7 +1413,7 @@ void FindCompSPInput(EnergyPlusData &state,
             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList.allocate(1);
             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).NumComps = (NumAlphas - 1) / 5;
             int ChargeSchedPtr;
-            int OnPeakSchedPtr;
+        int OnPeakSchedPtr;
 
             if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
                 // Read all of the additional parameters for ice storage control scheme and error check various parameters
@@ -2325,9 +2324,9 @@ void GetChillerHeaterChangeoverOpSchemeInput(EnergyPlusData &state,
                 ErrorsFound = true;
             }
 
-            for (int listNum = 1; listNum <= scheme.PlantOps.NumSimultHeatCoolHeatingEquipLists; ++listNum) {
+            cCurrentModuleObject = "PlantEquipmentList";
 
-                std::string cCurrentModuleObject("PlantEquipmentList");
+            for (int listNum = 1; listNum <= scheme.PlantOps.NumSimultHeatCoolHeatingEquipLists; ++listNum) {
 
                 auto const instances = ip->epJSON.find(cCurrentModuleObject);
                 auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
@@ -2653,7 +2652,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     auto &this_equip_list = this_op_scheme.EquipList(ListNum);
                     int thisSchemeNum;
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
-                        auto &this_equip = this_equip_list.Comp(EquipNum);
+                        auto const &this_equip = this_equip_list.Comp(EquipNum);
                         // dereference indices (stored in previous loop)
                         plantLoc.loopNum = this_equip.LoopNumPtr;
                         plantLoc.loopSideNum = this_equip.LoopSideNumPtr;
@@ -2685,12 +2684,12 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                 break;
                             }
                             if (FoundSchemeMatch) { // op scheme already exists, but need to add a list to the existing OpScheme
-                                auto &this_op_scheme = dummy_loop_equip.OpScheme(thisSchemeNum);
-                                int NewNumEquipLists = this_op_scheme.NumEquipLists + 1;
-                                this_op_scheme.EquipList.redimension(NewNumEquipLists);
-                                this_op_scheme.NumEquipLists = NewNumEquipLists;
-                                this_op_scheme.EquipList(NewNumEquipLists).ListPtr = ListNum;
-                                this_op_scheme.EquipList(NewNumEquipLists).CompPtr = EquipNum;
+                                auto &this_op_schemeAdd = dummy_loop_equip.OpScheme(thisSchemeNum);
+                                int NewNumEquipLists = this_op_schemeAdd.NumEquipLists + 1;
+                                this_op_schemeAdd.EquipList.redimension(NewNumEquipLists);
+                                this_op_schemeAdd.NumEquipLists = NewNumEquipLists;
+                                this_op_schemeAdd.EquipList(NewNumEquipLists).ListPtr = ListNum;
+                                this_op_schemeAdd.EquipList(NewNumEquipLists).CompPtr = EquipNum;
                             } else { // !FoundSchemeMatch: Add new op scheme and a new list
                                 int NewNumOpSchemes = OldNumOpSchemes + 1;
                                 dummy_loop_equip.OpScheme.redimension(NewNumOpSchemes);
@@ -3122,7 +3121,7 @@ void DistributePlantLoad(EnergyPlusData &state,
                 CompNum = this_equiplist.Comp(CompIndex).CompNumPtr;
 
                 // create a reference to the component itself
-                auto &this_component = this_loopside.Branch(BranchNum).Comp(CompNum);
+                auto const &this_component = this_loopside.Branch(BranchNum).Comp(CompNum);
 
                 if (this_component.Available) ++numAvail;
             }
@@ -4082,12 +4081,8 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
 
     // Locals
     static constexpr std::string_view Units("[on/off]");
-    // INTEGER                      :: NumAct
-    int LoopNum;
-    int BranchNum;
-    int CompNum;
 
-    for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+    for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
         std::string ActuatorName = "Plant Loop Overall";
         std::string UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).Name;
         std::string ActuatorType = "On/Off Supervisory";
@@ -4122,7 +4117,7 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
                          state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).EMSValue);
 
         for (DataPlant::LoopSideLocation LoopSideNum : LoopSideKeys) {
-            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+            for (int BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                 if (LoopSideNum == LoopSideLocation::Supply) {
                     ActuatorName = "Supply Side Branch";
                     UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name;
@@ -4146,7 +4141,8 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideOn,
                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideValue);
                 }
-                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                for (int CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents;
+                     ++CompNum) {
                     ActuatorName = format("Plant Component {}",
                                           PlantEquipTypeNames[static_cast<int>(
                                               state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Type)]);
@@ -4330,7 +4326,7 @@ void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
     // set up some nice references to avoid lookups
     auto &this_loopside = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum);
     auto &this_branch = this_loopside.Branch(plantLoc.branchNum);
-    auto &this_comp = this_branch.Comp(plantLoc.compNum);
+    auto const &this_comp = this_branch.Comp(plantLoc.compNum);
 
     if ((this_loopside.EMSCtrl) && (this_loopside.EMSValue <= 0.0)) {
         ChangeInLoad = 0.0;
