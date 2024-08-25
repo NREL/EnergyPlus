@@ -804,7 +804,6 @@ void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
     Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
     int TotalArgs(0);              // Total number of alpha and numeric arguments (max) for a
     //   certain object in the input file
-    int ListNum;
     std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
     bool SchemeNameFound;        // Set to FALSE if a match of OpScheme object and OpScheme name is not found
     Real64 OuterListNumLowerLimit;
@@ -853,6 +852,7 @@ void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
                 ShowSevereError(state, format("{} = \"{}\", specified without equipment list.", CurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             } else {
+                int ListNum;
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList.allocate(
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists);
                 int NumEquipLists = state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists;
@@ -1021,7 +1021,6 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlphas;
     int NumNums;
-    int IOStat;
     Array1D_string AlphArray;      // Alpha input items for object
     Array1D_string cAlphaFields;   // Alpha field names
     Array1D_string cNumericFields; // Numeric field names
@@ -1030,13 +1029,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
     Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
     int TotalArgs(0);              // Total number of alpha and numeric arguments (max) for a
     //   certain object in the input file
-    int Num;
-    int NumEquipLists;
-    int ListNum;
     std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
-    bool SchemeNameFound;        // Set to FALSE if a match of OpScheme object and OpScheme name is not found
-
-    SchemeNameFound = true;
 
     std::string cmoStr = std::string(BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(CurrentModuleObject)]);
 
@@ -1057,7 +1050,10 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
     }
 
     if (NumSchemes > 0) {
-        for (Num = 1; Num <= NumSchemes; ++Num) {
+        int IOStat;
+        bool SchemeNameFound = true;
+
+        for (int Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state, cmoStr, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
             if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
             if (Num == NumSchemes) {
@@ -1079,7 +1075,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
             } else {
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList.allocate(
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists);
-                NumEquipLists = state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists;
+                int NumEquipLists = state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists;
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).ReferenceNodeName = AlphArray(2);
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).ReferenceNodeNumber =
                     GetOnlySingleNode(state,
@@ -1092,7 +1088,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 // For DO Loop below -- Check for lower limit > upper limit.(invalid)
-                for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
+                for (int ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeLowerLimit = NumArray(ListNum * 2 - 1);
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeUpperLimit = NumArray(ListNum * 2);
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name = AlphArray(ListNum + 2);
@@ -1155,8 +1151,6 @@ void LoadEquipList(EnergyPlusData &state,
     bool FoundIntendedList;
     int Num;
     int MachineNum;
-    int PELists;
-    int CELists;
     //  INTEGER :: NumLists
     int NumAlphas;
     int NumNums;
@@ -1168,8 +1162,8 @@ void LoadEquipList(EnergyPlusData &state,
 
     if (state.dataPlantCondLoopOp->LoadEquipListOneTimeFlag) {
         // assemble mapping between list names and indices one time
-        PELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
-        CELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
+        int PELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
+        int CELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
         state.dataPlantCondLoopOp->TotNumLists = PELists + CELists;
         if (state.dataPlantCondLoopOp->TotNumLists > 0) {
             state.dataPlantCondLoopOp->EquipListsNameList.allocate(state.dataPlantCondLoopOp->TotNumLists);
