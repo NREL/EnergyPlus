@@ -1156,24 +1156,23 @@ void LoadEquipList(EnergyPlusData &state,
     int NumNums;
     int IOStat;
     std::string CurrentModuleObject;
-    bool firstblank;
 
     if (state.dataPlantCondLoopOp->LoadEquipListOneTimeFlag) {
         // assemble mapping between list names and indices one time
         int PELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
         int CELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
         state.dataPlantCondLoopOp->TotNumLists = PELists + CELists;
-        bool IsNotOK;
         if (state.dataPlantCondLoopOp->TotNumLists > 0) {
             state.dataPlantCondLoopOp->EquipListsNameList.allocate(state.dataPlantCondLoopOp->TotNumLists);
             state.dataPlantCondLoopOp->EquipListsTypeList.allocate(state.dataPlantCondLoopOp->TotNumLists);
             state.dataPlantCondLoopOp->EquipListsIndexList.allocate(state.dataPlantCondLoopOp->TotNumLists);
+            bool IsNotOK;
 
             // First load PlantEquipmentList info
             if (PELists > 0) {
                 CurrentModuleObject = "PlantEquipmentList";
                 for (Num = 1; Num <= PELists; ++Num) {
-                   int  iIndex = Num;
+                    int iIndex = Num;
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                              CurrentModuleObject,
                                                                              Num,
@@ -1191,8 +1190,8 @@ void LoadEquipList(EnergyPlusData &state,
                     state.dataPlantCondLoopOp->EquipListsIndexList(iIndex) = Num;
                     MachineNum = 2;
                     while (MachineNum <= NumAlphas) {
-                        firstblank = false;
                         if (state.dataIPShortCut->lAlphaFieldBlanks(MachineNum) || state.dataIPShortCut->lAlphaFieldBlanks(MachineNum + 1)) {
+                            bool firstblank = false;
                             if (state.dataIPShortCut->lAlphaFieldBlanks(MachineNum)) {
                                 ShowSevereError(
                                     state,
@@ -1247,8 +1246,8 @@ void LoadEquipList(EnergyPlusData &state,
                     state.dataPlantCondLoopOp->EquipListsIndexList(iIndex) = Num;
                     MachineNum = 2;
                     while (MachineNum <= NumAlphas) {
-                        firstblank = false;
                         if (state.dataIPShortCut->lAlphaFieldBlanks(MachineNum) || state.dataIPShortCut->lAlphaFieldBlanks(MachineNum + 1)) {
+                            bool firstblank = false;
                             if (state.dataIPShortCut->lAlphaFieldBlanks(MachineNum)) {
                                 ShowSevereError(
                                     state,
@@ -1371,11 +1370,6 @@ void FindCompSPInput(EnergyPlusData &state,
     using SetPointManager::SetUpNewScheduledTESSetPtMgr;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumAlphas;
-    int NumNums;
-    int CompNum;
-    int CompInNode;
-    int IOStat;
     Real64 CompFlowRate(0.0);
     std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
     bool SchemeNameFound;        // Set to FALSE if a match of OpScheme object and OpScheme name is not found
@@ -1402,6 +1396,11 @@ void FindCompSPInput(EnergyPlusData &state,
     }
 
     if (NumSchemes > 0) {
+        int NumAlphas;
+        int NumNums;
+        int CompNum;
+        int CompInNode;
+        int IOStat;
         for (int Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, CurrentModuleObject, Num, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
