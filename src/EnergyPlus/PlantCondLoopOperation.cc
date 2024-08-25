@@ -2532,14 +2532,8 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int LoopPtr;
     DataPlant::LoopSideLocation LoopSidePtr;
-    int BranchPtr;
-    int CompPtr;
     PlantLocation plantLoc{};
-    int Index;
-    int OpSchemePtr;
-    int thisSchemeNum;
 
     bool FoundScheme;
     bool FoundSchemeMatch;
@@ -2666,6 +2660,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                 auto &this_op_scheme = this_plant_loop.OpScheme(OpNum);
                 for (int ListNum = 1, ListNum_end = this_op_scheme.NumEquipLists; ListNum <= ListNum_end; ++ListNum) {
                     auto &this_equip_list = this_op_scheme.EquipList(ListNum);
+                    int thisSchemeNum;
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip = this_equip_list.Comp(EquipNum);
                         // dereference indices (stored in previous loop)
@@ -2733,8 +2728,8 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     for (int CompNum = 1, CompNum_end = this_branch.TotalComponents; CompNum <= CompNum_end; ++CompNum) {
                         auto const &this_component = this_branch.Comp(CompNum);
                         if (allocated(this_component.OpScheme)) {
-                            for (Index = 1; Index <= this_component.NumOpSchemes; ++Index) {
-                                OpSchemePtr = this_component.OpScheme(Index).OpSchemePtr;
+                            for (int Index = 1; Index <= this_component.NumOpSchemes; ++Index) {
+                                int OpSchemePtr = this_component.OpScheme(Index).OpSchemePtr;
                                 if (OpSchemePtr == 0) {
                                     ShowSevereError(state,
                                                     format("InitLoadDistribution: no operation scheme index found for component on PlantLoop={}",
@@ -2861,10 +2856,10 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                             auto const &this_list_component = this_equip_list.Comp(CompNum);
 
                             // then look up the component topological position from this structure
-                            LoopPtr = this_list_component.LoopNumPtr;
+                            int LoopPtr = this_list_component.LoopNumPtr;
                             LoopSidePtr = this_list_component.LoopSideNumPtr;
-                            BranchPtr = this_list_component.BranchNumPtr;
-                            CompPtr = this_list_component.CompNumPtr;
+                            int BranchPtr = this_list_component.BranchNumPtr;
+                            int CompPtr = this_list_component.CompNumPtr;
 
                             // then set up a reference to the component on the plant data structure
                             auto &this_loop_component = state.dataPlnt->PlantLoop(LoopPtr).LoopSide(LoopSidePtr).Branch(BranchPtr).Comp(CompPtr);
