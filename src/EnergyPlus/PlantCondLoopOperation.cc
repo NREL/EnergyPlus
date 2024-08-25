@@ -4081,9 +4081,6 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
     // Call the setupAcuator routine
 
     // Locals
-    std::string ActuatorType;
-    std::string ActuatorName;
-    std::string UniqueIDName;
     static constexpr std::string_view Units("[on/off]");
     // INTEGER                      :: NumAct
     int LoopNum;
@@ -4091,9 +4088,9 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
     int CompNum;
 
     for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-        ActuatorName = "Plant Loop Overall";
-        UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).Name;
-        ActuatorType = "On/Off Supervisory";
+        std::string ActuatorName = "Plant Loop Overall";
+        std::string UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).Name;
+        std::string ActuatorType = "On/Off Supervisory";
         SetupEMSActuator(state,
                          ActuatorName,
                          UniqueIDName,
