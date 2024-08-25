@@ -155,12 +155,6 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
     // Initializes output variables and data structure
     // On FirstHVAC, updates the demand inlet node pressure
 
-    // Using/Aliasing
-
-    // Simulation Variables
-    int NumBranches;
-    int BranchPressureTally;
-
     if (state.dataPlantPressureSys->InitPressureDropOneTimeInit) {
         // First allocate the initialization array to each plant loop
         state.dataPlantPressureSys->LoopInit.allocate(size(state.dataPlnt->PlantLoop));
@@ -175,7 +169,6 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
 
         // Initialize
         bool ErrorsFound(false);
-        bool SeriesPressureComponentFound(false);
 
         // Need to go along plant loop and set up component pressure drop data structure!
         for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
@@ -230,6 +223,8 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
         }
 
         if (loop.HasPressureComponents) {
+            bool SeriesPressureComponentFound = false;
+            int BranchPressureTally = 0;
             state.dataPlantPressureSys->FullParallelBranchSetFound[static_cast<int>(DataPlant::LoopSideLocation::Demand)] =
                 state.dataPlantPressureSys->FullParallelBranchSetFound[static_cast<int>(DataPlant::LoopSideLocation::Supply)] = false;
 
@@ -247,8 +242,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
             for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
                 // Check for illegal parallel branch setups
                 auto &loop_side(loop.LoopSide(LoopSideNum));
-                BranchPressureTally = 0;
-                NumBranches = size(loop_side.Branch);
+                int NumBranches = size(loop_side.Branch);
                 if (NumBranches > 2) {
                     for (int BranchNum = 2; BranchNum <= NumBranches - 1; ++BranchNum) {
                         if (loop_side.Branch(BranchNum).HasPressureComponents) {
@@ -717,8 +711,11 @@ void DistributePressureOnBranch(EnergyPlusData &state,
     }
 }
 
-void PassPressureAcrossMixer(
-    EnergyPlusData &state, int const LoopNum, const DataPlant::LoopSideLocation LoopSideNum, Real64 const MixerPressure, int const NumBranchesOnLoopSide)
+void PassPressureAcrossMixer(EnergyPlusData &state,
+                             int const LoopNum,
+                             const DataPlant::LoopSideLocation LoopSideNum,
+                             Real64 const MixerPressure,
+                             int const NumBranchesOnLoopSide)
 {
 
     // SUBROUTINE INFORMATION:
