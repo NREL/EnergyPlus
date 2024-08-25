@@ -2536,14 +2536,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     PlantLocation plantLoc{};
 
     DataPlant::PlantEquipmentType Type;
-    int CompOpNum;
-    int OldNumOpSchemes;
-    int NewNumEquipLists;
-    int NewNumOpSchemes;
-    int NumSearchResults;
-    bool GetInputOK; // successful Get Input
 
-    bool errFlag1;
     bool errFlag2;
     Real64 HighestRange;
 
@@ -2552,6 +2545,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     errFlag2 = false;
     // Get Input
     if (state.dataPlantCondLoopOp->GetPlantOpInput) {
+        bool GetInputOK; // successful Get Input
         GetPlantOperationInput(state, GetInputOK);
         if (GetInputOK) {
             GetOperationSchemeInput(state);
@@ -2566,6 +2560,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
         // Set up 'component' to 'op scheme' pointers in Plant data structure
         // We're looking for matches between a component on a PlantLoop.OpScheme.List()
         // and the same component in the PlantLoop.LoopSide.Branch.Comp() data structure
+        int NumSearchResults;
 
         // first loop over main operation scheme data and finish filling out indexes to plant topology for the components in the lists
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
@@ -2577,7 +2572,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip = this_equip_list.Comp(EquipNum);
                         Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
-                        errFlag1 = false;
+                        bool errFlag1 = false;
                         PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, plantLoc, errFlag1, _, _, NumSearchResults, _, LoopNum);
 
                         if (errFlag1) {
@@ -2678,7 +2673,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                             dummy_op_scheme_1.EquipList(1).ListPtr = ListNum;
                             dummy_op_scheme_1.EquipList(1).CompPtr = EquipNum;
                         } else { // already an op scheme
-                            OldNumOpSchemes = dummy_loop_equip.NumOpSchemes;
+                            int OldNumOpSchemes = dummy_loop_equip.NumOpSchemes;
 
                             // could be new list on existing scheme or new scheme with new list.  Check and see
                             bool FoundSchemeMatch = false;
@@ -2691,13 +2686,13 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                             }
                             if (FoundSchemeMatch) { // op scheme already exists, but need to add a list to the existing OpScheme
                                 auto &this_op_scheme = dummy_loop_equip.OpScheme(thisSchemeNum);
-                                NewNumEquipLists = this_op_scheme.NumEquipLists + 1;
+                                int NewNumEquipLists = this_op_scheme.NumEquipLists + 1;
                                 this_op_scheme.EquipList.redimension(NewNumEquipLists);
                                 this_op_scheme.NumEquipLists = NewNumEquipLists;
                                 this_op_scheme.EquipList(NewNumEquipLists).ListPtr = ListNum;
                                 this_op_scheme.EquipList(NewNumEquipLists).CompPtr = EquipNum;
                             } else { // !FoundSchemeMatch: Add new op scheme and a new list
-                                NewNumOpSchemes = OldNumOpSchemes + 1;
+                                int NewNumOpSchemes = OldNumOpSchemes + 1;
                                 dummy_loop_equip.OpScheme.redimension(NewNumOpSchemes);
                                 auto &new_op_scheme = dummy_loop_equip.OpScheme(NewNumOpSchemes);
                                 new_op_scheme.EquipList.allocate(1);
@@ -2824,7 +2819,6 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
         }
         // Update the OpScheme schedules
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-            bool FoundScheme = false;
             auto &this_loop = state.dataPlnt->PlantLoop(LoopNum);
             for (int OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum) {
                 auto &this_op_scheme = this_loop.OpScheme(OpNum);
@@ -2840,7 +2834,6 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
 
                 if (GetCurrentScheduleValue(state, this_op_scheme.SchedPtr) > 0.0) {
                     this_op_scheme.Available = true;
-                    FoundScheme = true;
                     for (int ListNum = 1, ListNum_end = this_op_scheme.NumEquipLists; ListNum <= ListNum_end; ++ListNum) {
                         auto &this_equip_list = this_op_scheme.EquipList(ListNum);
                         // The component loop loads the pointers from the OpScheme data structure
@@ -2870,7 +2863,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                 errFlag2 = true;
                             }
 
-                            for (CompOpNum = 1; CompOpNum <= this_loop_component.NumOpSchemes; ++CompOpNum) {
+                            for (int CompOpNum = 1; CompOpNum <= this_loop_component.NumOpSchemes; ++CompOpNum) {
                                 if (this_loop_component.OpScheme(CompOpNum).OpSchemePtr == OpNum) {
                                     this_loop_component.CurCompLevelOpNum = CompOpNum;
                                 }
@@ -2881,9 +2874,6 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     this_op_scheme.Available = false;
                 }
             }
-            //    IF(.NOT. foundscheme)THEN
-            //      !'call warning 'no current control scheme specified.  Loop Equipment will be shut down'
-            //    ENDIF
         }
     } else { // call supervisory scheme every iteration
         if (!state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes.empty()) {
@@ -2992,7 +2982,6 @@ void DistributePlantLoad(EnergyPlusData &state,
 
     // load local variables
     NumCompsOnList = this_equiplist.NumComps;
-    int numAvail = 0;
 
     // Allocate array once
     accrued_load_plr_values.reserve(NumCompsOnList);
@@ -3004,10 +2993,10 @@ void DistributePlantLoad(EnergyPlusData &state,
     } else {
 
         // OPTIMAL DISTRIBUTION SCHEME
+        int numAvail = 0;
         switch (this_loop.LoadDistribution) {
         case DataPlant::LoadingScheme::Optimal:
             // step 1: load all machines to optimal PLR
-            numAvail = 0;
             for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
                 // look up topology from the equipment list
