@@ -3138,10 +3138,10 @@ namespace PlantPipingSystemsManager {
         std::vector<Real64> tempCellWidths;
 
         if (PartitionsExist) {
+            int cellCountUpToNow = 0;
 
             for (int i = 0; i < (int)ThesePartitionRegions.size(); ++i) {
                 auto &thisPartition = ThesePartitionRegions[i];
-                int cellCountUpToNow = 0;
 
                 if (i == 0) { // First partition
                     // Create region to left of partition
