@@ -67,8 +67,6 @@ namespace MatrixDataManager {
     // MODULE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   June 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // Process user input for Matrix: input data objects
@@ -126,9 +124,6 @@ namespace MatrixDataManager {
         int NumNumbers;          // Number of Numbers for each GetObjectItem call
         int IOStatus;            // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        int NumRows;
-        int NumCols;
-        int NumElements;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "Matrix:TwoDimension";
@@ -156,9 +151,9 @@ namespace MatrixDataManager {
             Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataMatrixDataManager->MatData(MatNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-            NumRows = std::floor(state.dataIPShortCut->rNumericArgs(1));
-            NumCols = std::floor(state.dataIPShortCut->rNumericArgs(2));
-            NumElements = NumRows * NumCols;
+            int NumRows = std::floor(state.dataIPShortCut->rNumericArgs(1));
+            int NumCols = std::floor(state.dataIPShortCut->rNumericArgs(2));
+            int NumElements = NumRows * NumCols;
 
             // test
             if (NumElements < 1) {

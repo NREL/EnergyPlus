@@ -5534,7 +5534,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
             auto &sysSizing = state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum);
 
             switch (sysSizing.SizingOption) {
-            case Coincident: {
+            case DataSizing::SizingConcurrence::Coincident: {
                 if (finalSysSizing.SystemOAMethod == SysOAMethod::ZoneSum) {
                     sysSizing.DesCoolVolFlow = sysSizing.CoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
                     sysSizing.DesHeatVolFlow = sysSizing.CoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
@@ -5865,7 +5865,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                 sysSizing.DesMainVolFlow = max(sysSizing.DesCoolVolFlow, sysSizing.DesHeatVolFlow);
                 // this should also be as least as big as is needed for Vot
             } break;
-            case NonCoincident: {
+            case DataSizing::SizingConcurrence::NonCoincident: {
                 if (finalSysSizing.SystemOAMethod == SysOAMethod::ZoneSum) {
                     sysSizing.DesCoolVolFlow = sysSizing.NonCoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
                     sysSizing.DesHeatVolFlow = sysSizing.NonCoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
@@ -6426,8 +6426,14 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                                     (1.0 + termUnitSizing.InducRat);
                 CoolDDNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolDDNum;
                 CoolTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtCoolMax;
-                OutAirTemp += state.dataSize->DesDayWeath(CoolDDNum).Temp(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
-                OutAirHumRat += state.dataSize->DesDayWeath(CoolDDNum).HumRat(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                if (CoolDDNum == 0) {
+                    auto &zoneCFS = state.dataSize->CalcFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneNum);
+                    OutAirTemp += zoneCFS.CoolOutTemp * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                    OutAirHumRat += zoneCFS.CoolOutHumRat * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                } else {
+                    OutAirTemp += state.dataSize->DesDayWeath(CoolDDNum).Temp(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                    OutAirHumRat += state.dataSize->DesDayWeath(CoolDDNum).HumRat(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                }
             }
             if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow > 0.0) {
                 SysCoolRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
@@ -6490,8 +6496,15 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                                         (1.0 + termUnitSizing.InducRat);
                     HeatDDNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatDDNum;
                     HeatTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
-                    OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
-                    OutAirHumRat += state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    if (HeatDDNum == 0) {
+                        auto &zoneCFS = state.dataSize->CalcFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneNum);
+                        OutAirTemp += zoneCFS.HeatOutTemp * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                        OutAirHumRat += zoneCFS.HeatOutHumRat * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    } else {
+                        OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                        OutAirHumRat +=
+                            state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    }
                 }
                 if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
                     SysHeatRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
@@ -6537,8 +6550,15 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                                         (1.0 + termUnitSizing.InducRat);
                     HeatDDNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatDDNum;
                     HeatTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
-                    OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
-                    OutAirHumRat += state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    if (HeatDDNum == 0) {
+                        auto &zoneCFS = state.dataSize->CalcFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneNum);
+                        OutAirTemp += zoneCFS.HeatOutTemp * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                        OutAirHumRat += zoneCFS.HeatOutHumRat * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    } else {
+                        OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                        OutAirHumRat +=
+                            state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    }
                 }
                 if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
                     SysHeatRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
@@ -6564,7 +6584,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
             }
 
             // move the noncoincident results into the system sizing array
-            if (state.dataSize->CalcSysSizing(AirLoopNum).SizingOption == NonCoincident) {
+            if (state.dataSize->CalcSysSizing(AirLoopNum).SizingOption == DataSizing::SizingConcurrence::NonCoincident) {
                 // But first check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
                 if (!(state.dataSize->FinalSysSizing(AirLoopNum).CoolOAOption == OAControl::AllOA &&
                       SysSensCoolCap <= 0.0)) { // CoolOAOption = Yes 100% OA
@@ -6785,7 +6805,8 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                             ZoneOARatio = 0.0;
                         }
                         state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneCooling(ZoneOARatio);
-                    } else if ((SysCoolSizingRat > 1.0) || (SysCoolSizingRat < 1.0 && finalSysSizing.SizingOption == NonCoincident)) {
+                    } else if ((SysCoolSizingRat > 1.0) ||
+                               (SysCoolSizingRat < 1.0 && finalSysSizing.SizingOption == DataSizing::SizingConcurrence::NonCoincident)) {
                         // size on user input system design flows
                         state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneCooling(SysCoolSizingRat);
                     }
@@ -6845,7 +6866,8 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                             ZoneOARatio = termUnitFinalZoneSizing.MinOA / max(termUnitFinalZoneSizing.DesHeatVolFlow, termUnitFinalZoneSizing.MinOA);
                             ZoneOARatio *= (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                             termUnitFinalZoneSizing.scaleZoneHeating(ZoneOARatio);
-                        } else if ((SysHeatSizingRat > 1.0) || (SysHeatSizingRat < 1.0 && finalSysSizing.SizingOption == NonCoincident)) {
+                        } else if ((SysHeatSizingRat > 1.0) ||
+                                   (SysHeatSizingRat < 1.0 && finalSysSizing.SizingOption == DataSizing::SizingConcurrence::NonCoincident)) {
                             // size on user input system design flows
                             termUnitFinalZoneSizing.scaleZoneHeating(SysHeatSizingRat);
                         }

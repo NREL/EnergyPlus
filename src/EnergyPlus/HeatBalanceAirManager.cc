@@ -3802,7 +3802,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
             int AlphaNum = 2;
             int Zone1Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
-            if (Zone1Num == 0) {
+            int space1Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->space);
+            if ((Zone1Num == 0) && (space1Num == 0)) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", invalid (not found) {}=\"{}\".",
                                        RoutineName,
@@ -3811,11 +3812,14 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                        cAlphaFieldNames(AlphaNum),
                                        cAlphaArgs(AlphaNum)));
                 ErrorsFound = true;
+            } else if (Zone1Num == 0) {
+                Zone1Num = state.dataHeatBal->space(space1Num).zoneNum;
             }
 
             ++AlphaNum; // 3
             int Zone2Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
-            if (Zone2Num == 0) {
+            int space2Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->space);
+            if ((Zone2Num == 0) && (space2Num == 0)) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", invalid (not found) {}=\"{}\".",
                                        RoutineName,
@@ -3824,7 +3828,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                        cAlphaFieldNames(AlphaNum),
                                        cAlphaArgs(AlphaNum)));
                 ErrorsFound = true;
+            } else if (Zone2Num == 0) {
+                Zone2Num = state.dataHeatBal->space(space2Num).zoneNum;
             }
+
+            int spaceNumA = 0;
+            int spaceNumB = 0;
             if (Zone1Num == Zone2Num) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", The same zone name has been entered for both sides of a refrigerated door {}=\"{}\".",
@@ -3837,9 +3846,13 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             } else if (Zone1Num < Zone2Num) { // zone 1 will come first in soln loop, id zone 2 as mate zone
                 ZoneNumA = Zone1Num;
                 ZoneNumB = Zone2Num;
+                spaceNumA = space1Num;
+                spaceNumB = space2Num;
             } else { // zone 2 will come first in soln loop, id zone 1 as mate zone
                 ZoneNumA = Zone2Num;
                 ZoneNumB = Zone1Num;
+                spaceNumA = space2Num;
+                spaceNumB = space1Num;
             }
 
             if (!allocated(state.dataHeatBal->RefDoorMixing(ZoneNumA).OpenSchedPtr)) {
@@ -3891,6 +3904,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             ConnectionNumber = state.dataHeatBal->RefDoorMixing(ZoneNumA).NumRefDoorConnections + 1;
             state.dataHeatBal->RefDoorMixing(ZoneNumA).NumRefDoorConnections = ConnectionNumber;
             state.dataHeatBal->RefDoorMixing(ZoneNumA).ZonePtr = ZoneNumA;
+            state.dataHeatBal->RefDoorMixing(ZoneNumA).spaceIndex = spaceNumA;
+            state.dataHeatBal->RefDoorMixing(ZoneNumA).fromSpaceIndex = spaceNumB;
             state.dataHeatBal->RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber) = ZoneNumB;
             state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectionNumber) = NameThisObject;
             // need to make sure same pair of zones is only entered once.

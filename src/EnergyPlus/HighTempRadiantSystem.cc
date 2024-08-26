@@ -811,7 +811,7 @@ namespace HighTempRadiantSystem {
             // Determine the current setpoint temperature and the temperature at which the unit should be completely off
             Real64 SetPtTemp = ScheduleManager::GetCurrentScheduleValue(state, thisHTR.SetptSchedPtr);
             Real64 OffTemp = SetPtTemp + 0.5 * thisHTR.ThrottlRange;
-            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+            auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             Real64 OpTemp = (thisZoneHB.MAT + thisZoneHB.MRT) / 2.0; // Approximate the "operative" temperature
 
             // Determine the fraction of maximum power to the unit (limiting the fraction range from zero to unity)
@@ -904,7 +904,7 @@ namespace HighTempRadiantSystem {
 
             // First determine whether or not the unit should be on
             // Determine the proper temperature on which to control
-            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+            auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             switch (thisHTR.ControlType) {
             case RadControlType::MATSPControl: {
                 ZoneTemp = thisZoneHB.MAT;
@@ -950,16 +950,16 @@ namespace HighTempRadiantSystem {
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                     // Redetermine the current value of the controlling temperature
-                    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+                    auto &thisZoneHBMod = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
                     switch (thisHTR.ControlType) {
                     case RadControlType::MATControl: {
-                        ZoneTemp = thisZoneHB.MAT;
+                        ZoneTemp = thisZoneHBMod.MAT;
                     } break;
                     case RadControlType::MRTControl: {
-                        ZoneTemp = thisZoneHB.MRT;
+                        ZoneTemp = thisZoneHBMod.MRT;
                     } break;
                     case RadControlType::OperativeControl: {
-                        ZoneTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
+                        ZoneTemp = 0.5 * (thisZoneHBMod.MAT + thisZoneHBMod.MRT);
                     } break;
                     default:
                         break;

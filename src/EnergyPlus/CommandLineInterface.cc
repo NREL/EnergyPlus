@@ -356,6 +356,7 @@ state.dataStrGlobals->inputFilePath='{:g}',
         std::string tableSuffix;
         std::string mapSuffix;
         std::string zszSuffix;
+        std::string spszSuffix;
         std::string sszSuffix;
         std::string meterSuffix;
         std::string sqliteSuffix;
@@ -373,6 +374,7 @@ state.dataStrGlobals->inputFilePath='{:g}',
                 tableSuffix = "tbl";
                 mapSuffix = "map";
                 zszSuffix = "zsz";
+                spszSuffix = "spsz";
                 sszSuffix = "ssz";
                 meterSuffix = "mtr";
                 sqliteSuffix = "sqlite";
@@ -386,6 +388,7 @@ state.dataStrGlobals->inputFilePath='{:g}',
                 tableSuffix = "-table";
                 mapSuffix = "-map";
                 zszSuffix = "-zsz";
+                spszSuffix = "-spsz";
                 sszSuffix = "-ssz";
                 meterSuffix = "-meter";
                 sqliteSuffix = "-sqlite";
@@ -399,6 +402,7 @@ state.dataStrGlobals->inputFilePath='{:g}',
                 tableSuffix = "Table";
                 mapSuffix = "Map";
                 zszSuffix = "Zsz";
+                spszSuffix = "Spsz";
                 sszSuffix = "Ssz";
                 meterSuffix = "Meter";
                 sqliteSuffix = "Sqlite";
@@ -477,6 +481,9 @@ state.dataStrGlobals->inputFilePath='{:g}',
         state.files.outputZszCsvFilePath = composePath(zszSuffix + ".csv");
         state.files.outputZszTabFilePath = composePath(zszSuffix + ".tab");
         state.files.outputZszTxtFilePath = composePath(zszSuffix + ".txt");
+        state.files.outputSpszCsvFilePath = composePath(spszSuffix + ".csv");
+        state.files.outputSpszTabFilePath = composePath(spszSuffix + ".tab");
+        state.files.outputSpszTxtFilePath = composePath(spszSuffix + ".txt");
         state.files.outputSszCsvFilePath = composePath(sszSuffix + ".csv");
         state.files.outputSszTabFilePath = composePath(sszSuffix + ".tab");
         state.files.outputSszTxtFilePath = composePath(sszSuffix + ".txt");

@@ -355,7 +355,6 @@ void InitAirMixer(EnergyPlusData &state, int const MixerNum)
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;
     int NodeNum;
 
     // Do the following initializations (every time step): This should be the info from
@@ -364,7 +363,7 @@ void InitAirMixer(EnergyPlusData &state, int const MixerNum)
     // Transfer the node data to MixerCond data structure
     for (NodeNum = 1; NodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++NodeNum) {
 
-        InletNode = state.dataMixerComponent->MixerCond(MixerNum).InletNode(NodeNum);
+        int InletNode = state.dataMixerComponent->MixerCond(MixerNum).InletNode(NodeNum);
         // Set all of the inlet mass flow variables from the nodes
         state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(NodeNum) = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMaxAvail(NodeNum) = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;

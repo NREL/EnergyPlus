@@ -189,6 +189,13 @@ The following output is applicable only for indirect absorption chillersHVAC,Ave
     HVAC,Average,Chiller OtherFuel2 Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
+The following output is available only for electric chillers (i.e., Chiller:Electric, Chiller:Electric:EIR, Chiller:Electric:ReformulatedEIR and Chiller:ConstantCOP) and the cooling model of the plant loop heat pump (i.e., HeatPump:PlantLoop:EIR:Cooling).
+
+\begin{itemize}
+    \item
+    HVAC,Average,Thermosiphon Status {[]}
+\end{itemize}
+
 \subsubsection{Chiller Electricity Rate {[}W{]}}\label{chiller-electric-power-w}
 
 \subsubsection{Chiller Electricity Energy {[}J{]}}\label{chiller-electric-energy-j}
@@ -847,6 +854,25 @@ This numeric field contains the set point temperature (˚C) for the basin heater
 
 This alpha field contains the name of the basin heater operating schedule. This field only applies for Condenser Type = EvaporativelyCooled. The basin heater operating schedule is assumed to be an on/off schedule and the heater is available to operate any time the schedule value is greater than 0. The basin heater operates when scheduled on and the outdoor air dry-bulb temperature is below the set point temperature described in the previous field. If this field is left blank, the basin heater is available to operate throughout the simulation. Regardless of this schedule, the basin heater may only operate when the chiller is off.
 
+\paragraph{Field: Thermosiphon Capacity Fraction Curve Name}\label{thermosiphon-capacity-fraction-curve-name1}
+
+This optional field allows specification of a user-defined performance curve which defines the fraction of capacity available through refrigerant thermosiphoning when the condenser inlet temperature is lower than the evaporator outlet temperature. When this fraction is less than or equal to the chiller part-load ratio the load may be met by refrigerant thermosiphoning. During this time the chiller power is 0 W and the Thermosiphon Status flag is set to 1.
+
+\begin{equation}
+    ThermosiphonCapacityFraction = {C_1} + {C_2}{\Delta_{temp}}
+\end{equation}
+
+Where the Delta Temperature is defined as:
+
+\begin{equation}
+{\Delta_{{\rm{Temp}}}}
+    = {\rm{TempEvapOut  -  TempCondIn }}
+\end{equation}
+
+\paragraph{Field: Thermosiphon Minimum Temperature Difference}\label{thermosiphon-minimum-temperature-difference1}
+
+This optional input field specifies the minimum temperature difference to activate refrigerant thermosiphoning. If the temperature difference described above is less than this value refrigerant thermosiphoning is disabled. If this field is blank the default value is 0 C.
+
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
@@ -909,6 +935,8 @@ Chiller:ConstantCOP, Little Chiller,
     HVAC,Sum,Chiller Condenser Heat Transfer Energy {[}J{]}
     \item
     Zone,Meter,HeatRejection:EnergyTransfer {[}J{]}
+    \item
+    HVAC,Average,Thermosiphon Status {[]}
 \end{itemize}
 
 Air-cooled or Evap-cooled:
@@ -1173,6 +1201,25 @@ This field is optional.~ It can be used to refine the model and controls for hea
 
 This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
 
+\paragraph{Field: Thermosiphon Capacity Fraction Curve Name}\label{thermosiphon-capacity-fraction-curve-name2}
+
+This optional field allows specification of a user-defined performance curve which defines the fraction of capacity available through refrigerant thermosiphoning when the condenser inlet temperature is lower than the evaporator outlet temperature. When this fraction is less than or equal to the chiller part-load ratio the load may be met by refrigerant thermosiphoning. During this time the chiller power is 0 W and the Thermosiphon Status flag is set to 1.
+
+\begin{equation}
+    ThermosiphonCapacityFraction = {C_1} + {C_2}{\Delta_{temp}}
+\end{equation}
+
+Where the Delta Temperature is defined as:
+
+\begin{equation}
+{\Delta_{{\rm{Temp}}}}
+    = {\rm{TempEvapOut  -  TempCondIn }}
+\end{equation}
+
+\paragraph{Field: Thermosiphon Minimum Temperature Difference}\label{thermosiphon-minimum-temperature-difference2}
+
+This optional input field specifies the minimum temperature difference to activate refrigerant thermosiphoning. If the temperature difference described above is less than this value refrigerant thermosiphoning is disabled. If this field is blank the default value is 0 C.
+
 
 An example of this statement in an IDF is:
 
@@ -1361,6 +1408,8 @@ Chiller:Electric,
     HVAC,Sum,Chiller Condenser Heat Transfer Energy {[}J{]}
     \item
     Zone,Meter,HeatRejection:EnergyTransfer {[}J{]}
+    \item
+    HVAC,Average,Thermosiphon Status {[]}
 \end{itemize}
 
 Air-cooled or Evap-cooled:
@@ -1759,6 +1808,25 @@ This field should be a schedule that defines the temperature difference across t
 
 This field corresponds to the minimum condenser flow fraction. The minimum condenser flow is equal to the value of this input multiplied by the chiller maximum condenser flow rate. This input is only used when the ``Condenser Flow Control'' input is set to ``ModulatedChillerPLR'', ``ModulatedLoopPLR'' or ``ModulatedDeltaTemperature''. When not specified, a default of 0.2 is assumed.
 
+\paragraph{Field: Thermosiphon Capacity Fraction Curve Name}\label{thermosiphon-capacity-fraction-curve-name3}
+
+This optional field allows specification of a user-defined performance curve which defines the fraction of capacity available through refrigerant thermosiphoning when the condenser inlet temperature is lower than the evaporator outlet temperature. When this fraction is less than or equal to the chiller part-load ratio the load may be met by refrigerant thermosiphoning. During this time the chiller power is 0 W and the Thermosiphon Status flag is set to 1.
+
+\begin{equation}
+    ThermosiphonCapacityFraction = {C_1} + {C_2}{\Delta_{temp}}
+\end{equation}
+
+Where the Delta Temperature is defined as:
+
+\begin{equation}
+{\Delta_{{\rm{Temp}}}}
+    = {\rm{TempEvapOut  -  TempCondIn }}
+\end{equation}
+
+\paragraph{Field: Thermosiphon Minimum Temperature Difference}\label{thermosiphon-minimum-temperature-difference3}
+
+This optional input field specifies the minimum temperature difference to activate refrigerant thermosiphoning. If the temperature difference described above is less than this value refrigerant thermosiphoning is disabled. If this field is blank the default value is 0 C.
+
 
 An example of this statement in an IDF is:
 
@@ -1886,6 +1954,8 @@ An example of this statement in an IDF is:
     HVAC,Average,Chiller False Load Heat Transfer Rate {[}W{]}
     \item
     HVAC,Sum,Chiller False Load Heat Transfer Energy {[}J{]}
+    \item
+    HVAC,Average,Thermosiphon Status {[]}
 \end{itemize}
 
 Curve object outputs:
@@ -2163,6 +2233,25 @@ This field should be a schedule that defines the temperature difference across t
 \paragraph{Field: Condenser Minimum Flow Fraction}
 
 This field corresponds to the minimum condenser flow fraction. The minimum condenser flow is equal to the value of this input multiplied by the chiller maximum condenser flow rate. This input is only used when the ``Condenser Flow Control'' input is set to ``ModulatedChillerPLR'', ``ModulatedLoopPLR'' or ``ModulatedDeltaTemperature''. When not specified, a default of 0.2 is assumed.
+
+\paragraph{Field: Thermosiphon Capacity Fraction Curve Name}\label{thermosiphon-capacity-fraction-curve-name4}
+
+This optional field allows specification of a user-defined performance curve which defines the fraction of capacity available through refrigerant thermosiphoning when the condenser inlet temperature is lower than the evaporator outlet temperature. When this fraction is less than or equal to the chiller part-load ratio the load may be met by refrigerant thermosiphoning. During this time the chiller power is 0 W and the Thermosiphon Status flag is set to 1.
+
+\begin{equation}
+    ThermosiphonCapacityFraction = {C_1} + {C_2}{\Delta_{temp}}
+\end{equation}
+
+Where the Delta Temperature is defined as:
+
+\begin{equation}
+{\Delta_{{\rm{Temp}}}}
+    = {\rm{TempEvapOut  -  TempCondIn }}
+\end{equation}
+
+\paragraph{Field: Thermosiphon Minimum Temperature Difference}\label{thermosiphon-minimum-temperature-difference4}
+
+This optional input field specifies the minimum temperature difference to activate refrigerant thermosiphoning. If the temperature difference described above is less than this value refrigerant thermosiphoning is disabled. If this field is blank the default value is 0 C.
 
 
 An example of this statement in an IDF is:
@@ -5535,6 +5624,24 @@ This field is the name of a bivariate curve or table that defines an available c
 
 This field is the name of a bivariate curve or table that defines an EIR (1/COP) modifier as a function of the load side outlet temperature and the heat recovery side inlet temperature. The temperatures are in degrees Celsius when used in the function. The output of this function and the output of the EIR Modifier Function of PLR are multiplied by the reference EIR to get a current EIR when the unit is operating in heat recovery mode.
 
+\paragraph{Field: Thermosiphon Capacity Fraction Curve Name}\label{thermosiphon-capacity-fraction-curve-name5}
+
+This optional field allows specification of a user-defined performance curve which defines the fraction of capacity available through refrigerant thermosiphoning when the condenser inlet temperature is lower than the evaporator outlet temperature. When this fraction is less than or equal to the chiller part-load ratio the load may be met by refrigerant thermosiphoning. During this time the chiller power is 0 W and the Thermosiphon Status flag is set to 1.
+
+\begin{equation}
+    ThermosiphonCapacityFraction = {C_1} + {C_2}{\Delta_{temp}}
+\end{equation}
+
+Where the Delta Temperature is defined as:
+
+\begin{equation}
+{\Delta_{{\rm{Temp}}}}
+    = {\rm{TempEvapOut  -  TempCondIn }}
+\end{equation}
+
+\paragraph{Field: Thermosiphon Minimum Temperature Difference}\label{thermosiphon-minimum-temperature-difference5}
+
+This optional input field specifies the minimum temperature difference to activate refrigerant thermosiphoning. If the temperature difference described above is less than this value refrigerant thermosiphoning is disabled. If this field is blank the default value is 0 C.
 
 \subsection{HeatPump:PlantLoop:EIR:Heating}\label{plhp_eir_heating}
 
@@ -5825,6 +5932,13 @@ This section describes the outputs available for the water to water heat pump, e
     HVAC,Average,Heat Pump Heat Recovery Mass Flow Rate {[}kg/s{]}
     \item
     HVAC,Average,Heat Pump Heat Recovery Operation Status {[}{]}
+\end{itemize}
+
+Outputs specific to HeatPump:PlantLoop:EIR:Cooling
+
+\begin{itemize}
+    \item
+    HVAC,Average,Thermosiphon Status  {[}{]}
 \end{itemize}
 
 Outputs specific to HeatPump:PlantLoop:EIR:Heating

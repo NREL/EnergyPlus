@@ -225,7 +225,7 @@ void GetBoilerInput(EnergyPlusData &state)
             ShowSevereError(
                 state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("Invalid {}={:.3R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowSevereError(state, format("...{} must be greater than 0.0", state.dataIPShortCut->cNumericFieldNames(2)));
+            ShowContinueError(state, format("...{} must be greater than 0.0", state.dataIPShortCut->cNumericFieldNames(2)));
             ErrorsFound = true;
         } else if (state.dataIPShortCut->rNumericArgs(2) > 1.0) {
             ShowWarningError(state,
@@ -288,7 +288,7 @@ void GetBoilerInput(EnergyPlusData &state)
             ShowSevereError(state,
                             fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
-            ShowSevereError(state, format("...{} not found.", state.dataIPShortCut->cAlphaFieldNames(4)));
+            ShowContinueError(state, format("...{} not found.", state.dataIPShortCut->cAlphaFieldNames(4)));
             ErrorsFound = true;
         }
         thisBoiler.VolFlowRate = state.dataIPShortCut->rNumericArgs(3);
