@@ -297,6 +297,7 @@ class RegressionManager:
         any_diffs = False
         root_index_files_no_diff = []
         root_index_files_diffs = []
+        bundle_root.mkdir(exist_ok=True)
         for baseline in base_testfiles.iterdir():
             if not baseline.is_dir():
                 continue
