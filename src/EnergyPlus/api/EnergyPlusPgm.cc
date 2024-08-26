@@ -419,10 +419,13 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath
         EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
+#ifdef NDEBUG
     } catch (const std::exception &e) {
         ShowSevereError(state, e.what());
         return EnergyPlus::AbortEnergyPlus(state);
+#endif
     }
+
     return wrapUpEnergyPlus(state);
 }
 

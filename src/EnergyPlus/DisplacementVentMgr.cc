@@ -530,7 +530,6 @@ namespace RoomAir {
         Real64 ZTAveraged;
         Real64 TempDiffCritRep; // Minimum temperature difference between mixed and occupied subzones for reporting
         bool MIXFLAG;
-        int Ctd;
         Real64 MinFlow;
         Real64 NumPLPP; // Number of plumes per person
         Real64 MTGAUX;
@@ -656,7 +655,7 @@ namespace RoomAir {
         if (state.dataHeatBal->TotPeople > 0) {
             int NumberOfOccupants = 0;
             NumberOfPlumes = 0.0;
-            for (Ctd = 1; Ctd <= state.dataHeatBal->TotPeople; ++Ctd) {
+            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotPeople; ++Ctd) {
                 if (state.dataHeatBal->People(Ctd).ZonePtr == ZoneNum) {
                     NumberOfOccupants +=
                         state.dataHeatBal->People(Ctd).NumberOfPeople; // *GetCurrentScheduleValue(state, People(Ctd)%NumberOfPeoplePtr)
@@ -727,7 +726,7 @@ namespace RoomAir {
         } else {
             Real64 const plume_fac(NumberOfPlumes * std::pow(PowerPerPlume, OneThird));
             HeightFrac = min(24.55 * std::pow(MCp_Total * 0.000833 / plume_fac, 0.6) / CeilingHeight, 1.0);
-            for (Ctd = 1; Ctd <= 4; ++Ctd) {
+            for (int Ctd = 1; Ctd <= 4; ++Ctd) {
                 HcDispVent3Node(state, ZoneNum, HeightFrac);
                 // HeightFrac = min( 24.55 * std::pow( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, OneThird ) ), 0.6 ) /
                 // CeilingHeight, 1.0 ); //Tuned This does not vary in loop  EPTeam-replaces above (cause diffs)      HeightFrac =
@@ -893,7 +892,7 @@ namespace RoomAir {
             Real64 AirCap = thisZoneHB.AirPowerCap;
             TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + OneThird * thisZoneHB.ZTM[2]);
 
-            for (Ctd = 1; Ctd <= 3; ++Ctd) {
+            for (int Ctd = 1; Ctd <= 3; ++Ctd) {
                 TempDepCoef = state.dataDispVentMgr->HA_MX + state.dataDispVentMgr->HA_OC + state.dataDispVentMgr->HA_FLOOR + MCp_Total;
                 TempIndCoef =
                     ConvGains + state.dataDispVentMgr->HAT_MX + state.dataDispVentMgr->HAT_OC + state.dataDispVentMgr->HAT_FLOOR + MCpT_Total;
