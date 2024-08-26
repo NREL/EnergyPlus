@@ -285,7 +285,7 @@ namespace PlantPipingSystemsManager {
                     Real64 ZoneTemp = 0.0;
 
                     // Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
-                    for (auto &z : thisDomain.ZoneCoupledSurfaces) {
+                    for (auto const &z : thisDomain.ZoneCoupledSurfaces) {
                         int ZoneNum = z.Zone;
                         ZoneTemp += state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTAV;
                     }
@@ -428,7 +428,7 @@ namespace PlantPipingSystemsManager {
         for (int DomainNum = 0; DomainNum < TotalNumDomains; ++DomainNum) {
 
             // Convenience
-            auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum];
+            auto const &thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum];
 
             // validate pipe domain-circuit name-to-index references
             for (auto &thisCircuit : thisDomain.circuits) {
@@ -437,7 +437,7 @@ namespace PlantPipingSystemsManager {
 
             // correct segment locations for: INTERNAL DATA STRUCTURE Y VALUE MEASURED FROM BOTTOM OF DOMAIN,
             //                                INPUT WAS MEASURED FROM GROUND SURFACE
-            for (auto &thisCircuit : thisDomain.circuits) {
+            for (auto const &thisCircuit : thisDomain.circuits) {
                 for (auto &thisSegment : thisCircuit->pipeSegments) {
                     thisSegment->PipeLocation.Y = thisDomain.Extents.yMax - thisSegment->PipeLocation.Y;
                 }
@@ -445,7 +445,7 @@ namespace PlantPipingSystemsManager {
 
             // correct segment locations for: BASEMENT X SHIFT
             if (thisDomain.HasBasement && thisDomain.BasementZone.ShiftPipesByWidth) {
-                for (auto &thisCircuit : thisDomain.circuits) {
+                for (auto const &thisCircuit : thisDomain.circuits) {
                     for (auto &thisSegment : thisCircuit->pipeSegments) {
                         thisSegment->PipeLocation.X += thisDomain.BasementZone.Width;
                     }
@@ -453,9 +453,9 @@ namespace PlantPipingSystemsManager {
             }
 
             // now we will have good values of pipe segment locations, we can validate them
-            for (auto &thisCircuit : thisDomain.circuits) {
+            for (auto const &thisCircuit : thisDomain.circuits) {
                 // check to make sure it isn't outside the domain
-                for (auto &thisSegment : thisCircuit->pipeSegments) {
+                for (auto const &thisSegment : thisCircuit->pipeSegments) {
                     if ((thisSegment->PipeLocation.X > thisDomain.Extents.xMax) || (thisSegment->PipeLocation.X < 0.0) ||
                         (thisSegment->PipeLocation.Y > thisDomain.Extents.yMax) || (thisSegment->PipeLocation.Y < 0.0)) {
                         ShowSevereError(state,
@@ -1106,7 +1106,6 @@ namespace PlantPipingSystemsManager {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
-        int CurIndex;
 
         // initialize these counters properly so they can be incremented within the DO loop
         int DomainNum = StartingDomainNumForBasement - 1;
@@ -1173,7 +1172,7 @@ namespace PlantPipingSystemsManager {
             }
 
             // Basement zone depth
-            CurIndex = 11;
+            int CurIndex = 11;
             thisDomain.BasementZone.Depth = state.dataIPShortCut->rNumericArgs(CurIndex);
             if (thisDomain.BasementZone.Depth >= thisDomain.Extents.yMax || thisDomain.BasementZone.Depth <= 0.0) {
                 ShowSevereError(state, format("Invalid {}", state.dataIPShortCut->cNumericFieldNames(CurIndex)));
@@ -1378,7 +1377,7 @@ namespace PlantPipingSystemsManager {
 
             // Total surface area
             Real64 ThisArea = 0.0;
-            for (auto &z : thisDomain.ZoneCoupledSurfaces) {
+            for (auto const &z : thisDomain.ZoneCoupledSurfaces) {
                 ThisArea += z.SurfaceArea;
             }
 
@@ -1655,9 +1654,6 @@ namespace PlantPipingSystemsManager {
                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
-            if (thisCircuit.InletNodeNum == 0) {
-                CurIndex = 2;
-            }
             thisCircuit.OutletNodeName = state.dataIPShortCut->cAlphaArgs(3);
             thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             thisCircuit.OutletNodeName,
@@ -1668,9 +1664,6 @@ namespace PlantPipingSystemsManager {
                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
-            if (thisCircuit.OutletNodeNum == 0) {
-                CurIndex = 3;
-            }
             BranchNodeConnections::TestCompSet(
                 state, ObjName_HorizTrench, thisTrenchName, thisCircuit.InletNodeName, thisCircuit.OutletNodeName, "Piping System Circuit Nodes");
 
@@ -2123,8 +2116,8 @@ namespace PlantPipingSystemsManager {
             this->developMesh(state);
 
             // would be OK to do some post-mesh error handling here I think
-            for (auto &thisDomainCircuit : this->circuits) {
-                for (auto &segment : thisDomainCircuit->pipeSegments) {
+            for (auto const &thisDomainCircuit : this->circuits) {
+                for (auto const &segment : thisDomainCircuit->pipeSegments) {
                     if (!segment->PipeCellCoordinatesSet) {
                         ShowSevereError(state, format("PipingSystems:{}:Pipe segment index not set.", RoutineName));
                         ShowContinueError(state, "...Possibly because pipe segment was placed outside of the domain.");
@@ -2356,7 +2349,7 @@ namespace PlantPipingSystemsManager {
         Real64 ThisCellMax;
 
         Real64 MaxDivAmount = 0.0;
-        for (auto &radCell : CellToCheck.PipeCellData.Soil) {
+        for (auto const &radCell : CellToCheck.PipeCellData.Soil) {
             ThisCellMax = std::abs(radCell.Temperature - radCell.Temperature_PrevIteration);
             if (ThisCellMax > MaxDivAmount) {
                 MaxDivAmount = ThisCellMax;
@@ -2751,7 +2744,7 @@ namespace PlantPipingSystemsManager {
 
         //'NOTE: pipe location y values have already been corrected to be measured from the bottom surface
         //'in input they are measured by depth, but internally they are referred to by distance from y = 0, or the bottom boundary
-        for (auto &thisCircuit : this->circuits) {
+        for (auto const &thisCircuit : this->circuits) {
 
             // set up a convenience variable here
             //'account for the pipe and insulation if necessary
@@ -3029,7 +3022,7 @@ namespace PlantPipingSystemsManager {
 
         //'loop across all partitions
         for (int Index = 0; Index < (int)ThesePartitionCenters.size(); ++Index) {
-            auto &thisPartitionCenter = ThesePartitionCenters[Index];
+            auto const &thisPartitionCenter = ThesePartitionCenters[Index];
 
             Real64 const ThisCellWidthBy2 = thisPartitionCenter.TotalWidth / 2.0;
             PartitionType ThisPartitionType = thisPartitionCenter.partitionType;
@@ -3142,10 +3135,10 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        int cellCountUpToNow = 0;
         std::vector<Real64> tempCellWidths;
 
         if (PartitionsExist) {
+            int cellCountUpToNow = 0;
 
             for (int i = 0; i < (int)ThesePartitionRegions.size(); ++i) {
                 auto &thisPartition = ThesePartitionRegions[i];
@@ -3266,7 +3259,7 @@ namespace PlantPipingSystemsManager {
             default:
                 if (thisRegion.thisRegionType == DirDirection) {
                     Real64 StartingPointCounter = thisRegion.Min;
-                    for (auto &cellWidth : thisRegion.CellWidths) {
+                    for (auto const &cellWidth : thisRegion.CellWidths) {
                         RetVal.push_back(StartingPointCounter);
                         StartingPointCounter += cellWidth;
                     }
@@ -3459,22 +3452,20 @@ namespace PlantPipingSystemsManager {
                                 // Check if vertical insulation present
                                 if (this->VertInsPresentFlag) {
                                     if (InsulationYIndex != 0) { // Partial vertical insulation
-                                        if (CellYIndex <= this->y_max_index && CellYIndex > InsulationYIndex) {
+                                        if (CellYIndex > InsulationYIndex) {
                                             cellType = CellType::VertInsulation;
                                             ++NumInsulationCells;
                                         }
                                     } else { // Vertical insulation extends to depth of basement floor
-                                        if (CellYIndex <= this->y_max_index && CellYIndex > YFloorIndex) {
-                                            cellType = CellType::VertInsulation;
-                                            ++NumInsulationCells;
-                                        }
+                                        cellType = CellType::VertInsulation;
+                                        ++NumInsulationCells;
                                     }
                                 }
                             }
                         } else if (CellYIndex == this->y_max_index) { // Surface cells
                             cellType = CellType::GroundSurface;
                             ++NumGroundSurfaceCells;
-                        } else if (CellYIndex == 0 || CellXIndex == 0 || CellZIndex == 0) { // Farfield boundary
+                        } else if (CellXIndex == 0 || CellZIndex == 0) { // Farfield boundary
                             cellType = CellType::FarfieldBoundary;
                         }
                     } else if (CellXIndex == MaxBasementXNodeIndex && CellYIndex == MinBasementYNodeIndex) {
@@ -3507,7 +3498,7 @@ namespace PlantPipingSystemsManager {
                     bool HasInsulation(false);
                     RadialSizing PipeSizing;
                     Circuit *circuitReference = nullptr;
-                    for (auto &thisCircuit : this->circuits) {
+                    for (auto const &thisCircuit : this->circuits) {
                         for (auto &segment : thisCircuit->pipeSegments) {
                             if (XYRectangle.contains(segment->PipeLocation)) {
                                 //'inform the cell that it is a pipe node
@@ -3842,7 +3833,7 @@ namespace PlantPipingSystemsManager {
 
             bool CircuitInletCellSet = false;
 
-            for (auto &segment : thisCircuit->pipeSegments) {
+            for (auto const &segment : thisCircuit->pipeSegments) {
                 switch (segment->FlowDirection) {
                 case SegmentFlow::IncreasingZ:
                     SegmentInletCellX = segment->PipeCellCoordinates.X;
@@ -5178,7 +5169,7 @@ namespace PlantPipingSystemsManager {
                 NextOuterRadialCellTemperature = cell.PipeCellData.Pipe.Temperature;
             }
         } else {
-            auto &nextOuterMostSoilCell = cell.PipeCellData.Soil[numSoilCells - 2];
+            auto const &nextOuterMostSoilCell = cell.PipeCellData.Soil[numSoilCells - 2];
             NextOuterRadialCellOuterRadius = nextOuterMostSoilCell.OuterRadius;
             NextOuterRadialCellRadialCentroid = nextOuterMostSoilCell.RadialCentroid;
             NextOuterRadialCellConductivity = nextOuterMostSoilCell.Properties.Conductivity;
@@ -5858,12 +5849,12 @@ namespace PlantPipingSystemsManager {
         //'calculate this cell's new Cp value based on the cell temperature
         if (CellTemp <= frzAllIce) { // totally frozen
             rhoCp = this->Moisture.rhoCP_soil_ice;
-        } else if ((CellTemp > frzAllIce) && (CellTemp < frzIceTrans)) { // in between totally frozen and ice transition
+        } else if (CellTemp < frzIceTrans) { // in between totally frozen and ice transition
             rhoCp = this->Moisture.rhoCP_soil_ice +
                     (this->Moisture.rhoCP_soil_transient - this->Moisture.rhoCP_soil_ice) / (frzIceTrans - frzAllIce) * (CellTemp - frzAllIce);
-        } else if ((CellTemp >= frzIceTrans) && (CellTemp <= frzLiqTrans)) { // in between ice transition and liquid transition
+        } else if (CellTemp <= frzLiqTrans) { // in between ice transition and liquid transition
             rhoCp = this->Moisture.rhoCP_soil_transient;
-        } else if ((CellTemp > frzLiqTrans) && (CellTemp < frzAllLiq)) { // in between liquid transition and all liquid
+        } else if (CellTemp < frzAllLiq) { // in between liquid transition and all liquid
             rhoCp = this->Moisture.rhoCp_soil_liq_1 +
                     (this->Moisture.rhoCP_soil_transient - this->Moisture.rhoCP_soil_liq) / (frzAllLiq - frzLiqTrans) * (frzAllLiq - CellTemp);
         } else { // ( CellTemp >= frzAllLiq ) --- greater than or equal to all liquid

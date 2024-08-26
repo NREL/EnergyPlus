@@ -157,7 +157,6 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IOStat;                       // IO Status when calling get input subroutine
     Array1D_string MaterialNames(3);  // Number of Material Alpha names defined
-    int MaterNum;                     // Counter to keep track of the material number
     int MaterialNumAlpha;             // Number of material alpha names being passed
     int MaterialNumProp;              // Number of material properties being passed
     Array1D<Real64> MaterialProps(9); // Temporary array to transfer material properties
@@ -199,7 +198,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         // Load the material derived type from the input data.
-        MaterNum = Util::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
+        int MaterNum = Util::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
         if (MaterNum == 0) {
             ShowSevereError(state,
                             format("{}: invalid {} entered={}, must match to a valid Material name.",
@@ -350,10 +349,6 @@ void InitMoistureBalanceEMPD(EnergyPlusData &state)
     using Psychrometrics::PsyRhovFnTdbRh;
     using Psychrometrics::PsyRhovFnTdbWPb_fast;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNum;
-    int SurfNum;
-
     if (state.dataMoistureBalEMPD->InitEnvrnFlag) {
         state.dataMstBalEMPD->RVSurfaceOld.allocate(state.dataSurface->TotSurfaces);
         state.dataMstBalEMPD->RVSurface.allocate(state.dataSurface->TotSurfaces);
@@ -366,8 +361,8 @@ void InitMoistureBalanceEMPD(EnergyPlusData &state)
         state.dataMstBalEMPD->RVwall.allocate(state.dataSurface->TotSurfaces);
     }
 
-    for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        int ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
         if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
         Real64 const rv_air_in_initval =
             min(PsyRhovFnTdbWPb_fast(state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT,
@@ -387,7 +382,7 @@ void InitMoistureBalanceEMPD(EnergyPlusData &state)
 
     GetMoistureBalanceEMPDInput(state);
 
-    for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
         if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
         EMPDReportVarsData &rvd = state.dataMoistureBalEMPD->EMPDReportVars(SurfNum);
@@ -493,7 +488,6 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("CalcMoistureEMPD");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NOFITR;           // Number of iterations
     int MatNum;           // Material number at interior layer
     int ConstrNum;        // Construction number
     Real64 hm_deep_layer; // Overall deep-layer transfer coefficient
@@ -503,7 +497,6 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     Real64 RHaver; // Average zone relative humidity {0-1} between current time and previous time
     Real64 RVaver; // Average zone vapor density
     Real64 dU_dRH;
-    int Flag;             // Convergence flag (0 - converged)
     Real64 PVsurf;        // Surface vapor pressure
     Real64 PV_surf_layer; // Vapor pressure of surface layer
     Real64 PV_deep_layer;
@@ -546,8 +539,6 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     auto &heat_flux_latent(state.dataMstBalEMPD->HeatFluxLatent(SurfNum)); // output
 
     heat_flux_latent = 0.0;
-    Flag = 1;
-    NOFITR = 0;
     if (!surface.HeatTransSurf) {
         return;
     }
