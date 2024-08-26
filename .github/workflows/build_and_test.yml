@@ -161,7 +161,19 @@ jobs:
       run: python ./branch/scripts/dev/gha_regressions.py ./baseline/build/testfiles ./branch/build/testfiles/ ./branch/build/regressions
 
     - uses: actions/upload-artifact@v4
+      id: upload_regressions
       if: always() && steps.regressions.outcome == 'failure'  # only run this if regressions were encountered "failed"
       with:
         name: "regressions-${{ matrix.os }}"
         path: "${{ github.workspace }}/build/regressions"
+
+    - uses: actions/github-script@v7
+      if: always() && steps.regressions.outcome == 'failure'
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: "# :warning: Regressions Detected\n - Build: ${{ matrix.os }}\n - [View Results](https://github.com/NREL/EnergyPlus/actions/runs/${{ github.run_id }})\n - [Download Regressions](${{ steps.upload_regressions.outputs.artifact-url }})"
+          })
