@@ -91,13 +91,13 @@ namespace PlantPressureSystem {
     void PassPressureAcrossMixer(EnergyPlusData &state,
                                  const int LoopNum,
                                  const DataPlant::LoopSideLocation LoopSideNum,
-                                 Real64 &MixerPressure,
+                                 const Real64 MixerPressure,
                                  const int NumBranchesOnLoopSide);
 
     void PassPressureAcrossSplitter(EnergyPlusData &state,
                                     const int LoopNum,
                                     const DataPlant::LoopSideLocation LoopSideNum,
-                                    Real64 &SplitterInletPressure);
+                                    const Real64 SplitterInletPressure);
 
     void PassPressureAcrossInterface(EnergyPlusData &state, int LoopNum);
 
