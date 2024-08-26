@@ -135,14 +135,14 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // EnergyPlus input processor
 
-    int NumAlphas;                 // Number of elements in the alpha array
-    int NumNums;                   // Number of elements in the numeric array
-    int IOStat;                    // IO Status when calling get input subroutine
     Array1D_string AlphArray(25);  // character string data
     Array1D<Real64> NumArray(200); // numeric data TODO deal with allocatable for extensible
-    bool ErrorsFound(false);       // error flag
 
     if (state.dataCHPElectGen->MyOneTimeFlag) {
+        int NumAlphas = 0;        // Number of elements in the alpha array
+        int NumNums = 0;          // Number of elements in the numeric array
+        int IOStat = 0;           // IO Status when calling get input subroutine
+        bool ErrorsFound = false; // error flag
 
         // call to Fuel supply module to set up data there.
         GeneratorFuelSupply::GetGeneratorFuelSupplyInput(state);
@@ -845,10 +845,10 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     static constexpr std::string_view RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
 
     DataGenerators::OperatingMode CurrentOpMode = DataGenerators::OperatingMode::Invalid;
+    Real64 NdotFuel;
     Real64 AllowedLoad = 0.0;
     Real64 PLRforSubtimestepStartUp(1.0);
     Real64 PLRforSubtimestepShutDown(0.0);
-    bool RunFlag(false);
 
     GeneratorDynamicsManager::ManageGeneratorControlState(state,
                                                           this->DynamicsControlID,
@@ -860,8 +860,6 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                                                           CurrentOpMode,
                                                           PLRforSubtimestepStartUp,
                                                           PLRforSubtimestepShutDown);
-
-    if (RunFlagElectCenter || RunFlagPlant) RunFlag = true;
 
     Real64 Teng = this->A42Model.Teng;
     Real64 TcwOut = this->A42Model.TcwOut;
@@ -876,7 +874,6 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     Real64 Pnetss = 0.0;
     Real64 Pstandby = 0.0; // power draw during standby, positive here means negative production
     Real64 Pcooler = 0.0;  // power draw during cool down, positive here means negative production
-    Real64 NdotFuel = 0.0;
     Real64 ElecEff = 0.0;
     Real64 MdotAir = 0.0;
     Real64 Qgenss = 0.0;
@@ -890,8 +887,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     case DataGenerators::OperatingMode::Off: { // same as standby in model spec but no Pnet standby electicity losses.
 
         Qgenss = 0.0;
-        MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
-        TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
+        TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp; // C
         Pnetss = 0.0;
         Pstandby = 0.0;
         Pcooler = this->A42Model.PcoolDown * PLRforSubtimestepShutDown;
@@ -908,8 +904,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     } break;
     case DataGenerators::OperatingMode::Standby: {
         Qgenss = 0.0;
-        MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
-        TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
+        TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp; // C
         Pnetss = 0.0;
         Pstandby = this->A42Model.Pstandby * (1.0 - PLRforSubtimestepShutDown);
         Pcooler = this->A42Model.PcoolDown * PLRforSubtimestepShutDown;
@@ -1027,7 +1022,6 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             ThermEff = Curve::CurveValue(state, this->A42Model.ThermalEffCurveID, Pmax, MdotCW, TcwIn);
             Qgenss = ThermEff * Qgross; // W
         }
-        NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
     } break;
     case DataGenerators::OperatingMode::Normal: {
         if (PLRforSubtimestepStartUp < 1.0) {
@@ -1463,9 +1457,6 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
 }
 void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
 {
-
-    bool errFlag;
-
     if (this->myFlag) {
         this->setupOutputVars(state);
         this->myFlag = false;
@@ -1473,7 +1464,7 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
 
     if (this->MyPlantScanFlag) {
         if (allocated(state.dataPlnt->PlantLoop)) {
-            errFlag = false;
+            bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(
                 state, this->Name, DataPlant::PlantEquipmentType::Generator_MicroCHP, this->CWPlantLoc, errFlag, _, _, _, _, _);
 

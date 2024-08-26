@@ -671,6 +671,15 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
         if (NumNums > 15) {
             thisChiller.MinCondFlowRatio = state.dataIPShortCut->rNumericArgs(16);
         }
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
+            thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(19)));
+            if (thisChiller.thermosiphonTempCurveIndex == 0) {
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, thisChiller.Name));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(19), state.dataIPShortCut->cAlphaArgs(19)));
+                ErrorsFound = true;
+            }
+        }
+        thisChiller.thermosiphonMinTempDiff = state.dataIPShortCut->rNumericArgs(17);
     }
 
     if (ErrorsFound) {
@@ -846,6 +855,14 @@ void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         "Chiller Condenser Mass Flow Rate",
                         Constant::Units::kg_s,
                         this->CondMassFlowRate,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
+                        this->Name);
+
+    SetupOutputVariable(state,
+                        "Thermosiphon Status",
+                        Constant::Units::None,
+                        this->thermosiphonStatus,
                         OutputProcessor::TimeStepType::System,
                         OutputProcessor::StoreType::Average,
                         this->Name);
@@ -2074,9 +2091,11 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     this->ChillerCapFT = 0.0;
     this->ChillerEIRFT = 0.0;
     this->ChillerEIRFPLR = 0.0;
+    this->thermosiphonStatus = 0;
 
     // Set module-level chiller evap and condenser inlet temperature variables
     Real64 condInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
+    this->CondInletTemp = condInletTemp; // needed for thermosiphon model
 
     // If no loop demand or chiller OFF, return
     // If chiller load is 0 or chiller is not running then leave the subroutine. Before leaving
@@ -2430,9 +2449,6 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
         // Chiller cycles below minimum part load ratio, FRAC = amount of time chiller is ON during this time step
         if (PartLoadRat < this->MinPartLoadRat) FRAC = min(1.0, (PartLoadRat / this->MinPartLoadRat));
 
-        // set the module level variable used for reporting FRAC
-        this->ChillerCyclingRatio = FRAC;
-
         // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
         if (AvailChillerCap > 0.0) {
             PartLoadRat = max(PartLoadRat, this->MinUnloadRat);
@@ -2450,6 +2466,9 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
         }
 
     } // This is the end of the FlowLock Block
+
+    // set the module level variable used for reporting FRAC
+    this->ChillerCyclingRatio = FRAC;
 
     this->ChillerEIRFT = max(0.0, Curve::CurveValue(state, this->ChillerEIRFTIndex, this->EvapOutletTemp, this->ChillerCondAvgTemp));
 
@@ -2479,7 +2498,9 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     }
 
     if (ReferenceCOP <= 0) ReferenceCOP = 5.5;
-    this->Power = (AvailChillerCap / ReferenceCOP) * this->ChillerEIRFPLR * this->ChillerEIRFT * FRAC;
+    if (this->thermosiphonDisabled(state)) {
+        this->Power = (AvailChillerCap / ReferenceCOP) * this->ChillerEIRFPLR * this->ChillerEIRFT * FRAC;
+    }
 
     this->QCondenser = this->Power * this->CompPowerToCondenserFrac + this->QEvaporator + this->ChillerFalseLoadRate;
 
@@ -2524,16 +2545,16 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
             }
         } break;
         case DataPlant::CondenserFlowControl::ModulatedDeltaTemperature: {
-            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               this->CondInletTemp,
-                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
-                                                               RoutineName);
+            Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
+                                                                   this->CondInletTemp,
+                                                                   state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
+                                                                   RoutineName);
             Real64 condDT = 0.0;
             if (this->CondDTScheduleNum > 0) {
                 condDT = ScheduleManager::GetCurrentScheduleValue(state, this->CondDTScheduleNum);
             }
-            this->CondMassFlowRate = this->QCondenser / (Cp * condDT);
+            this->CondMassFlowRate = this->QCondenser / (CpCond * condDT);
         } break;
         default: {
             this->CondMassFlowRate = this->CondMassFlowRateMax;
@@ -2552,12 +2573,12 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
         // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
         if (this->HeatRecActive) this->calcHeatRecovery(state, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovery);
-        Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                    state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                    condInletTemp,
-                                                    state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
-                                                    RoutineName);
-        this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / Cp + condInletTemp;
+        Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(state,
+                                                               state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
+                                                               condInletTemp,
+                                                               state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
+                                                               RoutineName);
+        this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + condInletTemp;
     } else {
         ShowSevereError(state, format("ControlReformEIRChillerModel: Condenser flow = 0, for ElecReformEIRChiller={}", this->Name));
         ShowContinueErrorTimeStamp(state, "");
@@ -2928,6 +2949,27 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
                                            this->ChillerEIRFPLR,
                                            this->ChillerEIRFPLR);
         }
+    }
+}
+
+bool ReformulatedEIRChillerSpecs::thermosiphonDisabled(EnergyPlusData &state)
+{
+    if (this->thermosiphonTempCurveIndex > 0) {
+        this->thermosiphonStatus = 0;
+        Real64 dT = this->EvapOutletTemp - this->CondInletTemp;
+        if (dT < this->thermosiphonMinTempDiff) {
+            return true;
+        }
+        Real64 thermosiphonCapFrac = Curve::CurveValue(state, this->thermosiphonTempCurveIndex, dT);
+        Real64 capFrac = this->ChillerPartLoadRatio * this->ChillerCyclingRatio;
+        if (thermosiphonCapFrac >= capFrac) {
+            this->thermosiphonStatus = 1;
+            this->Power = 0.0;
+            return false;
+        }
+        return true;
+    } else {
+        return true;
     }
 }
 

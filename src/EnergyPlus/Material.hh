@@ -61,7 +61,7 @@ namespace EnergyPlus {
 
 namespace Material {
 
-    constexpr int MaxSlatAngs(19);
+    constexpr int MaxSlatAngs(181); // 1 degree increments for slat angles (We'll see what the performance implications are)
     constexpr int MaxProfAngs(37);
 
     // Parameters to indicate material group type for use with the Material

@@ -123,7 +123,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         Real64 totDemandSideMaxAvail = 0.0;
         for (int demIn = 1; demIn <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++demIn) {
             int demInNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(demIn);
-            auto &node = state.dataLoopNodes->Node(demInNode);
+            auto const &node = state.dataLoopNodes->Node(demInNode);
             totDemandSideMassFlow += node.MassFlowRate;
             totDemandSideMinAvail += node.MassFlowRateMinAvail;
             totDemandSideMaxAvail += node.MassFlowRateMaxAvail;
