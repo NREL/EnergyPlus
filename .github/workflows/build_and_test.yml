@@ -1,12 +1,8 @@
 name: Build And Test
 
 on:
-  push:
-    branches: [ develop ]
-    tags:
-      - 'v*' # Push events matching v*, i.e. v1.0, v20.15.10
   pull_request:
-    branches: [ develop ]
+    branches: [ develop ]  # run this on any PR pointing to develop
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -147,16 +143,25 @@ jobs:
         ../
 
     - name: Branch Build
+      id: branch_build
       working-directory: ./branch/build
       run: cmake --build . -j ${{ matrix.nproc }} --config Release
 
     - name: Branch Test
       working-directory: ./branch/build
       run: ctest -C Release -E Basement -j 3
-      continue-on-error: true  # allow unit tests to fail but still try to run regressions next
 
     - name: Install Regression Tool
-      run: pip install energyplus-regressions # TODO: Not sure if we need to use a different python path here, and we could pip it or clone it
+      if: always() && steps.branch_build.outcome != 'failure'  # always run this step as long as we actually built
+      run: pip install energyplus-regressions
 
     - name: Run Regressions
-      run: python ./branch/scripts/dev/gha_regressions.py ./baseline/build/testfiles ./branch/build/testfiles/
+      if: always() && steps.branch_build.outcome != 'failure'  # always run this step as long as we actually built
+      id: regressions
+      run: python ./branch/scripts/dev/gha_regressions.py ./baseline/build/testfiles ./branch/build/testfiles/ ./branch/build/regressions
+
+    - uses: actions/upload-artifact@v4
+      if: always() && steps.regressions.outcome == 'failure'  # only run this if regressions were encountered "failed"
+      with:
+        name: "regressions-${{ matrix.os }}"
+        path: "${{ github.workspace }}/build/regressions"

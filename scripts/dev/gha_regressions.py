@@ -53,227 +53,309 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
+from collections import defaultdict
 import json
-import sys
+from shutil import copy
 from pathlib import Path
+import sys
+import tempfile
 
 from energyplus_regressions.runtests import SuiteRunner
 from energyplus_regressions.structures import TextDifferences, TestEntry
 
 
-def print_notice(relative_test_file: str, message: str) -> None:
-    # relative_test_file should be relative to the testfiles/ directory, like "1Zone.idf" or "advanced/2a.idf"
-    print(f"::notice file=testfiles/{relative_test_file}::{message}")
+class RegressionManager:
 
+    def __init__(self):
+        self.diffs_by_idf = []
+        self.diffs_by_type = defaultdict(list)
+        self.all_files_compared = []
+        import energyplus_regressions
+        self.threshold_file = str(Path(energyplus_regressions.__file__).parent / 'diffs' / 'math_diff.config')
 
-def print_warning(relative_test_file: str, message: str) -> None:
-    # relative_test_file should be relative to the testfiles/ directory, like "1Zone.idf" or "advanced/2a.idf"
-    print(f"::warning file=testfiles/{relative_test_file}::{message}")
+    def single_file_regressions(self, baseline: Path, modified: Path) -> [TestEntry, bool]:
 
+        idf = baseline.name
+        this_file_diffs = []
 
-def print_error(relative_test_file: str, message: str) -> None:
-    # relative_test_file should be relative to the testfiles/ directory, like "1Zone.idf" or "advanced/2a.idf"
-    print(f"::error file=testfiles/{relative_test_file}::{message}")
+        entry = TestEntry(idf, "")
+        entry, message = SuiteRunner.process_diffs_for_one_case(
+            entry,
+            {'build_dir': str(baseline)},
+            {'build_dir': str(modified)},
+            "",
+            self.threshold_file,
+            ci_mode=True
+        )  # returns an updated entry
 
+        has_diffs = False
 
-def process_diffs(relative_test_file: str, diff_name, diffs, this_has_diffs, this_has_small_diffs):
-    # relative_test_file should be relative to the testfiles/ directory, like "1Zone.idf" or "advanced/2a.idf"
-    if not diffs:
-        return this_has_diffs, this_has_small_diffs
-    if diffs.diff_type == 'Big Diffs':
-        this_has_diffs = True
-        print_warning(relative_test_file, f"{diff_name} Big Diffs")
-    elif diffs.diff_type == 'Small Diffs':
-        this_has_small_diffs = True
-        print_warning(relative_test_file, f"{diff_name} Small Diffs")
-    return this_has_diffs, this_has_small_diffs
+        text_diff_results = {
+            "Audit": entry.aud_diffs,
+            "BND": entry.bnd_diffs,
+            "DELightIn": entry.dl_in_diffs,
+            "DELightOut": entry.dl_out_diffs,
+            "DXF": entry.dxf_diffs,
+            "EIO": entry.eio_diffs,
+            "ERR": entry.err_diffs,
+            "Readvars_Audit": entry.readvars_audit_diffs,
+            "EDD": entry.edd_diffs,
+            "WRL": entry.wrl_diffs,
+            "SLN": entry.sln_diffs,
+            "SCI": entry.sci_diffs,
+            "MAP": entry.map_diffs,
+            "DFS": entry.dfs_diffs,
+            "SCREEN": entry.screen_diffs,
+            "GLHE": entry.glhe_diffs,
+            "MDD": entry.mdd_diffs,
+            "MTD": entry.mtd_diffs,
+            "RDD": entry.rdd_diffs,
+            "SHD": entry.shd_diffs,
+            "PERF_LOG": entry.perf_log_diffs,
+            "IDF": entry.idf_diffs,
+            "StdOut": entry.stdout_diffs,
+            "StdErr": entry.stderr_diffs,
+        }
+        for diff_type, diffs in text_diff_results.items():
+            if diffs is None:
+                continue
+            if diffs.diff_type != TextDifferences.EQUAL:
+                has_diffs = True
+                this_file_diffs.append(diff_type)
+                self.diffs_by_type[diff_type].append(idf)
 
+        numeric_diff_results = {
+            "ESO": entry.eso_diffs,
+            "MTR": entry.mtr_diffs,
+            "SSZ": entry.ssz_diffs,
+            "ZSZ": entry.zsz_diffs,
+            "JSON": entry.json_diffs,
+        }
+        for diff_type, diffs in numeric_diff_results.items():
+            if diffs is None:
+                continue
+            if diffs.diff_type == 'Big Diffs':
+                has_diffs = True
+                this_file_diffs.append(f"{diff_type} Big Diffs")
+                self.diffs_by_type[f"{diff_type} Big Diffs"].append(idf)
+            elif diffs.diff_type == 'Small Diffs':
+                has_diffs = True
+                this_file_diffs.append(f"{diff_type} Small Diffs")
+                self.diffs_by_type[f"{diff_type} Big Diffs"].append(idf)
 
-def single_file_regressions(baseline: Path, modified: Path) -> [bool, bool, bool]:
+        if entry.table_diffs:
+            if entry.table_diffs.big_diff_count > 0:
+                has_diffs = True
+                this_file_diffs.append(f"Table Big Diffs")
+                self.diffs_by_type[f"Table Big Diffs"].append(idf)
+            elif entry.table_diffs.small_diff_count > 0:
+                has_diffs = True
+                this_file_diffs.append(f"Table Small Diffs")
+                self.diffs_by_type[f"Table Small Diffs"].append(idf)
+            if entry.table_diffs.string_diff_count > 1:  # There's always one...the time stamp
+                has_diffs = True
+                this_file_diffs.append(f"Table String Diffs")
+                self.diffs_by_type[f"Table String Diffs"].append(idf)
 
-    import energyplus_regressions
-    thresholds = Path(energyplus_regressions.__file__).parent / 'diffs' / 'math_diff.config'
+        return entry, has_diffs
 
-    idf = baseline.name
+    @staticmethod
+    def single_diff_html(contents: str) -> str:
+        return f"""
+<!doctype html>
+<html>
+ <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/diff.min.js"></script>
+ </head>
+ <body>
+  <pre>
+   <code class="diff">
+    {contents}
+   </code>
+  </pre>
+  <script>hljs.highlightAll();</script>
+ </body>
+</html>"""
 
-    entry = TestEntry(idf, "")
-    entry, message = SuiteRunner.process_diffs_for_one_case(
-        entry,
-        {'build_dir': str(baseline)},
-        {'build_dir': str(modified)},
-        "",
-        str(thresholds),
-        ci_mode=True
-    )  # returns an updated entry
+    @staticmethod
+    def regression_row_in_single_test_case_html(diff_file_name: str) -> str:
+        return f"""
+   <tr>
+    <td>{diff_file_name}</td>
+    <td><a href='{diff_file_name}' download='{diff_file_name}'>download</a></td>
+    <td><a href='{diff_file_name}.html'>view</a></td>
+   </tr>"""
 
-    with open('results.json', 'w') as f:
-        f.write(json.dumps(entry.to_dict(), indent=4))
+    @staticmethod
+    def single_test_case_html(contents: str) -> str:
+        return f"""
+<!doctype html>
+<html>
+ <head>
+  <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+  <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+ </head>
+ <body>
+  <table class='table table-hover'>
+   <tr>
+    <th>filename</th>
+    <th></th>
+    <th></th>
+   </tr>
+{contents}
+  </table>
+ </body>
+</html>"""
 
-    success = True
-    has_diffs = False
-    has_small_diffs = False
+    @staticmethod
+    def bundle_root_index_html(header_info: list[str], no_diffs: list[str], diffs: list[str]) -> str:
+        header_content = ""
+        for hi in header_info:
+            header_content += f"""<li class="list-group-item">{hi}</li>\n"""
+        # gather some plural "s" as needed and form up the html entries
+        num_no_diff = len(no_diffs)
+        nds = 's' if num_no_diff == 0 or num_no_diff > 1 else ''
+        no_diff_content = ""
+        for nd in no_diffs:
+            no_diff_content += f"""<li class="list-group-item">{nd}</li>\n"""
+        num_diff = len(diffs)
+        ds = 's' if num_diff == 0 or num_diff > 1 else ''
+        diff_content = ""
+        for d in diffs:
+            diff_content += f"""<a href="{d}/index.html" class="list-group-item list-group-item-action">{d}</a>\n"""
+        return f"""
+<!doctype html>
+<html>
+ <head>
+  <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+  <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+ </head>
+ <body><div class="container-fluid">
+  <div class="panel-group" id="accordion_header">
+   <div class="panel panel-default">
+    <div class="panel-heading">
+     <h4 class="panel-title">
+      <a data-toggle="collapse" data-parent="#accordion_header" href="#header">Header Metadata</a>
+     </h4>
+    </div>
+    <div id="header" class="panel-collapse collapse in">
+     <div class="panel-body">
+      <ul class="list-group">
+       {header_content}
+      </ul>
+     </div>
+    </div>
+   </div>
+  </div>
+  
+  <div class="panel-group">
+   <div class="panel panel-default">
+    <div class="panel-heading">
+     <h4 class="panel-title">
+      <a data-toggle="collapse" href="#nodiffs">{num_no_diff} File{nds} with No Diffs</a>
+     </h4>
+    </div>
+    <div id="nodiffs" class="panel-collapse collapse">
+     <div class="panel-body">
+      <ul class="list-group">
+       {no_diff_content}
+      </ul>
+     </div>
+    </div>
+   </div>
+  </div>
+  
+  <div class="panel-group">
+   <div class="panel panel-default">
+    <div class="panel-heading">
+     <h4 class="panel-title">
+      <a data-toggle="collapse" href="#diffs">{num_diff} File{ds} with Diffs</a>
+     </h4>
+    </div>
+    <div id="diffs" class="panel-collapse collapse">
+     <div class="panel-body">
+      <ul class="list-group">
+       {diff_content}
+      </ul>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div></body>
+</html>
+"""
 
-    # Note, comment out any of the "has_diffs" below if you don't want
-    # it to generate an error condition
+    def check_all_regressions(self, base_testfiles: Path, mod_testfiles: Path, bundle_root: Path) -> bool:
+        any_diffs = False
+        root_index_files_no_diff = []
+        root_index_files_diffs = []
+        for baseline in base_testfiles.iterdir():
+            if not baseline.is_dir():
+                continue
+            if baseline.name == 'CMakeFiles':  # add more ignore dirs here
+                continue
+            modified = mod_testfiles / baseline.name
+            if not modified.exists():
+                continue  # TODO: Should we warn that it is missing?
+            entry, diffs = self.single_file_regressions(baseline, modified)
+            if diffs:
+                root_index_files_diffs.append(baseline.name)
+                any_diffs = True
+                potential_diff_files = baseline.glob("*.*.*")  # TODO: Could try to get this from the regression tool
+                target_dir_for_this_file_diffs = bundle_root / baseline.name
+                if potential_diff_files:
+                    target_dir_for_this_file_diffs.mkdir()
+                    index_contents_this_file = ""
+                    for potential_diff_file in potential_diff_files:
+                        copy(potential_diff_file, target_dir_for_this_file_diffs)
+                        diff_file_with_html = target_dir_for_this_file_diffs / (potential_diff_file.name + '.html')
+                        if potential_diff_file.name.endswith('.htm'):
+                            # already a html file, just upload the raw contents but renamed as ...htm.html
+                            copy(potential_diff_file, diff_file_with_html)
+                        else:
+                            # it's not an HTML file, wrap it inside an HTML wrapper in a temp file and send it
+                            contents = potential_diff_file.read_text()
+                            wrapped_contents = self.single_diff_html(contents)
+                            diff_file_with_html.write_text(wrapped_contents)
+                        index_contents_this_file += self.regression_row_in_single_test_case_html(potential_diff_file.name)
+                    index_file = target_dir_for_this_file_diffs / 'index.html'
+                    index_this_file = self.single_test_case_html(index_contents_this_file)
+                    index_file.write_text(index_this_file)
+                so_far = ' Diffs! ' if any_diffs else 'No diffs'
+                print(f"Diff status so far: {so_far}, this file HAZ DIFFS: {baseline.name}")
+            else:
+                root_index_files_no_diff.append(baseline.name)
+                so_far = ' Diffs! ' if any_diffs else 'No diffs'
+                print(f"Diff status so far: {so_far}, this file has no diffs: {baseline.name}")
+        bundle_root_index_file_path = bundle_root / 'index.html'
+        bundle_root_index_content = self.bundle_root_index_html(
+            ['hello', 'world'], root_index_files_no_diff, root_index_files_diffs
+        )
+        bundle_root_index_file_path.write_text(bundle_root_index_content)
 
-    if entry.aud_diffs and (entry.aud_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "AUD diffs.")
-
-    if entry.bnd_diffs and (entry.bnd_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "BND diffs.")
-
-    if entry.dl_in_diffs and (entry.dl_in_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "delightin diffs.")
-
-    if entry.dl_out_diffs and (entry.dl_out_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "delightout diffs.")
-
-    if entry.dxf_diffs and (entry.dxf_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "DXF diffs.")
-
-    if entry.eio_diffs and (entry.eio_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "EIO diffs.")
-
-    if entry.err_diffs and (entry.err_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "ERR diffs.")
-
-    if entry.readvars_audit_diffs and (entry.readvars_audit_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "ReadvarsAudit diffs.")
-
-    if entry.edd_diffs and (entry.edd_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "EDD diffs.")
-
-    if entry.wrl_diffs and (entry.wrl_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "WRL diffs.")
-
-    if entry.sln_diffs and (entry.sln_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "SLN diffs.")
-
-    if entry.sci_diffs and (entry.sci_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "SCI diffs.")
-
-    if entry.map_diffs and (entry.map_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "MAP diffs.")
-
-    if entry.dfs_diffs and (entry.dfs_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "DFS diffs.")
-
-    if entry.screen_diffs and (entry.screen_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "SCREEN diffs.")
-
-    if entry.glhe_diffs and (entry.glhe_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "GLHE diffs")
-
-    # numeric diff
-    if entry.eso_diffs:
-        has_diffs, has_small_diffs = process_diffs(idf, "ESO", entry.eso_diffs, has_diffs, has_small_diffs)
-
-    if entry.mdd_diffs and (entry.mdd_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "MDD diffs.")
-
-    if entry.mtd_diffs and (entry.mtd_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "MTD diffs.")
-
-    # numeric diff
-    if entry.mtr_diffs:
-        has_diffs, has_small_diffs = process_diffs(idf, "MTR", entry.mtr_diffs, has_diffs, has_small_diffs)
-
-    if entry.rdd_diffs and (entry.rdd_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "RDD diffs.")
-
-    if entry.shd_diffs and (entry.shd_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "SHD diffs.")
-
-    if entry.perf_log_diffs and (entry.perf_log_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "PERF_LOG diffs.")
-
-    # numeric diff
-    if entry.ssz_diffs:
-        has_diffs, has_small_diffs = process_diffs(idf, "SSZ", entry.ssz_diffs, has_diffs, has_small_diffs)
-
-    # numeric diff
-    if entry.zsz_diffs:
-        has_diffs, has_small_diffs = process_diffs(idf, "ZSZ", entry.zsz_diffs, has_diffs, has_small_diffs)
-
-    # numeric diff
-    if entry.json_diffs:
-        has_diffs, has_small_diffs = process_diffs(idf, "JSON", entry.json_diffs, has_diffs, has_small_diffs)
-
-    if entry.table_diffs:
-        if entry.table_diffs.big_diff_count > 0:
-            has_diffs = True
-            print_warning(idf, "Table big diffs.")
-        elif entry.table_diffs.small_diff_count > 0:
-            has_small_diffs = True
-            print_warning(idf, "Table small diffs.")
-        if entry.table_diffs.string_diff_count > 1:  # There's always one...the time stamp
-            has_diffs = True
-            print_warning(idf, "Table string diffs.")
-
-    if entry.idf_diffs and (entry.idf_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "IDF diffs.")
-
-    if entry.stdout_diffs and (entry.stdout_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "StdOut diffs.")
-
-    if entry.stderr_diffs and (entry.stderr_diffs.diff_type != TextDifferences.EQUAL):
-        has_small_diffs = True
-        print_warning(idf, "StdErr diffs.")
-
-    return success, has_small_diffs, has_diffs, entry
-
-
-def check_all_regressions(base_testfiles: Path, mod_testfiles: Path) -> bool:
-    any_diffs = False
-    any_failures = False
-    for baseline in base_testfiles.iterdir():
-        if not baseline.is_dir():
-            continue
-        modified = mod_testfiles / baseline.name
-        if not modified.exists():
-            continue  # TODO: Should we warn that it is missing?
-        success, small_diffs, big_diffs, entry = single_file_regressions(baseline, modified)
-        if small_diffs or big_diffs:
-            any_diffs = True
-            print(f"*** Regressions for file {baseline.name}: {success=}, {small_diffs=}, {big_diffs=}")
-            print(f"{json.dumps(entry.to_dict(), indent=4)}\n")
-        if not success:
-            any_failures = True
-            print(f"*** FAILURE for file {baseline.name}\n")
-        if success and not any_diffs:
-            print(f"*** No regressions or failures found for {baseline.name}\n")
-    return any_diffs or any_failures
+            # print(f"*** Regressions for file {baseline.name}: {diffs=}")
+            # print(f"{json.dumps(entry.to_dict(), indent=4)}\n")
+            # if not any_diffs:
+            #     print(f"*** No regressions or failures found for {baseline.name}\n")
+        return any_diffs
 
 
 if __name__ == "__main__":  # pragma: no cover - testing function, not the __main__ entry point
 
-    if len(sys.argv) < 3:
-        print("syntax: %s base_dir mod_dir base_sha mod_sha device_id" % sys.argv[0])
+    if len(sys.argv) < 4:
+        print("syntax: %s base_dir mod_dir regression_dir" % sys.argv[0])
         sys.exit(1)
     arg_base_dir = Path(sys.argv[1])
     arg_mod_dir = Path(sys.argv[2])
-    sys.exit(1 if check_all_regressions(arg_base_dir, arg_mod_dir) else 0)
+    arg_regression_dir = Path(sys.argv[3])
+    rm = RegressionManager()
+    response = rm.check_all_regressions(arg_base_dir, arg_mod_dir, arg_regression_dir)
+    sys.exit(1 if response else 0)
