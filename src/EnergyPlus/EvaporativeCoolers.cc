@@ -3370,7 +3370,6 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     int NumNumbers;                  // Number of Numbers for each GetObjectItem call
     int NumFields;                   // Total number of fields in object
     bool ErrorsFound(false);         // Set to true if errors in input, fatal at end of routine
-    Real64 FanVolFlow;
 
     auto &EvapCond(state.dataEvapCoolers->EvapCond);
     auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
@@ -3468,7 +3467,6 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             }
 
             thisZoneEvapUnit.FanName = Alphas(8);
-            bool errFlag = false;
 
             thisZoneEvapUnit.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(7)));
             assert(thisZoneEvapUnit.fanType != HVAC::FanType::Invalid);
@@ -3489,12 +3487,6 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             // set evap unit to cycling mode for all fan types. Note OpMode var is not used
             // with used for ZONECOOLINGLOADVARIABLESPEEDFAN Cooler Unit Control Method
             thisZoneEvapUnit.fanOp = HVAC::FanOp::Cycling;
-
-            FanVolFlow = 0.0;
-            if (errFlag) {
-                ShowContinueError(state, format("specified in {} = {}", CurrentModuleObject, thisZoneEvapUnit.Name));
-                ErrorsFound = true;
-            }
 
             thisZoneEvapUnit.DesignAirVolumeFlowRate = Numbers(1);
 

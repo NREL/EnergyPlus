@@ -846,7 +846,7 @@ void GetFanInput(EnergyPlusData &state)
     } // end Number of Component Model FAN Loop
 
     for (int SystemFanNum = 1; SystemFanNum <= NumSystemModelFan; ++SystemFanNum) {
-        constexpr std::string_view cCurrentModuleObject = "Fan:SystemModel";
+        cCurrentModuleObject = "Fan:SystemModel";
 
         ip->getObjectItem(state,
                           cCurrentModuleObject,
@@ -1343,8 +1343,7 @@ void FanComponent::set_size(EnergyPlusData &state)
     static constexpr std::string_view routineName = "FanComponent::set_size()"; // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool _bPRINT = true;  // TRUE if sizing is reported to output (eio)
-    int NumFansSized = 0; // counter used to deallocate temporary string array after all fans have been sized
+    bool _bPRINT = true; // TRUE if sizing is reported to output (eio)
 
     std::string SizingString = sizingPrefix + " [m3/s]";
 

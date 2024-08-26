@@ -3879,9 +3879,6 @@ void LEEDtariffReporting(EnergyPlusData &state)
     Real64 distHeatWaterTotalCost;
     Real64 distHeatSteamTotalCost;
     Real64 allTotalCost;
-    std::string distCoolTariffNames;
-    std::string distHeatWaterTariffNames;
-    std::string distHeatSteamTariffNames;
     EconConv elecUnits;
     EconConv gasUnits;
     EconConv distCoolUnits;

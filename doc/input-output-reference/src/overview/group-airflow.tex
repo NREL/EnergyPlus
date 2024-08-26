@@ -1518,7 +1518,7 @@ The total heat gain due to the sum of mixing, cross-mixing, and refrigeration-do
 
 ZoneRefrigerationDoorMixing is ideally suited for two zones, at least one of which is refrigerated, that exchange an equal amount of dry air. As with \hyperref[zonemixing]{ZoneMixing}, this is a simplified interzone airflow in EnergyPlus. The ZoneRefrigerationDoorMixing approach shares some features of both \hyperref[zonemixing]{ZoneMixing} and \hyperref[zonecrossmixing]{ZoneCrossMixing}. Like \hyperref[zonecrossmixing]{ZoneCrossMixing}, ZoneRefrigerationDoorMixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. Unlike the other two mixing objects, ZoneRefrigerationDoorMixing always calculates the air exchange rate based on the zone temperature and relative humidity. That is, the user does not specify the air flow rate. The user can moderate the flow through a door-opening schedule.
 
-ZoneRefrigerationDoorMixing can only be entered once for any unique pair of zones. It doesn't matter which zone is listed first and the zones will automatically switch back and forth between source and receiving zones depending upon which zone is colder.
+ZoneRefrigerationDoorMixing can only be entered once for any unique pair of zones. It doesn't matter which zone is listed first and the zones will automatically switch back and forth between source and receiving zones depending upon which zone is colder. If space heat balance is active and a space name is specified for Zone or Space Name 1 or 2, then the space conditions will be used and the exchange will be with that space only. If space heat balance is active and a zone name is specified, then the aveerage zone conditions will be used, and the exchange will be proportioned to all spaces in the zone by space volume.
 
 \subsubsection{Inputs}\label{inputs-7-003}
 
@@ -1526,13 +1526,13 @@ ZoneRefrigerationDoorMixing can only be entered once for any unique pair of zone
 
 The name of the ZoneRefrigerationDoorMixing object.
 
-\paragraph{Field: Zone 1~ Name}\label{field-zone-1-name}
+\paragraph{Field: Zone or Space Name 1}\label{field-zone-1-name}
 
-This field is the name of one of the two zones (ref: Zone) exchanging air and attaches a particular refrigeration door~ mixing statement to both thermal zones in the building.
+This field is the name of one of the two zones (ref: Zone) or spaces exchanging air and attaches a particular refrigeration door~ mixing statement to both thermal zones or spaces in the building. If a space name is used, it must belong to a different zone than Zone or Space Name 2.
 
-\paragraph{Field: Zone 2~ Name}\label{field-zone-2-name}
+\paragraph{Field: Zone or Space Name 2}\label{field-zone-2-name}
 
-This field is the name of the other zone (ref: Zone) exchanging air and attaches a particular refrigeration door~ mixing statement to both thermal zones in the building.
+This field is the name of the other zone (ref: Zone) or space exchanging air and attaches a particular refrigeration door~ mixing statement to both thermal zones or spaces in the building. If a space name is used, it must belong to a different zone than Zone or Space Name 1.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-5}
 
@@ -1965,9 +1965,9 @@ This field is a unique user assigned name for each cooltower.~ Any reference to 
 
 This field is the name of the schedule that denotes whether the cooltower can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the cooltower is available and can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the cooltower is not available and must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-6}
+\paragraph{Field: Zone or Space Name}\label{field-zone-name-6}
 
-This field is the name of the zone (ref: Zone) and attaches a particular cooltower statement to a thermal zone in the building.
+This field is the name of the zone (ref: Zone) or space the cooltower is attached to.
 
 \paragraph{Field: Water Supply Storage Tank Name}\label{field-water-supply-storage-tank-name}
 
@@ -2185,9 +2185,9 @@ This number is the cross sectional area of air channel outlet. The area is expre
 
 This dimensionless number is the discharge coefficient of the thermal chimney. The ventilation rate enhanced by the thermal chimney is also dependent on the discharge coefficient.
 
-\paragraph{Field: Zone \textless{}\#\textgreater{} Name}\label{field-zone-name-8}
+\paragraph{Field: Zone or Space Name \textless{}\#\textgreater{}}\label{field-zone-name-8}
 
-This field is the name of the zone (ref: Zone) to which the thermal chimney is attached. It is used in conjunction with the next three fields. Note that up to 20 sets of zone name, distance from the top of the thermal chimney to each inlet, relative ratios of air flow rates passing through each zone and cross sectional areas of each air channel inlet may be entered for a single thermal chimney if multiple zones share the common thermal chimney.
+This field is the name of the zone (ref: Zone) or space to which the thermal chimney is attached. It is used in conjunction with the next three fields. Note that up to 20 sets of zone or space name, distance from the top of the thermal chimney to each inlet, relative ratios of air flow rates passing through each zone and cross sectional areas of each air channel inlet may be entered for a single thermal chimney if multiple zones or spaces share the common thermal chimney.  If space heat balance is active and a space name is specified for Zone or Space Name, then the space conditions will be used and the exchange will be with that space only. If space heat balance is active and a zone name is specified, then the aveerage zone conditions will be used, and the exchange will be proportioned to all spaces in the zone by space volume.
 
 \paragraph{Field: Distance from Top of Thermal Chimney to Inlet \textless{}\#\textgreater{}}\label{field-distance-from-top-of-thermal-chimney-to-inlet}
 

@@ -1362,7 +1362,7 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
         if (this->CondVolFlowRateWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, format("SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"{}\", autosize error.", this->Name));
-                ShowSevereError(state, "Autosizing of Exhaust Fired Absorption Chiller condenser flow rate requires a condenser");
+                ShowContinueError(state, "Autosizing of Exhaust Fired Absorption Chiller condenser flow rate requires a condenser");
                 ShowContinueError(state, "loop Sizing:Plant object.");
                 ErrorsFound = true;
             }
