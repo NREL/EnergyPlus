@@ -3,6 +3,8 @@ name: Debug Build with Coverage
 on:
   pull_request:
     branches: [ develop ]  # run this on any PR pointing to develop
+  push:
+    branches: [ develop ]  # also run this on any commit to develop
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
