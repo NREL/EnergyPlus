@@ -331,7 +331,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     auto &ComfortTStatObjects = state.dataZoneCtrls->ComfortTStatObjects;
     auto &ComfortControlledZone = state.dataZoneCtrls->ComfortControlledZone;
     int NumOfZones = state.dataGlobal->NumOfZones;
-    auto &StageControlledZone = state.dataZoneCtrls->StageControlledZone;
     auto &SetPointSingleHeating = state.dataZoneTempPredictorCorrector->SetPointSingleHeating;
     auto &SetPointSingleCooling = state.dataZoneTempPredictorCorrector->SetPointSingleCooling;
     auto &cAlphaArgs = state.dataIPShortCut->cAlphaArgs;
@@ -2336,7 +2335,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     }
 
     if (state.dataZoneTempPredictorCorrector->NumStageCtrZone > 0) {
-        StageControlledZone.allocate(state.dataZoneTempPredictorCorrector->NumStageCtrZone);
+        state.dataZoneCtrls->StageControlledZone.allocate(state.dataZoneTempPredictorCorrector->NumStageCtrZone);
         state.dataZoneCtrls->StageZoneLogic.dimension(NumOfZones, false);
 
         int StageControlledZoneNum = 0;
@@ -2359,37 +2358,42 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     cAlphaArgs(2) =
                         state.dataHeatBal->Zone(ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                 }
-                int ZoneAssigned = Util::FindItemInList(
-                    cAlphaArgs(2), StageControlledZone, &DataZoneControls::ZoneStagedControls::ZoneName, StageControlledZoneNum - 1);
+                int ZoneAssigned = Util::FindItemInList(cAlphaArgs(2),
+                                                        state.dataZoneCtrls->StageControlledZone,
+                                                        &DataZoneControls::ZoneStagedControls::ZoneName,
+                                                        StageControlledZoneNum - 1);
+                auto &stageControlledZone = state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum);
                 if (ZoneAssigned == 0) {
-                    StageControlledZone(StageControlledZoneNum).ZoneName = cAlphaArgs(2);
-                    StageControlledZone(StageControlledZoneNum).ActualZoneNum = Util::FindItemInList(cAlphaArgs(2), Zone);
-                    if (StageControlledZone(StageControlledZoneNum).ActualZoneNum == 0) {
+                    stageControlledZone.ZoneName = cAlphaArgs(2);
+                    stageControlledZone.ActualZoneNum = Util::FindItemInList(cAlphaArgs(2), Zone);
+                    if (stageControlledZone.ActualZoneNum == 0) {
                         ShowSevereError(
                             state,
                             format(
                                 "{}=\"{}\" invalid {}=\"{}\" not found.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                         ErrorsFound = true;
                     } else {
-                        //           Zone(StageControlledZone(StageControlledZoneNum)%ActualZoneNum)%StageControlledZoneIndex =
+                        //           Zone(stageControlledZone%ActualZoneNum)%StageControlledZoneIndex =
                         //           StageControlledZoneNum
                     }
-                    state.dataZoneCtrls->StageZoneLogic(StageControlledZone(StageControlledZoneNum).ActualZoneNum) = true;
+                    state.dataZoneCtrls->StageZoneLogic(stageControlledZone.ActualZoneNum) = true;
                 } else {
-                    StageControlledZone(StageControlledZoneNum).ZoneName = cAlphaArgs(2); // for continuity
+                    stageControlledZone.ZoneName = cAlphaArgs(2); // for continuity
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=\"{}\" zone previously assigned.",
                                            cCurrentModuleObject,
                                            cAlphaArgs(1),
                                            cAlphaFieldNames(2),
                                            cAlphaArgs(2)));
-                    ShowContinueError(state, format("...Zone was previously assigned to Thermostat=\"{}\".", StageControlledZone(ZoneAssigned).Name));
+                    ShowContinueError(
+                        state,
+                        format("...Zone was previously assigned to Thermostat=\"{}\".", state.dataZoneCtrls->StageControlledZone(ZoneAssigned).Name));
                     ErrorsFound = true;
                     continue;
                 }
 
                 if (!state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive) {
-                    StageControlledZone(StageControlledZoneNum).Name = cAlphaArgs(1);
+                    stageControlledZone.Name = cAlphaArgs(1);
                 } else {
                     CheckCreatedZoneItemName(
                         state,
@@ -2398,14 +2402,14 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                         state.dataHeatBal->Zone(ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name,
                         ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
                         state.dataZoneCtrls->StagedTStatObjects(Item).Name,
-                        StageControlledZone,
+                        state.dataZoneCtrls->StageControlledZone,
                         StageControlledZoneNum - 1,
-                        StageControlledZone(StageControlledZoneNum).Name,
+                        stageControlledZone.Name,
                         errFlag);
                     if (errFlag) ErrorsFound = true;
                 }
 
-                StageControlledZone(StageControlledZoneNum).NumOfHeatStages = rNumericArgs(1);
+                stageControlledZone.NumOfHeatStages = rNumericArgs(1);
                 if (rNumericArgs(1) < 1 || rNumericArgs(1) > 4) {
                     ShowSevereError(
                         state,
@@ -2414,10 +2418,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-                StageControlledZone(StageControlledZoneNum).HeatSetBaseSchedName = cAlphaArgs(3);
-                StageControlledZone(StageControlledZoneNum).HSBchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
+                stageControlledZone.HeatSetBaseSchedName = cAlphaArgs(3);
+                stageControlledZone.HSBchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
                 if (Item1 == 1) { // only show error on first of several if zone list
-                    if (StageControlledZone(StageControlledZoneNum).HSBchedIndex == 0) {
+                    if (stageControlledZone.HSBchedIndex == 0) {
                         ShowSevereError(
                             state,
                             format(
@@ -2426,7 +2430,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     }
                 }
 
-                StageControlledZone(StageControlledZoneNum).HeatThroRange = rNumericArgs(2);
+                stageControlledZone.HeatThroRange = rNumericArgs(2);
                 if (rNumericArgs(1) < 0.0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" negative value is found at {}=\"{:.1R}\"",
@@ -2438,10 +2442,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-                if (StageControlledZone(StageControlledZoneNum).NumOfHeatStages > 0) {
-                    StageControlledZone(StageControlledZoneNum).HeatTOffset.allocate(StageControlledZone(StageControlledZoneNum).NumOfHeatStages);
-                    for (i = 1; i <= StageControlledZone(StageControlledZoneNum).NumOfHeatStages; ++i) {
-                        StageControlledZone(StageControlledZoneNum).HeatTOffset(i) = rNumericArgs(2 + i);
+                if (stageControlledZone.NumOfHeatStages > 0) {
+                    stageControlledZone.HeatTOffset.allocate(stageControlledZone.NumOfHeatStages);
+                    for (i = 1; i <= stageControlledZone.NumOfHeatStages; ++i) {
+                        stageControlledZone.HeatTOffset(i) = rNumericArgs(2 + i);
                         if (rNumericArgs(2 + i) > 0.0) {
                             ShowSevereError(state,
                                             format("{}=\"{}\" positive value is found at {}",
@@ -2474,7 +2478,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     }
                 }
 
-                StageControlledZone(StageControlledZoneNum).NumOfCoolStages = rNumericArgs(7);
+                stageControlledZone.NumOfCoolStages = rNumericArgs(7);
                 if (rNumericArgs(7) < 1 || rNumericArgs(7) > 4) {
                     ShowSevereError(
                         state,
@@ -2483,10 +2487,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-                StageControlledZone(StageControlledZoneNum).CoolSetBaseSchedName = cAlphaArgs(4);
-                StageControlledZone(StageControlledZoneNum).CSBchedIndex = GetScheduleIndex(state, cAlphaArgs(4));
+                stageControlledZone.CoolSetBaseSchedName = cAlphaArgs(4);
+                stageControlledZone.CSBchedIndex = GetScheduleIndex(state, cAlphaArgs(4));
                 if (Item1 == 1) { // only show error on first of several if zone list
-                    if (StageControlledZone(StageControlledZoneNum).CSBchedIndex == 0) {
+                    if (stageControlledZone.CSBchedIndex == 0) {
                         ShowSevereError(
                             state,
                             format(
@@ -2495,7 +2499,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     }
                 }
 
-                StageControlledZone(StageControlledZoneNum).CoolThroRange = rNumericArgs(8);
+                stageControlledZone.CoolThroRange = rNumericArgs(8);
                 if (rNumericArgs(8) < 0.0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" negative value is found at {}=\"{:.1R}\"",
@@ -2507,10 +2511,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-                if (StageControlledZone(StageControlledZoneNum).NumOfCoolStages > 0) {
-                    StageControlledZone(StageControlledZoneNum).CoolTOffset.allocate(StageControlledZone(StageControlledZoneNum).NumOfCoolStages);
-                    for (i = 1; i <= StageControlledZone(StageControlledZoneNum).NumOfCoolStages; ++i) {
-                        StageControlledZone(StageControlledZoneNum).CoolTOffset(i) = rNumericArgs(8 + i);
+                if (stageControlledZone.NumOfCoolStages > 0) {
+                    stageControlledZone.CoolTOffset.allocate(stageControlledZone.NumOfCoolStages);
+                    for (i = 1; i <= stageControlledZone.NumOfCoolStages; ++i) {
+                        stageControlledZone.CoolTOffset(i) = rNumericArgs(8 + i);
                         if (rNumericArgs(8 + i) < 0.0) {
                             ShowSevereError(state,
                                             format("{}=\"{}\" negative value is found at {}=\"{:.1R}\"",
