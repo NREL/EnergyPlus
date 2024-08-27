@@ -1,0 +1,83 @@
+name: Debug Build with Coverage
+
+on:
+  pull_request:
+    branches: [ develop ]  # run this on any PR pointing to develop
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  FC: gfortran-13
+  Python_REQUIRED_VERSION: 3.12.3  # 3.12.2 not available on Ubuntu 24 GHA
+  shell: bash
+
+jobs:
+  run_debug_coverage:
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    steps:
+
+    - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
+      id: setup-python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.Python_REQUIRED_VERSION }}
+
+    - name: Install Dependencies for Linux
+      run: |
+        sudo apt-get update
+        sudo apt-get install libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev lcov gcovr
+        # https://github.com/actions/runner-images/issues/10025
+        echo "FC=gfortran-13" >> $GITHUB_ENV
+
+    - uses: actions/checkout@v4
+
+    - name: Create Build Directory
+      run: cmake -E make_directory ./build/
+
+    - name: Configure CMake
+      working-directory: ./build
+      run: >
+        cmake 
+        -G "Unix Makefiles"
+        -DCMAKE_BUILD_TYPE:STRING=Debug
+        -DLINK_WITH_PYTHON:BOOL=ON
+        -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }}
+        -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/x64/
+        -DBUILD_TESTING:BOOL=ON
+        -DBUILD_FORTRAN:BOOL=ON
+        -DBUILD_PACKAGE:BOOL=OFF
+        -DDOCUMENTATION_BUILD:STRING=DoNotBuild
+        -DENABLE_OPENMP:BOOL=OFF
+        -DUSE_OpenMP:BOOL=OFF
+        -DENABLE_COVERAGE:BOOL=ON
+        ../
+
+    - name: Build
+      working-directory: ./build
+      run: cmake --build . -j 4
+
+    - name: Run Tests
+      working-directory: ./build
+      run: ctest -R PlantLoadProfile -j 4
+      # run: ctest -E Basement -j 4
+
+    - name: Generate Raw Coverage Results
+      working-directory: ./build
+      run: lcov -c -d . -o ./lcov.output --no-external --base-directory ../src/EnergyPlus/
+
+    - name: Generate Filtered Coverage Results
+      working-directory: ./build
+      run: lcov -r ./lcov.output -o lcov.output.filtered
+
+    - name: Generate HTML Coverage Results
+      working-directory: ./build
+      run: genhtml ./lcov.output.filtered -o lcov-html --demangle-cpp --function-coverage
+
+    - uses: actions/upload-artifact@v4
+      id: upload_regressions
+      with:
+        name: "coverage_results"
+        path: "${{ github.workspace }}/build/lcov-html"
+
+    # TODO: Check coverage amount and decide if we fail or not
