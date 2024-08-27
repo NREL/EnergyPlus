@@ -6298,8 +6298,8 @@ Real64 CalcClearRoof(EnergyPlusData &state,
     Real64 Rex = WindAtZ * AirDensity * x / v;
 
     Real64 Rf = RoughnessMultiplier[(int)RoughnessIndex];
-    if (Rex > 0.1) { // avoid zero and crazy small denominators
-        Real64 tmp = std::log1p(GrLn / pow_2(Rex));  // std::log(1.0 + GrLn / pow_2(Rex));
+    if (Rex > 0.1) {                                // avoid zero and crazy small denominators
+        Real64 tmp = std::log1p(GrLn / pow_2(Rex)); // std::log(1.0 + GrLn / pow_2(Rex));
         eta = tmp / (1.0 + tmp);
     } else {
         eta = 1.0; // forced convection gone because no wind
