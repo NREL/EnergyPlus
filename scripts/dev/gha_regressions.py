@@ -69,6 +69,8 @@ from energyplus_regressions.structures import TextDifferences, TestEntry, EndErr
 class RegressionManager:
 
     def __init__(self):
+        self.root_index_files_no_diff = []
+        self.root_index_files_diffs = []
         self.diffs_by_idf = defaultdict(list)
         self.diffs_by_type = defaultdict(list)
         self.summary_results = {}
@@ -224,26 +226,26 @@ class RegressionManager:
  </body>
 </html>"""
 
-    def bundle_root_index_html(self, header_info: list[str], no_diffs: list[str], diffs: list[str]) -> str:
+    def bundle_root_index_html(self, header_info: list[str]) -> str:
         # set up header table
         header_content = ""
         for hi in header_info:
             header_content += f"""<li class="list-group-item">{hi}</li>\n"""
 
         # set up diff summary listings
-        num_no_diff = len(no_diffs)
+        num_no_diff = len(self.root_index_files_no_diff)
         nds = 's' if num_no_diff == 0 or num_no_diff > 1 else ''
         no_diff_content = ""
-        for nd in no_diffs:
+        for nd in self.root_index_files_no_diff:
             no_diff_content += f"""<li class="list-group-item">{nd}</li>\n"""
-        num_diff = len(diffs)
+        num_diff = len(self.root_index_files_diffs)
         ds = 's' if num_diff == 0 or num_diff > 1 else ''
         diff_content = ""
-        for d in diffs:
+        for d in self.root_index_files_diffs:
             diff_content += f"""<a href="{d}/index.html" class="list-group-item list-group-item-action">{d}</a>\n"""
 
         # set up diff type listing
-        diff_type_keys = self.diffs_by_type.keys()
+        diff_type_keys = sorted(self.diffs_by_type.keys())
         num_diff_types = len(diff_type_keys)
         dt = 's' if num_diff_types == 0 or num_diff_types > 1 else ''
         diff_type_content = ""
@@ -278,7 +280,9 @@ class RegressionManager:
         run_time_rows_text = ""
         sum_base_seconds = 0
         sum_branch_seconds = 0
-        for idf, summary in self.summary_results.items():
+        sorted_idf_keys = sorted(self.summary_results.keys())
+        for idf in sorted_idf_keys:
+            summary = self.summary_results[idf]
             case_1_success = summary.simulation_status_case1 == EndErrSummary.STATUS_SUCCESS
             case_2_success = summary.simulation_status_case2 == EndErrSummary.STATUS_SUCCESS
             if case_1_success:
@@ -424,7 +428,7 @@ class RegressionManager:
             diff_lines += f"  - {diff_type}: {len(idfs)}\n"
         content = f"""
 <details>
-  <summary>Regression Summary - Download Build Artifact for Full Details</summary>
+  <summary>Regression Summary</summary>
 
 {diff_lines}
 </details>"""
@@ -432,10 +436,8 @@ class RegressionManager:
 
     def check_all_regressions(self, base_testfiles: Path, mod_testfiles: Path, bundle_root: Path) -> bool:
         any_diffs = False
-        root_index_files_no_diff = []
-        root_index_files_diffs = []
         bundle_root.mkdir(exist_ok=True)
-        for baseline in base_testfiles.iterdir():
+        for baseline in sorted(base_testfiles.iterdir()):
             if not baseline.is_dir():
                 continue
             if baseline.name == 'CMakeFiles':  # add more ignore dirs here
@@ -445,7 +447,7 @@ class RegressionManager:
                 continue  # TODO: Should we warn that it is missing?
             entry, diffs = self.single_file_regressions(baseline, modified)
             if diffs:
-                root_index_files_diffs.append(baseline.name)
+                self.root_index_files_diffs.append(baseline.name)
                 any_diffs = True
                 potential_diff_files = baseline.glob("*.*.*")  # TODO: Could try to get this from the regression tool
                 target_dir_for_this_file_diffs = bundle_root / baseline.name
@@ -472,7 +474,7 @@ class RegressionManager:
                 so_far = ' Diffs! ' if any_diffs else 'No diffs'
                 print(f"Diff status so far: {so_far}. This file HAZ DIFFS: {baseline.name}")
             else:
-                root_index_files_no_diff.append(baseline.name)
+                self.root_index_files_no_diff.append(baseline.name)
                 so_far = ' Diffs! ' if any_diffs else 'No diffs'
                 print(f"Diff status so far: {so_far}. This file has no diffs: {baseline.name}")
         meta_data = [
@@ -481,14 +483,12 @@ class RegressionManager:
             f"Number of input files evaluated: {self.num_idf_inspected}",
         ]
         bundle_root_index_file_path = bundle_root / 'index.html'
-        bundle_root_index_content = self.bundle_root_index_html(
-            meta_data, root_index_files_no_diff, root_index_files_diffs
-        )
+        bundle_root_index_content = self.bundle_root_index_html(meta_data)
         bundle_root_index_file_path.write_text(bundle_root_index_content)
         print()
-        print(f"* Files with Diffs *:\n{"\n ".join(root_index_files_diffs)}\n")
-        print(f"* Diffs by File *:\n{json.dumps(self.diffs_by_idf, indent=2)}\n")
-        print(f"* Diffs by Type *:\n{json.dumps(self.diffs_by_type, indent=2)}\n")
+        print(f"* Files with Diffs *:\n{"\n ".join(self.root_index_files_diffs)}\n")
+        print(f"* Diffs by File *:\n{json.dumps(self.diffs_by_idf, indent=2, sort_keys=True)}\n")
+        print(f"* Diffs by Type *:\n{json.dumps(self.diffs_by_type, indent=2, sort_keys=True)}\n")
         if any_diffs:
             self.generate_markdown_summary(bundle_root)
         return any_diffs

@@ -1,0 +1,44 @@
+name: Alternate Linux Build
+
+on:
+  push:
+    branches: [ develop ]
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events matching v*, i.e. v1.0, v20.15.10
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+
+  alternate_build_configurations:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set FC for Ubuntu 24.04
+        shell: bash
+        run: echo "FC=gfortran-13" >> $GITHUB_ENV
+
+      - name: Create Build Directory
+        run: cmake -E make_directory ./build/
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: ./build/
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DLINK_WITH_PYTHON=OFF \
+                -DUSE_PSYCHROMETRICS_CACHING=OFF \
+                -DUSE_GLYCOL_CACHING=OFF \
+                -DOPENGL_REQUIRED=OFF \
+                -DUSE_PSYCH_STATS=ON \
+                -DUSE_PSYCH_ERRORS=OFF \
+                -DENABLE_PCH=OFF \
+                ../
+
+      - name: Build EnergyPlus
+        working-directory: ./build/
+        shell: bash
+        run: cmake --build . --target energyplus -j 4
