@@ -59,8 +59,7 @@ jobs:
 
     - name: Run Tests
       working-directory: ./build
-      run: ctest -R PlantLoadProfile -j 4
-      # run: ctest -E Basement -j 4
+      run: ctest -E Basement -j 4
 
     - name: Generate Raw Coverage Results
       working-directory: ./build
@@ -72,7 +71,14 @@ jobs:
 
     - name: Generate HTML Coverage Results
       working-directory: ./build
-      run: genhtml ./lcov.output.filtered -o lcov-html --demangle-cpp --function-coverage
+      run: genhtml ./lcov.output.filtered -o lcov-html --demangle-cpp --function-coverage | tee cover.txt
+
+    - name: Process Coverage Summary
+      working-directory: ./build
+      run: python ${{ github.workspace }}/scripts/dev/gha_coverage_summary.py
+
+    - name: Generate Artifact Summary
+      run: echo "$(cat ${{ github.workspace }}/build/cover.md)" >> $GITHUB_STEP_SUMMARY
 
     - uses: actions/upload-artifact@v4
       id: upload_regressions

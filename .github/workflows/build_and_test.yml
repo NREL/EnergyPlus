@@ -19,13 +19,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-#        - os: macos-12
-#          macos_dev_target: 12.1
-#          arch: x86_64
-#          python-arch: x64
-#          generator: "Unix Makefiles"
-#          nproc: 3
-#          targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
+        - os: macos-12
+          macos_dev_target: 12.1
+          arch: x86_64
+          python-arch: x64
+          generator: "Unix Makefiles"
+          nproc: 3
+          targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
+          run_regressions: false
         - os: macos-14
           macos_dev_target: 13.0
           arch: arm64
@@ -33,24 +34,28 @@ jobs:
           generator: "Unix Makefiles"
           nproc: 3
           targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
-#        - os: ubuntu-24.04
-#          arch: x86_64
-#          python-arch: x64
-#          generator: "Unix Makefiles"
-#          nproc: 4
-#          targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
-#        - os: windows-2019
-#          arch: x86_64
-#          python-arch: x64
-#          generator: "Visual Studio 16 2019"
-#          nproc: 4
-#          targets: energyplus ExpandObjects_build ReadVars_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
-#        - os: windows-2022
-#          arch: x86_64
-#          python-arch: x64
-#          generator: "Visual Studio 17 2022"
-#          nproc: 4
-#          targets: energyplus ExpandObjects_build ReadVars_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
+          run_regressions: true
+        - os: ubuntu-24.04
+          arch: x86_64
+          python-arch: x64
+          generator: "Unix Makefiles"
+          nproc: 4
+          targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
+          run_regressions: true
+        - os: windows-2019
+          arch: x86_64
+          python-arch: x64
+          generator: "Visual Studio 16 2019"
+          nproc: 4
+          targets: energyplus ExpandObjects_build ReadVars_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
+          run_regressions: false
+        - os: windows-2022
+          arch: x86_64
+          python-arch: x64
+          generator: "Visual Studio 17 2022"
+          nproc: 4
+          targets: energyplus ExpandObjects_build ReadVars_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
+          run_regressions: true
 
     steps:
 
@@ -81,15 +86,18 @@ jobs:
     # BUILD AND TEST INTEGRATION FILES ON THE BASELINE BRANCH
 
     - name: Baseline Checkout
+      if: ${{ matrix.run_regressions }}
       uses: actions/checkout@v4
       with:
         ref: develop
         path: baseline
 
     - name: Baseline Create Build Directory
+      if: ${{ matrix.run_regressions }}
       run: cmake -E make_directory ./baseline/build/
 
     - name: Baseline Configure CMake
+      if: ${{ matrix.run_regressions }}
       working-directory: ./baseline/build
       run: >
         cmake 
@@ -108,11 +116,13 @@ jobs:
         ../
 
     - name: Baseline Build
+      if: ${{ matrix.run_regressions }}
       working-directory: ./baseline/build
       # Building specific target list so that we don't waste time building the unit test binary
       run: cmake --build . -j ${{ matrix.nproc }} --config Release --target ${{ matrix.targets }}
 
     - name: Baseline Test
+      if: ${{ matrix.run_regressions }}
       working-directory: ./baseline/build
       run: ctest -C Release -E Basement -R integration -j 3  # TODO: Speed up basement so we don't have to skip it.
 
@@ -154,27 +164,27 @@ jobs:
       run: ctest -C Release -E Basement -j 3
 
     - name: Install Regression Tool
-      if: always() && steps.branch_build.outcome != 'failure'  # always run this step as long as we actually built
+      if: always() && matrix.run_regressions && steps.branch_build.outcome != 'failure'  # always run this step as long as we actually built
       run: pip install energyplus-regressions
 
     - name: Run Regressions
-      if: always() && steps.branch_build.outcome != 'failure'  # always run this step as long as we actually built
+      if: always() && matrix.run_regressions && steps.branch_build.outcome != 'failure'  # always run this step as long as we actually built
       id: regressions
       run: python ./branch/scripts/dev/gha_regressions.py ./baseline/build/testfiles ./branch/build/testfiles/ ${{ github.workspace }}/regressions
 
     - name: Generate Artifact Summary
-      if: always() && steps.regressions.outcome == 'failure'
+      if: always() && matrix.run_regressions && steps.regressions.outcome == 'failure'
       run: echo "$(cat ${{ github.workspace }}/regressions/summary.md)" >> $GITHUB_STEP_SUMMARY
 
     - uses: actions/upload-artifact@v4
       id: upload_regressions
-      if: always() && steps.regressions.outcome == 'failure'  # only run this if regressions were encountered "failed"
+      if: always() && matrix.run_regressions && steps.regressions.outcome == 'failure'  # only run this if regressions were encountered "failed"
       with:
         name: "regressions-${{ matrix.os }}"
         path: "${{ github.workspace }}/regressions"
 
     - uses: actions/github-script@v7
-      if: always() && steps.regressions.outcome == 'failure'
+      if: always() && matrix.run_regressions && steps.regressions.outcome == 'failure'
       with:
         script: |
           github.rest.issues.createComment({
