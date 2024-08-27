@@ -3651,7 +3651,6 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int RelativeZoneNum;
     int ActualZoneNum;
-    int TempControlSchedIndex;
     int SetPointTempSchedIndexHot;
     int SetPointTempSchedIndexCold;
     int SchedNameIndex;
@@ -3685,7 +3684,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
 
         // What if this zone not controlled???
         ActualZoneNum = TempControlledZone(RelativeZoneNum).ActualZoneNum;
-        TempControlSchedIndex = TempControlledZone(RelativeZoneNum).CTSchedIndex;
+        int TempControlSchedIndex = TempControlledZone(RelativeZoneNum).CTSchedIndex;
         TempControlType(ActualZoneNum) = static_cast<HVAC::ThermostatType>(ScheduleManager::GetCurrentScheduleValue(state, TempControlSchedIndex));
         TempControlTypeRpt(ActualZoneNum) = static_cast<int>(TempControlType(ActualZoneNum));
         // Error detection for these values is done in the Get routine
@@ -3903,8 +3902,6 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
 
                         bool IsThermostatFound = false;
                         double offsetThermostat = 0.0;
-                        double faultZoneWHumidifyingSetPoint;
-                        double faultZoneWDehumidifyingSetPoint;
 
                         // Get the offset value of the corresponding thermostat fault object
                         if (state.dataFaultsMgr->NumFaultyThermostat > 0) {
@@ -3947,9 +3944,9 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
 
                         if (offsetThermostat != 0.0) {
                             // Calculate the humidistat offset value from the thermostat offset value
-                            faultZoneWHumidifyingSetPoint = Psychrometrics::PsyWFnTdbRhPb(
+                            double faultZoneWHumidifyingSetPoint = Psychrometrics::PsyWFnTdbRhPb(
                                 state, (this->MAT + offsetThermostat), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
-                            faultZoneWDehumidifyingSetPoint = Psychrometrics::PsyWFnTdbRhPb(
+                            double faultZoneWDehumidifyingSetPoint = Psychrometrics::PsyWFnTdbRhPb(
                                 state, (this->MAT + offsetThermostat), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                             double offsetZoneRHHumidifyingSetPoint =
                                 ZoneRHHumidifyingSetPoint -
@@ -6229,7 +6226,7 @@ void AdjustOperativeSetPointsforAdapComfort(EnergyPlusData &state, int const Tem
     // This routine adjust the operative setpoints for each controlled adaptive thermal comfort models.
 
     auto &tempControlledZone = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID);
-    auto &AdapComfortDailySetPointSchedule = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule;
+    auto const &AdapComfortDailySetPointSchedule = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int originZoneAirSetPoint = ZoneAirSetPoint;
@@ -6297,11 +6294,11 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
     Real64 SetPointLo = 0.0;
     Real64 SetPointHi = 0.0;
     Real64 Tset = 0.0;
-    int PeopleNum = 0;
     int ObjectCount = 0;
     Real64 PeopleCount = 0.0;
     int SetPointComfortSchedIndex = 0;
     int SchedTypeIndex = 0;
+    int PeopleNum;
 
     // Call thermal comfort module to read zone control comfort object
     if (state.dataZoneTempPredictorCorrector->CalcZoneAirComfortSetPointsFirstTimeFlag) {
@@ -6417,13 +6414,13 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
         case DataZoneControls::AverageMethod::OBJ:
             SetPointLo = 0.0;
             SetPointHi = 0.0;
-            for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                if (ActualZoneNum == state.dataHeatBal->People(PeopleNum).ZonePtr) {
+            for (int peopleNum = 1; peopleNum <= state.dataHeatBal->TotPeople; ++peopleNum) {
+                if (ActualZoneNum == state.dataHeatBal->People(peopleNum).ZonePtr) {
                     ++ObjectCount;
-                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, zoneComfortControlsFanger.LowPMV, Tset);
+                    GetComfortSetPoints(state, peopleNum, RelativeZoneNum, zoneComfortControlsFanger.LowPMV, Tset);
                     SetPointLo += Tset;
                     if (comfortControlType == HVAC::ThermostatType::DualSetPointWithDeadBand) {
-                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, zoneComfortControlsFanger.HighPMV, Tset);
+                        GetComfortSetPoints(state, peopleNum, RelativeZoneNum, zoneComfortControlsFanger.HighPMV, Tset);
                         SetPointHi += Tset;
                     }
                 }
@@ -6434,15 +6431,15 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
         case DataZoneControls::AverageMethod::PEO:
             SetPointLo = 0.0;
             SetPointHi = 0.0;
-            for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                if (ActualZoneNum == state.dataHeatBal->People(PeopleNum).ZonePtr) {
-                    int NumberOccupants = state.dataHeatBal->People(PeopleNum).NumberOfPeople *
-                                          ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr);
+            for (int peopleNum = 1; peopleNum <= state.dataHeatBal->TotPeople; ++peopleNum) {
+                if (ActualZoneNum == state.dataHeatBal->People(peopleNum).ZonePtr) {
+                    int NumberOccupants = state.dataHeatBal->People(peopleNum).NumberOfPeople *
+                                          ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->People(peopleNum).NumberOfPeoplePtr);
                     PeopleCount += NumberOccupants;
-                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, zoneComfortControlsFanger.LowPMV, Tset);
+                    GetComfortSetPoints(state, peopleNum, RelativeZoneNum, zoneComfortControlsFanger.LowPMV, Tset);
                     SetPointLo += Tset * NumberOccupants;
                     if (comfortControlType == HVAC::ThermostatType::DualSetPointWithDeadBand) {
-                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, zoneComfortControlsFanger.HighPMV, Tset);
+                        GetComfortSetPoints(state, peopleNum, RelativeZoneNum, zoneComfortControlsFanger.HighPMV, Tset);
                         SetPointHi += Tset * NumberOccupants;
                     }
                 }
@@ -6467,13 +6464,13 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
                                                PeopleCount);
                 SetPointLo = 0.0;
                 SetPointHi = 0.0;
-                for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                    if (ActualZoneNum == state.dataHeatBal->People(PeopleNum).ZonePtr) {
+                for (int peopleNum = 1; peopleNum <= state.dataHeatBal->TotPeople; ++peopleNum) {
+                    if (ActualZoneNum == state.dataHeatBal->People(peopleNum).ZonePtr) {
                         ++ObjectCount;
-                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, zoneComfortControlsFanger.LowPMV, Tset);
+                        GetComfortSetPoints(state, peopleNum, RelativeZoneNum, zoneComfortControlsFanger.LowPMV, Tset);
                         SetPointLo += Tset;
                         if (comfortControlType == HVAC::ThermostatType::DualSetPointWithDeadBand) {
-                            GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, zoneComfortControlsFanger.HighPMV, Tset);
+                            GetComfortSetPoints(state, peopleNum, RelativeZoneNum, zoneComfortControlsFanger.HighPMV, Tset);
                             SetPointHi += Tset;
                         }
                     }
@@ -6652,7 +6649,6 @@ void GetComfortSetPoints(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 PMVResult = 0.0; // Calculated PMV value
-    int SolFla = 0;         // feed back flag from SolveRoot
 
     auto &comfortControlledZone = state.dataZoneCtrls->ComfortControlledZone(ComfortControlNum);
     Real64 Tmin = comfortControlledZone.TdbMinSetPoint;
@@ -6670,6 +6666,7 @@ void GetComfortSetPoints(EnergyPlusData &state,
             return (PMVSet - PMVresult);
         };
 
+        int SolFla = 0; // feed back flag from SolveRoot
         General::SolveRoot(state, Acc, MaxIter, SolFla, Tset, f, Tmin, Tmax);
         if (SolFla == -1) {
             if (!state.dataGlobal->WarmupFlag) {
