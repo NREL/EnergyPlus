@@ -437,7 +437,8 @@ class RegressionManager:
     def check_all_regressions(self, base_testfiles: Path, mod_testfiles: Path, bundle_root: Path) -> bool:
         any_diffs = False
         bundle_root.mkdir(exist_ok=True)
-        for baseline in sorted(base_testfiles.iterdir()):
+        entries = sorted(base_testfiles.iterdir())
+        for entry_num, baseline in enumerate(entries):
             if not baseline.is_dir():
                 continue
             if baseline.name == 'CMakeFiles':  # add more ignore dirs here
@@ -471,12 +472,11 @@ class RegressionManager:
                     index_file = target_dir_for_this_file_diffs / 'index.html'
                     index_this_file = self.single_test_case_html(index_contents_this_file)
                     index_file.write_text(index_this_file)
-                so_far = ' Diffs! ' if any_diffs else 'No diffs'
-                print(f"Diff status so far: {so_far}. This file HAZ DIFFS: {baseline.name}")
             else:
                 self.root_index_files_no_diff.append(baseline.name)
-                so_far = ' Diffs! ' if any_diffs else 'No diffs'
-                print(f"Diff status so far: {so_far}. This file has no diffs: {baseline.name}")
+            so_far = ' Diffs! ' if any_diffs else 'No diffs'
+            if entry_num % 40 == 0:
+                print(f"On file #{entry_num}/{len(entries)} ({baseline.name}), Diff status so far: {so_far}")
         meta_data = [
             f"Regression time stamp in UTC: {datetime.now(UTC)}",
             f"Regression time stamp in Central Time: {datetime.now(ZoneInfo('America/Chicago'))}",
