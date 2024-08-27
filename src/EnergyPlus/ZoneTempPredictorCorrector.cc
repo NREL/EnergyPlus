@@ -2594,7 +2594,6 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
     int calcStartDayCEN;
 
     std::string::size_type pos;
-    int ind, i, j;
 
     Array1D<Real64> adaptiveTemp(state.dataWeather->NumDaysInYear, 0.0);
     Array1D<Real64> dailyDryTemp(state.dataWeather->NumDaysInYear, 0.0);
@@ -2602,14 +2601,14 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
     if (FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
         // Read hourly dry bulb temperature first
         auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptive");
-        for (i = 1; i <= 9; ++i) { // Headers
+        for (int i = 1; i <= 9; ++i) { // Headers
             epwFile.readLine();
         }
-        for (i = 1; i <= state.dataWeather->NumDaysInYear; ++i) {
+        for (int i = 1; i <= state.dataWeather->NumDaysInYear; ++i) {
             avgDryBulb = 0.0;
-            for (j = 1; j <= 24; ++j) {
+            for (int j = 1; j <= 24; ++j) {
                 epwLine = epwFile.readLine().data;
-                for (ind = 1; ind <= 6; ++ind) {
+                for (int ind = 1; ind <= 6; ++ind) {
                     pos = index(epwLine, ',');
                     epwLine.erase(0, pos + 1);
                 }
@@ -2630,18 +2629,18 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
             calcStartDayCEN = calcEndDay - 7;
 
             if (calcStartDayASH > 0) {
-                for (i = calcStartDayASH; i <= calcStartDayASH + 30; i++) {
+                for (int i = calcStartDayASH; i <= calcStartDayASH + 30; i++) {
                     avgDryBulb = dailyDryTemp(i);
                     runningAverageASH(dayOfYear) = runningAverageASH(dayOfYear) + avgDryBulb;
                 }
                 runningAverageASH(dayOfYear) /= 30;
             } else { // Do special things for wrapping the epw
                 calcStartDayASH += state.dataWeather->NumDaysInYear;
-                for (i = 1; i <= calcEndDay; i++) {
+                for (int i = 1; i <= calcEndDay; i++) {
                     avgDryBulb = dailyDryTemp(i);
                     runningAverageASH(dayOfYear) = runningAverageASH(dayOfYear) + avgDryBulb;
                 }
-                for (i = calcStartDayASH; i < state.dataWeather->NumDaysInYear; i++) {
+                for (int i = calcStartDayASH; i < state.dataWeather->NumDaysInYear; i++) {
                     avgDryBulb = dailyDryTemp(i);
                     runningAverageASH(dayOfYear) = runningAverageASH(dayOfYear) + avgDryBulb;
                 }
@@ -2649,18 +2648,18 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
             }
 
             if (calcStartDayCEN > 0) {
-                for (i = calcStartDayCEN; i <= calcStartDayCEN + 7; i++) {
+                for (int i = calcStartDayCEN; i <= calcStartDayCEN + 7; i++) {
                     avgDryBulb = dailyDryTemp(i);
                     runningAverageCEN(dayOfYear) = runningAverageCEN(dayOfYear) + avgDryBulb;
                 }
                 runningAverageCEN(dayOfYear) /= 7;
             } else { // Do special things for wrapping the epw
                 calcStartDayCEN += state.dataWeather->NumDaysInYear;
-                for (i = 1; i <= calcEndDay; i++) {
+                for (int i = 1; i <= calcEndDay; i++) {
                     avgDryBulb = dailyDryTemp(i);
                     runningAverageCEN(dayOfYear) = runningAverageCEN(dayOfYear) + avgDryBulb;
                 }
-                for (i = calcStartDayCEN; i < state.dataWeather->NumDaysInYear; i++) {
+                for (int i = calcStartDayCEN; i < state.dataWeather->NumDaysInYear; i++) {
                     avgDryBulb = dailyDryTemp(i);
                     runningAverageCEN(dayOfYear) = runningAverageCEN(dayOfYear) + avgDryBulb;
                 }
@@ -2768,9 +2767,6 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
     static constexpr std::string_view RoutineName("InitZoneAirSetpoints: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool FirstSurfFlag;
-    int TRefFlag; // Flag for Reference Temperature process in Zones
-
     auto &ZoneList = state.dataHeatBal->ZoneList;
     auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone;
     auto &TempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint;
@@ -2782,6 +2778,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
     int NumOfZones = state.dataGlobal->NumOfZones;
 
     if (state.dataZoneTempPredictorCorrector->InitZoneAirSetPointsOneTimeFlag) {
+        int TRefFlag; // Flag for Reference Temperature process in Zones
         TempZoneThermostatSetPoint.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->AdapComfortCoolingSetPoint.dimension(NumOfZones, 0.0);
         ZoneThermostatSetPointHi.dimension(NumOfZones, 0.0);
@@ -2828,7 +2825,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         }
 
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
-            FirstSurfFlag = true;
+            bool FirstSurfFlag = true;
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                 auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
@@ -3650,7 +3647,6 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int RelativeZoneNum;
-    int ActualZoneNum;
     int SetPointTempSchedIndexHot;
     int SetPointTempSchedIndexCold;
     int SchedNameIndex;
@@ -3683,7 +3679,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
     for (RelativeZoneNum = 1; RelativeZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++RelativeZoneNum) {
 
         // What if this zone not controlled???
-        ActualZoneNum = TempControlledZone(RelativeZoneNum).ActualZoneNum;
+        int ActualZoneNum = TempControlledZone(RelativeZoneNum).ActualZoneNum;
         int TempControlSchedIndex = TempControlledZone(RelativeZoneNum).CTSchedIndex;
         TempControlType(ActualZoneNum) = static_cast<HVAC::ThermostatType>(ScheduleManager::GetCurrentScheduleValue(state, TempControlSchedIndex));
         TempControlTypeRpt(ActualZoneNum) = static_cast<int>(TempControlType(ActualZoneNum));
