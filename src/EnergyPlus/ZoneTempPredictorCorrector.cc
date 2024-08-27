@@ -282,8 +282,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     int CTIndex;
     int HumidControlledZoneNum; // The Humidity Controller that information is being loaded into
     bool ValidScheduleControlType;
-    bool ValidRadFractSched;          // check for if radiative fraction schedule has valid numbers
-    bool ValidZoneOvercoolRangeSched; // check for if Zone Overcool range schedule has valid numbers
     int SchedMin;
     int SchedMax;
     int ActualZoneNum;
@@ -291,10 +289,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     int ComfortControlledZoneNum; // The Splitter that you are currently loading input into
     int i;
-    int IZoneCount;
     int found;
     int NumStageControlledZones; // Number of staged controlled objects
-    int StageControlledZoneNum;  // Index for staged controlled zones
 
     Array1D_int CTSchedMapToControlledZone;
     Array1D_int CCmSchedMapToControlledZone;
@@ -1074,7 +1070,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 }
 
                 // Read Fields A3 and A4 for averaging method
-                IZoneCount = 0;
+                int IZoneCount = 0;
                 for (i = 1; i <= state.dataHeatBal->TotPeople; ++i) {
                     if (ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum == state.dataHeatBal->People(i).ZonePtr) {
                         ++IZoneCount;
@@ -1935,7 +1931,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
                     // check schedule min max.
                     if (TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled) {
-                        ValidRadFractSched = CheckScheduleValueMinMax(
+                        bool ValidRadFractSched = CheckScheduleValueMinMax(
                             state, TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9);
                         if (!ValidRadFractSched) {
                             ShowSevereError(
@@ -2033,7 +2029,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                         }
                         // check schedule min max.
                         if (TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled) {
-                            ValidRadFractSched = CheckScheduleValueMinMax(
+                            bool ValidRadFractSched = CheckScheduleValueMinMax(
                                 state, TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9);
                             if (!ValidRadFractSched) {
                                 ShowSevereError(
@@ -2176,7 +2172,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
                     // check zone Overcool range schedule min/max values.
                     if (TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled) {
-                        ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax(
+                        bool ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax(
                             state, TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0);
                         if (!ValidZoneOvercoolRangeSched) {
                             ShowSevereError(
@@ -2257,7 +2253,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                         }
                         // check zone Overcool range schedule min/max values.
                         if (TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled) {
-                            ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax(
+                            bool ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax(
                                 state, TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0);
                             if (!ValidZoneOvercoolRangeSched) {
                                 ShowSevereError(
@@ -2343,7 +2339,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         StageControlledZone.allocate(state.dataZoneTempPredictorCorrector->NumStageCtrZone);
         state.dataZoneCtrls->StageZoneLogic.dimension(NumOfZones, false);
 
-        StageControlledZoneNum = 0;
+        int StageControlledZoneNum = 0;
         for (Item = 1; Item <= NumStageControlledZones; ++Item) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -2584,14 +2580,8 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
     // SUBROUTINE PARAMETER DEFINITIONS:
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string epwLine;
-
     Real64 dryBulb;
     Real64 avgDryBulb;
-
-    int calcEndDay;
-    int calcStartDayASH;
-    int calcStartDayCEN;
 
     std::string::size_type pos;
 
@@ -2607,7 +2597,7 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
         for (int i = 1; i <= state.dataWeather->NumDaysInYear; ++i) {
             avgDryBulb = 0.0;
             for (int j = 1; j <= 24; ++j) {
-                epwLine = epwFile.readLine().data;
+                std::string epwLine = epwFile.readLine().data;
                 for (int ind = 1; ind <= 6; ++ind) {
                     pos = index(epwLine, ',');
                     epwLine.erase(0, pos + 1);
@@ -2624,9 +2614,9 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
         int dayOfYear = 0;
         while (dayOfYear < state.dataWeather->NumDaysInYear) {
             dayOfYear++;
-            calcEndDay = dayOfYear - 1;
-            calcStartDayASH = calcEndDay - 30;
-            calcStartDayCEN = calcEndDay - 7;
+            int calcEndDay = dayOfYear - 1;
+            int calcStartDayASH = calcEndDay - 30;
+            int calcStartDayCEN = calcEndDay - 7;
 
             if (calcStartDayASH > 0) {
                 for (int i = calcStartDayASH; i <= calcStartDayASH + 30; i++) {
