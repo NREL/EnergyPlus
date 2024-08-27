@@ -1793,12 +1793,11 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 ZoneVolCapMultpGenContam = rNumericArgs(4);
             } else {
                 // multiplier values for the specified zone(s)
-                int ZoneNum = 0;
                 ZLItem = 0;
                 Item1 = Util::FindItemInList(cAlphaArgs(2), Zone);
                 if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), ZoneList);
                 if (Item1 > 0) {
-                    ZoneNum = Item1;
+                    int ZoneNum = Item1;
                     Zone(ZoneNum).FlagCustomizedZoneCap = true;
                     Zone(ZoneNum).ZoneVolCapMultpSens = rNumericArgs(1);
                     Zone(ZoneNum).ZoneVolCapMultpMoist = rNumericArgs(2);
@@ -1806,7 +1805,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     Zone(ZoneNum).ZoneVolCapMultpGenContam = rNumericArgs(4);
                 } else if (ZLItem > 0) {
                     for (int ZonePtrNum = 1; ZonePtrNum < ZoneList(ZLItem).NumOfZones; ZonePtrNum++) {
-                        ZoneNum = ZoneList(ZLItem).Zone(ZonePtrNum);
+                        int ZoneNum = ZoneList(ZLItem).Zone(ZonePtrNum);
                         Zone(ZoneNum).FlagCustomizedZoneCap = true;
                         Zone(ZoneNum).ZoneVolCapMultpSens = rNumericArgs(1);
                         Zone(ZoneNum).ZoneVolCapMultpMoist = rNumericArgs(2);
@@ -2235,9 +2234,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                     "{}={} invalid {}=\"{}\" not found.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                             ErrorsFound = true;
                         }
-                    }
-                    // check validity of zone Overcool constant range
-                    if (Item == 1) {
+                        // check validity of zone Overcool constant range
                         if ((TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange < 0.0) &&
                             (!(TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled))) {
                             ShowSevereError(state,
@@ -2248,8 +2245,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                    rNumericArgs(1)));
                             ErrorsFound = true;
                         }
-                    }
-                    if (Item == 1) {
                         if ((TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange > 3.0) &&
                             (!(TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled))) {
                             ShowSevereError(state,
@@ -2260,9 +2255,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                    rNumericArgs(1)));
                             ErrorsFound = true;
                         }
-                    }
-                    // check zone Overcool range schedule min/max values.
-                    if (Item == 1) {
+                        // check zone Overcool range schedule min/max values.
                         if (TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled) {
                             ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax(
                                 state, TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0);
@@ -2591,15 +2584,11 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
     // SUBROUTINE PARAMETER DEFINITIONS:
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    std::string lineIn;
-    std::string lineAvg;
     std::string epwLine;
 
     Real64 dryBulb;
     Real64 avgDryBulb;
 
-    int readStat;
     int calcEndDay;
     int calcStartDayASH;
     int calcStartDayCEN;
@@ -2610,7 +2599,6 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
     Array1D<Real64> adaptiveTemp(state.dataWeather->NumDaysInYear, 0.0);
     Array1D<Real64> dailyDryTemp(state.dataWeather->NumDaysInYear, 0.0);
 
-    readStat = 0;
     if (FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
         // Read hourly dry bulb temperature first
         auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptive");
@@ -3915,8 +3903,6 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
 
                         bool IsThermostatFound = false;
                         double offsetThermostat = 0.0;
-                        double offsetZoneRHHumidifyingSetPoint = 0.0;
-                        double offsetZoneRHDehumidifyingSetPoint = 0.0;
                         double faultZoneWHumidifyingSetPoint;
                         double faultZoneWDehumidifyingSetPoint;
 
@@ -3965,10 +3951,10 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
                                 state, (this->MAT + offsetThermostat), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                             faultZoneWDehumidifyingSetPoint = Psychrometrics::PsyWFnTdbRhPb(
                                 state, (this->MAT + offsetThermostat), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
-                            offsetZoneRHHumidifyingSetPoint =
+                            double offsetZoneRHHumidifyingSetPoint =
                                 ZoneRHHumidifyingSetPoint -
                                 Psychrometrics::PsyRhFnTdbWPb(state, this->MAT, faultZoneWHumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
-                            offsetZoneRHDehumidifyingSetPoint =
+                            double offsetZoneRHDehumidifyingSetPoint =
                                 ZoneRHDehumidifyingSetPoint -
                                 Psychrometrics::PsyRhFnTdbWPb(state, this->MAT, faultZoneWDehumidifyingSetPoint, state.dataEnvrn->OutBaroPress) *
                                     100.0;
