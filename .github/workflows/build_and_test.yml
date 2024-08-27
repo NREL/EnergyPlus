@@ -177,5 +177,5 @@ jobs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: "# :warning: Regressions Detected\n - Build: ${{ matrix.os }}\n - [View Results](https://github.com/NREL/EnergyPlus/actions/runs/${{ github.run_id }})\n - [Download Regressions](${{ steps.upload_regressions.outputs.artifact-url }})"
+            body: "# :warning: Regressions Detected\n - Build: ${{ matrix.os }}\n - Commit: ${{ github.action_ref }}\n - [View Results](https://github.com/NREL/EnergyPlus/actions/runs/${{ github.run_id }})\n - [Download Regressions](${{ steps.upload_regressions.outputs.artifact-url }})"
           })

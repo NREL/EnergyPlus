@@ -54,28 +54,33 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 from collections import defaultdict
+from datetime import datetime, UTC
 import json
 from shutil import copy
 from pathlib import Path
 import sys
-import tempfile
+from shutil import rmtree
+from zoneinfo import ZoneInfo
 
 from energyplus_regressions.runtests import SuiteRunner
-from energyplus_regressions.structures import TextDifferences, TestEntry
+from energyplus_regressions.structures import TextDifferences, TestEntry, EndErrSummary
 
 
 class RegressionManager:
 
     def __init__(self):
-        self.diffs_by_idf = []
+        self.diffs_by_idf = defaultdict(list)
         self.diffs_by_type = defaultdict(list)
-        self.all_files_compared = []
+        self.summary_results = {}
+        self.num_idf_inspected = 0
+        # self.all_files_compared = []  TODO: need to get this from regression runner
         import energyplus_regressions
         self.threshold_file = str(Path(energyplus_regressions.__file__).parent / 'diffs' / 'math_diff.config')
 
     def single_file_regressions(self, baseline: Path, modified: Path) -> [TestEntry, bool]:
 
         idf = baseline.name
+        self.num_idf_inspected += 1
         this_file_diffs = []
 
         entry = TestEntry(idf, "")
@@ -87,6 +92,7 @@ class RegressionManager:
             self.threshold_file,
             ci_mode=True
         )  # returns an updated entry
+        self.summary_results[idf] = entry.summary_result
 
         has_diffs = False
 
@@ -123,6 +129,7 @@ class RegressionManager:
                 has_diffs = True
                 this_file_diffs.append(diff_type)
                 self.diffs_by_type[diff_type].append(idf)
+                self.diffs_by_idf[idf].append(diff_type)
 
         numeric_diff_results = {
             "ESO": entry.eso_diffs,
@@ -138,24 +145,29 @@ class RegressionManager:
                 has_diffs = True
                 this_file_diffs.append(f"{diff_type} Big Diffs")
                 self.diffs_by_type[f"{diff_type} Big Diffs"].append(idf)
+                self.diffs_by_idf[idf].append(f"{diff_type} Big Diffs")
             elif diffs.diff_type == 'Small Diffs':
                 has_diffs = True
                 this_file_diffs.append(f"{diff_type} Small Diffs")
-                self.diffs_by_type[f"{diff_type} Big Diffs"].append(idf)
+                self.diffs_by_type[f"{diff_type} Small Diffs"].append(idf)
+                self.diffs_by_idf[idf].append(f"{diff_type} Small Diffs")
 
         if entry.table_diffs:
             if entry.table_diffs.big_diff_count > 0:
                 has_diffs = True
-                this_file_diffs.append(f"Table Big Diffs")
-                self.diffs_by_type[f"Table Big Diffs"].append(idf)
+                this_file_diffs.append("Table Big Diffs")
+                self.diffs_by_type["Table Big Diffs"].append(idf)
+                self.diffs_by_idf[idf].append("Table Big Diffs")
             elif entry.table_diffs.small_diff_count > 0:
                 has_diffs = True
-                this_file_diffs.append(f"Table Small Diffs")
-                self.diffs_by_type[f"Table Small Diffs"].append(idf)
+                this_file_diffs.append("Table Small Diffs")
+                self.diffs_by_type["Table Small Diffs"].append(idf)
+                self.diffs_by_idf[idf].append("Table Small Diffs")
             if entry.table_diffs.string_diff_count > 1:  # There's always one...the time stamp
                 has_diffs = True
-                this_file_diffs.append(f"Table String Diffs")
-                self.diffs_by_type[f"Table String Diffs"].append(idf)
+                this_file_diffs.append("Table String Diffs")
+                self.diffs_by_type["Table String Diffs"].append(idf)
+                self.diffs_by_idf[idf].append("Table String Diffs")
 
         return entry, has_diffs
 
@@ -212,12 +224,13 @@ class RegressionManager:
  </body>
 </html>"""
 
-    @staticmethod
-    def bundle_root_index_html(header_info: list[str], no_diffs: list[str], diffs: list[str]) -> str:
+    def bundle_root_index_html(self, header_info: list[str], no_diffs: list[str], diffs: list[str]) -> str:
+        # set up header table
         header_content = ""
         for hi in header_info:
             header_content += f"""<li class="list-group-item">{hi}</li>\n"""
-        # gather some plural "s" as needed and form up the html entries
+
+        # set up diff summary listings
         num_no_diff = len(no_diffs)
         nds = 's' if num_no_diff == 0 or num_no_diff > 1 else ''
         no_diff_content = ""
@@ -228,6 +241,61 @@ class RegressionManager:
         diff_content = ""
         for d in diffs:
             diff_content += f"""<a href="{d}/index.html" class="list-group-item list-group-item-action">{d}</a>\n"""
+
+        # set up diff type listing
+        diff_type_keys = self.diffs_by_type.keys()
+        num_diff_types = len(diff_type_keys)
+        dt = 's' if num_diff_types == 0 or num_diff_types > 1 else ''
+        diff_type_content = ""
+        if num_diff_types > 0:
+            for k in diff_type_keys:
+                nice_type_key = k.lower().replace(' ', '')
+                diffs_this_type = self.diffs_by_type[k]
+                num_files_this_type = len(diffs_this_type)
+                dtt = 's' if num_diff_types == 0 or num_diff_types > 1 else ''
+                this_diff_type_list = ""
+                for idf in diffs_this_type:
+                    this_diff_type_list += f"""<a href="{idf}/index.html" class="list-group-item list-group-item-action">{idf}</a>\n"""
+                diff_type_content += f"""
+   <div class="panel-group">
+    <div class="panel panel-default">
+     <div class="panel-heading">
+      <h4 class="panel-title">
+       <a data-toggle="collapse" href="#{nice_type_key}">{k}: {num_files_this_type} File{dtt}</a>
+      </h4>
+     </div>
+     <div id="{nice_type_key}" class="panel-collapse collapse">
+      <div class="panel-body">
+       <ul class="list-group">
+{this_diff_type_list}
+       </ul>
+      </div>
+     </div>
+    </div>
+   </div>"""
+
+        # set up runtime results table
+        run_time_rows_text = ""
+        sum_base_seconds = 0
+        sum_branch_seconds = 0
+        for idf, summary in self.summary_results.items():
+            case_1_success = summary.simulation_status_case1 == EndErrSummary.STATUS_SUCCESS
+            case_2_success = summary.simulation_status_case2 == EndErrSummary.STATUS_SUCCESS
+            if case_1_success:
+                base_time = summary.run_time_seconds_case1
+            else:
+                base_time = "N/A"
+            if case_1_success:
+                branch_time = summary.run_time_seconds_case2
+            else:
+                branch_time = "N/A"
+            if case_1_success and case_2_success:
+                sum_base_seconds += base_time
+                sum_branch_seconds += branch_time
+
+            run_time_rows_text += f"""<tr><td><a href='{idf}/index.html'>{idf}</a></td><td>{base_time}</td><td>{branch_time}</td></tr>"""
+        run_time_rows_text += f"""<tr><td>Runtime Total (Successes)</td><td>{sum_base_seconds:.1f}</td><td>{sum_branch_seconds:.1f}</td></tr>"""
+
         return f"""
 <!doctype html>
 <html>
@@ -238,58 +306,115 @@ class RegressionManager:
   <script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
   <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
  </head>
- <body><div class="container-fluid">
-  <div class="panel-group" id="accordion_header">
-   <div class="panel panel-default">
-    <div class="panel-heading">
-     <h4 class="panel-title">
-      <a data-toggle="collapse" data-parent="#accordion_header" href="#header">Header Metadata</a>
-     </h4>
-    </div>
-    <div id="header" class="panel-collapse collapse in">
-     <div class="panel-body">
-      <ul class="list-group">
-       {header_content}
-      </ul>
-     </div>
-    </div>
-   </div>
-  </div>
+ <body>
+  <div class="container-fluid">
+ 
+   <h1>EnergyPlus Regressions</h1>
   
-  <div class="panel-group">
-   <div class="panel panel-default">
-    <div class="panel-heading">
-     <h4 class="panel-title">
-      <a data-toggle="collapse" href="#nodiffs">{num_no_diff} File{nds} with No Diffs</a>
-     </h4>
-    </div>
-    <div id="nodiffs" class="panel-collapse collapse">
-     <div class="panel-body">
-      <ul class="list-group">
-       {no_diff_content}
-      </ul>
+   <div class="panel-group" id="accordion_header">
+    <div class="panel panel-default">
+     <div class="panel-heading">
+      <h4 class="panel-title">
+       <a data-toggle="collapse" data-parent="#accordion_header" href="#header">Header Information</a>
+      </h4>
+     </div>
+     <div id="header" class="panel-collapse collapse">
+      <div class="panel-body">
+       <ul class="list-group">
+{header_content}
+       </ul>
+      </div>
      </div>
     </div>
    </div>
-  </div>
+
+   <hr>
   
-  <div class="panel-group">
-   <div class="panel panel-default">
-    <div class="panel-heading">
-     <h4 class="panel-title">
-      <a data-toggle="collapse" href="#diffs">{num_diff} File{ds} with Diffs</a>
-     </h4>
-    </div>
-    <div id="diffs" class="panel-collapse collapse">
-     <div class="panel-body">
-      <ul class="list-group">
-       {diff_content}
-      </ul>
+   <h2>Summary by File</h1>
+   
+   <div class="panel-group">
+    <div class="panel panel-default">
+     <div class="panel-heading">
+      <h4 class="panel-title">
+       <a data-toggle="collapse" href="#no_diffs">{num_no_diff} File{nds} with No Diffs</a>
+      </h4>
+     </div>
+     <div id="no_diffs" class="panel-collapse collapse">
+      <div class="panel-body">
+       <ul class="list-group">
+{no_diff_content}
+       </ul>
+      </div>
      </div>
     </div>
    </div>
+  
+   <div class="panel-group">
+    <div class="panel panel-default">
+     <div class="panel-heading">
+      <h4 class="panel-title">
+       <a data-toggle="collapse" href="#diffs">{num_diff} File{ds} with Diffs</a>
+      </h4>
+     </div>
+     <div id="diffs" class="panel-collapse collapse">
+      <div class="panel-body">
+       <ul class="list-group">
+{diff_content}
+       </ul>
+      </div>
+     </div>
+    </div>
+   </div>
+ 
+   <hr>
+  
+   <h2>Summary by Diff Type</h1>
+   
+   <div class="panel-group">
+    <div class="panel panel-default">
+     <div class="panel-heading">
+      <h4 class="panel-title">
+       <a data-toggle="collapse" href="#by_diff_type">{num_diff_types} Diff Type{dt} Encountered</a>
+      </h4>
+     </div>
+     <div id="by_diff_type" class="panel-collapse collapse">
+      <div class="panel-body">
+       <ul class="list-group">
+{diff_type_content}
+       </ul>
+      </div>
+     </div>
+    </div>
+   </div>
+  
+   <hr>
+  
+   <h2>Run Times</h2>
+  
+   <div class="panel-group">
+    <div class="panel panel-default">
+     <div class="panel-heading">
+      <h4 class="panel-title">
+       <a data-toggle="collapse" href="#run_times">Runtime Results Table</a>
+      </h4>
+     </div>
+     <div id="run_times" class="panel-collapse collapse">
+      <div class="panel-body">
+       <table class='table table-hover'>
+        <tr>
+         <th>Filename</th>
+         <th>Base Case Runtime (seconds)</th>
+         <th>Branch Case Runtime (seconds)</th>
+        </tr>
+{run_time_rows_text}
+       </table>
+      </div>
+     </div>
+    </div>
+   </div>
+   
   </div>
- </div></body>
+ </body>
 </html>
 """
 
@@ -313,6 +438,8 @@ class RegressionManager:
                 potential_diff_files = baseline.glob("*.*.*")  # TODO: Could try to get this from the regression tool
                 target_dir_for_this_file_diffs = bundle_root / baseline.name
                 if potential_diff_files:
+                    if target_dir_for_this_file_diffs.exists():
+                        rmtree(target_dir_for_this_file_diffs)
                     target_dir_for_this_file_diffs.mkdir()
                     index_contents_this_file = ""
                     for potential_diff_file in potential_diff_files:
@@ -331,27 +458,31 @@ class RegressionManager:
                     index_this_file = self.single_test_case_html(index_contents_this_file)
                     index_file.write_text(index_this_file)
                 so_far = ' Diffs! ' if any_diffs else 'No diffs'
-                print(f"Diff status so far: {so_far}, this file HAZ DIFFS: {baseline.name}")
+                print(f"Diff status so far: {so_far}. This file HAZ DIFFS: {baseline.name}")
             else:
                 root_index_files_no_diff.append(baseline.name)
                 so_far = ' Diffs! ' if any_diffs else 'No diffs'
-                print(f"Diff status so far: {so_far}, this file has no diffs: {baseline.name}")
+                print(f"Diff status so far: {so_far}. This file has no diffs: {baseline.name}")
+        meta_data = [
+            f"Regression time stamp in UTC: {datetime.now(UTC)}",
+            f"Regression time stamp in Central Time: {datetime.now(ZoneInfo('America/Chicago'))}",
+            f"Number of input files evaluated: {self.num_idf_inspected}",
+        ]
         bundle_root_index_file_path = bundle_root / 'index.html'
         bundle_root_index_content = self.bundle_root_index_html(
-            ['hello', 'world'], root_index_files_no_diff, root_index_files_diffs
+            meta_data, root_index_files_no_diff, root_index_files_diffs
         )
         bundle_root_index_file_path.write_text(bundle_root_index_content)
-
-            # print(f"*** Regressions for file {baseline.name}: {diffs=}")
-            # print(f"{json.dumps(entry.to_dict(), indent=4)}\n")
-            # if not any_diffs:
-            #     print(f"*** No regressions or failures found for {baseline.name}\n")
+        print()
+        print(f"* Files with Diffs *:\n{"\n ".join(root_index_files_diffs)}\n")
+        print(f"* Diffs by File *:\n{json.dumps(self.diffs_by_idf, indent=2)}\n")
+        print(f"* Diffs by Type *:\n{json.dumps(self.diffs_by_type, indent=2)}\n")
         return any_diffs
 
 
 if __name__ == "__main__":  # pragma: no cover - testing function, not the __main__ entry point
 
-    if len(sys.argv) < 4:
+    if len(sys.argv) != 4:
         print("syntax: %s base_dir mod_dir regression_dir" % sys.argv[0])
         sys.exit(1)
     arg_base_dir = Path(sys.argv[1])
