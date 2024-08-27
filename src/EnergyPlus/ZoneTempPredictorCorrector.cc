@@ -2011,10 +2011,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                     "{}={} invalid {}=\"{}\" not found.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
                             ErrorsFound = true;
                         }
-                    }
-
-                    // check validity of fixed radiative fraction
-                    if (Item == 1) {
+                        // check validity of fixed radiative fraction
                         if ((TempControlledZone(TempControlledZoneNum).FixedRadiativeFraction < 0.0) &&
                             (!(TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled))) {
                             ShowSevereError(state,
@@ -2025,8 +2022,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                    rNumericArgs(1)));
                             ErrorsFound = true;
                         }
-                    }
-                    if (Item == 1) {
                         if ((TempControlledZone(TempControlledZoneNum).FixedRadiativeFraction >= 0.9) &&
                             (!(TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled))) {
                             ShowSevereError(state,
@@ -2037,10 +2032,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                    rNumericArgs(1)));
                             ErrorsFound = true;
                         }
-                    }
-
-                    // check schedule min max.
-                    if (Item == 1) {
+                        // check schedule min max.
                         if (TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled) {
                             ValidRadFractSched = CheckScheduleValueMinMax(
                                 state, TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9);
@@ -7312,8 +7304,10 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         }
         }
         ZoneSetPoint = thisTempZoneThermostatSetPoint;
-        if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
-        if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
+        if (RAFNFrac > 0.0) {
+            LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
+            LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
+        }
 
         if (thisZone.HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
             LoadToCoolingSetPoint = this->tempDepLoad * thisZone.AdjustedReturnTempByITE - this->tempIndLoad;
@@ -7398,8 +7392,10 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
             assert(false);
         }
         }
-        if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
-        if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
+        if (RAFNFrac > 0.0) { // several of these inside the switch/case ??
+            LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
+            LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
+        }
 
         if (thisZone.HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
             LoadToCoolingSetPoint = this->tempDepLoad * thisZone.AdjustedReturnTempByITE - this->tempIndLoad;
