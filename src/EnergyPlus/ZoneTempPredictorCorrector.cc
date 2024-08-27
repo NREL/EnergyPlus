@@ -2761,7 +2761,6 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
     static constexpr std::string_view RoutineName("InitZoneAirSetpoints: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &ZoneList = state.dataHeatBal->ZoneList;
     auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone;
     auto &TempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint;
     auto &TempControlType = state.dataHeatBalFanSys->TempControlType;
@@ -2952,66 +2951,68 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
 
         // CurrentModuleObject='ZoneList'
         for (int Loop = 1; Loop <= state.dataHeatBal->NumOfZoneLists; ++Loop) {
+            auto &zoneList = state.dataHeatBal->ZoneList(Loop);
             SetupOutputVariable(state,
                                 "Zone List Sensible Heating Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->ZoneListSNLoadHeatEnergy(Loop),
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Sum,
-                                ZoneList(Loop).Name);
+                                zoneList.Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Cooling Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->ZoneListSNLoadCoolEnergy(Loop),
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Sum,
-                                ZoneList(Loop).Name);
+                                zoneList.Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Heating Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->ZoneListSNLoadHeatRate(Loop),
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                ZoneList(Loop).Name);
+                                zoneList.Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Cooling Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->ZoneListSNLoadCoolRate(Loop),
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                ZoneList(Loop).Name);
+                                zoneList.Name);
         } // Loop
 
         // CurrentModuleObject='ZoneGroup'
         for (int Loop = 1; Loop <= state.dataHeatBal->NumOfZoneGroups; ++Loop) {
+            auto &zoneGroup = state.dataHeatBal->ZoneGroup(Loop);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Heating Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->ZoneGroupSNLoadHeatEnergy(Loop),
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Sum,
-                                state.dataHeatBal->ZoneGroup(Loop).Name);
+                                zoneGroup.Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Cooling Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->ZoneGroupSNLoadCoolEnergy(Loop),
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Sum,
-                                state.dataHeatBal->ZoneGroup(Loop).Name);
+                                zoneGroup.Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Heating Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->ZoneGroupSNLoadHeatRate(Loop),
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                state.dataHeatBal->ZoneGroup(Loop).Name);
+                                zoneGroup.Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Cooling Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->ZoneGroupSNLoadCoolRate(Loop),
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                state.dataHeatBal->ZoneGroup(Loop).Name);
+                                zoneGroup.Name);
         } // Loop
 
         state.dataZoneTempPredictorCorrector->InitZoneAirSetPointsOneTimeFlag = false;
