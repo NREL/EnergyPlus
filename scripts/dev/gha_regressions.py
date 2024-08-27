@@ -418,6 +418,18 @@ class RegressionManager:
 </html>
 """
 
+    def generate_markdown_summary(self, bundle_root: Path):
+        diff_lines = ""
+        for diff_type, idfs in self.diffs_by_type.items():
+            diff_lines += f"  - {diff_type}: {len(idfs)}\n"
+        content = f"""
+<details>
+  <summary>Regression Summary - Download Build Artifact for Full Details</summary>
+
+{diff_lines}
+</details>"""
+        (bundle_root / 'summary.md').write_text(content)
+
     def check_all_regressions(self, base_testfiles: Path, mod_testfiles: Path, bundle_root: Path) -> bool:
         any_diffs = False
         root_index_files_no_diff = []
@@ -477,6 +489,8 @@ class RegressionManager:
         print(f"* Files with Diffs *:\n{"\n ".join(root_index_files_diffs)}\n")
         print(f"* Diffs by File *:\n{json.dumps(self.diffs_by_idf, indent=2)}\n")
         print(f"* Diffs by Type *:\n{json.dumps(self.diffs_by_type, indent=2)}\n")
+        if any_diffs:
+            self.generate_markdown_summary(bundle_root)
         return any_diffs
 
 
