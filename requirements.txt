@@ -3,4 +3,3 @@ wheel
 
 # requirements for the CI regression testing scripts
 energyplus-regressions
-boto3

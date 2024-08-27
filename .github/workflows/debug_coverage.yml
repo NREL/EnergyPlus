@@ -83,9 +83,8 @@ jobs:
       run: echo "$(cat ${{ github.workspace }}/build/cover.md)" >> $GITHUB_STEP_SUMMARY
 
     - uses: actions/upload-artifact@v4
-      id: upload_regressions
       with:
         name: "coverage_results"
         path: "${{ github.workspace }}/build/lcov-html"
 
-    # TODO: Check coverage amount and decide if we fail or not
+    # TODO: Check coverage amount and decide if we fail or not, could also comment on PR if low
