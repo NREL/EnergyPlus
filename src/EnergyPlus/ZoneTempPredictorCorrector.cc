@@ -2842,7 +2842,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             FirstSurfFlag = true;
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
                     if (FirstSurfFlag) {
                         TRefFlag = state.dataSurface->SurfTAirRef(SurfNum);
@@ -3318,7 +3318,7 @@ void PredictSystemLoads(EnergyPlusData &state,
         for (int RelativeZoneNum = 1; RelativeZoneNum <= state.dataZoneTempPredictorCorrector->NumStageCtrZone; ++RelativeZoneNum) {
             auto &thisStageControlZone = state.dataZoneCtrls->StageControlledZone(RelativeZoneNum);
             int ActualZoneNum = thisStageControlZone.ActualZoneNum;
-            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ActualZoneNum);
+            auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ActualZoneNum);
             auto &thisZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum);
             auto &thisZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum);
             Real64 ZoneT = thisZoneHB.MAT; // Zone temperature at previous time step
@@ -3404,7 +3404,7 @@ void PredictSystemLoads(EnergyPlusData &state,
                     thisTempControlledZone.CoolModeLastSave = thisTempControlledZone.CoolModeLast;
                 }
                 auto &thisTempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(thisTempControlledZone.ActualZoneNum);
-                auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisTempControlledZone.ActualZoneNum);
+                auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisTempControlledZone.ActualZoneNum);
                 auto &thisZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(thisTempControlledZone.ActualZoneNum);
                 auto &thisZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(thisTempControlledZone.ActualZoneNum);
 
@@ -4223,7 +4223,7 @@ Real64 correctZoneAirTemps(EnergyPlusData &state,
             } else {
                 // If no SpaceHB, then set space temps to match zone temps
                 if (state.dataHeatBal->space(spaceNum).IsControlled) {
-                    auto &thisZoneNode = state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber);
+                    auto const &thisZoneNode = state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber);
                     auto &thisSpaceNode = state.dataLoopNodes->Node(state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber);
                     thisSpaceNode.Temp = thisZoneNode.Temp;
                     thisSpaceNode.HumRat = thisZoneNode.HumRat;
@@ -4365,7 +4365,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
             }
             state.dataHeatBalFanSys->LoadCorrectionFactor(zoneNum) = 1.0;
         } else {
-            auto &thisAirModel = state.dataRoomAir->AirModel(zoneNum);
+            auto const &thisAirModel = state.dataRoomAir->AirModel(zoneNum);
             if ((thisAirModel.AirModel == RoomAir::RoomAirModel::Mixing) || (!thisAirModel.SimAirModel)) {
                 // Fully mixed
                 thisSystemNode.Temp = this->ZT;
@@ -4839,7 +4839,7 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
         auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
         // Calculate moisture flow rate into each zone
         for (int NodeNum = 1; NodeNum <= zoneEquipConfig.NumInletNodes; ++NodeNum) {
-            auto &inletNode = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(NodeNum));
+            auto const &inletNode = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(NodeNum));
             MoistureMassFlowRate += (inletNode.MassFlowRate * inletNode.HumRat) / ZoneMult;
             ZoneMassFlowRate += inletNode.MassFlowRate / ZoneMult;
         }
@@ -4849,14 +4849,14 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
         int ZoneRetPlenumNum = zone.PlenumCondNum;
         auto &zoneRetPlenCond = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum);
         for (int NodeNum = 1; NodeNum <= zoneRetPlenCond.NumInletNodes; ++NodeNum) {
-            auto &inletNode = state.dataLoopNodes->Node(zoneRetPlenCond.InletNode(NodeNum));
+            auto const &inletNode = state.dataLoopNodes->Node(zoneRetPlenCond.InletNode(NodeNum));
             MoistureMassFlowRate += (inletNode.MassFlowRate * inletNode.HumRat) / ZoneMult;
             ZoneMassFlowRate += inletNode.MassFlowRate / ZoneMult;
         }
         // add in the leak flow
         for (int ADUListIndex = 1; ADUListIndex <= zoneRetPlenCond.NumADUs; ++ADUListIndex) {
             int ADUNum = zoneRetPlenCond.ADUIndex(ADUListIndex);
-            auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(ADUNum);
+            auto const &airDistUnit = state.dataDefineEquipment->AirDistUnit(ADUNum);
             if (airDistUnit.UpStreamLeak) {
                 int ADUInNode = airDistUnit.InletNodeNum;
                 MoistureMassFlowRate += (airDistUnit.MassFlowRateUpStrLk * state.dataLoopNodes->Node(ADUInNode).HumRat) / ZoneMult;
@@ -4871,7 +4871,7 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
 
     } else if (ZoneSupPlenumAirFlag) {
         int ZoneSupPlenumNum = zone.PlenumCondNum;
-        auto &inletNode = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode);
+        auto const &inletNode = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode);
         MoistureMassFlowRate += (inletNode.MassFlowRate * inletNode.HumRat) / ZoneMult;
         ZoneMassFlowRate += inletNode.MassFlowRate / ZoneMult;
     }
@@ -4896,7 +4896,7 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
     if (state.afn->multizone_always_simulated ||
         (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
          state.afn->AirflowNetworkFanActivated)) {
-        auto &exchangeData = state.afn->exchangeData(zoneNum);
+        auto const &exchangeData = state.afn->exchangeData(zoneNum);
         // Multizone airflow calculated in AirflowNetwork
         B = (LatentGain / H2OHtOfVap) + (exchangeData.SumMHrW + exchangeData.SumMMHrW) + (MoistureMassFlowRate) + this->SumHmARaW;
         A = ZoneMassFlowRate + exchangeData.SumMHr + exchangeData.SumMMHr + this->SumHmARa;
@@ -5562,7 +5562,7 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
     if (state.afn->multizone_always_simulated ||
         (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
          state.afn->AirflowNetworkFanActivated)) {
-        auto &exchangeData = state.afn->exchangeData(zoneNum);
+        auto const &exchangeData = state.afn->exchangeData(zoneNum);
         this->SumMCp = exchangeData.SumMCp + exchangeData.SumMVCp + exchangeData.SumMMCp;
         this->SumMCpT = exchangeData.SumMCpT + exchangeData.SumMVCpT + exchangeData.SumMMCpT;
     }
@@ -5898,7 +5898,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
 
     // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
     for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+        auto const &thisSpace = state.dataHeatBal->space(spaceNum);
         for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
 
             Real64 Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
@@ -6782,7 +6782,7 @@ void OverrideAirSetPointsforEMSCntrl(EnergyPlusData &state)
     auto &ZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi;
 
     for (int Loop = 1; Loop <= state.dataZoneCtrls->NumTempControlledZones; ++Loop) {
-        auto &tempControlledZone = state.dataZoneCtrls->TempControlledZone(Loop);
+        auto const &tempControlledZone = state.dataZoneCtrls->TempControlledZone(Loop);
         if (tempControlledZone.EMSOverrideHeatingSetPointOn) {
             int ZoneNum = tempControlledZone.ActualZoneNum;
 
