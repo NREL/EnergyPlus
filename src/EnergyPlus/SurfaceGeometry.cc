@@ -12339,6 +12339,7 @@ namespace SurfaceGeometry {
             surfacenotused.dimension(NFaces, 0);
 
             for (int SurfNum = thisZone.AllSurfaceFirst; SurfNum <= thisZone.AllSurfaceLast; ++SurfNum) {
+                assert(SurfNum > 0);
                 auto &thisSurface = state.dataSurface->Surface(SurfNum);
                 // Only include Base Surfaces in Calc.
 
