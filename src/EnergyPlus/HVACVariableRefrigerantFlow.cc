@@ -11702,6 +11702,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         }
 
         // Key outputs of this subroutine
+        Ncomp *= CyclingRatio;
+        Q_c_OU *= CyclingRatio;
         this->CompActSpeed = max(CompSpdActual, 0.0);
         this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter;
         this->OUFanPower = this->RatedOUFanPower;
@@ -14196,7 +14198,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     Real64 RefTSat;                        // Saturated temperature of the refrigerant [C]
     Real64 RefPLow;                        // Low Pressure Value for Ps (>0.0) [Pa]
     Real64 RefPHigh;                       // High Pressure Value for Ps (max in tables) [Pa]
-    Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C}
+    Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C]
     Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
     Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
@@ -14306,9 +14308,9 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                     CyclingRatio = 1.0;
                 }
 
-                Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction) * CyclingRatio;
+                Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
                 // Cap_Eva1 is the updated compressor min speed capacity
-                OUEvapHeatExtract = Cap_Eva1 * CyclingRatio;
+                OUEvapHeatExtract = Cap_Eva1;
                 this->EvaporatingTemp = T_suction;
                 this->CondensingTemp = T_discharge;
                 this->IUCondensingTemp = T_discharge;
