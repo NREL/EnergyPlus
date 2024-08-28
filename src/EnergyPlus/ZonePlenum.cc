@@ -1186,14 +1186,12 @@ void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, b
     Real64 constexpr FlowRateToler(0.01); // Tolerance for mass flow rate convergence (in kg/s)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int OutletNode;
     int InletNode;
     int ZoneNode;
     int NodeIndex;
 
     auto &Node(state.dataLoopNodes->Node);
 
-    OutletNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletNode(1);
     InletNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletNode;
     ZoneNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
 
@@ -1201,7 +1199,7 @@ void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, b
     if (FirstCall) {
         // Set the outlet nodes for properties that just pass through and not used
         for (NodeIndex = 1; NodeIndex <= state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).NumOutletNodes; ++NodeIndex) {
-            OutletNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletNode(NodeIndex);
+            int OutletNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletNode(NodeIndex);
             Node(OutletNode).Temp = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletTemp(NodeIndex);
             Node(OutletNode).HumRat = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletHumRat(NodeIndex);
             Node(OutletNode).Enthalpy = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletEnthalpy(NodeIndex);
