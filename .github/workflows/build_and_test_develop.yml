@@ -4,11 +4,14 @@ on:
   push:
     branches: [ develop ]  # run this on all commits to the develop branch
 
+defaults:
+  run:
+    shell: bash
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   FC: gfortran-13
   Python_REQUIRED_VERSION: 3.12.3  # 3.12.2 not available on Ubuntu 24 GHA
-  shell: bash
 
 jobs:
   build_and_test:
@@ -101,4 +104,4 @@ jobs:
 
     - name: Test
       working-directory: ./build
-      run: ctest -C Release -E Basement -j 3
+      run: ctest -C Release -E Basement -j ${{ matrix.nproc }}

@@ -3,9 +3,6 @@ name: clang-format
 on:
   push:
     branches: [ develop ]
-    # Sequence of patterns matched against refs/tags
-    tags:
-      - '*'
   pull_request:
     branches: [ develop ]
 
