@@ -1085,12 +1085,9 @@ void UpdateAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto const &zoneRetPlenCond = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum);
-    int OutletNode = zoneRetPlenCond.OutletNode;
-    auto &outletNode = state.dataLoopNodes->Node(OutletNode);
-    int InletNode = zoneRetPlenCond.InletNode(1);
-    auto const &inletNode = state.dataLoopNodes->Node(InletNode);
-    int ZoneNode = zoneRetPlenCond.ZoneNodeNum;
-    auto &zoneNode = state.dataLoopNodes->Node(ZoneNode);
+    auto &outletNode = state.dataLoopNodes->Node(zoneRetPlenCond.OutletNode);
+    auto const &inletNode = state.dataLoopNodes->Node(zoneRetPlenCond.InletNode(1));
+    auto &zoneNode = state.dataLoopNodes->Node(zoneRetPlenCond.ZoneNodeNum);
 
     // Set the outlet air nodes of the ZonePlenum
     outletNode.MassFlowRate = zoneRetPlenCond.OutletMassFlowRate;
