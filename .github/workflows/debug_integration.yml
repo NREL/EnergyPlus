@@ -56,7 +56,7 @@ jobs:
 
     - name: Build
       working-directory: ./build
-      run: cmake --build . -j 4
+      run: cmake --build . -j 4 --target energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
 
     - name: Run Integration Tests
       working-directory: ./build

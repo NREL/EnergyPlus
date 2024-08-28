@@ -25,7 +25,6 @@ jobs:
           python-arch: x64
           generator: "Unix Makefiles"
           nproc: 3
-          targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
           run_regressions: false
         - os: macos-14
           macos_dev_target: 13.0
@@ -33,28 +32,24 @@ jobs:
           python-arch: arm64
           generator: "Unix Makefiles"
           nproc: 3
-          targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
           run_regressions: true
         - os: ubuntu-24.04
           arch: x86_64
           python-arch: x64
           generator: "Unix Makefiles"
           nproc: 4
-          targets: energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
           run_regressions: true
         - os: windows-2019
           arch: x86_64
           python-arch: x64
           generator: "Visual Studio 16 2019"
           nproc: 4
-          targets: energyplus ExpandObjects_build ReadVars_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
           run_regressions: false
         - os: windows-2022
           arch: x86_64
           python-arch: x64
           generator: "Visual Studio 17 2022"
           nproc: 4
-          targets: energyplus ExpandObjects_build ReadVars_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
           run_regressions: true
 
     steps:
@@ -66,7 +61,7 @@ jobs:
         python-version: ${{ env.Python_REQUIRED_VERSION }}
 
     - name: Install Dependencies for Mac  # gcc13 reinstall may not be needed
-      if: ${{ runner.os == 'macOS' }}
+      if: runner.os == 'macOS'
       run: |
         brew update
         brew reinstall gcc@13
@@ -74,7 +69,7 @@ jobs:
         echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
 
     - name: Install Dependencies for Linux
-      if: ${{ runner.os == 'Linux' }}
+      if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
@@ -86,18 +81,18 @@ jobs:
     # BUILD AND TEST INTEGRATION FILES ON THE BASELINE BRANCH
 
     - name: Baseline Checkout
-      if: ${{ matrix.run_regressions }}
+      if: matrix.run_regressions
       uses: actions/checkout@v4
       with:
         ref: develop
         path: baseline
 
     - name: Baseline Create Build Directory
-      if: ${{ matrix.run_regressions }}
+      if: matrix.run_regressions
       run: cmake -E make_directory ./baseline/build/
 
     - name: Baseline Configure CMake
-      if: ${{ matrix.run_regressions }}
+      if: matrix.run_regressions
       working-directory: ./baseline/build
       run: >
         cmake 
@@ -115,14 +110,20 @@ jobs:
         -DUSE_OpenMP:BOOL=OFF
         ../
 
-    - name: Baseline Build
-      if: ${{ matrix.run_regressions }}
+    # During baseline builds, just build specific target list so that we don't waste time building the unit test binary
+
+    - name: Baseline Build on Windows
+      if: matrix.run_regressions && runner.os == 'Windows'
       working-directory: ./baseline/build
-      # Building specific target list so that we don't waste time building the unit test binary
-      run: cmake --build . -j ${{ matrix.nproc }} --config Release --target ${{ matrix.targets }}
+      run: cmake --build . -j ${{ matrix.nproc }} --config Release --target energyplus ExpandObjects_build ReadVars_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
+
+    - name: Baseline Build on Mac/Linux
+      if: matrix.run_regressions && runner.os != 'Windows'
+      working-directory: ./baseline/build
+      run: cmake --build . -j ${{ matrix.nproc }} --target energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
 
     - name: Baseline Test
-      if: ${{ matrix.run_regressions }}
+      if: matrix.run_regressions
       working-directory: ./baseline/build
       run: ctest -C Release -E Basement -R integration -j 3  # TODO: Speed up basement so we don't have to skip it.
 
