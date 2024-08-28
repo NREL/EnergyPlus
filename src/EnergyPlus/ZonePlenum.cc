@@ -1162,26 +1162,23 @@ void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, b
     // METHODOLOGY EMPLOYED:
     // Similar to the Zone Splitter component but with interactions to the plenum zone.
 
-    // Using/Aliasing
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr FlowRateToler = 0.01; // Tolerance for mass flow rate convergence (in kg/s)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    int InletNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletNode;
-    auto &inletNode = state.dataLoopNodes->Node(InletNode);
-    int ZoneNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
-    auto &zoneNode = state.dataLoopNodes->Node(ZoneNode);
+    auto const &zoneSupPlenCon = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum);
+    auto &inletNode = state.dataLoopNodes->Node(zoneSupPlenCon.InletNode);
+    auto &zoneNode = state.dataLoopNodes->Node(zoneSupPlenCon.ZoneNodeNum);
 
     // On the FirstCall the State properties are passed through and the mass flows are not dealt with
     if (FirstCall) {
         // Set the outlet nodes for properties that just pass through and not used
-        for (int NodeIndex = 1; NodeIndex <= state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).NumOutletNodes; ++NodeIndex) {
-            int OutletNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletNode(NodeIndex);
+        for (int NodeIndex = 1; NodeIndex <= zoneSupPlenCon.NumOutletNodes; ++NodeIndex) {
+            int OutletNode = zoneSupPlenCon.OutletNode(NodeIndex);
             auto &outletNode = state.dataLoopNodes->Node(OutletNode);
-            outletNode.Temp = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletTemp(NodeIndex);
-            outletNode.HumRat = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletHumRat(NodeIndex);
-            outletNode.Enthalpy = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletEnthalpy(NodeIndex);
+            outletNode.Temp = zoneSupPlenCon.OutletTemp(NodeIndex);
+            outletNode.HumRat = zoneSupPlenCon.OutletHumRat(NodeIndex);
+            outletNode.Enthalpy = zoneSupPlenCon.OutletEnthalpy(NodeIndex);
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 outletNode.CO2 = inletNode.CO2;
             }
@@ -1198,20 +1195,18 @@ void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, b
         }
 
     } else {
-        // The second time through just updates the mass flow conditions back upstream
-        // to the inlet.
-
-        if (std::abs(inletNode.MassFlowRate - state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletMassFlowRate) > FlowRateToler) {
+        // The second time through just updates the mass flow conditions back upstream to the inlet.
+        if (std::abs(inletNode.MassFlowRate - zoneSupPlenCon.InletMassFlowRate) > FlowRateToler) {
             PlenumInletChanged = true;
         }
 
-        inletNode.MassFlowRate = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletMassFlowRate;
-        inletNode.MassFlowRateMaxAvail = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletMassFlowRateMaxAvail;
-        inletNode.MassFlowRateMinAvail = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletMassFlowRateMinAvail;
+        inletNode.MassFlowRate = zoneSupPlenCon.InletMassFlowRate;
+        inletNode.MassFlowRateMaxAvail = zoneSupPlenCon.InletMassFlowRateMaxAvail;
+        inletNode.MassFlowRateMinAvail = zoneSupPlenCon.InletMassFlowRateMinAvail;
 
-        zoneNode.MassFlowRate = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletMassFlowRate;
-        zoneNode.MassFlowRateMaxAvail = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletMassFlowRateMaxAvail;
-        zoneNode.MassFlowRateMinAvail = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletMassFlowRateMinAvail;
+        zoneNode.MassFlowRate = zoneSupPlenCon.InletMassFlowRate;
+        zoneNode.MassFlowRateMaxAvail = zoneSupPlenCon.InletMassFlowRateMaxAvail;
+        zoneNode.MassFlowRateMinAvail = zoneSupPlenCon.InletMassFlowRateMinAvail;
 
     } // For FirstCall
 }
