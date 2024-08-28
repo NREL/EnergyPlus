@@ -658,16 +658,8 @@ void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InletNode;
-    int InducedNode(0);
-    int InletNodeLoop;
     int ZoneNodeNum;
     int NodeNum;
-    int ZonePlenumLoop;
-    int PlenumZoneNum;
-    int ZoneEquipConfigLoop; // Loop number of ZoneEquipConfig derived type
-    int ADUNum;              // air distribution unit index
-    int NumADUsToPlen;       // number of ADUs that might leak to this plenum
-    int ADUsToPlenIndex;     // index of an ADU that might leak to this plenum in the plenum ADU list
 
     // Do the one time initializations
     if (state.dataZonePlenum->InitAirZoneReturnPlenumOneTimeFlag) {
@@ -677,14 +669,14 @@ void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum)
         // plenum conditions, such as plenum temperature and air flow. Also establish and save connections
         // to the Air Distribution Units. This is needed for the simple duct leakage calculation.
 
-        for (ZonePlenumLoop = 1; ZonePlenumLoop <= state.dataZonePlenum->NumZoneReturnPlenums; ++ZonePlenumLoop) {
-            ADUsToPlenIndex = 0;
-            NumADUsToPlen = 0;
+        for (int ZonePlenumLoop = 1; ZonePlenumLoop <= state.dataZonePlenum->NumZoneReturnPlenums; ++ZonePlenumLoop) {
+            int ADUsToPlenIndex = 0;
+            int NumADUsToPlen = 0;
             if (state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).NumInletNodes > 0) {
-                for (InletNodeLoop = 1; InletNodeLoop <= state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).NumInletNodes; ++InletNodeLoop) {
+                for (int InletNodeLoop = 1; InletNodeLoop <= state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).NumInletNodes; ++InletNodeLoop) {
                     InletNode = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).InletNode(InletNodeLoop);
                     // Loop through ZoneEquipConfig's and look for return air node value = InletNode
-                    for (ZoneEquipConfigLoop = 1; ZoneEquipConfigLoop <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigLoop) {
+                    for (int ZoneEquipConfigLoop = 1; ZoneEquipConfigLoop <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigLoop) {
                         if (!state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigLoop).IsControlled) continue;
                         for (int retNode = 1; retNode <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigLoop).NumReturnNodes; ++retNode) {
                             if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigLoop).ReturnNode(retNode) == InletNode) {
@@ -694,7 +686,7 @@ void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum)
                         }
                     }
                     // count the ADUs that can leak to this plenum
-                    for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
+                    for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                         if (state.dataDefineEquipment->AirDistUnit(ADUNum).ZoneEqNum ==
                             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).ZoneEqNum(InletNodeLoop)) {
                             state.dataDefineEquipment->AirDistUnit(ADUNum).RetPlenumNum = ZonePlenumLoop;
@@ -707,7 +699,7 @@ void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum)
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).NumADUs = NumADUsToPlen;
             // fill the list of air distribution units that can leak to this plenum
             if (NumADUsToPlen > 0) {
-                for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
+                for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                     if (state.dataDefineEquipment->AirDistUnit(ADUNum).RetPlenumNum == ZonePlenumLoop) {
                         ++ADUsToPlenIndex;
                         state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).ADUIndex(ADUsToPlenIndex) = ADUNum;
@@ -717,7 +709,7 @@ void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum)
         }
 
         // Check that all ADUs with leakage found a return plenum
-        for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
+        for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
             auto &thisADU(state.dataDefineEquipment->AirDistUnit(ADUNum));
             // TODO: the first half of this IF condition was a duplicated OR, if issues around this code, might want to check the history of this line
             if (thisADU.DownStreamLeak && (thisADU.RetPlenumNum == 0)) {
@@ -739,7 +731,7 @@ void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum)
     // Do the Begin Environment initializations
     if (state.dataZonePlenum->InitAirZoneReturnPlenumEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
-        for (PlenumZoneNum = 1; PlenumZoneNum <= state.dataZonePlenum->NumZoneReturnPlenums; ++PlenumZoneNum) {
+        for (int PlenumZoneNum = 1; PlenumZoneNum <= state.dataZonePlenum->NumZoneReturnPlenums; ++PlenumZoneNum) {
 
             ZoneNodeNum = state.dataZonePlenum->ZoneRetPlenCond(PlenumZoneNum).ZoneNodeNum;
             state.dataLoopNodes->Node(ZoneNodeNum).Temp = 20.0;
@@ -789,7 +781,7 @@ void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum)
     ZoneNodeNum = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum;
     // Set the induced air flow rates and conditions
     for (NodeNum = 1; NodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes; ++NodeNum) {
-        InducedNode = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode(NodeNum);
+        int InducedNode = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode(NodeNum);
         state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRate(NodeNum) = state.dataLoopNodes->Node(InducedNode).MassFlowRate;
         state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRateMaxAvail(NodeNum) =
             state.dataLoopNodes->Node(InducedNode).MassFlowRateMaxAvail;
@@ -1186,19 +1178,15 @@ void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, b
     Real64 constexpr FlowRateToler(0.01); // Tolerance for mass flow rate convergence (in kg/s)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;
-    int ZoneNode;
-    int NodeIndex;
-
     auto &Node(state.dataLoopNodes->Node);
 
-    InletNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletNode;
-    ZoneNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
+    int InletNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletNode;
+    int ZoneNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
 
     // On the FirstCall the State properties are passed through and the mass flows are not dealt with
     if (FirstCall) {
         // Set the outlet nodes for properties that just pass through and not used
-        for (NodeIndex = 1; NodeIndex <= state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).NumOutletNodes; ++NodeIndex) {
+        for (int NodeIndex = 1; NodeIndex <= state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).NumOutletNodes; ++NodeIndex) {
             int OutletNode = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletNode(NodeIndex);
             Node(OutletNode).Temp = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletTemp(NodeIndex);
             Node(OutletNode).HumRat = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletHumRat(NodeIndex);
