@@ -2625,10 +2625,14 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
                                                             Ncomp,
                                                             CyclingRatio);
 
-    EXPECT_NEAR(0.30, CyclingRatio, 0.01);
-    EXPECT_NEAR(2915, OUEvapHeatExtract, 1);
+    EXPECT_NEAR(0.20, CyclingRatio, 0.01);
+    Real64 x = T_discharge;
+    Real64 y = -5; // in low load modification
+    Real64 CurveValueEvap = 3.19E-01 -1.26E-03 * x -2.15E-05  * x * x + 1.20E-02 * y + 1.05E-04 * y * y -8.66E-05 * x * y;
+    Real64 CurveValuePower = 8.79E-02  -1.72E-04 * x + 6.93E-05   * x * x -3.38E-05 * y  -8.10E-06 * y * y -1.04E-05 * x * y;
+    EXPECT_NEAR(CurveValueEvap * state->dataHVACVarRefFlow->VRF(1).RatedEvapCapacity, OUEvapHeatExtract, 1);
     EXPECT_NEAR(1500, CompSpdActual, 1);
-    EXPECT_NEAR(630, Ncomp, 1);
+    EXPECT_NEAR(CurveValuePower * state->dataHVACVarRefFlow->VRF(1).RatedCompPower, Ncomp, 1);
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(1).VRFTUInletNodeNum).MassFlowRate, 0.0);
 }
 }
