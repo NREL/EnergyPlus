@@ -52,37 +52,12 @@ jobs:
         -DDOCUMENTATION_BUILD:STRING=DoNotBuild
         -DENABLE_OPENMP:BOOL=OFF
         -DUSE_OpenMP:BOOL=OFF
-        -DENABLE_COVERAGE:BOOL=ON
         ../
 
     - name: Build
       working-directory: ./build
       run: cmake --build . -j 4
 
-    - name: Run Unit Tests
+    - name: Run Integration Tests
       working-directory: ./build
-      run: ctest -E "integration.*"
-
-    - name: Generate Raw Unit Test Coverage Results
-      working-directory: ./build
-      run: lcov -c -d . -o ./lcov.output --no-external --base-directory ../src/EnergyPlus/
-
-    - name: Generate Filtered Unit Test Coverage Results
-      working-directory: ./build
-      run: lcov -r ./lcov.output -o lcov.output.filtered
-
-    - name: Generate HTML Unit Test Coverage Results
-      working-directory: ./build
-      run: genhtml ./lcov.output.filtered -o lcov-html --demangle-cpp --function-coverage | tee cover.txt
-
-    - name: Process Unit Test Coverage Summary
-      working-directory: ./build
-      run: python ${{ github.workspace }}/scripts/dev/gha_coverage_summary.py
-
-    - name: Generate Unit Test Artifact Summary
-      run: echo "$(cat ${{ github.workspace }}/build/cover.md)" >> $GITHUB_STEP_SUMMARY
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: "unit_test_coverage_results"
-        path: "${{ github.workspace }}/build/lcov-html"
+      run: ctest -R "integration.*"
