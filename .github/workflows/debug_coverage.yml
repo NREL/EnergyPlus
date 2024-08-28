@@ -69,7 +69,7 @@ jobs:
 
     - name: Generate Filtered Unit Test Coverage Results
       working-directory: ./build
-      run: lcov -r ./lcov.output -o lcov.output.filtered
+      run: lcov -r ./lcov.output "${{ github.workspace }}/build/*" -o lcov.output.filtered
 
     - name: Generate HTML Unit Test Coverage Results
       working-directory: ./build
