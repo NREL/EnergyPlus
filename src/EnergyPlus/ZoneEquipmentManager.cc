@@ -2046,22 +2046,22 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
 
         // Other
         if ((zoneCFS.HeatDDNum != 0) && (zoneCFS.HeatDDNum != spaceCFS.HeatDDNum)) {
-            zoneCFS.HeatDesDay = "n/a";
+            zoneCFS.HeatDesDay = "N/A";
             zoneCFS.HeatDDNum = 0;
             zoneCFS.cHeatDDDate = "";
         }
         if ((zoneCFS.HeatNoDOASDDNum != 0) && (zoneCFS.HeatNoDOASDDNum != spaceCFS.HeatNoDOASDDNum)) {
             zoneCFS.HeatNoDOASDDNum = 0;
-            zoneCFS.HeatNoDOASDesDay = "n/a";
+            zoneCFS.HeatNoDOASDesDay = "N/A";
         }
         if ((zoneCFS.CoolDDNum != 0) && (zoneCFS.CoolDDNum != spaceCFS.CoolDDNum)) {
-            zoneCFS.CoolDesDay = "n/a";
+            zoneCFS.CoolDesDay = "N/A";
             zoneCFS.CoolDDNum = 0;
             zoneCFS.cCoolDDDate = "";
         }
         if ((zoneCFS.CoolNoDOASDDNum != 0) && (zoneCFS.CoolNoDOASDDNum != spaceCFS.CoolNoDOASDDNum)) {
             zoneCFS.CoolNoDOASDDNum = 0;
-            zoneCFS.CoolNoDOASDesDay = "n/a";
+            zoneCFS.CoolNoDOASDesDay = "N/A";
         }
 
         if (zoneCFS.zoneLatentSizing) {
@@ -2089,22 +2089,22 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
 
             // Other
             if ((zoneCFS.LatentHeatDDNum != 0) && (zoneCFS.LatentHeatDDNum != spaceCFS.LatentHeatDDNum)) {
-                zoneCFS.LatHeatDesDay = "n/a";
+                zoneCFS.LatHeatDesDay = "N/A";
                 zoneCFS.cLatentHeatDDDate = "";
                 zoneCFS.LatentHeatDDNum = 0;
             }
             if ((zoneCFS.LatentHeatNoDOASDDNum != 0) && (zoneCFS.LatentHeatNoDOASDDNum != spaceCFS.LatentHeatNoDOASDDNum)) {
                 zoneCFS.LatentHeatNoDOASDDNum = 0;
-                zoneCFS.LatHeatNoDOASDesDay = "n/a";
+                zoneCFS.LatHeatNoDOASDesDay = "N/A";
             }
             if ((zoneCFS.LatentCoolDDNum != 0) && (zoneCFS.LatentCoolDDNum != spaceCFS.LatentCoolDDNum)) {
-                zoneCFS.LatCoolDesDay = "n/a";
+                zoneCFS.LatCoolDesDay = "N/A";
                 zoneCFS.cLatentCoolDDDate = "";
                 zoneCFS.LatentCoolDDNum = 0;
             }
             if ((zoneCFS.LatentCoolNoDOASDDNum != 0) && (zoneCFS.LatentCoolNoDOASDDNum != spaceCFS.LatentCoolNoDOASDDNum)) {
                 zoneCFS.LatentCoolNoDOASDDNum = 0;
-                zoneCFS.LatCoolNoDOASDesDay = "n/a";
+                zoneCFS.LatCoolNoDOASDesDay = "N/A";
             }
 
             // Time-series sums
@@ -2140,15 +2140,6 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
         zoneCFS.DesCoolCoilInTemp /= zoneCFS.DesCoolMassFlow;
         zoneCFS.DesCoolCoilInHumRat /= zoneCFS.DesCoolMassFlow;
     }
-    // Timestep at max
-    zoneCFS.TimeStepNumAtHeatMax = 0;
-    zoneCFS.TimeStepNumAtHeatNoDOASMax = 0;
-    zoneCFS.TimeStepNumAtCoolMax = 0;
-    zoneCFS.TimeStepNumAtHeatNoDOASMax = 0;
-    Real64 maxHeatLoad = 0.0;
-    Real64 maxHeatLoadNoDOAS = 0.0;
-    Real64 maxCoolLoad = 0.0;
-    Real64 maxCoolLoadNoDOAS = 0.0;
     for (int ts = 1; ts <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++ts) {
         Real64 tsHeatFlow = zoneCFS.HeatFlowSeq(ts);
         if (tsHeatFlow > 0) {
@@ -2158,8 +2149,6 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
             zoneCFS.HeatZoneHumRatSeq(ts) /= tsHeatFlow;
             zoneCFS.HeatOutHumRatSeq(ts) /= tsHeatFlow;
         }
-        if (zoneCFS.HeatLoadSeq(ts) > maxHeatLoad) zoneCFS.TimeStepNumAtHeatMax = ts;
-        if (zoneCFS.HeatLoadNoDOASSeq(ts) > maxHeatLoadNoDOAS) zoneCFS.TimeStepNumAtHeatNoDOASMax = ts;
 
         Real64 tsCoolFlow = zoneCFS.CoolFlowSeq(ts);
         if (tsCoolFlow > 0) {
@@ -2169,9 +2158,16 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
             zoneCFS.CoolZoneHumRatSeq(ts) /= tsCoolFlow;
             zoneCFS.CoolOutHumRatSeq(ts) /= tsCoolFlow;
         }
-        if (zoneCFS.CoolLoadSeq(ts) > maxCoolLoad) zoneCFS.TimeStepNumAtCoolMax = ts;
-        if (zoneCFS.CoolLoadNoDOASSeq(ts) > maxCoolLoadNoDOAS) zoneCFS.TimeStepNumAtCoolNoDOASMax = ts;
     }
+    // Timestep at max
+    zoneCFS.TimeStepNumAtHeatMax =
+        1 + std::distance(zoneCFS.HeatLoadSeq.begin(), std::max_element(zoneCFS.HeatLoadSeq.begin(), zoneCFS.HeatLoadSeq.end()));
+    zoneCFS.TimeStepNumAtHeatNoDOASMax =
+        1 + std::distance(zoneCFS.HeatLoadNoDOASSeq.begin(), std::max_element(zoneCFS.HeatLoadNoDOASSeq.begin(), zoneCFS.HeatLoadNoDOASSeq.end()));
+    zoneCFS.TimeStepNumAtCoolMax =
+        1 + std::distance(zoneCFS.CoolLoadSeq.begin(), std::max_element(zoneCFS.CoolLoadSeq.begin(), zoneCFS.CoolLoadSeq.end()));
+    zoneCFS.TimeStepNumAtCoolNoDOASMax =
+        1 + std::distance(zoneCFS.CoolLoadNoDOASSeq.begin(), std::max_element(zoneCFS.CoolLoadNoDOASSeq.begin(), zoneCFS.CoolLoadNoDOASSeq.end()));
 
     if (zoneCFS.zoneLatentSizing) {
         if (zoneCFS.DesLatentHeatMassFlow > 0) {
@@ -2189,20 +2185,16 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
             zoneCFS.DesLatentCoolCoilInHumRat /= zoneCFS.DesLatentCoolMassFlow;
         }
         // Timestep at max
-        zoneCFS.TimeStepNumAtLatentHeatMax = 0;
-        zoneCFS.TimeStepNumAtLatentHeatNoDOASMax = 0;
-        zoneCFS.TimeStepNumAtLatentCoolMax = 0;
-        zoneCFS.TimeStepNumAtLatentCoolNoDOASMax = 0;
-        Real64 maxLatHeatLoad = 0.0;
-        Real64 maxLatHeatLoadNoDOAS = 0.0;
-        Real64 maxLatCoolLoad = 0.0;
-        Real64 maxLatCoolLoadNoDOAS = 0.0;
-        for (int ts = 1; ts <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++ts) {
-            if (zoneCFS.LatentHeatFlowSeq(ts) > maxLatHeatLoad) zoneCFS.TimeStepNumAtLatentHeatMax = ts;
-            if (zoneCFS.HeatLatentLoadNoDOASSeq(ts) > maxLatHeatLoadNoDOAS) zoneCFS.TimeStepNumAtLatentHeatNoDOASMax = ts;
-            if (zoneCFS.LatentCoolLoadSeq(ts) > maxLatCoolLoad) zoneCFS.TimeStepNumAtLatentCoolMax = ts;
-            if (zoneCFS.CoolLatentLoadNoDOASSeq(ts) > maxLatCoolLoadNoDOAS) zoneCFS.TimeStepNumAtLatentCoolNoDOASMax = ts;
-        }
+        zoneCFS.TimeStepNumAtLatentHeatMax = 1 + std::distance(zoneCFS.LatentHeatFlowSeq.begin(),
+                                                               std::max_element(zoneCFS.LatentHeatFlowSeq.begin(), zoneCFS.LatentHeatFlowSeq.end()));
+        zoneCFS.TimeStepNumAtLatentHeatNoDOASMax =
+            1 + std::distance(zoneCFS.HeatLatentLoadNoDOASSeq.begin(),
+                              std::max_element(zoneCFS.HeatLatentLoadNoDOASSeq.begin(), zoneCFS.HeatLatentLoadNoDOASSeq.end()));
+        zoneCFS.TimeStepNumAtLatentCoolMax = 1 + std::distance(zoneCFS.LatentCoolLoadSeq.begin(),
+                                                               std::max_element(zoneCFS.LatentCoolLoadSeq.begin(), zoneCFS.LatentCoolLoadSeq.end()));
+        zoneCFS.TimeStepNumAtLatentCoolNoDOASMax =
+            1 + std::distance(zoneCFS.CoolLatentLoadNoDOASSeq.begin(),
+                              std::max_element(zoneCFS.CoolLatentLoadNoDOASSeq.begin(), zoneCFS.CoolLatentLoadNoDOASSeq.end()));
     }
 
     return;
