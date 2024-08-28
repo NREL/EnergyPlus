@@ -65,11 +65,11 @@ jobs:
       with:
         python-version: ${{ env.Python_REQUIRED_VERSION }}
 
-    - name: Install Dependencies for Mac
+    - name: Install Dependencies for Mac  # gcc13 reinstall may not be needed
       if: ${{ runner.os == 'macOS' }}
       run: |
         brew update
-        brew install gcc@13
+        brew reinstall gcc@13
         echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
         echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
 
@@ -174,10 +174,12 @@ jobs:
 
     - name: Generate Artifact Summary
       if: always() && matrix.run_regressions && steps.regressions.outcome == 'failure'
+      shell: bash
       run: echo "$(cat ${{ github.workspace }}/regressions/summary.md)" >> $GITHUB_STEP_SUMMARY
 
     - name: Store Summary in the Environment
       if: always() && matrix.run_regressions && steps.regressions.outcome == 'failure'
+      shell: bash
       run: echo "R_STUFF=$(cat ${{ github.workspace }}/regressions/summary.md)" >> $GITHUB_ENV
 
     - uses: actions/upload-artifact@v4
