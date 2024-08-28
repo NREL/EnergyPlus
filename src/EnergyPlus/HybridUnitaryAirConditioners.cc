@@ -90,8 +90,8 @@ void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CompNum;
-    bool errorsfound = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errorsfound = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
@@ -181,11 +181,9 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace Psychrometrics;
-    auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
     using DataZoneEquipment::CheckZoneEquipmentList;
 
     // Locals
-    int Loop;
     int InletNode;
 
     if (state.dataHybridUnitaryAC->HybridCoolOneTimeFlag) {
@@ -216,23 +214,23 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingEnergy = 0.0;
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingRate = 0.0;
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingEnergy = 0.0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus = 0;
+    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).availStatus = Avail::Status::NoAction;
 
     // set the availability status based on the availability manager list name
-    if (allocated(ZoneComp)) {
-        auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum);
+    if (allocated(state.dataAvail->ZoneComp)) {
+        auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum);
         if (state.dataHybridUnitaryAC->MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
             availMgr.AvailManagerListName = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailManagerListName;
             availMgr.ZoneNum = ZoneNum;
             state.dataHybridUnitaryAC->MyZoneEqFlag(UnitNum) = false;
         }
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus = availMgr.AvailStatus;
+        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).availStatus = availMgr.availStatus;
     }
 
     // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
     if (!state.dataHybridUnitaryAC->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataHybridUnitaryAC->ZoneEquipmentListChecked = true;
-        for (Loop = 1; Loop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++Loop) {
             if (CheckZoneEquipmentList(state, "ZoneHVAC:HybridUnitaryHVAC", state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(Loop).Name)) {
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
             } else {
@@ -395,10 +393,6 @@ void ReportZoneHybridUnitaryAirConditioners(EnergyPlusData &state, int const Uni
     using namespace DataLoopNode;
     using namespace Psychrometrics;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNodeNum;
-    ZoneNodeNum = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum;
-
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode =
         state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode;
 
@@ -463,10 +457,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
     int NumAlphas;                    // Number of Alphas for each GetObjectItem call
     int NumNumbers;                   // Number of Numbers for each GetObjectItem call
     int NumFields;                    // Total number of fields in object
-    int IOStatus;                     // Used in GetObjectItem
     bool ErrorsFound(false);          // Set to true if errors in input, fatal at end of routine
-    bool IsNotOK;                     // Flag to verify name
-    bool IsBlank;                     // Flag for blank name
     int UnitLoop;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -483,12 +474,11 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
     cNumericFields.allocate(MaxNumbers);
     lAlphaBlanks.dimension(MaxAlphas, true);
     lNumericBlanks.dimension(MaxNumbers, true);
-    std::vector<std::string> test;
-    std::vector<bool> blanks;
 
     if (state.dataHybridUnitaryAC->NumZoneHybridEvap > 0) {
         state.dataHybridUnitaryAC->CheckZoneHybridEvapName.dimension(state.dataHybridUnitaryAC->NumZoneHybridEvap, true);
         state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner.allocate(state.dataHybridUnitaryAC->NumZoneHybridEvap);
+        int IOStatus = 0;
 
         for (UnitLoop = 1; UnitLoop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++UnitLoop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -504,8 +494,8 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
-            IsNotOK = false;
-            IsBlank = false;
+            bool IsNotOK = false;
+            bool IsBlank = false;
             Util::VerifyName(state,
                              Alphas(1),
                              state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner,
@@ -751,507 +741,505 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             "Zone Hybrid Unitary HVAC System Total Cooling Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.SystemTotalCoolingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Total Cooling Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.SystemTotalCoolingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::CoolingCoils,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::CoolingCoils);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Sensible Cooling Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.SystemSensibleCoolingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Sensible Cooling Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.SystemSensibleCoolingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Latent Cooling Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.SystemLatentCoolingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Latent Cooling Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.SystemLatentCoolingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Total Cooling Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.UnitTotalCoolingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Total Cooling Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.UnitTotalCoolingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Sensible Cooling Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.UnitSensibleCoolingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Sensible Cooling Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.UnitSensibleCoolingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Latent Cooling Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.UnitLatentCoolingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Latent Cooling Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.UnitLatentCoolingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Total Heating Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.SystemTotalHeatingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Total Heating Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.SystemTotalHeatingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::HeatingCoils,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::HeatingCoils);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Sensible Heating Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.SystemSensibleHeatingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Sensible Heating Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.SystemSensibleHeatingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Latent Heating Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.SystemLatentHeatingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Latent Heating Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.SystemLatentHeatingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Total Heating Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.UnitTotalHeatingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Total Heating Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.UnitTotalHeatingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Sensible Heating Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.UnitSensibleHeatingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Sensible Heating Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.UnitSensibleHeatingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Latent Heating Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.UnitLatentHeatingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Zone Latent Heating Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.UnitLatentHeatingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Predicted Sensible Load to Setpoint Heat Transfer Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.RequestedLoadToCoolingSetpoint,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Error Code",
                             Constant::Units::None,
                             hybridUnitaryAC.ErrorCode,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Supply Air Temperature",
                             Constant::Units::C,
                             hybridUnitaryAC.OutletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Return Air Temperature",
                             Constant::Units::C,
                             hybridUnitaryAC.InletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Outdoor Air Temperature",
                             Constant::Units::C,
                             hybridUnitaryAC.SecInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Relief Air Temperature",
                             Constant::Units::C,
                             hybridUnitaryAC.SecOutletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Supply Air Humidity Ratio",
                             Constant::Units::kgWater_kgDryAir,
                             hybridUnitaryAC.OutletHumRat,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Return Air Humidity Ratio",
                             Constant::Units::kgWater_kgDryAir,
                             hybridUnitaryAC.InletHumRat,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Outdoor Air Humidity Ratio",
                             Constant::Units::kgWater_kgDryAir,
                             hybridUnitaryAC.SecInletHumRat,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Relief Air Humidity Ratio",
                             Constant::Units::kgWater_kgDryAir,
                             hybridUnitaryAC.SecOutletHumRat,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Supply Air Relative Humidity",
                             Constant::Units::Perc,
                             hybridUnitaryAC.OutletRH,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Return Air Relative Humidity",
                             Constant::Units::Perc,
                             hybridUnitaryAC.InletRH,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Outdoor Air Relative Humidity",
                             Constant::Units::Perc,
                             hybridUnitaryAC.SecInletRH,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Relief Air Relative Humidity",
                             Constant::Units::Perc,
                             hybridUnitaryAC.SecOutletRH,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate",
                             Constant::Units::kg_s,
                             hybridUnitaryAC.OutletMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Supply Air Standard Density Volume Flow Rate",
                             Constant::Units::m3_s,
                             hybridUnitaryAC.OutletVolumetricFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Return Air Mass Flow Rate",
                             Constant::Units::kg_s,
                             hybridUnitaryAC.InletMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Return Air Standard Density Volume Flow Rate",
                             Constant::Units::m3_s,
                             hybridUnitaryAC.InletVolumetricFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Relief Air Mass Flow Rate",
                             Constant::Units::kg_s,
                             hybridUnitaryAC.SecOutletMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Relief Air Standard Density Volume Flow Rate",
                             Constant::Units::m3_s,
                             hybridUnitaryAC.SecOutletVolumetricFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Ventilation Air Standard Density Volume Flow Rate",
                             Constant::Units::m3_s,
                             hybridUnitaryAC.SupplyVentilationVolume,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Electricity Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.FinalElectricalPower,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Electricity Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.FinalElectricalEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::Cooling,
-                            "Hybrid HVAC Cooling",
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::Cooling,
+                            "Hybrid HVAC Cooling");
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate",
                             Constant::Units::kg_s,
                             hybridUnitaryAC.MinOA_Msa,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Ventilation Air Mass Flow Rate",
                             Constant::Units::kg_s,
                             hybridUnitaryAC.SupplyVentilationAir,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Availability Status",
                             Constant::Units::None,
                             hybridUnitaryAC.UnitOn,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Outdoor Air Fraction",
                             Constant::Units::None,
                             hybridUnitaryAC.averageOSAF,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Dehumidification Load to Humidistat Setpoint Moisture Transfer Rate",
                             Constant::Units::kg_s,
                             hybridUnitaryAC.RequestedDeHumdificationMass,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Dehumidification Load to Humidistat Setpoint Heat Transfer Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.RequestedDeHumdificationLoad,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC DehumidificationLoad to Humidistat Setpoint Heat Tansfer Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.RequestedDeHumdificationEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Moisture Transfer Rate",
                             Constant::Units::kg_s,
                             hybridUnitaryAC.RequestedHumdificationMass,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Transfer Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.RequestedHumdificationLoad,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Tansfer Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.RequestedHumdificationEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Supply Fan Electricity Rate",
                             Constant::Units::W,
                             hybridUnitaryAC.SupplyFanElectricPower,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Supply Fan Electricity Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.SupplyFanElectricEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::Fans,
-                            "Hybrid HVAC Fans",
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::Fans,
+                            "Hybrid HVAC Fans");
         if (hybridUnitaryAC.secondFuel != Constant::eFuel::Invalid) {
             SetupOutputVariable(state,
                                 "Zone Hybrid Unitary HVAC Secondary Fuel Consumption Rate",
                                 Constant::Units::W,
                                 hybridUnitaryAC.SecondaryFuelConsumptionRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 hybridUnitaryAC.Name);
             SetupOutputVariable(state,
                                 "Zone Hybrid Unitary HVAC Secondary Fuel Consumption",
                                 Constant::Units::J,
                                 hybridUnitaryAC.SecondaryFuelConsumption,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 hybridUnitaryAC.Name,
                                 Constant::eFuel2eResource[(int)hybridUnitaryAC.secondFuel],
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                "Hybrid HVAC Cooling",
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Cooling,
+                                "Hybrid HVAC Cooling");
         }
         if (hybridUnitaryAC.thirdFuel != Constant::eFuel::Invalid) {
             SetupOutputVariable(state,
                                 "Zone Hybrid Unitary HVAC Third Fuel Consumption Rate",
                                 Constant::Units::W,
                                 hybridUnitaryAC.ThirdFuelConsumptionRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 hybridUnitaryAC.Name);
             SetupOutputVariable(state,
                                 "Zone Hybrid Unitary HVAC Third Fuel Consumption",
                                 Constant::Units::J,
                                 hybridUnitaryAC.ThirdFuelConsumption,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 hybridUnitaryAC.Name,
                                 Constant::eFuel2eResource[(int)hybridUnitaryAC.thirdFuel],
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                "Hybrid HVAC Cooling",
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Cooling,
+                                "Hybrid HVAC Cooling");
         }
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Water Consumption Rate",
                             Constant::Units::kgWater_s,
                             hybridUnitaryAC.WaterConsumptionRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Water Consumption",
                             Constant::Units::m3,
                             hybridUnitaryAC.WaterConsumption,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             hybridUnitaryAC.Name,
                             Constant::eResource::Water,
-                            OutputProcessor::SOVEndUseCat::Cooling,
-                            "Hybrid HVAC Cooling",
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::Cooling,
+                            "Hybrid HVAC Cooling");
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC External Static Pressure",
                             Constant::Units::Pa,
                             hybridUnitaryAC.ExternalStaticPressure,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
 
         if (hybridUnitaryAC.FanHeatGain) {
@@ -1259,15 +1247,15 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                 "Zone Hybrid Unitary HVAC Fan Rise in Air Temperature",
                                 Constant::Units::deltaC,
                                 hybridUnitaryAC.FanHeatTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 hybridUnitaryAC.Name);
             SetupOutputVariable(state,
                                 "Zone Hybrid Unitary HVAC Fan Heat Gain to Air",
                                 Constant::Units::W,
                                 hybridUnitaryAC.PowerLossToAir,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 hybridUnitaryAC.Name);
         }
 
@@ -1278,36 +1266,36 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                 format("Zone Hybrid Unitary HVAC Runtime Fraction in Setting {}", index),
                                 Constant::Units::None,
                                 thisSetting.Runtime_Fraction,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 hybridUnitaryAC.Name);
             SetupOutputVariable(state,
                                 format("Zone Hybrid Unitary HVAC Mode in Setting {}", index),
                                 Constant::Units::None,
                                 thisSetting.Mode,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 hybridUnitaryAC.Name);
             SetupOutputVariable(state,
                                 format("Zone Hybrid Unitary HVAC Outdoor Air Fraction in Setting {}", index),
                                 Constant::Units::kg_s,
                                 thisSetting.Outdoor_Air_Fraction,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 hybridUnitaryAC.Name);
             SetupOutputVariable(state,
                                 format("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting {}", index),
                                 Constant::Units::kg_s,
                                 thisSetting.Unscaled_Supply_Air_Mass_Flow_Rate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 hybridUnitaryAC.Name);
             SetupOutputVariable(state,
                                 format("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting {}", index),
                                 Constant::Units::None,
                                 thisSetting.Supply_Air_Mass_Flow_Rate_Ratio,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 hybridUnitaryAC.Name);
             index++;
         }
@@ -1320,8 +1308,8 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
 }
 int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const CompNum)
 {
-    bool errorsfound = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errorsfound = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
@@ -1337,8 +1325,8 @@ int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const CompNum)
 
 int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int const CompNum)
 {
-    bool errorsfound = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errorsfound = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
@@ -1354,8 +1342,8 @@ int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int const CompNum)
 
 int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const CompNum)
 {
-    bool errorsfound = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errorsfound = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
@@ -1367,6 +1355,23 @@ int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const CompNum)
     }
 
     return GetHybridUnitaryACReturnAirNode;
+}
+
+int getHybridUnitaryACIndex(EnergyPlusData &state, std::string_view CompName)
+{
+    if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errFlag = false;
+        GetInputZoneHybridUnitaryAirConditioners(state, errFlag);
+        state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
+    }
+
+    for (int UnitLoop = 1; UnitLoop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++UnitLoop) {
+        if (Util::SameString(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Name, CompName)) {
+            return UnitLoop;
+        }
+    }
+
+    return 0;
 }
 
 //*****************************************************************************************

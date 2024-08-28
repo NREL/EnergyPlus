@@ -218,7 +218,7 @@ namespace PurchasedAirManager {
         int OAFlowMaxCoolOutputIndex; // Recurring warning index for OAFlow > Max Cooling Flow error
         int OAFlowMaxHeatOutputIndex; // Recurring warning index for OAFlow > Max Heating Flow error
         int SaturationOutputIndex;    // Recurring warning index for OAFlow > Max Heating Flow error
-        int AvailStatus;
+        Avail::Status availStatus = Avail::Status::NoAction;
         int CoolErrIndex; // Cooling setpoint error index (recurring errors)
         int HeatErrIndex; // Heating setpoint error index (recurring errors)
         // Output variables
@@ -293,7 +293,7 @@ namespace PurchasedAirManager {
               OutdoorAirMassFlowRate(0.0), OutdoorAirVolFlowRateStdRho(0.0), SupplyAirMassFlowRate(0.0), SupplyAirVolFlowRateStdRho(0.0),
               HtRecSenOutput(0.0), HtRecLatOutput(0.0), OASenOutput(0.0), OALatOutput(0.0), SenOutputToZone(0.0), LatOutputToZone(0.0),
               SenCoilLoad(0.0), LatCoilLoad(0.0), OAFlowMaxCoolOutputError(0), OAFlowMaxHeatOutputError(0), SaturationOutputError(0),
-              OAFlowMaxCoolOutputIndex(0), OAFlowMaxHeatOutputIndex(0), SaturationOutputIndex(0), AvailStatus(0), CoolErrIndex(0), HeatErrIndex(0),
+              OAFlowMaxCoolOutputIndex(0), OAFlowMaxHeatOutputIndex(0), SaturationOutputIndex(0), CoolErrIndex(0), HeatErrIndex(0),
               SenHeatEnergy(0.0), LatHeatEnergy(0.0), TotHeatEnergy(0.0), SenCoolEnergy(0.0), LatCoolEnergy(0.0), TotCoolEnergy(0.0),
               ZoneSenHeatEnergy(0.0), ZoneLatHeatEnergy(0.0), ZoneTotHeatEnergy(0.0), ZoneSenCoolEnergy(0.0), ZoneLatCoolEnergy(0.0),
               ZoneTotCoolEnergy(0.0), OASenHeatEnergy(0.0), OALatHeatEnergy(0.0), OATotHeatEnergy(0.0), OASenCoolEnergy(0.0), OALatCoolEnergy(0.0),
@@ -379,6 +379,8 @@ namespace PurchasedAirManager {
 
     int GetPurchasedAirReturnAirNode(EnergyPlusData &state, int PurchAirNum);
 
+    int getPurchasedAirIndex(EnergyPlusData &state, std::string_view PurchAirName);
+
     Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int PurchAirNum);
 
     Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int PurchAirNum);
@@ -405,6 +407,10 @@ struct PurchasedAirManagerData : BaseGlobalStruct
     Array1D_bool InitPurchasedAirOneTimeUnitInitsDone; // True if one-time inits for PurchAirNum are completed
     Array1D<PurchasedAirManager::PurchAirPlenumArrayData>
         TempPurchAirPlenumArrays; // Used to save the indices of scalable sizing object for zone HVAC
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

@@ -145,6 +145,10 @@ struct HysteresisPhaseChangeData : BaseGlobalStruct
     int numHysteresisModels = 0;
     std::vector<HysteresisPhaseChange::HysteresisPhaseChange> hysteresisPhaseChangeModels;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         numHysteresisModels = 0;

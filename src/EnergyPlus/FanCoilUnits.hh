@@ -60,9 +60,9 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 
 namespace EnergyPlus {
 
@@ -110,12 +110,12 @@ namespace FanCoilUnits {
         // Members
         // Input data
         int UnitType_Num = 0;
-        std::string Sched;       // availability schedule
-        int SchedPtr = 0;        // index to schedule
-        std::string SchedOutAir; // outside air schedule, multipliy maximum outdoor air flow rate
-        int SchedOutAirPtr = 0;  // index to outside air schedule
-        int FanType_Num = 0;     // index to fan type
-        int SpeedFanSel = 0;     // Speed fan selected
+        std::string Sched;                              // availability schedule
+        int SchedPtr = 0;                               // index to schedule
+        std::string SchedOutAir;                        // outside air schedule, multipliy maximum outdoor air flow rate
+        int SchedOutAirPtr = 0;                         // index to outside air schedule
+        HVAC::FanType fanType = HVAC::FanType::Invalid; // index to fan type
+        int SpeedFanSel = 0;                            // Speed fan selected
         CCM CapCtrlMeth_Num = CCM::Invalid;
         Real64 PLR = 0.0;             // Part Load Ratio, fraction of time step fancoil is on
         int MaxIterIndexH = 0;        // Maximum iterations exceeded for heating
@@ -139,7 +139,6 @@ namespace FanCoilUnits {
         std::string OAMixType;        // type of outside air mixer
         int OAMixIndex = 0;
         std::string FanName;     // name of fan
-        std::string FanType;     // type of fan
         int FanIndex = 0;        // index for fan
         std::string CCoilName;   // name of cooling coil
         int CCoilName_Index = 0; // Index for this Cooling Coil in SimWaterComp
@@ -167,26 +166,26 @@ namespace FanCoilUnits {
         Real64 MinHotWaterFlow = 0.0;       // kg/s
         Real64 HotControlOffset = 0.0;      // control tolerance
         Real64 DesignHeatingCapacity = 0.0; // size of electric heating coil [W]
-        int AvailStatus = 0;
+        Avail::Status availStatus = Avail::Status::NoAction;
         std::string AvailManagerListName; // Name of an availability manager list object
         // addition for OA to Zone Units
-        std::string ATMixerName;        // name of air terminal mixer
-        int ATMixerIndex = 0;           // index to the air terminal mixer
-        int ATMixerType = 0;            // 1 = inlet side mixer, 2 = supply side mixer
-        int ATMixerPriNode = 0;         // primary inlet air node number for the air terminal mixer
-        int ATMixerSecNode = 0;         // secondary air inlet node number for the air terminal mixer
-        int HVACSizingIndex = 0;        // index of a HVACSizing object for a fancoil unit
-        Real64 SpeedRatio = 0.0;        // speed ratio when the fan is cycling between stages
-        int FanOpModeSchedPtr = 0;      // pointer to supply air fan operating mode schedule
-        int FanOpMode = 1;              // 1=cycling fan cycling coil; 2=constant fan cycling coil
-        bool ASHRAETempControl = false; // ASHRAE90.1 control to temperature set point when true
-        Real64 QUnitOutNoHC = 0.0;      // unit output with coils off [W]
-        Real64 QUnitOutMaxH = 0.0;      // unit output at maximum heating [W]
-        Real64 QUnitOutMaxC = 0.0;      // unit output at maximum cooling [W]
-        int LimitErrCountH = 0;         // count of SolveRoot limit errors
-        int LimitErrCountC = 0;         // count of SolveRoot limit errors
-        int ConvgErrCountH = 0;         // count of SolveRoot iteration limit errors
-        int ConvgErrCountC = 0;         // count of SolveRoot iteration limit errors
+        std::string ATMixerName;                                // name of air terminal mixer
+        int ATMixerIndex = 0;                                   // index to the air terminal mixer
+        HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid; // 1 = inlet side mixer, 2 = supply side mixer
+        int ATMixerPriNode = 0;                                 // primary inlet air node number for the air terminal mixer
+        int ATMixerSecNode = 0;                                 // secondary air inlet node number for the air terminal mixer
+        int HVACSizingIndex = 0;                                // index of a HVACSizing object for a fancoil unit
+        Real64 SpeedRatio = 0.0;                                // speed ratio when the fan is cycling between stages
+        int FanOpModeSchedPtr = 0;                              // pointer to supply air fan operating mode schedule
+        HVAC::FanOp fanOp = HVAC::FanOp::Cycling;               // 1=cycling fan cycling coil; 2=constant fan cycling coil
+        bool ASHRAETempControl = false;                         // ASHRAE90.1 control to temperature set point when true
+        Real64 QUnitOutNoHC = 0.0;                              // unit output with coils off [W]
+        Real64 QUnitOutMaxH = 0.0;                              // unit output at maximum heating [W]
+        Real64 QUnitOutMaxC = 0.0;                              // unit output at maximum cooling [W]
+        int LimitErrCountH = 0;                                 // count of SolveRoot limit errors
+        int LimitErrCountC = 0;                                 // count of SolveRoot limit errors
+        int ConvgErrCountH = 0;                                 // count of SolveRoot iteration limit errors
+        int ConvgErrCountC = 0;                                 // count of SolveRoot iteration limit errors
         // Report data
         Real64 HeatPower = 0.0;          // unit heating output in watts
         Real64 HeatEnergy = 0.0;         // unit heating output in J
@@ -320,7 +319,7 @@ namespace FanCoilUnits {
 
     void ReportFanCoilUnit(EnergyPlusData &state, int FanCoilNum); // number of the current fan coil unit being simulated
 
-    int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int FanCoilNum);
+    int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int const FanCoilNum);
 
     int GetFanCoilOutAirNode(EnergyPlusData &state, int FanCoilNum);
 
@@ -381,6 +380,7 @@ namespace FanCoilUnits {
                                               int WaterControlNode,
                                               Real64 MinWaterFlow);
 
+    int getEqIndex(EnergyPlusData &state, std::string_view CompName);
 } // namespace FanCoilUnits
 
 struct FanCoilUnitsData : BaseGlobalStruct
@@ -401,16 +401,16 @@ struct FanCoilUnitsData : BaseGlobalStruct
     bool InitFanCoilUnitsCheckInZoneEquipmentListFlag = false; // True after the Zone Equipment List has been checked for items
 
     // static variables extracted from functions
-    bool ErrorsFound = false;        // Set to true if errors in input, fatal at end of routine
-    bool errFlag = false;            // Local error flag for GetOAMixerNodeNums
-    int TotalArgs = 0;               // Total number of alpha and numeric arguments (max) for a
-    bool ZoneExNodeNotFound = false; // used in error checking
-    bool ZoneInNodeNotFound = false; // used in error checking
-    int ATMixerNum = 0;              // index of air terminal mixer in the air terminal mixer data array
-    int ATMixerType = 0;             // type of air terminal mixer (1=inlet side; 2=supply side)
-    int ATMixerPriNode = 0;          // node number of the air terminal mixer primary air inlet
-    int ATMixerSecNode = 0;          // node number of the air terminal mixer secondary air inlet
-    int ATMixerOutNode = 0;          // node number of the air terminal mixer secondary air inlet
+    bool ErrorsFound = false;                               // Set to true if errors in input, fatal at end of routine
+    bool errFlag = false;                                   // Local error flag for GetOAMixerNodeNums
+    int TotalArgs = 0;                                      // Total number of alpha and numeric arguments (max) for a
+    bool ZoneExNodeNotFound = false;                        // used in error checking
+    bool ZoneInNodeNotFound = false;                        // used in error checking
+    int ATMixerNum = 0;                                     // index of air terminal mixer in the air terminal mixer data array
+    HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid; // type of air terminal mixer (1=inlet side; 2=supply side)
+    int ATMixerPriNode = 0;                                 // node number of the air terminal mixer primary air inlet
+    int ATMixerSecNode = 0;                                 // node number of the air terminal mixer secondary air inlet
+    int ATMixerOutNode = 0;                                 // node number of the air terminal mixer secondary air inlet
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyPlantScanFlag;
     Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
@@ -418,6 +418,10 @@ struct FanCoilUnitsData : BaseGlobalStruct
     int CoilWaterOutletNode = 0;
     int ATMixOutNode = 0; // outlet node of ATM Mixer
     int ZoneNode = 0;     // zone node
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

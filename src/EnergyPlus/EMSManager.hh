@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -65,21 +66,6 @@ struct EnergyPlusData;
 // note there are routines that lie outside of the Module at the end of this file
 
 namespace EMSManager {
-
-    enum class SPControlType
-    {
-        Invalid = -1,
-        TemperatureSetPoint,      // integer for node setpoint control type
-        TemperatureMinSetPoint,   // integer for node setpoint control type
-        TemperatureMaxSetPoint,   // integer for node setpoint control type
-        HumidityRatioSetPoint,    // integer for node setpoint control type
-        HumidityRatioMinSetPoint, // integer for node setpoint control type
-        HumidityRatioMaxSetPoint, // integer for node setpoint control type
-        MassFlowRateSetPoint,     // integer for node setpoint control type
-        MassFlowRateMinSetPoint,  // integer for node setpoint control type
-        MassFlowRateMaxSetPoint,  // integer for node setpoint control type
-        Num
-    };
 
     // Parameters for EMS Calling Points
     enum class EMSCallFrom
@@ -137,12 +123,12 @@ namespace EMSManager {
 
     bool CheckIfNodeSetPointManaged(EnergyPlusData &state,
                                     int NodeNum, // index of node being checked.
-                                    SPControlType SetPointType,
+                                    HVAC::CtrlVarType SetPointType,
                                     bool byHandle = false);
 
     bool CheckIfNodeSetPointManagedByEMS(EnergyPlusData &state,
                                          int NodeNum, // index of node being checked.
-                                         SPControlType SetPointType,
+                                         HVAC::CtrlVarType SetPointType,
                                          bool &ErrorFlag);
 
     bool CheckIfNodeMoreInfoSensedByEMS(EnergyPlusData &state,
@@ -214,6 +200,10 @@ struct EMSManagerData : BaseGlobalStruct
     bool FinishProcessingUserInput = true; // Flag to indicate still need to process input
     bool lDummy = false;                   // dummy pointer location
     bool lDummy2 = false;                  // dummy pointer location
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

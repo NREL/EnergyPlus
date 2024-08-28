@@ -240,7 +240,16 @@ void ManageSizing(EnergyPlusData &state)
             state.files.zsz.filePath = state.files.outputZszTxtFilePath;
         }
 
+        if (state.dataSize->SizingFileColSep == CharComma) {
+            state.files.spsz.filePath = state.files.outputSpszCsvFilePath;
+        } else if (state.dataSize->SizingFileColSep == CharTab) {
+            state.files.spsz.filePath = state.files.outputSpszTabFilePath;
+        } else {
+            state.files.spsz.filePath = state.files.outputSpszTxtFilePath;
+        }
+
         state.files.zsz.ensure_open(state, "ManageSizing", state.files.outputControl.zsz);
+        state.files.spsz.ensure_open(state, "ManageSizing", state.files.outputControl.spsz);
 
         ShowMessage(state, "Beginning Zone Sizing Calculations");
 
@@ -1116,7 +1125,9 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                 // correct sizing design heating volume flow rate based on finalized air terminal unit operation
 
                 if (FinalSysSizing(AirLoopNum).SizingOption ==
-                    NonCoincident) { // If non-coincident sizing method for this air loop, the we can use these sum's from air terminals directly
+                    DataSizing::SizingConcurrence::NonCoincident) { // If non-coincident sizing method for this air loop, the we can use these sum's
+                                                                    // from
+                                                                    // air terminals directly
                     FinalSysSizing(AirLoopNum).DesHeatVolFlow = max(airLoopHeatingMaximumFlowRateSum, FinalSysSizing(AirLoopNum).DesHeatVolFlow);
                     FinalSysSizing(AirLoopNum).DesMainVolFlow = max(airLoopMaxFlowRateSum, FinalSysSizing(AirLoopNum).DesMainVolFlow);
                     if (FinalSysSizing(AirLoopNum).sysSizeCoolingDominant) {
@@ -1126,7 +1137,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                         FinalSysSizing(AirLoopNum).DesCoolVolFlow = max(airLoopHeatingMinimumFlowRateSum, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
                         FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
                     }
-                } else if (FinalSysSizing(AirLoopNum).SizingOption == Coincident) {
+                } else if (FinalSysSizing(AirLoopNum).SizingOption == DataSizing::SizingConcurrence::Coincident) {
 
                     if (FinalSysSizing(AirLoopNum).sysSizeCoolingDominant) { // use minimum heating flow sum from air terminals
                         // know that minimum heating flow is a hard minimum regardless of concurrence situation, so make sure that design is at
@@ -3279,6 +3290,8 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 }
+                zoneSizingIndex.spaceConcurrence = static_cast<DataSizing::SizingConcurrence>(
+                    getEnumValue(DataSizing::SizingConcurrenceNamesUC, state.dataIPShortCut->cAlphaArgs(15)));
                 zoneSizingIndex.zoneSizingMethod =
                     static_cast<DataSizing::ZoneSizing>(getEnumValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
                 if (zoneSizingIndex.zoneSizingMethod != ZoneSizing::SensibleOnly) {
@@ -3578,9 +3591,9 @@ void GetSystemSizingInput(EnergyPlusData &state)
         {
             std::string const &sizingOption = state.dataIPShortCut->cAlphaArgs(iSizingOptionAlphaNum);
             if (sizingOption == "COINCIDENT") {
-                SysSizInput(SysSizIndex).SizingOption = Coincident;
+                SysSizInput(SysSizIndex).SizingOption = DataSizing::SizingConcurrence::Coincident;
             } else if (sizingOption == "NONCOINCIDENT") {
-                SysSizInput(SysSizIndex).SizingOption = NonCoincident;
+                SysSizInput(SysSizIndex).SizingOption = DataSizing::SizingConcurrence::NonCoincident;
             } else {
                 ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
                 ShowContinueError(state,
@@ -4270,6 +4283,11 @@ void reportZoneSizing(EnergyPlusData &state,
             HumRatAtPeak = state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak);
             DOASHeatGainRateAtClPk = zsCalcSizing(DDNum, thisNum).DOASHeatAddSeq(TimeStepAtPeak);
             TStatSetPtAtPk = zSizing(DDNum, thisNum).CoolTstatTempSeq(TimeStepAtPeak);
+        } else {
+            TempAtPeak = zsCalcFinalSizing.OutTempAtCoolPeak;
+            HumRatAtPeak = zsCalcFinalSizing.OutHumRatAtCoolPeak;
+            DOASHeatGainRateAtClPk = zsCalcFinalSizing.DOASCoolLoad;
+            TStatSetPtAtPk = zsCalcFinalSizing.ZoneTempAtCoolPeak;
         }
         reportZoneSizingEio(state,
                             zsFinalSizing.ZoneName,
@@ -4338,6 +4356,11 @@ void reportZoneSizing(EnergyPlusData &state,
             HumRatAtPeak = state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak);
             DOASHeatGainRateAtHtPk = zsCalcSizing(DDNum, thisNum).DOASHeatAddSeq(TimeStepAtPeak);
             TStatSetPtAtPk = zSizing(DDNum, thisNum).HeatTstatTempSeq(TimeStepAtPeak);
+        } else {
+            TempAtPeak = zsCalcFinalSizing.OutTempAtHeatPeak;
+            HumRatAtPeak = zsCalcFinalSizing.OutHumRatAtHeatPeak;
+            DOASHeatGainRateAtHtPk = zsCalcFinalSizing.DOASHeatLoad;
+            TStatSetPtAtPk = zsCalcFinalSizing.ZoneTempAtHeatPeak;
         }
         reportZoneSizingEio(state,
                             zsFinalSizing.ZoneName,
@@ -5507,36 +5530,6 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
                 thisTUFZSizing.DesHeatOAFlowFrac = 0.0;
             }
         }
-
-        // begin std 229 air terminal new table
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermZoneName,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.ZoneNum > 0 ? state.dataHeatBal->Zone(thisTUFZSizing.ZoneNum).Name : "N/A");
-
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermMinFlow,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.DesCoolVolFlowMin); // ? there is another name that looks similar (see the next line)
-
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermMinOutdoorFlow, thisTUFZSizing.ADUName, thisTUFZSizing.MinOA);
-
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermSupCoolingSP, thisTUFZSizing.ADUName, thisTUFZSizing.CoolDesTemp);
-
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermSupHeatingSP, thisTUFZSizing.ADUName, thisTUFZSizing.HeatDesTemp);
-
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermHeatingCap,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.DesHeatLoad); // ? DesHeatLoad ==? Heating capacity?
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermCoolingCap,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.DesCoolLoad); // ? DesCoolLoad ==? Cooling capacity?
-        // end std 229 air terminal new table
     }
 }
 } // namespace EnergyPlus::SizingManager

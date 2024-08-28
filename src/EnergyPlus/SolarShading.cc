@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <memory>
@@ -136,7 +137,7 @@ using namespace DataSurfaces;
 using namespace DataShadowingCombinations;
 using namespace SolarReflectionManager;
 using namespace DataVectorTypes;
-using namespace WindowManager;
+using namespace Window;
 using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 
@@ -186,9 +187,8 @@ void InitSolarCalculations(EnergyPlusData &state)
             state.dataSolarShading->shd_stream =
                 std::make_unique<std::fstream>(state.dataStrGlobals->outputShdFilePath, std::ios_base::out | std::ios_base::trunc);
             if (!state.dataSolarShading->shd_stream) {
-                ShowFatalError(state,
-                               format("InitSolarCalculations: Could not open file \"{}\" for output (write).",
-                                      state.dataStrGlobals->outputShdFilePath.string()));
+                ShowFatalError(
+                    state, format("InitSolarCalculations: Could not open file \"{}\" for output (write).", state.dataStrGlobals->outputShdFilePath));
             }
         } else {
             state.dataSolarShading->shd_stream = std::make_unique<std::iostream>(nullptr);
@@ -196,7 +196,7 @@ void InitSolarCalculations(EnergyPlusData &state)
 
         if (state.dataSolarShading->GetInputFlag) {
             checkShadingSurfaceSchedules(state);
-            GetShadowingInput(state);
+            processShadowingInput(state);
             state.dataSolarShading->GetInputFlag = false;
             state.dataSolarShading->MaxHCV =
                 (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
@@ -415,7 +415,6 @@ void GetShadowingInput(EnergyPlusData &state)
     int NumNumbers;
     int NumAlphas;
     int IOStat;
-    int Found = 0;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     state.dataIPShortCut->rNumericArgs({1, 4}) = 0.0; // so if nothing gotten, defaults will be maintained.
     state.dataIPShortCut->cAlphaArgs(1) = "";
@@ -512,18 +511,6 @@ void GetShadowingInput(EnergyPlusData &state)
     } else {
         state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
         state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
-    }
-
-    if ((state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) &&
-        state.dataSolarShading->anyScheduledShadingSurface) {
-        ShowSevereError(state, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
-        ShowContinueError(state, "and there is at least one shading surface of type ");
-        ShowContinueError(state, "Shading:Site:Detailed, Shading:Building:Detailed, or Shading:Zone:Detailed, ");
-        ShowContinueError(state, "that has an active transmittance schedule value greater than zero or may vary.");
-        ShowContinueError(state, "With \"PixelCounting\" Shading Calculation Method, the shading surfaces will be treated as ");
-        ShowContinueError(state, "completely opaque (transmittance = 0) during the shading calculation, ");
-        ShowContinueError(state, "which may result in inaccurate or unexpected results.");
-        ShowContinueError(state, "It is suggested switching to another Shading Calculation Method, such as \"PolygonClipping\".");
     }
 
     aNum++;
@@ -629,30 +616,11 @@ void GetShadowingInput(EnergyPlusData &state)
         state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         state.dataSysVars->ReportExtShadingSunlitFrac = false;
     }
-    if (state.dataSysVars->shadingMethod == ShadingMethod::Imported) {
-        int ExtShadingSchedNum;
-        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataSurface->Surface(SurfNum).Name + "_shading");
-            if (ExtShadingSchedNum != 0) {
-                state.dataSurface->Surface(SurfNum).SurfSchedExternalShadingFrac = true;
-                state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd = ExtShadingSchedNum;
-            } else {
-                ShowWarningError(state,
-                                 format("{}: sunlit fraction schedule not found for {} when using ImportedShading.",
-                                        cCurrentModuleObject,
-                                        state.dataSurface->Surface(SurfNum).Name));
-                ShowContinueError(state, "These values are set to 1.0.");
-            }
-        }
-    }
-
-    bool DisableSelfShadingWithinGroup = false;
-    bool DisableSelfShadingBetweenGroup = false;
 
     aNum++;
     if (NumAlphas >= aNum) {
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
-            DisableSelfShadingWithinGroup = true;
+            state.dataSysVars->DisableSelfShadingWithinGroup = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
         } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
@@ -668,7 +636,7 @@ void GetShadowingInput(EnergyPlusData &state)
     aNum++;
     if (NumAlphas >= aNum) {
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
-            DisableSelfShadingBetweenGroup = true;
+            state.dataSysVars->DisableSelfShadingBetweenGroup = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
         } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
@@ -681,66 +649,17 @@ void GetShadowingInput(EnergyPlusData &state)
         state.dataIPShortCut->cAlphaArgs(aNum) = "No";
     }
 
-    if (DisableSelfShadingBetweenGroup && DisableSelfShadingWithinGroup) {
+    if (state.dataSysVars->DisableSelfShadingBetweenGroup && state.dataSysVars->DisableSelfShadingWithinGroup) {
         state.dataSysVars->DisableAllSelfShading = true;
-    } else if (DisableSelfShadingBetweenGroup || DisableSelfShadingWithinGroup) {
+    } else if (state.dataSysVars->DisableSelfShadingBetweenGroup || state.dataSysVars->DisableSelfShadingWithinGroup) {
         state.dataSysVars->DisableGroupSelfShading = true;
     }
 
     aNum++;
-    int SurfZoneGroup, CurZoneGroup;
-    if (state.dataSysVars->DisableGroupSelfShading) {
-        Array1D_int DisableSelfShadingGroups;
-        int NumOfShadingGroups;
-        if (NumAlphas >= aNum) {
-            // Read all shading groups
-            NumOfShadingGroups = NumAlphas - (aNum - 1);
-            DisableSelfShadingGroups.allocate(NumOfShadingGroups);
-            for (int i = 1; i <= NumOfShadingGroups; i++) {
-                Found = Util::FindItemInList(
-                    state.dataIPShortCut->cAlphaArgs(i + (aNum - 1)), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
-                if (Found != 0) DisableSelfShadingGroups(i) = Found;
-            }
-
-            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
-                if (state.dataSurface->Surface(SurfNum).ExtBoundCond == 0) { // Loop through all exterior surfaces
-                    SurfZoneGroup = 0;
-                    // Check the shading zone group of each exterior surface
-                    for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
-                        CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
-                        for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
-                             ZoneNum++) { // Loop through all zones in the zone list
-                            if (state.dataSurface->Surface(SurfNum).Zone == state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum)) {
-                                SurfZoneGroup = CurZoneGroup;
-                                break;
-                            }
-                        }
-                    }
-                    // if a surface is not in any zone group, no self shading is disabled for this surface
-                    if (SurfZoneGroup != 0) {
-                        // if DisableSelfShadingWithinGroup, add all zones in the same zone group to the surface's disabled zone list
-                        // if DisableSelfShadingBetweenGroups, add all zones in all other zone groups to the surface's disabled zone list
-                        for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
-                            CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
-                            if (SurfZoneGroup == CurZoneGroup && DisableSelfShadingWithinGroup) {
-                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
-                                     ZoneNum++) { // Loop through all zones in the zone list
-                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
-                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
-                                }
-                            } else if (SurfZoneGroup != CurZoneGroup && DisableSelfShadingBetweenGroup) {
-                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones; ZoneNum++) {
-                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
-                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            ShowFatalError(state, "No Shading groups are defined when disabling grouped self shading.");
-        }
+    state.dataSysVars->shadingGroupsNum = NumAlphas - (aNum - 1);
+    state.dataSysVars->shadingGroupZoneListNames.allocate(state.dataSysVars->shadingGroupsNum);
+    for (int numZone = 1; numZone <= state.dataSysVars->shadingGroupsNum; ++numZone) {
+        state.dataSysVars->shadingGroupZoneListNames(numZone) = state.dataIPShortCut->cAlphaArgs(aNum - 1 + numZone);
     }
 
     if (!state.dataSysVars->DetailedSolarTimestepIntegration && state.dataSurface->ShadingTransmittanceVaries &&
@@ -795,6 +714,93 @@ void GetShadowingInput(EnergyPlusData &state)
           state.dataIPShortCut->cAlphaArgs(5),
           state.dataIPShortCut->cAlphaArgs(6),
           state.dataIPShortCut->cAlphaArgs(7));
+}
+
+void processShadowingInput(EnergyPlusData &state)
+{
+    // all shadow input processing that needed zones and surfaces to already be read into data (part of fix for Defect #10299)
+
+    if ((state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) &&
+        state.dataSolarShading->anyScheduledShadingSurface) {
+        ShowSevereError(state, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
+        ShowContinueError(state, "and there is at least one shading surface of type ");
+        ShowContinueError(state, "Shading:Site:Detailed, Shading:Building:Detailed, or Shading:Zone:Detailed, ");
+        ShowContinueError(state, "that has an active transmittance schedule value greater than zero or may vary.");
+        ShowContinueError(state, "With \"PixelCounting\" Shading Calculation Method, the shading surfaces will be treated as ");
+        ShowContinueError(state, "completely opaque (transmittance = 0) during the shading calculation, ");
+        ShowContinueError(state, "which may result in inaccurate or unexpected results.");
+        ShowContinueError(state, "It is suggested switching to another Shading Calculation Method, such as \"PolygonClipping\".");
+    }
+
+    if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::Imported) {
+        int ExtShadingSchedNum;
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataSurface->Surface(SurfNum).Name + "_shading");
+            if (ExtShadingSchedNum != 0) {
+                state.dataSurface->Surface(SurfNum).SurfSchedExternalShadingFrac = true;
+                state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd = ExtShadingSchedNum;
+            } else {
+                ShowWarningError(state,
+                                 format("processShadowingInput: sunlit fraction schedule not found for {} when using ImportedShading.",
+                                        state.dataSurface->Surface(SurfNum).Name));
+                ShowContinueError(state, "These values are set to 1.0.");
+            }
+        }
+    }
+
+    int SurfZoneGroup, CurZoneGroup;
+    int Found = 0;
+    if (state.dataSysVars->DisableGroupSelfShading) {
+        Array1D_int DisableSelfShadingGroups;
+        int NumOfShadingGroups = state.dataSysVars->shadingGroupsNum;
+        if (NumOfShadingGroups > 0) {
+            DisableSelfShadingGroups.allocate(NumOfShadingGroups);
+            for (int i = 1; i <= NumOfShadingGroups; i++) {
+                Found = Util::FindItemInList(
+                    state.dataSysVars->shadingGroupZoneListNames(i), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
+                if (Found != 0) DisableSelfShadingGroups(i) = Found;
+            }
+
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+                if (state.dataSurface->Surface(SurfNum).ExtBoundCond == 0) { // Loop through all exterior surfaces
+                    SurfZoneGroup = 0;
+                    // Check the shading zone group of each exterior surface
+                    for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
+                        CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
+                        for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
+                             ZoneNum++) { // Loop through all zones in the zone list
+                            if (state.dataSurface->Surface(SurfNum).Zone == state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum)) {
+                                SurfZoneGroup = CurZoneGroup;
+                                break;
+                            }
+                        }
+                    }
+                    // if a surface is not in any zone group, no self shading is disabled for this surface
+                    if (SurfZoneGroup != 0) {
+                        // if DisableSelfShadingWithinGroup, add all zones in the same zone group to the surface's disabled zone list
+                        // if DisableSelfShadingBetweenGroups, add all zones in all other zone groups to the surface's disabled zone list
+                        for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
+                            CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
+                            if (SurfZoneGroup == CurZoneGroup && state.dataSysVars->DisableSelfShadingWithinGroup) {
+                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
+                                     ZoneNum++) { // Loop through all zones in the zone list
+                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
+                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
+                                }
+                            } else if (SurfZoneGroup != CurZoneGroup && state.dataSysVars->DisableSelfShadingBetweenGroup) {
+                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones; ZoneNum++) {
+                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
+                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            ShowFatalError(state, "No Shading groups are defined when disabling grouped self shading.");
+        }
+    }
 }
 
 void checkScheduledSurfacePresent(EnergyPlusData &state)
@@ -1054,75 +1060,75 @@ void AllocateModuleArrays(EnergyPlusData &state)
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
         std::string &thisEnclosureName = state.dataViewFactor->EnclSolInfo(enclosureNum).Name;
         SetupOutputVariable(state,
-                            "Zone Windows Total Transmitted Solar Radiation Rate",
+                            "Enclosure Windows Total Transmitted Solar Radiation Rate",
                             Constant::Units::W,
                             state.dataHeatBal->ZoneTransSolar(enclosureNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             thisEnclosureName);
         SetupOutputVariable(state,
-                            "Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate",
+                            "Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate",
                             Constant::Units::W,
                             state.dataHeatBal->ZoneBmSolFrExtWinsRep(enclosureNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             thisEnclosureName);
         SetupOutputVariable(state,
-                            "Zone Interior Windows Total Transmitted Beam Solar Radiation Rate",
+                            "Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate",
                             Constant::Units::W,
                             state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclosureNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             thisEnclosureName);
         SetupOutputVariable(state,
-                            "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate",
+                            "Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate",
                             Constant::Units::W,
                             state.dataHeatBal->ZoneDifSolFrExtWinsRep(enclosureNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             thisEnclosureName);
         SetupOutputVariable(state,
-                            "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate",
+                            "Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate",
                             Constant::Units::W,
                             state.dataHeatBal->ZoneDifSolFrIntWinsRep(enclosureNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             thisEnclosureName);
         // Energy variables
         SetupOutputVariable(state,
-                            "Zone Windows Total Transmitted Solar Radiation Energy",
+                            "Enclosure Windows Total Transmitted Solar Radiation Energy",
                             Constant::Units::J,
                             state.dataHeatBal->ZoneTransSolarEnergy(enclosureNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             thisEnclosureName);
         SetupOutputVariable(state,
-                            "Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy",
+                            "Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Energy",
                             Constant::Units::J,
                             state.dataHeatBal->ZoneBmSolFrExtWinsRepEnergy(enclosureNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             thisEnclosureName);
         SetupOutputVariable(state,
-                            "Zone Interior Windows Total Transmitted Beam Solar Radiation Energy",
+                            "Enclosure Interior Windows Total Transmitted Beam Solar Radiation Energy",
                             Constant::Units::J,
                             state.dataHeatBal->ZoneBmSolFrIntWinsRepEnergy(enclosureNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             thisEnclosureName);
         SetupOutputVariable(state,
-                            "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy",
+                            "Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Energy",
                             Constant::Units::J,
                             state.dataHeatBal->ZoneDifSolFrExtWinsRepEnergy(enclosureNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             thisEnclosureName);
         SetupOutputVariable(state,
-                            "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Energy",
+                            "Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Energy",
                             Constant::Units::J,
                             state.dataHeatBal->ZoneDifSolFrIntWinsRepEnergy(enclosureNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             thisEnclosureName);
     }
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
@@ -1130,29 +1136,29 @@ void AllocateModuleArrays(EnergyPlusData &state)
                             "Zone Windows Total Heat Gain Rate",
                             Constant::Units::W,
                             state.dataHeatBal->ZoneWinHeatGainRep(ZoneLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
                             "Zone Windows Total Heat Loss Rate",
                             Constant::Units::W,
                             state.dataHeatBal->ZoneWinHeatLossRep(ZoneLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
                             "Zone Windows Total Heat Gain Energy",
                             Constant::Units::J,
                             state.dataHeatBal->ZoneWinHeatGainRepEnergy(ZoneLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
                             "Zone Windows Total Heat Loss Energy",
                             Constant::Units::J,
                             state.dataHeatBal->ZoneWinHeatLossRepEnergy(ZoneLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             state.dataHeatBal->Zone(ZoneLoop).Name);
         if (state.dataGlobal->DisplayAdvancedReportVariables) {
             // CurrentModuleObject='Zone(Advanced)'
@@ -1160,30 +1166,30 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                 "Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->ZoneOpaqSurfInsFaceCondGainRep(ZoneLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 state.dataHeatBal->Zone(ZoneLoop).Name);
             SetupOutputVariable(state,
                                 "Zone Opaque Surface Inside Faces Total Conduction Heat Loss Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->ZoneOpaqSurfInsFaceCondLossRep(ZoneLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 state.dataHeatBal->Zone(ZoneLoop).Name);
             // Energy variables
             SetupOutputVariable(state,
                                 "Zone Opaque Surface Inside Faces Total Conduction Heat Gain Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->ZnOpqSurfInsFaceCondGnRepEnrg(ZoneLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 state.dataHeatBal->Zone(ZoneLoop).Name);
             SetupOutputVariable(state,
                                 "Zone Opaque Surface Inside Faces Total Conduction Heat Loss Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->ZnOpqSurfInsFaceCondLsRepEnrg(ZoneLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 state.dataHeatBal->Zone(ZoneLoop).Name);
         }
     }
@@ -1196,121 +1202,121 @@ void AllocateModuleArrays(EnergyPlusData &state)
                             "Surface Outside Normal Azimuth Angle",
                             Constant::Units::deg,
                             surf.Azimuth,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surf.Name);
         if (surf.ExtSolar) {
             SetupOutputVariable(state,
                                 "Surface Outside Face Sunlit Area",
                                 Constant::Units::m2,
                                 state.dataSurface->SurfSunlitArea(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Sunlit Fraction",
                                 Constant::Units::None,
                                 state.dataSurface->SurfSunlitFrac(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Incident Solar Radiation Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBal->SurfQRadSWOutIncident(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Incident Beam Solar Radiation Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Beam Solar Incident Angle Cosine Value",
                                 Constant::Units::None,
                                 state.dataHeatBal->SurfCosIncidenceAngle(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Incident Sky Diffuse Ground Reflected Solar Radiation Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Incident Beam To Beam Surface Reflected Solar Radiation Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Incident Beam To Diffuse Ground Reflected Solar Radiation Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Anisotropic Sky Multiplier",
                                 Constant::Units::None,
                                 state.dataSolarShading->SurfAnisoSkyMult(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Window BSDF Beam Direction Number",
                                 Constant::Units::None,
                                 state.dataHeatBal->SurfWinBSDFBeamDirectionRep(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Window BSDF Beam Theta Angle",
                                 Constant::Units::rad,
                                 state.dataHeatBal->SurfWinBSDFBeamThetaRep(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Window BSDF Beam Phi Angle",
                                 Constant::Units::rad,
                                 state.dataHeatBal->SurfWinBSDFBeamPhiRep(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
         }
         if (!surf.HeatTransSurf) continue;
@@ -1322,15 +1328,15 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                     "Surface Window Total Glazing Layers Absorbed Solar Radiation Rate",
                                     Constant::Units::W,
                                     state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate",
                                     Constant::Units::W,
                                     state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
 
                 if (state.dataConstruction->Construct(surf.Construction).WindowTypeBSDF) {
@@ -1344,8 +1350,8 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                             format("Surface Window Total Absorbed Shortwave Radiation Rate Layer {}", I),
                                             Constant::Units::W,
                                             state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfLoop, I),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                     }
                     if (state.dataConstruction->Construct(surf.Construction).WindowTypeBSDF || (I == 1)) {
@@ -1353,8 +1359,8 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                             format("Surface Window Front Face Temperature Layer {}", I),
                                             Constant::Units::C,
                                             state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfLoop, I),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                     }
                     if (state.dataConstruction->Construct(surf.Construction).WindowTypeBSDF || (I == NumOfLayers)) {
@@ -1362,8 +1368,8 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                             format("Surface Window Back Face Temperature Layer {}", I),
                                             Constant::Units::C,
                                             state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfLoop, I),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                     }
                 }
@@ -1372,15 +1378,15 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                     "Surface Window Transmitted Solar Radiation Rate",
                                     Constant::Units::W,
                                     state.dataSurface->SurfWinTransSolar(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Transmitted Beam Solar Radiation Rate",
                                     Constant::Units::W,
                                     state.dataSurface->SurfWinBmSolar(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
 
                 // added TH 12/9/2009
@@ -1388,58 +1394,58 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                     "Surface Window Transmitted Beam To Beam Solar Radiation Rate",
                                     Constant::Units::W,
                                     state.dataSurface->SurfWinBmBmSolar(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Transmitted Beam To Diffuse Solar Radiation Rate",
                                     Constant::Units::W,
                                     state.dataSurface->SurfWinBmDifSolar(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
 
                 SetupOutputVariable(state,
                                     "Surface Window Transmitted Diffuse Solar Radiation Rate",
                                     Constant::Units::W,
                                     state.dataSurface->SurfWinDifSolar(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Heat Gain Rate",
                                     Constant::Units::W,
                                     state.dataSurface->SurfWinHeatGainRep(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Heat Loss Rate",
                                     Constant::Units::W,
                                     state.dataSurface->SurfWinHeatLossRep(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Gap Convective Heat Transfer Rate",
                                     Constant::Units::W,
                                     state.dataSurface->SurfWinGapConvHtFlowRep(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Shading Device Absorbed Solar Radiation Rate",
                                     Constant::Units::W,
                                     state.dataSurface->SurfWinShadingAbsorbedSolar(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Net Heat Transfer Rate",
                                     Constant::Units::W,
                                     state.dataSurface->SurfWinHeatGain(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
 
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
@@ -1448,58 +1454,58 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                         "Surface Window Inside Face Glazing Zone Convection Heat Gain Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Face Glazing Net Infrared Heat Transfer Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Shortwave from Zone Back Out Window Heat Transfer Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Face Frame and Divider Zone Heat Gain Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinGainFrameDividerToZoneRep(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Face Gap between Shade and Glazing Zone Convection Heat Gain Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinConvHeatFlowNatural(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Face Shade Zone Convection Heat Gain Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Face Shade Net Infrared Heat Transfer Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     if (state.dataConstruction->Construct(surf.Construction).WindowTypeEQL) {
                         SetupOutputVariable(state,
                                             "Surface Window Inside Face Other Convection Heat Gain Rate",
                                             Constant::Units::W,
                                             state.dataSurface->SurfWinOtherConvHeatGain(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                     }
                 }
@@ -1511,15 +1517,15 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                         "Surface Window Thermochromic Layer Temperature",
                                         Constant::Units::C,
                                         state.dataSurface->SurfWinTCLayerTemp(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Thermochromic Layer Property Specification Temperature",
                                         Constant::Units::C,
                                         state.dataSurface->SurfWinSpecTemp(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                 }
 
@@ -1533,15 +1539,15 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                             "Surface Window Switchable Glazing Switching Factor",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinSwitchingFactor(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Switchable Glazing Visible Transmittance",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinVisTransSelected(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                     }
                 }
@@ -1552,29 +1558,29 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                         "Surface Window Frame Heat Gain Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinFrameHeatGain(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Frame Heat Loss Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinFrameHeatLoss(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Frame Inside Temperature",
                                         Constant::Units::C,
                                         state.dataSurface->SurfWinFrameTempIn(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Frame Outside Temperature",
                                         Constant::Units::C,
                                         state.dataSurface->SurfWinFrameTempSurfOut(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                 }
                 if (state.dataSurface->SurfWinDividerArea(SurfLoop) > 0.0) {
@@ -1583,29 +1589,29 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                         "Surface Window Divider Heat Gain Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinDividerHeatGain(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Divider Heat Loss Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinDividerHeatLoss(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Divider Inside Temperature",
                                         Constant::Units::C,
                                         state.dataSurface->SurfWinDividerTempIn(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Divider Outside Temperature",
                                         Constant::Units::C,
                                         state.dataSurface->SurfWinDividerTempSurfOut(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                 }
 
@@ -1615,22 +1621,22 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                     "Surface Window Total Glazing Layers Absorbed Solar Radiation Energy",
                                     Constant::Units::J,
                                     state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Transmitted Solar Radiation Energy",
                                     Constant::Units::J,
                                     state.dataSurface->SurfWinTransSolarEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Transmitted Beam Solar Radiation Energy",
                                     Constant::Units::J,
                                     state.dataSurface->SurfWinBmSolarEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
 
                 // added TH 12/9/2009
@@ -1638,101 +1644,101 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                     "Surface Window Transmitted Beam To Beam Solar Radiation Energy",
                                     Constant::Units::J,
                                     state.dataSurface->SurfWinBmBmSolarEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Transmitted Beam To Diffuse Solar Radiation Energy",
                                     Constant::Units::J,
                                     state.dataSurface->SurfWinBmDifSolarEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
 
                 SetupOutputVariable(state,
                                     "Surface Window Transmitted Diffuse Solar Radiation Energy",
                                     Constant::Units::J,
                                     state.dataSurface->SurfWinDifSolarEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Heat Gain Energy",
                                     Constant::Units::J,
                                     state.dataSurface->SurfWinHeatGainRepEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Heat Loss Energy",
                                     Constant::Units::J,
                                     state.dataSurface->SurfWinHeatLossRepEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Gap Convective Heat Transfer Energy",
                                     Constant::Units::J,
                                     state.dataSurface->SurfWinGapConvHtFlowRepEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Shading Device Absorbed Solar Radiation Energy",
                                     Constant::Units::J,
                                     state.dataSurface->SurfWinShadingAbsorbedSolarEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Net Heat Transfer Energy",
                                     Constant::Units::J,
                                     state.dataSurface->SurfWinHeatTransferRepEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
 
                 SetupOutputVariable(state,
                                     "Surface Window System Solar Transmittance",
                                     Constant::Units::None,
                                     state.dataSurface->SurfWinSysSolTransmittance(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window System Solar Reflectance",
                                     Constant::Units::None,
                                     state.dataSurface->SurfWinSysSolReflectance(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window System Solar Absorptance",
                                     Constant::Units::None,
                                     state.dataSurface->SurfWinSysSolAbsorptance(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Inside Face Glazing Condensation Status",
                                     Constant::Units::None,
                                     state.dataSurface->SurfWinInsideGlassCondensationFlag(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Inside Face Frame Condensation Status",
                                     Constant::Units::None,
                                     state.dataSurface->SurfWinInsideFrameCondensationFlag(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Inside Face Divider Condensation Status",
                                     Constant::Units::None,
                                     state.dataSurface->SurfWinInsideDividerCondensationFlag(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
 
                 // Outside reveal report variables
@@ -1741,16 +1747,16 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                     "Surface Window Outside Reveal Reflected Beam Solar Radiation Rate",
                                     Constant::Units::W,
                                     state.dataSurface->SurfWinBmSolRefldOutsRevealReport(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 // Energy
                 SetupOutputVariable(state,
                                     "Surface Window Outside Reveal Reflected Beam Solar Radiation Energy",
                                     Constant::Units::J,
                                     state.dataSurface->SurfWinBmSolRefldOutsRevealRepEnergy(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surf.Name);
                 // ENDIF
 
@@ -1760,16 +1766,16 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                         "Surface Window Inside Reveal Reflected Beam Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinBmSolRefldInsRevealReport(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     // Energy
                     SetupOutputVariable(state,
                                         "Surface Window Inside Reveal Reflected Beam Solar Radiation Energy",
                                         Constant::Units::J,
                                         state.dataSurface->SurfWinBmSolRefldInsRevealRepEnergy(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         surf.Name);
 
                     // Added report variables for inside reveal to debug CR 7596. TH 5/26/2009
@@ -1778,29 +1784,29 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                         "Surface Window Inside Reveal Absorbed Beam Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinBmSolAbsdInsRevealReport(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Reveal Reflected Diffuse Zone Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinInsRevealDiffIntoZoneReport(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Reveal Reflected Diffuse Frame Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinInsRevealDiffOntoFrameReport(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Reveal Reflected Diffuse Glazing Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinInsRevealDiffOntoGlazingReport(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                 }
 
@@ -1811,36 +1817,36 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                         "Surface Window Blind Beam to Beam Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinBlTsolBmBm(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Blind Beam to Diffuse Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinBlTsolBmDif(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Blind Diffuse to Diffuse Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinBlTsolDifDif(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Blind and Glazing System Beam Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinBlGlSysTsolBmBm(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Blind and Glazing System Diffuse Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinBlGlSysTsolDifDif(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                 }
 
@@ -1851,36 +1857,36 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                         "Surface Window Screen Beam to Beam Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinScTsolBmBm(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Screen Beam to Diffuse Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinScTsolBmDif(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Screen Diffuse to Diffuse Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinScTsolDifDif(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Screen and Glazing System Beam Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinScGlSysTsolBmBm(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Screen and Glazing System Diffuse Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinScGlSysTsolDifDif(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                 }
 
@@ -1889,43 +1895,43 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                     "Surface Window Solar Horizontal Profile Angle",
                                     Constant::Units::deg,
                                     state.dataSurface->SurfWinProfileAngHor(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Solar Vertical Profile Angle",
                                     Constant::Units::deg,
                                     state.dataSurface->SurfWinProfileAngVert(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Glazing Beam to Beam Solar Transmittance",
                                     Constant::Units::None,
                                     state.dataSurface->SurfWinGlTsolBmBm(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Glazing Beam to Diffuse Solar Transmittance",
                                     Constant::Units::None,
                                     state.dataSurface->SurfWinGlTsolBmDif(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Glazing Diffuse to Diffuse Solar Transmittance",
                                     Constant::Units::None,
                                     state.dataSurface->SurfWinGlTsolDifDif(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     "Surface Window Model Solver Iteration Count",
                                     Constant::Units::None,
                                     state.dataSurface->SurfWinWindowCalcIterationsRep(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surf.Name);
             } else { // Not ExtSolar
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
@@ -1935,16 +1941,16 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                             "Surface Window Total Glazing Layers Absorbed Solar Radiation Rate",
                                             Constant::Units::W,
                                             state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                     }
                     SetupOutputVariable(state,
                                         "Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate",
                                         Constant::Units::W,
                                         state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
 
                     if (surf.OriginalClass != SurfaceClass::TDD_Diffuser) {
@@ -1952,16 +1958,16 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                             "Surface Window Transmitted Solar Radiation Rate",
                                             Constant::Units::W,
                                             state.dataSurface->SurfWinTransSolar(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                     }
                     SetupOutputVariable(state,
                                         "Surface Window Transmitted Beam Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinBmSolar(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
 
                     // added TH 12/9/2009
@@ -1969,80 +1975,80 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                         "Surface Window Transmitted Beam To Beam Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinBmBmSolar(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Transmitted Beam To Diffuse Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinBmDifSolar(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
 
                     SetupOutputVariable(state,
                                         "Surface Window Transmitted Diffuse Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinDifSolar(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Heat Gain Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinHeatGainRep(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Heat Loss Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinHeatLossRep(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Gap Convective Heat Transfer Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinGapConvHtFlowRep(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Shading Device Absorbed Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinShadingAbsorbedSolar(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     if (state.dataSurface->SurfWinFrameArea(SurfLoop) > 0.0) {
                         SetupOutputVariable(state,
                                             "Surface Window Frame Heat Gain Rate",
                                             Constant::Units::W,
                                             state.dataSurface->SurfWinFrameHeatGain(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Frame Heat Loss Rate",
                                             Constant::Units::W,
                                             state.dataSurface->SurfWinFrameHeatLoss(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Frame Inside Temperature",
                                             Constant::Units::C,
                                             state.dataSurface->SurfWinFrameTempIn(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Frame Outside Temperature",
                                             Constant::Units::C,
                                             state.dataSurface->SurfWinFrameTempSurfOut(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                     }
                     if (state.dataSurface->SurfWinDividerArea(SurfLoop) > 0.0) {
@@ -2050,29 +2056,29 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                             "Surface Window Divider Heat Gain Rate",
                                             Constant::Units::W,
                                             state.dataSurface->SurfWinDividerHeatGain(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Divider Heat Loss Rate",
                                             Constant::Units::W,
                                             state.dataSurface->SurfWinDividerHeatLoss(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Divider Inside Temperature",
                                             Constant::Units::C,
                                             state.dataSurface->SurfWinDividerTempIn(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Divider Outside Temperature",
                                             Constant::Units::C,
                                             state.dataSurface->SurfWinDividerTempSurfOut(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                     }
                     // Energy
@@ -2082,8 +2088,8 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                             "Surface Window Total Glazing Layers Absorbed Solar Radiation Energy",
                                             Constant::Units::J,
                                             state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Sum,
                                             surf.Name);
                     }
 
@@ -2092,139 +2098,139 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                             "Surface Window Transmitted Solar Radiation Energy",
                                             Constant::Units::J,
                                             state.dataSurface->SurfWinTransSolarEnergy(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Sum,
                                             surf.Name);
                     }
                     SetupOutputVariable(state,
                                         "Surface Window Transmitted Beam Solar Radiation Energy",
                                         Constant::Units::J,
                                         state.dataSurface->SurfWinBmSolarEnergy(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         surf.Name);
 
                     SetupOutputVariable(state,
                                         "Surface Window Transmitted Beam To Beam Solar Radiation Energy",
                                         Constant::Units::J,
                                         state.dataSurface->SurfWinBmBmSolarEnergy(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Transmitted Beam To Diffuse Solar Radiation Energy",
                                         Constant::Units::J,
                                         state.dataSurface->SurfWinBmDifSolarEnergy(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         surf.Name);
 
                     SetupOutputVariable(state,
                                         "Surface Window Transmitted Diffuse Solar Radiation Energy",
                                         Constant::Units::J,
                                         state.dataSurface->SurfWinDifSolarEnergy(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Heat Gain Energy",
                                         Constant::Units::J,
                                         state.dataSurface->SurfWinHeatGainRepEnergy(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Heat Loss Energy",
                                         Constant::Units::J,
                                         state.dataSurface->SurfWinHeatLossRepEnergy(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Gap Convective Heat Transfer Energy",
                                         Constant::Units::J,
                                         state.dataSurface->SurfWinGapConvHtFlowRepEnergy(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Shading Device Absorbed Solar Radiation Energy",
                                         Constant::Units::J,
                                         state.dataSurface->SurfWinShadingAbsorbedSolarEnergy(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         surf.Name);
 
                     SetupOutputVariable(state,
                                         "Surface Window System Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinSysSolTransmittance(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window System Solar Reflectance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinSysSolReflectance(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window System Solar Absorptance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinSysSolAbsorptance(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Face Glazing Condensation Status",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinInsideGlassCondensationFlag(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Face Frame Condensation Status",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinInsideFrameCondensationFlag(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Face Divider Condensation Status",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinInsideDividerCondensationFlag(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Outside Reveal Reflected Beam Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinBmSolRefldOutsRevealReport(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Reveal Reflected Beam Solar Radiation Rate",
                                         Constant::Units::W,
                                         state.dataSurface->SurfWinBmSolRefldInsRevealReport(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     // Energy
                     SetupOutputVariable(state,
                                         "Surface Window Outside Reveal Reflected Beam Solar Radiation Energy",
                                         Constant::Units::J,
                                         state.dataSurface->SurfWinBmSolRefldOutsRevealRepEnergy(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Inside Reveal Reflected Beam Solar Radiation Energy",
                                         Constant::Units::J,
                                         state.dataSurface->SurfWinBmSolRefldInsRevealRepEnergy(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         surf.Name);
 
                     //     Output blind report variables only when blinds are used
@@ -2233,36 +2239,36 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                             "Surface Window Blind Beam to Beam Solar Transmittance",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinBlTsolBmBm(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Blind Beam to Diffuse Solar Transmittance",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinBlTsolBmDif(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Blind Diffuse to Diffuse Solar Transmittance",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinBlTsolDifDif(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Blind and Glazing System Beam Solar Transmittance",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinBlGlSysTsolBmBm(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Blind and Glazing System Diffuse Solar Transmittance",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinBlGlSysTsolDifDif(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                     }
 
@@ -2272,36 +2278,36 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                             "Surface Window Screen Beam to Beam Solar Transmittance",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinScTsolBmBm(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Screen Beam to Diffuse Solar Transmittance",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinScTsolBmDif(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Screen Diffuse to Diffuse Solar Transmittance",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinScTsolDifDif(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Screen and Glazing System Beam Solar Transmittance",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinScGlSysTsolBmBm(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                         SetupOutputVariable(state,
                                             "Surface Window Screen and Glazing System Diffuse Solar Transmittance",
                                             Constant::Units::None,
                                             state.dataSurface->SurfWinScGlSysTsolDifDif(SurfLoop),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             surf.Name);
                     }
 
@@ -2309,43 +2315,43 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                         "Surface Window Solar Horizontal Profile Angle",
                                         Constant::Units::deg,
                                         state.dataSurface->SurfWinProfileAngHor(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Solar Vertical Profile Angle",
                                         Constant::Units::deg,
                                         state.dataSurface->SurfWinProfileAngVert(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Glazing Beam to Beam Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinGlTsolBmBm(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Glazing Beam to Diffuse Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinGlTsolBmDif(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Glazing Diffuse to Diffuse Solar Transmittance",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinGlTsolDifDif(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                     SetupOutputVariable(state,
                                         "Surface Window Model Solver Iteration Count",
                                         Constant::Units::None,
                                         state.dataSurface->SurfWinWindowCalcIterationsRep(SurfLoop),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         surf.Name);
                 }
             } // end non extsolar reporting as advanced variables
@@ -2356,16 +2362,16 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                 "Surface Window Transmitted Beam Solar Radiation Rate",
                                 Constant::Units::W,
                                 state.dataSurface->SurfWinBmSolTransThruIntWinRep(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             // energy
             SetupOutputVariable(state,
                                 "Surface Window Transmitted Beam Solar Radiation Energy",
                                 Constant::Units::J,
                                 state.dataSurface->SurfWinBmSolTransThruIntWinRepEnergy(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 surf.Name);
         }
         if (surf.Class == SurfaceClass::TDD_Dome && surf.ExtSolar) {
@@ -2374,30 +2380,30 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                 "Surface Window Total Glazing Layers Absorbed Solar Radiation Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Window Transmitted Solar Radiation Rate",
                                 Constant::Units::W,
                                 state.dataSurface->SurfWinTransSolar(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             // energy
             SetupOutputVariable(state,
                                 "Surface Window Total Glazing Layers Absorbed Solar Radiation Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Window Transmitted Solar Radiation Energy",
                                 Constant::Units::J,
                                 state.dataSurface->SurfWinTransSolarEnergy(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 surf.Name);
         }
         if (surf.OriginalClass == SurfaceClass::TDD_Diffuser) {
@@ -2406,37 +2412,37 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                 "Surface Outside Face Incident Solar Radiation Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBal->SurfQRadSWOutIncident(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Window Total Glazing Layers Absorbed Solar Radiation Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Window Transmitted Solar Radiation Rate",
                                 Constant::Units::W,
                                 state.dataSurface->SurfWinTransSolar(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
             // energy
             SetupOutputVariable(state,
                                 "Surface Window Total Glazing Layers Absorbed Solar Radiation Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 surf.Name);
             SetupOutputVariable(state,
                                 "Surface Window Transmitted Solar Radiation Energy",
                                 Constant::Units::J,
                                 state.dataSurface->SurfWinTransSolarEnergy(SurfLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 surf.Name);
         }
     }
@@ -2449,65 +2455,65 @@ void AllocateModuleArrays(EnergyPlusData &state)
                             "Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate per Area",
                             Constant::Units::W_m2,
                             state.dataHeatBal->SurfBmIncInsSurfIntensRep(SurfLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surf.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate",
                             Constant::Units::W,
                             state.dataHeatBal->SurfBmIncInsSurfAmountRep(SurfLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surf.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate per Area",
                             Constant::Units::W_m2,
                             state.dataHeatBal->SurfIntBmIncInsSurfIntensRep(SurfLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surf.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate",
                             Constant::Units::W,
                             state.dataHeatBal->SurfIntBmIncInsSurfAmountRep(SurfLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surf.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate",
                             Constant::Units::W,
                             state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surf.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate",
                             Constant::Units::W,
                             state.dataHeatBal->SurfWinInitialDifSolInTransReport(SurfLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surf.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Absorbed Shortwave Radiation Rate",
                             Constant::Units::W,
                             state.dataHeatBal->SurfSWInAbsTotalReport(SurfLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surf.Name);
         // energy
         SetupOutputVariable(state,
                             "Surface Inside Face Exterior Windows Incident Beam Solar Radiation Energy",
                             Constant::Units::J,
                             state.dataHeatBal->SurfBmIncInsSurfAmountRepEnergy(SurfLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             surf.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Interior Windows Incident Beam Solar Radiation Energy",
                             Constant::Units::J,
                             state.dataHeatBal->SurfIntBmIncInsSurfAmountRepEnergy(SurfLoop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             surf.Name);
     }
 }
@@ -2580,7 +2586,6 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
     Real64 Epsilon;                // Sky clearness parameter
     Real64 Delta;                  // Sky brightness parameter
     Real64 CosIncAngBeamOnSurface; // Cosine of incidence angle of beam solar on surface
-    Real64 IncAng;                 // Incidence angle of beam solar on surface (radians)
     int EpsilonBin;                // Sky clearness (Epsilon) bin index
     Real64 AirMass;                // Relative air mass
     Real64 AirMassH;               // Intermediate variable for relative air mass calculation
@@ -2644,8 +2649,6 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
             }
             CosIncAngBeamOnSurface = -1.0;
         }
-
-        IncAng = std::acos(CosIncAngBeamOnSurface);
 
         ViewFactorSkyGeom = state.dataSurface->Surface(SurfNum).ViewFactorSky;
         state.dataSolarShading->SurfMultIsoSky(SurfNum) = ViewFactorSkyGeom * (1.0 - F1);
@@ -3134,19 +3137,17 @@ bool polygon_contains_point(int const nsides,            // number of sides (ver
     // Using/Aliasing
     using namespace DataVectorTypes;
 
-    // Return value
-    bool inside; // return value, true=inside, false = not inside
+    // return value, true=inside, false = not inside
 
     EP_SIZE_CHECK(polygon_3d, nsides);
 
-    int i;
     int ip1;
 
     // Object Data
     Array1D<Vector_2d> polygon(nsides);
     Vector_2d point;
 
-    inside = false;
+    bool inside = false;
     if (ignorex) {
         for (int i = 1; i <= nsides; ++i) {
             polygon(i).x = polygon_3d(i).y;
@@ -3173,7 +3174,7 @@ bool polygon_contains_point(int const nsides,            // number of sides (ver
         point.x = point.y = 0.0; // Elim possibly used uninitialized warnings
     }
 
-    for (i = 1; i <= nsides; ++i) {
+    for (int i = 1; i <= nsides; ++i) {
 
         if (i < nsides) {
             ip1 = i + 1;
@@ -3862,161 +3863,98 @@ inline bool d_eq(Real64 a, Real64 b)
     return std::abs(a - b) < 2.0;
 }
 
-void CLIPLINE(Real64 &x1, Real64 &x2, Real64 &y1, Real64 &y2, Real64 maxX, Real64 minX, Real64 maxY, Real64 minY, bool &visible, bool &rev)
+void CLIPLINE(Real64 &x0, Real64 &x1, Real64 &y0, Real64 &y1, Real64 maxX, Real64 minX, Real64 maxY, Real64 minY, bool &visible)
 {
+
     // Line segment clipping
     // Reference:
-    // Slater, M., Barsky, B.A.
+    // Liang, Y.D., Barsky, B.A., Slater, M.
     // 2D line and polygon clipping based on space subdivision.
     // The Visual Computer 10, 407–422 (1994).
-    Real64 dx, dy, e, xinc, yinc, tempVar;
-    bool needX = true, needY = true;
-    int c1, c2;
 
-    if (x1 > x2) { // reverse for efficiency
-        tempVar = x1;
-        x1 = x2;
-        x2 = tempVar;
-        tempVar = y1;
-        y1 = y2;
-        y2 = tempVar;
+    // Tweaked via microbenchmarking to improve efficiency
+
+    bool rev = false;
+    if (x0 > x1) { // reverse for efficiency
+        std::swap(x0, x1);
+        std::swap(y0, y1);
         rev = true;
     }
-    if (x1 > maxX || x2 < minX) return; // x is positive
-    if (x1 < minX) {
-        if (y1 < minY) {
-            if (y2 < minY) return;
-            c1 = 0;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            e = dy * (minX - x1) + dx * (y1 - minY);
-        } else if (y1 > maxY) {
-            if (y2 > maxY) return;
-            c1 = 6;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            e = dy * (minX - x1) + dx * (y1 - maxY);
-        } else {
-            c1 = 3;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            if (dy > 0) {
-                e = dy * (minX - x1) + dx * (y1 - maxY);
-            } else {
-                e = dy * (minX - x1) + dx * (y1 - minY);
-            }
+
+    if (x0 > maxX || x1 < minX) {
+        // Both points are outside the clip window, so they can't cross it
+        return;
+    }
+
+    // defining variables
+    Real64 const dx = x1 - x0; // >= 0
+    Real64 const dy = y1 - y0;
+
+    Real64 const q1 = x0 - minX;
+    Real64 const q2 = maxX - x0;
+    Real64 const q3 = y0 - minY;
+    Real64 const q4 = maxY - y0;
+
+    Real64 u1 = 0;
+    Real64 u2 = 1;
+
+    if ((dx == 0 && (q1 < 0 || q2 < 0)) || (dy == 0 && (q3 < 0 || q4 < 0))) {
+        // Line is parallel to clipping window
+        return;
+    }
+    if (dx != 0) {
+        Real64 const r1 = q1 / -dx;
+        if (r1 > u1) {
+            u1 = r1;
         }
-    } else {
-        if (y1 < minY) {
-            if (y2 < minY) return;
-            c1 = 1;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            e = dy * (maxX - x1) + dx * (y1 - minY);
-        } else if (y1 > maxY) {
-            if (y2 > maxY) return;
-            c1 = 7;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            e = dy * (maxX - x1) + dx * (y1 - maxY);
+        Real64 const r2 = q2 / dx;
+        if (r2 < u2) {
+            u2 = r2;
+        }
+    }
+    if (dy != 0) {
+        Real64 const r3 = q3 / -dy;
+        Real64 const r4 = q4 / dy;
+        if (dy > 0) {
+            if (r3 > u1) {
+                u1 = r3;
+            }
+            if (r4 < u2) {
+                u2 = r4;
+            }
         } else {
-            visible = true;
-            if (x2 <= maxX && (y2 >= minY && y2 <= maxY)) return;
-            c1 = 4;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            if (dy > 0) {
-                e = dy * (maxX - x1) + dx * (y1 - maxY);
-            } else {
-                e = dy * (maxX - x1) + dx * (y1 - minY);
+            if (r4 > u1) {
+                u1 = r4;
+            }
+            if (r3 < u2) {
+                u2 = r3;
             }
         }
     }
-    c2 = c1;
-    if (dy > 0) {
-        while (true) {
-            if (e < 0.0) {
-                if (c2 == 1)
-                    return;
-                else if (c2 == 3) {
-                    visible = true;
-                    x1 = minX;
-                    y1 = maxY + e / dx;
-                    if (x2 <= maxX && y2 <= maxY) return;
-                } else if (c2 == 4) {
-                    x2 = maxX;
-                    y2 = maxY + e / dx;
-                    return;
-                }
-                if (needX) {
-                    xinc = dy * (maxX - minX);
-                    needX = false;
-                }
-                e += xinc;
-                c2 += 1;
-            } else {
-                if (c2 == 3)
-                    return;
-                else if (c2 == 1) {
-                    visible = true;
-                    x1 = maxX - e / dy;
-                    y1 = minY;
-                    if (x2 <= maxX && y2 <= maxY) return;
-                } else if (c2 == 4) {
-                    x2 = maxX - e / dy;
-                    y2 = maxY;
-                    return;
-                }
-                if (needY) {
-                    yinc = dx * (maxY - minY);
-                    needY = false;
-                }
-                e -= yinc;
-                c2 += 3;
-            }
-        }
+
+    if (u1 > u2) { // reject
+        // Line is outside the clipping window
+        return;
+    }
+
+    visible = true;
+
+    Real64 const xn0 = x0 + dx * u1;
+    Real64 const yn0 = y0 + dy * u1;
+
+    Real64 const xn1 = x0 + dx * u2;
+    Real64 const yn1 = y0 + dy * u2;
+
+    if (rev) {
+        x0 = xn1;
+        y0 = yn1;
+        x1 = xn0;
+        y1 = yn0;
     } else {
-        while (true) {
-            if (e >= 0.0) {
-                if (c2 == 7)
-                    return;
-                else if (c2 == 3) {
-                    visible = true;
-                    x1 = minX;
-                    y1 = minY + e / dx;
-                    if (x2 <= maxX && y2 >= minY) return;
-                } else if (c2 == 4) {
-                    x2 = maxX;
-                    y2 = minY + e / dx;
-                    return;
-                }
-                if (needX) {
-                    xinc = dy * (maxX - minX);
-                    needX = false;
-                }
-                e += xinc;
-                c2 += 1;
-            } else {
-                if (c2 == 3)
-                    return;
-                else if (c2 == 7) {
-                    visible = true;
-                    x1 = maxX - e / dy;
-                    y1 = maxY;
-                    if (x2 <= maxX && y2 >= minY) return;
-                } else if (c2 == 4) {
-                    x2 = maxX - e / dy;
-                    y2 = minY;
-                    return;
-                }
-                if (needY) {
-                    yinc = dx * (maxY - minY);
-                    needY = false;
-                }
-                e += yinc;
-                c2 -= 3;
-            }
-        }
+        x0 = xn0;
+        y0 = yn0;
+        x1 = xn1;
+        y1 = yn1;
     }
 }
 
@@ -4057,19 +3995,10 @@ void CLIPRECT(EnergyPlusData &state, int const NS2, int const NV1, int &NV3)
         Real64 x1 = x_1, x2 = x_2, y1 = y_1, y2 = y_2;
 
         bool visible = false;
-        bool rev = false;
-        CLIPLINE(x_1, x_2, y_1, y_2, maxX, minX, maxY, minY, visible, rev);
+        CLIPLINE(x_1, x_2, y_1, y_2, maxX, minX, maxY, minY, visible);
         if (visible) {
             if ((x_1 != x1 || y_1 != y1) || (x_2 != x2 || y_2 != y2)) {
                 INTFLAG = true;
-            }
-            if (rev) { // undo reverse
-                Real64 tempVar = x_1;
-                x_1 = x_2;
-                x_2 = tempVar;
-                tempVar = y_1;
-                y_1 = y_2;
-                y_2 = tempVar;
             }
             // if line on edge, or inside, add both points
             if (arrc == 0 || ((neq(arrx[arrc - 1], x_1) || neq(arry[arrc - 1], y_1)) && (neq(arrx[0], x_1) || neq(arry[0], y_1)))) {
@@ -5746,7 +5675,7 @@ void SHADOW(EnergyPlusData &state,
                      state.dataSurface->Surface(NGRS).lcsz.y * state.dataSolarShading->SUNCOS(2) +
                      state.dataSurface->Surface(NGRS).lcsz.z * state.dataSolarShading->SUNCOS(3);
 
-                if (std::abs(ZS) > 1.e-4) {
+                if (std::abs(ZS) > Constant::SmallDistance) {
                     state.dataSolarShading->XShadowProjection = XS / ZS;
                     state.dataSolarShading->YShadowProjection = YS / ZS;
                     if (std::abs(state.dataSolarShading->XShadowProjection) < 1.e-8) state.dataSolarShading->XShadowProjection = 0.0;
@@ -6528,30 +6457,30 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                 if (SunLitFract > 0.0 || SunlitFracWithoutReveal) {
                     if (VarSlats) {
-                        FrontBeamDiffTrans = WindowManager::InterpProfSlat(thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexLower),
-                                                                           thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexLower),
-                                                                           thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexUpper),
-                                                                           thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexUpper),
-                                                                           SlatsAngInterpFac,
-                                                                           ProfAngInterpFac);
-                        FrontBeamAbs = WindowManager::InterpProfSlat(thisBlind.SolFrontBeamAbs(SlatsAngIndexLower, ProfAngIndexLower),
-                                                                     thisBlind.SolFrontBeamAbs(SlatsAngIndexUpper, ProfAngIndexLower),
-                                                                     thisBlind.SolFrontBeamAbs(SlatsAngIndexLower, ProfAngIndexUpper),
-                                                                     thisBlind.SolFrontBeamAbs(SlatsAngIndexUpper, ProfAngIndexUpper),
-                                                                     SlatsAngInterpFac,
-                                                                     ProfAngInterpFac);
+                        FrontBeamDiffTrans = Window::InterpProfSlat(thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexLower),
+                                                                    thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                                    thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                                    thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                                    SlatsAngInterpFac,
+                                                                    ProfAngInterpFac);
+                        FrontBeamAbs = Window::InterpProfSlat(thisBlind.SolFrontBeamAbs(SlatsAngIndexLower, ProfAngIndexLower),
+                                                              thisBlind.SolFrontBeamAbs(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                              thisBlind.SolFrontBeamAbs(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                              thisBlind.SolFrontBeamAbs(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                              SlatsAngInterpFac,
+                                                              ProfAngInterpFac);
                         if (ShadeFlag != WinShadingType::ExtBlind) { // FRONT: interior or bg blinds
                             FrontDiffDiffRefl = General::Interp(thisBlind.SolFrontDiffDiffRefl(SlatsAngIndexLower),
                                                                 thisBlind.SolFrontDiffDiffRefl(SlatsAngIndexUpper),
                                                                 SlatsAngInterpFac);
                             FrontDiffAbs = General::Interp(
                                 thisBlind.SolFrontDiffAbs(SlatsAngIndexLower), thisBlind.SolFrontDiffAbs(SlatsAngIndexUpper), SlatsAngInterpFac);
-                            FrontBeamDiffRefl = WindowManager::InterpProfSlat(thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexLower),
-                                                                              thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexLower),
-                                                                              thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexUpper),
-                                                                              thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexUpper),
-                                                                              SlatsAngInterpFac,
-                                                                              ProfAngInterpFac);
+                            FrontBeamDiffRefl = Window::InterpProfSlat(thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexLower),
+                                                                       thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                                       thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                                       thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                                       SlatsAngInterpFac,
+                                                                       ProfAngInterpFac);
                         }
                         if (ShadeFlag != WinShadingType::IntBlind) { // BACK: exterior or bg blinds
                             BackDiffDiffTrans = General::Interp(thisBlind.SolBackDiffDiffTrans(SlatsAngIndexLower),
@@ -6562,24 +6491,24 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                                SlatsAngInterpFac);
                             BackDiffAbs = General::Interp(
                                 thisBlind.SolBackDiffAbs(SlatsAngIndexLower), thisBlind.SolBackDiffAbs(SlatsAngIndexUpper), SlatsAngInterpFac);
-                            BackBeamDiffTrans = WindowManager::InterpProfSlat(thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexLower),
-                                                                              thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexLower),
-                                                                              thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexUpper),
-                                                                              thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexUpper),
-                                                                              SlatsAngInterpFac,
-                                                                              ProfAngInterpFac);
-                            BackBeamDiffRefl = WindowManager::InterpProfSlat(thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexLower),
-                                                                             thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexLower),
-                                                                             thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexUpper),
-                                                                             thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexUpper),
-                                                                             SlatsAngInterpFac,
-                                                                             ProfAngInterpFac);
-                            BackBeamAbs = WindowManager::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLower, ProfAngIndexLower),
-                                                                        thisBlind.SolBackBeamAbs(SlatsAngIndexUpper, ProfAngIndexLower),
-                                                                        thisBlind.SolBackBeamAbs(SlatsAngIndexLower, ProfAngIndexUpper),
-                                                                        thisBlind.SolBackBeamAbs(SlatsAngIndexUpper, ProfAngIndexUpper),
-                                                                        SlatsAngInterpFac,
-                                                                        ProfAngInterpFac);
+                            BackBeamDiffTrans = Window::InterpProfSlat(thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexLower),
+                                                                       thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                                       thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                                       thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                                       SlatsAngInterpFac,
+                                                                       ProfAngInterpFac);
+                            BackBeamDiffRefl = Window::InterpProfSlat(thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexLower),
+                                                                      thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                                      thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                                      thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                                      SlatsAngInterpFac,
+                                                                      ProfAngInterpFac);
+                            BackBeamAbs = Window::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLower, ProfAngIndexLower),
+                                                                 thisBlind.SolBackBeamAbs(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                                 thisBlind.SolBackBeamAbs(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                                 thisBlind.SolBackBeamAbs(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                                 SlatsAngInterpFac,
+                                                                 ProfAngInterpFac);
                         }
                     } else {
                         FrontBeamAbs = General::Interp(
@@ -6710,9 +6639,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 Real64 TBlBmDiff = FrontBeamDiffTrans;                              // Blind solar front beam-diffuse transmittance
                                 Real64 RhoBlBack = BackBeamDiffRefl;                                // Blind solar back beam-diffuse reflectance
                                 Real64 RhoBlDiffBack = BackDiffDiffRefl;                            // Blind solar back diffuse reflectance
-                                Real64 RGlFront = POLYF(CosInc,
-                                                        thisConstruct.ReflSolBeamFrontCoef); // Glazing system solar front beam-beam reflectance
-                                Real64 RGlDiffFront = thisConstruct.ReflectSolDiffFront;     // Glazing system front diffuse solar reflectance
+                                Real64 RGlFront =
+                                    POLYF(CosInc, thisConstruct.ReflSolBeamFrontCoef);   // Glazing system solar front beam-beam reflectance
+                                Real64 RGlDiffFront = thisConstruct.ReflectSolDiffFront; // Glazing system front diffuse solar reflectance
                                 for (int Lay = 1; Lay <= NGlass; ++Lay) {
                                     Real64 ADiffWin = thisConstruct.AbsDiff(Lay);     // Diffuse solar absorptance of glass layer, bare window
                                     Real64 AGlDiffFront = thisConstruct.AbsDiff(Lay); // Glass layer front diffuse solar absorptance
@@ -6731,36 +6660,86 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                   (AbsBlDiffBack * RGlDiffFront / (1.0 - RhoBlDiffBack * RGlDiffFront)) *
                                                       (RGlFront * TBlBmBm * RhoBlBack + TBlBmDiff);
                                 state.dataSolarShading->SurfWinExtBeamAbsByShadFac(SurfNum) = AbsShade * CosInc * SunLitFract * InOutProjSLFracMult;
-                                if (state.dataEnvrn->Month == 7 && state.dataEnvrn->DayOfMonth == 21 && state.dataGlobal->HourOfDay == 8) {
-                                    double tst = state.dataSolarShading->SurfWinExtBeamAbsByShadFac(SurfNum);
-                                    tst = 0;
-                                }
                             } else if (ShadeFlag == WinShadingType::ExtScreen) {
                                 // Exterior screen on
-                                Real64 TScBmBm = state.dataMaterial->Screens(ScNum).BmBmTrans;    // Screen solar front beam-beam transmittance
-                                Real64 TScBmDiff = state.dataMaterial->Screens(ScNum).BmDifTrans; // Screen solar front beam-diffuse transmittance
-                                Real64 RScBack = state.dataMaterial->Screens(ScNum).ReflectSolBeamFront; // Screen solar back beam-diffuse reflectance
-                                Real64 RScDifBack = state.dataMaterial->Screens(ScNum).DifReflect; // Screen solar back diffuse-diffuse reflectance
-                                Real64 RGlFront = POLYF(CosInc,
-                                                        thisConstruct.ReflSolBeamFrontCoef);       // Glazing system solar front beam-beam reflectance
-                                Real64 RGlDiffFront = thisConstruct.ReflectSolDiffFront;           // Glazing system front diffuse solar reflectance
-                                Real64 TScDifDif = state.dataMaterial->Screens(ScNum).DifDifTrans; // Diffuse-diffuse solar transmittance of screen
-                                Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;               // Diffuse front reflectance of glass
+                                auto const *screen = dynamic_cast<Material::MaterialScreen const *>(state.dataMaterial->Material(ScNum));
+                                assert(screen != nullptr);
+
+                                auto &surf = state.dataSurface->Surface(SurfNum);
+
+                                Real64 solPhi = std::acos(state.dataEnvrn->SOLCOS.z);
+                                Real64 solTheta = std::atan2(state.dataEnvrn->SOLCOS.x, state.dataEnvrn->SOLCOS.y);
+                                Real64 winPhi = surf.Tilt * Constant::DegToRad;
+                                Real64 winTheta = surf.Azimuth * Constant::DegToRad;
+                                Real64 phi = std::abs(solPhi - winPhi);
+                                Real64 theta = std::abs(solTheta - winTheta);
+                                Material::NormalizePhiTheta(phi, theta);
+#ifdef PRECALC_INTERP_SCREEN
+                                int ip1, ip2, it1, it2;
+                                General::BilinearInterpCoeffs coeffs;
+                                Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
+                                GetBilinearInterpCoeffs(
+                                    phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                                auto const &b11 = screen->btars[ip1][it1];
+                                auto const &b12 = screen->btars[ip1][it2];
+                                auto const &b21 = screen->btars[ip2][it1];
+                                auto const &b22 = screen->btars[ip2][it2];
+
+                                Real64 TScDifDif = screen->DfTrans;
+                                Real64 TScBmDif = BilinearInterp(b11.DfTrans, b12.DfTrans, b21.DfTrans, b22.DfTrans, coeffs);
+                                Real64 TScBmBm = BilinearInterp(b11.BmTrans, b12.BmTrans, b21.BmTrans, b22.BmTrans, coeffs);
+                                Real64 RScBack = BilinearInterp(b11.RefSolFront, b12.RefSolFront, b21.RefSolFront, b22.RefSolFront, coeffs);
+                                Real64 RScDifBack = screen->DfRef;
+
+                                Real64 RGlFront =
+                                    POLYF(CosInc, thisConstruct.ReflSolBeamFrontCoef);   // Glazing system solar front beam-beam reflectance
+                                Real64 RGlDiffFront = thisConstruct.ReflectSolDiffFront; // Glazing system front diffuse solar reflectance
+                                Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;     // Diffuse front reflectance of glass
                                 // Reduce the bare window absorbed beam by the screen beam transmittance and then account for
                                 // interreflections
                                 for (int Lay = 1; Lay <= NGlass; ++Lay) {
                                     Real64 ADiffWin = thisConstruct.AbsDiff(Lay); // Diffuse solar absorptance of glass layer, bare window
-                                    AbWinSh(Lay) = TScBmBm * AbWin(Lay) + (TScBmBm * RGlFront * RScBack + TScBmDiff) * thisConstruct.AbsDiff(Lay) /
+                                    AbWinSh(Lay) = TScBmBm * AbWin(Lay) + (TScBmBm * RGlFront * RScBack + TScBmDif) * thisConstruct.AbsDiff(Lay) /
                                                                               (1.0 - RGlDiffFront * RScDifBack) * CosInc * FracSunLit;
                                     ADiffWinSh(Lay) = ADiffWin * TScDifDif / (1.0 - RGlDifFr * RScDifBack);
                                 }
                                 // Exterior beam absorbed by EXTERIOR SCREEN
-                                Real64 AbsScBeam = state.dataMaterial->Screens(ScNum).AbsorpSolarBeamFront; // Screen solar beam absorptance
-                                Real64 AbsScDiffBack = state.dataMaterial->Screens(ScNum).DifScreenAbsorp;  // Screen solar back diffuse absorptance
+                                Real64 AbsScBeam = BilinearInterp(b11.AbsSolFront, b12.AbsSolFront, b21.AbsSolFront, b22.AbsSolFront, coeffs);
+                                Real64 AbsScDiffBack = screen->DfAbs;
                                 Real64 AbsScreen = AbsScBeam * (1.0 + TScBmBm * RGlFront) +
                                                    (AbsScDiffBack * TScBmBm * RGlFront * RGlDiffFront * RScBack /
                                                     (1.0 - RScDifBack * RGlDiffFront)); // Exterior screen beam solar absorptance
                                 state.dataSolarShading->SurfWinExtBeamAbsByShadFac(SurfNum) = AbsScreen * CosInc * SunLitFract * InOutProjSLFracMult;
+#else  // !PRECALC_INTERP_SCREEN
+                                Material::ScreenBmTransAbsRef btar;
+                                CalcScreenTransmittance(state, screen, phi, theta, btar);
+
+                                Real64 TScDifDif = screen->DfTrans;
+                                Real64 TScBmDif = btar.DfTrans;
+                                Real64 TScBmBm = btar.BmTrans;
+                                Real64 RScBack = btar.RefSolFront;
+                                Real64 RScDifBack = screen->DfRef;
+
+                                Real64 RGlFront =
+                                    POLYF(CosInc, thisConstruct.ReflSolBeamFrontCoef);   // Glazing system solar front beam-beam reflectance
+                                Real64 RGlDiffFront = thisConstruct.ReflectSolDiffFront; // Glazing system front diffuse solar reflectance
+                                Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;     // Diffuse front reflectance of glass
+                                // Reduce the bare window absorbed beam by the screen beam transmittance and then account for
+                                // interreflections
+                                for (int Lay = 1; Lay <= NGlass; ++Lay) {
+                                    Real64 ADiffWin = thisConstruct.AbsDiff(Lay); // Diffuse solar absorptance of glass layer, bare window
+                                    AbWinSh(Lay) = TScBmBm * AbWin(Lay) + (TScBmBm * RGlFront * RScBack + TScBmDif) * thisConstruct.AbsDiff(Lay) /
+                                                                              (1.0 - RGlDiffFront * RScDifBack) * CosInc * FracSunLit;
+                                    ADiffWinSh(Lay) = ADiffWin * TScDifDif / (1.0 - RGlDifFr * RScDifBack);
+                                }
+                                // Exterior beam absorbed by EXTERIOR SCREEN
+                                Real64 AbsScBeam = btar.AbsSolFront;
+                                Real64 AbsScDiffBack = screen->DfAbs;
+                                Real64 AbsScreen = AbsScBeam * (1.0 + TScBmBm * RGlFront) +
+                                                   (AbsScDiffBack * TScBmBm * RGlFront * RGlDiffFront * RScBack /
+                                                    (1.0 - RScDifBack * RGlDiffFront)); // Exterior screen beam solar absorptance
+                                state.dataSolarShading->SurfWinExtBeamAbsByShadFac(SurfNum) = AbsScreen * CosInc * SunLitFract * InOutProjSLFracMult;
+#endif // PRECALC_INTERP_SCREEN
                             } else if (ShadeFlag == WinShadingType::BGBlind) {
                                 // Between-glass blind o
                                 // Isolated glass and blind properties at current incidence angle, profile angle and slat angle
@@ -6788,7 +6767,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 Real64 tfshBB =
                                     state.dataSurface->SurfWinBlindBmBmTrans(SurfNum); // Bare-blind front and back beam-beam solar transmittance
                                 auto const &thisBlind = state.dataMaterial->Blind(BlNum);
-                                Real64 tbshBB = WindowManager::BlindBeamBeamTrans(
+                                Real64 tbshBB = Window::BlindBeamBeamTrans(
                                     ProfAng, Constant::Pi - SlatAng, thisBlind.SlatWidth, thisBlind.SlatSeparation, thisBlind.SlatThickness);
                                 Real64 tfshBd = FrontBeamDiffTrans; // Bare-blind front and back beam-diffuse solar transmittance
                                 Real64 tbshBd = BackBeamDiffTrans;
@@ -6868,12 +6847,12 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             for (int Lay = 1; Lay <= NGlass; ++Lay) {
                                 Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum);
                                 Real64 ADiffWin = thisConstruct.AbsDiff(Lay);
-                                state.dataSurface->SurfWinA(SurfNum, Lay) = WindowManager::InterpSw(SwitchFac, AbWin(Lay), AbWinSh(Lay));
+                                state.dataSurface->SurfWinA(SurfNum, Lay) = Window::InterpSw(SwitchFac, AbWin(Lay), AbWinSh(Lay));
                                 // Add contribution of diffuse from beam on outside and inside reveal
                                 state.dataSurface->SurfWinA(SurfNum, Lay) +=
-                                    WindowManager::InterpSw(SwitchFac, ADiffWin, ADiffWinSh(Lay)) *
+                                    Window::InterpSw(SwitchFac, ADiffWin, ADiffWinSh(Lay)) *
                                         state.dataSurface->SurfWinOutsRevealDiffOntoGlazing(SurfNum) +
-                                    WindowManager::InterpSw(SwitchFac, thisConstruct.AbsDiffBack(Lay), thisConstructSh.AbsDiffBack(Lay)) *
+                                    Window::InterpSw(SwitchFac, thisConstruct.AbsDiffBack(Lay), thisConstructSh.AbsDiffBack(Lay)) *
                                         state.dataSurface->SurfWinInsRevealDiffOntoGlazing(SurfNum);
                             }
                         }
@@ -7044,7 +7023,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     } else {
                         // Switchable glazing
                         Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum); // Switching factor for a window
-                        DiffTrans = WindowManager::InterpSw(SwitchFac, thisConstruct.TransDiff, thisConstructSh.TransDiff);
+                        DiffTrans = Window::InterpSw(SwitchFac, thisConstruct.TransDiff, thisConstructSh.TransDiff);
                     }
                 }
             }
@@ -7057,7 +7036,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     state.dataSurface->SurfWinBlGlSysTsolDifDif(SurfNum) = DiffTrans;
                     state.dataSurface->SurfWinScGlSysTsolDifDif(SurfNum) = DiffTrans;
                     if (ShadeFlag == WinShadingType::ExtScreen) {
-                        state.dataSurface->SurfWinScTsolDifDif(SurfNum) = state.dataMaterial->Screens(ScNum).DifDifTrans;
+                        auto const *screen = dynamic_cast<Material::MaterialScreen const *>(state.dataMaterial->Material(ScNum));
+                        assert(screen != nullptr);
+                        state.dataSurface->SurfWinScTsolDifDif(SurfNum) = screen->DfTrans;
                     } else {
                         state.dataSurface->SurfWinBlTsolDifDif(SurfNum) = FrontDiffDiffTrans;
                     }
@@ -7142,23 +7123,69 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             Real64 TScBmBm;
                             Real64 TBlBmBm;
                             if (ShadeFlag == WinShadingType::ExtScreen) { // Exterior screen
-                                Real64 RScBack = state.dataMaterial->Screens(ScNum).ReflectSolBeamFront;
-                                Real64 RScDifDifBk = state.dataMaterial->Screens(ScNum).DifReflect; // Diffuse-diffuse back refectance of screen
+                                auto const *screen = dynamic_cast<Material::MaterialScreen const *>(state.dataMaterial->Material(ScNum));
+                                assert(screen != nullptr);
+
+                                auto &surf = state.dataSurface->Surface(SurfNum);
+                                Real64 solPhi = std::acos(state.dataEnvrn->SOLCOS.z);
+                                Real64 solTheta = std::atan2(state.dataEnvrn->SOLCOS.x, state.dataEnvrn->SOLCOS.y);
+                                Real64 winPhi = surf.Tilt * Constant::DegToRad;
+                                Real64 winTheta = surf.Azimuth * Constant::DegToRad;
+                                Real64 phi = std::abs(solPhi - winPhi);
+                                Real64 theta = std::abs(solTheta - winTheta);
+                                Material::NormalizePhiTheta(phi, theta);
+#ifdef PRECALC_INTERP_SCREEN
+                                int ip1, ip2, it1, it2;
+                                General::BilinearInterpCoeffs coeffs;
+                                Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
+                                GetBilinearInterpCoeffs(
+                                    phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                                auto const &b11 = screen->btars[ip1][it1];
+                                auto const &b12 = screen->btars[ip1][it2];
+                                auto const &b21 = screen->btars[ip2][it1];
+                                auto const &b22 = screen->btars[ip2][it2];
+
+                                Real64 RScBack = BilinearInterp(b11.RefSolFront, b12.RefSolFront, b21.RefSolFront, b22.RefSolFront, coeffs);
+                                Real64 RScDifBack = screen->DfRef;
+
                                 Real64 RGlBmFr = POLYF(CosInc, thisConstruct.ReflSolBeamFrontCoef); // Beam front reflectance of glass
                                 Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;                // Diffuse front reflectance of glass
                                 // beam transmittance (written in subroutine CalcScreenTransmittance each time step)
-                                TScBmBm = state.dataMaterial->Screens(ScNum).BmBmTrans;
+                                TScBmBm = BilinearInterp(b11.BmTrans, b12.BmTrans, b21.BmTrans, b22.BmTrans, coeffs);
                                 TBmBmSc = TBmBm * TScBmBm;
-                                TScBmDif = state.dataMaterial->Screens(ScNum).BmDifTrans;
+                                TScBmDif = BilinearInterp(b11.DfTrans, b12.DfTrans, b21.DfTrans, b22.DfTrans, coeffs);
                                 // beam-beam and diffuse transmittance of exterior beam
-                                TBmAllShBlSc = TScBmBm * (TBmBm + RGlBmFr * RScBack * TDifBare / (1 - RGlDifFr * RScDifDifBk)) +
-                                               TScBmDif * TDifBare / (1 - RGlDifFr * RScDifDifBk);
+                                TBmAllShBlSc = TScBmBm * (TBmBm + RGlBmFr * RScBack * TDifBare / (1 - RGlDifFr * RScDifBack)) +
+                                               TScBmDif * TDifBare / (1 - RGlDifFr * RScDifBack);
                                 TBmBmShBlSc = TBmBmSc;
                                 TBmDifShBlSc = TBmAllShBlSc - TBmBmShBlSc;
                                 // Report variable for Beam-to-Diffuse transmittance (scattered transmittance)
                                 state.dataSurface->SurfWinScGlSysTsolBmBm(SurfNum) = TBmBmSc;
                                 state.dataSurface->SurfWinScTsolBmBm(SurfNum) = TScBmBm;
                                 state.dataSurface->SurfWinScTsolBmDif(SurfNum) = TScBmDif;
+#else  // !PRECALC_INTERP_SCREEN
+                                Material::ScreenBmTransAbsRef btar;
+                                CalcScreenTransmittance(state, screen, phi, theta, btar);
+
+                                Real64 RScBack = btar.RefSolFront;
+                                Real64 RScDifBack = screen->DfRef;
+
+                                Real64 RGlBmFr = POLYF(CosInc, thisConstruct.ReflSolBeamFrontCoef); // Beam front reflectance of glass
+                                Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;                // Diffuse front reflectance of glass
+                                // beam transmittance (written in subroutine CalcScreenTransmittance each time step)
+                                TScBmBm = btar.BmTrans;
+                                TBmBmSc = TBmBm * TScBmBm;
+                                TScBmDif = btar.DfTrans;
+                                // beam-beam and diffuse transmittance of exterior beam
+                                TBmAllShBlSc = TScBmBm * (TBmBm + RGlBmFr * RScBack * TDifBare / (1 - RGlDifFr * RScDifBack)) +
+                                               TScBmDif * TDifBare / (1 - RGlDifFr * RScDifBack);
+                                TBmBmShBlSc = TBmBmSc;
+                                TBmDifShBlSc = TBmAllShBlSc - TBmBmShBlSc;
+                                // Report variable for Beam-to-Diffuse transmittance (scattered transmittance)
+                                state.dataSurface->SurfWinScGlSysTsolBmBm(SurfNum) = TBmBmSc;
+                                state.dataSurface->SurfWinScTsolBmBm(SurfNum) = TScBmBm;
+                                state.dataSurface->SurfWinScTsolBmDif(SurfNum) = TScBmDif;
+#endif // PRECALC_INTERP_SCREEN
                             } else {
                                 TBlBmBm = state.dataSurface->SurfWinBlindBmBmTrans(SurfNum);
                                 TBlBmDif = FrontBeamDiffTrans;
@@ -7235,9 +7262,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                 // Switchable glazing
                 Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum);
                 if (!state.dataSurface->SurfWinSolarDiffusing(SurfNum)) {
-                    TBmBm = WindowManager::InterpSw(SwitchFac, TBmBm, TBmAllShBlSc);
+                    TBmBm = Window::InterpSw(SwitchFac, TBmBm, TBmAllShBlSc);
                 } else {
-                    TBmDif = WindowManager::InterpSw(SwitchFac, TBmDif, TBmAllShBlSc);
+                    TBmDif = Window::InterpSw(SwitchFac, TBmDif, TBmAllShBlSc);
                 }
             }
             // Report variables
@@ -7465,8 +7492,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 int ConstrNumBackShRaw = state.dataSurface->SurfWinActiveShadedConstruction(BackSurfNum);
                                 int const ConstrNumBackSh = ConstrNumBackShRaw == 0 ? ConstrNumBack : ConstrNumBackShRaw;
                                 state.dataSolarShading->SurfWinAbsBeam.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
-                                Real64 TransBeamWin = 0.0;  // Beam solar transmittance of a window
-                                Real64 AbsBeamTotWin = 0.0; // Sum of window glass layer beam solar absorptances
+                                Real64 TransBeamWin = 0.0;           // Beam solar transmittance of a window
+                                Real64 AbsBeamTotWin = 0.0;          // Sum of window glass layer beam solar absorptances
+                                Real64 backSurfBeamSolInTrans = 0.0; // Fraction of BeamSolarRad transmitted out through window inside face [W]
 
                                 // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
                                 // or interior window WITHOUT SHADING this timestep
@@ -7495,6 +7523,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
                                     BABSZone += BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade;
+                                    backSurfBeamSolInTrans += BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade;
                                 } else if (ShadeFlagBack ==
                                            WinShadingType::ExtShade) { // Interior beam absorbed by EXTERIOR SHADE of back exterior window
                                     Real64 RGlFront = state.dataConstruction->Construct(ConstrNumBack).ReflectSolDiffFront;
@@ -7506,6 +7535,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     Real64 AShBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef) * AbsSh /
                                                      (1.0 - RGlFront * RhoSh);
                                     BABSZone += BOverlap * AShBack;
+                                    backSurfBeamSolInTrans += BOverlap * AShBack;
                                     state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * AShBack /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
@@ -7539,6 +7569,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * AShBack / state.dataSurface->Surface(BackSurfNum).Area;
                                     BABSZone += BOverlap * AShBack;
+                                    backSurfBeamSolInTrans += BOverlap * AShBack;
                                 }
 
                                 // Interior beam absorptance of glass layers and beam absorbed in blind
@@ -7559,20 +7590,20 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                                     Real64 TGlBmBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef);
                                     Real64 TBlBmBmBack =
-                                        WindowManager::BlindBeamBeamTrans(ProfAngBack,
-                                                                          Constant::Pi - SlatAngBack,
-                                                                          thisBlindBack.SlatWidth,
-                                                                          thisBlindBack.SlatSeparation,
-                                                                          thisBlindBack.SlatThickness); // Blind solar back beam-beam transmittance
-                                    Real64 TBlBmDiffBack;                                               // Blind solar back beam-diffuse transmittance
+                                        Window::BlindBeamBeamTrans(ProfAngBack,
+                                                                   Constant::Pi - SlatAngBack,
+                                                                   thisBlindBack.SlatWidth,
+                                                                   thisBlindBack.SlatSeparation,
+                                                                   thisBlindBack.SlatThickness); // Blind solar back beam-beam transmittance
+                                    Real64 TBlBmDiffBack;                                        // Blind solar back beam-diffuse transmittance
                                     if (state.dataSurface->SurfWinMovableSlats(BackSurfNum)) {
-                                        TBlBmDiffBack = WindowManager::InterpProfSlat(
-                                            thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                            thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                            thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                            thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                            SlatsAngInterpFacBack,
-                                            ProfAngInterpFacBack);
+                                        TBlBmDiffBack =
+                                            Window::InterpProfSlat(thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                   thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                   thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                   thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                   SlatsAngInterpFacBack,
+                                                                   ProfAngInterpFacBack);
                                     } else {
                                         TBlBmDiffBack = General::Interp(thisBlind.SolBackBeamDiffTrans(1, ProfAngIndexLowerBack),
                                                                         thisBlind.SolBackBeamDiffTrans(1, ProfAngIndexUpperBack),
@@ -7595,27 +7626,27 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                                 thisBlindBack.SolFrontDiffAbs(std::min(
                                                                     Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum) + 1)),
                                                                 state.dataSurface->SurfWinSlatsAngInterpFac(BackSurfNum));
-                                            RhoBlFront = WindowManager::InterpProfSlat(
-                                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
-                                            AbsBlFront = WindowManager::InterpProfSlat(
-                                                thisBlind.SolFrontBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolFrontBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolFrontBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolFrontBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
+                                            RhoBlFront =
+                                                Window::InterpProfSlat(thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                       thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                       SlatsAngInterpFacBack,
+                                                                       ProfAngInterpFacBack);
+                                            AbsBlFront =
+                                                Window::InterpProfSlat(thisBlind.SolFrontBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolFrontBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolFrontBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                       thisBlind.SolFrontBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                       SlatsAngInterpFacBack,
+                                                                       ProfAngInterpFacBack);
                                             AbsBlBack =
-                                                WindowManager::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                                              SlatsAngInterpFacBack,
-                                                                              ProfAngInterpFacBack);
+                                                Window::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                       thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                       SlatsAngInterpFacBack,
+                                                                       ProfAngInterpFacBack);
                                         } else {
                                             FrontDiffDiffRefl = thisBlindBack.SolFrontDiffDiffRefl(1); // Blind solar front beam reflectance
                                             FrontDiffAbs = thisBlindBack.SolFrontDiffAbs(1);
@@ -7665,6 +7696,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                             BOverlap * ABlBack /
                                             (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
                                         BABSZone += BOverlap * ABlBack;
+                                        backSurfBeamSolInTrans += BOverlap * ABlBack;
 
                                     } else if (ShadeFlagBack == WinShadingType::ExtBlind) {
 
@@ -7676,27 +7708,27 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         Real64 RhoBlBmDifBk;
                                         Real64 AbsBlBack;
                                         if (state.dataSurface->SurfWinMovableSlats(BackSurfNum)) {
-                                            RhoBlBack = WindowManager::InterpProfSlat(
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
-                                            RhoBlBmDifBk = WindowManager::InterpProfSlat(
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
+                                            RhoBlBack =
+                                                Window::InterpProfSlat(thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                       thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                       SlatsAngInterpFacBack,
+                                                                       ProfAngInterpFacBack);
+                                            RhoBlBmDifBk =
+                                                Window::InterpProfSlat(thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                       thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                       SlatsAngInterpFacBack,
+                                                                       ProfAngInterpFacBack);
                                             AbsBlBack =
-                                                WindowManager::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                                              SlatsAngInterpFacBack,
-                                                                              ProfAngInterpFacBack);
+                                                Window::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                       thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                       SlatsAngInterpFacBack,
+                                                                       ProfAngInterpFacBack);
                                         } else {
                                             RhoBlBack = General::Interp(thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexLowerBack),
                                                                         thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexUpperBack),
@@ -7728,6 +7760,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                                     TBlDifDif * RhoBlBmDifBk * RGlDifFr / (1.0 - RhoBlDifDifBk * RGlDifFr));
                                         // Interior beam absorbed by EXTERIOR BLIND on exterior back window
                                         BABSZone += BOverlap * ABlBack;
+                                        backSurfBeamSolInTrans += BOverlap * ABlBack;
                                         state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                             BOverlap * ABlBack /
                                             (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
@@ -7749,16 +7782,16 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         Real64 rfd2k = state.dataConstruction->Construct(ConstrNumBack).rfBareSolDiff(2);
                                         Real64 rbd1k = state.dataConstruction->Construct(ConstrNumBack).rbBareSolDiff(1);
                                         Real64 rbd2k = state.dataConstruction->Construct(ConstrNumBack).rbBareSolDiff(2);
-                                        Real64 tfshBBk = WindowManager::BlindBeamBeamTrans(ProfAngBack,
-                                                                                           SlatAngBack,
-                                                                                           thisBlindBack.SlatWidth,
-                                                                                           thisBlindBack.SlatSeparation,
-                                                                                           thisBlindBack.SlatThickness);
-                                        Real64 tbshBBk = WindowManager::BlindBeamBeamTrans(ProfAngBack,
-                                                                                           Constant::Pi - SlatAngBack,
-                                                                                           thisBlindBack.SlatWidth,
-                                                                                           thisBlindBack.SlatSeparation,
-                                                                                           thisBlindBack.SlatThickness);
+                                        Real64 tfshBBk = Window::BlindBeamBeamTrans(ProfAngBack,
+                                                                                    SlatAngBack,
+                                                                                    thisBlindBack.SlatWidth,
+                                                                                    thisBlindBack.SlatSeparation,
+                                                                                    thisBlindBack.SlatThickness);
+                                        Real64 tbshBBk = Window::BlindBeamBeamTrans(ProfAngBack,
+                                                                                    Constant::Pi - SlatAngBack,
+                                                                                    thisBlindBack.SlatWidth,
+                                                                                    thisBlindBack.SlatSeparation,
+                                                                                    thisBlindBack.SlatThickness);
 
                                         Real64 tfshBdk = General::Interp(thisBlind.SolFrontBeamDiffTrans(1, ProfAngIndexLowerBack),
                                                                          thisBlind.SolFrontBeamDiffTrans(1, ProfAngIndexUpperBack),
@@ -7803,48 +7836,46 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                             abshdk = General::Interp(thisBlindBack.SolBackDiffAbs(SlatsAngIndexLowerBack),
                                                                      thisBlindBack.SolBackDiffAbs(SlatsAngIndexUpperBack),
                                                                      SlatsAngInterpFacBack);
-                                            tfshBdk = WindowManager::InterpProfSlat(
-                                                thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
-                                            tbshBdk = WindowManager::InterpProfSlat(
-                                                thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
-                                            rfshBk = WindowManager::InterpProfSlat(
-                                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
-                                            rbshBk = WindowManager::InterpProfSlat(
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
-                                            afshBk = WindowManager::InterpProfSlat(
-                                                thisBlind.SolFrontBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolFrontBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolFrontBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolFrontBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
-                                            abshBk =
-                                                WindowManager::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                                              SlatsAngInterpFacBack,
-                                                                              ProfAngInterpFacBack);
+                                            tfshBdk =
+                                                Window::InterpProfSlat(thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                       thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                       SlatsAngInterpFacBack,
+                                                                       ProfAngInterpFacBack);
+                                            tbshBdk =
+                                                Window::InterpProfSlat(thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                       thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                       SlatsAngInterpFacBack,
+                                                                       ProfAngInterpFacBack);
+                                            rfshBk =
+                                                Window::InterpProfSlat(thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                       thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                       SlatsAngInterpFacBack,
+                                                                       ProfAngInterpFacBack);
+                                            rbshBk =
+                                                Window::InterpProfSlat(thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                       thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                       thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                       SlatsAngInterpFacBack,
+                                                                       ProfAngInterpFacBack);
+                                            afshBk = Window::InterpProfSlat(thisBlind.SolFrontBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                            thisBlind.SolFrontBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                            thisBlind.SolFrontBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                            thisBlind.SolFrontBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                            SlatsAngInterpFacBack,
+                                                                            ProfAngInterpFacBack);
+                                            abshBk = Window::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                            thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                            thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                            thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                            SlatsAngInterpFacBack,
+                                                                            ProfAngInterpFacBack);
                                         }
 
                                         Real64 ABlBack;
@@ -7891,6 +7922,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         }
 
                                         BABSZone += BOverlap * ABlBack;
+                                        backSurfBeamSolInTrans += BOverlap * ABlBack;
                                         state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                             BOverlap * ABlBack / state.dataSurface->Surface(BackSurfNum).Area;
 
@@ -7901,12 +7933,33 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     int ScNumBack = surfWin.screenNum; // Back surface screen number
                                     Real64 TGlBmBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef);
                                     Real64 RGlDiffFront = state.dataConstruction->Construct(ConstrNumBack).ReflectSolDiffFront;
-                                    Real64 TScBmBmBack =
-                                        state.dataMaterial->Screens(ScNumBack).BmBmTransBack; // Screen solar back beam-beam transmittance
-                                    Real64 TScBmDiffBack =
-                                        state.dataMaterial->Screens(ScNumBack).BmDifTransBack; // Screen solar back beam-diffuse transmittance
-                                    Real64 RScBack = state.dataMaterial->Screens(ScNumBack).ReflectSolBeamFront;
-                                    Real64 RScDifBack = state.dataMaterial->Screens(ScNumBack).DifReflect;
+
+                                    auto const *screen = dynamic_cast<Material::MaterialScreen const *>(state.dataMaterial->Material(ScNum));
+                                    assert(screen != nullptr);
+
+                                    auto &surf = state.dataSurface->Surface(SurfNum);
+                                    Real64 solPhi = std::acos(state.dataEnvrn->SOLCOS.z);
+                                    Real64 solTheta = std::atan2(state.dataEnvrn->SOLCOS.x, state.dataEnvrn->SOLCOS.y);
+                                    Real64 winPhi = surf.Tilt * Constant::DegToRad;
+                                    Real64 winTheta = surf.Azimuth * Constant::DegToRad;
+                                    Real64 phi = std::abs(solPhi - winPhi);
+                                    Real64 theta = std::abs(solTheta - winTheta);
+                                    Material::NormalizePhiTheta(phi, theta);
+#ifdef PRECALC_INTERP_SCREEN
+                                    int ip1, ip2, it1, it2;
+                                    General::BilinearInterpCoeffs coeffs;
+                                    Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
+                                    GetBilinearInterpCoeffs(
+                                        phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                                    auto const &b11 = screen->btars[ip1][it1];
+                                    auto const &b12 = screen->btars[ip1][it2];
+                                    auto const &b21 = screen->btars[ip2][it1];
+                                    auto const &b22 = screen->btars[ip2][it2];
+
+                                    Real64 TScBmBmBack = BilinearInterp(b11.BmTransBack, b12.BmTransBack, b21.BmTransBack, b22.BmTransBack, coeffs);
+                                    Real64 TScBmDiffBack = BilinearInterp(b11.DfTransBack, b12.DfTransBack, b21.DfTransBack, b22.DfTransBack, coeffs);
+                                    Real64 RScBack = BilinearInterp(b11.RefSolFront, b12.RefSolFront, b21.RefSolFront, b22.RefSolFront, coeffs);
+                                    Real64 RScDifBack = screen->DfRef;
                                     for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
                                         Real64 AbWinBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef(Lay));
                                         Real64 AGlDiffFront = state.dataConstruction->Construct(ConstrNumBack).AbsDiff(Lay);
@@ -7915,29 +7968,62 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     }
 
                                     // Interior beam transmitted by exterior back window with EXTERIOR SCREEN
-                                    Real64 TScDifDif = state.dataMaterial->Screens(ScNumBack).DifDifTrans;
-                                    Real64 RScBmDifBk =
-                                        state.dataMaterial->Screens(ScNumBack).ReflectSolBeamBack; // Beam-diffuse back reflectance of blind
+                                    Real64 TScDifDif = screen->DfTrans;
+                                    Real64 RScBmDifBk = BilinearInterp(b11.RefSolBack, b12.RefSolBack, b21.RefSolBack, b22.RefSolBack, coeffs);
                                     Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;
-                                    Real64 RScDifDifBk = state.dataMaterial->Screens(ScNumBack).DifReflect;
+                                    Real64 RScDifDifBk = screen->DfRef;
                                     TransBeamWin = TGlBmBack *
                                                    (TScBmBmBack + TScBmDiffBack + TScDifDif * RScBmDifBk * RGlDifFr / (1.0 - RScDifDifBk * RGlDifFr));
 
                                     // Interior beam absorbed by EXTERIOR SCREEN on exterior back window
-                                    Real64 AbsScBack =
-                                        state.dataMaterial->Screens(ScNumBack).AbsorpSolarBeamBack; // Screen solar back beam absorptance
-                                    Real64 AbsScDiffBack =
-                                        state.dataMaterial->Screens(ScNumBack).DifScreenAbsorp; // Screen solar back diffuse absorptance
-                                    Real64 RScDiffBack =
-                                        state.dataMaterial->Screens(ScNumBack).ReflectSolBeamFront; // Screen solar back diffuse reflectance
+                                    Real64 AbsScBack = BilinearInterp(b11.AbsSolBack, b12.AbsSolBack, b21.AbsSolBack, b22.AbsSolBack, coeffs);
+                                    Real64 AbsScDiffBack = screen->DfAbs;
+                                    Real64 RScDiffBack = BilinearInterp(b11.RefSolFront, b12.RefSolFront, b21.RefSolFront, b22.RefSolFront, coeffs);
+                                    // Screen solar back absorptance for interior solar
                                     Real64 AScBack =
-                                        TGlBmBack *
-                                        (AbsScBack + RScBack * RGlDiffFront * AbsScDiffBack /
-                                                         (1.0 - RScDiffBack * RGlDiffFront)); // Screen solar back absorptance for interior solar
+                                        TGlBmBack * (AbsScBack + RScBack * RGlDiffFront * AbsScDiffBack / (1.0 - RScDiffBack * RGlDiffFront));
+
+                                    BABSZone += BOverlap * AScBack;
+                                    backSurfBeamSolInTrans += BOverlap * AScBack;
+                                    state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
+                                        BOverlap * AScBack /
+                                        (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
+#else  // !PRECALC_INTERP_SCREEN
+                                    Material::ScreenBmTransAbsRef btar;
+                                    Material::CalcScreenTransmittance(state, screen, phi, theta, btar);
+
+                                    Real64 TScBmBmBack = btar.BmTransBack;
+                                    Real64 TScBmDiffBack = btar.DfTransBack;
+                                    Real64 RScBack = btar.RefSolFront;
+                                    Real64 RScDifBack = screen->DfRef;
+                                    for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
+                                        Real64 AbWinBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef(Lay));
+                                        Real64 AGlDiffFront = state.dataConstruction->Construct(ConstrNumBack).AbsDiff(Lay);
+                                        state.dataSolarShading->SurfWinAbsBeam(Lay) =
+                                            AbWinBack + (TGlBmBack * AGlDiffFront * RScBack / (1.0 - RScDifBack * RGlDiffFront));
+                                    }
+
+                                    // Interior beam transmitted by exterior back window with EXTERIOR SCREEN
+                                    Real64 TScDifDif = screen->DfTrans;
+                                    Real64 RScBmDifBk = btar.RefSolBack;
+                                    Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;
+                                    Real64 RScDifDifBk = screen->DfRef;
+                                    TransBeamWin = TGlBmBack *
+                                                   (TScBmBmBack + TScBmDiffBack + TScDifDif * RScBmDifBk * RGlDifFr / (1.0 - RScDifDifBk * RGlDifFr));
+
+                                    // Interior beam absorbed by EXTERIOR SCREEN on exterior back window
+                                    Real64 AbsScBack = btar.AbsSolBack;
+                                    Real64 AbsScDiffBack = screen->DfAbs;
+                                    Real64 RScDiffBack = btar.RefSolFront;
+                                    // Screen solar back absorptance for interior solar
+                                    Real64 AScBack =
+                                        TGlBmBack * (AbsScBack + RScBack * RGlDiffFront * AbsScDiffBack / (1.0 - RScDiffBack * RGlDiffFront));
+
                                     BABSZone += BOverlap * AScBack;
                                     state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * AScBack /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
+#endif // PRECALC_INTERP_SCREEN
 
                                 } // End of check if exterior screen on back window
 
@@ -7948,11 +8034,11 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
                                         AbsBeamWinSh = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBackSh).AbsBeamBackCoef(Lay));
                                         state.dataSolarShading->SurfWinAbsBeam(Lay) =
-                                            WindowManager::InterpSw(SwitchFac, state.dataSolarShading->SurfWinAbsBeam(Lay), AbsBeamWinSh);
+                                            Window::InterpSw(SwitchFac, state.dataSolarShading->SurfWinAbsBeam(Lay), AbsBeamWinSh);
                                     }
                                     // Beam solar transmittance of a shaded window
                                     Real64 TransBeamWinSh = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBackSh).TransSolBeamCoef);
-                                    TransBeamWin = WindowManager::InterpSw(SwitchFac, TransBeamWin, TransBeamWinSh);
+                                    TransBeamWin = Window::InterpSw(SwitchFac, TransBeamWin, TransBeamWinSh);
                                 }
 
                                 // Sum of interior beam absorbed by all glass layers of back window
@@ -7966,6 +8052,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                                 // To BABSZon, add interior beam glass absorption and overall beam transmission for this back window
                                 BABSZone += BOverlap * (AbsBeamTotWin + TransBeamWin);
+                                backSurfBeamSolInTrans += BOverlap * (AbsBeamTotWin + TransBeamWin);
+                                state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(BackSurfNum) +=
+                                    backSurfBeamSolInTrans * state.dataEnvrn->BeamSolarRad; //[W]
                                 // Interior beam transmitted to adjacent zone through an interior back window (assumed unshaded);
                                 // this beam radiation is categorized as diffuse radiation in the adjacent zone.
                                 int AdjSurfNum = state.dataSurface->Surface(BackSurfNum).ExtBoundCond;
@@ -8083,9 +8172,13 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                 // CurLambda = ComplexWind(BackSurfaceNumber)%Geom(CurBackState)%Trn%Lamda(CurTrnDir)
                                                 // Add influence of this exact direction to what stays in the zone.  It is important to note that
                                                 // this needs to be done for each outgoing direction
-                                                BABSZone += CFDirBoverlap(IBack, CurTrnDir) * (1 - state.dataSurface->SurfaceWindow(BackSurfaceNumber)
-                                                                                                       .ComplexFen.State(CurBackState)
-                                                                                                       .IntegratedBkRefl(bestBackTrn));
+                                                Real64 babs =
+                                                    CFDirBoverlap(IBack, CurTrnDir) * (1 - state.dataSurface->SurfaceWindow(BackSurfaceNumber)
+                                                                                               .ComplexFen.State(CurBackState)
+                                                                                               .IntegratedBkRefl(bestBackTrn));
+                                                BABSZone += babs;
+                                                state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(BackSurfaceNumber) +=
+                                                    babs * state.dataEnvrn->BeamSolarRad; //[W]
 
                                                 // Absorptance from current back direction
                                                 int TotSolidLay = state.dataConstruction->Construct(ConstrNumBack).TotSolidLayers;
@@ -8175,7 +8268,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 //  Note in equivalent layer window model if storm window exists it is defined as part of
                                 //  window construction, hence it does not require a separate treatment
                                 state.dataSolarShading->SurfWinAbsBeamEQL = 0.0;
-                                Real64 TransBeamWin = 0.0; // Beam solar transmittance of a window
+                                Real64 TransBeamWin = 0.0;           // Beam solar transmittance of a window
+                                Real64 backSurfBeamSolInTrans = 0.0; // Fraction of BeamSolarRad transmitted out through window inside face [W]
 
                                 // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
                                 // or interior window (treates windows with/without shades as defined) for this timestep
@@ -8195,6 +8289,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         BOverlap * state.dataSolarShading->SurfWinAbsSolBeamBackEQL(1, CFS(EQLNum).NL) /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
                                     BABSZone += BOverlap * state.dataSolarShading->SurfWinAbsSolBeamBackEQL(1, CFS(EQLNum).NL);
+                                    backSurfBeamSolInTrans += BOverlap * state.dataSolarShading->SurfWinAbsSolBeamBackEQL(1, CFS(EQLNum).NL);
                                 }
                                 //   Absorbed by the exterior shade layer of back exterior window
                                 if (CFS(EQLNum).L(1).LTYPE != LayerType::GLAZE) {
@@ -8202,6 +8297,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         BOverlap * state.dataSolarShading->SurfWinAbsSolBeamBackEQL(1, 1) /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
                                     BABSZone += BOverlap * state.dataSolarShading->SurfWinAbsSolBeamBackEQL(1, 1);
+                                    backSurfBeamSolInTrans += BOverlap * state.dataSolarShading->SurfWinAbsSolBeamBackEQL(1, 1);
                                 }
 
                                 // determine the number of glass layers
@@ -8219,6 +8315,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                 BOverlap * state.dataSolarShading->SurfWinAbsSolBeamBackEQL(1, Lay) /
                                                 state.dataSurface->Surface(BackSurfNum).Area;
                                             BABSZone += BOverlap * state.dataSolarShading->SurfWinAbsSolBeamBackEQL(1, Lay);
+                                            backSurfBeamSolInTrans += BOverlap * state.dataSolarShading->SurfWinAbsSolBeamBackEQL(1, Lay);
                                         }
                                     }
                                 }
@@ -8234,6 +8331,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 // To BABSZon, add interior beam glass absorption and overall beam transmission for this back window
 
                                 BABSZone += BOverlap * (AbsBeamTotWin + TransBeamWin);
+                                backSurfBeamSolInTrans += BOverlap * (AbsBeamTotWin + TransBeamWin);
+                                state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(BackSurfNum) +=
+                                    backSurfBeamSolInTrans * state.dataEnvrn->BeamSolarRad; //[W]
 
                                 // Interior beam transmitted to adjacent zone through an interior back window (assumed unshaded);
                                 // this beam radiation is categorized as diffuse radiation in the adjacent zone.
@@ -10075,7 +10175,7 @@ void WindowShadingManager(EnergyPlusData &state)
                             1.0 - (std::abs(blind.SlatWidth * std::cos(SlatAng)) + blind.SlatThickness * std::sin(SlatAng)) / blind.SlatSeparation;
                         state.dataSurface->SurfWinBlindAirFlowPermeability(ISurf) = min(1.0, max(0.0, PermeabilityA, PermeabilityB));
                         state.dataSurface->SurfWinBlindBmBmTrans(ISurf) =
-                            WindowManager::BlindBeamBeamTrans(ProfAng, SlatAng, blind.SlatWidth, blind.SlatSeparation, blind.SlatThickness);
+                            Window::BlindBeamBeamTrans(ProfAng, SlatAng, blind.SlatWidth, blind.SlatSeparation, blind.SlatThickness);
                         // Calculate blind interpolation factors and indices.
                         if (state.dataSurface->SurfWinMovableSlats(ISurf)) {
                             if (SlatAng > Constant::Pi || SlatAng < 0.0) {
@@ -10088,10 +10188,11 @@ void WindowShadingManager(EnergyPlusData &state)
                     }
                 } // End of check if interior or exterior or between glass blind in place
 
-                //   CALL CalcScreenTransmittance to intialized all screens prior to HB calc's
-                if (state.dataSurface->SurfWinShadingFlag(ISurf) == WinShadingType::ExtScreen && state.dataEnvrn->SunIsUp) {
-                    CalcScreenTransmittance(state, ISurf);
-                }
+                // AR: don't need to do this anymore I don't think
+                // CALL CalcScreenTransmittance to intialized all screens prior to HB calc's
+                // if (state.dataSurface->SurfWinShadingFlag(ISurf) == WinShadingType::ExtScreen && state.dataEnvrn->SunIsUp) {
+                //    CalcScreenTransmittance(state, ISurf);
+                // }
 
                 // EMS Actuator Point: override setting if ems flag on
                 if (state.dataSurface->SurfWinShadingFlagEMSOn(ISurf)) {
@@ -10387,38 +10488,38 @@ void SkyDifSolarShading(EnergyPlusData &state)
                                 "Debug Surface Solar Shading Model DifShdgRatioIsoSky",
                                 Constant::Units::None,
                                 state.dataSolarShading->SurfCurDifShdgRatioIsoSky(SurfNum),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
         } else {
             SetupOutputVariable(state,
                                 "Debug Surface Solar Shading Model DifShdgRatioIsoSky",
                                 Constant::Units::None,
                                 state.dataSolarShading->SurfDifShdgRatioIsoSky(SurfNum),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surf.Name);
         }
         SetupOutputVariable(state,
                             "Debug Surface Solar Shading Model DifShdgRatioHoriz",
                             Constant::Units::None,
                             state.dataSolarShading->SurfDifShdgRatioHoriz(SurfNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surf.Name);
         SetupOutputVariable(state,
                             "Debug Surface Solar Shading Model WithShdgIsoSky",
                             Constant::Units::None,
                             state.dataSolarShading->SurfWithShdgIsoSky(SurfNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surf.Name);
         SetupOutputVariable(state,
                             "Debug Surface Solar Shading Model WoShdgIsoSky",
                             Constant::Units::None,
                             state.dataSolarShading->SurfWoShdgIsoSky(SurfNum),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surf.Name);
     }
 
@@ -11213,7 +11314,7 @@ void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state)
                     if (A2ill < 0.0) A2ill = 0.0;
 
                     // Quantities related to outside reveal
-                    if (A1ill > 1.0e-6) {
+                    if (A1ill > Constant::OneMillionth) {
 
                         state.dataSurface->SurfWinBmSolAbsdOutsReveal(SurfNum) +=
                             A1ill * state.dataSurface->SurfWinOutsideRevealSolAbs(SurfNum) * CosBeta * tmp_SunlitFracWithoutReveal;
@@ -11241,17 +11342,17 @@ void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state)
 
                     if (NOT_SHADED(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
 
-                        if (A2ill > 1.0e-6) {
+                        if (A2ill > Constant::OneMillionth) {
 
-                            auto const &thisConstructSh = state.dataConstruction->Construct(ConstrNumSh);
                             DiffReflGlass = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
                             if (ShadeFlag == WinShadingType::SwitchableGlazing) {
+                                auto const &thisConstructSh = state.dataConstruction->Construct(ConstrNumSh);
                                 SolTransGlassSh =
                                     POLYF(state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum),
                                           thisConstructSh.TransSolBeamCoef);
-                                SolTransGlass = InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum), SolTransGlass, SolTransGlassSh);
+                                SolTransGlass = Window::InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum), SolTransGlass, SolTransGlassSh);
                                 DiffReflGlassSh = thisConstructSh.ReflectSolDiffBack;
-                                DiffReflGlass = InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum), DiffReflGlass, DiffReflGlassSh);
+                                DiffReflGlass = Window::InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum), DiffReflGlass, DiffReflGlassSh);
                             }
 
                             // Calc beam solar sbsorbed (m2)
@@ -11684,31 +11785,30 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
     //  INTEGER :: MatNumSh           ! Shade layer material number
     //  REAL(r64)    :: TransGl,ReflGl,AbsGl ! Glass layer solar transmittance, reflectance, absorptance
 
-    Real64 ViewFactor;       // temp var for view factor
-                             //        Real64 ViewFactorTotal;             // debug var for view factor total
-    Real64 WinDifSolarTrans; // debug var for WinDifSolar() [W]
-                             //        Real64 WinDifSolarDistTotl;         // debug var for window total
-                             //        distributed diffuse solar [W] Real64 WinDifSolarDistAbsorbedTotl; // debug
-                             //        var for individual exterior window total distributed
-    //    diffuse solar absorbed [W]
-    //        Real64 WinDifSolarDistReflectedTotl; // debug var for individual exterior window total distributed
-    //    diffuse solar reflected [W]
-    //        Real64 WinDifSolarDistTransmittedTotl; // debug var for individual exterior window total distributed
-    //    diffuse solar transmitted [W]
-    Real64 WinDifSolLayAbsW; // temp var for diffuse solar absorbed by individual glass layer [W]
-                             //        Real64 ZoneDifSolarTrans;               // debug var for WinDifSolar() [W]
-                             //        Real64 ZoneDifSolarDistTotl;            // debug var for zone total
-                             //        distributed diffuse solar [W] Real64 ZoneDifSolarDistAbsorbedTotl;    //
-                             //        debug var for zone total distributed diffuse solar absorbed [W] Real64
-                             //        ZoneDifSolarDistReflectedTotl;   // debug var for zone total distributed
-                             //        diffuse solar reflected [W] Real64 ZoneDifSolarDistTransmittedTotl; //
-                             //        debug var for zone total distributed diffuse solar transmitted [W]
+    Real64 ViewFactor = 0.0;       // temp var for view factor
+                                   //        Real64 ViewFactorTotal;             // debug var for view factor total
+    Real64 WinDifSolarTrans = 0.0; // debug var for WinDifSolar() [W]
+                                   //        Real64 WinDifSolarDistTotl;         // debug var for window total
+                                   //        distributed diffuse solar [W] Real64 WinDifSolarDistAbsorbedTotl; // debug
+                                   //        var for individual exterior window total distributed
+                                   //    diffuse solar absorbed [W]
+                                   //        Real64 WinDifSolarDistReflectedTotl; // debug var for individual exterior window total distributed
+                                   //    diffuse solar reflected [W]
+                                   //        Real64 WinDifSolarDistTransmittedTotl; // debug var for individual exterior window total distributed
+                                   //    diffuse solar transmitted [W]
+    Real64 WinDifSolLayAbsW = 0.0; // temp var for diffuse solar absorbed by individual glass layer [W]
+                                   //        Real64 ZoneDifSolarTrans;               // debug var for WinDifSolar() [W]
+                                   //        Real64 ZoneDifSolarDistTotl;            // debug var for zone total
+                                   //        distributed diffuse solar [W] Real64 ZoneDifSolarDistAbsorbedTotl;    //
+                                   //        debug var for zone total distributed diffuse solar absorbed [W] Real64
+                                   //        ZoneDifSolarDistReflectedTotl;   // debug var for zone total distributed
+                                   //        diffuse solar reflected [W] Real64 ZoneDifSolarDistTransmittedTotl; //
+                                   //        debug var for zone total distributed diffuse solar transmitted [W]
 
-    Real64 DifSolarAbsW;     // temp var for diffuse solar absorbed by surface [W]
-    Real64 DifSolarAbs;      // temp var for diffuse solar absorbed by surface [W/m2]
-    Real64 DifSolarReflW;    // temp var for diffuse solar reflected by surface [W]
-    Real64 DifSolarTransW;   // temp var for diffuse solar transmitted through interior window surface [W]
-    Real64 ShBlDifSolarAbsW; // temp var for diffuse solar absorbed by shade/blind [W]
+    Real64 DifSolarAbsW = 0.0;     // temp var for diffuse solar absorbed by surface [W]
+    Real64 DifSolarAbs = 0.0;      // temp var for diffuse solar absorbed by surface [W/m2]
+    Real64 DifSolarReflW = 0.0;    // temp var for diffuse solar reflected by surface [W]
+    Real64 ShBlDifSolarAbsW = 0.0; // temp var for diffuse solar absorbed by shade/blind [W]
 
     Array2D<Real64> SurfWinAbsSolBeamEQL(2, CFSMAXNL + 1); // absorbed exterior beam radiation by layers fraction
     Array2D<Real64> SurfWinAbsSolDiffEQL(2,
@@ -11894,7 +11994,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                 //    (receiving) surface HeatTransSurfNum
                                 //    - diffuse absorbed by this interior window
                                 //    - diffuse reflected by this interior window
-                                DifSolarTransW = WinDifSolarTrans_Factor - DifSolarAbsW - DifSolarReflW;
+                                Real64 DifSolarTransThroughW = WinDifSolarTrans_Factor - DifSolarAbsW - DifSolarReflW;
                                 // HERE 8/15/07 Note Construct(AdjConstrNum)%TransDiff could be used here since
                                 // the "front" transmittance for an interior window in the adjacent zone is the
                                 // correct direction as long as I use the Construct() of the Surface in the
@@ -11912,19 +12012,17 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
 
                                 // Call routine to distribute diffuse solar transmitted through this interior
                                 // window into adjacent zone
-                                CalcInteriorWinTransDifSolInitialDistribution(state, adjEnclosureNum, AdjSurfNum, DifSolarTransW);
+                                CalcInteriorWinTransDifSolInitialDistribution(state, adjEnclosureNum, AdjSurfNum, DifSolarTransThroughW);
+                            }
 
-                            } else { // this is an exterior window surface
-
-                                // Calc transmitted Window and Zone total distributed diffuse solar to check for
-                                // conservation of energy This is not very effective since it assigns whatever
-                                // distributed diffuse solar has not been absorbed or reflected to transmitted.
-                                DifSolarTransW = WinDifSolarTrans_Factor - DifSolarAbsW - DifSolarReflW;
-
-                            } // this is an interior window surface
+                            // Calc transmitted Window and Zone total distributed diffuse solar to check for
+                            // conservation of energy This is not very effective since it assigns whatever
+                            // distributed diffuse solar has not been absorbed or reflected to transmitted.
+                            // Should be just total less reflected
+                            Real64 DifSolarTransIntoW = WinDifSolarTrans_Factor - DifSolarReflW;
 
                             // Accumulate transmitted diffuse solar for reporting
-                            state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
+                            state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransIntoW * per_HTSurfaceArea;
 
                         } else if (ShadeFlag == WinShadingType::SwitchableGlazing) { // Switchable glazing
                             // Init accumulator for transmittance calc below
@@ -11936,8 +12034,9 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                             auto const &construct_sh_AbsDiffBack = construct_sh.AbsDiffBack;
                             for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                                 // Calc diffuse solar absorbed in each window glass layer
-                                WinDifSolLayAbsW = WinDifSolarTrans_Factor *
-                                                   InterpSw(win_SwitchingFactor, construct_AbsDiffBack(IGlass), construct_sh_AbsDiffBack(IGlass));
+                                WinDifSolLayAbsW =
+                                    WinDifSolarTrans_Factor *
+                                    Window::InterpSw(win_SwitchingFactor, construct_AbsDiffBack(IGlass), construct_sh_AbsDiffBack(IGlass));
 
                                 // Accumulate distributed diffuse solar absorbed [W] by overall window for
                                 // transmittance calc below
@@ -11950,7 +12049,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
 
                             // Calc diffuse solar reflected back to zone
                             DifSolarReflW = WinDifSolarTrans_Factor *
-                                            InterpSw(win_SwitchingFactor, construct.ReflectSolDiffBack, construct_sh.ReflectSolDiffBack);
+                                            Window::InterpSw(win_SwitchingFactor, construct.ReflectSolDiffBack, construct_sh.ReflectSolDiffBack);
 
                             // Accumulate total reflected distributed diffuse solar for each zone for subsequent
                             // interreflection calcs
@@ -11959,10 +12058,11 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                             // Accumulate transmitted Window and Zone total distributed diffuse solar to check for
                             // conservation of energy This is not very effective since it assigns whatever
                             // distributed diffuse solar has not been absorbed or reflected to transmitted.
-                            DifSolarTransW = WinDifSolarTrans_Factor - DifSolarAbsW - DifSolarReflW;
+                            // Should be just total less reflected
+                            Real64 DifSolarTransIntoW = WinDifSolarTrans_Factor - DifSolarReflW;
 
                             // Accumulate transmitted diffuse solar for reporting
-                            state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
+                            state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransIntoW * per_HTSurfaceArea;
 
                         } else if (ConstrNumSh != 0) {
                             // Interior, exterior or between-glass shade, screen or blind in place
@@ -12059,10 +12159,11 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                             // Accumulate transmitted Window and Zone total distributed diffuse solar to check for
                             // conservation of energy This is not very effective since it assigns whatever
                             // distributed diffuse solar has not been absorbed or reflected to transmitted.
-                            DifSolarTransW = WinDifSolarTrans_Factor - DifSolarAbsW - DifSolarReflW;
+                            // Should be just total less reflected
+                            Real64 DifSolarTransIntoW = WinDifSolarTrans_Factor - DifSolarReflW;
 
                             // Accumulate transmitted diffuse solar for reporting
-                            state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
+                            state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransIntoW * per_HTSurfaceArea;
                         } // End of shading flag check
 
                     } else {
@@ -12125,25 +12226,23 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                             // Transmitted diffuse solar [W] = current exterior window transmitted diffuse solar
                             //    * view factor from current (sending) window DifTransSurfNum to current
                             //    (receiving) surface HeatTransSurfNum
-                            DifSolarTransW = AbsSolDiffBackEQL(2, state.dataWindowEquivLayer->CFS(EQLNum).NL + 1) * ViewFactor;
+                            Real64 DifSolarTransW = AbsSolDiffBackEQL(2, state.dataWindowEquivLayer->CFS(EQLNum).NL + 1) * ViewFactor;
                             // int AdjConstrNum = Surface(AdjSurfNum).Construction;
                             // Get the adjacent zone index
                             int adjEnclosureNum = state.dataSurface->Surface(AdjSurfNum).SolarEnclIndex;
                             // Call routine to distribute diffuse solar transmitted through this interior window
                             // into adjacent zone
                             CalcInteriorWinTransDifSolInitialDistribution(state, adjEnclosureNum, AdjSurfNum, DifSolarTransW);
+                        }
 
-                        } else { // this is an exterior window surface
-
-                            // Calc transmitted Window and Zone total distributed diffuse solar to check for
-                            // conservation of energy This is not very effective since it assigns whatever
-                            // distributed diffuse solar has not been absorbed or reflected to transmitted.
-                            DifSolarTransW = AbsSolDiffBackEQL(2, state.dataWindowEquivLayer->CFS(EQLNum).NL + 1) * ViewFactor;
-
-                        } // this is an interior window surface
+                        // Calc transmitted Window and Zone total distributed diffuse solar to check for
+                        // conservation of energy This is not very effective since it assigns whatever
+                        // distributed diffuse solar has not been absorbed or reflected to transmitted.
+                        // Should be just total less reflected
+                        Real64 DifSolarTransIntoW = WinDifSolarTrans_Factor - DifSolarReflW;
 
                         // Accumulate transmitted diffuse solar for reporting
-                        state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
+                        state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransIntoW * per_HTSurfaceArea;
 
                     } // IF (SurfaceWindow(HeatTransSurfNum)%WindowModelType /= WindowModel:: EQL) THEN
 
@@ -12282,11 +12381,11 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
     //        diffuse solar reflected [W] Real64 ZoneDifSolarDistTransmittedTotl( 0.0 ); // debug var for zone
     //        total distributed diffuse solar transmitted [W]
 
-    Real64 DifSolarAbsW;     // temp var for diffuse solar absorbed by surface [W]
-    Real64 DifSolarAbs;      // temp var for diffuse solar absorbed by surface [W/m2]
-    Real64 DifSolarReflW;    // temp var for diffuse solar reflected by surface [W]
-    Real64 DifSolarTransW;   // temp var for diffuse solar transmitted through interior window surface [W]
-    Real64 ShBlDifSolarAbsW; // temp var for diffuse solar absorbed by shade/blind [W]
+    Real64 DifSolarAbsW = 0.0;     // temp var for diffuse solar absorbed by surface [W]
+    Real64 DifSolarAbs = 0.0;      // temp var for diffuse solar absorbed by surface [W/m2]
+    Real64 DifSolarReflW = 0.0;    // temp var for diffuse solar reflected by surface [W]
+    Real64 DifSolarTransW = 0.0;   // temp var for diffuse solar transmitted through interior window surface [W]
+    Real64 ShBlDifSolarAbsW = 0.0; // temp var for diffuse solar absorbed by shade/blind [W]
 
     //-------------------------------------------------------------------------------------------------
     // DISTRIBUTE TRANSMITTED DIFFUSE SOLAR THROUGH INTERIOR WINDOW TO INTERIOR HEAT TRANSFER SURFACES
@@ -12424,7 +12523,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
 
                 // Accumulate transmitted diffuse solar for reporting
                 state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) +=
-                    (DifSolarTransW / state.dataSurface->Surface(HeatTransSurfNum).Area);
+                    (SolarTrans_ViewFactor - DifSolarReflW) / state.dataSurface->Surface(HeatTransSurfNum).Area;
 
                 //-----------------------------------------------------------------------------------
                 // ADD TRANSMITTED DIFFUSE SOLAR THROUGH INTERIOR WINDOW TO ADJACENT ZONE
@@ -12494,7 +12593,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
 
                 // Accumulate transmitted diffuse solar for reporting
                 state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) +=
-                    (DifSolarTransW / state.dataSurface->Surface(HeatTransSurfNum).Area);
+                    (SolarTrans_ViewFactor - DifSolarReflW) / state.dataSurface->Surface(HeatTransSurfNum).Area;
 
             } else {
                 // Interior, exterior or between-glass shade, screen or blind in place
@@ -12603,7 +12702,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
 
                 // Accumulate transmitted diffuse solar for reporting
                 state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) +=
-                    (DifSolarTransW / state.dataSurface->Surface(HeatTransSurfNum).Area);
+                    (SolarTrans_ViewFactor - DifSolarReflW) / state.dataSurface->Surface(HeatTransSurfNum).Area;
 
             } // End of shading flag check
 
@@ -12736,7 +12835,7 @@ void CalcComplexWindowOverlap(EnergyPlusData &state,
         ZSp = -SdotZ;
 
         // Projection of shadows for current basis direciton
-        if (std::abs(ZSp) > 1.e-4) {
+        if (std::abs(ZSp) > Constant::SmallDistance) {
             XShadowProjection = XSp / ZSp;
             YShadowProjection = YSp / ZSp;
             if (std::abs(XShadowProjection) < 1.e-8) XShadowProjection = 0.0;

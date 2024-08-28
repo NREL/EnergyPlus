@@ -30,7 +30,7 @@
 !    dhw_type =
 !    TEMPLATE_PATH = template/v9.5
 
-  Version,24.1;
+  Version,24.2;
 
 ! added VRF system
 
@@ -482,7 +482,7 @@
     0,                       !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanModeSchedule,      !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
-    Fan:VariableVolume,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     TU1 VRF Supply Fan,      !- Supply Air Fan Object Name
     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
     TU1 OA Mixer,            !- Outside Air Mixer Object Name
@@ -497,7 +497,45 @@
     ,                        !- Design Specification ZoneHVAC Sizing Object Name
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
     TU1 Supp Heating Coil,   !- Supplemental Heating Coil Name
-    50;                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
+    50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
+    ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
+
+  Fan:SystemModel,
+    TU1 VRF Supply Fan,      !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
+    TU1 VRF Fan Outlet Node, !- Air Outlet Node Name
+    0.595,                   !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+            0.69748,         !- Electric Power Minimum Flow Rate Fraction
+    400,                     !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1,                       !- Motor In Air Stream Fraction
+    autosize,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5,                     !- Fan Total Efficiency
+    TU1 VRF Supply Fan_curve,!- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General;                 !- End-Use Subcategory
+
+  Curve:Quartic,
+    TU1 VRF Supply Fan_curve,!- Name
+    0.09,                    !- Coefficient1 Constant
+    0,                       !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    0.91,                    !- Coefficient4 x**3
+    0,                       !- Coefficient5 x**4
+    0.0,                     !- Minimum Value of x
+    1.0,                     !- Maximum Value of x
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:ELECTRIC ===========
 
@@ -529,26 +567,6 @@
 
   OutdoorAir:NodeList,
     Outside Air Inlet Node 1;!- Node or NodeList Name 1
-
-  Fan:VariableVolume,
-    TU1 VRF Supply Fan,      !- Name
-    VRFAvailSched,           !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    400,                     !- Pressure Rise {Pa}
-    0.595,                   !- Maximum Flow Rate {m3/s}
-    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
-    0,                       !- Fan Power Minimum Flow Fraction
-    0.415,                   !- Fan Power Minimum Air Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1,                       !- Motor In Airstream Fraction
-    0.09,                    !- Fan Power Coefficient 1
-    0,                       !- Fan Power Coefficient 2
-    0,                       !- Fan Power Coefficient 3
-    0.91,                    !- Fan Power Coefficient 4
-    0,                       !- Fan Power Coefficient 5
-    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
-    TU1 VRF Fan Outlet Node, !- Air Outlet Node Name
-    General;                 !- End-Use Subcategory
 
 !- ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL ===========
 
@@ -4695,7 +4713,7 @@
     DishWasher,              !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     65.698787492023,         !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.15,                    !- Fraction Latent
     0.6,                     !- Fraction Radiant
@@ -4708,7 +4726,7 @@
     Refrigerator,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     91.0575745202123,        !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0,                       !- Fraction Latent
     1,                       !- Fraction Radiant
@@ -4721,7 +4739,7 @@
     ClothesWasher,           !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     28.4784377542718,        !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0,                       !- Fraction Latent
     0.8,                     !- Fraction Radiant
@@ -4734,7 +4752,7 @@
     ClothesDryer,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     213.064557285022,        !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.05,                    !- Fraction Latent
     0.15,                    !- Fraction Radiant
@@ -4747,7 +4765,7 @@
     CookingRange,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     248.154224774405,        !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.3,                     !- Fraction Latent
     0.4,                     !- Fraction Radiant
@@ -4760,7 +4778,7 @@
     InteriorLighting,        !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0,                       !- Fraction Latent
     1,                       !- Fraction Radiant
@@ -4773,7 +4791,7 @@
     MiscPlugLoad,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     567.464237516869,        !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.06,                    !- Fraction Latent
     0.69,                    !- Fraction Radiant
@@ -4786,7 +4804,7 @@
     MiscPlugLoad,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
-    1.54356736989469,        !- Watts per Zone Floor Area {W/m2}
+    1.54356736989469,        !- Watts per Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0624390461422629,      !- Fraction Latent
     0.41190936353998,        !- Fraction Radiant
@@ -6355,7 +6373,7 @@
     InteriorLightingHE,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
-    1.91387072900558,        !- Watts per Zone Floor Area {W/m2}
+    1.91387072900558,        !- Watts per Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0,                       !- Return Air Fraction
     0.6,                     !- Fraction Radiant
@@ -6368,7 +6386,7 @@
     InteriorLightingHE,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
-    0.478467682251396,       !- Watts per Zone Floor Area {W/m2}
+    0.478467682251396,       !- Watts per Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0,                       !- Return Air Fraction
     0.6,                     !- Fraction Radiant

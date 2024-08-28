@@ -108,8 +108,8 @@ namespace HeatRecovery {
 
     struct HeatExchCond
     {
-        std::string Name;                                   // name of component
-        int ExchType = 0;                                   // Integer equivalent to ExchType
+        std::string Name; // name of component
+        HVAC::HXType type = HVAC::HXType::Invalid;
         std::string HeatExchPerfName;                       // Desiccant balanced heat exchanger performance data name
         int SchedPtr = 0;                                   // index of schedule
         HXConfiguration FlowArr = HXConfiguration::Invalid; // flow Arrangement:
@@ -214,7 +214,7 @@ namespace HeatRecovery {
         void CalcAirToAirGenericHeatExch(EnergyPlusData &state,
                                          bool HXUnitOn,                                      // flag to simulate heat exchanger heat recovery
                                          bool FirstHVACIteration,                            // first HVAC iteration flag
-                                         int FanOpMode,                                      // Supply air fan operating mode (1=cycling, 2=constant)
+                                         HVAC::FanOp const fanOp,                            // Supply air fan operating mode (1=cycling, 2=constant)
                                          ObjexxFCL::Optional_bool_const EconomizerFlag = _,  // economizer flag pass by air loop or OA sys
                                          ObjexxFCL::Optional_bool_const HighHumCtrlFlag = _, // high humidity control flag passed by airloop or OA sys
                                          ObjexxFCL::Optional<Real64 const> HXPartLoadRatio = _ //
@@ -224,7 +224,7 @@ namespace HeatRecovery {
         CalcDesiccantBalancedHeatExch(EnergyPlusData &state,
                                       bool HXUnitOn,           // flag to simulate heat exchager heat recovery
                                       bool FirstHVACIteration, // First HVAC iteration flag
-                                      int FanOpMode,           // Supply air fan operating mode (1=cycling, 2=constant)
+                                      HVAC::FanOp const fanOp, // Supply air fan operating mode (1=cycling, 2=constant)
                                       Real64 PartLoadRatio,    // Part load ratio requested of DX compressor
                                       int CompanionCoilIndex,  // index of companion cooling coil
                                       int CompanionCoilType,   // type of cooling coil
@@ -394,7 +394,7 @@ namespace HeatRecovery {
                          std::string_view CompName,                             // name of the heat exchanger unit
                          bool FirstHVACIteration,                               // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                                        // Pointer to Component
-                         int FanOpMode,                                         // Supply air fan operating mode
+                         HVAC::FanOp const fanOp,                               // Supply air fan operating mode
                          ObjexxFCL::Optional<Real64 const> HXPartLoadRatio = _, // Part load ratio requested of DX compressor
                          ObjexxFCL::Optional_bool_const HXUnitEnable = _,       // Flag to operate heat exchanger
                          ObjexxFCL::Optional_int_const CompanionCoilIndex = _,  // index of companion cooling coil
@@ -452,9 +452,9 @@ namespace HeatRecovery {
                                 bool &ErrorsFound          // set to true if problem
     );
 
-    int GetHeatExchangerObjectTypeNum(EnergyPlusData &state,
-                                      std::string const &HXName, // must match HX names for the ExchCond type
-                                      bool &ErrorsFound          // set to true if problem
+    HVAC::HXType GetHeatExchangerObjectTypeNum(EnergyPlusData &state,
+                                               std::string const &HXName, // must match HX names for the ExchCond type
+                                               bool &ErrorsFound          // set to true if problem
     );
 
 } // namespace HeatRecovery
@@ -502,9 +502,13 @@ struct HeatRecoveryData : BaseGlobalStruct
     Array1D<HeatRecovery::HeatExchCond> ExchCond;
     Array1D<HeatRecovery::BalancedDesDehumPerfData> BalDesDehumPerfData;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = HeatRecoveryData();
+        new (this) HeatRecoveryData();
     }
 };
 

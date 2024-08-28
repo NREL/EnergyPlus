@@ -83,10 +83,10 @@ namespace HVACDXHeatPumpSystem {
         int DXSystemControlNodeNum; // the node number of the node with the set point
         Real64 DesiredOutletTemp;   // the temperature at the unit outlet node needed
         // to meet the supply air set point.
-        Real64 PartLoadFrac; // part load fraction for current time step (single speed)
-        Real64 SpeedRatio;   // current compressor speed ratio (variable speed)
-        Real64 CycRatio;     // cycling part load ratio (variable speed)
-        int FanOpMode;       // Fan operating mode (see parameter above)
+        Real64 PartLoadFrac;                      // part load fraction for current time step (single speed)
+        Real64 SpeedRatio;                        // current compressor speed ratio (variable speed)
+        Real64 CycRatio;                          // cycling part load ratio (variable speed)
+        HVAC::FanOp fanOp = HVAC::FanOp::Invalid; // Fan operating mode (see parameter above)
         // Warning message variables
         int DXCoilSensPLRIter;      // used in DXCoil calculations
         int DXCoilSensPLRIterIndex; // used in DXCoil calculations
@@ -104,9 +104,9 @@ namespace HVACDXHeatPumpSystem {
         // Default Constructor
         DXHeatPumpSystemStruct()
             : SchedPtr(0), HeatPumpCoilType_Num(0), HeatPumpCoilIndex(0), DXHeatPumpCoilInletNodeNum(0), DXHeatPumpCoilOutletNodeNum(0),
-              DXSystemControlNodeNum(0), DesiredOutletTemp(0.0), PartLoadFrac(0.0), SpeedRatio(0.0), CycRatio(0.0), FanOpMode(0),
-              DXCoilSensPLRIter(0), DXCoilSensPLRIterIndex(0), DXCoilSensPLRFail(0), DXCoilSensPLRFailIndex(0), OAUnitSetTemp(0.0), SpeedNum(0),
-              FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0)
+              DXSystemControlNodeNum(0), DesiredOutletTemp(0.0), PartLoadFrac(0.0), SpeedRatio(0.0), CycRatio(0.0), DXCoilSensPLRIter(0),
+              DXCoilSensPLRIterIndex(0), DXCoilSensPLRFail(0), DXCoilSensPLRFailIndex(0), OAUnitSetTemp(0.0), SpeedNum(0), FaultyCoilSATFlag(false),
+              FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0)
         {
         }
     };
@@ -154,7 +154,7 @@ namespace HVACDXHeatPumpSystem {
                                  Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  int CoilIndex,
                                  Real64 desiredTemp,
-                                 int FanOpMode);
+                                 HVAC::FanOp const fanOp);
 
     //******************************************************************************
 
@@ -163,7 +163,7 @@ namespace HVACDXHeatPumpSystem {
                                int CoilIndex,
                                Real64 desiredTemp,
                                int speedNumber,
-                               int FanOpMode);
+                               HVAC::FanOp const fanOp);
 
     int GetHeatingCoilInletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName, bool &InletNodeErrFlag);
 
@@ -196,6 +196,10 @@ struct HVACDXHeatPumpSystemData : BaseGlobalStruct
     Real64 QLatentReq = 0.0;           // Zone latent load, input to variable-speed DX coil
     Real64 AirFlowOnOffRatio = 1.0;    // ratio of compressor on flow to average flow over time step
     Real64 SpeedPartLoadRatio = 1.0;   // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

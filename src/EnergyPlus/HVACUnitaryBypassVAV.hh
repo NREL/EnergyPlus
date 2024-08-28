@@ -136,35 +136,35 @@ namespace HVACUnitaryBypassVAV {
         std::string OAMixName;                 // Name of OA mixer
         int OAMixIndex = 0;                    // Index to OA mixer
         std::string FanName;                   // Name of fan
-        DataHVACGlobals::FanType FanType = DataHVACGlobals::FanType::Invalid;
-        DataHVACGlobals::FanLoc FanPlace = DataHVACGlobals::FanLoc::Invalid; // Fan placement is either blowthru (1) or drawthru (2)
-        int FanIndex = 0;                                                    // Index number to fan
-        int FanOpModeSchedPtr = 0;                                           // Fan operating mode schedule pointer
-        Real64 FanVolFlow = 0.0;                                             // Volumetric flow rate of system supply air fan [m3/s]
-        Real64 HeatingSpeedRatio = 1.0;                                      // Fan speed ratio in heating mode
-        Real64 CoolingSpeedRatio = 1.0;                                      // Fan speed ratio in cooling mode
-        Real64 NoHeatCoolSpeedRatio = 1.0;                                   // Fan speed ratio when no cooling or heating
-        bool CheckFanFlow = true;                                            // Check fan volumetric flow versus system flow in init routine.
-        std::string DXCoolCoilName;                                          // Name of DX cooling coil
-        DataHVACGlobals::CoilType CoolCoilType = DataHVACGlobals::CoilType::Invalid;
+        HVAC::FanType fanType = HVAC::FanType::Invalid;
+        HVAC::FanPlace fanPlace = HVAC::FanPlace::Invalid; // Fan placement is either blowthru (1) or drawthru (2)
+        int FanIndex = 0;                                  // Index number to fan
+        int FanOpModeSchedPtr = 0;                         // Fan operating mode schedule pointer
+        Real64 FanVolFlow = 0.0;                           // Volumetric flow rate of system supply air fan [m3/s]
+        Real64 HeatingSpeedRatio = 1.0;                    // Fan speed ratio in heating mode
+        Real64 CoolingSpeedRatio = 1.0;                    // Fan speed ratio in cooling mode
+        Real64 NoHeatCoolSpeedRatio = 1.0;                 // Fan speed ratio when no cooling or heating
+        bool CheckFanFlow = true;                          // Check fan volumetric flow versus system flow in init routine.
+        std::string DXCoolCoilName;                        // Name of DX cooling coil
+        HVAC::CoilType CoolCoilType = HVAC::CoilType::Invalid;
         int CoolCoilCompIndex = 0;  // cooling coil component index number
         int DXCoolCoilIndexNum = 0; // actual DX cooling coil index number
         int DXHeatCoilIndexNum = 0; // actual DX heating coil index number
         std::string HeatCoilName;   // Name of heating coil
-        DataHVACGlobals::CoilType HeatCoilType = DataHVACGlobals::CoilType::Invalid;
-        int HeatCoilIndex = 0;                  // DX heating coil index number
-        int OpMode = 0;                         // mode of operation
-        int CoilControlNode = 0;                // heating coil hot water or steam inlet node
-        int CoilOutletNode = 0;                 // outlet node for hot water and steam coil
-        PlantLocation plantLoc;                 // plant loop component location object for water heating coil
-        int HotWaterCoilMaxIterIndex = 0;       // Index to recurring warning message
-        int HotWaterCoilMaxIterIndex2 = 0;      // Index to recurring warning message
-        Real64 MaxHeatCoilFluidFlow = 0.0;      // water or steam mass flow rate for heating coil [kg/s]
-        Real64 DesignHeatingCapacity = 0.0;     // design heating capacity of the heating coil
-        Real64 DesignSuppHeatingCapacity = 0.0; // Operating capacity of supplemental Heating Coil [W]
-        Real64 MinOATCompressor = 0.0;          // Minimum OAT for compressor operation [C]
-        Real64 MinLATCooling = 0.0;             // Minimum leaving air temp for compressor cooling operation [C]
-        Real64 MaxLATHeating = 0.0;             // Maximum leaving air temp for heating operation [C]
+        HVAC::CoilType HeatCoilType = HVAC::CoilType::Invalid;
+        int HeatCoilIndex = 0;                    // DX heating coil index number
+        HVAC::FanOp fanOp = HVAC::FanOp::Invalid; // mode of operation
+        int CoilControlNode = 0;                  // heating coil hot water or steam inlet node
+        int CoilOutletNode = 0;                   // outlet node for hot water and steam coil
+        PlantLocation plantLoc;                   // plant loop component location object for water heating coil
+        int HotWaterCoilMaxIterIndex = 0;         // Index to recurring warning message
+        int HotWaterCoilMaxIterIndex2 = 0;        // Index to recurring warning message
+        Real64 MaxHeatCoilFluidFlow = 0.0;        // water or steam mass flow rate for heating coil [kg/s]
+        Real64 DesignHeatingCapacity = 0.0;       // design heating capacity of the heating coil
+        Real64 DesignSuppHeatingCapacity = 0.0;   // Operating capacity of supplemental Heating Coil [W]
+        Real64 MinOATCompressor = 0.0;            // Minimum OAT for compressor operation [C]
+        Real64 MinLATCooling = 0.0;               // Minimum leaving air temp for compressor cooling operation [C]
+        Real64 MaxLATHeating = 0.0;               // Maximum leaving air temp for heating operation [C]
         // Report data
         Real64 TotHeatEnergyRate = 0.0;                            // Total heating output [W]
         Real64 TotHeatEnergy = 0.0;                                // Total heating output [J]
@@ -206,48 +206,48 @@ namespace HVACUnitaryBypassVAV {
         Real64 CoilTempSetPoint = 0.0;                                // Coil oulet node temperature setpoint (inc. fan heat) [C]
         int HeatCoolMode = 0;                                         // System operating mode (0 = floating, 1 = cooling, 2 = heating)
         Real64 BypassMassFlowRate = 0.0;                              // Bypass mass flow rate report variable [m3/s]
-        int DehumidificationMode = 0;                                 // Dehumidification mode (0=normal, 1=enhanced)
-        DehumidControl DehumidControlType = DehumidControl::None;     // Dehumidification control type (currently only for multimode coil)
-        bool HumRatMaxCheck = true;                                   // Used in Init for warning messages
-        int DXIterationExceeded = 0;                                  // Counter for DX coil messages
-        int DXIterationExceededIndex = 0;                             // Counter for DX coil messages
-        int DXIterationFailed = 0;                                    // Counter for DX coil messages
-        int DXIterationFailedIndex = 0;                               // Counter for DX coil messages
-        int DXCyclingIterationExceeded = 0;                           // Counter for VS DX coil messages, when on/off cycling between off and speed 1
-        int DXCyclingIterationExceededIndex = 0;                      // Counter for VS DX coil messages, when on/off cycling between off and speed 1
-        int DXCyclingIterationFailed = 0;                             // Counter for VS DX coil messages, when on/off cycling between off and speed 1
-        int DXCyclingIterationFailedIndex = 0;                        // Counter for VS DX coil messages, when on/off cycling between off and speed 1
-        int DXHeatIterationExceeded = 0;                              // Counter for DX coil messages
-        int DXHeatIterationExceededIndex = 0;                         // Counter for DX coil messages
-        int DXHeatIterationFailed = 0;                                // Counter for DX coil messages
-        int DXHeatIterationFailedIndex = 0;                           // Counter for DX coil messages
-        int DXHeatCyclingIterationExceeded = 0;                       // Counter for VS DX coil messages, when on/off cycling between off and speed 1
-        int DXHeatCyclingIterationExceededIndex = 0;                  // Counter for VS DX coil messages, when on/off cycling between off and speed 1
-        int DXHeatCyclingIterationFailed = 0;                         // Counter for VS DX coil messages, when on/off cycling between off and speed 1
-        int DXHeatCyclingIterationFailedIndex = 0;                    // Counter for VS DX coil messages, when on/off cycling between off and speed 1
-        int HXDXIterationExceeded = 0;                                // Counter for HX assisted DX coil messages
-        int HXDXIterationExceededIndex = 0;                           // Counter for HX assisted DX coil messages
-        int HXDXIterationFailed = 0;                                  // Counter for HX assisted DX coil messages
-        int HXDXIterationFailedIndex = 0;                             // Counter for HX assisted DX coil messages
-        int MMDXIterationExceeded = 0;                                // Counter for multimode DX coil messages
-        int MMDXIterationExceededIndex = 0;                           // Counter for multimode DX coil messages
-        int MMDXIterationFailed = 0;                                  // Counter for multimode DX coil messages
-        int MMDXIterationFailedIndex = 0;                             // Counter for multimode DX coil messages
-        int DMDXIterationExceeded = 0;                                // Counter for dehumidifying multimode DX coil messages
-        int DMDXIterationExceededIndex = 0;                           // Counter for dehumidifying multimode DX coil messages
-        int DMDXIterationFailed = 0;                                  // Counter for dehumidifying multimode DX coil messages
-        int DMDXIterationFailedIndex = 0;                             // Counter for dehumidifying multimode DX coil messages
-        int CRDXIterationExceeded = 0;                                // Counter for cool reheat multimode DX coil messages
-        int CRDXIterationExceededIndex = 0;                           // Counter for cool reheat multimode DX coil messages
-        int CRDXIterationFailed = 0;                                  // Counter for cool reheat multimode DX coil messages
-        int CRDXIterationFailedIndex = 0;                             // Counter for cool reheat multimode DX coil messages
-        bool FirstPass = true;                                        // used to determine when first call is made
-        int plenumIndex = 0;                                          // index to AirloopHVAC:ReturnPlenum
-        int mixerIndex = 0;                                           // index to AirloopHVAC:ZoneMixer
-        Real64 changeOverTimer = -1.0;                                // timer to avoid rapid change of operating modes (e.g., cooling to heating)
-        Real64 minModeChangeTime = -1.0;                              // time limit before mode change is allowed (hr)
-        int OutNodeSPMIndex = 0;                                      // set point manager index if exists on outlet node
-        bool modeChanged = false;                                     // identifies operating mode changed this time step
+        HVAC::CoilMode DehumidificationMode = HVAC::CoilMode::Invalid; // Dehumidification mode (0=normal, 1=enhanced)
+        DehumidControl DehumidControlType = DehumidControl::None;      // Dehumidification control type (currently only for multimode coil)
+        bool HumRatMaxCheck = true;                                    // Used in Init for warning messages
+        int DXIterationExceeded = 0;                                   // Counter for DX coil messages
+        int DXIterationExceededIndex = 0;                              // Counter for DX coil messages
+        int DXIterationFailed = 0;                                     // Counter for DX coil messages
+        int DXIterationFailedIndex = 0;                                // Counter for DX coil messages
+        int DXCyclingIterationExceeded = 0;                            // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+        int DXCyclingIterationExceededIndex = 0;                       // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+        int DXCyclingIterationFailed = 0;                              // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+        int DXCyclingIterationFailedIndex = 0;                         // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+        int DXHeatIterationExceeded = 0;                               // Counter for DX coil messages
+        int DXHeatIterationExceededIndex = 0;                          // Counter for DX coil messages
+        int DXHeatIterationFailed = 0;                                 // Counter for DX coil messages
+        int DXHeatIterationFailedIndex = 0;                            // Counter for DX coil messages
+        int DXHeatCyclingIterationExceeded = 0;                        // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+        int DXHeatCyclingIterationExceededIndex = 0;                   // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+        int DXHeatCyclingIterationFailed = 0;                          // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+        int DXHeatCyclingIterationFailedIndex = 0;                     // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+        int HXDXIterationExceeded = 0;                                 // Counter for HX assisted DX coil messages
+        int HXDXIterationExceededIndex = 0;                            // Counter for HX assisted DX coil messages
+        int HXDXIterationFailed = 0;                                   // Counter for HX assisted DX coil messages
+        int HXDXIterationFailedIndex = 0;                              // Counter for HX assisted DX coil messages
+        int MMDXIterationExceeded = 0;                                 // Counter for multimode DX coil messages
+        int MMDXIterationExceededIndex = 0;                            // Counter for multimode DX coil messages
+        int MMDXIterationFailed = 0;                                   // Counter for multimode DX coil messages
+        int MMDXIterationFailedIndex = 0;                              // Counter for multimode DX coil messages
+        int DMDXIterationExceeded = 0;                                 // Counter for dehumidifying multimode DX coil messages
+        int DMDXIterationExceededIndex = 0;                            // Counter for dehumidifying multimode DX coil messages
+        int DMDXIterationFailed = 0;                                   // Counter for dehumidifying multimode DX coil messages
+        int DMDXIterationFailedIndex = 0;                              // Counter for dehumidifying multimode DX coil messages
+        int CRDXIterationExceeded = 0;                                 // Counter for cool reheat multimode DX coil messages
+        int CRDXIterationExceededIndex = 0;                            // Counter for cool reheat multimode DX coil messages
+        int CRDXIterationFailed = 0;                                   // Counter for cool reheat multimode DX coil messages
+        int CRDXIterationFailedIndex = 0;                              // Counter for cool reheat multimode DX coil messages
+        bool FirstPass = true;                                         // used to determine when first call is made
+        int plenumIndex = 0;                                           // index to AirloopHVAC:ReturnPlenum
+        int mixerIndex = 0;                                            // index to AirloopHVAC:ZoneMixer
+        Real64 changeOverTimer = -1.0;                                 // timer to avoid rapid change of operating modes (e.g., cooling to heating)
+        Real64 minModeChangeTime = -1.0;                               // time limit before mode change is allowed (hr)
+        int OutNodeSPMIndex = 0;                                       // set point manager index if exists on outlet node
+        bool modeChanged = false;                                      // identifies operating mode changed this time step
     };
 
     void SimUnitaryBypassVAV(EnergyPlusData &state,
@@ -310,7 +310,7 @@ namespace HVACUnitaryBypassVAV {
                                int CBVAVNum,            // Changeover bypass VAV unit index
                                bool FirstHVACIteration, // flag for first HVAC iteration in the time step
                                Real64 &HeatCoilLoad,    // heating coil load to be met (Watts)
-                               int FanMode,             // fan operation mode
+                               HVAC::FanOp const fanOp, // fan operation mode
                                Real64 &HeatCoilLoadmet  // coil heating load met
     );
 
@@ -342,6 +342,10 @@ struct HVACUnitaryBypassVAVData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag;     // Used for initializations each begin environment flag
     Array1D_bool MySizeFlag;      // Used for sizing CBVAV inputs one time
     Array1D_bool MyPlantScanFlag; // Used for initializations plant component for heating coils
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

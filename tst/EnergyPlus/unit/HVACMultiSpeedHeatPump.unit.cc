@@ -78,7 +78,6 @@
 
 using namespace EnergyPlus::BranchInputManager;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -1363,8 +1362,8 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     state->dataLoopNodes->Node(16).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(16).Temp, state->dataLoopNodes->Node(16).HumRat);
     state->dataLoopNodes->Node(24).MassFlowRateMax = state->dataLoopNodes->Node(16).MassFlowRateMaxAvail;
 
-    state->dataFans->Fan(2).MaxAirMassFlowRate = state->dataLoopNodes->Node(16).MassFlowRateMaxAvail;
-    state->dataFans->Fan(2).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataFans->fans(2)->maxAirMassFlowRate = state->dataLoopNodes->Node(16).MassFlowRateMaxAvail;
+    state->dataFans->fans(2)->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
     state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(1) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
     state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(2) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(2) * state->dataEnvrn->StdRhoAir;
     state->dataDXCoils->DXCoil(2).MSRatedCBF(1) = 0.2;
@@ -1459,7 +1458,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
 TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
 {
-
+    state->init_state(*state);
     state->dataLoopNodes->Node.allocate(2);
     state->dataHVACMultiSpdHP->MSHeatPump.allocate(1);
     int HeatRecInNode(1);
@@ -2190,13 +2189,13 @@ TEST_F(EnergyPlusFixture, HVACMSHP_UnitarySystemElectricityRateTest)
     EXPECT_EQ(msHeatPump.MinOATCompressorCooling, -25.0);
     EXPECT_EQ(msHeatPump.MinOATCompressorHeating, -8.0);
     // set local variables for convenience
-    auto &supplyFan = state->dataFans->Fan(1);
+    auto *supplyFan = state->dataFans->fans(1);
     auto &dxClgCoilMain = state->dataDXCoils->DXCoil(1);
     auto &dxHtgCoilMain = state->dataDXCoils->DXCoil(2);
     auto &elecHtgCoilSupp = state->dataHeatingCoils->HeatingCoil(msHeatPump.SuppHeatCoilNum);
     state->dataScheduleMgr->Schedule(11).CurrentValue = 1.0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    supplyFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    supplyFan->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
     state->dataGlobal->DoCoilDirectSolutions = false;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->DoCoilDirectSolutions = false;
@@ -2205,6 +2204,14 @@ TEST_F(EnergyPlusFixture, HVACMSHP_UnitarySystemElectricityRateTest)
     state->dataEnvrn->OutHumRat = 0.005;
     state->dataEnvrn->StdBaroPress = 101325.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
+
+    for (int Mode = 1; Mode <= dxClgCoilMain.NumOfSpeeds; ++Mode) {
+        dxClgCoilMain.MSRatedAirMassFlowRate(Mode) = dxClgCoilMain.MSRatedAirVolFlowRate(Mode) * state->dataEnvrn->StdRhoAir;
+    }
+    for (int Mode = 1; Mode <= dxHtgCoilMain.NumOfSpeeds; ++Mode) {
+        dxHtgCoilMain.MSRatedAirMassFlowRate(Mode) = dxHtgCoilMain.MSRatedAirVolFlowRate(Mode) * state->dataEnvrn->StdRhoAir;
+    }
+
     // set zone air conditions
     auto &zoneAirNode =
         state->dataLoopNodes->Node(Util::FindItemInList("Z401 AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
@@ -2227,13 +2234,13 @@ TEST_F(EnergyPlusFixture, HVACMSHP_UnitarySystemElectricityRateTest)
     msHeatPump.HeatCoolMode = EnergyPlus::HVACMultiSpeedHeatPump::ModeOfOperation::HeatingMode;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     // calculate the total electricity rate
-    Real64 result_msHeatPump_ElectricityRate = supplyFan.FanPower + state->dataHVACGlobal->DXElecCoolingPower +
+    Real64 result_msHeatPump_ElectricityRate = supplyFan->totalPower + state->dataHVACGlobal->DXElecCoolingPower +
                                                state->dataHVACGlobal->DXElecHeatingPower + state->dataHVACGlobal->ElecHeatingCoilPower +
                                                state->dataHVACGlobal->SuppHeatingCoilPower + msHeatPump.AuxElecPower;
     // test results
     EXPECT_NEAR(55366.46, msHeatPump.ElecPower, 0.01);
     EXPECT_NEAR(55366.46, result_msHeatPump_ElectricityRate, 0.01);
-    EXPECT_NEAR(3197.31, supplyFan.FanPower, 0.01);
+    EXPECT_NEAR(3197.31, supplyFan->totalPower, 0.01);
     EXPECT_NEAR(0.0, dxClgCoilMain.ElecCoolingPower, 0.01);
     EXPECT_NEAR(0.0, state->dataHVACGlobal->DXElecCoolingPower, 0.01);
     EXPECT_NEAR(16846.22, dxHtgCoilMain.ElecHeatingPower, 0.01);

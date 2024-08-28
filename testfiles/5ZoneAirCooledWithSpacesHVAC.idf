@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,24.1;
+  Version,24.2;
 
   Building,
     Building,                !- Name
@@ -2536,8 +2536,19 @@ ZoneAirHeatBalanceAlgorithm,
     Zone 5 Exhaust Fan Inlet,!- Zone Equipment Inlet Node Name
     DesignCoolingLoad,       !- Space Fraction Method
     Space 5 Conference,      !- Space 1 Name
-    autosize,                       !- Space 1 Fraction {dimensionless}
+    autosize,                !- Space 1 Fraction {dimensionless}
     Space 5 Conference Exhaust Fan Inlet;  !- Space 1 Node Name
+
+  SpaceHVAC:ZoneReturnMixer,
+    Zone 5 Return Mixer,     !- Name
+    Zone 5,                  !- Zone Name
+    Zone 5 Out Node,         !- Zone Return Air Node Name
+    Space 5 Office,          !- Space 1 Name
+    Space 5 Office Return Node,  !- Space 1 Return Air Node Name
+    Space 5 Conference,      !- Space 2 Name
+    Space 5 Conference Return Node,  !- Space 2 Return Air Node Name
+    Zone 5-Remainder,        !- Space 3 Name
+    Zone 5-Remainder Return Node;  !- Space 3 Return Air Node Name
 
   SpaceHVAC:EquipmentConnections,
     Space 5 Office,          !- Space Name
@@ -3788,10 +3799,21 @@ ZoneAirHeatBalanceAlgorithm,
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
+  EnergyManagementSystem:ProgramCallingManager,
+    test calling point,  !- Name
+    EndOfZoneTimestepBeforeZoneReporting,  !- EnergyPlus Model Calling Point
+    testProgram;     !- Program Name 1
+
+  EnergyManagementSystem:Program,
+    testProgram,     !- Name
+    Set dummy = 1;           !- Program Line 1
+
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
   Output:Variable,*,Zone Air Temperature,hourly;
   Output:Variable,*,Space Air Temperature,hourly;
+  Output:Variable,Space 5 Office,Space Wetbulb Globe Temperature,hourly;
+  Output:Variable,*,Zone Wetbulb Globe Temperature,hourly;
 
   Output:Variable,*,Zone Air Humidity Ratio,hourly; !- HVAC Average []
   Output:Variable,*,Zone Air Relative Humidity,hourly; !- HVAC Average [%]
@@ -3816,6 +3838,23 @@ Output:Variable,*,Space Predicted Sensible Load to Setpoint Heat Transfer Rate,h
   Output:Variable,Space 5 Office In Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
   Output:Variable,Space 5 Conference In Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
   Output:Variable,Zone 5-Remainder In Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+
+  Output:Variable,Zone 5 Out Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Zone 5 Exhaust Fan Inlet,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Office Return Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Conference Return Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Conference Exhaust Fan Inlet,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Zone 5-Remainder Return Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+
+  Output:Variable,Zone 5 Out Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Zone 5 Exhaust Fan Inlet,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Office Return Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Conference Return Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Space 5 Conference Exhaust Fan Inlet,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Zone 5-Remainder Return Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+
+  Output:Variable,*,EMS Zone Wetbulb Globe Temperature,hourly;
+  Output:Variable,*,EMS Space Wetbulb Globe Temperature,hourly;
 
   Output:VariableDictionary,idf;
 
@@ -3859,3 +3898,34 @@ Output:Variable,*,Space Predicted Sensible Load to Setpoint Heat Transfer Rate,h
   Output:Surfaces:List,DecayCurvesFromComponentLoadsSummary;
 
   Output:Surfaces:Drawing,dxf;
+
+  EnergyManagementSystem:Sensor,
+    test_WBGT,                   !- Name
+    ZONE 5,                        !- Output:Variable or Output:Meter Index Key Name
+    Zone Wetbulb Globe Temperature;  !- Output:Variable or Output:Meter Name
+
+  EnergyManagementSystem:Sensor,
+    test_space_WBGT,                   !- Name
+    Space 5 Office,                        !- Output:Variable or Output:Meter Index Key Name
+    Space Wetbulb Globe Temperature;  !- Output:Variable or Output:Meter Name
+
+  EnergyManagementSystem:OutputVariable,
+    EMS Zone Wetbulb Globe Temperature, !- Name
+    test_WBGT,               !- EMS Variable Name
+    Averaged,                !- Type of Data in Variable
+    ZoneTimeStep,          !- Update Frequency
+    ,                        !- EMS Program or Subroutine Name
+    deg;                       !- Units
+
+  EnergyManagementSystem:OutputVariable,
+    EMS Space Wetbulb Globe Temperature, !- Name
+    test_space_WBGT,               !- EMS Variable Name
+    Averaged,                !- Type of Data in Variable
+    ZoneTimeStep,          !- Update Frequency
+    ,                        !- EMS Program or Subroutine Name
+    deg;                       !- Units
+
+Output:EnergyManagementSystem,
+    Verbose,    ! Actuator Availability Dictionary Reporting
+    Verbose,    ! Internal Variable Availability Dictionary Reporting
+    ErrorsOnly; ! EnergyPlus Runtime Language Debug Output Level

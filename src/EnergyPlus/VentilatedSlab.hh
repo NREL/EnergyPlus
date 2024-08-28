@@ -161,9 +161,9 @@ namespace VentilatedSlab {
         // (assumes fan is upstream of heating coil)
         int MSlabInNode;
         int MSlabOutNode;
-        std::string FanName; // name of fan
-        int Fan_Index;       // index of fan in array or vector
-        int FanType_Num;     // type of fan
+        std::string FanName;   // name of fan
+        int Fan_Index;         // index of fan in array or vector
+        HVAC::FanType fanType; // type of fan
         int ControlCompTypeNum;
         int CompErrIndex;
         Real64 MaxAirVolFlow;                        // m3/s
@@ -272,7 +272,7 @@ namespace VentilatedSlab {
         Real64 FanOutletTemp;             // FanOutlet temp in degree C
         Real64 ZoneInletTemp;             // supply air temp
         std::string AvailManagerListName; // Name of an availability manager list object
-        int AvailStatus;
+        Avail::Status availStatus = Avail::Status::NoAction;
         int HVACSizingIndex;                 // index of a HVACSizing object for a ventilator slab
         bool FirstPass;                      // detects first time through for resetting sizing data
         Real64 ZeroVentSlabSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
@@ -286,7 +286,7 @@ namespace VentilatedSlab {
         VentilatedSlabData()
             : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0),
               controlType(ControlType::Invalid), ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0),
-              Fan_Index(0), FanType_Num(0), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0),
+              Fan_Index(0), fanType(HVAC::FanType::Invalid), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0),
               outsideAirControlType(OutsideAirControlType::Invalid), MinOASchedPtr(0), MaxOASchedPtr(0), TempSchedPtr(0), OutsideAirNode(0),
               AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0),
               SysConfg(VentilatedSlabConfig::Invalid), coilOption(CoilType::Invalid), heatingCoilPresent(false), hCoilType(HeatingCoilType::Invalid),
@@ -303,8 +303,8 @@ namespace VentilatedSlab {
               RadHeatingEnergy(0.0), RadCoolingPower(0.0), RadCoolingEnergy(0.0), HeatCoilPower(0.0), HeatCoilEnergy(0.0), TotCoolCoilPower(0.0),
               TotCoolCoilEnergy(0.0), SensCoolCoilPower(0.0), SensCoolCoilEnergy(0.0), LateCoolCoilPower(0.0), LateCoolCoilEnergy(0.0),
               ElecFanPower(0.0), ElecFanEnergy(0.0), AirMassFlowRate(0.0), AirVolFlow(0.0), SlabInTemp(0.0), SlabOutTemp(0.0), ReturnAirTemp(0.0),
-              FanOutletTemp(0.0), ZoneInletTemp(0.0), AvailStatus(0), HVACSizingIndex(0), FirstPass(true), ZeroVentSlabSourceSumHATsurf(0.0),
-              QRadSysSrcAvg(0.0), LastQRadSysSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0)
+              FanOutletTemp(0.0), ZoneInletTemp(0.0), HVACSizingIndex(0), FirstPass(true), ZeroVentSlabSourceSumHATsurf(0.0), QRadSysSrcAvg(0.0),
+              LastQRadSysSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0)
         {
         }
     };
@@ -383,6 +383,7 @@ namespace VentilatedSlab {
 
     void ReportVentilatedSlab(EnergyPlusData &state, int const Item); // Index for the ventilated slab under consideration within the derived types
 
+    int getVentilatedSlabIndex(EnergyPlusData &state, std::string_view CompName);
     //*****************************************************************************************
 
 } // namespace VentilatedSlab
@@ -420,6 +421,10 @@ struct VentilatedSlabData : BaseGlobalStruct
     int CondensationErrorCount = 0;    // Counts for # times the radiant systems are shutdown due to condensation
     int EnergyImbalanceErrorCount = 0; // Counts for # times a temperature mismatch is found in the energy balance check
     bool FirstTimeFlag = true;         // for setting size of AirTempOut array
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

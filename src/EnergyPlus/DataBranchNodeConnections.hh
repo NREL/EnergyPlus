@@ -130,9 +130,13 @@ struct BranchNodeConnectionsData : BaseGlobalStruct
     EPVector<DataBranchNodeConnections::EqNodeConnectionDef> AirTerminalNodeConnections;
     Array1D_bool NonConnectedNodes;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = BranchNodeConnectionsData();
+        new (this) BranchNodeConnectionsData();
     }
 };
 

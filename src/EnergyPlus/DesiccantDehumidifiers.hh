@@ -109,7 +109,6 @@ namespace DesiccantDehumidifiers {
         std::string Sched;                     // name of availability schedule
         std::string RegenCoilType;             // type of regen coil
         std::string RegenCoilName;             // name of regen coil
-        std::string RegenFanType;              // type of regen fan
         std::string RegenFanName;              // name of regen fan
         PerformanceModel PerformanceModel_Num; // type of performance model, default or user curves
         int ProcAirInNode;                     // process air inlet node of dehumidifier
@@ -125,7 +124,7 @@ namespace DesiccantDehumidifiers {
         Real64 NomRotorPower;           // rotor power consumption at full output [W]
         int RegenCoilIndex;             // Index for regen coil
         int RegenFanIndex;              // Index for regen fan
-        int regenFanType_Num;           // Fan type number (see DataHVACGlobals)
+        HVAC::FanType regenFanType;     // Fan type number (see DataHVACGlobals)
         int ProcDryBulbCurvefTW;        // number of process leaving dry bulb f(edb,ew) curve
         int ProcDryBulbCurvefV;         // number of process leaving dry bulb f(v) curve
         int ProcHumRatCurvefTW;         // number of process leaving humidity ratio f(edb,ew) curve
@@ -191,7 +190,7 @@ namespace DesiccantDehumidifiers {
         Real64 ExhaustFanPower;              // exhaust fan power for reporting [W]
         Real64 ExhaustFanElecConsumption;    // exhaust fan electric consumption for reporting [J]
         Real64 CompanionCoilCapacity;        // DX coil capacity for dehumidifier companion cooling coil [W]
-        int RegenFanPlacement;               // placement of the fan used for regeneration air flow
+        HVAC::FanPlace regenFanPlace;        // placement of the fan used for regeneration air flow
         int ControlNodeNum;                  // node number of control node
         int ExhaustFanCurveIndex;            // exhaust fan curve object index
         int CompIndex;                       // index of HX component to call simheatrecovery
@@ -222,22 +221,23 @@ namespace DesiccantDehumidifiers {
         DesiccantDehumidifierData()
             : PerformanceModel_Num(PerformanceModel::Invalid), ProcAirInNode(0), ProcAirOutNode(0), RegenAirInNode(0), RegenAirOutNode(0),
               RegenFanInNode(0), controlType(DesicDehumCtrlType::Invalid), HumRatSet(0.0), NomProcAirVolFlow(0.0), NomProcAirVel(0.0),
-              NomRotorPower(0.0), RegenCoilIndex(0), RegenFanIndex(0), regenFanType_Num(0), ProcDryBulbCurvefTW(0), ProcDryBulbCurvefV(0),
-              ProcHumRatCurvefTW(0), ProcHumRatCurvefV(0), RegenEnergyCurvefTW(0), RegenEnergyCurvefV(0), RegenVelCurvefTW(0), RegenVelCurvefV(0),
-              NomRegenTemp(121.0), MinProcAirInTemp(-73.3), MaxProcAirInTemp(65.6), MinProcAirInHumRat(0.0), MaxProcAirInHumRat(0.21273), SchedPtr(0),
-              NomProcAirMassFlow(0.0), NomRegenAirMassFlow(0.0), ProcAirInTemp(0.0), ProcAirInHumRat(0.0), ProcAirInEnthalpy(0.0),
-              ProcAirInMassFlowRate(0.0), ProcAirOutTemp(0.0), ProcAirOutHumRat(0.0), ProcAirOutEnthalpy(0.0), ProcAirOutMassFlowRate(0.0),
-              RegenAirInTemp(0.0), RegenAirInHumRat(0.0), RegenAirInEnthalpy(0.0), RegenAirInMassFlowRate(0.0), RegenAirVel(0.0),
-              DehumTypeCode(DesicDehumType::Invalid), WaterRemove(0.0), WaterRemoveRate(0.0), SpecRegenEnergy(0.0), QRegen(0.0), RegenEnergy(0.0),
-              ElecUseEnergy(0.0), ElecUseRate(0.0), PartLoad(0.0), RegenCapErrorIndex1(0), RegenCapErrorIndex2(0), RegenCapErrorIndex3(0),
-              RegenCapErrorIndex4(0), RegenFanErrorIndex1(0), RegenFanErrorIndex2(0), RegenFanErrorIndex3(0), RegenFanErrorIndex4(0), HXTypeNum(0),
-              coolingCoil_TypeNum(0), Preheat(Selection::Invalid), RegenSetPointTemp(0.0), ExhaustFanMaxVolFlowRate(0.0),
-              ExhaustFanMaxMassFlowRate(0.0), ExhaustFanMaxPower(0.0), ExhaustFanPower(0.0), ExhaustFanElecConsumption(0.0),
-              CompanionCoilCapacity(0.0), RegenFanPlacement(0), ControlNodeNum(0), ExhaustFanCurveIndex(0), CompIndex(0), CoolingCoilOutletNode(0),
-              RegenFanOutNode(0), RegenCoilInletNode(0), RegenCoilOutletNode(0), HXProcInNode(0), HXProcOutNode(0), HXRegenInNode(0),
-              HXRegenOutNode(0), CondenserInletNode(0), DXCoilIndex(0), ErrCount(0), ErrIndex1(0), CoilUpstreamOfProcessSide(Selection::Invalid),
-              RegenInletIsOutsideAirNode(false), RegenCoilType_Num(0), CoilControlNode(0), CoilOutletNode(0), HotWaterCoilMaxIterIndex(0),
-              HotWaterCoilMaxIterIndex2(0), MaxCoilFluidFlow(0.0), RegenCoilCapacity(0.0)
+              NomRotorPower(0.0), RegenCoilIndex(0), RegenFanIndex(0), regenFanType(HVAC::FanType::Invalid), ProcDryBulbCurvefTW(0),
+              ProcDryBulbCurvefV(0), ProcHumRatCurvefTW(0), ProcHumRatCurvefV(0), RegenEnergyCurvefTW(0), RegenEnergyCurvefV(0), RegenVelCurvefTW(0),
+              RegenVelCurvefV(0), NomRegenTemp(121.0), MinProcAirInTemp(-73.3), MaxProcAirInTemp(65.6), MinProcAirInHumRat(0.0),
+              MaxProcAirInHumRat(0.21273), SchedPtr(0), NomProcAirMassFlow(0.0), NomRegenAirMassFlow(0.0), ProcAirInTemp(0.0), ProcAirInHumRat(0.0),
+              ProcAirInEnthalpy(0.0), ProcAirInMassFlowRate(0.0), ProcAirOutTemp(0.0), ProcAirOutHumRat(0.0), ProcAirOutEnthalpy(0.0),
+              ProcAirOutMassFlowRate(0.0), RegenAirInTemp(0.0), RegenAirInHumRat(0.0), RegenAirInEnthalpy(0.0), RegenAirInMassFlowRate(0.0),
+              RegenAirVel(0.0), DehumTypeCode(DesicDehumType::Invalid), WaterRemove(0.0), WaterRemoveRate(0.0), SpecRegenEnergy(0.0), QRegen(0.0),
+              RegenEnergy(0.0), ElecUseEnergy(0.0), ElecUseRate(0.0), PartLoad(0.0), RegenCapErrorIndex1(0), RegenCapErrorIndex2(0),
+              RegenCapErrorIndex3(0), RegenCapErrorIndex4(0), RegenFanErrorIndex1(0), RegenFanErrorIndex2(0), RegenFanErrorIndex3(0),
+              RegenFanErrorIndex4(0), HXTypeNum(0), coolingCoil_TypeNum(0), Preheat(Selection::Invalid), RegenSetPointTemp(0.0),
+              ExhaustFanMaxVolFlowRate(0.0), ExhaustFanMaxMassFlowRate(0.0), ExhaustFanMaxPower(0.0), ExhaustFanPower(0.0),
+              ExhaustFanElecConsumption(0.0), CompanionCoilCapacity(0.0), regenFanPlace(HVAC::FanPlace::Invalid), ControlNodeNum(0),
+              ExhaustFanCurveIndex(0), CompIndex(0), CoolingCoilOutletNode(0), RegenFanOutNode(0), RegenCoilInletNode(0), RegenCoilOutletNode(0),
+              HXProcInNode(0), HXProcOutNode(0), HXRegenInNode(0), HXRegenOutNode(0), CondenserInletNode(0), DXCoilIndex(0), ErrCount(0),
+              ErrIndex1(0), CoilUpstreamOfProcessSide(Selection::Invalid), RegenInletIsOutsideAirNode(false), RegenCoilType_Num(0),
+              CoilControlNode(0), CoilOutletNode(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), MaxCoilFluidFlow(0.0),
+              RegenCoilCapacity(0.0)
         {
         }
     };
@@ -306,6 +306,10 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
     Real64 QRegen = 0.0;          // required coil load passed to sim heating coil routine (W)
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

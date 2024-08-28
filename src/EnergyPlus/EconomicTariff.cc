@@ -2576,7 +2576,7 @@ void GatherForEconomics(EnergyPlusData &state)
         for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             auto &tariff = state.dataEconTariff->tariff(iTariff);
             // if the meter is defined get the value
-            if (tariff.reportMeterIndx != 0) {
+            if (tariff.reportMeterIndx != -1) {
                 curInstantValue = GetCurrentMeterValue(state, tariff.reportMeterIndx);
             } else {
                 curInstantValue = 0.0;
@@ -3879,9 +3879,6 @@ void LEEDtariffReporting(EnergyPlusData &state)
     Real64 distHeatWaterTotalCost;
     Real64 distHeatSteamTotalCost;
     Real64 allTotalCost;
-    std::string distCoolTariffNames;
-    std::string distHeatWaterTariffNames;
-    std::string distHeatSteamTariffNames;
     EconConv elecUnits;
     EconConv gasUnits;
     EconConv distCoolUnits;
@@ -4105,7 +4102,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             // Economics Results Summary Report
             //---------------------------------
             OutputReportTabular::WriteReportHeaders(
-                state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Average);
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
                 OutputReportTabular::UnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
@@ -4275,7 +4272,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                 auto const &tariff = state.dataEconTariff->tariff(iTariff);
                 auto const &computation = state.dataEconTariff->computation(iTariff);
-                OutputReportTabular::WriteReportHeaders(state, "Tariff Report", tariff.tariffName, OutputProcessor::StoreType::Averaged);
+                OutputReportTabular::WriteReportHeaders(state, "Tariff Report", tariff.tariffName, OutputProcessor::StoreType::Average);
                 rowHead.allocate(7);
                 columnHead.allocate(1);
                 columnWidth.allocate(1);

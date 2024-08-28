@@ -188,7 +188,7 @@ In this case, shadow patterns on exterior surfaces caused by detached shading, w
 
 This is the same as FullExterior except that instead of assuming all transmitted beam solar falls on the floor the program calculates the amount of beam radiation falling on each surface in the zone, including floor, walls and windows, by projecting the sun's rays through the exterior windows, taking into account the effect of exterior shadowing surfaces and window shading devices.
 
-If this option is used, you should be sure that the surfaces of the zone totally enclose a space. This can be determined by viewing the \textbf{eplusout.dxf} file with a program like AutoDesk's Volo View Express. You should also be sure that the zone is \textbf{convex}. Examples of convex and non-convex zones are shown in Figure~\ref{fig:illustration-of-convex-and-non-convex-zones}. The most common non-convex zone is an L-shaped zone. (A formal definition of convex is that any straight line passing through the zone intercepts at most two surfaces.) If the zone's surfaces do not enclose a space or if the zone is not convex you should use Solar Distribution = \textbf{FullExterior} instead of \textbf{FullInteriorAndExterior}.
+If this option is used, you should be sure that the surfaces of the zone totally enclose a space. This can be determined by viewing the \textbf{eplusout.dxf} file with a program like AutoDesk's Volo View Express. You should also be sure that the zone is \textbf{convex}. Examples of convex and non-convex zones are shown in Figure~\ref{fig:illustration-of-convex-and-non-convex-zones}. The most common non-convex zone is an L-shaped zone. (A formal definition of convex is that any straight line passing through the zone intercepts at most two surfaces.) If the zone's surfaces do not enclose a space, Solar Distribution should be set to \textbf{FullExterior} instead of \textbf{FullInteriorAndExterior}.  If the zone or a surface in the zone is not convex, Solar Distribution should also be set to \textbf{FullExterior} instead of \textbf{FullInteriorAndExterior} unless this file is not using PolygonClipping (see the \hyperref [field-shading-calculation-method]{Shading Calculation Method} field in \hyperref[shadowcalculation]{ShadowCalculation} for more information).
 
 If you use \textbf{FullInteriorAndExterior} the program will also calculate how much beam radiation falling on the inside of an exterior window (from other windows in the zone) is absorbed by the window, how much is reflected back into the zone, and how much is transmitted to the outside. In this calculation the effect of a shading device, if present, is accounted for.
 
@@ -473,7 +473,7 @@ Three choices are allowed to select which solution algorithm will be used. The \
 If yes, space-level heat balance will be calculated and reported during sizing, and space sizing results will be reported along with zone sizing results. If no, then only zone-level heat balance will be calculated. This field defaults to No. For zones with more than one space, the zone sizing results are calculated for the whole zone and represent the coincident peak for the spaces in the zone. Note that space heat balance is not supported for \hyperref[inputs-hm]{HybridModel:Zone}, \hyperref[roomairmodeltype]{RoomAirModelType} other than Mixing, \hyperref[heatbalancealgorithm]{HeatBalanceAlgorithm} MoisturePenetrationDepthConductionTransferFunction and CombinedHeatAndMoistureFiniteElement.
 
 \paragraph{Field: Do Space Heat Balance for Simulation}\label{field-do-space-heat-balance-simulation}
-If yes, space-level heat balance will be calculated and reported during the simulation. If no, then only zone-level heat balance will be calculated. This field defaults to No. When this field is Yes, optional SpaceHVAC objects may be used to distribute zone HVAC equipment output to the spaces in the zone. See \hyperref[spacehvacequipmentconnections]{SpaceHVAC:EquipmentConnections}, \hyperref[spacehvaczoneequipmentsplitter]{SpaceHVAC:ZoneEquipmentSplitter} and \hyperref[spacehvaczoneequipmentmixer]{SpaceHVAC:ZoneEquipmentMixer}.
+If yes, space-level heat balance will be calculated and reported during the simulation. If no, then only zone-level heat balance will be calculated. This field defaults to No. When this field is Yes, optional SpaceHVAC objects may be used to distribute zone HVAC equipment output to the spaces in the zone. See \hyperref[spacehvacequipmentconnections]{SpaceHVAC:EquipmentConnections}, \hyperref[spacehvaczoneequipmentsplitter]{SpaceHVAC:ZoneEquipmentSplitter}, \hyperref[spacehvaczoneequipmentmixer]{SpaceHVAC:ZoneEquipmentMixer} and \hyperref[spacehvaczonereturnmixer]{SpaceHVAC:ZoneReturnMixer}.
 
 And, a default IDF example is shown below:
 
@@ -568,7 +568,7 @@ Choices are:
     \item Imported
 \end{enumerate}
 
-If \textbf{PixelCounting} is selected and GPU hardware (or GPU emulation) is not available, a warning will be displayed and EnergyPlus will revert to PolygonClipping. Unlike PolygonClipping, PixelCounting has no limitations related to zone concavity when used with any ``FullInterior'' solar distribution options (i.e., it can accommodate both concave and convex zones equally).
+If \textbf{PixelCounting} is selected and GPU hardware (or GPU emulation) is not available, a warning will be displayed and EnergyPlus will revert to PolygonClipping. Unlike PolygonClipping, PixelCounting has no limitations related to zone concavity when used with any ``FullInterior'' solar distribution options (i.e., it can accommodate both concave and convex zones and surfaces equally).
 
 Use of the PixelCounting method requires some overhead in passing instructions between the CPU and the GPU. For low numbers of shading surfaces (less than about 200 for most hardware), PolygonClipping requires less runtime than PixelCounting. However, PixelCounting runtime scales significantly better at higher numbers of shading surfaces.
 
@@ -689,25 +689,23 @@ Output:Diagnostics,
 
 \subsection{Output:DebuggingData}\label{outputdebuggingdata}
 
-There may be times when a particular input file requires additional debugging. The Output:DebuggingData object may be used to report all available node data (e.g., temperature, mass flow rate, set point, pressure, etc.). The debug data is reported to the DBG text file. The debug file first reports the node number and name, and then all available node information for each zone time step (Ref. Timestep).
-
-The 2 fields of the Output:DebuggingData object can accept either a 1 (turn on) or any other value (turn off). Only one object may be entered.
+There may be times when a particular input file requires additional debugging. The Output:DebuggingData object may be used to report all available node data (e.g., temperature, mass flow rate, set point, pressure, etc.). The debug data is reported to the DBG text file. The debug file first reports the node number and name, and then all available node information for each zone time step (Ref. Timestep). Only one object may be entered.
 
 \subsubsection{Inputs}\label{inputs-12-017}
 
 \paragraph{Field: Report Debugging Data}\label{field-report-debugging-data}
 
-This field turns on debug reporting when a value of 1 is entered. Any other value (usually 0) disables debug reporting.
+This field turns on debug reporting when ``Yes'' is entered. ``No'' (the default) disables debug reporting.
 
 \paragraph{Field: Report During Warmup}\label{field-report-during-warmup}
 
-This field allows the debug data to be reported during the warmup period. When a value of 1 is entered the data is reported at all times, even during warmup. Any other value (usually 0) disables ``reporting at all time'' and debug data is only reported for each environment (\hyperref[runperiod]{RunPeriod} or \hyperref[sizingperioddesignday]{SizingPeriod:DesignDay}).
+This field reports the debug data during the warmup period when ``Yes'' is entered. ``No'' (the default) disables reporting during warmup.
 
 In IDF use:
 
 \begin{lstlisting}
 Output:DebuggingData,
-  1,1;
+  Yes,Yes;
 \end{lstlisting}
 
 \subsection{Output:PreprocessorMessage}\label{outputpreprocessormessage}

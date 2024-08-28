@@ -98,6 +98,8 @@ namespace HybridUnitaryAirConditioners {
 
     int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int UnitNum);
 
+    int getHybridUnitaryACIndex(EnergyPlusData &state, std::string_view CompName);
+
 } // namespace HybridUnitaryAirConditioners
 
 struct HybridUnitaryAirConditionersData : BaseGlobalStruct
@@ -113,6 +115,10 @@ struct HybridUnitaryAirConditionersData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyFanFlag;
     Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

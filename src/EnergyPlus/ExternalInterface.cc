@@ -324,7 +324,7 @@ void CloseSocket(EnergyPlusData &state, int const FlagToWriteToSocket)
     bool fileExist = FileSystem::fileExists(state.dataExternalInterface->socCfgFilPath);
 
     if ((state.dataExternalInterface->socketFD == -1) && fileExist) {
-        state.dataExternalInterface->socketFD = establishclientsocket(state.dataExternalInterface->socCfgFilPath.string().c_str());
+        state.dataExternalInterface->socketFD = establishclientsocket(FileSystem::toString(state.dataExternalInterface->socCfgFilPath).c_str());
     }
 
     if (state.dataExternalInterface->socketFD >= 0) {
@@ -398,14 +398,14 @@ void InitExternalInterface(EnergyPlusData &state)
 
         // Get port number
         if (FileSystem::fileExists(state.dataExternalInterface->socCfgFilPath)) {
-            state.dataExternalInterface->socketFD = establishclientsocket(state.dataExternalInterface->socCfgFilPath.string().c_str());
+            state.dataExternalInterface->socketFD = establishclientsocket(FileSystem::toString(state.dataExternalInterface->socCfgFilPath).c_str());
             if (state.dataExternalInterface->socketFD < 0) {
                 ShowSevereError(state,
                                 format("ExternalInterface: Could not open socket. File descriptor = {}.", state.dataExternalInterface->socketFD));
                 state.dataExternalInterface->ErrorsFound = true;
             }
         } else {
-            ShowSevereError(state, format("ExternalInterface: Did not find file \"{}\".", state.dataExternalInterface->socCfgFilPath.string()));
+            ShowSevereError(state, format("ExternalInterface: Did not find file \"{}\".", state.dataExternalInterface->socCfgFilPath));
             ShowContinueError(state, "This file needs to be in same directory as in.idf.");
             ShowContinueError(state, "Check the documentation for the ExternalInterface.");
             state.dataExternalInterface->ErrorsFound = true;
@@ -833,7 +833,7 @@ void InstantiateInitializeFMUImport(EnergyPlusData &state)
     // Instantiate FMUs
     for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
         for (int j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
-            std::string const &folderStr = state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string();
+            std::string const folderStr = FileSystem::toString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder);
             state.dataExternalInterface->FMU(i).Instance(j).fmicomponent =
                 fmiEPlusInstantiateSlave((char *)folderStr.c_str(),
                                          &state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder,
@@ -1024,7 +1024,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                         strippedFileName(Loop) = state.dataExternalInterface->FMU(Loop).Name;
                     }
                 }
-                fullFileName(Loop) = tempFullFilePath.string();
+                fullFileName(Loop) = FileSystem::toString(tempFullFilePath);
             } else {
                 state.dataExternalInterface->ErrorsFound = true;
             }
@@ -1132,14 +1132,13 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
             for (int j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
                 // get the length of working folder trimmed
-                state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder =
-                    state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string().length();
+                std::string const workingFolderStr = FileSystem::toString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder);
+                state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder = workingFolderStr.length();
                 // unpack fmus
                 // preprocess arguments for library call
                 {
                     std::vector<char> fullFileNameArr(getCharArrayFromString(fullFileName(i)));
-                    std::vector<char> workingFolderArr(
-                        getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
+                    std::vector<char> workingFolderArr(getCharArrayFromString(workingFolderStr));
                     int lenFileName(len(fullFileName(i)));
 
                     // make the library call
@@ -1158,8 +1157,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 {
                     // determine modelID and modelGUID of all FMU instances
                     // preprocess arguments for library call
-                    std::vector<char> workingFolderArr(
-                        getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
+                    std::vector<char> workingFolderArr(getCharArrayFromString(workingFolderStr));
 
                     // make the library call
                     state.dataExternalInterface->FMU(i).Instance(j).Index =
@@ -1185,13 +1183,12 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 {
                     // get the path to the binaries
                     // preprocess args for library call
-                    std::vector<char> workingFolderArr(
-                        getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
+                    std::vector<char> workingFolderArr(getCharArrayFromString(workingFolderStr));
                     // Reserve some space in the string, becasue addLibPathCurrentWorkflowFolder doesn't allocate memory for the
                     // workingFolderWithLibArr Note: you can't call str.resize(str.length() + 91) because the conversion to std::vector<char> will
                     // find the null terminator and so it will have no effect
-                    std::string reservedString = state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string() +
-                                                 "                                                                                           ";
+                    std::string reservedString =
+                        workingFolderStr + "                                                                                           ";
                     std::vector<char> workingFolderWithLibArr(getCharArrayFromString(reservedString));
 
                     // make the library call
@@ -1218,14 +1215,14 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
 
                     // get the length of the working folder with libraries
                     state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder_wLib =
-                        state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib.string().length();
+                        FileSystem::toString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib).length();
                 }
 
                 {
                     // determine the FMI version
                     // preprocess args for library call
                     std::vector<char> workingFolderWithLibArr(
-                        getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib.string()));
+                        getCharArrayFromString(FileSystem::toString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib)));
                     std::vector<char> VersionNumArr(
                         getCharArrayFromString("    ")); // the version should only be 3 characters long, since for now we only handle "1.0"
 
@@ -1955,7 +1952,7 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
     if (state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) { // Data exchange after design days
         if (state.dataExternalInterface->FirstCallWUp) {
             // set the report during warmup to true so that variables are also updated during the warmup
-            // UpdateDataDuringWarmupExternalInterface = true;
+            state.dataSysVars->UpdateDataDuringWarmupExternalInterface = true;
             state.dataExternalInterface->hStep = (60.0 * state.dataGlobal->TimeStepZone) * 60.0;
             state.dataExternalInterface->tStart = GetCurSimStartTimeSeconds(state);
             state.dataExternalInterface->tStop = state.dataExternalInterface->tStart + 24.0 * 3600.0;
@@ -2403,7 +2400,7 @@ void GetReportVariableKey(
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     OutputProcessor::VariableType varType(OutputProcessor::VariableType::Invalid);  // 0=not found, 1=integer, 2=real, 3=meter
     int numKeys(0);                                                                 // Number of keys found
-    OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Averaged);     // Variable  is Averaged=1 or Summed=2
+    OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Average);      // Variable  is Averaged=1 or Summed=2
     OutputProcessor::TimeStepType varStepType(OutputProcessor::TimeStepType::Zone); // Variable time step is Zone=1 or HVAC=2
     Constant::Units varUnits(Constant::Units::None);                                // Units sting, may be blank
     Array1D_string keyNames;

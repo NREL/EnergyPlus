@@ -333,13 +333,12 @@ namespace WaterThermalTanks {
         int DXCoilTypeNum;                                          // Type Number of DX coil
         int DXCoilAirInletNode;                                     // Inlet air node number of DX coil
         int DXCoilPLFFPLR;                                          // Index to HPWH's DX Coil PLF as a function of PLR curve
-        std::string FanType;                                        // Type of Fan (Fan:OnOff)
-        int FanType_Num;                                            // Integer type of fan (3 = Fan:OnOff)
+        HVAC::FanType fanType;                                      // Integer type of fan (3 = Fan:OnOff)
         std::string FanName;                                        // Name of Fan
         std::string FanInletNode_str;                               // Fan inlet node name
         std::string FanOutletNode_str;                              // Fan outlet node name
         int FanNum;                                                 // Index of Fan
-        int FanPlacement;                                           // Location of Fan
+        HVAC::FanPlace fanPlace;                                    // Location of Fan
         int FanOutletNode;                                          // Outlet node of heat pump water heater fan
         int WaterHeaterTankNum;                                     // Index of Water Heater Tank
         int OutletAirSplitterSchPtr;                                // Index to air-side outlet air splitter schedule
@@ -421,6 +420,7 @@ namespace WaterThermalTanks {
         bool myOneTimeInitFlag;
 
         // end of variables for variable-speed HPWH
+        ~HeatPumpWaterHeaterData() = default;
 
         // Default Constructor
         HeatPumpWaterHeaterData()
@@ -430,24 +430,24 @@ namespace WaterThermalTanks {
               WHPLFCurve(0), OperatingAirFlowRate(0.0), OperatingAirMassFlowRate(0.0), OperatingWaterFlowRate(0.0), COP(0.0), SHR(0.0),
               RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), FoundTank(false), HeatPumpAirInletNode(0),
               HeatPumpAirOutletNode(0), OutsideAirNode(0), ExhaustAirNode(0), CondWaterInletNode(0), CondWaterOutletNode(0), WHUseInletNode(0),
-              WHUseOutletNode(0), WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0), FanType_Num(0),
-              FanNum(0), FanPlacement(0), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Power(0.0),
-              Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0), MaxAirTempForHPOperation(48.8888888889),
-              InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0), InletAirConfiguration(WTTAmbientTemp::OutsideAir),
-              AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0), CrankcaseTempIndicator(CrankcaseHeaterControlTemp::Schedule),
-              CrankcaseTempSchedule(0), CrankcaseTempZone(0), OffCycParaLoad(0.0), OnCycParaLoad(0.0),
-              ParasiticTempIndicator(WTTAmbientTemp::OutsideAir), OffCycParaFuelRate(0.0), OnCycParaFuelRate(0.0), OffCycParaFuelEnergy(0.0),
-              OnCycParaFuelEnergy(0.0), AirFlowRateAutoSized(false), WaterFlowRateAutoSized(false), HPSetPointError(0), HPSetPointErrIndex1(0),
-              IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0),
-              IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true), ShowSetPointWarning(true),
-              HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0), WrappedCondenserBottomLocation(0.0),
-              WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1), ControlSensor1Weight(1.0),
-              ControlSensor2Height(-1.0), ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0), ControlTempFinal(0.0),
-              AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
-              HPWHAirMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), HPWHWaterVolFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
-              HPWHWaterMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), MSAirSpeedRatio(DataHVACGlobals::MaxSpeedLevels, 0.0),
-              MSWaterSpeedRatio(DataHVACGlobals::MaxSpeedLevels, 0.0), bIsIHP(false), MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true),
-              CheckHPWHEquipName(true), myOneTimeInitFlag(true)
+              WHUseOutletNode(0), WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0),
+              fanType(HVAC::FanType::Invalid), FanNum(0), fanPlace(HVAC::FanPlace::Invalid), FanOutletNode(0), WaterHeaterTankNum(0),
+              OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0),
+              MinAirTempForHPOperation(5.0), MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0),
+              SourceMassFlowRate(0.0), InletAirConfiguration(WTTAmbientTemp::OutsideAir), AmbientTempSchedule(0), AmbientRHSchedule(0),
+              AmbientTempZone(0), CrankcaseTempIndicator(CrankcaseHeaterControlTemp::Schedule), CrankcaseTempSchedule(0), CrankcaseTempZone(0),
+              OffCycParaLoad(0.0), OnCycParaLoad(0.0), ParasiticTempIndicator(WTTAmbientTemp::OutsideAir), OffCycParaFuelRate(0.0),
+              OnCycParaFuelRate(0.0), OffCycParaFuelEnergy(0.0), OnCycParaFuelEnergy(0.0), AirFlowRateAutoSized(false), WaterFlowRateAutoSized(false),
+              HPSetPointError(0), HPSetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0),
+              RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0), IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0),
+              FirstTimeThroughFlag(true), ShowSetPointWarning(true), HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0),
+              WrappedCondenserBottomLocation(0.0), WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1),
+              ControlSensor1Weight(1.0), ControlSensor2Height(-1.0), ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0),
+              ControlTempFinal(0.0), AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0),
+              HPWHAirVolFlowRate(HVAC::MaxSpeedLevels, 0.0), HPWHAirMassFlowRate(HVAC::MaxSpeedLevels, 0.0),
+              HPWHWaterVolFlowRate(HVAC::MaxSpeedLevels, 0.0), HPWHWaterMassFlowRate(HVAC::MaxSpeedLevels, 0.0),
+              MSAirSpeedRatio(HVAC::MaxSpeedLevels, 0.0), MSWaterSpeedRatio(HVAC::MaxSpeedLevels, 0.0), bIsIHP(false), MyOneTimeFlagHP(true),
+              MyTwoTimeFlagHP(true), CheckHPWHEquipName(true), myOneTimeInitFlag(true)
         {
         }
 
@@ -671,6 +671,8 @@ namespace WaterThermalTanks {
 
         int callerLoopNum;
         int waterIndex;
+
+        ~WaterThermalTankData() = default;
 
         // Default Constructor
         WaterThermalTankData()
@@ -989,6 +991,8 @@ namespace WaterThermalTanks {
 
     bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int NodeNumber);
 
+    int getHeatPumpWaterHeaterIndex(EnergyPlusData &state, std::string_view CompName);
+
 } // namespace WaterThermalTanks
 
 struct WaterThermalTanksData : BaseGlobalStruct
@@ -1014,9 +1018,13 @@ struct WaterThermalTanksData : BaseGlobalStruct
     bool getWaterThermalTankInputFlag = true; // Calls to Water Heater from multiple places in code
     bool calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = WaterThermalTanksData();
+        new (this) WaterThermalTanksData();
     }
 };
 

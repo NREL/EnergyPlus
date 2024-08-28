@@ -42,7 +42,7 @@
 ! Chillers:                       HeatPump:PlantLoop:EIR:Cooling, HeatPump:PlantLoop:EIR:Heating
 ! Number of Zones: 19
 
-  Version,24.1;
+  Version,24.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -8424,48 +8424,81 @@
     AWHP_2 Cooling Side Outlet Node;
 
   HeatPump:PlantLoop:EIR:Cooling,
-    AWHP_1 Cooling Side,            !- Name
+    AWHP_1 Cooling Side,             !- Name
     AWHP_1 Cooling Side Inlet Node,  !- Load Side Inlet Node Name
-    AWHP_1 Cooling Side Outlet Node,  !- Load Side Outlet Node Name
-    AirSource,             !- Condenser Type
+    AWHP_1 Cooling Side Outlet Node, !- Load Side Outlet Node Name
+    AirSource,                       !- Condenser Type
     AWHP_1 Cooling Side Condenser Air Inlet Node,  !- Source Side Inlet Node Name
     AWHP_1 Cooling Side Condenser Air Outlet Node,  !- Source Side Outlet Node Name
-    AWHP_1 Heating Side,            !- Companion Heat Pump Name
-    autosize,                   !- Load Side Reference Flow Rate {m3/s}
-    autosize,                   !- Source Side Reference Flow Rate {m3/s}
-    autosize,                  !- Reference Capacity {W}
-    2.89,                    !- Reference Coefficient of Performance {W/W}
-    1.0,                        !- Sizing Factor
-    CoolCapCurveFuncTemp,    !- Capacity Modifier Function of Temperature Curve Name
-    CoolEIRCurveFuncTemp,    !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
-    Setpoint,                    !- Control Type
+    ,                                !- Heat Recovery Inlet Node Name
+    ,                                !- Heat Recovery Outlet Node Name   
+    AWHP_1 Heating Side,             !- Companion Heat Pump Name
+    autosize,                        !- Load Side Reference Flow Rate {m3/s}
+    autosize,                        !- Source Side Reference Flow Rate {m3/s}
+    ,                                !- Heat Recovery Reference Flow Rate {m3/s}
+    autosize,                        !- Reference Capacity {W}
+    2.89,                            !- Reference Coefficient of Performance {W/W}
+    1.0,                             !- Sizing Factor
+    CoolCapCurveFuncTemp,            !- Capacity Modifier Function of Temperature Curve Name
+    CoolEIRCurveFuncTemp,            !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
+    EIRCurveFuncPLR,                 !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    Setpoint,                        !- Control Type
     VariableSpeedPumping,            !- Flow Mode
-    0.2;                     !- Minimum Part Load Ratio
+    0.2,                             !- Minimum Part Load Ratio
+    ,                                !- Minimum Source Inlet Temperature
+    ,                                !- Maximum Source Inlet Temperature
+    ,                                !- Minimum Supply Water Temperature Curve Name
+    ,                                !- Maximum Supply Water Temperature Curve Name
+    ,                                !- Maximum Heat Recovery Outlet Temperature
+    ,                                !- Heat Recovery Capacity Modifier Function of Temperature Curve Name
+    ,                                !- Heat Recovery Electric Input to Output Ratio Modifier Function of Temperature Curve Name
+    ThermosiphonCurve,               !- Thermosiphon Temperature Difference Curve Name
+    2.0;                             !- Thermosiphon Minimum Temperature Difference
 
   OutdoorAir:Node,
     AWHP_1 Cooling Side Condenser Air Inlet Node,
     -1;
   
   HeatPump:PlantLoop:EIR:Cooling,
-    AWHP_2 Cooling Side,            !- Name
-    AWHP_2 Cooling Side Inlet Node,  !- Load Side Inlet Node Name
+    AWHP_2 Cooling Side,              !- Name
+    AWHP_2 Cooling Side Inlet Node,   !- Load Side Inlet Node Name
     AWHP_2 Cooling Side Outlet Node,  !- Load Side Outlet Node Name
-    AirSource,             !- Condenser Type
+    AirSource,                        !- Condenser Type
     AWHP_2 Condenser Air Inlet Node,  !- Source Side Inlet Node Name
-    AWHP_2 Condenser Air Outlet Node,  !- Source Side Outlet Node Name
-    AWHP_2 Heating Side,            !- Companion Heat Pump Name
-    autosize,                   !- Load Side Reference Flow Rate {m3/s}
-    autosize,                   !- Source Side Reference Flow Rate {m3/s}
-    autosize,                  !- Reference Capacity {W}
-    2.89,                    !- Reference Coefficient of Performance {W/W}
-    1.0,                        !- Sizing Factor
-    CoolCapCurveFuncTemp,    !- Capacity Modifier Function of Temperature Curve Name
-    CoolEIRCurveFuncTemp,    !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
-    Setpoint,                    !- Control Type
-    VariableSpeedPumping,            !- Flow Mode
-    0.2;                     !- Minimum Part Load Ratio
+    AWHP_2 Condenser Air Outlet Node, !- Source Side Outlet Node Name
+    ,                                 !- Heat Recovery Inlet Node Name
+    ,                                 !- Heat Recovery Outlet Node Name
+    AWHP_2 Heating Side,              !- Companion Heat Pump Name
+    autosize,                         !- Load Side Reference Flow Rate {m3/s}
+    autosize,                         !- Source Side Reference Flow Rate {m3/s}
+    ,                                 !- Heat Recovery Reference Flow Rate {m3/s}
+    autosize,                         !- Reference Capacity {W}
+    2.89,                             !- Reference Coefficient of Performance {W/W}
+    1.0,                              !- Sizing Factor
+    CoolCapCurveFuncTemp,             !- Capacity Modifier Function of Temperature Curve Name
+    CoolEIRCurveFuncTemp,             !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
+    EIRCurveFuncPLR,                  !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    Setpoint,                         !- Control Type
+    VariableSpeedPumping,             !- Flow Mode
+    0.2,                              !- Minimum Part Load Ratio
+    ,                                 !- Minimum Source Inlet Temperature
+    ,                                 !- Maximum Source Inlet Temperature
+    ,                                 !- Minimum Supply Water Temperature Curve Name
+    ,                                 !- Maximum Supply Water Temperature Curve Name
+    ,                                 !- Maximum Heat Recovery Outlet Temperature
+    ,                                 !- Heat Recovery Capacity Modifier Function of Temperature Curve Name
+    ,                                 !- Heat Recovery Electric Input to Output Ratio Modifier Function of Temperature Curve Name
+    ThermosiphonCurve,                !- Thermosiphon Temperature Difference Curve Name
+    2.0;                              !- Thermosiphon Minimum Temperature Difference
+
+  Curve:Linear,
+    ThermosiphonCurve,       !- Name
+    0,                       !- Coefficient1 Constant
+    0.06,                    !- Coefficient2 x
+    0,                       !- Minimum Value of x
+    30.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Curve Output
+    1.0;                     !- Maximum Curve Output
 
 !- ACX 140 Biquadratic cooling curves provided by Trane 
 Curve:Biquadratic,
@@ -8515,9 +8548,12 @@ Curve:Biquadratic,
     AirSource,             !- Condenser Type
     AWHP_1 Heating Side Condenser Air Inlet Node,  !- Source Side Inlet Node Name
     AWHP_1 Heating Side Condenser Air Outlet Node,  !- Source Side Outlet Node Name
+    ,                           !- Heat Recovery Inlet Node Name
+    ,                           !- Heat Recovery Outlet Node Name       
     AWHP_1 Cooling Side,            !- Companion Heat Pump Name
     autosize,                   !- Load Side Reference Flow Rate {m3/s}
     autosize,                   !- Source Side Reference Flow Rate {m3/s}
+    ,                           !- Heat Recovery Reference Flow Rate {m3/s}
     autosize,                   !- Reference Capacity {W}
     2.89,                    !- Reference Coefficient of Performance {W/W}
     1.0,                        !- Sizing Factor
@@ -8577,9 +8613,12 @@ Curve:Biquadratic,
     AirSource,             !- Condenser Type
     AWHP_2 Heating Side Condenser Air Inlet Node,  !- Source Side Inlet Node Name
     AWHP_2 Heating Side Condenser Air Outlet Node,  !- Source Side Outlet Node Name
+    ,                           !- Heat Recovery Inlet Node Name
+    ,                           !- Heat Recovery Outlet Node Name       
     AWHP_2 Cooling Side,            !- Companion Heat Pump Name
     autosize,                   !- Load Side Reference Flow Rate {m3/s}
     autosize,                   !- Source Side Reference Flow Rate {m3/s}
+    ,                           !- Heat Recovery Reference Flow Rate {m3/s}
     autosize,                   !- Reference Capacity {W}
     2.89,                    !- Reference Coefficient of Performance {W/W}
     1.0,                        !- Sizing Factor
@@ -10315,6 +10354,7 @@ Curve:Biquadratic,
   Output:Variable,*,Heat Pump Electricity Rate,hourly; !- HVAC Average [W]
   Output:Variable,*,Heat Pump Load Side Mass Flow Rate,hourly; !- HVAC Average [kg/s]
   Output:Variable,*,Heat Pump Source Side Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,*,Thermosiphon Status,hourly; !- HVAC Average [kg/s]
 
   Output:Variable,*,Boiler Heating Rate,hourly; !- HVAC Average [W]
   Output:Variable,*,Boiler Inlet Temperature,hourly; !- HVAC Average [C]

@@ -1006,7 +1006,7 @@ namespace DataPlant {
                                 if (CompIndex > 0) {
                                     auto const &this_pump(state.dataPumps->PumpEquip(CompIndex));
                                     if (ParallelBranchIndex >= 1) { // branch pump
-                                        if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
+                                        if (branch.max_abs_Comp_MyLoad() > HVAC::SmallLoad) {
                                             ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax);
                                         } else if (loop.CommonPipeType != DataPlant::CommonPipeType::No) { // common pipe and constant branch pumps
                                             ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax);
@@ -1023,7 +1023,7 @@ namespace DataPlant {
                                 if (CompIndex > 0) {
                                     auto const &this_pump(state.dataPumps->PumpEquip(CompIndex));
                                     if (ParallelBranchIndex >= 1) { // branch pump
-                                        if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
+                                        if (branch.max_abs_Comp_MyLoad() > HVAC::SmallLoad) {
                                             ThisBranchFlowRequestNeedIfOn =
                                                 max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank);
                                         } else if (loop.CommonPipeType != DataPlant::CommonPipeType::No) { // common pipe and constant branch pumps
@@ -1126,7 +1126,7 @@ namespace DataPlant {
                         if (BranchCounter > 1 && BranchCounter < NumBranchesOnThisLoopSide) ++ParallelBranchIndex;
                         if (loop_branch.HasConstantSpeedBranchPump) {
                             Real64 const branch_mass_flow(loop_branch.ConstantSpeedBranchMassFlow);
-                            if (loop_branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
+                            if (loop_branch.max_abs_Comp_MyLoad() > HVAC::SmallLoad) {
                                 LoadedConstantSpeedBranchFlowRateSteps_sum += branch_mass_flow;
                             } else {
                                 this_loop_side.noLoadConstantSpeedBranchFlowRateSteps(ParallelBranchIndex) = branch_mass_flow;
@@ -1175,7 +1175,7 @@ namespace DataPlant {
 
         // overrides the loop solver flow request to allow loop pump to turn off when not in use
         if (this_loop_side.TotalPumps == 1) {
-            if (LoopFlow < DataConvergParams::PlantLowFlowRateToler) { // Update from dataconvergetols...
+            if (LoopFlow < HVAC::VerySmallMassFlow) { // Update from dataconvergetols...
                 for (int BranchCounter = 1; BranchCounter <= this_loop_side.TotalBranches; ++BranchCounter) {
                     // reference
                     auto &branch(this_loop_side.Branch(BranchCounter));
@@ -1945,9 +1945,6 @@ namespace DataPlant {
         //    load range based: these components do not 'alter' the load, they reject the load
         //    Therefore they are not included
 
-        // Using/Aliasing
-        using FluidProperties::GetSpecificHeatGlycol;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("PlantLoopSolver::UpdateAnyLoopDemandAlterations");
 
@@ -2001,11 +1998,11 @@ namespace DataPlant {
         Real64 const InletTemp(state.dataLoopNodes->Node(InletNode).Temp);
         Real64 const OutletTemp(state.dataLoopNodes->Node(OutletNode).Temp);
         Real64 const AverageTemp((InletTemp + OutletTemp) / 2.0);
-        Real64 const ComponentCp(GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                       AverageTemp,
-                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                                       RoutineName));
+        Real64 const ComponentCp(FluidProperties::GetSpecificHeatGlycol(state,
+                                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                        AverageTemp,
+                                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                        RoutineName));
 
         // Calculate the load altered by this component
         Real64 const LoadAlteration(ComponentMassFlowRate * ComponentCp * (OutletTemp - InletTemp));

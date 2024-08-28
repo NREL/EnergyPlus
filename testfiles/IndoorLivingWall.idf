@@ -105,15 +105,15 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 Version,
-    23.2;                    !- Version Identifier
+    24.2;                    !- Version Identifier
 
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
 SimulationControl,
-    Yes,                     !- Do Zone Sizing Calculation
-    Yes,                     !- Do System Sizing Calculation
-    Yes,                     !- Do Plant Sizing Calculation
+    No,                      !- Do Zone Sizing Calculation
+    No,                      !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
     Yes,                     !- Run Simulation for Weather File Run Periods
     No,                      !- Do HVAC Sizing Simulation for Sizing Periods
@@ -309,14 +309,6 @@ ScheduleTypeLimits,
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:COMPACT ===========
 
 Schedule:Compact,
-    AlwaysOff,               !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    0;                       !- Field 4
-
-Schedule:Compact,
     AlwaysOn,                !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -428,241 +420,6 @@ Schedule:Compact,
     For: AllDays,            !- Field 2
     Until: 24:00,            !- Field 3
     117.239997864;           !- Field 4
-
-Schedule:Compact,
-    ShadeTransSch,           !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    0.0;                     !- Field 4
-
-Schedule:Compact,
-    Htg-SetP-Sch,            !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: SummerDesignDay,    !- Field 2
-    Until: 24:00,            !- Field 3
-    16.7,                    !- Field 4
-    For: WinterDesignDay,    !- Field 5
-    Until: 24:00,            !- Field 6
-    22.2,                    !- Field 7
-    For: WeekDays,           !- Field 8
-    Until: 6:00,             !- Field 9
-    16.7,                    !- Field 10
-    Until: 20:00,            !- Field 11
-    22.2,                    !- Field 12
-    Until: 24:00,            !- Field 13
-    16.7,                    !- Field 14
-    For: WeekEnds Holiday,   !- Field 15
-    Until: 24:00,            !- Field 16
-    16.7,                    !- Field 17
-    For: AllOtherDays,       !- Field 18
-    Until: 24:00,            !- Field 19
-    16.7;                    !- Field 20
-
-Schedule:Compact,
-    PlenumHtg-SetP-Sch,      !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    12.8;                    !- Field 4
-
-Schedule:Compact,
-    Clg-SetP-Sch,            !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: SummerDesignDay,    !- Field 2
-    Until: 24:00,            !- Field 3
-    23.9,                    !- Field 4
-    For: WinterDesignDay,    !- Field 5
-    Until: 24:00,            !- Field 6
-    29.4,                    !- Field 7
-    For: WeekDays,           !- Field 8
-    Until: 6:00,             !- Field 9
-    29.4,                    !- Field 10
-    Until: 20:00,            !- Field 11
-    23.9,                    !- Field 12
-    Until: 24:00,            !- Field 13
-    29.4,                    !- Field 14
-    For: WeekEnds Holiday,   !- Field 15
-    Until: 24:00,            !- Field 16
-    29.4,                    !- Field 17
-    For: AllOtherDays,       !- Field 18
-    Until: 24:00,            !- Field 19
-    29.4;                    !- Field 20
-
-Schedule:Compact,
-    PlenumClg-SetP-Sch,      !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    40.0;                    !- Field 4
-
-Schedule:Compact,
-    Zone Control Type Sched, !- Name
-    Control Type,            !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: SummerDesignDay,    !- Field 2
-    Until: 24:00,            !- Field 3
-    2,                       !- Field 4
-    For: WinterDesignDay,    !- Field 5
-    Until: 24:00,            !- Field 6
-    1,                       !- Field 7
-    For: AllOtherDays,       !- Field 8
-    Until: 24:00,            !- Field 9
-    4;                       !- Field 10
-
-Schedule:Compact,
-    Min OA Sched,            !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekdays,           !- Field 2
-    Until: 6:00,             !- Field 3
-    0.02,                    !- Field 4
-    Until: 20:00,            !- Field 5
-    1.0,                     !- Field 6
-    Until: 24:00,            !- Field 7
-    0.02,                    !- Field 8
-    For: AllOtherDays,       !- Field 9
-    Until: 24:00,            !- Field 10
-    0.02;                    !- Field 11
-
-Schedule:Compact,
-    FanAvailSched,           !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    1.0,                     !- Field 4
-    Through: 9/30,           !- Field 5
-    For: WeekDays,           !- Field 6
-    Until: 6:00,             !- Field 7
-    0.0,                     !- Field 8
-    Until: 20:00,            !- Field 9
-    1.0,                     !- Field 10
-    Until: 24:00,            !- Field 11
-    0.0,                     !- Field 12
-    For: SummerDesignDay WinterDesignDay,  !- Field 13
-    Until: 24:00,            !- Field 14
-    1.0,                     !- Field 15
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,            !- Field 17
-    0.0,                     !- Field 18
-    Through: 12/31,          !- Field 19
-    For: AllDays,            !- Field 20
-    Until: 24:00,            !- Field 21
-    1.0;                     !- Field 22
-
-Schedule:Compact,
-    CoolingCoilAvailSched,   !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: WeekDays,           !- Field 2
-    Until: 6:00,             !- Field 3
-    0.0,                     !- Field 4
-    Until: 20:00,            !- Field 5
-    1.0,                     !- Field 6
-    Until: 24:00,            !- Field 7
-    0.0,                     !- Field 8
-    For: SummerDesignDay WinterDesignDay,  !- Field 9
-    Until: 24:00,            !- Field 10
-    1.0,                     !- Field 11
-    For: AllOtherDays,       !- Field 12
-    Until: 24:00,            !- Field 13
-    0.0;                     !- Field 14
-
-Schedule:Compact,
-    CoolingPumpAvailSched,   !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    1.0;                     !- Field 4
-
-Schedule:Compact,
-    ReheatCoilAvailSched,    !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    1.0,                     !- Field 4
-    Through: 9/30,           !- Field 5
-    For: WeekDays,           !- Field 6
-    Until: 6:00,             !- Field 7
-    0.0,                     !- Field 8
-    Until: 20:00,            !- Field 9
-    1.0,                     !- Field 10
-    Until: 24:00,            !- Field 11
-    0.0,                     !- Field 12
-    For: SummerDesignDay WinterDesignDay,  !- Field 13
-    Until: 24:00,            !- Field 14
-    1.0,                     !- Field 15
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,            !- Field 17
-    0.0,                     !- Field 18
-    Through: 12/31,          !- Field 19
-    For: AllDays,            !- Field 20
-    Until: 24:00,            !- Field 21
-    1.0;                     !- Field 22
-
-Schedule:Compact,
-    CW Loop Temp Schedule,   !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    7.22;                    !- Field 4
-
-Schedule:Compact,
-    HW Loop Temp Schedule,   !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    82;                      !- Field 4
-
-Schedule:Compact,
-    PlantOnSched,            !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    1.0;                     !- Field 4
-
-Schedule:Compact,
-    Seasonal Reset Supply Air Temp Sch,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    16.0,                    !- Field 4
-    Through: 9/30,           !- Field 5
-    For: AllDays,            !- Field 6
-    Until: 24:00,            !- Field 7
-    13.0,                    !- Field 8
-    Through: 12/31,          !- Field 9
-    For: AllDays,            !- Field 10
-    Until: 24:00,            !- Field 11
-    16.0;                    !- Field 12
-
-Schedule:Compact,
-    OA Cooling Supply Air Temp Sch,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    11.5;                    !- Field 4
-
-Schedule:Compact,
-    OA Heating Supply Air Temp Sch,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    4.5;                     !- Field 4
 
 Schedule:Compact,
     LightingTarget,          !- Name
@@ -2414,7 +2171,7 @@ Daylighting:Controls,
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     ,                        !- Glare Calculation Daylighting Reference Point Name
     ,                        !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
-    22,                      !- Maximum Allowable Discomfort Glare Index
+    ,                        !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     ReferenceSouthPartition, !- Daylighting Reference Point 1 Name
     1,                       !- Fraction of Lights Controlled by Reference Point 1
@@ -2865,17 +2622,6 @@ ZoneHVAC:EquipmentConnections,
     SPACE5-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
 
-!-   ===========  ALL OBJECTS IN CLASS: CURVE:QUADRATIC ===========
-
-Curve:Quadratic,
-    BoilerEfficiency,        !- Name
-    1.0,                     !- Coefficient1 Constant
-    0.0,                     !- Coefficient2 x
-    0.0,                     !- Coefficient3 x**2
-    0,                       !- Minimum Value of x
-    1;                       !- Maximum Value of x
-
-
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 
 Output:VariableDictionary,
@@ -2903,14 +2649,13 @@ Output:Surfaces:Drawing,
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:TABLE:SUMMARYREPORTS ===========
 
 Output:Table:SummaryReports,
-    AllSummaryAndSizingPeriod;  !- Report 1 Name
+    AllSummary;              !- Report 1 Name
 
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUTCONTROL:TABLE:STYLE ===========
 
 OutputControl:Table:Style,
     HTML;                    !- Column Separator
-
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
 
@@ -3118,7 +2863,7 @@ Output:Variable,
 
 Output:Variable,
     *,                       !- Key Value
-    Indoor Living Wall Energy Required For Evapotranspiration Per Unit Are,  !- Variable Name
+    Indoor Living Wall Energy Rate Required For Evapotranspiration Per Unit Area,  !- Variable Name
     Timestep;                !- Reporting Frequency
 
 Output:Variable,
@@ -3139,21 +2884,6 @@ Output:Variable,
 Output:Variable,
     *,                       !- Key Value
     Zone Air System Sensible Heating Rate,  !- Variable Name
-    Timestep;                !- Reporting Frequency
-
-Output:Variable,
-    *,                       !- Key Value
-    Heating Coil Heating Rate,  !- Variable Name
-    Timestep;                !- Reporting Frequency
-
-Output:Variable,
-    *,                       !- Key Value
-    Cooling Coil Total Cooling Rate,  !- Variable Name
-    Timestep;                !- Reporting Frequency
-
-Output:Variable,
-    *,                       !- Key Value
-    Cooling Coil Sensible Cooling Rate,  !- Variable Name
     Timestep;                !- Reporting Frequency
 
 Output:Variable,
@@ -3193,7 +2923,7 @@ Output:Variable,
 
 Output:Variable,
     *,                       !- Key Value
-    Indoor Living Wall VPD , !- Variable Name
+    Indoor Living Wall Vapor Pressure Deficit , !- Variable Name
     Timestep;                !- Reporting Frequency
 
 Output:Variable,
@@ -3210,90 +2940,6 @@ Output:Variable,
     *,                       !- Key Value
     Indoor Living Wall LED Electricity Energy ,  !- Variable Name
     Timestep;                !- Reporting Frequency
-
-
-!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
-
-Output:Meter:MeterFileOnly,
-    Electricity:Facility,    !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:Building,    !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    InteriorLights:Electricity,  !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:HVAC,        !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:Plant,       !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    NaturalGas:Facility,     !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    NaturalGas:Plant,        !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:Facility,    !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:Building,    !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    InteriorLights:Electricity,  !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:HVAC,        !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    Electricity:Plant,       !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    NaturalGas:Facility,     !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    NaturalGas:Plant,        !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyGeneralLights,         !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyGeneralLights,         !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyBuildingElectric,      !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyBuildingElectric,      !- Key Name
-    runperiod;               !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyBuildingOther,         !- Key Name
-    monthly;                 !- Reporting Frequency
-
-Output:Meter:MeterFileOnly,
-    MyBuildingOther,         !- Key Name
-    runperiod;               !- Reporting Frequency
-
 
 !-   ===========  ALL OBJECTS IN CLASS: METER:CUSTOM ===========
 

@@ -179,7 +179,7 @@ std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path
     if (output_to_file) {
         tbl_stream.open(filePath);
         if (!tbl_stream) {
-            ShowFatalError(state, format("OpenOutputTabularFile: Could not open file \"{}\" for output (write).", filePath.string()));
+            ShowFatalError(state, format("OpenOutputTabularFile: Could not open file \"{}\" for output (write).", filePath));
         }
     } else {
         tbl_stream.setstate(std::ios_base::badbit);
@@ -623,7 +623,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             // call the key count function but only need count during this pass
             int KeyCount = 0;
             GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
-            if (TypeVar == OutputProcessor::VariableType::NotFound) { // TODO: This NotFound thing has to go
+            if (TypeVar == OutputProcessor::VariableType::Invalid) { // TODO: This NotFound thing has to go
                 if (!ort->MonthlyInput(TabNum).isNamedMonthly) {
                     ++state.dataOutRptTab->ErrCount1;
                 }
@@ -723,7 +723,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
         e.varName.clear();
         e.varNum = 0;
         e.typeOfVar = OutputProcessor::VariableType::Invalid;
-        e.avgSum = OutputProcessor::StoreType::Averaged;
+        e.avgSum = OutputProcessor::StoreType::Average;
         e.stepType = OutputProcessor::TimeStepType::Zone;
         e.units = Constant::Units::None;
         e.aggType = AggType::Invalid;
@@ -934,7 +934,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     ort->MonthlyColumns(mColumn).varName = curVariMeter;
                     ort->MonthlyColumns(mColumn).varNum = 0;
                     ort->MonthlyColumns(mColumn).typeOfVar = OutputProcessor::VariableType::Invalid;
-                    ort->MonthlyColumns(mColumn).avgSum = OutputProcessor::StoreType::Averaged;
+                    ort->MonthlyColumns(mColumn).avgSum = OutputProcessor::StoreType::Average;
                     ort->MonthlyColumns(mColumn).stepType = OutputProcessor::TimeStepType::Zone;
                     ort->MonthlyColumns(mColumn).units = Constant::Units::None;
                     ort->MonthlyColumns(mColumn).aggType = AggType::SumOrAvg;
@@ -2552,21 +2552,23 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         curReport = AddMonthlyReport(state, "WindowZoneSummaryMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Rate", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Transmitted Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Windows Total Transmitted Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(42).show) {
         curReport = AddMonthlyReport(state, "WindowEnergyZoneSummaryMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Transmitted Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Windows Total Transmitted Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(
+            state, curReport, "Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(
+            state, curReport, "Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Interior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(43).show) {
         curReport = AddMonthlyReport(state, "AverageOutdoorConditionsMonthly", 2, true);
@@ -3493,7 +3495,7 @@ void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
                     // put actual value from OutputProcesser arrays
                     Real64 curValue = GetInternalVariableValue(state, curTypeOfVar, ort->BinObjVarID(repIndex).varMeterNum);
                     // per MJW when a summed variable is used divide it by the length of the time step
-                    if (ort->OutputTableBinned(iInObj).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                    if (ort->OutputTableBinned(iInObj).avgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                         curValue /= (elapsedTime * Constant::SecInHour);
                     }
                     // round the value to the number of signficant digits used in the final output report
@@ -3623,7 +3625,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                 // use next lines since it is faster was: SELECT CASE (MonthlyColumns(curCol)%aggType)
                 switch (state.dataOutRptTab->MonthlyColumnsAggType(curCol)) {
                 case AggType::SumOrAvg: {
-                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                         newResultValue = oldResultValue + curValue;
                     } else {
                         newResultValue = oldResultValue + curValue * elapsedTime; // for averaging - weight by elapsed time
@@ -3633,7 +3635,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                 } break;
                 case AggType::Maximum: {
                     // per MJW when a summed variable is used divide it by the length of the time step
-                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                         if (t_timeStepType == OutputProcessor::TimeStepType::System) {
                             curValue /= TimeStepSysSec;
                         } else {
@@ -3651,7 +3653,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                 } break;
                 case AggType::Minimum: {
                     // per MJW when a summed variable is used divide it by the length of the time step
-                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                         if (t_timeStepType == OutputProcessor::TimeStepType::System) {
                             curValue /= TimeStepSysSec;
                         } else {
@@ -3756,7 +3758,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                             int const scanVarNum = ort->MonthlyColumns(scanColumn).varNum;
                             Real64 scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
                             // When a summed variable is used divide it by the length of the time step
-                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                                 if (t_timeStepType == OutputProcessor::TimeStepType::System) {
                                     scanValue /= TimeStepSysSec;
                                 } else {
@@ -3790,7 +3792,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                             break; // do
                         case AggType::SumOrAverageHoursShown: {
                             // this case is when the value should be set
-                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                                 ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue;
                             } else {
                                 // for averaging - weight by elapsed time
@@ -3799,7 +3801,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                             ort->MonthlyColumns(scanColumn).duration(state.dataEnvrn->Month) += elapsedTime;
                         } break;
                         case AggType::MaximumDuringHoursShown: {
-                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                                 if (t_timeStepType == OutputProcessor::TimeStepType::System) {
                                     scanValue /= TimeStepSysSec;
                                 } else {
@@ -3812,7 +3814,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                             }
                         } break;
                         case AggType::MinimumDuringHoursShown: {
-                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                                 if (t_timeStepType == OutputProcessor::TimeStepType::System) {
                                     scanValue /= TimeStepSysSec;
                                 } else {
@@ -4366,10 +4368,8 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     for (int iCoil = 1; iCoil <= state.dataDXCoils->NumDXCoils; ++iCoil) {
         auto const &thisDXCoil = state.dataDXCoils->DXCoil(iCoil);
 
-        if (thisDXCoil.DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
-            thisDXCoil.DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
-            thisDXCoil.DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-            thisDXCoil.DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+        if (thisDXCoil.DXCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed || thisDXCoil.DXCoilType_Num == HVAC::CoilDX_CoolingTwoSpeed ||
+            thisDXCoil.DXCoilType_Num == HVAC::CoilDX_MultiSpeedCooling || thisDXCoil.DXCoilType_Num == HVAC::CoilDX_CoolingTwoStageWHumControl) {
             if (thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.ElecCoolingConsumption + thisDXCoil.DefrostConsumption +
                                                                  thisDXCoil.CrankcaseHeaterConsumption + thisDXCoil.TotalCoolingEnergy;
@@ -4380,8 +4380,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
             if (thisDXCoil.FuelType != Constant::eFuel::Electricity) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.MSFuelWasteHeat * TimeStepSysSec;
             }
-        } else if (thisDXCoil.DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
-                   thisDXCoil.DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+        } else if (thisDXCoil.DXCoilType_Num == HVAC::CoilDX_HeatingEmpirical || thisDXCoil.DXCoilType_Num == HVAC::CoilDX_MultiSpeedHeating) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.ElecHeatingConsumption + thisDXCoil.DefrostConsumption +
                                                              thisDXCoil.FuelConsumed + thisDXCoil.CrankcaseHeaterConsumption -
                                                              thisDXCoil.TotalHeatingEnergy;
@@ -4391,7 +4390,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     for (int iCoil = 1; iCoil <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++iCoil) {
         auto const &thisCoil = state.dataVariableSpeedCoils->VarSpeedCoil(iCoil);
 
-        if (thisCoil.VSCoilType == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+        if (thisCoil.VSCoilType == HVAC::Coil_CoolingAirToAirVariableSpeed) {
             if (thisCoil.CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
                     thisCoil.Energy + thisCoil.CrankcaseHeaterConsumption + thisCoil.DefrostConsumption + thisCoil.EnergyLoadTotal;
@@ -4399,7 +4398,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
                     thisCoil.EvapCondPumpElecConsumption + thisCoil.BasinHeaterConsumption + thisCoil.EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
             }
-        } else if (thisCoil.VSCoilType == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+        } else if (thisCoil.VSCoilType == HVAC::Coil_HeatingAirToAirVariableSpeed) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
                 thisCoil.Energy + thisCoil.CrankcaseHeaterConsumption + thisCoil.DefrostConsumption - thisCoil.EnergyLoadTotal;
         }
@@ -4409,8 +4408,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     for (int iCoil = 1; iCoil <= state.dataHeatingCoils->NumHeatingCoils; ++iCoil) {
         auto const &thisCoil = state.dataHeatingCoils->HeatingCoil(iCoil);
 
-        if (thisCoil.HCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage ||
-            thisCoil.HCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
+        if (thisCoil.HCoilType_Num == HVAC::Coil_HeatingGas_MultiStage || thisCoil.HCoilType_Num == HVAC::Coil_HeatingGasOrOtherFuel) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisCoil.FuelUseLoad + thisCoil.ParasiticFuelConsumption - thisCoil.HeatingCoilLoad;
         }
     }
@@ -6899,6 +6897,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
     }
     // fill the LEED setpoint table
     ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state);
+    ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSchedules(state);
 }
 
 void WriteMonthlyTables(EnergyPlusData &state)
@@ -7087,7 +7086,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                         maxVal = storedMinVal;
                         for (lMonth = 1; lMonth <= 12; ++lMonth) {
                             if (ort->MonthlyColumns(curCol).avgSum ==
-                                OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
+                                OutputProcessor::StoreType::Average) { // if it is a average variable divide by duration
                                 if (ort->MonthlyColumns(curCol).duration(lMonth) != 0) {
                                     curVal = ((ort->MonthlyColumns(curCol).reslt(lMonth) / ort->MonthlyColumns(curCol).duration(lMonth)) *
                                               curConversionFactor) +
@@ -7112,7 +7111,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                         } // lMonth
                         // add the summary to bottom
                         if (ort->MonthlyColumns(curCol).avgSum ==
-                            OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
+                            OutputProcessor::StoreType::Average) { // if it is a average variable divide by duration
                             if (sumDuration > 0) {
                                 tableBody(columnRecount, 14) = RealToStr(sumVal / sumDuration, digitsShown);
                             } else {
@@ -7162,7 +7161,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                     } break;
                     case AggType::ValueWhenMaxMin: {
                         ++columnRecount;
-                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) {
+                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Sum) {
                             curUnits += "/s";
                         }
                         if (Util::SameString(curUnits, "J/s")) {
@@ -7220,7 +7219,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                     case AggType::MinimumDuringHoursShown: {
                         columnRecount += 2;
                         // put in the name of the variable for the column
-                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                             curUnits += "/s";
                         }
                         if (Util::SameString(curUnits, "J/s")) {
@@ -7299,7 +7298,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                 } // KColumn
                 if (produceTabular) {
                     WriteReportHeaders(
-                        state, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, OutputProcessor::StoreType::Averaged);
+                        state, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, OutputProcessor::StoreType::Average);
                     WriteSubtitle(state, "Custom Monthly Report");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose monthly XML tables.
                 }
@@ -7674,7 +7673,7 @@ void WriteBEPSTable(EnergyPlusData &state)
 
     // show the headers of the report
     if (ort->displayTabularBEPS) {
-        WriteReportHeaders(state, "Annual Building Utility Performance Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+        WriteReportHeaders(state, "Annual Building Utility Performance Summary", "Entire Facility", OutputProcessor::StoreType::Average);
         // show the number of hours that the table applies to
         WriteTextLine(state, "Values gathered over " + RealToStr(ort->gatherElapsedTimeBEPS, 2) + " hours", true);
         if (ort->gatherElapsedTimeBEPS < 8759.0) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
@@ -9782,7 +9781,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
     Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 14);
 
     // show the headers of the report
-    WriteReportHeaders(state, "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+    WriteReportHeaders(state, "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Average);
     // show the number of hours that the table applies to
     WriteTextLine(state, "Values gathered over " + RealToStr(ort->gatherElapsedTimeBEPS, 2) + " hours", true);
     if (ort->gatherElapsedTimeBEPS < 8759.0) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
@@ -10191,7 +10190,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
     Array2D<Real64> endUseSubOther(14, static_cast<int>(Constant::EndUse::Num));
 
     // show the headers of the report
-    WriteReportHeaders(state, "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+    WriteReportHeaders(state, "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Average);
 
     Real64 ipElectricityConversion = 1.0; // declare here so that last one used is correct for LEEED section
     for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
@@ -10699,7 +10698,7 @@ void WriteCompCostTable(EnergyPlusData &state)
     Array1D_string rowHead;
     Array2D_string tableBody;
 
-    WriteReportHeaders(state, "Component Cost Economics Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+    WriteReportHeaders(state, "Component Cost Economics Summary", "Entire Facility", OutputProcessor::StoreType::Average);
 
     // compute floor area if no ABUPS
     if (ort->buildingConditionedFloorArea == 0.0) {
@@ -11006,7 +11005,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
 
         // show the headers of the report
         if (produceTabular) {
-            WriteReportHeaders(state, "Input Verification and Results Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+            WriteReportHeaders(state, "Input Verification and Results Summary", "Entire Facility", OutputProcessor::StoreType::Average);
         }
 
         // Moved these initializations into the loop
@@ -12176,7 +12175,7 @@ void WriteAdaptiveComfortTable(EnergyPlusData &state)
     rowHead.allocate(ort->numPeopleAdaptive);
     tableBody.allocate(5, ort->numPeopleAdaptive);
 
-    WriteReportHeaders(state, "Adaptive Comfort Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+    WriteReportHeaders(state, "Adaptive Comfort Summary", "Entire Facility", OutputProcessor::StoreType::Average);
     WriteSubtitle(state, "Time Not Meeting the Adaptive Comfort Models during Occupied Hours");
 
     Array1D_int columnWidth;
@@ -12242,7 +12241,7 @@ void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
         state,
         fmt::format("{} Resilience Summary for Reporting Period {}: {}", reportKeyWord, periodIdx, ReportPeriodInputData(periodIdx).title),
         "Entire Facility",
-        OutputProcessor::StoreType::Averaged);
+        OutputProcessor::StoreType::Average);
 
     WriteSubtitle(state,
                   format("Reporting period: {} -- {}, Total Electricity Usage: {:.2R} kWh",
@@ -12279,7 +12278,7 @@ void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
     int constexpr reportperiodEnd(5);
     int constexpr reportperiodElectricity(6);
 
-    WriteReportHeaders(state, "Reporting Period Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+    WriteReportHeaders(state, "Reporting Period Summary", "Entire Facility", OutputProcessor::StoreType::Average);
 
     columnHead(reportperiodType) = "Report Type";
     columnHead(reportperiodId) = "Report Index";
@@ -13109,7 +13108,7 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         degreeHourConversion = 1.0;
     }
 
-    WriteReportHeaders(state, "Annual Thermal Resilience Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+    WriteReportHeaders(state, "Annual Thermal Resilience Summary", "Entire Facility", OutputProcessor::StoreType::Average);
 
     Array1D_int columnWidth;
     columnWidth.allocate(numColumnThermalTbl);
@@ -13517,7 +13516,7 @@ void WriteHeatEmissionTable(EnergyPlusData &state)
             if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             if (produceTabular) {
-                WriteReportHeaders(state, "Annual Heat Emissions Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                WriteReportHeaders(state, "Annual Heat Emissions Report", "Entire Facility", OutputProcessor::StoreType::Average);
                 WriteSubtitle(state, "Annual Heat Emissions Summary");
             }
 
@@ -13665,7 +13664,7 @@ void WritePredefinedTables(EnergyPlusData &state)
                     WriteReportHeaders(state,
                                        state.dataOutRptPredefined->reportName(iReportName).namewithspaces,
                                        "Entire Facility",
-                                       OutputProcessor::StoreType::Averaged);
+                                       OutputProcessor::StoreType::Average);
                 }
                 // loop through the subtables and include those that are associated with this report
                 for (int jSubTable = 1, jSubTable_end = state.dataOutRptPredefined->numSubTable; jSubTable <= jSubTable_end; ++jSubTable) {
@@ -13871,7 +13870,7 @@ void WriteComponentSizing(EnergyPlusData &state)
     int iTableEntry;
     int jUnique;
 
-    WriteReportHeaders(state, "Component Sizing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+    WriteReportHeaders(state, "Component Sizing Summary", "Entire Facility", OutputProcessor::StoreType::Average);
 
     for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
         UnitsStyle unitsStyle_cur = ort->unitsStyle;
@@ -14149,7 +14148,7 @@ void WriteSurfaceShadowing(EnergyPlusData &state)
     }
     assert(numreceivingfields == state.dataOutRptPredefined->numShadowRelate);
 
-    WriteReportHeaders(state, "Surface Shadowing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+    WriteReportHeaders(state, "Surface Shadowing Summary", "Entire Facility", OutputProcessor::StoreType::Average);
     unique.allocate(state.dataOutRptPredefined->numShadowRelate);
     // do entire process twice, once with surfaces receiving, once with subsurfaces receiving
     for (int iKindRec = recKindSurface; iKindRec <= recKindSubsurface; ++iKindRec) {
@@ -14254,7 +14253,7 @@ void WriteEioTables(EnergyPlusData &state)
     Array1D_int colUnitConv;
 
     // setting up  report header
-    WriteReportHeaders(state, "Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+    WriteReportHeaders(state, "Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Average);
 
     std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
     std::vector<std::string> bodyLines;   // holds the data records only
@@ -15355,7 +15354,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                 }
                 for (int SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
                     if (state.dataSize->SysSizInput(SysSizIndex).AirLoopNum != iAirLoop) continue;
-                    if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::Coincident) {
+                    if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::SizingConcurrence::Coincident) {
                         airLoopCoolTable.peakDesSensLoad = finalSysSizing.SysCoolCoinSpaceSens;
                         airLoopCoolTable.designPeakLoad = finalSysSizing.SysDesCoolLoad;
 
@@ -15971,7 +15970,7 @@ void CollectPeakZoneConditions(
 
         if (isCooling) {
             // Time of Peak Load
-            if ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size()) {
+            if ((desDaySelected > 0) && ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size())) {
                 compLoad.peakDateHrMin = format("{}/{} {}",
                                                 state.dataWeather->DesDayInput(desDaySelected).Month,
                                                 state.dataWeather->DesDayInput(desDaySelected).DayOfMonth,
@@ -16524,7 +16523,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
     Array2D_string tableBody; //(row, column)
 
     if (produceTabular_para) {
-        WriteReportHeaders(state, reportName, zoneAirLoopFacilityName, OutputProcessor::StoreType::Averaged);
+        WriteReportHeaders(state, reportName, zoneAirLoopFacilityName, OutputProcessor::StoreType::Average);
     }
     std::string peakLoadCompName;
     std::string peakCondName;
@@ -16832,7 +16831,7 @@ void WriteReportHeaders(EnergyPlusData &state,
     //   Write the first few lines of each report with headers to the output
     //   file for tabular reports.
 
-    std::string const modifiedReportName(reportName + (averageOrSum == OutputProcessor::StoreType::Summed ? " per second" : ""));
+    std::string const modifiedReportName(reportName + (averageOrSum == OutputProcessor::StoreType::Sum ? " per second" : ""));
     auto &ort = state.dataOutRptTab;
 
     for (int iStyle = 1; iStyle <= ort->numStyles; ++iStyle) {

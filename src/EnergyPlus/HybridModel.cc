@@ -79,10 +79,6 @@ namespace HybridModel {
     // Using/Aliasing
     using namespace DataHeatBalance;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    // Object Data
-
     // Functions
 
     void GetHybridModelZone(EnergyPlusData &state)
@@ -90,39 +86,13 @@ namespace HybridModel {
 
         using ScheduleManager::GetScheduleIndex;
 
-        bool ErrorsFound(false); // If errors detected in input
         Array1D_bool lAlphaFieldBlanks(16, false);
         Array1D_bool lNumericFieldBlanks(4, false);
-        int NumAlphas;  // Number of Alphas for each GetobjectItem call
-        int NumNumbers; // Number of Numbers for each GetobjectItem call
-        int IOStatus;
-        int ZonePtr;                     // Pointer to the zone
-        int ZoneListPtr;                 // Pointer to the zone list
         std::string CurrentModuleObject; // to assist in getting input
         Array1D_string cAlphaArgs(16);   // Alpha input items for object
         Array1D_string cAlphaFieldNames(16);
         Array1D_string cNumericFieldNames(16);
         Array1D<Real64> rNumericArgs(4); // Numeric input items for object
-        int HybridModelStartMonth(0);    // Hybrid model start month
-        int HybridModelStartDate(0);     // Hybrid model start date of month
-        int HybridModelEndMonth(0);      // Hybrid model end month
-        int HybridModelEndDate(0);       // Hybrid model end date of month
-        int HMStartDay(0);
-        int HMEndDay(0);
-
-        int TemperatureSchPtr(0);      // Temperature schedule pointer
-        int HumidityRatioSchPtr(0);    // Humidity ratio schedule pointer
-        int CO2ConcentrationSchPtr(0); // CO2 concentration schedule pointer
-
-        int PeopleActivityLevelSchPtr(0);    // People activity level schedule pointer
-        int PeopleSensibleFractionSchPtr(0); // People sensible heat portion schedule pointer
-        int PeopleRadiantFractionSchPtr(0);  // People radiant heat portion (of sensible heat) schedule pointer
-        int PeopleCO2GenRateSchPtr(0);       // People CO2 generation rate schedule pointer
-
-        int SupplyAirTemperatureSchPtr(0);
-        int SupplyAirMassFlowRateSchPtr(0);
-        int SupplyAirHumidityRatioSchPtr(0);
-        int SupplyAirCO2ConcentrationSchPtr(0);
 
         // Read hybrid model input
         CurrentModuleObject = "HybridModel:Zone";
@@ -130,6 +100,11 @@ namespace HybridModel {
 
         if (state.dataHybridModel->NumOfHybridModelZones > 0) {
             state.dataHybridModel->HybridModelZone.allocate(state.dataGlobal->NumOfZones);
+            bool ErrorsFound = false; // If errors detected in input
+            int NumAlphas = 0;        // Number of Alphas for each GetobjectItem call
+            int NumNumbers = 0;       // Number of Numbers for each GetobjectItem call
+            int IOStatus = 0;
+            int ZonePtr = 0;
             for (int HybridModelNum = 1; HybridModelNum <= state.dataHybridModel->NumOfHybridModelZones; ++HybridModelNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -145,10 +120,7 @@ namespace HybridModel {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                ZoneListPtr = 0;
                 ZonePtr = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone); // "Zone" is a 1D array, cAlphaArgs(2) is the zone name
-                if (ZonePtr == 0 && state.dataHeatBal->NumOfZoneLists > 0)
-                    ZoneListPtr = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
                 if (ZonePtr > 0) {
                     state.dataHybridModel->HybridModelZone(ZonePtr).Name = cAlphaArgs(1);               // Zone HybridModel name
                     state.dataHybridModel->FlagHybridModel_TM = Util::SameString(cAlphaArgs(3), "Yes"); // Calculate thermal mass option
@@ -157,21 +129,21 @@ namespace HybridModel {
 
                     // Pointers used to help decide which unknown parameter to solve
                     // Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
-                    TemperatureSchPtr = GetScheduleIndex(state, cAlphaArgs(6));
-                    HumidityRatioSchPtr = GetScheduleIndex(state, cAlphaArgs(7));
-                    CO2ConcentrationSchPtr = GetScheduleIndex(state, cAlphaArgs(8));
+                    int TemperatureSchPtr = GetScheduleIndex(state, cAlphaArgs(6));
+                    int HumidityRatioSchPtr = GetScheduleIndex(state, cAlphaArgs(7));
+                    int CO2ConcentrationSchPtr = GetScheduleIndex(state, cAlphaArgs(8));
 
                     // Not used for now
-                    PeopleActivityLevelSchPtr = GetScheduleIndex(state, cAlphaArgs(9));
-                    PeopleSensibleFractionSchPtr = GetScheduleIndex(state, cAlphaArgs(10));
-                    PeopleRadiantFractionSchPtr = GetScheduleIndex(state, cAlphaArgs(11));
-                    PeopleCO2GenRateSchPtr = GetScheduleIndex(state, cAlphaArgs(12));
+                    int PeopleActivityLevelSchPtr = GetScheduleIndex(state, cAlphaArgs(9));
+                    int PeopleSensibleFractionSchPtr = GetScheduleIndex(state, cAlphaArgs(10));
+                    int PeopleRadiantFractionSchPtr = GetScheduleIndex(state, cAlphaArgs(11));
+                    int PeopleCO2GenRateSchPtr = GetScheduleIndex(state, cAlphaArgs(12));
 
                     // Pointers used to help decide wheather to include system supply terms in the inverse algorithms
-                    SupplyAirTemperatureSchPtr = GetScheduleIndex(state, cAlphaArgs(13));
-                    SupplyAirMassFlowRateSchPtr = GetScheduleIndex(state, cAlphaArgs(14));
-                    SupplyAirHumidityRatioSchPtr = GetScheduleIndex(state, cAlphaArgs(15));
-                    SupplyAirCO2ConcentrationSchPtr = GetScheduleIndex(state, cAlphaArgs(16));
+                    int SupplyAirTemperatureSchPtr = GetScheduleIndex(state, cAlphaArgs(13));
+                    int SupplyAirMassFlowRateSchPtr = GetScheduleIndex(state, cAlphaArgs(14));
+                    int SupplyAirHumidityRatioSchPtr = GetScheduleIndex(state, cAlphaArgs(15));
+                    int SupplyAirCO2ConcentrationSchPtr = GetScheduleIndex(state, cAlphaArgs(16));
 
                     //  Note: Internal thermal mass can be calculated only with measured temperature.
                     //                  Air infiltration rate can be calculated with either measured temperature, humifity ratio, or CO2
@@ -418,23 +390,21 @@ namespace HybridModel {
                         state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndMonth = rNumericArgs(3);
                         state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndDate = rNumericArgs(4);
                         {
-                            int HMDayArr[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+                            int const HMDayArr[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
-                            HybridModelStartMonth = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureStartMonth;
-                            HybridModelStartDate = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureStartDate;
-                            HybridModelEndMonth = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndMonth;
-                            HybridModelEndDate = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndDate;
+                            int HybridModelStartMonth = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureStartMonth;
+                            int HybridModelStartDate = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureStartDate;
+                            int HybridModelEndMonth = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndMonth;
+                            int HybridModelEndDate = state.dataHybridModel->HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndDate;
 
+                            int HMStartDay = 0;
+                            int HMEndDay = 0;
                             if (HybridModelStartMonth >= 1 && HybridModelStartMonth <= 12) {
                                 HMStartDay = HMDayArr[HybridModelStartMonth - 1];
-                            } else {
-                                HMStartDay = 0;
                             }
 
                             if (HybridModelEndMonth >= 1 && HybridModelEndMonth <= 12) {
                                 HMEndDay = HMDayArr[HybridModelEndMonth - 1];
-                            } else {
-                                HMEndDay = 0;
                             }
 
                             state.dataHybridModel->HybridModelZone(ZonePtr).HybridStartDayOfYear = HMStartDay + HybridModelStartDate;
@@ -450,15 +420,15 @@ namespace HybridModel {
                                             "Zone Infiltration Hybrid Model Air Change Rate",
                                             Constant::Units::ach,
                                             state.dataHeatBal->Zone(ZonePtr).InfilOAAirChangeRateHM,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                         SetupOutputVariable(state,
                                             "Zone Infiltration Hybrid Model Mass Flow Rate",
                                             Constant::Units::kg_s,
                                             state.dataHeatBal->Zone(ZonePtr).MCPIHM,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                     }
                     if (state.dataHybridModel->HybridModelZone(ZonePtr).PeopleCountCalc_T ||
@@ -468,11 +438,19 @@ namespace HybridModel {
                                             "Zone Hybrid Model People Count",
                                             Constant::Units::None,
                                             state.dataHeatBal->Zone(ZonePtr).NumOccHM,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                     }
-
+                    if (state.dataHybridModel->HybridModelZone(ZonePtr).InternalThermalMassCalc_T) {
+                        SetupOutputVariable(state,
+                                            "Zone Hybrid Model Thermal Mass Multiplier",
+                                            Constant::Units::None,
+                                            state.dataHeatBal->Zone(ZonePtr).ZoneVolCapMultpSensHM,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
+                                            state.dataHeatBal->Zone(ZonePtr).Name);
+                    }
                 } else {
                     ShowSevereError(
                         state,

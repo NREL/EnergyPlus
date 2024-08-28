@@ -131,6 +131,10 @@ struct VectorsData : BaseGlobalStruct
 {
     Vectors::Vector p0 = Vectors::Vector(0.0, 0.0, 0.0);
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->p0 = Vectors::Vector(0.0, 0.0, 0.0);

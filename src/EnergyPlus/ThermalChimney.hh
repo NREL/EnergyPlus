@@ -79,6 +79,7 @@ namespace ThermalChimney {
         bool EMSOverrideOn;         // if true then EMS is requesting to override
         Real64 EMSAirFlowRateValue; // value EMS is setting for air flow rate
         Array1D_int ZonePtr;
+        Array1D_int spacePtr;
         Array1D_string ZoneName;
         Array1D<Real64> DistanceThermChimInlet;
         Array1D<Real64> RatioThermChimAirFlow;
@@ -146,6 +147,10 @@ struct ThermalChimneysData : BaseGlobalStruct
     EPVector<ThermalChimney::ThermalChimneyData> ThermalChimneySys;
     EPVector<ThermalChimney::ThermChimZnReportVars> ZnRptThermChim;
     EPVector<ThermalChimney::ThermChimReportVars> ThermalChimneyReport;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

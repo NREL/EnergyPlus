@@ -289,6 +289,10 @@ struct WindowEquivLayerData : BaseGlobalStruct
     Array1D<DataWindowEquivalentLayer::CFSTY> CFS;
     Array1D<DataWindowEquivalentLayer::CFSGAP> CFSGaps;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->TotWinEquivLayerConstructs = 0;

@@ -59,6 +59,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 
 namespace EnergyPlus {
 
@@ -110,12 +111,12 @@ namespace UnitVentilator {
         int AirOutNode = 0;    // outlet air node number
         int FanOutletNode = 0; // outlet node number for fan exit
         // (assumes fan is upstream of heating coil)
-        int FanType_Num = 0; // Fan type number (see DataHVACGlobals)
-        std::string FanName; // name of fan
+        HVAC::FanType fanType = HVAC::FanType::Invalid; // Fan type number (see DataHVACGlobals)
+        std::string FanName;                            // name of fan
         int Fan_Index = 0;
-        int FanSchedPtr = 0;      // index to fan operating mode schedule
-        int FanAvailSchedPtr = 0; // index to fan availability schedule
-        int OpMode = 0;           // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
+        int FanSchedPtr = 0;                      // index to fan operating mode schedule
+        int FanAvailSchedPtr = 0;                 // index to fan availability schedule
+        HVAC::FanOp fanOp = HVAC::FanOp::Invalid; // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
         int ControlCompTypeNum = 0;
         int CompErrIndex = 0;
         Real64 MaxAirVolFlow = 0.0;                     // m3/s
@@ -181,19 +182,19 @@ namespace UnitVentilator {
         Real64 ElecPower = 0.0;
         Real64 ElecEnergy = 0.0;
         std::string AvailManagerListName; // Name of an availability manager list object
-        int AvailStatus = 0;
-        Real64 FanPartLoadRatio = 0.0; // fan part-load ratio for time step
-        Real64 PartLoadFrac = 0.0;     // unit ventilator part-load ratio for time step
-        int ZonePtr = 0;               // pointer to a zone served by a unit ventilator
-        int HVACSizingIndex = 0;       // index of a HVACSizing object for a unit ventilator
-        bool ATMixerExists = false;    // True if there is an ATMixer
-        std::string ATMixerName;       // name of air mixer
-        int ATMixerIndex = 0;          // index to the air mixer
-        int ATMixerType = 0;           // 1 = inlet side mixer, 2 = supply side mixer
-        int ATMixerPriNode = 0;        // primary inlet air node number for the mixer
-        int ATMixerSecNode = 0;        // secondary air inlet node number for the mixer
-        int ATMixerOutNode = 0;        // outlet air node number for the mixer
-        bool FirstPass = true;         // detects first time through for resetting sizing data
+        Avail::Status availStatus = Avail::Status::NoAction;
+        Real64 FanPartLoadRatio = 0.0;                          // fan part-load ratio for time step
+        Real64 PartLoadFrac = 0.0;                              // unit ventilator part-load ratio for time step
+        int ZonePtr = 0;                                        // pointer to a zone served by a unit ventilator
+        int HVACSizingIndex = 0;                                // index of a HVACSizing object for a unit ventilator
+        bool ATMixerExists = false;                             // True if there is an ATMixer
+        std::string ATMixerName;                                // name of air mixer
+        int ATMixerIndex = 0;                                   // index to the air mixer
+        HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid; // 1 = inlet side mixer, 2 = supply side mixer
+        int ATMixerPriNode = 0;                                 // primary inlet air node number for the mixer
+        int ATMixerSecNode = 0;                                 // secondary air inlet node number for the mixer
+        int ATMixerOutNode = 0;                                 // outlet air node number for the mixer
+        bool FirstPass = true;                                  // detects first time through for resetting sizing data
 
         UnitVentilatorData() = default;
         ~UnitVentilatorData()
@@ -242,13 +243,13 @@ namespace UnitVentilator {
                                       int const UnitVentNum,         // Unit index in unit ventilator array
                                       bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                       Real64 &LoadMet,               // load met by unit (watts)
-                                      ObjexxFCL::Optional_int_const OpMode = DataHVACGlobals::ContFanCycCoil, // Fan Type
+                                      ObjexxFCL::Optional<HVAC::FanOp const> fanOp = HVAC::FanOp::Continuous, // Fan Type
                                       ObjexxFCL::Optional<Real64 const> PartLoadFrac = 1.0                    // Part Load Ratio of coil and fan
     );
 
     void SimUnitVentOAMixer(EnergyPlusData &state,
-                            int const UnitVentNum, // Unit index in unit ventilator array
-                            int const FanOpMode    // unit ventilator fan operating mode
+                            int const UnitVentNum,  // Unit index in unit ventilator array
+                            HVAC::FanOp const fanOp // unit ventilator fan operating mode
     );
 
     void ReportUnitVentilator(EnergyPlusData &state, int const UnitVentNum); // Unit index in unit ventilator array
@@ -260,6 +261,8 @@ namespace UnitVentilator {
     int GetUnitVentilatorMixedAirNode(EnergyPlusData &state, int const UnitVentNum);
 
     int GetUnitVentilatorReturnAirNode(EnergyPlusData &state, int const UnitVentNum);
+
+    int getUnitVentilatorIndex(EnergyPlusData &state, std::string_view CompName);
 
     Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state,
                                                       int const UnitVentNum,     // Unit Ventilator index number
@@ -310,6 +313,10 @@ struct UnitVentilatorsData : BaseGlobalStruct
     int ATMixOutNode = 0;   // outlet node of ATM Mixer
     int ATMixerPriNode = 0; // primary air node of ATM Mixer
     int ZoneNode = 0;       // zone node
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

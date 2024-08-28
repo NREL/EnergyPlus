@@ -138,7 +138,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(20), DIMENSION(4) :: HxEffectAt75Airflow
   CHARACTER(20), DIMENSION(4) :: HxEffectAt100Airflow
   CHARACTER(MaxNameLength + 2), DIMENSION(4) :: HxTableName
-  LOGICAL :: tableAdded
+  LOGICAL :: tableAdded = .false.
   LOGICAL :: tableIndependentVarAdded = .false.
   CHARACTER(10) :: tableID
   REAL :: effect75
@@ -429,14 +429,22 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
 
                 ! read in 8 reference value for the effectiveness at 75% and 100%
-                HxEffectAt75Airflow(1) = TRIM(InArgs(6))    ! Sensible Effectiveness at 75% Heating Air Flow
-                HxEffectAt75Airflow(2) = TRIM(InArgs(7))    ! Latent Effectiveness at 75% Heating Air Flow
-                HxEffectAt75Airflow(3) = TRIM(InArgs(10))   ! Sensible Effectiveness at 75% Cooling Air Flow
-                HxEffectAt75Airflow(4) = TRIM(InArgs(11))   ! Latent Effectiveness at 75% Cooling Air Flow
-                HxEffectAt100Airflow(1) = TRIM(InArgs(4))   ! Sensible Effectiveness at 100% Heating Air Flow
-                HxEffectAt100Airflow(2) = TRIM(InArgs(5))   ! Latent Effectiveness at 100% Heating Air Flow
-                HxEffectAt100Airflow(3) = TRIM(InArgs(8))   ! Sensible Effectiveness at 100% Cooling Air Flow
-                HxEffectAt100Airflow(4) = TRIM(InArgs(9))   ! Latent Effectiveness at 100% Cooling Air Flow
+                ! Sensible Effectiveness at 75% Heating Air Flow
+                HxEffectAt75Airflow(1) = GetFieldOrIDDDefault(InArgs(6), FldDefaults(6))
+                ! Latent Effectiveness at 75% Heating Air Flow
+                HxEffectAt75Airflow(2) = GetFieldOrIDDDefault(InArgs(7), FldDefaults(7))
+                ! Sensible Effectiveness at 75% Cooling Air Flow
+                HxEffectAt75Airflow(3) = GetFieldOrIDDDefault(InArgs(10), FldDefaults(10))
+                ! Latent Effectiveness at 75% Cooling Air Flow
+                HxEffectAt75Airflow(4) = GetFieldOrIDDDefault(InArgs(11), FldDefaults(11))
+                ! Sensible Effectiveness at 100% Heating Air Flow
+                HxEffectAt100Airflow(1) = GetFieldOrIDDDefault(InArgs(4), FldDefaults(4))
+                ! Latent Effectiveness at 100% Heating Air Flow
+                HxEffectAt100Airflow(2) = GetFieldOrIDDDefault(InArgs(5), FldDefaults(5))
+                ! Sensible Effectiveness at 100% Cooling Air Flow
+                HxEffectAt100Airflow(3) = GetFieldOrIDDDefault(InArgs(8), FldDefaults(8))
+                ! Latent Effectiveness at 100% Cooling Air Flow
+                HxEffectAt100Airflow(4) = GetFieldOrIDDDefault(InArgs(9), FldDefaults(9))
 
                 ! Remove the 4 fields for 75% airflow and adjust the index of the fields
                 OutArgs(1:5) = InArgs(1:5)

@@ -81,24 +81,24 @@ namespace WindowAC {
         int AirOutNode;        // outlet air node number
         int OutsideAirNode;    // outside air node number
         int AirReliefNode;     // relief air node number
+        int ReturnAirNode;     // return air node number
         int MixedAirNode;      // Mixed Air Node number
         std::string OAMixName; // name of outdoor air mixer
         std::string OAMixType; // type of outdoor air mixer
         int OAMixIndex;
-        std::string FanName; // name of fan
-        std::string FanType; // type of fan
-        int FanType_Num;     // index to fan type
+        std::string FanName;   // name of fan
+        HVAC::FanType fanType; // index to fan type
         int FanIndex;
         std::string DXCoilName; // name of cooling coil
         std::string DXCoilType; // type of cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
         // 'CoilSystem:Cooling:DX:HeatExchangerAssisted'
-        int DXCoilType_Num;    // Numeric Equivalent for DXCoil Type
-        int DXCoilIndex;       // Index to DX cooling coil
-        int DXCoilNumOfSpeeds; // number of speed levels for variable speed DX coil
-        int CoilOutletNodeNum; // Outlet node number of DX cooling coil
-        int OpMode;            // mode of operation; 1=cycling fan, cycling compressor,
+        int DXCoilType_Num;                       // Numeric Equivalent for DXCoil Type
+        int DXCoilIndex;                          // Index to DX cooling coil
+        int DXCoilNumOfSpeeds;                    // number of speed levels for variable speed DX coil
+        int CoilOutletNodeNum;                    // Outlet node number of DX cooling coil
+        HVAC::FanOp fanOp = HVAC::FanOp::Invalid; // mode of operation; 1=cycling fan, cycling compressor,
         // 2=continuous fan, cycling compresor
-        int FanPlace; // fan placement; 1=blow through, 2=draw through
+        HVAC::FanPlace fanPlace; // fan placement; 1=blow through, 2=draw through
         int MaxIterIndex1;
         int MaxIterIndex2;
         Real64 ConvergenceTol; // Convergence tolerance, fraction (ZoneLoad - Equip Output)/ZoneLoad
@@ -118,7 +118,7 @@ namespace WindowAC {
         Real64 FanPartLoadRatio;          // fan part-load ratio for time step
         Real64 CompPartLoadRatio;         // compressor part-load ratio for time step
         std::string AvailManagerListName; // Name of an availability manager list object
-        int AvailStatus;
+        Avail::Status availStatus = Avail::Status::NoAction;
         int ZonePtr;         // pointer to a zone served by a Window AC unit
         int HVACSizingIndex; // index of a HVACSizing object for a Window AC unit
         bool FirstPass;      // detects first time through for resetting sizing data
@@ -126,12 +126,12 @@ namespace WindowAC {
         // Default Constructor
         WindACData()
             : UnitType(0), SchedPtr(0), FanSchedPtr(0), FanAvailSchedPtr(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OutAirVolFlow(0.0),
-              OutAirMassFlow(0.0), AirInNode(0), AirOutNode(0), OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0), FanType_Num(0),
-              FanIndex(0), DXCoilType_Num(0), DXCoilIndex(0), DXCoilNumOfSpeeds(0), CoilOutletNodeNum(0), OpMode(0), FanPlace(0), MaxIterIndex1(0),
-              MaxIterIndex2(0), ConvergenceTol(0.0), PartLoadFrac(0.0), EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0),
-              TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0),
-              ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0), CompPartLoadRatio(0.0), AvailStatus(0), ZonePtr(0), HVACSizingIndex(0),
-              FirstPass(true)
+              OutAirMassFlow(0.0), AirInNode(0), AirOutNode(0), OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0),
+              fanType(HVAC::FanType::Invalid), FanIndex(0), DXCoilType_Num(0), DXCoilIndex(0), DXCoilNumOfSpeeds(0), CoilOutletNodeNum(0),
+              fanPlace(HVAC::FanPlace::Invalid), MaxIterIndex1(0), MaxIterIndex2(0), ConvergenceTol(0.0), PartLoadFrac(0.0),
+              EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensCoolEnergyRate(0.0),
+              SensCoolEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0),
+              CompPartLoadRatio(0.0), ZonePtr(0), HVACSizingIndex(0), FirstPass(true)
         {
         }
     };
@@ -183,7 +183,7 @@ namespace WindowAC {
     void CalcWindowACOutput(EnergyPlusData &state,
                             int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
+                            HVAC::FanOp const fanOp,       // operating mode: FanOp::Cycling | FanOp::Continuous
                             Real64 const PartLoadFrac,     // unit part load fraction
                             bool const HXUnitOn,           // Flag to toggle HX heat recovery as needed
                             Real64 &LoadMet                // load met by unit (watts)
@@ -192,11 +192,13 @@ namespace WindowAC {
     void ControlCycWindACOutput(EnergyPlusData &state,
                                 int const WindACNum,           // Unit index in fan coil array
                                 bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                                int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
+                                HVAC::FanOp const fanOp,       // operating mode: FanOp::Cycling | FanOp::Continuous
                                 Real64 const QZnReq,           // cooling output needed by zone [W]
                                 Real64 &PartLoadFrac,          // unit part load fraction
                                 bool &HXUnitOn                 // Used to control HX heat recovery as needed
     );
+
+    bool getWindowACNodeNumber(EnergyPlusData &state, int const WindACNum);
 
     int GetWindowACZoneInletAirNode(EnergyPlusData &state, int const WindACNum);
 
@@ -205,6 +207,8 @@ namespace WindowAC {
     int GetWindowACReturnAirNode(EnergyPlusData &state, int const WindACNum);
 
     int GetWindowACMixedAirNode(EnergyPlusData &state, int const WindACNum);
+
+    int getWindowACIndex(EnergyPlusData &state, std::string_view CompName);
 
 } // namespace WindowAC
 
@@ -231,6 +235,10 @@ struct WindowACData : BaseGlobalStruct
 
     Array1D_bool MyEnvrnFlag;  // one time initialization flag
     Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

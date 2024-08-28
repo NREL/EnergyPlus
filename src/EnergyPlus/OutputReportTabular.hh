@@ -265,12 +265,12 @@ namespace OutputReportTabular {
         // the lowest bin and above the value of the last bin are also shown.
         int resIndex = 0; // result index - pointer to BinResults array
         int numTables = 0;
-        OutputProcessor::VariableType typeOfVar = OutputProcessor::VariableType::NotFound;
-        OutputProcessor::StoreType avgSum = OutputProcessor::StoreType::Averaged;     // Variable  is Averaged=1 or Summed=2
-        OutputProcessor::TimeStepType stepType = OutputProcessor::TimeStepType::Zone; // Variable time step is Zone=1 or HVAC=2
-        Constant::Units units = Constant::Units::Invalid;                             // the units enumeration
-        std::string ScheduleName;                                                     // the name of the schedule
-        int scheduleIndex = 0;                                                        // index to the schedule specified - if no schedule use zero
+        OutputProcessor::VariableType typeOfVar = OutputProcessor::VariableType::Invalid; // Was NotFound
+        OutputProcessor::StoreType avgSum = OutputProcessor::StoreType::Average;          // Variable  is Averaged=1 or Summed=2
+        OutputProcessor::TimeStepType stepType = OutputProcessor::TimeStepType::Zone;     // Variable time step is Zone=1 or HVAC=2
+        Constant::Units units = Constant::Units::Invalid;                                 // the units enumeration
+        std::string ScheduleName;                                                         // the name of the schedule
+        int scheduleIndex = 0;                                                            // index to the schedule specified - if no schedule use zero
     };
 
     struct BinResultsType
@@ -354,7 +354,7 @@ namespace OutputReportTabular {
         // Default Constructor
         MonthlyFieldSetInputType()
             : aggregate(AggType::Invalid), varUnits(Constant::Units::None), typeOfVar(OutputProcessor::VariableType::Invalid), keyCount(0),
-              varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::Zone)
+              varAvgSum(OutputProcessor::StoreType::Average), varStepType(OutputProcessor::TimeStepType::Zone)
         {
         }
     };
@@ -391,7 +391,7 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyColumnsType()
-            : varNum(0), typeOfVar(OutputProcessor::VariableType::Invalid), avgSum(OutputProcessor::StoreType::Averaged),
+            : varNum(0), typeOfVar(OutputProcessor::VariableType::Invalid), avgSum(OutputProcessor::StoreType::Average),
               stepType(OutputProcessor::TimeStepType::Zone), units(Constant::Units::None), aggType(AggType::Invalid), reslt(12, 0.0),
               duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
@@ -1330,6 +1330,10 @@ struct OutputReportTabularData : BaseGlobalStruct
     std::string Wm2_unitName;
     std::string curColHeadWithSI;
     std::string curColHead;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

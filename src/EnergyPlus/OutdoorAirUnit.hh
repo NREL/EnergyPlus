@@ -185,15 +185,15 @@ namespace OutdoorAirUnit {
         int AirOutletNode;           // outlet air node number
         std::string SFanName;        // name of supply fan
         int SFan_Index;              // index in fan structure
-        int SFanType;                // type of fan in cFanTypes
+        HVAC::FanType supFanType;    // type of fan in cFanTypes
         int SFanAvailSchedPtr;       // supply fan availability sched from fan object
-        int FanPlace;                // fan placement; blow through and draw through
+        HVAC::FanPlace supFanPlace;  // fan placement; blow through and draw through
         Real64 FanCorTemp;           // correction temperature
         bool FanEffect;              // .TRUE. if unit has a fan type of draw through
         int SFanOutletNode;          // supply fan outlet node number
         std::string ExtFanName;      // name of exhaust fan
         int ExtFan_Index;            // index in fan structure
-        int ExtFanType;              // type of fan in cFanTypes
+        HVAC::FanType extFanType;    // type of fan in cFanTypes
         int ExtFanAvailSchedPtr;     // exhaust fan availability sched from fan object
         bool ExtFan;                 // true if there is an exhaust fan
         std::string OutAirSchedName; // schedule of fraction for outside air (all controls)
@@ -221,7 +221,7 @@ namespace OutdoorAirUnit {
         int NumComponents;
         std::string ComponentListName;
         Real64 CompOutSetTemp; // component outlet setpoint temperature
-        int AvailStatus;
+        Avail::Status availStatus = Avail::Status::NoAction;
         std::string AvailManagerListName; // Name of an availability manager list object
         Array1D<OAEquipList> OAEquip;
         // Report data
@@ -244,14 +244,14 @@ namespace OutdoorAirUnit {
         // Default Constructor
         OAUnitData()
             : SchedPtr(0), ZonePtr(0), ZoneNodeNum(0), controlType(OAUnitCtrlType::Invalid), AirInletNode(0), AirOutletNode(0), SFan_Index(0),
-              SFanType(0), SFanAvailSchedPtr(0), FanPlace(0), FanCorTemp(0.0), FanEffect(false), SFanOutletNode(0), ExtFan_Index(0), ExtFanType(0),
-              ExtFanAvailSchedPtr(0), ExtFan(false), OutAirSchedPtr(0), OutsideAirNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0),
-              ExtAirVolFlow(0.0), ExtAirMassFlow(0.0), ExtOutAirSchedPtr(0), SMaxAirMassFlow(0.0), EMaxAirMassFlow(0.0), SFanMaxAirVolFlow(0.0),
-              EFanMaxAirVolFlow(0.0), HiCtrlTempSchedPtr(0), LoCtrlTempSchedPtr(0), OperatingMode(Operation::Invalid), ControlCompTypeNum(0),
-              CompErrIndex(0), AirMassFlow(0.0), FlowError(false), NumComponents(0), CompOutSetTemp(0.0), AvailStatus(0), TotCoolingRate(0.0),
-              TotCoolingEnergy(0.0), SensCoolingRate(0.0), SensCoolingEnergy(0.0), LatCoolingRate(0.0), LatCoolingEnergy(0.0), ElecFanRate(0.0),
-              ElecFanEnergy(0.0), SensHeatingEnergy(0.0), SensHeatingRate(0.0), LatHeatingEnergy(0.0), LatHeatingRate(0.0), TotHeatingEnergy(0.0),
-              TotHeatingRate(0.0), FirstPass(true)
+              supFanType(HVAC::FanType::Invalid), SFanAvailSchedPtr(0), supFanPlace(HVAC::FanPlace::Invalid), FanCorTemp(0.0), FanEffect(false),
+              SFanOutletNode(0), ExtFan_Index(0), extFanType(HVAC::FanType::Invalid), ExtFanAvailSchedPtr(0), ExtFan(false), OutAirSchedPtr(0),
+              OutsideAirNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), ExtAirVolFlow(0.0), ExtAirMassFlow(0.0), ExtOutAirSchedPtr(0),
+              SMaxAirMassFlow(0.0), EMaxAirMassFlow(0.0), SFanMaxAirVolFlow(0.0), EFanMaxAirVolFlow(0.0), HiCtrlTempSchedPtr(0),
+              LoCtrlTempSchedPtr(0), OperatingMode(Operation::Invalid), ControlCompTypeNum(0), CompErrIndex(0), AirMassFlow(0.0), FlowError(false),
+              NumComponents(0), CompOutSetTemp(0.0), TotCoolingRate(0.0), TotCoolingEnergy(0.0), SensCoolingRate(0.0), SensCoolingEnergy(0.0),
+              LatCoolingRate(0.0), LatCoolingEnergy(0.0), ElecFanRate(0.0), ElecFanEnergy(0.0), SensHeatingEnergy(0.0), SensHeatingRate(0.0),
+              LatHeatingEnergy(0.0), LatHeatingRate(0.0), TotHeatingEnergy(0.0), TotHeatingRate(0.0), FirstPass(true)
         {
         }
     };
@@ -309,6 +309,8 @@ namespace OutdoorAirUnit {
     int GetOutdoorAirUnitZoneInletNode(EnergyPlusData &state, int OAUnitNum);
 
     int GetOutdoorAirUnitReturnAirNode(EnergyPlusData &state, int OAUnitNum);
+
+    int getOutdoorAirUnitEqIndex(EnergyPlusData &state, std::string_view EquipName);
 } // namespace OutdoorAirUnit
 
 struct OutdoorAirUnitData : BaseGlobalStruct
@@ -331,9 +333,13 @@ struct OutdoorAirUnitData : BaseGlobalStruct
     bool HeatActive = false;
     bool CoolActive = false;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = OutdoorAirUnitData();
+        new (this) OutdoorAirUnitData();
     }
 };
 

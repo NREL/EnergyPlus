@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  Version,24.1;
+  Version,24.2;
 
   Timestep,4;
 
@@ -20218,7 +20218,7 @@
     PACKAGED VAV WITH REHEAT Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
   SetpointManager:MixedAir,
-    PACKAGED VAV WITH REHEAT_HeatC SAT Manager,  !- Name
+    PACKAGED VAV WITH REHEAT_HeatC SAT Manager MA,  !- Name
     Temperature,             !- Control Variable
     PACKAGED VAV WITH REHEAT Supply Equipment Outlet Node,  !- Reference Setpoint Node Name
     PACKAGED VAV WITH REHEAT_HeatC-PACKAGED VAV WITH REHEAT FanNode,  !- Fan Inlet Node Name

@@ -85,9 +85,9 @@ namespace CoolTower {
         std::string Name;                                                  // The component name
         std::string CompType;                                              // Type of component
         std::string Schedule;                                              // Available schedule
-        std::string ZoneName;                                              // Name of zone the component is serving
         int SchedPtr = 0;                                                  // Index to schedule
-        int ZonePtr = 0;                                                   // Point to this zone
+        int ZonePtr = 0;                                                   // Index to zone
+        int spacePtr = 0;                                                  // Index to space (if applicable)
         int PumpSchedPtr = 0;                                              // Index to schedule for water pump
         FlowCtrl FlowCtrlType = FlowCtrl::Invalid;                         // Type of cooltower operation
         WaterSupplyMode CoolTWaterSupplyMode = WaterSupplyMode::FromMains; // Type of water source
@@ -145,9 +145,13 @@ struct CoolTowerData : BaseGlobalStruct
     bool GetInputFlag = true;
     Array1D<CoolTower::CoolTowerParams> CoolTowerSys;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
+
     void clear_state() override
     {
-        *this = CoolTowerData();
+        new (this) CoolTowerData();
     }
 };
 

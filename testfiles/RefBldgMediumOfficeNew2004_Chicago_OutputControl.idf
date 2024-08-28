@@ -69,7 +69,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 18
 
-  Version,24.1;
+  Version,24.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -7875,6 +7875,7 @@
     No,                      !- Output SQLite
     No,                      !- Output JSON
     No,                      !- Output AUDIT
+    No,                      !- Output Space Sizing
     No,                      !- Output Zone Sizing
     No,                      !- Output System Sizing
     No,                      !- Output DXF

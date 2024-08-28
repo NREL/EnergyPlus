@@ -95,11 +95,9 @@ namespace RoomAir {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    Real64 constexpr CpAir(1005.0);   // Specific heat of air
-    Real64 constexpr MinSlope(0.001); // Bound on result from Mundt model
-    Real64 constexpr MaxSlope(5.0);   // Bound on result from Mundt Model
-
-    // MODULE VARIABLE DECLARATIONS:
+    Real64 constexpr CpAir = 1005.0;   // Specific heat of air
+    Real64 constexpr MinSlope = 0.001; // Bound on result from Mundt model
+    Real64 constexpr MaxSlope = 5.0;   // Bound on result from Mundt Model
 
     void ManageDispVent1Node(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
@@ -109,11 +107,6 @@ namespace RoomAir {
         //       DATE WRITTEN   July 2003
         //       MODIFIED       February 2004, fix allocate-deallocate problem (CC)
         //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   manage the Mundt model
-
-        bool ErrorsFound;
 
         // initialize Mundt model data
         if (state.dataHeatBal->MundtFirstTimeFlag) {
@@ -131,7 +124,7 @@ namespace RoomAir {
         if ((state.dataMundtSimMgr->SupplyAirVolumeRate > 0.0001) && (state.dataMundtSimMgr->QsysCoolTot > 0.0001)) {
 
             // setup Mundt model
-            ErrorsFound = false;
+            bool ErrorsFound = false;
             SetupDispVent1Node(state, ZoneNum, ErrorsFound);
             if (ErrorsFound) ShowFatalError(state, "ManageMundtModel: Errors in setting up Mundt Model. Preceding condition(s) cause termination.");
 
@@ -189,14 +182,14 @@ namespace RoomAir {
         MaxNumOfRoomNodes = 0;
         ErrorsFound = false;
         for (ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
-            auto &thisZone = state.dataHeatBal->Zone(ZoneIndex);
+            auto const &thisZone = state.dataHeatBal->Zone(ZoneIndex);
             if (state.dataRoomAir->AirModel(ZoneIndex).AirModel == RoomAir::RoomAirModel::DispVent1Node) {
                 // find number of zones using the Mundt model
                 ++NumOfMundtZones;
                 // find maximum number of surfaces in zones using the Mundt model
                 int NumOfSurfs = 0;
                 for (int spaceNum : thisZone.spaceIndexes) {
-                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                     for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; ++surfNum) {
                         state.dataMundtSimMgr->ZoneData(ZoneIndex).HBsurfaceIndexes.emplace_back(surfNum);
                         ++NumOfSurfs;
@@ -271,8 +264,8 @@ namespace RoomAir {
                                                     "Room Air Node Air Temperature",
                                                     Constant::Units::C,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).Temp,
-                                                    OutputProcessor::SOVTimeStepType::HVAC,
-                                                    OutputProcessor::SOVStoreType::Average,
+                                                    OutputProcessor::TimeStepType::System,
+                                                    OutputProcessor::StoreType::Average,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).AirNodeName);
 
                                 AirNodeBeginNum = AirNodeNum + 1;
@@ -335,7 +328,6 @@ namespace RoomAir {
         using Psychrometrics::PsyWFnTdpPb;
 
         Real64 CpAir;            // specific heat
-        int NodeNum;             // index for air nodes
         Real64 SumSysMCp;        // zone sum of air system MassFlowRate*Cp
         Real64 SumSysMCpT;       // zone sum of air system MassFlowRate*Cp*T
         Real64 MassFlowRate;     // mass flowrate
@@ -346,7 +338,7 @@ namespace RoomAir {
         Real64 ZoneMult;         // total zone multiplier
         Real64 RetAirConvGain;
 
-        auto &Zone(state.dataHeatBal->Zone);
+        auto const &Zone(state.dataHeatBal->Zone);
 
         // determine ZoneEquipConfigNum for this zone
         ZoneEquipConfigNum = ZoneNum;
@@ -378,7 +370,7 @@ namespace RoomAir {
             // determine supply air conditions
             SumSysMCp = 0.0;
             SumSysMCpT = 0.0;
-            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+            for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                 CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
@@ -461,7 +453,6 @@ namespace RoomAir {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum; // index for air nodes
-        int SurfNum; // index for surfaces
 
         // set up air node ID
         state.dataMundtSimMgr->NumRoomNodes = 0;
@@ -507,7 +498,7 @@ namespace RoomAir {
                 e.Area = 0.0;
             }
             // get floor surface data
-            for (SurfNum = 1; SurfNum <= state.dataMundtSimMgr->NumFloorSurfs; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= state.dataMundtSimMgr->NumFloorSurfs; ++SurfNum) {
                 state.dataMundtSimMgr->FloorSurf(SurfNum).Temp =
                     state.dataMundtSimMgr->MundtAirSurf(state.dataMundtSimMgr->FloorSurfSetIDs(SurfNum), state.dataMundtSimMgr->MundtZoneNum).Temp;
                 state.dataMundtSimMgr->FloorSurf(SurfNum).Hc =
@@ -728,7 +719,6 @@ namespace RoomAir {
         //     map data from air domain back to surface domain for each particular zone
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNodeNum;  // index number of the zone node
         Real64 DeltaTemp; // dummy variable for temperature difference
 
         // get surface info
@@ -753,7 +743,7 @@ namespace RoomAir {
                 // TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
                 // ZT(ZoneNum) = TRoomAverage
                 // c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
-                ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+                int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
                 state.dataLoopNodes->Node(ZoneNodeNum).Temp =
                     state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Temp;
                 // d) Thermostat air temperature -> TempTstatAir(ZoneNum)
@@ -777,7 +767,7 @@ namespace RoomAir {
                 // DeltaTemp = TRoomAverage - LineNode( TstatNodeID, MundtZoneNum ).Temp;
                 // ZT(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp
                 // c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
-                ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+                int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
                 DeltaTemp = state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Temp -
                             state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->TstatNodeID, state.dataMundtSimMgr->MundtZoneNum).Temp;
                 state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;

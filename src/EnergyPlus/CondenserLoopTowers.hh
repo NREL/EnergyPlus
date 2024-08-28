@@ -301,6 +301,8 @@ namespace CondenserLoopTowers {
         Real64 TankSupplyVol = 0.0;
         Real64 StarvedMakeUpVdot = 0.0;
         Real64 StarvedMakeUpVol = 0.0;
+        Real64 coolingTowerApproach = 0.0;
+        Real64 coolingTowerRange = 0.0;
 
         // From VSTower struct - for Variable speed towers only
         std::array<Real64, 35> Coeff = {0.0}; // - model coefficients
@@ -318,11 +320,13 @@ namespace CondenserLoopTowers {
         int VSErrorCountWFRR = 0;             // - counter if water flow rate ratio limits are exceeded
         int VSErrorCountIAWB = 0;             // - counter if inlet air wet-bulb temperature limits are exceeded
         int VSErrorCountTR = 0;               // - counter if tower range temperature limits are exceeded
+        int VSErrorCountTRCalc = 0;           // - counter if tower range temperature could not be calculated
         int VSErrorCountTA = 0;               // - counter if tower approach temperature limits are exceeded
         int ErrIndexFlowFrac = 0;             // - index to recurring error structure for liquid to gas ratio
         int ErrIndexWFRR = 0;                 // - index to recurring error structure for water flow rate ratio
         int ErrIndexIAWB = 0;                 // - index to recurring error structure for inlet air WB
         int ErrIndexTR = 0;                   // - index to recurring error structure for tower range
+        int ErrIndexTRCalc = 0;               // - index to recurring error structure for tower range
         int ErrIndexTA = 0;                   // - index to recurring error structure for tower approach
         int ErrIndexLG = 0;                   // - index to recurring error structure for tower liquid/gas ratio
         //- Tr = Range temperature
@@ -383,13 +387,13 @@ namespace CondenserLoopTowers {
 
         void SizeVSMerkelTower(EnergyPlusData &state);
 
-        void calculateSingleSpeedTower(EnergyPlusData &state);
+        void calculateSingleSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void calculateTwoSpeedTower(EnergyPlusData &state);
+        void calculateTwoSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad);
+        void calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void calculateVariableSpeedTower(EnergyPlusData &state);
+        void calculateVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
         Real64 calculateSimpleTowerOutletTemp(EnergyPlusData &state, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
 
@@ -423,6 +427,8 @@ namespace CondenserLoopTowers {
 
         void report(EnergyPlusData &state, bool RunFlag);
 
+        void checkMassFlowAndLoad(EnergyPlusData &state, Real64 MyLoad, bool RunFlag, bool &returnFlagSet);
+
         static CoolingTower *factory(EnergyPlusData &state, std::string_view objectName);
     };
 
@@ -435,9 +441,13 @@ struct CondenserLoopTowersData : BaseGlobalStruct
     bool GetInput = true;
     Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
 
+    void init_state([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
+
     void clear_state() override
     {
-        *this = CondenserLoopTowersData();
+        new (this) CondenserLoopTowersData();
     }
 };
 

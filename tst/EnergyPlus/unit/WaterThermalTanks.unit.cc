@@ -54,22 +54,32 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
+#include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+
+#include <cmath>
 
 using namespace EnergyPlus;
 using namespace OutputReportPredefined;
@@ -356,6 +366,7 @@ TEST_F(EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 }
 
@@ -541,9 +552,6 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 
 TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 {
-    using FluidProperties::GetSpecificHeatGlycol;
-    using FluidProperties::Water;
-
     std::string idf_objects = delimited_string({
         "Schedule:Constant,",
         "    WaterHeaterSP1Schedule,  !- Name",
@@ -772,7 +780,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     state->dataWaterThermalTanks->mdotAir = 0.0993699992873531;
 
     int GlycolIndex = 0;
-    const Real64 Cp = FluidProperties::GetSpecificHeatGlycol(*state, Water, Tank.TankTemp, GlycolIndex, "HPWHEnergyBalance");
+    const Real64 Cp = FluidProperties::GetSpecificHeatGlycol(*state, "WATER", Tank.TankTemp, GlycolIndex, "HPWHEnergyBalance");
 
     Tank.CalcHeatPumpWaterHeater(*state, false);
 
@@ -797,9 +805,9 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     // ValidateFuelType tests for WaterHeater:Stratified
     WaterThermalTanks::getWaterHeaterStratifiedInput(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, Constant::eFuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, Constant::eFuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, Constant::eFuel::Electricity));
+    EXPECT_ENUM_EQ(Tank.FuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OffCycParaFuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OnCycParaFuelType, Constant::eFuel::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, HPWHSizing)
@@ -1039,13 +1047,14 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     ASSERT_FALSE(ErrorsFound);
     state->dataHVACGlobal->TimeStepSys = 1;
     state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    state->dataEnvrn->OutBaroPress = 101325;
 
     SetPredefinedTables(*state);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
     WaterThermalTanks::SimHeatPumpWaterHeater(*state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
-    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
-    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));
+    EXPECT_EQ(state->dataFans->fans(1)->maxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
+    EXPECT_EQ(state->dataFans->fans(1)->maxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));
 }
 
 TEST_F(EnergyPlusFixture, WaterThermalTank_CalcTempIntegral)
@@ -1530,9 +1539,9 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     // ValidateFuelType tests for WaterHeater:Mixed
     WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, Constant::eFuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, Constant::eFuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, Constant::eFuel::Electricity));
+    EXPECT_ENUM_EQ(Tank.FuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OffCycParaFuelType, Constant::eFuel::Electricity);
+    EXPECT_ENUM_EQ(Tank.OnCycParaFuelType, Constant::eFuel::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
@@ -1752,7 +1761,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     Tank.CalcWaterThermalTankStratified(*state);
 
     // check source inlet and outlet temperatures are different
-    EXPECT_EQ(Tank.SourceInletTemp, 5.0);
+    EXPECT_DOUBLE_EQ(Tank.SourceInletTemp, 5.0);
     EXPECT_NEAR(Tank.SourceOutletTemp, 10.34, 0.01);
 }
 
@@ -2658,7 +2667,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataPlnt->TotNumLoops = 1;
     int TankNum(1);
     int HPNum(1);
-    int CyclingScheme(1);
+    HVAC::FanOp fanOp = HVAC::FanOp::Cycling;
     int LoopNum(1);
     int BranchNum(1);
     int CompNum(1);
@@ -2689,13 +2698,13 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     CoilBranch.Comp(CompNum).Name = "GSHP_COIL1";
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(*state, HPNum, 10.0, 10.0, CyclingScheme, 1.0, 1);
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
+    WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(*state, HPNum, 10.0, 10.0, fanOp, 1.0, 1);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, fanOp, 10.0, 10.0, HVAC::CompressorOp::On, PLR, 1.0);
     // Coil source side heat successfully passed to HeatReclaimSimple_WAHPCoil(1).AvailCapacity
     EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity, state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource);
     // Reclaimed heat successfully returned to reflect the plant impact
     state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).WaterHeatingDesuperheaterReclaimedHeat(1) = 100.0;
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, fanOp, 10.0, 10.0, HVAC::CompressorOp::On, PLR, 1.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource,
               state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity - 100.0);
 
@@ -3076,7 +3085,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
     // Calculate multispeed DX cooling coils
-    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, DataHVACGlobals::CompressorOperation::On, 1);
+    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, HVAC::FanOp::Cycling, HVAC::CompressorOp::On, 1);
 
     // Source availably heat successfully passed to DataHeatBalance::HeatReclaimDXCoil data struct
     EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(DXNum).AvailCapacity,
@@ -3124,7 +3133,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Desuperheater.SaveMode = WaterThermalTanks::TankOperatingMode::Floating;
     state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
     Tank.SourceMassFlowRate = 0.003;
-    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, DataHVACGlobals::CompressorOperation::On, 1);
+    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, HVAC::FanOp::Cycling, HVAC::CompressorOp::On, 1);
     Tank.CalcDesuperheaterWaterHeater(*state, false);
     EXPECT_TRUE(Desuperheater.Mode == WaterThermalTanks::TankOperatingMode::Floating);
     EXPECT_EQ(Desuperheater.HeaterRate, 0.0);
@@ -3221,7 +3230,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     // Source side is in the demand side of the plant loop
     Tank.SrcSidePlantLoc.loopSideNum = EnergyPlus::DataPlant::LoopSideLocation::Demand;
     Tank.SavedSourceOutletTemp = 60.0;
-    rho = GetDensityGlycol(*state, "Water", Tank.TankTemp, WaterIndex, "MixedTankAlternateSchedule");
+    rho = FluidProperties::GetDensityGlycol(*state, "Water", Tank.TankTemp, WaterIndex, "MixedTankAlternateSchedule");
 
     // Set the available max flow rates for tank and node
     Tank.PlantSourceMassFlowRateMax = Tank.SourceDesignVolFlowRate * rho;
@@ -4223,9 +4232,9 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
         // ValidateFuelType tests for WaterHeater:Mixed
         WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, Constant::eFuel::DistrictHeatingSteam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, Constant::eFuel::DistrictHeatingSteam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, Constant::eFuel::DistrictHeatingSteam));
+        EXPECT_ENUM_EQ(HPWHTank.FuelType, Constant::eFuel::DistrictHeatingSteam);
+        EXPECT_ENUM_EQ(HPWHTank.OffCycParaFuelType, Constant::eFuel::DistrictHeatingSteam);
+        EXPECT_ENUM_EQ(HPWHTank.OnCycParaFuelType, Constant::eFuel::DistrictHeatingSteam);
     }
 
     ++HPWaterHeaterNum;
@@ -5424,4 +5433,280 @@ TEST_F(EnergyPlusFixture, setBackupElementCapacityTest)
     EXPECT_NEAR(HPWH.BackupElementCapacity, expectedAnswer, allowedTolerance);
     expectedAnswer = -456.0;
     EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
+}
+
+TEST_F(EnergyPlusFixture, MixedTank_PVT_Per_VolumeSizing_PerSolarCollectorArea)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "Schedule:Constant, Sch 80C, , 80.0;",
+        "Schedule:Constant, Sch 55C, , 55.0;",
+        "Schedule:Constant, Always 1, , 1.0;",
+
+        "Zone,",
+        "  Zone1,                   !- Name",
+        "  0 ,                      !- Direction of Relative North {deg}",
+        "  0,                       !- X Origin {m}",
+        "  0,                       !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  ,                        !- Ceiling Height {m}",
+        "  300,                     !- Volume {m3}",
+        "  100,                     !- Floor Area {m2}",
+        "  TARP,                    !- Zone Inside Convection Algorithm",
+        "  ,                        !- Zone Outside Convection Algorithm",
+        "  Yes;                     !- Part of Total Floor Area",
+
+        "BuildingSurface:Detailed,"
+        "  Zone1,                   !- Name",
+        "  Floor,                   !- Surface Type",
+        "  DummyConstruction,       !- Construction Name",
+        "  Zone1,                   !- Zone Name",
+        "  ,                        !- Space Name",
+        "  Outdoors,                !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  0,                       !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  10.0,  0.0, 0.0,         !- X,Y,Z  1 {m}",
+        "   0.0,  0.0, 0.0,         !- X,Y,Z  2 {m}",
+        "   0.0, 10.0, 0.0,         !- X,Y,Z  3 {m}",
+        "  10.0, 10.0, 0.0;         !- X,Y,Z  4 {m}",
+
+        "Construction,"
+        "  DummyConstruction,       !- Name",
+        "  DummyMaterial;           !- Outside Layer",
+
+        "Material,"
+        "  DummyMaterial,           !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.4,                     !- Thickness {m}",
+        "  0.033,                   !- Conductivity {W/m-K}",
+        "  32,                      !- Density {kg/m3}",
+        "  1210,                    !- Specific Heat {J/kg-K}",
+        "  0.9,                     !- Thermal Absorptance",
+        "  0.7,                     !- Solar Absorptance",
+        "  0.7;                     !- Visible Absorptance",
+
+        "WaterHeater:Mixed,"
+        "  Solar Loop Water Heater, !- Name",
+        "  Autosize,                !- Tank Volume {m3}",
+        "  Sch 80C,                 !- Setpoint Temperature Schedule Name",
+        "  5.00,                    !- Deadband Temperature Difference {deltaC}",
+        "  100.00,                  !- Maximum Temperature Limit {C}",
+        "  Cycle,                   !- Heater Control Type",
+        "  0.0,                     !- Heater Maximum Capacity {W}",
+        "  0.0,                     !- Heater Minimum Capacity {W}",
+        "  ,                        !- Heater Ignition Minimum Flow Rate {m3/s}",
+        "  ,                        !- Heater Ignition Delay {s}",
+        "  Electricity,             !- Heater Fuel Type",
+        "  0.8,                     !- Heater Thermal Efficiency",
+        "  ,                        !- Part Load Factor Curve Name",
+        "  ,                        !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "  ,                        !- Off Cycle Parasitic Fuel Type",
+        "  ,                        !- Off Cycle Parasitic Heat Fraction to Tank",
+        "  ,                        !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "  ,                        !- On Cycle Parasitic Fuel Type",
+        "  ,                        !- On Cycle Parasitic Heat Fraction to Tank",
+        "  Zone,                    !- Ambient Temperature Indicator",
+        "  ,                        !- Ambient Temperature Schedule Name",
+        "  Zone1,                   !- Ambient Temperature Zone Name",
+        "  ,                        !- Ambient Temperature Outdoor Air Node Name",
+        "  0.0000,                  !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "  1.00,                    !- Off Cycle Loss Fraction to Zone",
+        "  0.0000,                  !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "  1.00,                    !- On Cycle Loss Fraction to Zone",
+        "  0.01,                    !- Peak Use Flow Rate {m3/s}",
+        "  Always 1,                !- Use Flow Rate Fraction Schedule Name",
+        "  ,                        !- Cold Water Supply Temperature Schedule Name",
+        "  ,                        !- Use Side Inlet Node Name",
+        "  ,                        !- Use Side Outlet Node Name",
+        "  1.00,                    !- Use Side Effectiveness",
+        "  Solar Loop Water Heater Heating Inlet Node,  !- Source Side Inlet Node Name",
+        "  Solar Loop Water Heater Heating Outlet Node,  !- Source Side Outlet Node Name",
+        "  1.00,                    !- Source Side Effectiveness",
+        "  1.0,                     !- Use Side Design Flow Rate {m3/s}",
+        "  1.0,                     !- Source Side Design Flow Rate {m3/s}",
+        "  1.500000,                !- Indirect Water Heating Recovery Time {hr}",
+        "  IndirectHeatPrimarySetpoint,  !- Source Side Flow Control Mode",
+        "  Sch 55C;                 !- Indirect Alternate Setpoint Temperature Schedule Name",
+
+        "WaterHeater:Sizing,"
+        "  Solar Loop Water Heater, !- WaterHeater Name",
+        "  PerSolarCollectorArea,   !- Design Mode",
+        "  0.600000,                !- Time Storage Can Meet Peak Draw {hr}",
+        "  0.600000,                !- Time for Tank Recovery {hr}",
+        "  1.000000,                !- Nominal Tank Volume for Autosizing Plant Connections {m3}",
+        "  4,                       !- Number of Bedrooms",
+        "  2,                       !- Number of Bathrooms",
+        "  0.200000,                !- Storage Capacity per Person {m3/person}",
+        "  0.200000,                !- Recovery Capacity per Person {m3/hr-person}",
+        "  0.020000,                !- Storage Capacity per Floor Area {m3/m2}",
+        "  0.020000,                !- Recovery Capacity per Floor Area {m3/hr-m2}",
+        "  4,                       !- Number of Units",
+        "  0.200000,                !- Storage Capacity per Unit {m3}",
+        "  0.200000,                !- Recovery Capacity PerUnit {m3/hr}",
+        "  0.200,                   !- Storage Capacity per Collector Area {m3/m2}",
+        "  1.000;                   !- Height Aspect Ratio",
+
+        "SolarCollector:FlatPlate:PhotovoltaicThermal,"
+        "  Collector 2 PVT,         !- Name",
+        "  Solar collector 3,       !- Surface Name",
+        "  30percentPVThalfarea,    !- Photovoltaic-Thermal Model Performance Name",
+        "  Collector 2 PV,          !- Photovoltaic Name",
+        "  Water,                   !- Thermal Working Fluid Type",
+        "  Solar Collector Water Inlet Node,  !- Water Inlet Node Name",
+        "  Solar Collector Water Outlet Node,  !- Water Outlet Node Name",
+        "  ,                        !- Air Inlet Node Name",
+        "  ,                        !- Air Outlet Node Name",
+        "  autosize;                !- Design Flow Rate {m3/s}",
+
+        "SolarCollectorPerformance:PhotovoltaicThermal:Simple,"
+        "  30percentPVThalfarea,    !- Name",
+        "  0.5,                     !- Fraction of Surface Area with Active Thermal Collector {dimensionless}",
+        "  Fixed,                   !- Thermal Conversion Efficiency Input Mode Type",
+        "  0.3,                     !- Value for Thermal Conversion Efficiency if Fixed",
+        "  ,                        !- Thermal Conversion Efficiency Schedule Name",
+        "  0.84;                    !- Front Surface Emittance",
+
+        "Generator:Photovoltaic,"
+        "  Collector 2 PV,          !- Name",
+        "  Solar collector 3,       !- Surface Name",
+        "  PhotovoltaicPerformance:Simple,  !- Photovoltaic Performance Object Type",
+        "  15percentPV Constant Efficiency,  !- Module Performance Name",
+        "  PhotovoltaicThermalSolarCollector,  !- Heat Transfer Integration Mode",
+        "  1,                       !- Number of Series Strings in Parallel {dimensionless}",
+        "  1;                       !- Number of Modules in Series {dimensionless}",
+
+        "PhotovoltaicPerformance:Simple,"
+        "  15percentPV Constant Efficiency,  !- Name",
+        "  0.90,                    !- Fraction of Surface Area with Active Solar Cells {dimensionless}",
+        "  Fixed,                   !- Conversion Efficiency Input Mode",
+        "  0.15;                    !- Value for Cell Efficiency if Fixed",
+
+        "Shading:Building:Detailed,",
+        "  Solar collector 3,       !- Name",
+        "  ,                        !- Transmittance Schedule Name",
+        "  4,                       !- Number of Vertices",
+        "  0, 10, 6,               !- X,Y,Z Vertex 1 {m}",
+        "  0, 0, 6,               !- X,Y,Z Vertex 2 {m}",
+        "  1, 0, 6,               !- X,Y,Z Vertex 3 {m}",
+        "  1, 10, 6;               !- X,Y,Z Vertex 4 {m} ",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetHeatBalanceInput(*state); // Gets materials, constructions, zones, surfaces, etc.
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    SolarShading::AllocateModuleArrays(*state);
+
+    Photovoltaics::GetPVInput(*state);
+    PhotovoltaicThermalCollectors::GetPVTcollectorsInput(*state);
+
+    EXPECT_EQ(1, state->dataPhotovoltaicThermalCollector->NumPVT);
+    auto &pvt = state->dataPhotovoltaicThermalCollector->PVT(1);
+    // 10 m^2 for the surface, 0.5 Fraction of Surface Area with Active Thermal Collector
+    EXPECT_EQ(10.0 * 0.5, pvt.AreaCol);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    has_err_output(true);
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state)); // This returns true if ErrorsFound
+    EXPECT_TRUE(compare_err_stream(""));
+
+    EXPECT_EQ(4, state->dataLoopNodes->NumOfNodes);
+
+    EXPECT_EQ(1, state->dataWaterThermalTanks->numWaterHeaterMixed);
+    EXPECT_EQ(1, state->dataWaterThermalTanks->numWaterHeaterSizing);
+    EXPECT_EQ(0, state->dataWaterThermalTanks->numWaterHeaterStratified);
+    EXPECT_EQ(0, state->dataWaterThermalTanks->numWaterHeaterDesuperheater);
+    auto &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
+    EXPECT_TRUE(Tank.VolumeWasAutoSized);
+
+    // set up the plant loops
+    // first the load side
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+
+    auto &plantLoop = state->dataPlnt->PlantLoop(1);
+    auto &supplySide = plantLoop.LoopSide(DataPlant::LoopSideLocation::Supply);
+    supplySide.TotalBranches = 1;
+    supplySide.Branch.allocate(1);
+    supplySide.Branch(1).TotalComponents = 1;
+    supplySide.Branch(1).Comp.allocate(1);
+    auto &PlantSupplySideComp = supplySide.Branch(1).Comp(1);
+    PlantSupplySideComp.Type = DataPlant::PlantEquipmentType::WtrHeaterMixed;
+    PlantSupplySideComp.Name = Tank.Name;
+    PlantSupplySideComp.NodeNumIn = Tank.SourceInletNode;
+    PlantSupplySideComp.NodeNumOut = Tank.SourceOutletNode;
+
+    auto &demandSide = plantLoop.LoopSide(DataPlant::LoopSideLocation::Demand);
+    demandSide.TotalBranches = 1;
+    demandSide.Branch.allocate(1);
+    demandSide.Branch(1).TotalComponents = 1;
+    demandSide.Branch(1).Comp.allocate(1);
+    auto &PlantDemandSideComp = demandSide.Branch(1).Comp(1);
+    PlantDemandSideComp.Type = DataPlant::PlantEquipmentType::PVTSolarCollectorFlatPlate;
+    PlantDemandSideComp.Name = pvt.Name;
+    PlantDemandSideComp.NodeNumIn = pvt.PlantInletNodeNum;
+    PlantDemandSideComp.NodeNumOut = pvt.PlantOutletNodeNum;
+
+    state->dataGlobal->BeginEnvrnFlag = false;
+
+    EXPECT_ENUM_EQ(DataPlant::LoopSideLocation::Invalid, pvt.WPlantLoc.loopSideNum);
+    EXPECT_EQ(0, pvt.WPlantLoc.loopNum);
+    // This is actually unused by PVTCollectorStruct::onInitLoopEquip but in case that changes, make it make sense
+    PlantLocation plantLocDemand = PlantLocation(1, DataPlant::LoopSideLocation::Demand, 1, 1);
+    pvt.onInitLoopEquip(*state, plantLocDemand);
+    EXPECT_ENUM_EQ(DataPlant::LoopSideLocation::Demand, pvt.WPlantLoc.loopSideNum);
+    EXPECT_EQ(1, pvt.WPlantLoc.loopNum);
+
+    EXPECT_ENUM_EQ(DataPlant::LoopSideLocation::Invalid, Tank.SrcSidePlantLoc.loopSideNum);
+    EXPECT_EQ(0, Tank.SrcSidePlantLoc.loopNum);
+    PlantLocation plantLocSupply = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
+    EXPECT_DOUBLE_EQ(0.00, Tank.Sizing.TotalSolarCollectorArea);
+    EXPECT_DOUBLE_EQ(DataSizing::AutoSize, Tank.Volume);
+
+    has_eio_output(true);
+
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    Tank.onInitLoopEquip(*state, plantLocSupply);
+    EXPECT_ENUM_EQ(DataPlant::LoopSideLocation::Supply, Tank.SrcSidePlantLoc.loopSideNum);
+    EXPECT_EQ(1, Tank.SrcSidePlantLoc.loopNum);
+
+    // compare_eio_stream(delimited_string({
+    //     "Water Heater Information,WaterHeater:Mixed,SOLAR LOOP WATER HEATER,-99998.9999,0.0,0.000,0.0000",
+    //     "! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value",
+    //     " Component Sizing Information, WaterHeater:Mixed, SOLAR LOOP WATER HEATER, Tank Volume [m3], 1.00000",
+    // }));
+    EXPECT_DOUBLE_EQ(5.00, Tank.Sizing.TotalSolarCollectorArea);
+    EXPECT_DOUBLE_EQ(0.2, Tank.Sizing.TankCapacityPerCollectorArea);
+    EXPECT_DOUBLE_EQ(1.0, Tank.Volume);
+
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Tank.SavedTankTemp = 60.0;
+    Tank.TankTemp = 60.0;
+    Tank.AmbientTempZone = 20.0;
+    Tank.AmbientTemp = 20.0;
+    Tank.UseInletTemp = 20.0;
+    Tank.SetPointTemp = 55.0;
+    Tank.SetPointTemp2 = Tank.SetPointTemp;
+    Tank.TimeElapsed = 0.0;
+
+    Tank.SourceMassFlowRate = 0.0;
+
+    Tank.CalcWaterThermalTankMixed(*state);
+    EXPECT_FALSE(std::isnan(Tank.AmbientZoneGain));
+    EXPECT_DOUBLE_EQ(0.0, Tank.AmbientZoneGain); // Didn't define on/off cycle losses
 }

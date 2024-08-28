@@ -233,8 +233,8 @@ namespace PlantValves {
                                 "Tempering Valve Flow Fraction",
                                 Constant::Units::None,
                                 state.dataPlantValves->TemperValve(Item).FlowDivFract,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 state.dataPlantValves->TemperValve(Item).Name);
         }
 
@@ -328,10 +328,10 @@ namespace PlantValves {
                                     if (thisLoopSide.Mixer.Exists) {
                                         if (any_eq(thisLoopSide.Mixer.NodeNumIn, this->PltStream2NodeNum)) {
                                             int thisInnerBranchCtr = 0;
-                                            for (auto &thisInnerBranch : thisLoopSide.Branch) {
+                                            for (auto const &thisInnerBranch : thisLoopSide.Branch) {
                                                 thisInnerBranchCtr++;
                                                 if (branchCtr == thisInnerBranchCtr) continue; // already looped into this one
-                                                for (auto &thisInnerComp : thisInnerBranch.Comp) {
+                                                for (auto const &thisInnerComp : thisInnerBranch.Comp) {
                                                     if (thisInnerComp.NodeNumOut == this->PltStream2NodeNum) {
                                                         Stream2NodeOkay = true;
                                                     }

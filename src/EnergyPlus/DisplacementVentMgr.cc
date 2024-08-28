@@ -511,8 +511,6 @@ namespace RoomAir {
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
-        using InternalHeatGains::SumInternalConvectionGainsByTypes;
-        using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -532,7 +530,6 @@ namespace RoomAir {
         Real64 ZTAveraged;
         Real64 TempDiffCritRep; // Minimum temperature difference between mixed and occupied subzones for reporting
         bool MIXFLAG;
-        int Ctd;
         Real64 MinFlow;
         Real64 NumPLPP; // Number of plumes per person
         Real64 MTGAUX;
@@ -603,26 +600,30 @@ namespace RoomAir {
             }
         }
 
-        ConvGainsOccupiedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+        ConvGainsOccupiedSubzone = InternalHeatGains::SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
 
         ConvGainsOccupiedSubzone += 0.5 * thisZoneHB.SysDepZoneLoadsLagged;
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
         if (zone.NoHeatToReturnAir) {
-            RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+            RetAirGain = InternalHeatGains::SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
             ConvGainsOccupiedSubzone += RetAirGain;
         }
 
-        ConvGainsMixedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
+        ConvGainsMixedSubzone = InternalHeatGains::SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
         ConvGainsMixedSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                                  0.5 * thisZoneHB.SysDepZoneLoadsLagged;
         if (zone.NoHeatToReturnAir) {
-            RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
+            RetAirGain = InternalHeatGains::SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
             ConvGainsMixedSubzone += RetAirGain;
         }
 
         ConvGains = ConvGainsOccupiedSubzone + ConvGainsMixedSubzone;
+
+        // Make sure all types of internal gains have been gathered
+        assert((int)(size(IntGainTypesOccupied) + size(IntGainTypesMixedSubzone) + size(ExcludedIntGainTypes)) ==
+               (int)DataHeatBalance::IntGainType::Num);
 
         //=================== Entering air system temperature and flow====================
         SumSysMCp = 0.0;
@@ -654,7 +655,7 @@ namespace RoomAir {
         if (state.dataHeatBal->TotPeople > 0) {
             int NumberOfOccupants = 0;
             NumberOfPlumes = 0.0;
-            for (Ctd = 1; Ctd <= state.dataHeatBal->TotPeople; ++Ctd) {
+            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotPeople; ++Ctd) {
                 if (state.dataHeatBal->People(Ctd).ZonePtr == ZoneNum) {
                     NumberOfOccupants +=
                         state.dataHeatBal->People(Ctd).NumberOfPeople; // *GetCurrentScheduleValue(state, People(Ctd)%NumberOfPeoplePtr)
@@ -725,7 +726,7 @@ namespace RoomAir {
         } else {
             Real64 const plume_fac(NumberOfPlumes * std::pow(PowerPerPlume, OneThird));
             HeightFrac = min(24.55 * std::pow(MCp_Total * 0.000833 / plume_fac, 0.6) / CeilingHeight, 1.0);
-            for (Ctd = 1; Ctd <= 4; ++Ctd) {
+            for (int Ctd = 1; Ctd <= 4; ++Ctd) {
                 HcDispVent3Node(state, ZoneNum, HeightFrac);
                 // HeightFrac = min( 24.55 * std::pow( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, OneThird ) ), 0.6 ) /
                 // CeilingHeight, 1.0 ); //Tuned This does not vary in loop  EPTeam-replaces above (cause diffs)      HeightFrac =
@@ -891,7 +892,7 @@ namespace RoomAir {
             Real64 AirCap = thisZoneHB.AirPowerCap;
             TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + OneThird * thisZoneHB.ZTM[2]);
 
-            for (Ctd = 1; Ctd <= 3; ++Ctd) {
+            for (int Ctd = 1; Ctd <= 3; ++Ctd) {
                 TempDepCoef = state.dataDispVentMgr->HA_MX + state.dataDispVentMgr->HA_OC + state.dataDispVentMgr->HA_FLOOR + MCp_Total;
                 TempIndCoef =
                     ConvGains + state.dataDispVentMgr->HAT_MX + state.dataDispVentMgr->HAT_OC + state.dataDispVentMgr->HAT_FLOOR + MCpT_Total;

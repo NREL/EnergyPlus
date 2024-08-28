@@ -295,6 +295,10 @@ In addition to the canned Surface reports (view the Reports section later in thi
   Zone,Sum,Zone Total Internal Total Heating Energy {[}J{]}
 \item
   Zone,Average,Zone Total Internal Total Heating Rate {[}W{]}
+ \item
+  Zone Phase Change Material Melting Enthalpy{[{J/kg}]}
+ \item
+  Zone Phase Change Material Freezing Enthalpy{[{J/kg}]}
 \item
   HVAC,Average,Zone Exfiltration Heat Transfer Rate {[}W{]}
 \item
@@ -372,6 +376,13 @@ These two variable outputs are/should be identical. However, note that they can 
 \paragraph{Zone Mean Air Temperature {[}C{]}}\label{zone-mean-air-temperature-c}
 
 From the code definition, the zone mean air temperature is the average temperature of the air temperatures at the system timestep. Remember that the zone heat balance represents a ``well stirred'' model for a zone, therefore there is only one mean air temperature to represent the air temperature for the zone unless a non-mixing RoomAirModel is specified.
+
+\paragraph{Zone Wetbulb Globe Temperature {[}C{]}}\label{zone-wetbulb-globe-temperature-c}
+
+The indoor wet-bulb globe temperature (WBGT) is a measure of indoor heat stress as it affects humans.
+It is calculated as a weighted average of the zone wet-bulb temperature (WBT) and the operative temperature (OT) as follows
+
+WBGT = 0.7*WBT + 0.3*OT
 
 \paragraph{Zone Air Temperature {[}C{]}}\label{zone-air-temperature-c}
 
@@ -652,6 +663,14 @@ These output variables represent the sum of latent gains from specific internal 
 \paragraph{Space or Zone Total Internal Total Heating Energy {[}J{]}}\label{zone-total-internal-total-heating-energy-j}
 
 These output variables represent the sum of all heat gains throughout the space or zone in Watts (for rate) or joules. This includes all heat gains from Energyplus objects that are listed in Table \ref{table:space-or-zone-total-internal-heat-gain-constituents}.
+
+\paragraph{Zone Phase Change Material Melting Enthalpy {[}J/kg{]}}\label{zone-phase-change-material-melting-enthalpy-jkg}
+
+This output variable tracks the summation of all energy within a zone that is associated with phase change materials melting during the current time period in J/kg.  This report is only produced when the user enters phase change materials (see \hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}), opts to use the Conduction Finite Difference (aka CondFD) solution algorithm (see \hyperref[heatbalancealgorithm]{HeatBalanceAlgorithm}), and requests DisplayAdvancedReportVariables (see \hyperref[outputdiagnostics]{Output:Diagnostics}).
+
+\paragraph{Zone Phase Change Material Freezing Enthalpy {[}J/kg{]}}\label{zone-phase-change-material-freezing-enthalpy-jkg}
+
+This output variable tracks the summation of all energy within a zone that is associated with phase change materials freezing during the current time period in J/kg.  This report is only produced when the user enters phase change materials (\hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}), opts to use the Conduction Finite Difference (aka CondFD) solution algorithm (see \hyperref[heatbalancealgorithm]{HeatBalanceAlgorithm}), and requests DisplayAdvancedReportVariables (see \hyperref[outputdiagnostics]{Output:Diagnostics}).
 
 \paragraph{Zone Exfiltration Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-heat-transfer-rate-w}
 
@@ -1976,7 +1995,7 @@ Each of the following surfaces:
 use the same vertex input. The numeric parameters indicated below are taken from the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} definition; the others may not be exactly the same but are identical in configuration. They are also ``extensible'' -- so, to define more vertices for these surfaces, simply add the required number of vertices (X, Y, and Z coordinates for each vertex) to the input file. Note that \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} is not extensible and is limited to 4 (max) vertices. If the Number of Surface Vertex groups is left blank or entered as \textbf{autocalculate}, EnergyPlus looks at the number of groups entered and figures out how many coordinate groups are entered.
 
 \begin{callout}
-\warning{Note that the resolution on the surface vertex input is 1 millimeter (.001 meter). Therefore, using vertices that are very close together (\textless{} 1 mm) may result in invalid dot product and fatal errors during shading calculations.}
+\warning{Note that the resolution for surface vertex input is 1 centimeter (0.01 meter). Vertices that are \textless{} 1 cm apart will be combined.}
 \end{callout}
 
 \begin{figure}[hbtp] % fig 29
@@ -2753,11 +2772,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-14}
 
-This field is the name of the \hyperref[zone]{Zone} or \hyperref[zonelist]{ZoneList} in which the internal mass will be added. When the ZoneList option is used then this internal mass object is applied to each of zone in the list. The name of the actual internal mass object in each zone becomes <Zone Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
+This field is the name of the \hyperref[zone]{Zone} or \hyperref[zonelist]{ZoneList} in which the internal mass will be added. When the ZoneList option is used then this internal mass object is applied to each zone in the list. The name of the actual internal mass object in each zone becomes <Zone Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run. This field is ignored when a Space or SpaceList Name is specified.
 
 \paragraph{Field: Space or SpaceList Name}\label{field-space-or-spacelist-name-14}
 
-This field is the name of the \hyperref[space]{Space} or \hyperref[spacelist]{SpaceList} in which the internal mass will be added. When the SpaceList option is used then this internal mass object is applied to each space in the list. The name of the actual internal mass object in each space becomes <Space Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run. This field is ignored when a ZoneList Name is specified for Zone or ZoneList Name. If a Space Name is used, then the Space must be part of Zone Name. If a SpaceList Name is used, then the Zone Name is ignored (even though it is a required field), and the surface is assigned to the corresponding Zone(s) for each Space in the SpaceList.
+This field is the name of the \hyperref[space]{Space} or \hyperref[spacelist]{SpaceList} in which the internal mass will be added. If this field is blank (or a ZoneList Name is specified), the internal mass will be added to the last space attached to the zone. When the SpaceList option is used then this internal mass object is applied to each space in the list. The name of the actual internal mass object in each space becomes <Space Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run. This field is ignored when a ZoneList Name is specified for Zone or ZoneList Name. If this field is entered, then the Zone or ZoneList Name is ignored, and the surface is assigned to the corresponding Zone(s) for the Space(s).
 
 \paragraph{Field: Surface Area}\label{field-surface-area}
 
@@ -2770,13 +2789,15 @@ InternalMass,
   Zn002:IntM001,                !- Surface Name
   INTERIOR,                     !- Construction Name
   DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
-  408.7734;                     !- Total area exposed to Zone {m2}
+  ,                             !- Space or SpaceList Name
+  408.7734;                     !- Surface Area {m2}
 
 InternalMass,
   Zn002:IntM002,                !- Surface Name
   PARTITION02,                  !- Construction Name
   DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
-  371.6122;                     !- Total area exposed to Zone {m2}
+  ,                             !- Space or SpaceList Name
+  371.6122;                     !- Surface Area {m2}
 \end{lstlisting}
 
 \subsection{Surface Output Variables/Reports}\label{surface-output-variablesreports}
@@ -2919,19 +2940,21 @@ Zone,Average, Surface Inside Face Beam Solar Radiation Heat Gain Rate [W]
 Output variables applicable to exterior windows and glass doors:
 
 \begin{lstlisting}
-Zone,Average,Zone Windows Total Transmitted Solar Radiation Rate [W]
+Zone,Average,Enclosure Windows Total Transmitted Solar Radiation Rate [W]
+Zone,Sum,Enclosure Windows Total Transmitted Solar Radiation Energy [J]
 Zone,Sum,Zone Transmitted Solar Energy [J]
 Zone,Average,Zone Windows Total Heat Gain Rate [W]
 Zone,Sum,Zone Windows Total Heat Gain Energy [J]
 Zone,Average,Zone Windows Total Heat Loss Rate [W]
 Zone,Sum,Zone Windows Total Heat Loss Energy [J]
-Zone,Average,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate [W]
-Zone,Sum,Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy [J]
-Zone,Average,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate [W]
-Zone,Sum,Zone Interior Windows Total Transmitted Beam Solar Radiation Energy [J]
-Zone,Average,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
-Zone,Sum,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy [J]
-Zone,Average,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
+Zone,Average,Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate [W]
+Zone,Sum,Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Energy [J]
+Zone,Average,Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate [W]
+Zone,Sum,Enclosure Interior Windows Total Transmitted Beam Solar Radiation Energy [J]
+Zone,Average,Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
+Zone,Sum,Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Energy [J]
+Zone,Average,Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
+Zone,Sum,Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Energy [J]
 Zone,Average,Surface Window Total Glazing Layers Absorbed Solar Radiation Rate [W]
 Zone,Average,Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate [W]
 Zone,Sum,Surface Window Total Glazing Layers Absorbed Solar Radiation Energy [J]
@@ -3439,11 +3462,11 @@ Beam solar radiation from exterior windows absorbed on the inside face of an opa
 
 The following output variables apply to subsurfaces that are windows or glass doors. These two subsurface types are called ``window'' here. ``Exterior window'' means that the base surface of the window is an exterior wall, floor, roof or ceiling (i.e., the base surface is a \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} with OutsideFaceEnvironment = ExteriorEnvironment). ``Interior window'' means that the base surface of the window is an inter-zone wall, floor or ceiling. ``Glass'' means a transparent solid layer, usually glass, but possibly plastic or other transparent material. ``Shading device'' means an interior, exterior or between-glass shade or blind, or an exterior screen (only exterior windows can have a shading device).
 
-\subsubsection{Zone Windows Total Transmitted Solar Radiation Rate {[}W{]}}\label{zone-windows-total-transmitted-solar-radiation-rate-w}
+\subsubsection{Enclosure Windows Total Transmitted Solar Radiation Rate {[}W{]}}\label{zone-windows-total-transmitted-solar-radiation-rate-w}
 
-\subsubsection{Zone Windows Total Transmitted Solar Radiation Energy {[}J{]}}\label{zone-windows-total-transmitted-solar-radiation-energy-j}
+\subsubsection{Enclosure Windows Total Transmitted Solar Radiation Energy {[}J{]}}\label{zone-windows-total-transmitted-solar-radiation-energy-j}
 
-The total Surface Window Transmitted Solar Radiation Rate of all the exterior windows in a zone.
+The total Surface Window Transmitted Solar Radiation Rate of all the exterior windows in an enclosure. If the user wishes to report these variables only for a specific enclosure and is uncertain as to what the name of the enclosure is, the enclosure name can be obtained from the the "Input Verification and Results Summary" output report in the "Space Summary" subtable.
 
 \subsubsection{Zone Windows Total Heat Gain Rate {[}W{]}}\label{zone-windows-total-heat-gain-rate-w}
 
@@ -3501,17 +3524,17 @@ For a window with a blind, this transmitted radiation consists of beam radiation
 
 For a window with a blind, this transmitted radiation consists of diffuse radiation reflected from beam by the slats. For a window with a screen, this value consists of diffuse radiation reflected by the screen material.
 
-\subsubsection{Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate {[}W{]}}\label{zone-exterior-windows-total-transmitted-beam-solar-radiation-rate-w}
+\subsubsection{Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate {[}W{]}}\label{zone-exterior-windows-total-transmitted-beam-solar-radiation-rate-w}
 
-\subsubsection{Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy {[}J{]}}\label{zone-exterior-windows-total-transmitted-beam-solar-radiation-energy-j}
+\subsubsection{Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Energy {[}J{]}}\label{zone-exterior-windows-total-transmitted-beam-solar-radiation-energy-j}
 
-The sum of the Surface Window Transmitted Beam Solar Radiation Rate (see definition above) from all exterior windows in a zone.
+The sum of the Surface Window Transmitted Beam Solar Radiation Rate (see definition above) from all exterior windows in an enclosure. If the user wishes to report these variables only for a specific enclosure and is uncertain as to what the name of the enclosure is, the enclosure name can be obtained from the the "Input Verification and Results Summary" output report in the "Space Summary" subtable.
 
-\subsubsection{Zone Interior Windows Total Transmitted Beam Solar Radiation Rate {[}W{]}}\label{zone-interior-windows-total-transmitted-beam-solar-radiation-rate-w}
+\subsubsection{Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate {[}W{]}}\label{zone-interior-windows-total-transmitted-beam-solar-radiation-rate-w}
 
-\subsubsection{Zone Interior Windows Total Transmitted Beam Solar Radiation Energy {[}J{]}}\label{zone-interior-windows-total-transmitted-beam-solar-radiation-energy-j}
+\subsubsection{Enclosure Interior Windows Total Transmitted Beam Solar Radiation Energy {[}J{]}}\label{zone-interior-windows-total-transmitted-beam-solar-radiation-energy-j}
 
-The sum of the Surface Window Transmitted Beam Solar Radiation Rate (see definition above) from all interior windows in a zone.
+The sum of the Surface Window Transmitted Beam Solar Radiation Rate (see definition above) from all interior windows in an enclosure. If the user wishes to report these variables only for a specific enclosure and is uncertain as to what the name of the enclosure is, the enclosure name can be obtained from the the "Input Verification and Results Summary" output report in the "Space Summary" subtable.
 
 \subsubsection{Surface Window Transmitted Diffuse Solar Radiation Rate {[}W{]}}\label{surface-window-transmitted-diffuse-solar-radiation-rate-w}
 
@@ -3519,17 +3542,17 @@ The sum of the Surface Window Transmitted Beam Solar Radiation Rate (see definit
 
 The solar radiation transmitted by an exterior window whose source is diffuse solar incident on the outside of the window. For a bare window, this transmitted radiation consists of diffuse radiation passing through the glass. For a window with a shade, this transmitted radiation is totally diffuse (shades are assumed to be perfect diffusers). For a window with a blind, this transmitted radiation consists of diffuse radiation that passes between the slats and diffuse radiation from diffuse-to-diffuse reflection from the slats. For a window with a screen, this value consists of diffuse radiation transmitted through the screen (gaps between the screen material) and diffuse radiation from diffuse-to-diffuse reflection from the screen material.
 
-\subsubsection{Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate {[}W{]}}\label{zone-exterior-windows-total-transmitted-diffuse-solar-radiation-rate-w}
+\subsubsection{Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate {[}W{]}}\label{zone-exterior-windows-total-transmitted-diffuse-solar-radiation-rate-w}
 
-\subsubsection{Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy {[}J{]}}\label{zone-exterior-windows-total-transmitted-diffuse-solar-radiation-energy-j}
+\subsubsection{Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Energy {[}J{]}}\label{zone-exterior-windows-total-transmitted-diffuse-solar-radiation-energy-j}
 
-The combined beam and diffuse solar that first entered adjacent zones through exterior windows in the adjacent zones, was subsequently reflected from interior surfaces in those zones (becoming diffuse through that reflection), and was then transmitted through interior windows into the current zone.
+The combined beam and diffuse solar that first entered adjacent zones through exterior windows in the adjacent zones, was subsequently reflected from interior surfaces in those zones (becoming diffuse through that reflection), and was then transmitted through interior windows into the current enclosure. If the user wishes to report these variables only for a specific enclosure and is uncertain as to what the name of the enclosure is, the enclosure name can be obtained from the the "Input Verification and Results Summary" output report in the "Space Summary" subtable.
 
-\subsubsection{Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate {[}W{]}}\label{zone-interior-windows-total-transmitted-diffuse-solar-radiation-rate-w}
+\subsubsection{Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate {[}W{]}}\label{zone-interior-windows-total-transmitted-diffuse-solar-radiation-rate-w}
 
-\subsubsection{Zone Interior Windows Total Transmitted Diffuse Solar Radiation Energy {[}J{]}}\label{zone-interior-windows-total-transmitted-diffuse-solar-radiation-energy-j}
+\subsubsection{Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Energy {[}J{]}}\label{zone-interior-windows-total-transmitted-diffuse-solar-radiation-energy-j}
 
-The sum of the Surface Window Transmitted Diffuse Solar Radiation Rate (see definition above) from all interior windows in a zone.
+The sum of the Surface Window Transmitted Diffuse Solar Radiation Rate (see definition above) from all interior windows in an enclosure. If the user wishes to report these variables only for a specific enclosure and is uncertain as to what the name of the enclosure is, the enclosure name can be obtained from the the "Input Verification and Results Summary" output report in the "Space Summary" subtable.
 
 \subsubsection{Surface Window System Solar Transmittance {[]}}\label{surface-window-system-solar-transmittance}
 
@@ -3549,101 +3572,63 @@ Effective solar reflectance of an exterior window, including effect of shading d
 
 For an airflow window, the forced convective heat flow from the gap through which airflow occurs. This is the heat gained (or lost) by the air from the glass surfaces (and between-glass shading device surfaces, if present) that the air comes in contact with as it flows through the gap. If the gap airflow goes to the zone indoor air, the gap convective heat flow is added to the zone load. Applicable to exterior windows only.
 
+\subsubsection{Surface Window Net Heat Transfer Rate {[}W{]}}\label{surface-window-net-heat-transfer-rate-w}
+
+\subsubsection{Surface Window Net Heat Transfer Energy {[}J{]}}\label{surface-window-net-heat-transfer-rate-j}
+
+The net heat flow to the zone through the glazing, frame and divider of an exterior window, including net solar gains. Negative values imply heat flow to the exterior. It is important to note that the boundary volume is at the inside face of the window surface (or shading device). Beam and diffuse solar which is absorbed in the window (and/or shading) layers will impact the window surface temperature which impacts the convective and IR heat flow components.
+
+For a window \emph{without an interior shading device}, this heat flow is equal to:
+
+  {[}Surface Window Transmitted Solar Radiation Rate{]}
+  
+  + {[}Surface Window Inside Face Glazing Zone Convection Heat Gain Rate{]}
+  
+  + {[}Surface Window Inside Face Glazing Net Infrared Heat Transfer Rate{]}
+  
+  + {[}Surface Window Inside Face Frame and Divider Zone Heat Gain Rate{]} (if present)
+  
+  - {[}Surface Window Shortwave from Zone Back Out Window Heat Transfer Rate{]}
+  
+  - {[}Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate{]}
+
+  + {[Surface Window Gap Convective Heat Transfer Rate] (for \hyperref[windowpropertyairflowcontrol]{WindowProperty:AirflowControl} with destination IndoorAir)}
+
+Here, short-wave radiation is that from lights and interior solar radiation (beam and diffuse) incident on this window.
+
+For a window \emph{with an interior shading device}, this heat flow is equal to:
+
+  {[}Surface Window Transmitted Solar Radiation Rate{]}
+
+  + {[}Surface Window Inside Face Gap between Shade and Glazing Zone Convection Heat Gain Rate{]}
+
+  + {[}Surface Window Inside Face Shade Zone Convection Heat Gain Rate{]}
+
+  + {[}Surface Window Inside Face Glazing Net Infrared Heat Transfer Rate{]}
+
+  + {[}Surface Window Inside Face Shade Net Infrared Heat Transfer Rate{]}
+
+  + {[}Surface Window Inside Face Frame and Divider Zone Heat Gain Rate{]} (if present)
+
+  - {[}Surface Window Shortwave from Zone Back Out Window Heat Transfer Rate{]}
+
+  - {[}Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate{]}
+  
+  + {[Surface Window Gap Convective Heat Transfer Rate] (for \hyperref[windowpropertyairflowcontrol]{WindowProperty:AirflowControl} with destination IndoorAir)}
+
+The total window heat flow can also be thought of as the sum of the solar and conductive gain \emph{to the zone} from the window.
+
 \subsubsection{Surface Window Heat Gain Rate {[}W{]}}\label{surface-window-heat-gain-rate-w}
 
 \subsubsection{Surface Window Heat Gain Energy {[}J{]}}\label{surface-window-heat-gain-energy-j}
 
-The total heat flow \emph{to the zone} from the glazing, frame and divider of an exterior window when the total heat flow is positive.
-
-For a window \emph{without an interior shading device}, this heat flow is equal to:
-
-\begin{itemize}
-\item
-  {[}Surface Window Transmitted Solar Radiation Rate (see definition, above){]}
-\item
-  {[}Convective heat flow to the zone from the zone side of the glazing{]}
-\item
-  {[}Net IR heat flow to the zone from zone side of the glazing{]}
-\item
-  {[}Short-wave radiation from zone transmitted back out the window{]}
-\item
-  {[}Convection to zone from window frame and divider, if present{]}
-\end{itemize}
-
-Here, short-wave radiation is that from lights and diffuse interior solar radiation.
-
-For a window \emph{with an interior shading device}, this heat flow is equal to:
-
-
-\begin{itemize}
-\item
-  {[}Surface Window Transmitted Solar Radiation Rate{]}
-\item
-  {[}Convective heat flow to the zone from the air flowing through the gap between glazing and shading device{]}
-\item
-  {[}Convective heat flow to the zone from the zone side of the shading device{]}
-\item
-  {[}Net IR heat flow to the zone from the zone side of the glazing{]}
-\item
-  {[}Net IR heat flow to the zone from the zone side of the shading device{]}
-\item
-  {[}Short-wave radiation from zone transmitted back out the window{]}
-\item
-  {[}Convection to zone from window frame and divider, if present{]}
-\end{itemize}
-
-The total window heat flow can also be thought of as the sum of the solar and conductive gain \emph{to the zone} from the window.
+The total heat flow \emph{to the zone} from the glazing, frame and divider of an exterior window when the Surface Window Net Heat Transfer (see definition above) is positive.
 
 \subsubsection{Surface Window Heat Loss Rate {[}W{]}}\label{surface-window-heat-loss-rate-w}
 
 \subsubsection{Surface Window Heat Loss Energy {[}J{]}}\label{surface-window-heat-loss-energy-j}
 
-The absolute value of the total heat flow through an exterior window when the total heat flow is negative. (See definition of ``total heat flow'' under ``Surface Window Heat Gain Rate,'' above.)
-
-\subsubsection{Surface Window Net Heat Transfer Rate {[}W{]}}\label{surface-window-net-heat-transfer-rate-w}
-
-\subsubsection{Surface Window Net Heat Transfer Energy {[}J{]}}\label{surface-window-net-heat-transfer-rate-j}
-
-The total heat flow through the glazing, frame and divider of an exterior window. Negative values imply heat flow to the exterior.
-
-The important distinction between this output variable and those for ``Surface Window Heat Gain/Loss'' is that this represents the net heat flow through the window and not the heat flow \emph{to the zone}. The only difference is the heat flow \emph{to the zone} does not account for radiation from the opaque frame and divider components. This is because these components, as a simplification, do not participate in the overall radiative exchange with other surfaces in the zone.
-
-For a window \emph{without an interior shading device}, this heat flow is equal to:
-
-\begin{itemize}
-\item
-  {[}Surface Window Transmitted Solar Radiation Rate (see definition, above){]}
-\item
-  {[}Convective heat flow from the zone side of the glazing{]}
-\item
-  {[}Net IR heat flow from the zone side of the glazing{]}
-\item
-  {[}Short-wave radiation from zone transmitted back out the window{]}
-\item
-  {[}Conduction through window frame and divider, if present{]}
-\end{itemize}
-
-Here, short-wave radiation is that from lights and diffuse interior solar radiation.
-
-For a window \emph{with an interior shading device}, this heat flow is equal to:
-
-
-\begin{itemize}
-\item
-  {[}Surface Window Transmitted Solar Radiation Rate{]}
-\item
-  {[}Convective heat flow from the air flowing through the gap between glazing and shading device{]}
-\item
-  {[}Convective heat flow from the zone side of the shading device{]}
-\item
-  {[}Net IR heat flow from the zone side of the glazing{]}
-\item
-  {[}Net IR heat flow from the zone side of the shading device{]}
-\item
-  {[}Short-wave radiation from zone transmitted back out the window{]}
-\item
-  {[}Conduction through the window frame and divider, if present{]}
-\end{itemize}
+The total heat flow \emph{from the zone} from the glazing, frame and divider of an exterior window when the Surface Window Net Heat Transfer (see definition above) is negative.
 
 \subsubsection{Surface Window Glazing Beam to Beam Solar Transmittance {[]}}\label{surface-window-glazing-beam-to-beam-solar-transmittance}
 
@@ -3803,7 +3788,7 @@ Indicates whether a storm window glass layer is present (ref: StormWindow object
 
 \subsubsection{Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate {[}W{]}}\label{surface-inside-face-initial-transmitted-diffuse-transmitted-out-window-solar-radiation-rate-w}
 
-As of Version 2.1, the diffuse solar transmitted through exterior windows that is initially distributed to another window in the zone and transmitted out of the zone through that window. For exterior windows, this transmitted diffuse solar is ``lost'' to the exterior environment For interior windows, this transmitted diffuse solar is distributed to heat transfer surfaces in the adjacent zone, and is part of the Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate for these adjacent zone surfaces.
+As of Version 2.1, the diffuse solar transmitted through exterior windows that is initially distributed to another window in the zone and transmitted out of the zone through the inside face of the window. Some of this will be absorbed in the window layers and some will be transmitted through. For exterior windows, transmitted diffuse solar is ``lost'' to the exterior environment. For interior windows, this transmitted diffuse solar is distributed to heat transfer surfaces in the adjacent zone, and is part of the Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate for these adjacent zone surfaces.
 
 \subsubsection{Additional Window Outputs (Advanced)}\label{additional-window-outputs-advanced}
 
@@ -3819,11 +3804,11 @@ The net exchange of infrared radiation heat transfer from the glazing to the zon
 
 \subsubsection{Surface Window Shortwave from Zone Back Out Window Heat Transfer Rate {[}W{]}}\label{surface-window-shortwave-from-zone-back-out-window-heat-transfer-rate-w}
 
-This is the short-wave radiation heat transfer from the zone back out the window in watts. This is a measure of the diffuse short-wave light (from reflected solar and electric lighting) that leave the zone through the window. This output variable is the term called ``{[}Short-wave radiation from zone transmitted back out the window{]}'' under the description above for Surface Window Heat Gain Rate output variable.
+This is the short-wave radiation heat transfer from the zone back out the inside face of the window in watts. This is a measure of the diffuse short-wave light (from beam and diffuse solar and electric lighting) that leaves the zone through the window.
 
 \subsubsection{Surface Window Inside Face Frame and Divider Zone Heat Gain Rate {[}W{]}}\label{surface-window-inside-face-frame-and-divider-zone-heat-gain-rate-w}
 
-This is the heat transfer from any frames and/or dividers to the zone in watts. This output variable is the term called ``{[}Conduction to zone from window frame and divider, if present{]}'' under the description above for Surface Window Heat Gain Rate output variable. (The word ``conduction'' here is used because the models is simplified compared to the complexities of surface convection and radiation.)
+This is the convective heat transfer from any frames and/or dividers to the zone in watts. Negative values imply heat flow to the exterior. The Surface Window Frame Inside Temperature and Surface Window Divider Inside Temperature are computed from a heat balance on the frame/divider that includes solar radiation, long-wave radiation, convection, and conduction. The frame/divider is then included in the zone heat balance via convection at this inside temperature. See Engineering Reference ``Window Frame and Divider Calculation'' for more details.
 
 \subsubsection{Surface Window Frame Heat Gain Rate {[}W{]}}\label{surface-window-frame-heat-gain-rate-w}
 

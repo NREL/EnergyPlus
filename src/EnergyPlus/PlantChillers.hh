@@ -214,6 +214,13 @@ namespace PlantChillers {
         Real64 HeatRecInletTemp; // (HeatRecOutletTemp is in base already)
         Real64 HeatRecMdot;
         Real64 ChillerCondAvgTemp; // the effective condenser temperature for chiller performance [C]
+        Real64 partLoadRatio = 0.0;
+        Real64 cyclingRatio = 0.0;
+
+        // thermosiphon model
+        int thermosiphonTempCurveIndex = 0;
+        Real64 thermosiphonMinTempDiff = 0.0;
+        int thermosiphonStatus = 0;
 
         // Default Constructor
         ElectricChillerSpecs()
@@ -260,12 +267,14 @@ namespace PlantChillers {
         );
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        bool thermosiphonDisabled(EnergyPlusData &state);
     };
 
     struct EngineDrivenChillerSpecs : BaseChillerSpecs
     {
         // temperature at the chiller evaporator side outlet
-        Constant::eFuel FuelType;
+        Constant::eFuel FuelType = Constant::eFuel::Invalid;
         Array1D<Real64> CapRatCoef;                // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef;              // (EngineDriven ADJEC() ) coeff of power rat poly fit
         Array1D<Real64> FullLoadCoef;              // (EngineDriven RPWRC() ) coeff of full load poly. fit
@@ -363,7 +372,7 @@ namespace PlantChillers {
     struct GTChillerSpecs : BaseChillerSpecs
     {
         // Members
-        Constant::eFuel FuelType;
+        Constant::eFuel FuelType = Constant::eFuel::Invalid;
         Array1D<Real64> CapRatCoef;   // (GT RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
         Array1D<Real64> FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit
@@ -455,6 +464,13 @@ namespace PlantChillers {
     {
         // Members
         Real64 ActualCOP;
+        Real64 partLoadRatio = 0.0;
+        Real64 cyclingRatio = 1.0;
+
+        // thermosiphon model
+        int thermosiphonTempCurveIndex = 0;
+        Real64 thermosiphonMinTempDiff = 0.0;
+        int thermosiphonStatus = 0;
 
         // Default Constructor
         ConstCOPChillerSpecs() : ActualCOP(0.0)
@@ -482,6 +498,8 @@ namespace PlantChillers {
         void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        bool thermosiphonDisabled(EnergyPlusData &state);
     };
 } // namespace PlantChillers
 
@@ -502,6 +520,10 @@ struct PlantChillersData : BaseGlobalStruct
     EPVector<PlantChillers::EngineDrivenChillerSpecs> EngineDrivenChiller;
     EPVector<PlantChillers::GTChillerSpecs> GTChiller;
     EPVector<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

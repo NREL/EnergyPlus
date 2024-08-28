@@ -90,8 +90,7 @@ namespace UnitHeater {
         int SchedPtr;          // index to schedule
         int AirInNode;         // inlet air node number
         int AirOutNode;        // outlet air node number
-        int FanType_Num;       // Fan type number (see DataHVACGlobals)
-        std::string FanType;   // type of fan
+        HVAC::FanType fanType; // Fan type number (see DataHVACGlobals)
         std::string FanName;   // name of fan
         int Fan_Index;
         int FanSchedPtr;      // index to fan operating mode schedule
@@ -103,10 +102,10 @@ namespace UnitHeater {
         std::string FanOperatesDuringNoHeating; // Indicates whether fan operates or not during no heating
         int FanOutletNode;                      // outlet node number for fan exit
         // (assumes fan is upstream of heating coil)
-        int OpMode;              // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
-        HCoilType Type;          // type of heating coil (water, gas, electric, etc.)
-        std::string HCoilTypeCh; // actual object name
-        std::string HCoilName;   // name of heating coil
+        HVAC::FanOp fanOp = HVAC::FanOp::Invalid; // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
+        HCoilType Type;                           // type of heating coil (water, gas, electric, etc.)
+        std::string HCoilTypeCh;                  // actual object name
+        std::string HCoilName;                    // name of heating coil
         int HCoil_Index;
         DataPlant::PlantEquipmentType HeatingCoilType;
         int HCoil_FluidIndex;
@@ -129,7 +128,7 @@ namespace UnitHeater {
         Real64 ElecPower;
         Real64 ElecEnergy;
         std::string AvailManagerListName; // Name of an availability manager list object
-        int AvailStatus;
+        Avail::Status availStatus = Avail::Status::NoAction;
         bool FanOffNoHeating;    // True when fan is on during no heating load
         Real64 FanPartLoadRatio; // fan part-load ratio for time step
         int ZonePtr;             // pointer to a zone served by a unit heater
@@ -138,13 +137,13 @@ namespace UnitHeater {
 
         // Default Constructor
         UnitHeaterData()
-            : SchedPtr(0), AirInNode(0), AirOutNode(0), FanType_Num(0), Fan_Index(0), FanSchedPtr(0), FanAvailSchedPtr(0), ControlCompTypeNum(0),
-              CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), FanOutletNode(0), OpMode(0), HCoil_Index(0),
+            : SchedPtr(0), AirInNode(0), AirOutNode(0), fanType(HVAC::FanType::Invalid), Fan_Index(0), FanSchedPtr(0), FanAvailSchedPtr(0),
+              ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), FanOutletNode(0), HCoil_Index(0),
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0),
               MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0),
               MinHotSteamFlow(0.0), HotControlNode(0), HotControlOffset(0.0), HotCoilOutNodeNum(0), HWplantLoc{}, PartLoadFrac(0.0), HeatPower(0.0),
-              HeatEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanOffNoHeating(false), FanPartLoadRatio(0.0), ZonePtr(0),
-              HVACSizingIndex(0), FirstPass(true)
+              HeatEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), FanOffNoHeating(false), FanPartLoadRatio(0.0), ZonePtr(0), HVACSizingIndex(0),
+              FirstPass(true)
         {
         }
     };
@@ -187,11 +186,11 @@ namespace UnitHeater {
     );
 
     void CalcUnitHeaterComponents(EnergyPlusData &state,
-                                  int const UnitHeatNum,                              // Unit index in unit heater array
-                                  bool const FirstHVACIteration,                      // flag for 1st HVAV iteration in the time step
-                                  Real64 &LoadMet,                                    // load met by unit (watts)
-                                  int const OpMode = DataHVACGlobals::ContFanCycCoil, // fan operating mode
-                                  Real64 const PartLoadRatio = 1.0                    // part-load ratio
+                                  int const UnitHeatNum,                             // Unit index in unit heater array
+                                  bool const FirstHVACIteration,                     // flag for 1st HVAV iteration in the time step
+                                  Real64 &LoadMet,                                   // load met by unit (watts)
+                                  HVAC::FanOp const fanOp = HVAC::FanOp::Continuous, // fan operating mode
+                                  Real64 const PartLoadRatio = 1.0                   // part-load ratio
     );
 
     // SUBROUTINE UpdateUnitHeater
@@ -203,6 +202,7 @@ namespace UnitHeater {
 
     void ReportUnitHeater(EnergyPlusData &state, int const UnitHeatNum); // Unit index in unit heater array
 
+    int getUnitHeaterIndex(EnergyPlusData &state, std::string_view CompName);
 } // namespace UnitHeater
 
 struct UnitHeatersData : BaseGlobalStruct
@@ -233,6 +233,10 @@ struct UnitHeatersData : BaseGlobalStruct
     Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 
     int RefrigIndex = 0;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

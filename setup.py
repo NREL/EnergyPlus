@@ -76,7 +76,8 @@ def get_ep_version_string(repository_root_dir: Path) -> str:
     version_major = findall(r'CMAKE_VERSION_MAJOR (\d+)', version_contents)[0]
     version_minor = findall(r'CMAKE_VERSION_MINOR (\d+)', version_contents)[0]
     version_patch = findall(r'CMAKE_VERSION_PATCH (\d+)', version_contents)[0]
-    return f"{version_major}.{version_minor}.{version_patch}"
+    build_increment = 1
+    return f"{version_major}.{version_minor}.{version_patch}.{build_increment}"  # TODO: Determine good numbering
 
 
 def get_current_wheel_details():
@@ -97,7 +98,7 @@ def get_current_wheel_details():
         },
         "Linux": {
             "x86_64": {
-                "wheel": "linux_x86_64",
+                "wheel": "manylinux_2_17_x86_64",
                 "zip_tag": "Linux",
                 "build_tool": "Unix Makefiles",
                 "extension": "so",

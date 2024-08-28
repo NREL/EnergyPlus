@@ -269,32 +269,32 @@ void KivaInstanceMap::setInitialBoundaryConditions(
         case KIVAZONE_TEMPCONTROL: {
 
             int controlTypeSchId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).CTSchedIndex;
-            DataHVACGlobals::ThermostatType controlType =
-                static_cast<DataHVACGlobals::ThermostatType>(ScheduleManager::LookUpScheduleValue(state, controlTypeSchId, hour, timestep));
+            HVAC::ThermostatType controlType =
+                static_cast<HVAC::ThermostatType>(ScheduleManager::LookUpScheduleValue(state, controlTypeSchId, hour, timestep));
 
             switch (controlType) {
-            case DataHVACGlobals::ThermostatType::Uncontrolled:
+            case HVAC::ThermostatType::Uncontrolled:
                 Tin = assumedFloatingTemp + Constant::Kelvin;
                 break;
-            case DataHVACGlobals::ThermostatType::SingleHeating: {
+            case HVAC::ThermostatType::SingleHeating: {
                 int schNameId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_SingleHeatSetPoint;
                 Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, schNameId, hour, timestep);
                 Tin = setpoint + Constant::Kelvin;
                 break;
             }
-            case DataHVACGlobals::ThermostatType::SingleCooling: {
+            case HVAC::ThermostatType::SingleCooling: {
                 int schNameId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_SingleCoolSetPoint;
                 Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, schNameId, hour, timestep);
                 Tin = setpoint + Constant::Kelvin;
                 break;
             }
-            case DataHVACGlobals::ThermostatType::SingleHeatCool: {
+            case HVAC::ThermostatType::SingleHeatCool: {
                 int schNameId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_SingleHeatCoolSetPoint;
                 Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, schNameId, hour, timestep);
                 Tin = setpoint + Constant::Kelvin;
                 break;
             }
-            case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand: {
+            case HVAC::ThermostatType::DualSetPointWithDeadBand: {
                 int schNameIdHeat = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_DualSetPointWDeadBandHeat;
                 int schNameIdCool = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_DualSetPointWDeadBandCool;
                 Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(state, schNameIdHeat, hour, timestep);

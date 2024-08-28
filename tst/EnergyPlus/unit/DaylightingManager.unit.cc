@@ -78,6 +78,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Construction;
@@ -157,8 +158,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", thisDaylightControl.Name);
     EXPECT_EQ("WEST ZONE", thisDaylightControl.ZoneName);
-    EXPECT_TRUE(compare_enums(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod));
-    EXPECT_TRUE(compare_enums(LtgCtrlType::Continuous, thisDaylightControl.LightControlType));
+    EXPECT_ENUM_EQ(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod);
+    EXPECT_ENUM_EQ(LtgCtrlType::Continuous, thisDaylightControl.LightControlType);
 
     EXPECT_EQ(0.3, thisDaylightControl.MinPowerFraction);
     EXPECT_EQ(0.2, thisDaylightControl.MinLightFraction);
@@ -268,8 +269,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
     auto const &thisDaylightControl = dl->daylightControl(1);
     EXPECT_EQ("WEST ZONE_DAYLCTRL", thisDaylightControl.Name);
     EXPECT_EQ("WEST ZONE", thisDaylightControl.ZoneName);
-    EXPECT_TRUE(compare_enums(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod));
-    EXPECT_TRUE(compare_enums(LtgCtrlType::Continuous, thisDaylightControl.LightControlType));
+    EXPECT_ENUM_EQ(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod);
+    EXPECT_ENUM_EQ(LtgCtrlType::Continuous, thisDaylightControl.LightControlType);
 
     EXPECT_EQ(0.3, thisDaylightControl.MinPowerFraction);
     EXPECT_EQ(0.2, thisDaylightControl.MinLightFraction);
@@ -870,6 +871,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors
+    ZoneEquipmentManager::GetZoneEquipment(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
@@ -1767,6 +1769,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors
+    ZoneEquipmentManager::GetZoneEquipment(*state);
 
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                               // expect no errors
@@ -2015,8 +2018,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     auto const &thisDaylightControl = dl->daylightControl(1);
     EXPECT_EQ("WEST ZONE_DAYLCTRL", thisDaylightControl.Name);
     EXPECT_EQ("WEST ZONE", thisDaylightControl.ZoneName);
-    EXPECT_TRUE(compare_enums(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod));
-    EXPECT_TRUE(compare_enums(LtgCtrlType::Continuous, thisDaylightControl.LightControlType));
+    EXPECT_ENUM_EQ(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod);
+    EXPECT_ENUM_EQ(LtgCtrlType::Continuous, thisDaylightControl.LightControlType);
 
     EXPECT_EQ(0.3, thisDaylightControl.MinPowerFraction);
     EXPECT_EQ(0.2, thisDaylightControl.MinLightFraction);
@@ -2567,6 +2570,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors
+    ZoneEquipmentManager::GetZoneEquipment(*state);
+
     state->dataViewFactor->NumOfSolarEnclosures = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     dl->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);

@@ -67,7 +67,6 @@
 using namespace EnergyPlus;
 using namespace HVACStandAloneERV;
 using namespace DataHeatBalance;
-using namespace DataHVACGlobals;
 using namespace DataZoneEquipment;
 using namespace DataSizing;
 using namespace Fans;
@@ -115,7 +114,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
 
     state->dataHeatBal->TotPeople = 2; // Total number of people statements
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
@@ -129,47 +128,48 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
 
     // size on floor area
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerFloorArea = 1.0;
-    state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerOccupant = 0.0;
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = "ERV SUPPLY FAN";
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = "ERV EXHAUST FAN";
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
+    auto &erv = state->dataHVACStandAloneERV->StandAloneERV(1);
+    erv.SupplyAirVolFlow = AutoSize;
+    erv.ExhaustAirVolFlow = AutoSize;
+    erv.AirVolFlowPerFloorArea = 1.0;
+    erv.AirVolFlowPerOccupant = 0.0;
+    erv.supplyAirFanType = HVAC::FanType::OnOff;
+    erv.SupplyAirFanName = "ERV SUPPLY FAN";
+    erv.SupplyAirFanIndex = Fans::GetFanIndex(*state, erv.SupplyAirFanName);
+    erv.exhaustAirFanType = HVAC::FanType::OnOff;
+    erv.ExhaustAirFanName = "ERV EXHAUST FAN";
+    erv.ExhaustAirFanIndex = Fans::GetFanIndex(*state, erv.ExhaustAirFanName);
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).FloorArea = 1000.0;
     SizeStandAloneERV(*state, 1);
-    EXPECT_EQ(1000.0, state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow);
+    EXPECT_EQ(1000.0, erv.SupplyAirVolFlow);
 
     // size on occupancy
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = AutoSize; // Need to reset this for each pass
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerFloorArea = 0.0;
-    state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
+    erv.SupplyAirVolFlow = AutoSize; // Need to reset this for each pass
+    erv.ExhaustAirVolFlow = AutoSize;
+    erv.AirVolFlowPerFloorArea = 0.0;
+    erv.AirVolFlowPerOccupant = 10.0;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).FloorArea = 1000.0;
     SizeStandAloneERV(*state, 1);
-    EXPECT_EQ(3000.0, state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow);
+    EXPECT_EQ(3000.0, erv.SupplyAirVolFlow);
 
     // size on floor area and occupancy
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerFloorArea = 1.0;
-    state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
+    erv.SupplyAirVolFlow = AutoSize;
+    erv.ExhaustAirVolFlow = AutoSize;
+    erv.AirVolFlowPerFloorArea = 1.0;
+    erv.AirVolFlowPerOccupant = 10.0;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).FloorArea = 1000.0;
     SizeStandAloneERV(*state, 1);
-    EXPECT_EQ(4000.0, state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow);
+    EXPECT_EQ(4000.0, erv.SupplyAirVolFlow);
 
     // size on floor area and occupancy using zone multiplier
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
+    erv.SupplyAirVolFlow = AutoSize;
+    erv.ExhaustAirVolFlow = AutoSize;
     state->dataHeatBal->Zone(1).Multiplier = 5.0;
     SizeStandAloneERV(*state, 1);
-    EXPECT_EQ(20000.0, state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow);
+    EXPECT_EQ(20000.0, erv.SupplyAirVolFlow);
 }
 
 TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
@@ -227,7 +227,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.0;
@@ -243,24 +243,25 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     state->dataHeatBal->People(2).NumberOfPeoplePtr = ScheduleManager::ScheduleAlwaysOn; // always returns a 1 for schedule value
 
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = DataSizing::AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = DataSizing::AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = DataSizing::AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = DataSizing::AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = DataSizing::AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = state->dataFans->Fan(1).FanName;
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).FanName;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
-    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
-    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
-    state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerFloorArea = 0.01;
-    state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerOccupant = 0.0;
-    state->dataHVACStandAloneERV->StandAloneERV(1).HighRHOAFlowRatio = 1.2;
+    auto &erv = state->dataHVACStandAloneERV->StandAloneERV(1);
+    erv.SupplyAirVolFlow = DataSizing::AutoSize;
+    erv.ExhaustAirVolFlow = DataSizing::AutoSize;
+    erv.DesignSAFanVolFlowRate = DataSizing::AutoSize;
+    erv.DesignEAFanVolFlowRate = DataSizing::AutoSize;
+    erv.DesignHXVolFlowRate = DataSizing::AutoSize;
+    erv.SupplyAirFanName = state->dataFans->fans(1)->Name;
+    erv.SupplyAirFanIndex = 1;
+    erv.ExhaustAirFanName = state->dataFans->fans(2)->Name;
+    erv.ExhaustAirFanIndex = 2;
+    erv.hxType = HVAC::HXType::AirToAir_Generic;
+    erv.HeatExchangerName = "ERV Heat Exchanger";
+    erv.AirVolFlowPerFloorArea = 0.01;
+    erv.AirVolFlowPerOccupant = 0.0;
+    erv.HighRHOAFlowRatio = 1.2;
 
     SizeStandAloneERV(*state, 1);
 
-    EXPECT_EQ(1.0, state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow);
-    EXPECT_EQ(1.2, state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate);
-    EXPECT_EQ(1.2, state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate);
+    EXPECT_EQ(1.0, erv.SupplyAirVolFlow);
+    EXPECT_EQ(1.2, erv.DesignSAFanVolFlowRate);
+    EXPECT_EQ(1.2, erv.DesignEAFanVolFlowRate);
 }

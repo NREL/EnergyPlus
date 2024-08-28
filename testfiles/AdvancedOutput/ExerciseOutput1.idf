@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,24.1;
+  Version,24.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -1470,55 +1470,55 @@
 
   Output:Variable,*,Site Wind Direction,Daily;
 
-  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,Timestep;
+  Output:Variable,*,Enclosure Windows Total Transmitted Solar Radiation Rate,Timestep;
 
-  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,Hourly;
+  Output:Variable,*,Enclosure Windows Total Transmitted Solar Radiation Rate,Hourly;
 
-  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,Daily;
+  Output:Variable,*,Enclosure Windows Total Transmitted Solar Radiation Rate,Daily;
 
-  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,Monthly;
+  Output:Variable,*,Enclosure Windows Total Transmitted Solar Radiation Rate,Monthly;
 
-  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,Annual;
+  Output:Variable,*,Enclosure Windows Total Transmitted Solar Radiation Rate,Annual;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,Timestep;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,Timestep;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,Hourly;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,Hourly;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,Daily;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,Daily;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,Monthly;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,Monthly;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,Annual;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,Annual;
 
-  Output:Variable,*,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate,Timestep;
+  Output:Variable,*, Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate,Timestep;
 
-  Output:Variable,*,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate,Hourly;
+  Output:Variable,*, Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate,Hourly;
 
-  Output:Variable,*,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate,Daily;
+  Output:Variable,*, Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate,Daily;
 
-  Output:Variable,*,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate,Monthly;
+  Output:Variable,*, Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate,Monthly;
 
-  Output:Variable,*,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate,Annual;
+  Output:Variable,*, Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate,Annual;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Timestep;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Timestep;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Hourly;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Hourly;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Daily;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Daily;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Monthly;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Monthly;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Annual;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Annual;
 
-  Output:Variable,*,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Timestep;
+  Output:Variable,*, Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Timestep;
 
-  Output:Variable,*,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Hourly;
+  Output:Variable,*, Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Hourly;
 
-  Output:Variable,*,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Daily;
+  Output:Variable,*, Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Daily;
 
-  Output:Variable,*,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Monthly;
+  Output:Variable,*, Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Monthly;
 
-  Output:Variable,*,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Annual;
+  Output:Variable,*, Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Annual;
 
   Output:Variable,*,Surface Outside Face Sunlit Area,Timestep;
 

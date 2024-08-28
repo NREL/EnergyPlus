@@ -70,7 +70,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
@@ -78,6 +77,7 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -115,7 +115,7 @@ namespace EnergyPlus::WaterThermalTanks {
 // WaterHeater:Mixed simulates a well-mixed, single-node tank for hot water applications.  Source (e.g. heat recovery) and
 // use plant connections are allowed.  A scheduled domestic hot water demand can also be specified
 // to directly utilize the hot water without use side connections.
-// WaterHeater:Stratified simulates a stratified, multi-node tank for hot water applicatons.
+// WaterHeater:Stratified simulates a stratified, multi-node tank for hot water applications.
 // The model shares most of the same capabilities as WaterHeater:Mixed
 // but also has up to two heating elements which can be operated in
 // a master-slave mode or simultaneous mode.
@@ -401,7 +401,7 @@ void HeatPumpWaterHeaterData::simulate(
     int DXINletNodeSav = this->DXCoilAirInletNode;
     int IHPFanIndexSav = this->FanNum;
     std::string IHPFanNameSave = this->FanName;
-    int IHPFanplaceSav = this->FanPlacement;
+    HVAC::FanPlace IHPFanplaceSav = this->fanPlace;
 
     if (this->bIsIHP) // pass the tank indexes to the IHP object
     {
@@ -426,11 +426,11 @@ void HeatPumpWaterHeaterData::simulate(
                                                                    state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).DWHCoilName,
                                                                    bDWHCoilReading);
             this->DXCoilAirInletNode = this->HeatPumpAirInletNode;
-        } else // default is to input outdoor fan to the the this
+        } else // default is to input outdoor fan to the HPWH
         {
             this->FanNum = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).IDFanID;
             this->FanName = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).IDFanName;
-            this->FanPlacement = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).IDFanPlace;
+            this->fanPlace = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).fanPlace;
         }
     }
 
@@ -443,7 +443,7 @@ void HeatPumpWaterHeaterData::simulate(
     this->DXCoilAirInletNode = DXINletNodeSav;
     this->FanNum = IHPFanIndexSav;
     this->FanName = IHPFanNameSave;
-    this->FanPlacement = IHPFanplaceSav;
+    this->fanPlace = IHPFanplaceSav;
     // reset caller loop num to 0 to mimic what plantloopequip was doing
     Tank.callerLoopNum = 0;
 }
@@ -1126,6 +1126,8 @@ bool getDesuperHtrInput(EnergyPlusData &state)
 
 bool getHPWaterHeaterInput(EnergyPlusData &state)
 {
+
+    static constexpr std::string_view routineName = "getHPWaterHeaterInput";
     bool ErrorsFound = false;
 
     int const NumPumpedCondenser = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
@@ -1185,7 +1187,9 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
-        // Copy those lists into C++ std::maps
+        ErrorObjectHeader eoh{routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
+
+        // Copy those lists into C++ std::maps // Why, no really why?  This is really dumb
         std::map<int, std::string> hpwhAlpha;
         std::map<int, Real64> hpwhNumeric;
         std::map<int, bool> hpwhAlphaBlank;
@@ -1497,16 +1501,16 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else {
-            if (!((HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped &&
+            if (!((HPWH.DXCoilTypeNum == HVAC::CoilDX_HeatPumpWaterHeaterPumped &&
                    HPWH.HPWHType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped) ||
-                  (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped &&
+                  (HPWH.DXCoilTypeNum == HVAC::CoilDX_HeatPumpWaterHeaterWrapped &&
                    HPWH.HPWHType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped))) {
                 ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 std::string ExpectedCoilType;
                 if (HPWH.HPWHType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped) {
-                    ExpectedCoilType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped);
+                    ExpectedCoilType = HVAC::cAllCoilTypes(HVAC::CoilDX_HeatPumpWaterHeaterPumped);
                 } else if (HPWH.HPWHType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped) {
-                    ExpectedCoilType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped);
+                    ExpectedCoilType = HVAC::cAllCoilTypes(HVAC::CoilDX_HeatPumpWaterHeaterWrapped);
                 } else {
                     assert(0);
                 }
@@ -1516,7 +1520,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // Dummy condenser Inlet/Outlet Nodes for wrapped tanks
-        if (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped) {
+        if (HPWH.DXCoilTypeNum == HVAC::CoilDX_HeatPumpWaterHeaterWrapped) {
             DXCoils::DXCoilData &Coil = state.dataDXCoils->DXCoil(HPWH.DXCoilNum);
 
             HPWH.InletNodeName1 = "DUMMY CONDENSER INLET " + Coil.Name;
@@ -1615,49 +1619,40 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         // Fan Name
         HPWH.FanName = hpwhAlpha[23 + nAlphaOffset];
-        HPWH.FanType = hpwhAlpha[22 + nAlphaOffset];
-
-        // check that the fan exists
-        bool errFlag = false;
-        ValidateComponent(state, HPWH.FanType, HPWH.FanName, errFlag, state.dataIPShortCut->cCurrentModuleObject);
 
         Real64 FanVolFlow = 0.0;
-        if (errFlag) {
-            ShowContinueError(state, format("...occurs in {}, unit=\"{}\".", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+        bool errFlag(false);
+
+        HPWH.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, hpwhAlpha[22 + nAlphaOffset]));
+
+        if ((HPWH.FanNum = Fans::GetFanIndex(state, HPWH.FanName)) == 0) {
+            ShowSevereItemNotFound(state, eoh, hpwhAlphaFieldNames[23 + nAlphaOffset], HPWH.FanName);
             ErrorsFound = true;
         } else {
-            if (Util::SameString(HPWH.FanType, "Fan:SystemModel")) {
-                HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, HPWH.FanName)); // call constructor
-                HPWH.FanNum = HVACFan::getFanObjectVectorIndex(state, HPWH.FanName);
-                FanVolFlow = state.dataHVACFan->fanObjs[HPWH.FanNum]->designAirVolFlowRate;
-
-            } else {
-                Fans::GetFanType(state, HPWH.FanName, HPWH.FanType_Num, errFlag, state.dataIPShortCut->cCurrentModuleObject, HPWH.Name);
-                Fans::GetFanIndex(state, HPWH.FanName, HPWH.FanNum, errFlag, state.dataIPShortCut->cCurrentModuleObject);
-                Fans::GetFanVolFlow(state, HPWH.FanNum, FanVolFlow);
-            }
+            assert(HPWH.fanType == state.dataFans->fans(HPWH.FanNum)->type);
+            FanVolFlow = state.dataFans->fans(HPWH.FanNum)->maxAirFlowRate;
         }
         // issue #5630, set fan info in coils.
         if (bIsVScoil) {
-            VariableSpeedCoils::setVarSpeedHPWHFanTypeNum(state, HPWH.DXCoilNum, HPWH.FanType_Num);
+            VariableSpeedCoils::setVarSpeedHPWHFanType(state, HPWH.DXCoilNum, HPWH.fanType);
             VariableSpeedCoils::setVarSpeedHPWHFanIndex(state, HPWH.DXCoilNum, HPWH.FanNum);
         } else {
+            // LOL
             DXCoils::SetDXCoolingCoilData(state, HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanName);
             DXCoils::SetDXCoolingCoilData(state, HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanNum);
             DXCoils::SetDXCoolingCoilData(
-                state, HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanType_Num);
+                state, HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.fanType);
         }
 
         if (errFlag) {
             ErrorsFound = true;
-        } else if (HPWH.FanType_Num != DataHVACGlobals::FanType_SimpleOnOff && HPWH.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+        } else if (HPWH.fanType != HVAC::FanType::OnOff && HPWH.fanType != HVAC::FanType::SystemModel) {
             ShowSevereError(state, format("{}=\"{}\": illegal fan type specified.", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(
                 state,
                 format(" The fan object ({}) type must be Fan:SystemModel or Fan:OnOff when used with a heat pump water heater.", HPWH.FanName));
             ErrorsFound = true;
-        } else if (!Util::SameString(HPWH.FanType, "Fan:OnOff") && !Util::SameString(HPWH.FanType, "Fan:SystemModel")) {
+        } else if (HPWH.fanType != HVAC::FanType::OnOff && HPWH.fanType != HVAC::FanType::SystemModel) {
             ShowSevereError(state, format("{}=\"{}\": illegal fan type specified.", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(state, format(" The {} must specify that the fan object", state.dataIPShortCut->cCurrentModuleObject));
             ShowContinueError(state,
@@ -1678,15 +1673,9 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // Fan Placement
-        if (Util::SameString(hpwhAlpha[24 + nAlphaOffset], "BlowThrough")) {
-            HPWH.FanPlacement = DataHVACGlobals::BlowThru;
-
-        } else if (Util::SameString(hpwhAlpha[24 + nAlphaOffset], "DrawThrough")) {
-            HPWH.FanPlacement = DataHVACGlobals::DrawThru;
-
-        } else {
-            ShowSevereError(state, format("{}=\"{}\", invalid ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
-            ShowContinueError(state, format("{}=\"{}\".", hpwhAlphaFieldNames[24 + nAlphaOffset], hpwhAlpha[24 + nAlphaOffset]));
+        HPWH.fanPlace = static_cast<HVAC::FanPlace>(getEnumValue(HVAC::fanPlaceNamesUC, hpwhAlpha[24 + nAlphaOffset]));
+        if (HPWH.fanPlace == HVAC::FanPlace::Invalid) {
+            ShowSevereInvalidKey(state, eoh, hpwhAlphaFieldNames[24 + nAlphaOffset], hpwhAlpha[24 + nAlphaOffset]);
             ErrorsFound = true;
         }
 
@@ -1998,10 +1987,6 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
         if ((HPWH.InletAirConfiguration == WTTAmbientTemp::TempZone || HPWH.InletAirConfiguration == WTTAmbientTemp::ZoneAndOA) &&
             HPWH.AmbientTempZone > 0) {
-            if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-                DataZoneEquipment::GetZoneEquipmentData(state);
-                state.dataZoneEquip->ZoneEquipInputsFilled = true;
-            }
             if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
                 bool FoundInletNode = false;
                 bool FoundOutletNode = false;
@@ -2068,7 +2053,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
-        if (HPWH.FanPlacement == DataHVACGlobals::DrawThru) {
+        if (HPWH.fanPlace == HVAC::FanPlace::DrawThru) {
             if (HPWH.OutletAirSplitterNode != 0) {
                 HPWH.FanOutletNode = HPWH.OutletAirSplitterNode;
             } else {
@@ -2078,7 +2063,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                     HPWH.FanOutletNode = HPWH.HeatPumpAirOutletNode;
                 }
             }
-        } else if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+        } else if (HPWH.fanPlace == HVAC::FanPlace::BlowThru) {
             // set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
             if (bIsVScoil) {
                 if (HPWH.bIsIHP) {
@@ -2092,17 +2077,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // check that fan outlet node is indeed correct
-        int FanOutletNodeNum(0);
-        if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            FanOutletNodeNum = state.dataHVACFan->fanObjs[HPWH.FanNum]->outletNodeNum;
-        } else {
-            errFlag = false;
-            FanOutletNodeNum = Fans::GetFanOutletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
-            if (errFlag) {
-                ShowContinueError(state, format("...occurs in unit=\"{}\".", HPWH.Name));
-                ErrorsFound = true;
-            }
-        }
+        int FanOutletNodeNum = state.dataFans->fans(HPWH.FanNum)->outletNodeNum;
+
         if (FanOutletNodeNum != HPWH.FanOutletNode) {
             ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(state, "Heat pump water heater fan outlet node name does not match next connected component.");
@@ -2114,17 +2090,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             }
             ErrorsFound = true;
         }
-        int FanInletNodeNum(0);
-        if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            FanInletNodeNum = state.dataHVACFan->fanObjs[HPWH.FanNum]->inletNodeNum;
-        } else {
-            errFlag = false;
-            FanInletNodeNum = Fans::GetFanInletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
-            if (errFlag) {
-                ShowContinueError(state, format("...occurs in unit=\"{}\".", HPWH.Name));
-                ErrorsFound = true;
-            }
-        }
+        int FanInletNodeNum = state.dataFans->fans(HPWH.FanNum)->inletNodeNum;
+
         int HPWHFanInletNodeNum(0);
         if (HPWH.InletAirMixerNode != 0) {
             HPWHFanInletNodeNum = HPWH.InletAirMixerNode;
@@ -2135,7 +2102,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 HPWHFanInletNodeNum = HPWH.HeatPumpAirInletNode;
             }
         }
-        if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+        if (HPWH.fanPlace == HVAC::FanPlace::BlowThru) {
             if (FanInletNodeNum != HPWHFanInletNodeNum) {
                 ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state, "Heat pump water heater fan inlet node name does not match previous connected component.");
@@ -2160,7 +2127,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         } else if (HPWH.DXCoilNum > 0) {
             DXCoilAirOutletNodeNum = state.dataDXCoils->DXCoil(HPWH.DXCoilNum).AirOutNode;
         }
-        if (HPWH.FanPlacement == DataHVACGlobals::DrawThru) {
+        if (HPWH.fanPlace == HVAC::FanPlace::DrawThru) {
             if (FanInletNodeNum != DXCoilAirOutletNodeNum) {
                 ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state, "Heat pump water heater fan inlet node name does not match previous connected component.");
@@ -2172,7 +2139,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 }
                 ErrorsFound = true;
             }
-        } else if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+        } else if (HPWH.fanPlace == HVAC::FanPlace::BlowThru) {
             int HPWHCoilOutletNodeNum(0);
             if (HPWH.OutletAirSplitterNode != 0) {
                 HPWHCoilOutletNodeNum = HPWH.OutletAirSplitterNode;
@@ -2201,7 +2168,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             state.dataLoopNodes->Node(HPWH.FanOutletNode).MassFlowRateMax =
                 HPWH.OperatingAirFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, 20.0, 0.0);
 
-        if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+        if (HPWH.fanPlace == HVAC::FanPlace::BlowThru) {
             if (HPWH.InletAirMixerNode > 0) {
                 HPWH.FanInletNode_str = hpwhAlpha[26 + nAlphaOffset];
                 HPWH.FanOutletNode_str = "UNDEFINED";
@@ -2262,7 +2229,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 state, HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWH.CoilInletNode_str, HPWH.CoilOutletNode_str);
         }
 
-        BranchNodeConnections::SetUpCompSets(state, HPWH.Type, HPWH.Name, HPWH.FanType, HPWH.FanName, HPWH.FanInletNode_str, HPWH.FanOutletNode_str);
+        BranchNodeConnections::SetUpCompSets(
+            state, HPWH.Type, HPWH.Name, HVAC::fanTypeNames[(int)HPWH.fanType], HPWH.FanName, HPWH.FanInletNode_str, HPWH.FanOutletNode_str);
 
         // Control Logic Flag
         std::string CtrlLogicFlag = hpwhAlphaBlank[29 + nAlphaOffset] ? "SIMULTANEOUS" : hpwhAlpha[29 + nAlphaOffset];
@@ -5019,109 +4987,109 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
                         "Chilled Water Thermal Storage Tank Temperature",
                         Constant::Units::C,
                         this->TankTempAvg,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Final Tank Temperature",
                         Constant::Units::C,
                         this->TankTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Tank Heat Gain Rate",
                         Constant::Units::W,
                         this->LossRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Tank Heat Gain Energy",
                         Constant::Units::J,
                         this->LossEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Use Side Mass Flow Rate",
                         Constant::Units::kg_s,
                         this->UseMassFlowRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Use Side Inlet Temperature",
                         Constant::Units::C,
                         this->UseInletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Use Side Outlet Temperature",
                         Constant::Units::C,
                         this->UseOutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Use Side Heat Transfer Rate",
                         Constant::Units::W,
                         this->UseRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Use Side Heat Transfer Energy",
                         Constant::Units::J,
                         this->UseEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Source Side Mass Flow Rate",
                         Constant::Units::kg_s,
                         this->SourceMassFlowRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Source Side Inlet Temperature",
                         Constant::Units::C,
                         this->SourceInletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Source Side Outlet Temperature",
                         Constant::Units::C,
                         this->SourceOutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Source Side Heat Transfer Rate",
                         Constant::Units::W,
                         this->SourceRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Source Side Heat Transfer Energy",
                         Constant::Units::J,
                         this->SourceEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
@@ -5131,8 +5099,8 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
                                 format("Chilled Water Thermal Storage Temperature Node {}", NodeNum),
                                 Constant::Units::C,
                                 this->Node(NodeNum).TempAvg,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         }
 
@@ -5141,8 +5109,8 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
                                 format("Chilled Water Thermal Storage Final Temperature Node {}", NodeNum),
                                 Constant::Units::C,
                                 this->Node(NodeNum).Temp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         }
     }
@@ -5203,328 +5171,328 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         "Water Heater Tank Temperature",
                         Constant::Units::C,
                         this->TankTempAvg,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Final Tank Temperature",
                         Constant::Units::C,
                         this->TankTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Heat Loss Rate",
                         Constant::Units::W,
                         this->LossRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Heat Loss Energy",
                         Constant::Units::J,
                         this->LossEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Use Side Mass Flow Rate",
                         Constant::Units::kg_s,
                         this->UseMassFlowRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Use Side Inlet Temperature",
                         Constant::Units::C,
                         this->UseInletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Use Side Outlet Temperature",
                         Constant::Units::C,
                         this->UseOutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Use Side Heat Transfer Rate",
                         Constant::Units::W,
                         this->UseRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Use Side Heat Transfer Energy",
                         Constant::Units::J,
                         this->UseEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Source Side Mass Flow Rate",
                         Constant::Units::kg_s,
                         this->SourceMassFlowRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Source Side Inlet Temperature",
                         Constant::Units::C,
                         this->SourceInletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Source Side Outlet Temperature",
                         Constant::Units::C,
                         this->SourceOutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Source Side Heat Transfer Rate",
                         Constant::Units::W,
                         this->SourceRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Source Side Heat Transfer Energy",
                         Constant::Units::J,
                         this->SourceEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
                         Constant::eResource::PlantLoopHeatingDemand,
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::Group::Plant,
+                        OutputProcessor::EndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
 
     SetupOutputVariable(state,
                         "Water Heater Off Cycle Parasitic Tank Heat Transfer Rate",
                         Constant::Units::W,
                         this->OffCycParaRateToTank,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Off Cycle Parasitic Tank Heat Transfer Energy",
                         Constant::Units::J,
                         this->OffCycParaEnergyToTank,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater On Cycle Parasitic Tank Heat Transfer Rate",
                         Constant::Units::W,
                         this->OnCycParaRateToTank,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater On Cycle Parasitic Tank Heat Transfer Energy",
                         Constant::Units::J,
                         this->OnCycParaEnergyToTank,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Total Demand Heat Transfer Rate",
                         Constant::Units::W,
                         this->TotalDemandRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Total Demand Heat Transfer Energy",
                         Constant::Units::J,
                         this->TotalDemandEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Heating Rate",
                         Constant::Units::W,
                         this->HeaterRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Heating Energy",
                         Constant::Units::J,
                         this->HeaterEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Unmet Demand Heat Transfer Rate",
                         Constant::Units::W,
                         this->UnmetRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Unmet Demand Heat Transfer Energy",
                         Constant::Units::J,
                         this->UnmetEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Venting Heat Transfer Rate",
                         Constant::Units::W,
                         this->VentRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Venting Heat Transfer Energy",
                         Constant::Units::J,
                         this->VentEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Net Heat Transfer Rate",
                         Constant::Units::W,
                         this->NetHeatTransferRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Net Heat Transfer Energy",
                         Constant::Units::J,
                         this->NetHeatTransferEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater Cycle On Count",
                         Constant::Units::None,
                         this->CycleOnCount,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Runtime Fraction",
                         Constant::Units::None,
                         this->RuntimeFraction,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Part Load Ratio",
                         Constant::Units::None,
                         this->PartLoadRatio,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         format("Water Heater {} Rate", Constant::eFuelNames[static_cast<int>(this->FuelType)]),
                         Constant::Units::W,
                         this->FuelRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         format("Water Heater {} Energy", Constant::eFuelNames[static_cast<int>(this->FuelType)]),
                         Constant::Units::J,
                         this->FuelEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
                         Constant::eFuel2eResource[(int)this->FuelType],
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::Group::Plant,
+                        OutputProcessor::EndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
 
     SetupOutputVariable(state,
                         format("Water Heater Off Cycle Parasitic {} Rate", Constant::eFuelNames[static_cast<int>(this->OffCycParaFuelType)]),
                         Constant::Units::W,
                         this->OffCycParaFuelRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         format("Water Heater Off Cycle Parasitic {} Energy", Constant::eFuelNames[static_cast<int>(this->OffCycParaFuelType)]),
                         Constant::Units::J,
                         this->OffCycParaFuelEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
                         Constant::eFuel2eResource[(int)this->OffCycParaFuelType],
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::Group::Plant,
+                        OutputProcessor::EndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
 
     SetupOutputVariable(state,
                         format("Water Heater On Cycle Parasitic {} Rate", Constant::eFuelNames[static_cast<int>(this->OnCycParaFuelType)]),
                         Constant::Units::W,
                         this->OnCycParaFuelRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         format("Water Heater On Cycle Parasitic {} Energy", Constant::eFuelNames[static_cast<int>(this->OnCycParaFuelType)]),
                         Constant::Units::J,
                         this->OnCycParaFuelEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
                         Constant::eFuel2eResource[(int)this->OnCycParaFuelType],
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::Group::Plant,
+                        OutputProcessor::EndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
 
     SetupOutputVariable(state,
                         "Water Heater Water Volume Flow Rate",
                         Constant::Units::m3_s,
                         this->VolFlowRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Water Volume",
                         Constant::Units::m3,
                         this->VolumeConsumed,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
                         Constant::eResource::Water,
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::Group::Plant,
+                        OutputProcessor::EndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
     SetupOutputVariable(state,
                         "Water Heater Mains Water Volume",
                         Constant::Units::m3,
                         this->VolumeConsumed,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
                         Constant::eResource::MainsWater,
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::Group::Plant,
+                        OutputProcessor::EndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
 
     if (this->HeatPumpNum > 0) {
         // CurrentModuleObject='WaterHeater:HeatPump:PumpedCondenser'
@@ -5533,58 +5501,58 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             "Water Heater Compressor Part Load Ratio",
                             Constant::Units::None,
                             HPWH.HeatingPLR,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             HPWH.Name);
         SetupOutputVariable(state,
                             "Water Heater Off Cycle Ancillary Electricity Rate",
                             Constant::Units::W,
                             HPWH.OffCycParaFuelRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             HPWH.Name);
         SetupOutputVariable(state,
                             "Water Heater Off Cycle Ancillary Electricity Energy",
                             Constant::Units::J,
                             HPWH.OffCycParaFuelEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             HPWH.Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Water Heater Parasitic",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::WaterSystem, // DHW
+                            "Water Heater Parasitic");
         SetupOutputVariable(state,
                             "Water Heater On Cycle Ancillary Electricity Rate",
                             Constant::Units::W,
                             HPWH.OnCycParaFuelRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             HPWH.Name);
         SetupOutputVariable(state,
                             "Water Heater On Cycle Ancillary Electricity Energy",
                             Constant::Units::J,
                             HPWH.OnCycParaFuelEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             HPWH.Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Water Heater Parasitic",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::WaterSystem, // DHW
+                            "Water Heater Parasitic");
         SetupOutputVariable(state,
                             "Water Heater Heat Pump Control Tank Temperature",
                             Constant::Units::C,
                             HPWH.ControlTempAvg,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             HPWH.Name);
         SetupOutputVariable(state,
                             "Water Heater Heat Pump Control Tank Final Temperature",
                             Constant::Units::C,
                             HPWH.ControlTempFinal,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             HPWH.Name);
     }
 
@@ -5594,88 +5562,88 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             "Water Heater Part Load Ratio",
                             Constant::Units::None,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).DesuperheaterPLR,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater On Cycle Parasitic Electricity Rate",
                             Constant::Units::W,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OnCycParaFuelRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater On Cycle Parasitic Electricity Energy",
                             Constant::Units::J,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OnCycParaFuelEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Water Heater Parasitic",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::WaterSystem, // DHW
+                            "Water Heater Parasitic");
         SetupOutputVariable(state,
                             "Water Heater Off Cycle Parasitic Electricity Rate",
                             Constant::Units::W,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OffCycParaFuelRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater Off Cycle Parasitic Electricity Energy",
                             Constant::Units::J,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OffCycParaFuelEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Water Heater Parasitic",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::WaterSystem, // DHW
+                            "Water Heater Parasitic");
         SetupOutputVariable(state,
                             "Water Heater Heat Reclaim Efficiency Modifier Multiplier",
                             Constant::Units::None,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).HEffFTempOutput,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater Pump Electricity Rate",
                             Constant::Units::W,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).PumpPower,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater Pump Electricity Energy",
                             Constant::Units::J,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).PumpEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Desuperheater Pump",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::WaterSystem, // DHW
+                            "Desuperheater Pump");
         SetupOutputVariable(state,
                             "Water Heater Heating Rate",
                             Constant::Units::W,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).HeaterRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater Heating Energy",
                             Constant::Units::J,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).HeaterEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Water Heater",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::WaterSystem, // DHW
+                            "Water Heater");
     }
 
     // Setup report variables for WaterHeater:Stratified
@@ -5686,60 +5654,60 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             "Water Heater Heater 1 Heating Rate",
                             Constant::Units::W,
                             this->HeaterRate1,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Water Heater Heater 2 Heating Rate",
                             Constant::Units::W,
                             this->HeaterRate2,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Water Heater Heater 1 Heating Energy",
                             Constant::Units::J,
                             this->HeaterEnergy1,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
         SetupOutputVariable(state,
                             "Water Heater Heater 2 Heating Energy",
                             Constant::Units::J,
                             this->HeaterEnergy2,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Water Heater Heater 1 Cycle On Count",
                             Constant::Units::None,
                             this->CycleOnCount1,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
         SetupOutputVariable(state,
                             "Water Heater Heater 2 Cycle On Count",
                             Constant::Units::None,
                             this->CycleOnCount2,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Water Heater Heater 1 Runtime Fraction",
                             Constant::Units::None,
                             this->RuntimeFraction1,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Water Heater Heater 2 Runtime Fraction",
                             Constant::Units::None,
                             this->RuntimeFraction2,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
@@ -5747,8 +5715,8 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                                 format("Water Heater Temperature Node {}", NodeNum),
                                 Constant::Units::C,
                                 this->Node(NodeNum).TempAvg,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         }
 
@@ -5757,8 +5725,8 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                                 format("Water Heater Final Temperature Node {}", NodeNum),
                                 Constant::Units::C,
                                 this->Node(NodeNum).Temp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         }
     }
@@ -6697,8 +6665,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                       std::string(),
                                                       state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                                      0,
-                                                      DataHVACGlobals::CompressorOperation::Off,
+                                                      HVAC::FanOp::Invalid, // Invalid instead of off?
+                                                      HVAC::CompressorOp::Off,
                                                       0.0,
                                                       1,
                                                       0.0,
@@ -6727,12 +6695,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             }
 
             // check fan flow rate, should be larger than the max flow rate of the VS coil
-            Real64 FanVolFlow = 0.0;
-            if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                FanVolFlow = state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->designAirVolFlowRate;
-            } else if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
-                Fans::GetFanVolFlow(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum, FanVolFlow);
-            }
+            Real64 FanVolFlow = state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->maxAirFlowRate;
 
             if (FanVolFlow < state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHAirVolFlowRate(
                                  state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed)) { // but this is the not the scaled mas flow
@@ -8697,7 +8660,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
             switch (DesupHtr.Mode) {
             case TankOperatingMode::Heating:
                 // Calculate until consistency of desuperheater and tank source side energy transfer achieved
-                while ((std::abs(PreTankAvgTemp - NewTankAvgTemp) > DataHVACGlobals::SmallTempDiff || firstThrough) && count < max_count) {
+                while ((std::abs(PreTankAvgTemp - NewTankAvgTemp) > HVAC::SmallTempDiff || firstThrough) && count < max_count) {
                     count++;
                     firstThrough = false;
                     PreTankAvgTemp = this->TankTempAvg;
@@ -8824,7 +8787,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                     } else {
                         partLoadRatio = DesupHtr.DXSysPLR;
                     }
-                    while ((std::abs(PreTankAvgTemp - NewTankAvgTemp) > DataHVACGlobals::SmallTempDiff || firstThrough) && count < max_count) {
+                    while ((std::abs(PreTankAvgTemp - NewTankAvgTemp) > HVAC::SmallTempDiff || firstThrough) && count < max_count) {
                         count++;
                         firstThrough = false;
                         PreTankAvgTemp = this->TankTempAvg;
@@ -9036,7 +8999,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     int OutletAirSplitterNode = HeatPump.OutletAirSplitterNode;
     int DXCoilAirInletNode = HeatPump.DXCoilAirInletNode;
     state.dataWaterThermalTanks->hpPartLoadRatio = 0.0;
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::Off; // DX compressor operation; 1=on, 0=off
+    HVAC::CompressorOp compressorOp = HVAC::CompressorOp::Off; // DX compressor operation; 1=on, 0=off
     HeatPump.OnCycParaFuelRate = 0.0;
     HeatPump.OnCycParaFuelEnergy = 0.0;
     HeatPump.OffCycParaFuelRate = 0.0;
@@ -9087,19 +9050,16 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             // set the SCWH mode
             Real64 SpeedRatio = 1.0; // speed ratio for interpolating between two speed levels
             int SpeedNum = 1;
-            if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+            if (HeatPump.fanPlace == HVAC::FanPlace::BlowThru) {
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
                 this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                 if (HeatPump.bIsIHP)
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               "",
                                                               VSCoilNum,
-                                                              DataHVACGlobals::CycFanCycCoil,
-                                                              DataHVACGlobals::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9110,8 +9070,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               HeatPump.DXCoilName,
                                                               VSCoilNum,
-                                                              DataHVACGlobals::CycFanCycCoil,
-                                                              DataHVACGlobals::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9124,8 +9084,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               "",
                                                               VSCoilNum,
-                                                              DataHVACGlobals::CycFanCycCoil,
-                                                              DataHVACGlobals::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9136,19 +9096,15 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               HeatPump.DXCoilName,
                                                               VSCoilNum,
-                                                              DataHVACGlobals::CycFanCycCoil,
-                                                              DataHVACGlobals::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
                                                               0.0,
                                                               0.0,
                                                               1.0);
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
             }
 
             // set the DWH mode
@@ -9157,18 +9113,15 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
                 if (VSCoilNum > 0) // if DWH coil exists
                 {
-                    if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
-                        if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                        } else {
-                            Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                        }
+                    if (HeatPump.fanPlace == HVAC::FanPlace::BlowThru) {
+                        state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
                         this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                   "",
                                                                   VSCoilNum,
-                                                                  DataHVACGlobals::CycFanCycCoil,
-                                                                  DataHVACGlobals::CompressorOperation::On,
+                                                                  HVAC::FanOp::Cycling,
+                                                                  HVAC::CompressorOp::On,
                                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -9180,50 +9133,39 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                   "",
                                                                   VSCoilNum,
-                                                                  DataHVACGlobals::CycFanCycCoil,
-                                                                  DataHVACGlobals::CompressorOperation::On,
+                                                                  HVAC::FanOp::Cycling,
+                                                                  HVAC::CompressorOp::On,
                                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                                   SpeedNum,
                                                                   SpeedRatio,
                                                                   0.0,
                                                                   0.0,
                                                                   1.0);
-                        if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                        } else {
-                            Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                        }
+                        state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
                     }
                 }
             }
 
         } else {
-            if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+            if (HeatPump.fanPlace == HVAC::FanPlace::BlowThru) {
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
                 DXCoils::SimDXCoil(state,
                                    HeatPump.DXCoilName,
-                                   CompressorOp,
+                                   compressorOp,
                                    FirstHVACIteration,
                                    HeatPump.DXCoilNum,
-                                   DataHVACGlobals::CycFanCycCoil,
+                                   HVAC::FanOp::Cycling,
                                    state.dataWaterThermalTanks->hpPartLoadRatio);
             } else {
                 DXCoils::SimDXCoil(state,
                                    HeatPump.DXCoilName,
-                                   CompressorOp,
+                                   compressorOp,
                                    FirstHVACIteration,
                                    HeatPump.DXCoilNum,
-                                   DataHVACGlobals::CycFanCycCoil,
+                                   HVAC::FanOp::Cycling,
                                    state.dataWaterThermalTanks->hpPartLoadRatio);
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
             }
         }
 
@@ -9474,8 +9416,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               "",
                                                               VSCoilNum,
-                                                              DataHVACGlobals::CycFanCycCoil,
-                                                              DataHVACGlobals::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9492,8 +9434,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     IntegratedHeatPump::SimIHP(state,
                                                HeatPump.DXCoilName,
                                                HeatPump.DXCoilNum,
-                                               DataHVACGlobals::CycFanCycCoil,
-                                               DataHVACGlobals::CompressorOperation::On,
+                                               HVAC::FanOp::Cycling,
+                                               HVAC::CompressorOp::On,
                                                state.dataWaterThermalTanks->hpPartLoadRatio,
                                                SpeedNum,
                                                SpeedRatio,
@@ -9521,8 +9463,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
-                                                          DataHVACGlobals::CycFanCycCoil,
-                                                          DataHVACGlobals::CompressorOperation::On,
+                                                          HVAC::FanOp::Cycling,
+                                                          HVAC::CompressorOp::On,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -9623,8 +9565,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                         IntegratedHeatPump::SimIHP(state,
                                                    HeatPump.DXCoilName,
                                                    HeatPump.DXCoilNum,
-                                                   DataHVACGlobals::CycFanCycCoil,
-                                                   DataHVACGlobals::CompressorOperation::On,
+                                                   HVAC::FanOp::Cycling,
+                                                   HVAC::CompressorOp::On,
                                                    state.dataWaterThermalTanks->hpPartLoadRatio,
                                                    SpeedNum,
                                                    SpeedRatio,
@@ -9638,8 +9580,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               HeatPump.DXCoilName,
                                                               HeatPump.DXCoilNum,
-                                                              DataHVACGlobals::CycFanCycCoil,
-                                                              DataHVACGlobals::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9669,8 +9611,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                         IntegratedHeatPump::SimIHP(state,
                                                    HeatPump.DXCoilName,
                                                    HeatPump.DXCoilNum,
-                                                   DataHVACGlobals::CycFanCycCoil,
-                                                   DataHVACGlobals::CompressorOperation::On,
+                                                   HVAC::FanOp::Cycling,
+                                                   HVAC::CompressorOp::On,
                                                    state.dataWaterThermalTanks->hpPartLoadRatio,
                                                    SpeedNum,
                                                    SpeedRatio,
@@ -9683,8 +9625,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                   HeatPump.DXCoilName,
                                                                   HeatPump.DXCoilNum,
-                                                                  DataHVACGlobals::CycFanCycCoil,
-                                                                  DataHVACGlobals::CompressorOperation::On,
+                                                                  HVAC::FanOp::Cycling,
+                                                                  HVAC::CompressorOp::On,
                                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -9793,8 +9735,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     IntegratedHeatPump::SimIHP(state,
                                                HeatPump.DXCoilName,
                                                HeatPump.DXCoilNum,
-                                               DataHVACGlobals::CycFanCycCoil,
-                                               DataHVACGlobals::CompressorOperation::On,
+                                               HVAC::FanOp::Cycling,
+                                               HVAC::CompressorOp::On,
                                                state.dataWaterThermalTanks->hpPartLoadRatio,
                                                SpeedNum,
                                                SpeedRatio,
@@ -9807,8 +9749,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               HeatPump.DXCoilName,
                                                               HeatPump.DXCoilNum,
-                                                              DataHVACGlobals::CycFanCycCoil,
-                                                              DataHVACGlobals::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9835,7 +9777,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 }
                 // update inlet temp
                 state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
-                if (std::abs(state.dataLoopNodes->Node(HPWaterInletNode).Temp - HPWHCondInletNodeLast) < DataHVACGlobals::SmallTempDiff) break;
+                if (std::abs(state.dataLoopNodes->Node(HPWaterInletNode).Temp - HPWHCondInletNodeLast) < HVAC::SmallTempDiff) break;
                 HPWHCondInletNodeLast = state.dataLoopNodes->Node(HPWaterInletNode).Temp;
             }
 
@@ -9897,18 +9839,15 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
         if (HeatPump.bIsIHP) {
             // pass node information using resulting PLR
-            if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
+            if (HeatPump.fanPlace == HVAC::FanPlace::BlowThru) {
                 //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
                 IntegratedHeatPump::SimIHP(state,
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
-                                           DataHVACGlobals::CycFanCycCoil,
-                                           CompressorOp,
+                                           HVAC::FanOp::Cycling,
+                                           compressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -9917,16 +9856,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                            true,
                                            false,
                                            1.0);
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
                 IntegratedHeatPump::SimIHP(state,
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
-                                           DataHVACGlobals::CycFanCycCoil,
-                                           CompressorOp,
+                                           HVAC::FanOp::Cycling,
+                                           compressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -9940,8 +9876,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 IntegratedHeatPump::SimIHP(state,
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
-                                           DataHVACGlobals::CycFanCycCoil,
-                                           CompressorOp,
+                                           HVAC::FanOp::Cycling,
+                                           compressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -9950,16 +9886,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                            true,
                                            false,
                                            1.0);
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
                 IntegratedHeatPump::SimIHP(state,
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
-                                           DataHVACGlobals::CycFanCycCoil,
-                                           CompressorOp,
+                                           HVAC::FanOp::Cycling,
+                                           compressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -9968,42 +9901,33 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                            true,
                                            false,
                                            1.0);
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
             }
         } else {
             // pass node information using resulting PLR
-            if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
+            if (HeatPump.fanPlace == HVAC::FanPlace::BlowThru) {
                 //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
-                                                          DataHVACGlobals::CycFanCycCoil,
-                                                          CompressorOp,
+                                                          HVAC::FanOp::Cycling,
+                                                          compressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
                                                           0.0,
                                                           0.0,
                                                           1.0);
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
-                                                          DataHVACGlobals::CycFanCycCoil,
-                                                          CompressorOp,
+                                                          HVAC::FanOp::Cycling,
+                                                          compressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -10015,92 +9939,77 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
-                                                          DataHVACGlobals::CycFanCycCoil,
-                                                          CompressorOp,
+                                                          HVAC::FanOp::Cycling,
+                                                          compressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
                                                           0.0,
                                                           0.0,
                                                           1.0);
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
-                                                          DataHVACGlobals::CycFanCycCoil,
-                                                          CompressorOp,
+                                                          HVAC::FanOp::Cycling,
+                                                          compressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
                                                           0.0,
                                                           0.0,
                                                           1.0);
-                if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-                } else {
-                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-                }
+
+                state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
             }
         }
     } else { // single speed
 
         // pass node information using resulting PLR
-        if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
+        if (HeatPump.fanPlace == HVAC::FanPlace::BlowThru) {
             //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
-            if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-            } else {
-                Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-            }
+            state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompressorOp,
+                               compressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
-                               DataHVACGlobals::CycFanCycCoil,
+                               HVAC::FanOp::Cycling,
                                state.dataWaterThermalTanks->hpPartLoadRatio);
-            if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-            } else {
-                Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-            }
+
+            state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompressorOp,
+                               compressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
-                               DataHVACGlobals::CycFanCycCoil,
+                               HVAC::FanOp::Cycling,
                                state.dataWaterThermalTanks->hpPartLoadRatio);
         } else {
             //   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompressorOp,
+                               compressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
-                               DataHVACGlobals::CycFanCycCoil,
+                               HVAC::FanOp::Cycling,
                                state.dataWaterThermalTanks->hpPartLoadRatio);
-            if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-            } else {
-                Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-            }
+
+            state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
+
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompressorOp,
+                               compressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
-                               DataHVACGlobals::CycFanCycCoil,
+                               HVAC::FanOp::Cycling,
                                state.dataWaterThermalTanks->hpPartLoadRatio);
-            if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
-            } else {
-                Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
-            }
+
+            state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
         }
     }
 
@@ -10219,7 +10128,7 @@ void WaterThermalTankData::ConvergeSingleSpeedHPWHCoilAndTank(EnergyPlusData &st
         this->CalcWaterThermalTank(state);
         state.dataLoopNodes->Node(Coil.WaterInNode).Temp = this->SourceOutletTemp;
 
-        if (std::abs(this->SourceOutletTemp - PrevTankTemp) < DataHVACGlobals::SmallTempDiff) {
+        if (std::abs(this->SourceOutletTemp - PrevTankTemp) < HVAC::SmallTempDiff) {
             break;
         }
 
@@ -10285,25 +10194,16 @@ void WaterThermalTankData::SetVSHPWHFlowRates(EnergyPlusData &state,
     }
 
     // put fan component first, regardless placement, to calculate fan power
-    int FanInNode;
-    if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-        FanInNode = state.dataHVACFan->fanObjs[HPWH.FanNum]->inletNodeNum;
-    } else {
-        FanInNode = state.dataFans->Fan(HPWH.FanNum).InletNodeNum;
-    }
+    int FanInNode = state.dataFans->fans(HPWH.FanNum)->inletNodeNum;
 
     state.dataLoopNodes->Node(FanInNode).MassFlowRate = state.dataWaterThermalTanks->mdotAir;
     state.dataLoopNodes->Node(FanInNode).MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
     state.dataLoopNodes->Node(FanInNode).MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
-    if (HPWH.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-        state.dataFans->Fan(HPWH.FanNum).MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
+    if (HPWH.fanType != HVAC::FanType::SystemModel) {
+        state.dataFans->fans(HPWH.FanNum)->massFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
     } // system fan will use the inlet node max avail.
 
-    if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-        state.dataHVACFan->fanObjs[HPWH.FanNum]->simulate(state, _, _);
-    } else {
-        Fans::SimulateFanComponents(state, HPWH.FanName, FirstHVACIteration, HPWH.FanNum);
-    }
+    state.dataFans->fans(HPWH.FanNum)->simulate(state, FirstHVACIteration, _, _);
 }
 
 Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
@@ -10343,8 +10243,8 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
         IntegratedHeatPump::SimIHP(state,
                                    state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
                                    state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                   DataHVACGlobals::CycFanCycCoil,
-                                   DataHVACGlobals::CompressorOperation::On,
+                                   HVAC::FanOp::Cycling,
+                                   HVAC::CompressorOp::On,
                                    state.dataWaterThermalTanks->hpPartLoadRatio,
                                    SpeedNum,
                                    SpeedRatio,
@@ -10357,8 +10257,8 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                   state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
                                                   state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                                  DataHVACGlobals::CycFanCycCoil,
-                                                  DataHVACGlobals::CompressorOperation::On,
+                                                  HVAC::FanOp::Cycling,
+                                                  HVAC::CompressorOp::On,
                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                   SpeedNum,
                                                   SpeedRatio,
@@ -10692,7 +10592,7 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
         break;
     }
 
-    if (FlowResult < DataHVACGlobals::VerySmallMassFlow) FlowResult = 0.0; // Catch underflow problems
+    if (FlowResult < HVAC::VerySmallMassFlow) FlowResult = 0.0; // Catch underflow problems
 
     return FlowResult;
 }
@@ -10795,7 +10695,7 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
             int PltSizNum = this->UseSidePlantSizNum;
             if (PltSizNum > 0) { // we have a Plant Sizing Object
                 if (this->UseSidePlantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) {
-                    if (PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                             this->UseDesignVolFlowRate = PlantSizData(PltSizNum).DesVolFlowRate;
                         } else {
@@ -10858,7 +10758,7 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
             int PltSizNum = this->SourceSidePlantSizNum;
             if (PltSizNum > 0) {
                 if (this->SrcSidePlantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) {
-                    if (PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                             this->SourceDesignVolFlowRate = PlantSizData(PltSizNum).DesVolFlowRate;
                         } else {
@@ -11302,9 +11202,6 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
 
     static constexpr std::string_view RoutineName("SizeTankForSupplySide");
 
-    Real64 Tstart = 14.44;
-    Real64 Tfinish = 57.22;
-
     Real64 tmpTankVolume = this->Volume;
     Real64 tmpMaxCapacity = this->MaxCapacity;
 
@@ -11322,8 +11219,11 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
         }
         if (this->MaxCapacityWasAutoSized) {
             if (this->Sizing.RecoveryTime > 0.0) {
-                Real64 rho;
-                Real64 Cp;
+                Real64 rho = 0.0;
+                Real64 Cp = 0.0;
+                constexpr Real64 Tstart = 14.44;
+                constexpr Real64 Tfinish = 57.22;
+
                 if (this->SrcSidePlantLoc.loopNum > 0) {
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->SrcSidePlantLoc.loopNum).FluidName,
@@ -11343,8 +11243,7 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
                                  (this->Sizing.RecoveryTime * Constant::SecInHour); // m3 | kg/m3 | J/Kg/K | K | seconds
             } else {
                 ShowFatalError(
-                    state,
-                    format("SizeTankForSupplySide: Tank=\"{}\", requested sizing for max capacity but entered Recovery Time is zero.", this->Name));
+                    state, format("{}: Tank=\"{}\", requested sizing for max capacity but entered Recovery Time is zero.", RoutineName, this->Name));
             }
         }
 
@@ -11360,12 +11259,31 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
     } else if (this->Sizing.DesignMode == SizingMode::PerSolarColArea) {
 
         this->Sizing.TotalSolarCollectorArea = 0.0;
+
         for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
-            this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
+            auto const &collector = state.dataSolarCollectors->Collector(CollectorNum);
+            this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(collector.Surface).Area;
         }
 
-        if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
-        if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 0.0;
+        for (int CollectorNum = 1; CollectorNum <= state.dataPhotovoltaicThermalCollector->NumPVT; ++CollectorNum) {
+            auto const &collector = state.dataPhotovoltaicThermalCollector->PVT(CollectorNum);
+            this->Sizing.TotalSolarCollectorArea += collector.AreaCol;
+        }
+
+        if (this->VolumeWasAutoSized) {
+            if (this->Sizing.TotalSolarCollectorArea > 0) {
+                tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
+            } else {
+                ShowFatalError(state,
+                               format("{}: Tank=\"{}\", requested sizing for volume with PerSolarCollectorArea but total found "
+                                      "area of Collectors is zero.",
+                                      RoutineName,
+                                      this->Name));
+            }
+        }
+        if (this->MaxCapacityWasAutoSized) {
+            tmpMaxCapacity = 0.0;
+        }
         if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             this->Volume = tmpTankVolume;
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -11386,7 +11304,9 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
         }
     }
 
-    if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
+    if (this->MaxCapacityWasAutoSized) {
+        this->setBackupElementCapacity(state);
+    }
 
     if ((this->VolumeWasAutoSized) && (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) &&
         state.dataPlnt->PlantFirstSizesOkayToFinalize) { // might set height
@@ -11678,8 +11598,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                 } else {
                     ShowFatalError(
                         state,
-                        format("SizeStandAloneWaterHeater: Tank=\"{}\", requested sizing for max capacity but entered Recovery Time is zero.",
-                               this->Name));
+                        format("{}: Tank=\"{}\", requested sizing for max capacity but entered Recovery Time is zero.", RoutineName, this->Name));
                 }
                 this->MaxCapacity = tmpMaxCapacity;
                 BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
@@ -11901,13 +11820,34 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             break;
         }
         case SizingMode::PerSolarColArea: {
+
             this->Sizing.TotalSolarCollectorArea = 0.0;
+
             for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
-                this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
+                auto const &collector = state.dataSolarCollectors->Collector(CollectorNum);
+                this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(collector.Surface).Area;
             }
 
-            if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
-            if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 0.0;
+            for (int CollectorNum = 1; CollectorNum <= state.dataPhotovoltaicThermalCollector->NumPVT; ++CollectorNum) {
+                auto const &collector = state.dataPhotovoltaicThermalCollector->PVT(CollectorNum);
+                this->Sizing.TotalSolarCollectorArea += collector.AreaCol;
+            }
+
+            if (this->VolumeWasAutoSized) {
+                if (this->Sizing.TotalSolarCollectorArea > 0) {
+                    tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
+                } else {
+                    ShowFatalError(state,
+                                   format("{}: Tank=\"{}\", requested sizing for volume with PerSolarCollectorArea but total found "
+                                          "area of Collectors is zero.",
+                                          RoutineName,
+                                          this->Name));
+                }
+            }
+            if (this->MaxCapacityWasAutoSized) {
+                tmpMaxCapacity = 0.0;
+            }
+
             if (this->VolumeWasAutoSized) {
                 this->Volume = tmpTankVolume;
                 BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
@@ -11919,7 +11859,9 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             break;
         }
         default:
-            if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
+            if (this->MaxCapacityWasAutoSized) {
+                this->setBackupElementCapacity(state);
+            }
             break;
         }
     }
@@ -12136,42 +12078,31 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                         MdotWater,
                         true);
                     //       simulate the HPWH coil/fan to find heating capacity
-                    if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanPlacement == DataHVACGlobals::BlowThru) {
+                    if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).fanPlace == HVAC::FanPlace::BlowThru) {
                         //   simulate fan and DX coil twice
-                        if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->simulate(state, _, _);
-                        } else {
-                            Fans::SimulateFanComponents(state,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanName,
-                                                        true,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum);
-                        }
+                        state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
+
                         VariableSpeedCoils::SimVariableSpeedCoils(
                             state,
                             VSCoilName,
                             VSCoilNum,
-                            DataHVACGlobals::CycFanCycCoil,
-                            DataHVACGlobals::CompressorOperation::On,
+                            HVAC::FanOp::Cycling,
+                            HVAC::CompressorOp::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                             1.0,
                             0.0,
                             0.0,
                             1.0);
-                        if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->simulate(state, _, _);
-                        } else {
-                            Fans::SimulateFanComponents(state,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanName,
-                                                        true,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum);
-                        }
+
+                        state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
+
                         VariableSpeedCoils::SimVariableSpeedCoils(
                             state,
                             VSCoilName,
                             VSCoilNum,
-                            DataHVACGlobals::CycFanCycCoil,
-                            DataHVACGlobals::CompressorOperation::On,
+                            HVAC::FanOp::Cycling,
+                            HVAC::CompressorOp::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                             1.0,
@@ -12184,42 +12115,31 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                             state,
                             VSCoilName,
                             VSCoilNum,
-                            DataHVACGlobals::CycFanCycCoil,
-                            DataHVACGlobals::CompressorOperation::On,
+                            HVAC::FanOp::Cycling,
+                            HVAC::CompressorOp::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                             1.0,
                             0.0,
                             0.0,
                             1.0);
-                        if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->simulate(state, _, _);
-                        } else {
-                            Fans::SimulateFanComponents(state,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanName,
-                                                        true,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum);
-                        }
+
+                        state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
+
                         VariableSpeedCoils::SimVariableSpeedCoils(
                             state,
                             VSCoilName,
                             VSCoilNum,
-                            DataHVACGlobals::CycFanCycCoil,
-                            DataHVACGlobals::CompressorOperation::On,
+                            HVAC::FanOp::Cycling,
+                            HVAC::CompressorOp::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                             1.0,
                             0.0,
                             0.0,
                             1.0);
-                        if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->simulate(state, _, _);
-                        } else {
-                            Fans::SimulateFanComponents(state,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanName,
-                                                        true,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum);
-                        }
+
+                        state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
                     }
 
                     this->MaxCapacity = state.dataVariableSpeedCoils->VSHPWHHeatingCapacity;
@@ -12228,67 +12148,50 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                 } else {
                     bIsVSCoil = false;
                     //       simulate the HPWH coil/fan to find heating capacity
-                    if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanPlacement == DataHVACGlobals::BlowThru) {
+                    if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).fanPlace == HVAC::FanPlace::BlowThru) {
                         if (FirstTimeFlag) { // first time DXCoils::DXCoil is called, it's sized at the RatedCondenserWaterInlet temp, size and
                                              // reset water inlet temp. If already sized, no harm.
-                            if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->simulate(state, _, _);
-                            } else {
-                                Fans::SimulateFanComponents(state,
-                                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanName,
-                                                            true,
-                                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum);
-                            }
+                            state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
+
                             DXCoils::SimDXCoil(state,
                                                state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                               DataHVACGlobals::CompressorOperation::On,
+                                               HVAC::CompressorOp::On,
                                                true,
                                                state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                               DataHVACGlobals::CycFanCycCoil,
+                                               HVAC::FanOp::Cycling,
                                                1.0);
                             state.dataLoopNodes->Node(state.dataWaterThermalTanks->HPWaterHeater(HPNum).CondWaterInletNode).Temp = this->TankTemp;
                         }
                         // ?? should only need to call twice if PLR<1 since this might affect OnOffFanPartLoadFraction which impacts fan energy.
                         // PLR=1 here.
-                        if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->simulate(state, _, _);
-                        } else {
-                            Fans::SimulateFanComponents(state,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanName,
-                                                        true,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum);
-                        }
+                        state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
+
                         DXCoils::SimDXCoil(state,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                           DataHVACGlobals::CompressorOperation::On,
+                                           HVAC::CompressorOp::On,
                                            true,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                           DataHVACGlobals::CycFanCycCoil,
+                                           HVAC::FanOp::Cycling,
                                            1.0);
-                        if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->simulate(state, _, _);
-                        } else {
-                            Fans::SimulateFanComponents(state,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanName,
-                                                        true,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum);
-                        }
+
+                        state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
+
                         DXCoils::SimDXCoil(state,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                           DataHVACGlobals::CompressorOperation::On,
+                                           HVAC::CompressorOp::On,
                                            true,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                           DataHVACGlobals::CycFanCycCoil,
+                                           HVAC::FanOp::Cycling,
                                            1.0);
                     } else {
                         if (FirstTimeFlag) { // first time DXCoils::DXCoil is called, it's sized at the RatedCondenserWaterInlet temp, size and
                                              // reset water inlet temp. If already sized, no harm.
                             DXCoils::SimDXCoil(state,
                                                state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                               DataHVACGlobals::CompressorOperation::On,
+                                               HVAC::CompressorOp::On,
                                                true,
                                                state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                               DataHVACGlobals::CycFanCycCoil,
+                                               HVAC::FanOp::Cycling,
                                                1.0);
                             state.dataLoopNodes->Node(state.dataWaterThermalTanks->HPWaterHeater(HPNum).CondWaterInletNode).Temp = this->TankTemp;
                         }
@@ -12296,34 +12199,23 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                         // PLR=1 here.
                         DXCoils::SimDXCoil(state,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                           DataHVACGlobals::CompressorOperation::On,
+                                           HVAC::CompressorOp::On,
                                            true,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                           DataHVACGlobals::CycFanCycCoil,
+                                           HVAC::FanOp::Cycling,
                                            1.0);
-                        if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->simulate(state, _, _);
-                        } else {
-                            Fans::SimulateFanComponents(state,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanName,
-                                                        true,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum);
-                        }
+
+                        state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
+
                         DXCoils::SimDXCoil(state,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                           DataHVACGlobals::CompressorOperation::On,
+                                           HVAC::CompressorOp::On,
                                            true,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                           DataHVACGlobals::CycFanCycCoil,
+                                           HVAC::FanOp::Cycling,
                                            1.0);
-                        if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->simulate(state, _, _);
-                        } else {
-                            Fans::SimulateFanComponents(state,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanName,
-                                                        true,
-                                                        state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum);
-                        }
+
+                        state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
                     }
 
                     this->MaxCapacity = state.dataDXCoils->HPWHHeatingCapacity;
@@ -12584,17 +12476,7 @@ bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumbe
             }
 
             // Get fan inlet node index
-            bool ErrorsFound{false};
-            int FanInletNodeIndex(0);
-            if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                FanInletNodeIndex = state.dataHVACFan->fanObjs[HPWH.FanNum]->inletNodeNum;
-            } else {
-                FanInletNodeIndex = Fans::GetFanInletNode(state, HPWH.FanType, HPWH.FanName, ErrorsFound);
-                if (ErrorsFound) {
-                    ShowWarningError(state, format("Could not retrieve fan outlet node for this unit=\"{}\".", HPWH.Name));
-                    ErrorsFound = true;
-                }
-            }
+            int FanInletNodeIndex = state.dataFans->fans(HPWH.FanNum)->inletNodeNum;
 
             // Fan inlet node
             if (NodeNumber == FanInletNodeIndex) {
@@ -12623,6 +12505,22 @@ bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumbe
     }
 
     return HeatPumpWaterHeaterNodeException;
+}
+
+int getHeatPumpWaterHeaterIndex(EnergyPlusData &state, std::string_view CompName)
+{
+    if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
+        GetWaterThermalTankInput(state);
+        state.dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
+    }
+
+    for (int HPNum = 1; HPNum <= state.dataWaterThermalTanks->numHeatPumpWaterHeater; ++HPNum) {
+        if (Util::SameString(state.dataWaterThermalTanks->HPWaterHeater(HPNum).Name, CompName)) {
+            return HPNum;
+        }
+    }
+
+    return 0;
 }
 
 } // namespace EnergyPlus::WaterThermalTanks
