@@ -1082,83 +1082,78 @@ void UpdateAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   November 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // Using/Aliasing
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int OutletNode;
-    int InletNode;
-    int ZoneNode;
-    int InletNodeNum;
-    int IndNum; // the induced air outlet index in ZoneRetPlenCond
-
-    auto &Node(state.dataLoopNodes->Node);
-
-    OutletNode = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode;
-    InletNode = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletNode(1);
-    ZoneNode = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum;
+    int OutletNode = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode;
+    auto &outletNode = state.dataLoopNodes->Node(OutletNode);
+    int InletNode = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletNode(1);
+    auto const &inletNode = state.dataLoopNodes->Node(InletNode);
+    int ZoneNode = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum;
+    auto &zoneNode = state.dataLoopNodes->Node(ZoneNode);
 
     // Set the outlet air nodes of the ZonePlenum
-    Node(OutletNode).MassFlowRate = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRate;
-    Node(OutletNode).MassFlowRateMaxAvail = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMaxAvail;
-    Node(OutletNode).MassFlowRateMinAvail = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMinAvail;
+    outletNode.MassFlowRate = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRate;
+    outletNode.MassFlowRateMaxAvail = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMaxAvail;
+    outletNode.MassFlowRateMinAvail = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMinAvail;
 
-    Node(ZoneNode).MassFlowRate = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRate;
-    Node(ZoneNode).MassFlowRateMaxAvail = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMaxAvail;
-    Node(ZoneNode).MassFlowRateMinAvail = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMinAvail;
-    Node(ZoneNode).Press = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletPressure;
+    zoneNode.MassFlowRate = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRate;
+    zoneNode.MassFlowRateMaxAvail = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMaxAvail;
+    zoneNode.MassFlowRateMinAvail = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMinAvail;
+    zoneNode.Press = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletPressure;
 
-    Node(OutletNode).Temp = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletTemp;
-    Node(OutletNode).HumRat = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletHumRat;
-    Node(OutletNode).Enthalpy = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletEnthalpy;
-    Node(OutletNode).Press = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletPressure;
-    for (IndNum = 1; IndNum <= state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes; ++IndNum) {
+    outletNode.Temp = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletTemp;
+    outletNode.HumRat = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletHumRat;
+    outletNode.Enthalpy = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletEnthalpy;
+    outletNode.Press = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletPressure;
+    for (int IndNum = 1; IndNum <= state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes; ++IndNum) {
         int InducedNode = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode(IndNum);
-        Node(InducedNode).Temp = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedTemp(IndNum);
-        Node(InducedNode).HumRat = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedHumRat(IndNum);
-        Node(InducedNode).Enthalpy = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedEnthalpy(IndNum);
-        Node(InducedNode).Press = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedPressure(IndNum);
+        auto &inducedNode = state.dataLoopNodes->Node(InducedNode);
+        inducedNode.Temp = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedTemp(IndNum);
+        inducedNode.HumRat = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedHumRat(IndNum);
+        inducedNode.Enthalpy = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedEnthalpy(IndNum);
+        inducedNode.Press = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedPressure(IndNum);
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(InducedNode).CO2 = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedCO2(IndNum);
+            inducedNode.CO2 = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedCO2(IndNum);
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(InducedNode).GenContam = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedGenContam(IndNum);
+            inducedNode.GenContam = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedGenContam(IndNum);
         }
-        Node(InducedNode).Quality = Node(InletNode).Quality;
+        inducedNode.Quality = inletNode.Quality;
     }
 
     // Set the outlet nodes for properties that are just pass through and not used
-    Node(OutletNode).Quality = Node(InletNode).Quality;
-    Node(ZoneNode).Quality = Node(InletNode).Quality;
+    outletNode.Quality = inletNode.Quality;
+    zoneNode.Quality = inletNode.Quality;
 
     // Set the outlet node contaminant properties if needed. The zone contaminant conditions are calculated in ZoneContaminantPredictorCorrector
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
         if (state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRate > 0.0) {
             // CO2 balance to get outlet air CO2
-            Node(OutletNode).CO2 = 0.0;
-            for (InletNodeNum = 1; InletNodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInletNodes; ++InletNodeNum) {
-                Node(OutletNode).CO2 += Node(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletNode(InletNodeNum)).CO2 *
+            outletNode.CO2 = 0.0;
+            for (int InletNodeNum = 1; InletNodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInletNodes; ++InletNodeNum) {
+                outletNode.CO2 += state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletNode(InletNodeNum)).CO2 *
                                         state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletMassFlowRate(InletNodeNum) /
                                         state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRate;
             }
-            Node(ZoneNode).CO2 = Node(OutletNode).CO2;
+            zoneNode.CO2 = outletNode.CO2;
         } else {
-            Node(OutletNode).CO2 = Node(ZoneNode).CO2;
+            outletNode.CO2 = zoneNode.CO2;
         }
     }
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
         if (state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRate > 0.0) {
             // GenContam balance to get outlet air GenContam
-            Node(OutletNode).GenContam = 0.0;
-            for (InletNodeNum = 1; InletNodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInletNodes; ++InletNodeNum) {
-                Node(OutletNode).GenContam += Node(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletNode(InletNodeNum)).GenContam *
+            outletNode.GenContam = 0.0;
+            for (int InletNodeNum = 1; InletNodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInletNodes; ++InletNodeNum) {
+                outletNode.GenContam +=
+                    state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletNode(InletNodeNum)).GenContam *
                                               state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletMassFlowRate(InletNodeNum) /
                                               state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRate;
             }
-            Node(ZoneNode).GenContam = Node(OutletNode).GenContam;
+            zoneNode.GenContam = outletNode.GenContam;
         } else {
-            Node(OutletNode).GenContam = Node(ZoneNode).GenContam;
+            outletNode.GenContam = zoneNode.GenContam;
         }
     }
 }
