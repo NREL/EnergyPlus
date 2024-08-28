@@ -61,7 +61,7 @@ jobs:
 
     - name: Run Unit Tests
       working-directory: ./build
-      run: ctest -E "integration.*"
+      run: ctest -E "integration.*" -j 4
 
     - name: Generate Raw Unit Test Coverage Results
       working-directory: ./build
