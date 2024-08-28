@@ -170,7 +170,7 @@ jobs:
       id: regressions
       # steps.regressions.conclusion is always "success", but if no regressions, steps.regressions.outcome is "success"
       continue-on-error: true
-      run: python ./branch/scripts/dev/gha_regressions.py ./baseline/build/testfiles ./branch/build/testfiles/ ${{ github.workspace }}/regressions
+      run: python ./branch/scripts/dev/gha_regressions.py ./baseline/build/testfiles ./branch/build/testfiles/ ./regressions
 
     - uses: actions/upload-artifact@v4
       id: upload_regressions
