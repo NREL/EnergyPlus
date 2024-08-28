@@ -491,6 +491,7 @@ class RegressionManager:
         print(f"* Diffs by Type *:\n{json.dumps(self.diffs_by_type, indent=2, sort_keys=True)}\n")
         if any_diffs:
             self.generate_markdown_summary(bundle_root)
+            print("::warning title=Regressions::Diffs Detected")
         return any_diffs
 
 

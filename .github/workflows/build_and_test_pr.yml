@@ -198,7 +198,7 @@ jobs:
       run: cat ${{ github.workspace }}/regressions/summary.js
 
     - uses: actions/github-script@v7
-      if: always() && matrix.run_regression && steps.regressions.outcome == 'failure'
+      if: always() && matrix.run_regressions && steps.regressions.outcome == 'failure'
       with:
         script: |
           const script = require('${{ github.workspace }}/regressions/summary.js')
