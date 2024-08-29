@@ -6,6 +6,7 @@ on:
 
 jobs:
   check_pr_labels:
+    name: Verify PR Labeling
     runs-on: ubuntu-latest
     steps:
       - name: Verify PR label action
