@@ -1,6 +1,10 @@
 name: Checking Code Integrity
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
 
 jobs:
   code_integrity_checks:

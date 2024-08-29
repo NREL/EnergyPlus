@@ -2,7 +2,9 @@ name: Documentation Windows
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
 
 env:
   CMAKE_Fortran_COMPILER: "/c/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe"

@@ -1,7 +1,10 @@
 name: epJSON dependency
 
 on:
-  push
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
