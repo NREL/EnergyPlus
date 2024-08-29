@@ -97,6 +97,9 @@ When a SpaceHVAC:ZoneEquipmentMixer is used, before any zone HVAC equipment is s
 
 After all of the zone HVAC equipment is simulated, the flow rates on the space outlet nodes are set to the space fraction times the zone equipment inlet node flow rate.
 
+\subsubsection{SpaceHVAC:ZoneReturnMixer Adjustments}\label{space-hvac-zoneretmixer-adjustments}
+When a SpaceHVAC:ZoneReturnMixer is used, after zone-level return node flow rates are set, the space return node flow rates are set. The space flow rates are set based on the same method used for zones (sum of inlet flows minus sum of exhaust flows). Then the space flow rates are adjusted proportionately so the sum is equal to the previously determined zone-level return node flow rate. Then the conditions on the zone return nodes are set to the combined space outlet node conditions weighted by the space return node flow rates. 
+
 \subsection{References}\label{references-043}
 
 Ceylan, H. T., and G. E. Myers. 1980. Long-time Solutions to Heat Conduction Transients with Time-Dependent Inputs. ASME Journal of Heat Transfer, Volume 102, No. 1, pp.~115-120.
