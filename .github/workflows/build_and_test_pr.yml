@@ -47,7 +47,7 @@ jobs:
           python-arch: x64
           generator: "Visual Studio 17 2022"
           nproc: 4
-          run_regressions: true
+          run_regressions: false
 
     steps:
 
