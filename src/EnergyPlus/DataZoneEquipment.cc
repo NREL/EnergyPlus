@@ -1867,11 +1867,9 @@ void ZoneEquipmentSplitterMixer::size(EnergyPlusData &state)
         }
         break;
     case DataZoneEquipment::SpaceEquipSizingBasis::PerimeterLength:
-        ShowFatalError(state,
-                       format("ZoneEquipmentSplitterMixer::size: Space Fraction Method={} not supported for {}={}",
-                              DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
-                              BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
-                              this->Name));
+        for (auto &thisSpace : this->spaces) {
+            spacesTotal += state.dataHeatBal->space(thisSpace.spaceIndex).extPerimeter;
+        }
         break;
     default:
         // If method is not set, then return
@@ -1890,43 +1888,41 @@ void ZoneEquipmentSplitterMixer::size(EnergyPlusData &state)
         for (auto &thisSpace : this->spaces) {
             thisSpace.fraction = spaceFrac;
         }
-        return;
+    } else {
+        // Calculate space fractions
+        for (auto &thisSpace : this->spaces) {
+            if (thisSpace.fraction == DataSizing::AutoSize) {
+                switch (this->spaceSizingBasis) {
+                case DataZoneEquipment::SpaceEquipSizingBasis::DesignCoolingLoad:
+                    thisSpace.fraction = state.dataSize->FinalSpaceSizing(thisSpace.spaceIndex).DesCoolLoad / spacesTotal;
+                    break;
+                case DataZoneEquipment::SpaceEquipSizingBasis::DesignHeatingLoad:
+                    thisSpace.fraction = state.dataSize->FinalSpaceSizing(thisSpace.spaceIndex).DesHeatLoad / spacesTotal;
+                    break;
+                case DataZoneEquipment::SpaceEquipSizingBasis::FloorArea:
+                    thisSpace.fraction = state.dataHeatBal->space(thisSpace.spaceIndex).FloorArea / spacesTotal;
+                    break;
+                case DataZoneEquipment::SpaceEquipSizingBasis::Volume:
+                    thisSpace.fraction = state.dataHeatBal->space(thisSpace.spaceIndex).Volume / spacesTotal;
+                    break;
+                case DataZoneEquipment::SpaceEquipSizingBasis::PerimeterLength:
+                    thisSpace.fraction = state.dataHeatBal->space(thisSpace.spaceIndex).extPerimeter / spacesTotal;
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
     }
-
-    // Calculate space fractions
+    // Report sizing results
     int spaceCounter = 0;
     for (auto &thisSpace : this->spaces) {
         ++spaceCounter;
-        if (thisSpace.fraction == DataSizing::AutoSize) {
-            switch (this->spaceSizingBasis) {
-            case DataZoneEquipment::SpaceEquipSizingBasis::DesignCoolingLoad:
-                thisSpace.fraction = state.dataSize->FinalSpaceSizing(thisSpace.spaceIndex).DesCoolLoad / spacesTotal;
-                break;
-            case DataZoneEquipment::SpaceEquipSizingBasis::DesignHeatingLoad:
-                thisSpace.fraction = state.dataSize->FinalSpaceSizing(thisSpace.spaceIndex).DesHeatLoad / spacesTotal;
-                break;
-            case DataZoneEquipment::SpaceEquipSizingBasis::FloorArea:
-                thisSpace.fraction = state.dataHeatBal->space(thisSpace.spaceIndex).FloorArea / spacesTotal;
-                break;
-            case DataZoneEquipment::SpaceEquipSizingBasis::Volume:
-                thisSpace.fraction = state.dataHeatBal->space(thisSpace.spaceIndex).Volume / spacesTotal;
-                break;
-            case DataZoneEquipment::SpaceEquipSizingBasis::PerimeterLength:
-                ShowFatalError(state,
-                               format("ZoneEquipmentSplitterMixer::size: Space Fraction Method={} not supported for {}={}",
-                                      DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
-                                      BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
-                                      this->Name));
-                break;
-            default:
-                break;
-            }
-            BaseSizer::reportSizerOutput(state,
-                                         BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
-                                         this->Name,
-                                         format("Space {} Fraction", spaceCounter),
-                                         thisSpace.fraction);
-        }
+        BaseSizer::reportSizerOutput(state,
+                                     BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
+                                     this->Name,
+                                     format("Space {} Fraction", spaceCounter),
+                                     thisSpace.fraction);
     }
 }
 

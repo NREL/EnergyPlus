@@ -423,6 +423,8 @@ namespace SurfaceGeometry {
                         thisZone.ExtGrossWallArea += thisSurface.GrossArea;
                         thisSpace.ExtGrossWallArea += thisSurface.GrossArea;
                         thisZone.ExtGrossWallArea_Multiplied += thisSurface.GrossArea * thisZone.Multiplier * thisZone.ListMultiplier;
+                        thisZone.extPerimeter += thisSurface.Width;
+                        thisSpace.extPerimeter += thisSurface.Width;
                         if (DetailedWWR) {
                             print(state.files.debug,
                                   "{},Wall,{:.2R},{:.1R}\n",

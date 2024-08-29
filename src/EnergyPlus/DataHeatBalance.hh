@@ -458,6 +458,7 @@ namespace DataHeatBalance {
         Real64 Volume = Constant::AutoCalculate;        // Volume entered by user [m3] or calculated
         Real64 ExtGrossWallArea = 0.0;                  // Exterior Wall Area for Zone (Gross)
         Real64 ExteriorTotalSurfArea = 0.0;             // Total surface area of all exterior surfaces for Zone
+        Real64 extPerimeter = 0.0;                      // Total exposed perimeter (sum of width of exterior walls)
         int SystemZoneNodeNumber = 0;                   // This is the zone or space node number for the system for a controlled zone
         Real64 FloorArea = 0.0;                         // Floor area used for this space
         Real64 TotOccupants = 0.0;                      // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
