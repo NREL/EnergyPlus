@@ -72,17 +72,9 @@ jobs:
       #      integration.RefBldgSecondarySchoolNew2004_Chicago  # 378 seconds
       #      integration.ASHRAE901_OutPatientHealthCare_STD2019_Denver  # 373 seconds
       # after this, there is a big drop and everything is less than 5 minutes.
+      # by skipping these 10 tests, we remove over 6000 test seconds, and on a 4 core machine, that's almost a half hour
       run: >
         ctest
         -R "integration.*"
-        -E "*UnitaryHybridAC_DedicatedOutsideAir*"
-        -E "*DirectIndirectEvapCoolersVSAS*"
-        -E "*HospitalBaselineReheatReportEMS*"
-        -E "*ASHRAE901_ApartmentHighRise_STD2019_Denver*"
-        -E "*HospitalBaseline*"
-        -E "*RefBldgOutPatientNew2004_Chicago*"
-        -E "*UnitarySystem_MultiSpeedDX_EconoStaging*"
-        -E "*RefrigeratedWarehouse*"
-        -E "*RefBldgSecondarySchoolNew2004_Chicago*"
-        -E "*ASHRAE901_OutPatientHealthCare_STD2019_Denver*"
+        -E "UnitaryHybridAC_DedicatedOutsideAir|DirectIndirectEvapCoolersVSAS|HospitalBaselineReheatReportEMS|ASHRAE901_ApartmentHighRise_STD2019_Denver|HospitalBaseline|RefBldgOutPatientNew2004_Chicago|UnitarySystem_MultiSpeedDX_EconoStaging|RefrigeratedWarehouse|RefBldgSecondarySchoolNew2004_Chicago|ASHRAE901_OutPatientHealthCare_STD2019_Denver"
         -j 4
