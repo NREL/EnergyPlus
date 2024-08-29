@@ -64,28 +64,29 @@ jobs:
         id: cpp_check_run
         if: always()
         run: >
-          cppcheck --cppcheck-build-dir=.cppcheck-build-dir
-           -D__cppcheck__ -UEP_Count_Calls -DEP_NO_OPENGL -UGROUND_PLOT -DLINK_WITH_PYTHON -DMSVC_DEBUG -DSKYLINE_MATRIX_REMOVE_ZERO_COLUMNS -U_OPENMP -Ugeneratetestdata
-           -DEP_cache_GlycolSpecificHeat -DEP_cache_PsyTsatFnPb -UEP_nocache_Psychrometrics -UEP_psych_errors -UEP_psych_stats 
-           --force
-           --std=c++17
-           --inline-suppr
-           --suppress=cppcheckError
-           --suppress=unusedFunction:src/EnergyPlus/api/autosizing.cc
-           --suppress=unusedFunction:src/EnergyPlus/api/datatransfer.cc
-           --suppress=unusedFunction:src/EnergyPlus/api/func.cc
-           --suppress=unusedFunction:src/EnergyPlus/api/runtime.cc
-           --suppress=unusedFunction:src/EnergyPlus/api/state.cc
-           --suppress=unusedFunction:src/EnergyPlus/Psychrometrics.cc
-           --enable=all
-           -i EnergyPlus/DXCoils.cc
-           -i EnergyPlus/RefrigeratedCase.cc
-           -i EnergyPlus/SolarShading.cc
-           -j $(nproc)
-           --template='[{file}:{line}]:({severity}),[{id}],{message}'
-           --suppress="uninitvar:*"
-           ./src
-           3>&1 1>&2 2>&3 | tee cppcheck.txt
+          cppcheck 
+          --cppcheck-build-dir=.cppcheck-build-dir
+          -D__cppcheck__ -UEP_Count_Calls -DEP_NO_OPENGL -UGROUND_PLOT -DLINK_WITH_PYTHON -DMSVC_DEBUG -DSKYLINE_MATRIX_REMOVE_ZERO_COLUMNS -U_OPENMP -Ugeneratetestdata
+          -DEP_cache_GlycolSpecificHeat -DEP_cache_PsyTsatFnPb -UEP_nocache_Psychrometrics -UEP_psych_errors -UEP_psych_stats 
+          --force
+          --std=c++17
+          --inline-suppr
+          --suppress=cppcheckError
+          --suppress=unusedFunction:src/EnergyPlus/api/autosizing.cc
+          --suppress=unusedFunction:src/EnergyPlus/api/datatransfer.cc
+          --suppress=unusedFunction:src/EnergyPlus/api/func.cc
+          --suppress=unusedFunction:src/EnergyPlus/api/runtime.cc
+          --suppress=unusedFunction:src/EnergyPlus/api/state.cc
+          --suppress=unusedFunction:src/EnergyPlus/Psychrometrics.cc
+          --enable=all
+          -i EnergyPlus/DXCoils.cc
+          -i EnergyPlus/RefrigeratedCase.cc
+          -i EnergyPlus/SolarShading.cc
+          -j $(nproc)
+          --template='[{file}:{line}]:({severity}),[{id}],{message}'
+          --suppress="uninitvar:*"
+          ./src
+          3>&1 1>&2 2>&3 | tee cppcheck.txt
 
       - name: Parse and colorize cppcheck
         if: always() && steps.cpp_check_run.outcome == 'success'
