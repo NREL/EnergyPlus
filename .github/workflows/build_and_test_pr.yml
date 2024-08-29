@@ -2,7 +2,7 @@ name: Pull Request Testing
 
 on:
   pull_request:
-    branches: [ develop ]  # run this on any PR pointing to develop
+    branches: [ develop ]  # TODO: Run this on any PR, and compare to baseline branch, not necessarily develop.  Also perhaps non-draft PRs only.
 
 defaults:
   run:
