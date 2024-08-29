@@ -15,6 +15,7 @@ env:
 
 jobs:
   build_and_test:
+    name: Unit and Regression Testing
     runs-on: ${{ matrix.os }}
     permissions:
       pull-requests: write

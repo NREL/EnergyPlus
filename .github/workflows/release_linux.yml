@@ -12,7 +12,7 @@ env:
 
 jobs:
   build_installer_artifact:
-    name: Build Installer and Upload  # keeping upload in this job so we could potentially download problematic builds
+    name: Build and Test Linux Installers
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     strategy:

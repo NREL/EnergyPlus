@@ -12,6 +12,7 @@ defaults:
 
 jobs:
   build:
+    name: Build and Upload PDF Documentation
     strategy:
       fail-fast: false
       matrix:

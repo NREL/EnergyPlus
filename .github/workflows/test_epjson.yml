@@ -12,6 +12,7 @@ env:
 
 jobs:
   release:
+    name: Test EpJSON Operations
     runs-on: ${{ matrix.os }}
     strategy:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others

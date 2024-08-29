@@ -16,6 +16,7 @@ env:
 
 jobs:
   build_installer_artifact:
+    name: Build and Test Mac Installers
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.allow_failure }}
     strategy:
