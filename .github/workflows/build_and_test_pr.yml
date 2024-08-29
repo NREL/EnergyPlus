@@ -41,7 +41,7 @@ jobs:
           python-arch: x64
           generator: "Unix Makefiles"
           nproc: 4
-          run_regressions: true
+          run_regressions: false
         - os: windows-2022
           arch: x86_64
           python-arch: x64

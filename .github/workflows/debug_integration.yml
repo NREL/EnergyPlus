@@ -60,4 +60,29 @@ jobs:
 
     - name: Run Integration Tests
       working-directory: ./build
-      run: ctest -R "integration.*" -j 4
+      # skipping several here because they take a hideously long time in debug builds, would love to clean them up:
+      #      integration.UnitaryHybridAC_DedicatedOutsideAir  # 952 seconds
+      #      integration.DirectIndirectEvapCoolersVSAS  # 847 seconds
+      #      integration.HospitalBaselineReheatReportEMS  # 705 seconds
+      #      integration.ASHRAE901_ApartmentHighRise_STD2019_Denver  # 614 seconds
+      #      integration.HospitalBaseline  # 610 seconds
+      #      integration.RefBldgOutPatientNew2004_Chicago  # 586 seconds
+      #      integration.UnitarySystem_MultiSpeedDX_EconoStaging  # 536 seconds
+      #      integration.RefrigeratedWarehouse  # 445 seconds
+      #      integration.RefBldgSecondarySchoolNew2004_Chicago  # 378 seconds
+      #      integration.ASHRAE901_OutPatientHealthCare_STD2019_Denver  # 373 seconds
+      # after this, there is a big drop and everything is less than 5 minutes.
+      run: >
+        ctest
+        -R "integration.*"
+        -E "*UnitaryHybridAC_DedicatedOutsideAir*"
+        -E "*DirectIndirectEvapCoolersVSAS*"
+        -E "*HospitalBaselineReheatReportEMS*"
+        -E "*ASHRAE901_ApartmentHighRise_STD2019_Denver*"
+        -E "*HospitalBaseline*"
+        -E "*RefBldgOutPatientNew2004_Chicago*"
+        -E "*UnitarySystem_MultiSpeedDX_EconoStaging*"
+        -E "*RefrigeratedWarehouse*"
+        -E "*RefBldgSecondarySchoolNew2004_Chicago*"
+        -E "*ASHRAE901_OutPatientHealthCare_STD2019_Denver*"
+        -j 4
