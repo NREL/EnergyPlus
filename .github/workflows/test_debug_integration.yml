@@ -75,8 +75,9 @@ jobs:
       #      integration.ASHRAE901_OutPatientHealthCare_STD2019_Denver  # 373 seconds
       # after this, there is a big drop and everything is less than 5 minutes.
       # by skipping these 10 tests, we remove over 6000 test seconds, and on a 4 core machine, that's almost a half hour
+      # I'm also skipping the SolarShadingTest_ImportedShading file because we force CI to a 30 minute timestep, but this causes a mismatch on importing that solar data
       run: >
         ctest
         -R "integration.*"
-        -E "UnitaryHybridAC_DedicatedOutsideAir|DirectIndirectEvapCoolersVSAS|HospitalBaselineReheatReportEMS|ASHRAE901_ApartmentHighRise_STD2019_Denver|HospitalBaseline|RefBldgOutPatientNew2004_Chicago|UnitarySystem_MultiSpeedDX_EconoStaging|RefrigeratedWarehouse|RefBldgSecondarySchoolNew2004_Chicago|ASHRAE901_OutPatientHealthCare_STD2019_Denver"
+        -E "UnitaryHybridAC_DedicatedOutsideAir|DirectIndirectEvapCoolersVSAS|HospitalBaselineReheatReportEMS|ASHRAE901_ApartmentHighRise_STD2019_Denver|HospitalBaseline|RefBldgOutPatientNew2004_Chicago|UnitarySystem_MultiSpeedDX_EconoStaging|RefrigeratedWarehouse|RefBldgSecondarySchoolNew2004_Chicago|ASHRAE901_OutPatientHealthCare_STD2019_Denver|SolarShadingTest_ImportedShading"
         -j 4
