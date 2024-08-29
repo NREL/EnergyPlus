@@ -12222,13 +12222,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
     this->TotalCoolingCapacity = TotalCondCoolingCapacity * CoolingPLR;
     // adjustment for matching HP heating rate and coil heating rate
-    this->TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR * (this->RatedEvapCapacity / (this->RatedEvapCapacity + Pipe_Q_h));
-    if (this->VRFCondPLR < 1.0) {
-        this->TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR * this->PipingCorrectionHeating;
-    }
-    if (this->TUHeatingLoad / this->PipingCorrectionHeating > TotalCondHeatingCapacity) {
-        this->TotalHeatingCapacity = this->HeatingCapacityPrev * HeatingPLR * this->PipingCorrectionHeatingPrev;
-    }
+    this->TotalHeatingCapacity = TU_HeatingLoad;
 
     if (this->MinPLR > 0.0) {
         bool const plrTooLow = this->VRFCondPLR < this->MinPLR;
