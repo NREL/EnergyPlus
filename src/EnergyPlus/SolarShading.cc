@@ -10005,6 +10005,13 @@ void WindowShadingManager(EnergyPlusData &state)
                             surfShade.blind.TAR.interpSlatAng(matBlind->TARs[surfShade.blind.slatAngIdxLo],
                                                               matBlind->TARs[surfShade.blind.slatAngIdxHi],
                                                               surfShade.blind.slatAngInterpFac);
+
+                            Real64 TauShIR = surfShade.blind.TAR.IR.Ft.Tra;
+                            Real64 EpsShIR = surfShade.blind.TAR.IR.Bk.Emi;
+                            Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
+
+                            surfShade.effShadeEmi = EpsShIR * (1.0 + surfShade.glass.rhoIR * TauShIR / (1.0 - surfShade.glass.rhoIR * RhoShIR));
+                            surfShade.effGlassEmi = surfShade.glass.epsIR * TauShIR / (1.0 - surfShade.glass.rhoIR * RhoShIR);
                         }
 
                         surfShade.blind.slatBlockBeam = slatBlockBeam;

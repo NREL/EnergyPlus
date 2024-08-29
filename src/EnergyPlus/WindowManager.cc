@@ -1532,8 +1532,8 @@ namespace Window {
             } else if (mat->group == Material::Group::Blind) {
                 auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(mat);
                 assert(matBlind != nullptr);
-                Real64 EpsGlIR = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
-                Real64 RhoGlIR = 1 - EpsGlIR;
+                surfShade.glass.epsIR = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
+                surfShade.glass.rhoIR = 1 - surfShade.glass.epsIR;
 
                 // surfShade.blind has not been initialized yet
                 surfShade.blind.slatAngDeg = matBlind->SlatAngle;
@@ -1547,8 +1547,8 @@ namespace Window {
                 Real64 TauShIR = surfShade.blind.TAR.IR.Ft.Tra;
                 Real64 EpsShIR = surfShade.blind.TAR.IR.Bk.Emi;
                 Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                surfShade.effShadeEmi = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                surfShade.effGlassEmi = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                surfShade.effShadeEmi = EpsShIR * (1.0 + surfShade.glass.rhoIR * TauShIR / (1.0 - surfShade.glass.rhoIR * RhoShIR));
+                surfShade.effGlassEmi = surfShade.glass.epsIR * TauShIR / (1.0 - surfShade.glass.rhoIR * RhoShIR);
                     
             }     // End of check if interior shade or interior blind
         }         // End of surface loop
@@ -3837,7 +3837,12 @@ namespace Window {
         ABotGap = matShadingDevice->bottomOpeningMult * AGap;
         ALeftGap = matShadingDevice->leftOpeningMult * GapHeight * GapDepth;
         ARightGap = matShadingDevice->rightOpeningMult * GapHeight * GapDepth;
-        AHolesGap = matShadingDevice->airFlowPermeability * GapHeight * surf.Width;
+        // For blinds, airFlowPermeability depends on slat angle which is a property of the surface, not the material
+        if (matShadingDevice->group == Material::Group::Blind) {
+            AHolesGap = s_surf->surfShades(SurfNum).blind.airFlowPermeability * GapHeight * surf.Width;
+        } else {
+            AHolesGap = matShadingDevice->airFlowPermeability * GapHeight * surf.Width;
+        }                
 
         RhoAir = wm->AirProps[0] + wm->AirProps[1] * (TGapOld - Constant::Kelvin);
         ViscAir = wm->AirProps[4] + wm->AirProps[5] * (TGapOld - Constant::Kelvin);
@@ -4032,7 +4037,12 @@ namespace Window {
         ABotGap = matShadingDevice->bottomOpeningMult * AGap;
         ALeftGap = matShadingDevice->leftOpeningMult * GapHeight * GapDepth;
         ARightGap = matShadingDevice->rightOpeningMult * GapHeight * GapDepth;
-        AHolesGap = matShadingDevice->airFlowPermeability * GapHeight * surf.Width;
+        // For blinds, airFlowPermeability depends on slat angle which is a property of the surface, not the material
+        if (matShadingDevice->group == Material::Group::Blind) {
+            AHolesGap = s_surf->surfShades(SurfNum).blind.airFlowPermeability * GapHeight * surf.Width;
+        } else {
+            AHolesGap = matShadingDevice->airFlowPermeability * GapHeight * surf.Width;
+        }
         
         for (int IGap = 1; IGap <= 2; ++IGap) {
             WindowGasPropertiesAtTemp(state, TGapOld(IGap), IGap + IGapInc, RhoGas(IGap), ViscGas(IGap));

@@ -262,6 +262,10 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
     SurfaceFD(surfaceIndex).PhaseChangeState(finiteDiffLayerIndex) = Material::Phase::Liquid;
     SurfaceFD(surfaceIndex).PhaseChangeStateOld.allocate(1);
     SurfaceFD(surfaceIndex).PhaseChangeStateOld(finiteDiffLayerIndex) = Material::Phase::Melting;
+    SurfaceFD(surfaceIndex).PhaseChangeStateRep.allocate(1);
+    SurfaceFD(surfaceIndex).PhaseChangeStateRep(finiteDiffLayerIndex) = Material::phaseInts[(int)Material::Phase::Liquid];
+    SurfaceFD(surfaceIndex).PhaseChangeStateOldRep.allocate(1);
+    SurfaceFD(surfaceIndex).PhaseChangeStateOldRep(finiteDiffLayerIndex) = Material::phaseInts[(int)Material::Phase::Melting];
 
     // create a materials data object and assign the phase change variable based on above IDF processing
     auto *mat = new Material::MaterialBase;

@@ -1810,6 +1810,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         matBlind->SlatThickness = s_ipsc->rNumericArgs(3);
         matBlind->SlatAngle = s_ipsc->rNumericArgs(4);
         matBlind->SlatConductivity = s_ipsc->rNumericArgs(5);
+
+        
         matBlind->slatTAR.Sol.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(6);
         matBlind->slatTAR.Sol.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(7);
         matBlind->slatTAR.Sol.Bk.Bm[0].DfRef = s_ipsc->rNumericArgs(8);

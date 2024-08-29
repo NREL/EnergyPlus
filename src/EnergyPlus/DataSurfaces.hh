@@ -956,6 +956,12 @@ namespace DataSurfaces {
             Material::BlindTraAbsRef<Material::MaxProfAngs+1> TAR;
         } blind;
 
+        // Save these from the glass in case we need to recalculate blind properties
+        struct {
+            Real64 epsIR = 0.0; 
+            Real64 rhoIR = 0.0;
+        } glass;
+             
         Real64 effShadeEmi = 0.0; // Effective emissivity of interior blind or shade
         Real64 effGlassEmi = 0.0;   // Effective emissivity of glass adjacent to interior blind or shade
     };
