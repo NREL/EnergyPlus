@@ -1,4 +1,4 @@
-EnergyPlus [![](https://img.shields.io/github/release/NREL/energyplus.svg)](https://github.com/NREL/EnergyPlus/releases/latest)
+ EnergyPlus [![](https://img.shields.io/github/release/NREL/energyplus.svg)](https://github.com/NREL/EnergyPlus/releases/latest)
 ==========
 
 [![](https://img.shields.io/github/downloads/NREL/EnergyPlus/latest/total?color=5AC451)](https://github.com/NREL/EnergyPlus/releases/latest)
