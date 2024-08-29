@@ -114,85 +114,98 @@ jobs:
 
     - name: Upload Acknowledgments
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: Acknowledgments
         path: ${{ github.workspace }}/doc/build/pdf/Acknowledgments.pdf
 
     - name: Upload AuxiliaryPrograms
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: AuxiliaryPrograms
         path: ${{ github.workspace }}/doc/build/pdf/AuxiliaryPrograms.pdf
 
     - name: Upload EMSApplicationGuide
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: EMSApplicationGuide
         path: ${{ github.workspace }}/doc/build/pdf/EMSApplicationGuide.pdf
 
     - name: Upload EnergyPlusEssentials
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: EnergyPlusEssentials
         path: ${{ github.workspace }}/doc/build/pdf/EnergyPlusEssentials.pdf
 
     - name: Upload EngineeringReference
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: EngineeringReference
         path: ${{ github.workspace }}/doc/build/pdf/EngineeringReference.pdf
 
     - name: Upload ExternalInterfacesApplicationGuide
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: ExternalInterfacesApplicationGuide
         path: ${{ github.workspace }}/doc/build/pdf/ExternalInterfacesApplicationGuide.pdf
 
     - name: Upload GettingStarted
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: GettingStarted
         path: ${{ github.workspace }}/doc/build/pdf/GettingStarted.pdf
 
     - name: Upload InputOutputReference
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: InputOutputReference
         path: ${{ github.workspace }}/doc/build/pdf/InputOutputReference.pdf
 
     - name: Upload InterfaceDeveloper
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: InterfaceDeveloper
         path: ${{ github.workspace }}/doc/build/pdf/InterfaceDeveloper.pdf
 
     - name: Upload ModuleDeveloper
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: ModuleDeveloper
         path: ${{ github.workspace }}/doc/build/pdf/ModuleDeveloper.pdf
 
     - name: Upload OutputDetailsAndExamples
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: OutputDetailsAndExamples
         path: ${{ github.workspace }}/doc/build/pdf/OutputDetailsAndExamples.pdf
 
     - name: Upload PlantApplicationGuide
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: PlantApplicationGuide
         path: ${{ github.workspace }}/doc/build/pdf/PlantApplicationGuide.pdf
 
     - name: Upload UsingEnergyPlusForCompliance
       uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-24.04'
       with:
         name: UsingEnergyPlusForCompliance
         path: ${{ github.workspace }}/doc/build/pdf/UsingEnergyPlusForCompliance.pdf
 
     - name: Upload entire pdf folder
-      if: always()
       uses: actions/upload-artifact@v4
+      if: always() && matrix.os == 'ubuntu-24.04'
       with:
         name: AllDocumentation
         path: ${{ github.workspace }}/doc/build/pdf/
