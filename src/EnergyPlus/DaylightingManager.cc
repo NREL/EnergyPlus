@@ -790,7 +790,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     }
 
     auto &thisDayltgCtrl = dl->daylightControl(daylightCtrlNum);
-    auto &thisEnclDaylight = dl->enclDaylight(thisDayltgCtrl.enclIndex);
+    auto const &thisEnclDaylight = dl->enclDaylight(thisDayltgCtrl.enclIndex);
     int zoneNum = thisDayltgCtrl.zoneIndex;
     // Azimuth of view vector in absolute coord sys
     Real64 AZVIEW = (thisDayltgCtrl.ViewAzimuthForGlare + state.dataHeatBal->Zone(zoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth +
@@ -831,7 +831,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     BRef = 0;
 
     for (int IL = 1; IL <= thisDayltgCtrl.TotalDaylRefPoints; ++IL) {
-        auto &refPt = thisDayltgCtrl.refPts(IL);
+        auto const &refPt = thisDayltgCtrl.refPts(IL);
         // Reference point in absolute coordinate system
         Vector3<Real64> RREF = refPt.absCoords;
 
@@ -1151,7 +1151,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
 
     auto &illumMap = dl->illumMaps(mapNum);
     int enclNum = illumMap.enclIndex;
-    auto &thisEnclDaylight = dl->enclDaylight(enclNum);
+    auto const &thisEnclDaylight = dl->enclDaylight(enclNum);
 
     // Azimuth of view vector in absolute coord sys - set to zero here, because glare isn't calculated for map points
     // but these are arguments to some of the functions that are shared with regular reference points, so initalize here.
@@ -1185,7 +1185,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
     }
 
     for (int IL = 1; IL <= numRefPts; ++IL) {
-        auto &refPt = illumMap.refPts(IL);
+        auto const &refPt = illumMap.refPts(IL);
         Vector3<Real64> RREF = refPt.absCoords;
 
         //           -------------
@@ -1942,7 +1942,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
     TVISIntWin = 0.0;
 
     Vector3<Real64> HitPtIntWin = {0.0, 0.0, 0.0};
-    auto &surf = state.dataSurface->Surface(IWin);
+    auto const &surf = state.dataSurface->Surface(IWin);
     if (surf.OriginalClass == SurfaceClass::TDD_Diffuser) {
         // Look up the TDD:DOME object
         int PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
@@ -2315,7 +2315,7 @@ void InitializeCFSStateData(EnergyPlusData &state,
 
     CFSRefPointPosFactor(state, RefPoint, StateRefPoint, iWin, CurFenState, NTrnBasis, AZVIEW);
 
-    auto &surf = state.dataSurface->Surface(iWin);
+    auto const &surf = state.dataSurface->Surface(iWin);
 
     curWinEl = 0;
     // loop through window elements. This will calculate sky, ground and reflection bins for each window element
@@ -2427,7 +2427,7 @@ void InitializeCFSStateData(EnergyPlusData &state,
                     }
                 } // do JSurf = 1, TotSurfaces
                 if (TotHits <= 0) {
-                    auto &sIncRay = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay);
+                    auto const &sIncRay = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay);
                     // This ray reached the sky or ground unobstructed
                     if (sIncRay.z < 0.0) {
                         // A ground ray
@@ -2684,7 +2684,7 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
     // Phi = 0 at the horizon; Phi = Pi/2 at the zenith.
 
     // Locals
-    auto &dl = state.dataDayltg;
+    auto const &dl = state.dataDayltg; // but dl vars are getting updated?
 
     bool hitObs; // True iff obstruction is hit
 
@@ -4784,7 +4784,7 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
 {
     // Perform GetInput function for the Daylighting:ReferencePoint object
     // Glazer - July 2016
-    auto &dl = state.dataDayltg;
+    auto const &dl = state.dataDayltg;
     auto &ip = state.dataInputProcessing->inputProcessor;
     auto const &ipsc = state.dataIPShortCut;
     ipsc->cCurrentModuleObject = "Daylighting:ReferencePoint";
@@ -4832,7 +4832,7 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
 
 bool doesDayLightingUseDElight(EnergyPlusData &state)
 {
-    auto &dl = state.dataDayltg;
+    auto const &dl = state.dataDayltg;
     for (auto const &znDayl : dl->daylightControl) {
         if (znDayl.DaylightMethod == DaylightingMethod::DElight) {
             return true;
@@ -5666,7 +5666,7 @@ void manageDaylighting(EnergyPlusData &state)
 
     if (state.dataEnvrn->SunIsUp && (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad > 0.0)) {
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
-            auto &enclSol = state.dataViewFactor->EnclSolInfo(enclNum);
+            auto const &enclSol = state.dataViewFactor->EnclSolInfo(enclNum);
             if (enclSol.TotalEnclosureDaylRefPoints == 0 || !enclSol.HasInterZoneWindow) continue;
 
             DayltgInterReflIllFrIntWins(state, enclNum);
@@ -6368,7 +6368,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                             rdayil[iLum_Back] = refPt.lums[iLum_Back] - wdayil[iLum_Back][iWinCover_Bare] + wdayil[iLum_Back][iWinCover_Shaded];
                         } else {
                             // switchable glazings already in partially switched state when calc the RDAYIL(IL) & RBACLU(IL)
-                            auto &tmpDayl = tmpDaylFromWinAtRefPt(loop, IL);
+                            auto const &tmpDayl = tmpDaylFromWinAtRefPt(loop, IL);
                             rdayil[iLum_Illum] = dl->DaylIllum(IL) - wdayil[iLum_Illum][iWinCover_Shaded] + tmpDayl[iLum_Illum][iWinCover_Shaded];
                             rdayil[iLum_Back] = refPt.lums[iLum_Back] - wdayil[iLum_Back][iWinCover_Shaded] + tmpDayl[iLum_Back][iWinCover_Shaded];
                         }
@@ -8446,7 +8446,7 @@ Real64 DayltgSkyLuminance(EnergyPlusData const &state,
     // PHSKY ranges from 0 to Pi starting with 0 at the horizon and Pi/2 at the zenith.
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    auto &dl = state.dataDayltg;
+    auto const &dl = state.dataDayltg;
 
     Real64 G = 0.0;    // Angle between sun and element of sky (radians)
     Real64 COSG = 0.0; // Cosine of G
@@ -9458,7 +9458,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
                     // Get exterior windows in EnclNumAdj -- there must be at least one, otherwise
                     // it would not be an "AdjIntWinEncl"
                     for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
-                        auto &surfAdj = state.dataSurface->Surface(SurfNumAdj);
+                        auto const &surfAdj = state.dataSurface->Surface(SurfNumAdj);
                         if ((surfAdj.Class == SurfaceClass::Window && surfAdj.ExtBoundCond == ExternalEnvironment) ||
                             surfAdj.OriginalClass == SurfaceClass::TDD_Diffuser) {
                             ++enclExtWinCtr;
@@ -9681,7 +9681,7 @@ void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int const enclNum)
     auto &dl = state.dataDayltg;
 
     auto &enclDayl = dl->enclDaylight(enclNum);
-    auto &enclSol = state.dataViewFactor->EnclSolInfo(enclNum);
+    auto const &enclSol = state.dataViewFactor->EnclSolInfo(enclNum);
 
     enclDayl.InterReflIllFrIntWins = 0.0;
 
