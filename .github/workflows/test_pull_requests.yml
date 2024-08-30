@@ -1,4 +1,4 @@
-name: Pull Request Testing
+name: Build and Test
 
 on:
   pull_request:
@@ -15,7 +15,7 @@ env:
 
 jobs:
   build_and_test:
-    name: Unit/Regression Testing
+    name: Testing on ${{ matrix.pretty }}
     runs-on: ${{ matrix.os }}
     permissions:
       pull-requests: write
@@ -30,18 +30,21 @@ jobs:
           generator: "Unix Makefiles"
           nproc: 3
           run_regressions: true
+          pretty: "Mac arm64"
         - os: ubuntu-24.04
           arch: x86_64
           python-arch: x64
           generator: "Unix Makefiles"
           nproc: 4
           run_regressions: false
+          pretty: "Ubuntu 24.04"
         - os: windows-2022
           arch: x86_64
           python-arch: x64
           generator: "Visual Studio 17 2022"
           nproc: 4
           run_regressions: false
+          pretty: "Windows x64"
 
     steps:
 

@@ -1,4 +1,4 @@
-name: Checking Code Integrity
+name: Code Integrity
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   code_integrity_checks:
-    name: Code Integrity Checks
+    name: Static Code Analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -67,6 +67,7 @@ jobs:
       - name: Run CppCheck
         id: cpp_check_run
         if: always()
+        # TODO: Evaluate the long list of flags here
         run: >
           cppcheck
           --cppcheck-build-dir=.cppcheck-build-dir

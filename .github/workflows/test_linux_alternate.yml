@@ -1,4 +1,4 @@
-name: Alternate Linux Build
+name: Develop Branch Testing
 
 on:
   push:
@@ -10,7 +10,7 @@ defaults:
 
 jobs:
   alternate_build_configurations:
-    name: Alternate Compiler Configuration
+    name: Alternate Build
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4

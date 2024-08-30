@@ -1,4 +1,4 @@
-name: Windows Releases
+name: Releases
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
 
 jobs:
   build_installer_artifact:
-    name: Build and Test Windows Installers
+    name: Build Packages for ${{ matrix.pretty }}
     runs-on: windows-2019
     # to move to windows-2022, just make sure to set the Visual Studio generator build to "17 2022"
     continue-on-error: ${{ matrix.allow_failure }}
@@ -31,6 +31,7 @@ jobs:
           vs-generator: x64
           package-arch: x86_64
           enable_hardened_runtime: OFF
+          pretty: "Windows x64"
         # - name: x86
         #   arch: x86
         #   allow_failure: false
@@ -43,6 +44,7 @@ jobs:
           vs-generator: x64
           package-arch: x86_64-HardenedRuntime
           enable_hardened_runtime: ON
+          pretty: "Windows x64 Hardened"
 
     permissions:
       # Needed permission to upload the release asset

@@ -1,4 +1,4 @@
-name: Debug Integration Testing
+name: Debug Testing
 
 on:
   pull_request:
@@ -15,7 +15,7 @@ env:
 
 jobs:
   run_debug_integration:
-    name: Run Integration Tests (Debug)
+    name: Integration Testing
     runs-on: ubuntu-24.04
     permissions:
       pull-requests: write

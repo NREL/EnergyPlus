@@ -1,4 +1,4 @@
-name: Develop Testing
+name: Develop Branch Testing
 
 on:
   push:
@@ -15,7 +15,7 @@ env:
 
 jobs:
   build_and_test:
-    name: Core Testing on Commits to Develop
+    name: Standard Build on ${{ matrix.pretty }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -27,27 +27,32 @@ jobs:
           python-arch: x64
           generator: "Unix Makefiles"
           nproc: 3
+          pretty: "Mac x64"
         - os: macos-14
           macos_dev_target: 13.0
           arch: arm64
           python-arch: arm64
           generator: "Unix Makefiles"
           nproc: 3
+          pretty: "Mac arm64"
         - os: ubuntu-24.04
           arch: x86_64
           python-arch: x64
           generator: "Unix Makefiles"
           nproc: 4
+          pretty: "Ubuntu 24.04"
         - os: windows-2019
           arch: x86_64
           python-arch: x64
           generator: "Visual Studio 16 2019"
           nproc: 4
+          pretty: "Windows VS 2019"
         - os: windows-2022
           arch: x86_64
           python-arch: x64
           generator: "Visual Studio 17 2022"
           nproc: 4
+          pretty: "Windows VS 2022"
 
     steps:
 

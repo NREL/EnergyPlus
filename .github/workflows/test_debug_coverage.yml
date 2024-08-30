@@ -1,4 +1,4 @@
-name: Debug Build with Unit Test Coverage
+name: Debug Testing
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ env:
 
 jobs:
   run_unit_test_debug_coverage:
-    name: Run Unit Tests (Debug & Coverage)
+    name: Unit Test Coverage
     runs-on: ubuntu-24.04
     permissions:
       pull-requests: write
