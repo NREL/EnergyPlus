@@ -8894,10 +8894,10 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                         // We add the contribution from the solar disk if slats do not block beam solar
                         // TH CR 8010, DaylIllFacSunDisk needs to be interpolated
                         if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin)) {
-                            Real64 DaylIllFacSunDiskNow =
-                                General::Interp(daylFacHrCurr(loop, ILB, slatAngLo2).sunDisk, daylFacHrCurr(loop, ILB, slatAngHi2).sunDisk, interpFac2);
-                            Real64 DaylIllFacSunDiskPrev =
-                                General::Interp(daylFacHrPrev(loop, ILB, slatAngLo2).sunDisk, daylFacHrPrev(loop, ILB, slatAngHi2).sunDisk, interpFac2);
+                            Real64 DaylIllFacSunDiskNow = General::Interp(
+                                daylFacHrCurr(loop, ILB, slatAngLo2).sunDisk, daylFacHrCurr(loop, ILB, slatAngHi2).sunDisk, interpFac2);
+                            Real64 DaylIllFacSunDiskPrev = General::Interp(
+                                daylFacHrPrev(loop, ILB, slatAngLo2).sunDisk, daylFacHrPrev(loop, ILB, slatAngHi2).sunDisk, interpFac2);
                             DFHR[iWinCover_Shaded].sun += VTRatio * (wgtThisHr * DaylIllFacSunDiskNow + wgtPrevHr * DaylIllFacSunDiskPrev);
                         }
                     } // End of check if window has blind with movable slats
@@ -8925,11 +8925,11 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                         if (state.dataSurface->SurfWinWindowModelType(IWin) == WindowModel::BSDF) break;
                         if (NOT_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) && !state.dataSurface->SurfWinSolarDiffusing(IWin)) break;
                     }
-                    auto const &dfhr = DFHR[iWinCover];
+                    auto const &dfhr2 = DFHR[iWinCover];
 
                     thisMap.refPts(ILB).winLums(loop)[iWinCover] = tmpDFHR[iWinCover].sun * state.dataEnvrn->HISUNF +
-                                                                   HorIllSkyFac * (dfhr.sky[iSky1] * SkyWeight * tmpHorIll.sky[iSky1] +
-                                                                                   dfhr.sky[iSky2] * (1.0 - SkyWeight) * tmpHorIll.sky[iSky2]);
+                                                                   HorIllSkyFac * (dfhr2.sky[iSky1] * SkyWeight * tmpHorIll.sky[iSky1] +
+                                                                                   dfhr2.sky[iSky2] * (1.0 - SkyWeight) * tmpHorIll.sky[iSky2]);
                 }
 
             } // End of reference point loop
