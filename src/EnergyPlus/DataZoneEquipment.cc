@@ -126,10 +126,13 @@ constexpr std::array<std::string_view, static_cast<int>(ZoneEquipType::Num)> zon
     "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",              // BaseboardWater
     "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC",           // BaseboardElectric
     "ZONEHVAC:HIGHTEMPERATURERADIANT",                         // HighTempRadiant
-    "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW",             //  LowTempRadiant
+    "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW",             //  LowTempRadiantConstFlow
+    "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW",             //  LowTempRadiantVarFlow
+    "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC",                 //  LowTempRadiantElectric
     "FAN:ZONEEXHAUST",                                         // ExhaustFan
     "HEATEXCHANGER:AIRTOAIR:FLATPLATE",                        // HeatExchanger
-    "WATERHEATER:HEATPUMP:PUMPEDCONDENSER",                    //  HeatPumpWaterHeater
+    "WATERHEATER:HEATPUMP:PUMPEDCONDENSER",                    //  HeatPumpWaterHeaterPumpedCondenser
+    "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER",                   //  HeatPumpWaterHeaterWrappedCondenser
     "ZONEHVAC:DEHUMIDIFIER:DX",                                //  DXDehumidifier
     "ZONEHVAC:REFRIGERATIONCHILLERSET",                        // RefrigerationAirChillerSet
     "ZONEHVAC:FORCEDAIR:USERDEFINED",                          // UserDefinedVACForcedAir
@@ -984,16 +987,9 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                     }
 
                     if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::Invalid) {
-                        if (thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" ||
-                            thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") {
-                            thisZoneEquipList.EquipType(ZoneEquipTypeNum) = ZoneEquipType::LowTemperatureRadiant;
-                        } else if (thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
-                            thisZoneEquipList.EquipType(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
-                        } else {
-                            ShowSevereError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-                            ShowContinueError(state, format("..Invalid Equipment Type = {}", thisZoneEquipList.EquipType(ZoneEquipTypeNum)));
-                            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
-                        }
+                        ShowSevereError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
+                        ShowContinueError(state, format("..Invalid Equipment Type = {}", thisZoneEquipList.EquipType(ZoneEquipTypeNum)));
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
                 }
             } // End parsing all extensible Zone Equipment info
@@ -1216,17 +1212,10 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
     auto &ip = state.dataInputProcessing->inputProcessor;
     std::string const zeqTypeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_object_type");
     thisZeqSplitter.zoneEquipType = DataZoneEquipment::ZoneEquipType(getEnumValue(zoneEquipTypeNamesUC, zeqTypeName));
-    // SpaceHVAC TODO: Copied this block from processZoneEquipmentInput section for ZoneHVAC:EquipmentList - seems this could be simplified
     if (thisZeqSplitter.zoneEquipType == ZoneEquipType::Invalid) {
-        if (zeqTypeName == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" || zeqTypeName == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") {
-            thisZeqSplitter.zoneEquipType = ZoneEquipType::LowTemperatureRadiant;
-        } else if (zeqTypeName == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
-            thisZeqSplitter.zoneEquipType = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
-        } else {
-            ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
-            ShowContinueError(state, format("..Invalid Equipment Type = {}", zeqTypeName));
-            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
-        }
+        ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
+        ShowContinueError(state, format("..Invalid Equipment Type = {}", zeqTypeName));
+        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
     }
 
     thisZeqSplitter.zoneEquipName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_name");
