@@ -266,7 +266,7 @@ void SimulateVRF(EnergyPlusData &state,
 
         if (state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
-            state.dataHVACVarRefFlow->VRF(VRFCondenser).CalcVRFCondenser_FluidTCtrl(state, FirstHVACIteration);
+            state.dataHVACVarRefFlow->VRF(VRFCondenser).CalcVRFCondenser_FluidTCtrl(state);
         } else {
             // Algorithm Type: VRF model based on system curve
             CalcVRFCondenser(state, VRFCondenser);
@@ -11010,7 +11010,7 @@ void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(EnergyPlusData &state,
     }
 }
 
-void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, const bool FirstHVACIteration)
+void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -12334,26 +12334,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
 
     // Calculate the IU Te/Tc for the next time step
     this->CalcVRFIUTeTc_FluidTCtrl(state);
-
-    // update coil and IU condensing temperature, also keep coil RTF updated with the condenser side cycling ratio, for the FluidTCtrl model
-    for (int VRFTUNum = 1; VRFTUNum <= state.dataHVACVarRefFlow->NumVRFTU; ++VRFTUNum) {
-        auto const &thisTU = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
-        auto &heatingCoil = state.dataDXCoils->DXCoil(thisTU.HeatCoilIndex);
-        if (this->adjustedTeHeating && (!FirstHVACIteration)) {
-            heatingCoil.CondensingTemp = this->CondensingTemp;
-            this->IUCondensingTemp = this->CondensingTemp;
-        }
-
-        int PLF;
-        if (heatingCoil.PLFFPLR(1) > 0 && this->VRFCondCyclingRatio < 1.0) {
-            PLF = Curve::CurveValue(state, heatingCoil.PLFFPLR(1), this->VRFCondCyclingRatio); // Calculate part-load factor
-        } else {
-            PLF = 1.0;
-        }
-        if (heatingCoil.TotalCoolingEnergyRate > 0.0) {
-            heatingCoil.CoolingCoilRuntimeFraction = this->VRFCondCyclingRatio / PLF;
-        }
-    }
 }
 
 void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
@@ -14219,7 +14199,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     Real64 RefTSat;                        // Saturated temperature of the refrigerant [C]
     Real64 RefPLow;                        // Low Pressure Value for Ps (>0.0) [Pa]
     Real64 RefPHigh;                       // High Pressure Value for Ps (max in tables) [Pa]
-    Real64 constexpr Tolerance(0.05);      // Tolerance for condensing temperature calculation [C]
+    Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C]
     Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
     Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
@@ -14244,7 +14224,6 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     C_cap_operation = this->VRFOU_CapModFactor(
         state, Pipe_h_comp_in, Pipe_h_out_ave, max(min(MinOutdoorUnitPe, RefPHigh), RefPLow), T_suction + this->SH, T_suction + 8, IUMaxCondTemp - 5);
 
-    this->adjustedTeHeating = false;
     // Perform iterations to find the compressor speed that can meet the required heating load, Iteration DoName2
     for (CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++) {
 
@@ -14289,15 +14268,8 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                 };
                 General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe, T_suction);
                 if (SolFla < 0) SmallLoadTe = MinOutdoorUnitTe;
-                if (SolFla == -1) {
-                    // show error not converging
-                    ShowWarningMessage(state, format("{}: low load Te adjustment failed for {}", RoutineName, this->Name));
-                    ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating OU evaporating temperature", MaxIter));
-                }
 
                 T_suction = SmallLoadTe;
-                this->adjustedTeHeating = true;
 
                 // Update SH and Pe to calculate Modification Factor, which is used to update rps to for N_comp calculations
                 if (this->C3Te == 0)
