@@ -3574,7 +3574,6 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
         } // for (iSky)
 
         if (dl->horIllum[iHour].sun > tmpDFCalc) {
-            auto &daylFac = daylFacHr(loopwin, iRefPoint, JSH);
             daylFac[iLum_Illum].sun = (dl->dirIllum(iHour, JSH).sun + dl->reflIllum(iHour, JSH).sun) / (dl->horIllum[iHour].sun + 0.0001);
             daylFac[iLum_Illum].sunDisk = (dl->dirIllum(iHour, JSH).sunDisk + dl->reflIllum(iHour, JSH).sunDisk) / (dl->horIllum[iHour].sun + 0.0001);
             daylFac[iLum_Source].sun = dl->avgWinLum(iHour, JSH).sun / (NWX * NWY * (dl->horIllum[iHour].sun + 0.0001));
