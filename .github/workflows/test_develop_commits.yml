@@ -15,7 +15,7 @@ env:
 
 jobs:
   build_and_test:
-    name: Standard Build on ${{ matrix.pretty }}
+    name: ${{ matrix.pretty }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -27,32 +27,44 @@ jobs:
           python-arch: x64
           generator: "Unix Makefiles"
           nproc: 3
-          pretty: "Mac x64"
+          pretty: "Standard Build on Mac x64"
+          alternate: false
         - os: macos-14
           macos_dev_target: 13.0
           arch: arm64
           python-arch: arm64
           generator: "Unix Makefiles"
           nproc: 3
-          pretty: "Mac arm64"
+          pretty: "Standard Build on Mac arm64"
+          alternate: false
         - os: ubuntu-24.04
           arch: x86_64
           python-arch: x64
           generator: "Unix Makefiles"
           nproc: 4
-          pretty: "Ubuntu 24.04"
+          pretty: "Standard Build on Ubuntu 24.04"
+          alternate: false
         - os: windows-2019
           arch: x86_64
           python-arch: x64
           generator: "Visual Studio 16 2019"
           nproc: 4
           pretty: "Windows VS 2019"
+          alternate: false
         - os: windows-2022
           arch: x86_64
           python-arch: x64
           generator: "Visual Studio 17 2022"
           nproc: 4
-          pretty: "Windows VS 2022"
+          pretty: "Standard Build on Windows VS 2022"
+          alternate: false
+        - os: ubuntu-24.04
+          arch: x86_64
+          python-arch: x64
+          generator: "Unix Makefiles"
+          nproc: 4
+          pretty: "Alternate Build on Ubuntu 24.04"
+          alternate: true
 
     steps:
 
@@ -85,7 +97,8 @@ jobs:
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
 
-    - name: Configure CMake
+    - name: Configure CMake with Standard Flags
+      if: matrix.alternate == false
       working-directory: ./build
       run: >
         cmake
@@ -103,11 +116,28 @@ jobs:
         -DUSE_OpenMP:BOOL=OFF
         ../
 
+    - name: Configure CMake with Alternative Flags
+      if: matrix.alternate == true
+      working-directory: ./build/
+      run: >
+        cmake
+        -DCMAKE_BUILD_TYPE=Release
+        -DLINK_WITH_PYTHON=OFF
+        -DUSE_PSYCHROMETRICS_CACHING=OFF
+        -DUSE_GLYCOL_CACHING=OFF
+        -DOPENGL_REQUIRED=OFF
+        -DUSE_PSYCH_STATS=ON
+        -DUSE_PSYCH_ERRORS=OFF
+        -DENABLE_PCH=OFF
+        ../
+
     - name: Build
       id: build
       working-directory: ./build
       run: cmake --build . -j ${{ matrix.nproc }} --config Release
 
     - name: Test
+      # Not running test on alternate build yet, I need to test things
+      if: matrix.alternate == false
       working-directory: ./build
       run: ctest -C Release -E Basement -j ${{ matrix.nproc }}
