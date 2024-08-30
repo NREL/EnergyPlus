@@ -23,13 +23,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - os: macos-12
-          macos_dev_target: 12.1
-          arch: x86_64
-          python-arch: x64
-          generator: "Unix Makefiles"
-          nproc: 3
-          run_regressions: false
         - os: macos-14
           macos_dev_target: 13.0
           arch: arm64
