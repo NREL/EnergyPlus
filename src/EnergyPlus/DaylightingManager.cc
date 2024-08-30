@@ -6028,22 +6028,22 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             auto &daylFromWinAtRefPt = thisDayltgCtrl.refPts(IL).extWins(loop).lums;
             auto &tmpDayl = tmpDaylFromWinAtRefPt(IL, loop);
             for (int iWinCover = 0; iWinCover < (int)WinCover::Num; ++iWinCover) {
-                auto const &dfhr = DFHR[iWinCover];
-                auto const &bfhr = BFHR[iWinCover];
-                auto const &sfhr = SFHR[iWinCover];
+                auto const &dfhr3 = DFHR[iWinCover];
+                auto const &bfhr3 = BFHR[iWinCover];
+                auto const &sfhr3 = SFHR[iWinCover];
 
                 // What is this?
                 if (iWinCover == iWinCover_Shaded && !ShadedOrDiffusingGlassWin) break;
 
                 daylFromWinAtRefPt[iLum_Illum][iWinCover] =
-                    dfhr.sun * state.dataEnvrn->HISUNF +
-                    HorIllSkyFac * (dfhr.sky[iSky1] * SkyWeight * horIllSky1 + dfhr.sky[iSky2] * (1.0 - SkyWeight) * horIllSky2);
+                    dfhr3.sun * state.dataEnvrn->HISUNF +
+                    HorIllSkyFac * (dfhr3.sky[iSky1] * SkyWeight * horIllSky1 + dfhr3.sky[iSky2] * (1.0 - SkyWeight) * horIllSky2);
                 daylFromWinAtRefPt[iLum_Back][iWinCover] =
-                    bfhr.sun * state.dataEnvrn->HISUNF +
-                    HorIllSkyFac * (bfhr.sky[iSky1] * SkyWeight * horIllSky1 + bfhr.sky[iSky2] * (1.0 - SkyWeight) * horIllSky2);
+                    bfhr3.sun * state.dataEnvrn->HISUNF +
+                    HorIllSkyFac * (bfhr3.sky[iSky1] * SkyWeight * horIllSky1 + bfhr3.sky[iSky2] * (1.0 - SkyWeight) * horIllSky2);
                 daylFromWinAtRefPt[iLum_Source][iWinCover] =
-                    sfhr.sun * state.dataEnvrn->HISUNF +
-                    HorIllSkyFac * (sfhr.sky[iSky1] * SkyWeight * horIllSky1 + sfhr.sky[iSky2] * (1.0 - SkyWeight) * horIllSky2);
+                    sfhr3.sun * state.dataEnvrn->HISUNF +
+                    HorIllSkyFac * (sfhr3.sky[iSky1] * SkyWeight * horIllSky1 + sfhr3.sky[iSky2] * (1.0 - SkyWeight) * horIllSky2);
 
                 daylFromWinAtRefPt[iLum_Source][iWinCover] = max(daylFromWinAtRefPt[iLum_Source][iWinCover], 0.0);
 
@@ -7778,16 +7778,16 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         // for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
                         auto const &blind = state.dataMaterial->Blind(BlNum);
 
-                        Real64 TransBlBmDiffFront = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
+                        TransBlBmDiffFront = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
 
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
                             // TH CR 8121, 7/7/2010
                             // ReflBlBmDiffFront = WindowManager::InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
-                            Real64 ReflBlBmDiffFront = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
+                            ReflBlBmDiffFront = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
 
                             // TH added 7/12/2010 for CR 8121
-                            Real64 ReflBlDiffDiffFront = blind.VisFrontDiffDiffRefl(JB);
-                            Real64 TransBlDiffDiffFront = blind.VisFrontDiffDiffTrans(JB);
+                            ReflBlDiffDiffFront = blind.VisFrontDiffDiffRefl(JB);
+                            TransBlDiffDiffFront = blind.VisFrontDiffDiffTrans(JB);
 
                             transMult[JB] = TVISBSun * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                                  (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
@@ -8853,10 +8853,10 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                             dfhr2.sky[iSky] = VTRatio * (wgtThisHr * ill2SkyCurr.sky[iSky] + wgtPrevHr * ill2SkyPrev.sky[iSky]);
 
                         } else { // Blind with movable slats
-                            Real64 illSkyCurr = General::Interp(illLoSkyCurr.sky[iSky], illHiSkyCurr.sky[iSky], interpFac);
-                            Real64 illSkyPrev = General::Interp(illLoSkyPrev.sky[iSky], illHiSkyPrev.sky[iSky], interpFac);
+                            Real64 illSkyCurr2 = General::Interp(illLoSkyCurr.sky[iSky], illHiSkyCurr.sky[iSky], interpFac);
+                            Real64 illSkyPrev2 = General::Interp(illLoSkyPrev.sky[iSky], illHiSkyPrev.sky[iSky], interpFac);
 
-                            dfhr2.sky[iSky] = VTRatio * (wgtThisHr * illSkyCurr + wgtPrevHr * illSkyPrev);
+                            dfhr2.sky[iSky] = VTRatio * (wgtThisHr * illSkyCurr2 + wgtPrevHr * illSkyPrev2);
                         } // End of check if window has blind with movable slats
                     }     // End of check if window is shaded or has diffusing glass
                 }         // for (iSky)
@@ -8880,24 +8880,24 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                                 VTRatio * (wgtThisHr * daylFacHrCurr(loop, ILB, 2).sunDisk + wgtPrevHr * daylFacHrPrev(loop, ILB, 2).sunDisk);
                         }
                     } else { // Blind with movable slats
-                        int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(IWin);
-                        int slatAngLo = SurfWinSlatsAngIndex + 1;
-                        int slatAngHi = min(slatAngLo + 1, Material::MaxSlatAngs + 1);
-                        Real64 interpFac = state.dataSurface->SurfWinSlatsAngInterpFac(IWin);
+                        int SurfWinSlatsAngIndex2 = state.dataSurface->SurfWinSlatsAngIndex(IWin);
+                        int slatAngLo2 = SurfWinSlatsAngIndex2 + 1;
+                        int slatAngHi2 = min(slatAngLo2 + 1, Material::MaxSlatAngs + 1);
+                        Real64 interpFac2 = state.dataSurface->SurfWinSlatsAngInterpFac(IWin);
 
                         Real64 DaylIllFacSunNow =
-                            General::Interp(daylFacHrCurr(loop, ILB, slatAngLo).sun, daylFacHrCurr(loop, ILB, slatAngHi).sun, interpFac);
+                            General::Interp(daylFacHrCurr(loop, ILB, slatAngLo2).sun, daylFacHrCurr(loop, ILB, slatAngHi2).sun, interpFac);
                         Real64 DaylIllFacSunPrev =
-                            General::Interp(daylFacHrPrev(loop, ILB, slatAngLo).sun, daylFacHrPrev(loop, ILB, slatAngHi).sun, interpFac);
+                            General::Interp(daylFacHrPrev(loop, ILB, slatAngLo2).sun, daylFacHrPrev(loop, ILB, slatAngHi2).sun, interpFac2);
                         DFHR[iWinCover_Shaded].sun = VTRatio * (wgtThisHr * DaylIllFacSunNow + wgtPrevHr * DaylIllFacSunPrev);
 
                         // We add the contribution from the solar disk if slats do not block beam solar
                         // TH CR 8010, DaylIllFacSunDisk needs to be interpolated
                         if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin)) {
                             Real64 DaylIllFacSunDiskNow =
-                                General::Interp(daylFacHrCurr(loop, ILB, slatAngLo).sunDisk, daylFacHrCurr(loop, ILB, slatAngHi).sunDisk, interpFac);
+                                General::Interp(daylFacHrCurr(loop, ILB, slatAngLo2).sunDisk, daylFacHrCurr(loop, ILB, slatAngHi2).sunDisk, interpFac2);
                             Real64 DaylIllFacSunDiskPrev =
-                                General::Interp(daylFacHrPrev(loop, ILB, slatAngLo).sunDisk, daylFacHrPrev(loop, ILB, slatAngHi).sunDisk, interpFac);
+                                General::Interp(daylFacHrPrev(loop, ILB, slatAngLo2).sunDisk, daylFacHrPrev(loop, ILB, slatAngHi2).sunDisk, interpFac2);
                             DFHR[iWinCover_Shaded].sun += VTRatio * (wgtThisHr * DaylIllFacSunDiskNow + wgtPrevHr * DaylIllFacSunDiskPrev);
                         }
                     } // End of check if window has blind with movable slats
