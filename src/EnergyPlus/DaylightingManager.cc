@@ -5734,7 +5734,6 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     int ISWFLG; // Switchable glazing flag: =1 if one or more windows in a zone
     //  has switchable glazing that adjusts visible transmittance to just meet
     //  daylighting setpoint; =0 otherwise.
-    int ICtrl;           // Window shading control pointer
     Real64 VTRAT;        // Ratio between switched and unswitched visible transmittance at normal incidence
     Real64 BACL;         // Window background (surround) luminance for glare calc (cd/m2)
     Real64 SkyWeight;    // Weighting factor used to average two different sky types
@@ -6335,7 +6334,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                     continueOuterLoop = false;
                     continue;
                 }
-                ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
+                int ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
                 if (!state.dataSurface->Surface(IWin).HasShadeControl) {
                     continueOuterLoop = false;
                     continue;
@@ -6476,7 +6475,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                     ANY_BLIND(state.dataSurface->SurfWinShadingFlag(IWin)))
                     continue;
 
-                ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
+                int ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
                 if (!state.dataSurface->Surface(IWin).HasShadeControl) continue;
                 if (state.dataSurface->WindowShadingControl(ICtrl).GlareControlIsActive) {
 
