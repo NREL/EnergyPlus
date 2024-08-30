@@ -1086,7 +1086,6 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
 
     //  In the following four variables, I=1 for clear sky, 2 for overcast.
     int numRefPts; // Number of daylighting reference points in a zone
-    int IL;        // Reference point counter
     //  glare calculation (radians)
     int IConst;            // Construction counter
     int ICtrl;             // Window control counter
@@ -1141,7 +1140,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
     Vector3<Real64> VIEWVC2;
 
     if (dl->mapFirstTime && (int)dl->illumMaps.size() > 0) {
-        IL = -999;
+        int IL = -999;
         for (int MapNum = 1; MapNum <= (int)dl->illumMaps.size(); ++MapNum) {
             IL = max(IL, dl->illumMaps(MapNum).TotalMapRefPoints);
         }
@@ -4011,7 +4010,6 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
 
     CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
 
-    auto &ip = state.dataInputProcessing->inputProcessor;
     auto const &ipsc = state.dataIPShortCut;
     ipsc->cCurrentModuleObject = "Output:IlluminanceMap";
     int TotIllumMaps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
@@ -4022,6 +4020,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
         int IOStat;
         int NumAlpha;
         int NumNumber;
+        auto &ip = state.dataInputProcessing->inputProcessor;
         for (int MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
             ip->getObjectItem(state,
                               ipsc->cCurrentModuleObject,
