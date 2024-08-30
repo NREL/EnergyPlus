@@ -87,6 +87,13 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
                   bool const singleMode,
                   Real64 LoadSHR = 0.0) override;
 
+    void calculate_cycling_capcacity(EnergyPlus::EnergyPlusData &state,
+                                     const DataLoopNode::NodeData &inletNode,
+                                     DataLoopNode::NodeData &outletNode,
+                                     Real64 const gross_power,
+                                     Real64 const ratio,
+                                     HVAC::FanOp const fanOpMode);
+
     void calculate(EnergyPlusData &state,
                    const DataLoopNode::NodeData &inletNode,
                    DataLoopNode::NodeData &outletNode,

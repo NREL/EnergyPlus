@@ -948,9 +948,8 @@ namespace HVACHXAssistedCoolingCoil {
                     mCoolingSpeedNum = 1; // Bypass mixed-speed calculations in called functions
                 } else {
                     if (singleMode) {
-                        CoilPLR = (mCoolingSpeedNum == 1)
-                                        ? PartLoadRatio
-                                        : 0.0; // singleMode allows cycling, but not part load operation at higher speeds
+                        CoilPLR =
+                            (mCoolingSpeedNum == 1) ? PartLoadRatio : 0.0; // singleMode allows cycling, but not part load operation at higher speeds
                     } else {
                         CoilPLR = PartLoadRatio;
                     }
@@ -1167,11 +1166,8 @@ namespace HVACHXAssistedCoolingCoil {
                 if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == HVAC::CoilDX_Cooling) {
                     int coolingCoilDXIndex = state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilIndex;
                     CoilCapacity = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilDXIndex].performance->RatedGrossTotalCap();
-                } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil)
-                               .CoolingCoilType_Num ==
-                           HVAC::CoilDX_CoolingSingleSpeed) {
-                    CoilCapacity = DXCoils::GetCoilCapacity(
-                        state,
+                } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed) {
+                    CoilCapacity = DXCoils::GetCoilCapacity(state,
                                                             state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
                                                             state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
                                                             errFlag);
