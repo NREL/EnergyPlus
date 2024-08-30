@@ -11670,7 +11670,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
                                   Tdischarge,
                                   h_IU_cond_out_ave,
                                   this->IUCondensingTemp,
-                                  this->IUEvapTempLow,
+                                  // Te can't be smaller than user input lower bound
+                                  max(this->IUEvapTempLow, CapMinTe),
                                   Tfs,
                                   Pipe_Q_h,
                                   Q_c_OU,
@@ -14286,8 +14287,6 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                 auto f = [&state, T_discharge, CondHeat, CAPFT](Real64 const T_suc) {
                     return CompResidual_FluidTCtrl(state, T_discharge, CondHeat, CAPFT, T_suc);
                 };
-                // Te can't be smaller than user input lower bound
-                MinOutdoorUnitTe = max(this->IUEvapTempLow, MinOutdoorUnitTe);
                 General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe, T_suction);
                 if (SolFla < 0) SmallLoadTe = MinOutdoorUnitTe;
                 if (SolFla == -1) {
