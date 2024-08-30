@@ -24,7 +24,7 @@ jobs:
       - name: Configure CMake
         working-directory: ./build/
         run: >
-          cmake 
+          cmake
           -DCMAKE_BUILD_TYPE=Release
           -DLINK_WITH_PYTHON=OFF
           -DUSE_PSYCHROMETRICS_CACHING=OFF

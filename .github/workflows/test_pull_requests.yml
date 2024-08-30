@@ -86,7 +86,7 @@ jobs:
       if: matrix.run_regressions
       working-directory: ./baseline/build
       run: >
-        cmake 
+        cmake
         -G "${{ matrix.generator }}"
         -DCMAKE_BUILD_TYPE:STRING=Release
         -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }}
@@ -94,7 +94,7 @@ jobs:
         -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }}
         -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/
         -DBUILD_TESTING:BOOL=ON
-        -DBUILD_FORTRAN:BOOL=ON 
+        -DBUILD_FORTRAN:BOOL=ON
         -DBUILD_PACKAGE:BOOL=OFF
         -DDOCUMENTATION_BUILD:STRING=DoNotBuild
         -DENABLE_OPENMP:BOOL=OFF
@@ -131,7 +131,7 @@ jobs:
     - name: Branch Configure CMake
       working-directory: ./branch/build
       run: >
-        cmake 
+        cmake
         -G "${{ matrix.generator }}"
         -DCMAKE_BUILD_TYPE:STRING=Release
         -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }}
@@ -175,8 +175,8 @@ jobs:
 
     - name: Generate Regression Summary GitHub Script
       if: always() && matrix.run_regressions && steps.regressions.outcome == 'failure'
-      run: > 
-        python ./branch/scripts/dev/build_regression_summary.py 
+      run: >
+        python ./branch/scripts/dev/build_regression_summary.py
         ${{ github.workspace }}/regressions/summary.md
         ${{ github.workspace }}/regressions/summary.js
         ${{ matrix.os }}

@@ -83,7 +83,7 @@ jobs:
     - name: Configure CMake
       working-directory: ./build
       run: >
-        cmake 
+        cmake
         -G "${{ matrix.generator }}"
         -DCMAKE_BUILD_TYPE:STRING=Release
         -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }}

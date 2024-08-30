@@ -41,7 +41,7 @@ jobs:
     - name: Configure CMake
       working-directory: ./build
       run: >
-        cmake 
+        cmake
         -G "Unix Makefiles"
         -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo
         -DFORCE_DEBUG_ARITHM_GCC_OR_CLANG:BOOL=ON
@@ -49,7 +49,7 @@ jobs:
         -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }}
         -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/x64/
         -DBUILD_TESTING:BOOL=ON
-        -DBUILD_FORTRAN:BOOL=ON
+        -DBUILD_FORTRAN:BOOL=OFF
         -DBUILD_PACKAGE:BOOL=OFF
         -DDOCUMENTATION_BUILD:STRING=DoNotBuild
         -DENABLE_OPENMP:BOOL=OFF
@@ -59,7 +59,13 @@ jobs:
 
     - name: Build
       working-directory: ./build
-      run: cmake --build . -j 4
+      run: >
+        cmake
+        --build .
+        -j 4
+        --target
+        energyplus_tests energyplusapi energyplus parser ConvertInputFormat
+        TestAPI_DataTransfer_C TestAPI_Functional_C TestAPI_RuntimeDeleteState_C TestAPI_RuntimeResetState_C TestAPI_Runtime_C TestEnergyPlusCallbacks energyplusapi_tests
 
     - name: Run Unit Tests
       working-directory: ./build

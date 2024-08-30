@@ -42,7 +42,7 @@ jobs:
     - name: Configure CMake
       working-directory: ./build
       run: >
-        cmake 
+        cmake
         -G "Unix Makefiles"
         -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo
         -DFORCE_DEBUG_ARITHM_GCC_OR_CLANG:BOOL=ON
