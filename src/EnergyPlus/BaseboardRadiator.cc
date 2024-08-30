@@ -418,6 +418,8 @@ namespace BaseboardRadiator {
 
                 thisBaseboard.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
                     state, DataZoneEquipment::ZoneEquipType::BaseboardConvectiveWater, thisBaseboard.EquipID);
+
+                thisBaseboard.resetSizingFlagBasedOnInput(state); // set MySizeFlag to false if no autosizing is being done
             }
 
             if (ErrorsFound) {
@@ -938,6 +940,20 @@ namespace BaseboardRadiator {
 
         if (ErrorsFound) {
             ShowFatalError(state, "SizeBaseboard: Preceding sizing errors cause program termination");
+        }
+    }
+
+    void BaseboardParams::resetSizingFlagBasedOnInput(EnergyPlusData &state)
+    {
+        // this->MySizeFlag defaults to true.  Set to false if no sizing is requested.
+        // Condition 1: Is UA hardwired (not autosized)?
+        // Condition 2: Is max flow rate hardwired (not autosized)?
+        // Condition 3: Is EITHER capacity used and hardwired (not autosized) OR capacity per floor area used?
+        // If YES to all three, then this unit does not need to be autosized and the sizing flag needs to be set to false.
+        if ((this->UA != DataSizing::AutoSize) && (this->WaterVolFlowRateMax != DataSizing::AutoSize) &&
+            (((this->HeatingCapMethod == DataSizing::HeatingDesignCapacity) && (this->ScaledHeatingCapacity != DataSizing::AutoSize)) ||
+             (this->HeatingCapMethod == DataSizing::CapacityPerFloorArea))) {
+            this->MySizeFlag = false;
         }
     }
 
