@@ -8925,11 +8925,11 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                         if (state.dataSurface->SurfWinWindowModelType(IWin) == WindowModel::BSDF) break;
                         if (NOT_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) && !state.dataSurface->SurfWinSolarDiffusing(IWin)) break;
                     }
-                    auto const &dfhr2 = DFHR[iWinCover];
+                    auto const &dfhr3 = DFHR[iWinCover];
 
                     thisMap.refPts(ILB).winLums(loop)[iWinCover] = tmpDFHR[iWinCover].sun * state.dataEnvrn->HISUNF +
-                                                                   HorIllSkyFac * (dfhr2.sky[iSky1] * SkyWeight * tmpHorIll.sky[iSky1] +
-                                                                                   dfhr2.sky[iSky2] * (1.0 - SkyWeight) * tmpHorIll.sky[iSky2]);
+                                                                   HorIllSkyFac * (dfhr3.sky[iSky1] * SkyWeight * tmpHorIll.sky[iSky1] +
+                                                                                   dfhr3.sky[iSky2] * (1.0 - SkyWeight) * tmpHorIll.sky[iSky2]);
                 }
 
             } // End of reference point loop
@@ -9773,8 +9773,7 @@ void CalcMinIntWinSolidAngs(EnergyPlusData &state)
                     Vector3<Real64> W23 = W3 - W2;
                     Real64 HW = W21.magnitude();
                     Real64 WW = W23.magnitude();
-                    Vector3<Real64> WC =
-                        (is_Rectangle) ? (W2 + (W23 + W21) / 2.0) : (is_Triangle ? (W2 + (W23 + W21) / 3.0) : (W2 + (W23 + W21) / 3.0));
+                    Vector3<Real64> WC = (is_Rectangle) ? (W2 + (W23 + W21) / 2.0) : (W2 + (W23 + W21) / 3.0);
 
                     // Vector from ref point to center of window
                     Vector3<Real64> REFWC = WC - RREF;
