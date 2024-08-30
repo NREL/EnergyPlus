@@ -14274,9 +14274,13 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                 // Update SH and Pe to calculate Modification Factor, which is used to update rps to for N_comp calculations
                 if (this->C3Te == 0)
                     Modifi_SH = -(this->C1Te - Tfs + T_suction) / this->C2Te;
-                else
-                    Modifi_SH =
-                        (-this->C2Te + std::pow((pow_2(this->C2Te) - 4 * (this->C1Te - Tfs + T_suction) * this->C3Te), 0.5)) / (2 * this->C3Te);
+                else {
+                    if ((pow_2(this->C2Te) - 4 * (this->C1Te - Tfs + T_suction) * this->C3Te) < 0.0)
+                        Modifi_SH = this->C2Te / (-2 * (this->C1Te - Tfs + T_suction));
+                    else
+                        Modifi_SH =
+                            (-this->C2Te + std::pow((pow_2(this->C2Te) - 4 * (this->C1Te - Tfs + T_suction) * this->C3Te), 0.5)) / (2 * this->C3Te);
+                }
 
                 Modifi_Pe = this->refrig->getSatPressure(state, T_suction, RoutineName);
 
