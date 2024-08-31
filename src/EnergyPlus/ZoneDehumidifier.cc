@@ -749,7 +749,6 @@ namespace ZoneDehumidifier {
         Real64 AirMassFlowRate;        // Air mass flow rate through this dehumidifier (kg/s)
         Real64 Cp;                     // Heat capacity of inlet air (J/kg-C)
         int AirInletNodeNum(0);        // Node number for the inlet air to the dehumidifier
-        int AirOutletNodeNum(0);       // Node number for the outlet air from the dehumidifier
 
         SensibleOutput = 0.0;
         LatentOutput = 0.0;
@@ -763,7 +762,6 @@ namespace ZoneDehumidifier {
         ElectricPowerOnCycle = 0.0;
 
         AirInletNodeNum = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).AirInletNodeNum;
-        AirOutletNodeNum = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).AirOutletNodeNum;
 
         InletAirTemp = state.dataLoopNodes->Node(AirInletNodeNum).Temp;
         InletAirHumRat = state.dataLoopNodes->Node(AirInletNodeNum).HumRat;
@@ -1105,7 +1103,6 @@ namespace ZoneDehumidifier {
         Real64 RhoWater;      // Density of condensate (water) being removed (kg/m3)
         Real64 InletAirTemp;  // Dry-bulb temperature of air entering the dehumidifier (C)
         Real64 OutletAirTemp; // Dry-bulb temperature of air leaving the dehumidifier (C)
-        int AirInletNodeNum;  // Node number corresponding to the air entering dehumidifier
 
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingEnergy =
             state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingRate * TimeStepSysSec;
@@ -1121,7 +1118,7 @@ namespace ZoneDehumidifier {
             // Calculate and report condensation rate (how much water extracted from the air stream)
             // Volumetric flow of water in m3/s for water system interactions
 
-            AirInletNodeNum = state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).AirInletNodeNum;
+            int AirInletNodeNum = state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).AirInletNodeNum;
             InletAirTemp = state.dataLoopNodes->Node(AirInletNodeNum).Temp;
             OutletAirTemp = max((InletAirTemp - 11.0), 1.0); // Assume coil outlet air is 11C (20F) lower than inlet air temp
             RhoWater = RhoH2O(OutletAirTemp);                // Density of water, minimum temp = 1.0 C
