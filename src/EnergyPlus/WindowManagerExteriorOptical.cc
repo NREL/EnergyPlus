@@ -388,7 +388,7 @@ namespace Window {
     {
         int blindDataPtr = m_MaterialProperties.BlindDataPtr;
         assert(blindDataPtr > 0);
-        auto &blind = state.dataMaterial->Blind(blindDataPtr);
+        auto const &blind = state.dataMaterial->Blind(blindDataPtr);
 
         CWavelengthRange aRange(WavelengthRange::Visible);
         Real64 lowLambda = aRange.minLambda();
@@ -406,7 +406,7 @@ namespace Window {
     {
         int blindDataPtr = m_MaterialProperties.BlindDataPtr;
         assert(blindDataPtr > 0);
-        auto &blind = state.dataMaterial->Blind(blindDataPtr);
+        auto const &blind = state.dataMaterial->Blind(blindDataPtr);
 
         CWavelengthRange aRange(WavelengthRange::Solar);
         Real64 lowLambda = aRange.minLambda();
@@ -525,7 +525,7 @@ namespace Window {
     {
         const int blindDataPtr = m_Material.BlindDataPtr;
         assert(blindDataPtr > 0);
-        auto &blind = state.dataMaterial->Blind(blindDataPtr);
+        auto const &blind = state.dataMaterial->Blind(blindDataPtr);
 
         Real64 slatWidth = blind.SlatWidth;
         Real64 slatSpacing = blind.SlatSeparation;
