@@ -1757,7 +1757,7 @@ void updateZoneSizingEndDay(DataSizing::ZoneSizingData &zsCalcSizing,
     // save heat peak conditions when there is no design heating load or design heating volume flow rate, i.e., when
     // zone temperature is always greater than the zone heating thermostat temperature
     if (zsCalcFinalSizing.DesHeatLoad == 0) {
-        bool FirstIteration = true;
+        bool FirstIteration = true; // declare as static to save for next iteration? but needs to be space/zone specific?
         for (int TimeStepIndex = 1; TimeStepIndex <= numTimeStepInDay; ++TimeStepIndex) {
             if ((zsCalcSizing.HeatZoneTempSeq(TimeStepIndex) < zsCalcSizing.ZoneTempAtHeatPeak) || FirstIteration) {
                 zsCalcSizing.ZoneTempAtHeatPeak = zsCalcSizing.HeatZoneTempSeq(TimeStepIndex);
@@ -1985,10 +1985,6 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
     }
 
     int numSpaces = 0; // Track this for averages later
-    bool heatDDNumAllSame = true;
-    bool coolDDNumAllSame = true;
-    int priorHeatDDNum = 0;
-    int priorCoolDDNum = 0;
     for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
         auto &spaceCFS = state.dataSize->CalcFinalSpaceSizing(spaceNum);
         ++numSpaces;
