@@ -315,8 +315,6 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
                                                 : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).NonAirSystemResponse;
     auto &sysDepZoneLoads = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).SysDepZoneLoads
                                            : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).SysDepZoneLoads;
-    auto &zoneLatentGain = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGain
-                                          : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).latentGain;
     auto &zoneNodeNum =
         (spaceNum > 0) ? state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber : state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNumber;
     nonAirSystemResponse = 0.0;
@@ -565,6 +563,8 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
             }
         }
         if (zsCalcSizing.zoneLatentSizing) {
+            auto &zoneLatentGain = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGain
+                                                  : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).latentGain;
             int ZoneMult = zoneOrSpace.Multiplier * zoneOrSpace.ListMultiplier;
             zoneLatentGain += (LatOutputProvided * HgAir) / ZoneMult;
         }
@@ -1050,13 +1050,13 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
 
         // Calculate the design min OA flow rate for this zone
         // flag to use occupancy schedule when calculating OA
-        bool UseOccSchFlag = false;
         // flag to use min OA schedule when calculating OA
-        bool UseMinOASchFlag = false;
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex = DSOAPtr;                                     // store for later use
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex = finalZoneSizing.ZoneAirDistributionIndex; // store for later use
         Real64 OAVolumeFlowRate = 0.0;
         if (!dsoaError) {
+            bool UseOccSchFlag = false;
+            bool UseMinOASchFlag = false;
             OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, DSOAPtr, CtrlZoneNum, UseOccSchFlag, UseMinOASchFlag);
         }
 
@@ -4045,9 +4045,6 @@ void SetZoneEquipSimOrder(EnergyPlusData &state, int const ControlledZoneNum)
     // required conditions (heating or cooling).
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int CurEqHeatingPriority; // Used to make sure "optimization features" on compilers don't defeat purpose of this routine
-    int CurEqCoolingPriority; // Used to make sure "optimization features" on compilers don't defeat purpose of this routine
-
     auto &zeq(state.dataZoneEquip->ZoneEquipList(ControlledZoneNum));
     int const NumOfEquipTypes(zeq.NumOfEquipTypes);
     for (int EquipTypeNum = 1; EquipTypeNum <= NumOfEquipTypes; ++EquipTypeNum) {
@@ -4072,8 +4069,8 @@ void SetZoneEquipSimOrder(EnergyPlusData &state, int const ControlledZoneNum)
     for (int EquipTypeNum = 1; EquipTypeNum <= NumOfEquipTypes; ++EquipTypeNum) {
         auto &pso(state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum));
 
-        CurEqHeatingPriority = pso.HeatingPriority;
-        CurEqCoolingPriority = pso.CoolingPriority;
+        int CurEqHeatingPriority = pso.HeatingPriority;
+        int CurEqCoolingPriority = pso.CoolingPriority;
 
         for (int ComparedEquipTypeNum = EquipTypeNum; ComparedEquipTypeNum <= NumOfEquipTypes; ++ComparedEquipTypeNum) {
             auto &psc(state.dataZoneEquipmentManager->PrioritySimOrder(ComparedEquipTypeNum));
@@ -5838,9 +5835,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         bool MixingLimitFlag = false;
 
         // Hybrid ventilation global control
-        int I = 0;
         if (thisMixing.HybridControlType == DataHeatBalance::HybridCtrlType::Global && thisMixing.HybridControlMasterNum > 0) {
-            I = thisMixing.HybridControlMasterNum;
+            int I = thisMixing.HybridControlMasterNum;
             if (!state.dataHeatBal->Ventilation(I).HybridControlMasterStatus) continue;
         } else {
             // Ensure the minimum indoor temperature <= the maximum indoor temperature
