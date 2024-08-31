@@ -6183,7 +6183,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 thisCrossMixing.ReportFlag = true;
             }
 
-            if ((TD <= 0.0) || ((TD > 0.0) && (TZM - TZN >= TD))) {
+            if ((TD <= 0.0) || (TZM - TZN >= TD)) {
                 //                                      SET COEFFICIENTS .
                 Real64 Tavg = (TZN + TZM) / 2.0;
                 Real64 Wavg = (HumRatZN + HumRatZM) / 2.0;
