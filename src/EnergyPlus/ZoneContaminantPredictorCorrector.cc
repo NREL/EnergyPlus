@@ -2332,12 +2332,12 @@ void RevertZoneTimestepHistories(EnergyPlusData &state)
 }
 
 void InverseModelCO2(EnergyPlusData &state,
-                     int const ZoneNum,           // Zone number
-                     Real64 &CO2Gain,             // Zone total CO2 gain
-                     Real64 &CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
-                     Real64 &ZoneMassFlowRate,    // Zone air mass flow rate
-                     Real64 &CO2MassFlowRate,     // Zone air CO2 mass flow rate
-                     Real64 &RhoAir               // Air density
+                     int const ZoneNum,                // Zone number
+                     Real64 const CO2Gain,             // Zone total CO2 gain
+                     Real64 const CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
+                     Real64 const ZoneMassFlowRate,    // Zone air mass flow rate
+                     Real64 const CO2MassFlowRate,     // Zone air CO2 mass flow rate
+                     Real64 const RhoAir               // Air density
 )
 {
     // SUBROUTINE INFORMATION:
