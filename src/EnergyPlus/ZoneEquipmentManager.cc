@@ -584,7 +584,7 @@ void sizeZoneSpaceEquipmentPart2(EnergyPlusData &state,
     int zoneNodeNum =
         (spaceNum > 0) ? state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber : state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNumber;
     Real64 RetTemp = (returnNodeNum > 0) ? state.dataLoopNodes->Node(returnNodeNum).Temp : state.dataLoopNodes->Node(zoneNodeNum).Temp;
-    auto &zoneTstatSP = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum);
+    auto const &zoneTstatSP = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum);
     if (zsCalcSizing.HeatLoad > 0.0) {
         zsCalcSizing.HeatZoneRetTemp = RetTemp;
         zsCalcSizing.HeatTstatTemp = (zoneTstatSP > 0.0) ? zoneTstatSP : state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum);
@@ -992,7 +992,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     // from the specified OA method
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-        auto &thisZone = state.dataHeatBal->Zone(CtrlZoneNum);
+        auto const &thisZone = state.dataHeatBal->Zone(CtrlZoneNum);
         auto &finalZoneSizing = state.dataSize->FinalZoneSizing(CtrlZoneNum);
         auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
         // Use the max occupancy PEOPLE structure to calculate design min OA for each zone from the outside air flow per person input
@@ -1953,7 +1953,7 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, int const zoneNum
 
     // Other - Initialize to first space values (clear later if not all the same)
     int firstSpace = state.dataHeatBal->Zone(zoneNum).spaceIndexes[0];
-    auto &firstSpaceCFS = state.dataSize->CalcFinalSpaceSizing(firstSpace);
+    auto const &firstSpaceCFS = state.dataSize->CalcFinalSpaceSizing(firstSpace);
     zoneCFS.HeatDesDay = firstSpaceCFS.HeatDesDay;
     zoneCFS.HeatDDNum = firstSpaceCFS.HeatDDNum;
     zoneCFS.cHeatDDDate = firstSpaceCFS.cHeatDDDate;
@@ -5004,7 +5004,7 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             auto &thisZoneEquip(state.dataZoneEquip->ZoneEquipConfig(zoneNum));
-            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
+            auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
             if (!thisZoneEquip.IsControlled) continue;
             int numRetNodes = thisZoneEquip.NumReturnNodes;
             Real64 totalZoneReturnMassFlow = 0.0;
@@ -5230,7 +5230,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
 
             if (state.dataHeatBal->Zone(ZoneNum).HasAirFlowWindowReturn) {
                 for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                     for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
                         if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                             state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
@@ -5811,14 +5811,14 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         Real64 HumRatZN = 0.0; // HumRat of this Zone/Space
         Real64 HumRatZM = 0.0; // HumRat of From Zone/Space
         if (state.dataHeatBal->doSpaceHeatBalance) {
-            auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisMixing.spaceIndex);
-            auto &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisMixing.fromSpaceIndex);
+            auto const &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisMixing.spaceIndex);
+            auto const &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisMixing.fromSpaceIndex);
             TZN = thisSpaceHB.MixingMAT;         // Temperature of this Space
             TZM = fromSpaceHB.MixingMAT;         // Temperature of From Space
             HumRatZN = thisSpaceHB.MixingHumRat; // HumRat of this Space
             HumRatZM = fromSpaceHB.MixingHumRat; // HumRat of From Space
         } else {
-            auto &fromZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(fromZoneNum);
+            auto const &fromZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(fromZoneNum);
             TZN = thisZoneHB.MixingMAT;         // Temperature of this zone
             TZM = fromZoneHB.MixingMAT;         // Temperature of From Zone
             HumRatZN = thisZoneHB.MixingHumRat; // HumRat of this zone
@@ -6063,8 +6063,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             Real64 HumRatZN = 0.0; // HumRat of this Zone/Space
             Real64 HumRatZM = 0.0; // HumRat of From Zone/Space
             if (state.dataHeatBal->doSpaceHeatBalance) {
-                auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.spaceIndex);
-                auto &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.fromSpaceIndex);
+                auto const &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.spaceIndex);
+                auto const &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.fromSpaceIndex);
                 TZN = thisSpaceHB.MixingMAT;         // Temperature of this Space
                 TZM = fromSpaceHB.MixingMAT;         // Temperature of From Space
                 HumRatZN = thisSpaceHB.MixingHumRat; // HumRat of this Space
@@ -6244,7 +6244,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             Real64 TZoneA = zoneAHB.MixingMAT;
             Real64 HumRatZoneA = zoneAHB.MixingHumRat;
             if ((state.dataHeatBal->doSpaceHeatBalance) && (thisRefDoorMixing.spaceIndex > 0)) {
-                auto &spaceAHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisRefDoorMixing.spaceIndex);
+                auto const &spaceAHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisRefDoorMixing.spaceIndex);
                 TZoneA = spaceAHB.MixingMAT;
                 HumRatZoneA = spaceAHB.MixingHumRat;
             }
