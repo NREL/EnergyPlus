@@ -1004,7 +1004,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             // If this is a DesignSpecification:OutdoorAir:SpaceList check to make sure spaces are valid and belong to this zone
             if (thisOAReq.numDSOA > 0) {
                 for (int spaceCounter = 1; spaceCounter <= thisOAReq.numDSOA; ++spaceCounter) {
-                    std::string thisSpaceName = thisOAReq.dsoaSpaceNames(spaceCounter);
                     int thisSpaceNum = thisOAReq.dsoaSpaceIndexes(spaceCounter);
                     if (thisSpaceNum > 0) {
                         if (state.dataHeatBal->space(thisSpaceNum).zoneNum != CtrlZoneNum) {
@@ -6257,7 +6256,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 Real64 HumRatZoneB = zoneBHB.MixingHumRat;
                 Real64 CpAirZoneB = PsyCpAirFnW(HumRatZoneB);
                 if ((state.dataHeatBal->doSpaceHeatBalance) && (thisRefDoorMixing.fromSpaceIndex > 0)) {
-                    auto &spaceBHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisRefDoorMixing.fromSpaceIndex);
+                    auto const &spaceBHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisRefDoorMixing.fromSpaceIndex);
                     TZoneB = spaceBHB.MixingMAT;
                     HumRatZoneB = spaceBHB.MixingHumRat;
                 }
