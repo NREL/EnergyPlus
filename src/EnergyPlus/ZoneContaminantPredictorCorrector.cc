@@ -2051,7 +2051,6 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // Calculate the coefficients for the 3rd Order derivative for final
                 // zone CO2.  The A, B, C coefficients are analogous to the CO2 balance.
                 // Assume that the system will have flow
-                auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
                 if (state.afn->multizone_always_simulated ||
                     (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
                      state.afn->AirflowNetworkFanActivated)) {
@@ -2165,7 +2164,6 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // Calculate the coefficients for the 3rd Order derivative for final
                 // zone GC.  The A, B, C coefficients are analogous to the GC balance.
                 // Assume that the system will have flow
-                auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
                 if (state.afn->multizone_always_simulated ||
                     (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
                      state.afn->AirflowNetworkFanActivated)) {
