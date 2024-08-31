@@ -2361,7 +2361,7 @@ void InverseModelCO2(EnergyPlusData &state,
         state.dataEnvrn->DayOfYear <= state.dataHybridModel->HybridModelZone(ZoneNum).HybridEndDayOfYear) {
         state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration;
 
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+        auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_C && state.dataHVACGlobal->UseZoneTimeStepHistory) {
             static constexpr std::string_view RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
             // Conditionally calculate the CO2-dependent and CO2-independent terms.
@@ -2573,7 +2573,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
 
             // Calculate moisture flow rate into each zone
             for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-                auto &node = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum));
+                auto const &node = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum));
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     CO2MassFlowRate += (node.MassFlowRate * node.CO2) / ZoneMult;
                 }
@@ -2586,7 +2586,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             // Do the calculations for the plenum zone
         } else if (ZoneRetPlenumAirFlag) {
             for (int NodeNum = 1; NodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
-                auto &node = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum));
+                auto const &node = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum));
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     CO2MassFlowRate += (node.MassFlowRate * node.CO2) / ZoneMult;
                 }
@@ -2600,7 +2600,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
                 int ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                 if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
                     auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(ADUNum);
-                    auto &node = state.dataLoopNodes->Node(airDistUnit.InletNodeNum);
+                    auto const &node = state.dataLoopNodes->Node(airDistUnit.InletNodeNum);
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         CO2MassFlowRate += (airDistUnit.MassFlowRateUpStrLk * node.CO2) / ZoneMult;
                     }
@@ -2611,7 +2611,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
                 }
                 if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
                     auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(ADUNum);
-                    auto &node = state.dataLoopNodes->Node(airDistUnit.OutletNodeNum);
+                    auto const &node = state.dataLoopNodes->Node(airDistUnit.OutletNodeNum);
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         CO2MassFlowRate += (airDistUnit.MassFlowRateDnStrLk * node.CO2) / ZoneMult;
                     }
@@ -2623,7 +2623,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             }
 
         } else if (ZoneSupPlenumAirFlag) {
-            auto &node = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode);
+            auto const &node = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode);
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 CO2MassFlowRate += (node.MassFlowRate * node.CO2) / ZoneMult;
             }
