@@ -1504,7 +1504,6 @@ void InitZoneContSetPoints(EnergyPlusData &state)
     Real64 Pi;     // Pressue at zone i
     Real64 Pj;     // Pressue at zone j
     Real64 Sch;    // Schedule value
-    bool ErrorsFound(false);
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
         state.dataContaminantBalance->OutdoorCO2 =
@@ -1707,6 +1706,7 @@ void InitZoneContSetPoints(EnergyPlusData &state)
     }
 
     if (allocated(state.dataZoneEquip->ZoneEquipConfig) && state.dataZoneContaminantPredictorCorrector->MyConfigOneTimeFlag) {
+        bool ErrorsFound = false;
         for (int ContZoneNum = 1; ContZoneNum <= (int)state.dataContaminantBalance->ContaminantControlledZone.size(); ++ContZoneNum) {
             int ZoneNum = state.dataContaminantBalance->ContaminantControlledZone(ContZoneNum).ActualZoneNum;
             for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++zoneInNode) {
@@ -1817,13 +1817,13 @@ void InitZoneContSetPoints(EnergyPlusData &state)
 
         // From decay model
         for (auto &con : state.dataContaminantBalance->ZoneContamGenericDecay) {
-            int Sch = ScheduleManager::GetCurrentScheduleValue(state, con.GCEmiRateSchedPtr);
-            if (Sch == 0.0 || state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
+            int intSch = ScheduleManager::GetCurrentScheduleValue(state, con.GCEmiRateSchedPtr);
+            if (intSch == 0.0 || state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
                 con.GCTime = 0.0;
             } else {
                 con.GCTime += state.dataGlobal->TimeStepZoneSec;
             }
-            GCGain = con.GCInitEmiRate * Sch * std::exp(-con.GCTime / con.GCDelayTime);
+            GCGain = con.GCInitEmiRate * intSch * std::exp(-con.GCTime / con.GCDelayTime);
             con.GCGenRate = GCGain;
         }
 
