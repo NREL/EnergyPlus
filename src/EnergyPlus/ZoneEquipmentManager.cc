@@ -3321,8 +3321,8 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
         for (std::size_t i = 0; i < state.dataSize->ZoneSizing.size(); ++i) {
             updateZoneSizingEndZoneSizingCalc4(state.dataSize->ZoneSizing[i], state.dataSize->CalcZoneSizing[i]);
             if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
-                for (std::size_t i = 0; i < state.dataSize->SpaceSizing.size(); ++i) {
-                    updateZoneSizingEndZoneSizingCalc4(state.dataSize->SpaceSizing[i], state.dataSize->CalcSpaceSizing[i]);
+                for (std::size_t j = 0; j < state.dataSize->SpaceSizing.size(); ++j) {
+                    updateZoneSizingEndZoneSizingCalc4(state.dataSize->SpaceSizing[j], state.dataSize->CalcSpaceSizing[j]);
                 }
             }
         }
@@ -3330,8 +3330,8 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
         for (std::size_t i = 0; i < state.dataSize->FinalZoneSizing.size(); ++i) {
             updateZoneSizingEndZoneSizingCalc5(state.dataSize->FinalZoneSizing[i], state.dataSize->CalcFinalZoneSizing[i]);
             if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
-                for (std::size_t i = 0; i < state.dataSize->FinalSpaceSizing.size(); ++i) {
-                    updateZoneSizingEndZoneSizingCalc5(state.dataSize->FinalSpaceSizing[i], state.dataSize->CalcFinalSpaceSizing[i]);
+                for (std::size_t j = 0; j < state.dataSize->FinalSpaceSizing.size(); ++j) {
+                    updateZoneSizingEndZoneSizingCalc5(state.dataSize->FinalSpaceSizing[j], state.dataSize->CalcFinalSpaceSizing[j]);
                 }
             }
         }
@@ -4266,8 +4266,8 @@ void distributeOutputRequired(EnergyPlusData &state,
             const int &equipNum = state.dataZoneEquipmentManager->PrioritySimOrder(priorityNum).EquipPtr;
 
             // Determine whether we're heating or cooling and choose the appropriate fraction
-            const Real64 heatLoadRatio = thisZEqList.SequentialHeatingFraction(state, equipNum);
-            const Real64 coolLoadRatio = thisZEqList.SequentialCoolingFraction(state, equipNum);
+            heatLoadRatio = thisZEqList.SequentialHeatingFraction(state, equipNum);
+            coolLoadRatio = thisZEqList.SequentialCoolingFraction(state, equipNum);
             const Real64 loadRatio = (energy.TotalOutputRequired >= 0.0) ? heatLoadRatio : coolLoadRatio;
 
             // Energy loads
