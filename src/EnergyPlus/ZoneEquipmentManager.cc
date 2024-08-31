@@ -556,10 +556,10 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
     } else {
         nonAirSystemResponse = SysOutputProvided;
         if (state.dataHeatBal->doSpaceHeatBalance) {
-            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+            for (int spaceNumLoop : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                 // SpaceHB ToDo: For now allocate by space volume frac
-                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).NonAirSystemResponse =
-                    nonAirSystemResponse * state.dataHeatBal->space(spaceNum).fracZoneVolume;
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNumLoop).NonAirSystemResponse =
+                    nonAirSystemResponse * state.dataHeatBal->space(spaceNumLoop).fracZoneVolume;
             }
         }
         if (zsCalcSizing.zoneLatentSizing) {
