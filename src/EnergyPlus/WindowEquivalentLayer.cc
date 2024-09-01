@@ -6845,7 +6845,7 @@ void Specular_RATDiff(EnergyPlusData &state, Real64 &RAT_1MRDiff, Real64 &RAT_TA
     RAT_1MRDiff = state.dataWindowEquivalentLayer->X1MRDiff;
 }
 
-Real64 Specular_F(EnergyPlusData &state,
+Real64 Specular_F(EnergyPlusData const &state,
                   Real64 const THETA,                       // incidence angle, radians
                   int const OPT,                            // options (unused)
                   [[maybe_unused]] const Array1D<Real64> &P // parameters (none defined)
@@ -7321,7 +7321,7 @@ bool VB_LWP(EnergyPlusData &state,
     return VB_LWP;
 }
 
-bool VB_SWP(EnergyPlusData &state,
+bool VB_SWP(EnergyPlusData const &state,
             CFSLAYER const &L, // VB layer
             CFSSWP &LSWP,      // returned: equivalent off-normal properties
             const Real64 OMEGA // incident profile angle (radians)
@@ -7406,7 +7406,7 @@ bool VB_SWP(EnergyPlusData &state,
     return true;
 }
 
-bool VB_ShadeControl(EnergyPlusData &state,
+bool VB_ShadeControl(EnergyPlusData const &state,
                      CFSLAYER &L,           // VB layer
                      Real64 const OMEGA_DEG // incident profile angle (degrees)
 )
@@ -7630,7 +7630,7 @@ bool IsGlazeLayerX(CFSLAYER const &L)
     return IsGlazeLayerX;
 }
 
-bool IsControlledShade(EnergyPlusData &state, CFSLAYER const &L)
+bool IsControlledShade(EnergyPlusData const &state, CFSLAYER const &L)
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         JOHN L. WRIGHT, University of Waterloo, Mechanical Engineering
