@@ -514,12 +514,10 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
     Real64 HProfA;
     int NL;
     int I;
-    bool CFSSHGC;
 
     // Object Data
     Array1D<CFSSWP> SWP_ON(CFSMAXNL);
 
-    CFSSHGC = true;
     NL = FS.NL;
     IncA = 0.0;
     VProfA = 0.0;
@@ -546,7 +544,7 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
     TransNormal = Abs1(1, NL + 1);
 
     // Calculate SHGC using net radiation method (ASHWAT Model)
-    CFSSHGC = ASHWAT_ThermalRatings(state,
+    bool CFSSHGC = ASHWAT_ThermalRatings(state,
                                     FS,
                                     TIN,
                                     TOUT,
@@ -5354,13 +5352,11 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
                 }     //  end of IF/ELSE (I .EQ. 0)
             }         //  end of IF(ISDL(I) .EQ. 0) .AND. .....
         }             //   end of scan through all layers
-    }
 
-    //  calculate convective OCF/jump heat transfer coefficients
-
-    if (NL >= 2) { // no OCF unless at least two layers exist
-                   //  It is not possible for both of the following cases to be
-                   //  true for the same gap (i.e., for NL=2)
+        //  calculate convective OCF/jump heat transfer coefficients
+        // no OCF unless at least two layers exist
+        //  It is not possible for both of the following cases to be
+        //  true for the same gap (i.e., for NL=2)
 
         if (FS.G(NL - 1).GTYPE == state.dataWindowEquivalentLayer->gtyOPENin) {
             SaveHCNLm = HC[NL - 1];
@@ -7596,10 +7592,6 @@ void FinalizeCFSLAYER(EnergyPlusData &state, CFSLAYER &L) // layer, input: LTYPE
     bool DOK;
     bool BOK;
     bool CFSLAYERFlag;
-
-    LOK = false;
-    DOK = false;
-    BOK = false;
 
     if (IsVBLayer(L)) {
         LOK = VB_LWP(state, L, L.LWP_EL);
