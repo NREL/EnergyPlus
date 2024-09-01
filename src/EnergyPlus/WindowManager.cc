@@ -1598,7 +1598,6 @@ namespace Window {
         Real64 GlWidth;       // Width of glazed part of window {m}
         int NumHorDividers;   // Number of horizontal divider elements
         int NumVertDividers;  // Number of vertical divider elements
-        int BaseSurfNum;      // Base surface number
         int MatNum;           // Material number
         int DifOverrideCount; // Count the number of SolarDiffusing material overrides
 
@@ -1661,7 +1660,7 @@ namespace Window {
             GlWidth = surf.Width;
             NumVertDividers = frdiv.VertDividers;
             NumHorDividers = frdiv.HorDividers;
-            BaseSurfNum = surf.BaseSurf;
+            int BaseSurfNum = surf.BaseSurf;
             state.dataSurface->SurfWinFrameConductance(SurfNum) = frdiv.FrameConductance;
             state.dataSurface->SurfWinFrameSolAbsorp(SurfNum) = frdiv.FrameSolAbsorp;
             state.dataSurface->SurfWinFrameVisAbsorp(SurfNum) = frdiv.FrameVisAbsorp;
@@ -2128,7 +2127,6 @@ namespace Window {
         Real64 dT1(0.0);
         Real64 SurfOutsideEmiss; // temporary for result of outside surface emissivity
         Real64 Tsout;            // temporary for result of outside surface temp in Kelvin
-        int temp;
 
         Array1D<Real64> deltaTemp(100, 0.0);
         Array1D_int iMinDT(1, 0);
@@ -2142,7 +2140,7 @@ namespace Window {
 
         if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::BSDF) {
 
-            temp = 0;
+            int temp = 0;
 
             // Simon: Complex fenestration state works only with tarcog
             CalcComplexWindowThermal(
@@ -2239,7 +2237,6 @@ namespace Window {
             }
             // end new TC code
 
-            TotLay = state.dataConstruction->Construct(ConstrNum).TotLayers;
             TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
             wm->ngllayer = TotGlassLay;
             wm->nglface = 2 * wm->ngllayer;
@@ -3399,7 +3396,6 @@ namespace Window {
         Real64 TauShIR = 0.0; // Long-wave transmittance of isolated shade/blind
         Real64 sconsh = 0.0;  // shade/blind conductance (W/m2-K)
 
-        WinShadingType ShadeFlag = WinShadingType::NoShade; // Shading flag
         //  radiation from lights and zone equipment absorbed by faces of shade/blind (W/m2)
         Real64 ShadeArea = 0.0; // shade/blind area (m2)
         // Real64 CondHeatGainGlass = 0.0; // Conduction through inner glass layer, outside to inside (W)
@@ -3424,7 +3420,7 @@ namespace Window {
         Array1D_int indx(2 * maxGlassLayers);                          // Vector of row permutations in LU decomposition
 
         wm->nglfacep = wm->nglface;
-        ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
+        WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
         ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
         AbsRadShadeFace = 0.0;
 
