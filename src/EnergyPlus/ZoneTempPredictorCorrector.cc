@@ -324,7 +324,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     auto &Zone = state.dataHeatBal->Zone;
-    auto &ZoneList = state.dataHeatBal->ZoneList;
     int NumOfZones = state.dataGlobal->NumOfZones;
     auto &cAlphaArgs = state.dataIPShortCut->cAlphaArgs;
     auto &rNumericArgs = state.dataIPShortCut->rNumericArgs;
@@ -360,7 +359,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         TStatObjects.Name = cAlphaArgs(1);
         Item1 = Util::FindItemInList(cAlphaArgs(2), Zone);
         ZLItem = 0;
-        if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), ZoneList);
+        if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
         if (Item1 > 0) {
             TStatObjects.TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
             ++state.dataZoneCtrls->NumTempControlledZones;
@@ -368,9 +367,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             TStatObjects.ZoneListActive = false;
             TStatObjects.ZoneOrZoneListPtr = Item1;
         } else if (ZLItem > 0) {
+            auto &ZoneList = state.dataHeatBal->ZoneList(ZLItem);
             TStatObjects.TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
-            state.dataZoneCtrls->NumTempControlledZones += ZoneList(ZLItem).NumOfZones;
-            TStatObjects.NumOfZones = ZoneList(ZLItem).NumOfZones;
+            state.dataZoneCtrls->NumTempControlledZones += ZoneList.NumOfZones;
+            TStatObjects.NumOfZones = ZoneList.NumOfZones;
             TStatObjects.ZoneListActive = true;
             TStatObjects.ZoneOrZoneListPtr = ZLItem;
         } else {
@@ -411,7 +411,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 ++TempControlledZoneNum;
                 auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum);
                 if (TStatObjects.ZoneListActive) {
-                    cAlphaArgs(2) = Zone(ZoneList(TStatObjects.ZoneOrZoneListPtr).Zone(Item1)).Name;
+                    auto &ZoneList = state.dataHeatBal->ZoneList(TStatObjects.ZoneOrZoneListPtr);
+                    cAlphaArgs(2) = Zone(ZoneList.Zone(Item1)).Name;
                 }
                 int ZoneAssigned = Util::FindItemInList(
                     cAlphaArgs(2), state.dataZoneCtrls->TempControlledZone, &DataZoneControls::ZoneTempControls::ZoneName, TempControlledZoneNum - 1);
@@ -445,11 +446,12 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (!TStatObjects.ZoneListActive) {
                     TempControlledZone.Name = cAlphaArgs(1);
                 } else {
+                    auto &ZoneList = state.dataHeatBal->ZoneList(TStatObjects.ZoneOrZoneListPtr);
                     CheckCreatedZoneItemName(state,
                                              RoutineName,
                                              cCurrentModuleObject,
-                                             Zone(ZoneList(TStatObjects.ZoneOrZoneListPtr).Zone(Item1)).Name,
-                                             ZoneList(TStatObjects.ZoneOrZoneListPtr).MaxZoneNameLength,
+                                             Zone(ZoneList.Zone(Item1)).Name,
+                                             ZoneList.MaxZoneNameLength,
                                              TStatObjects.Name,
                                              state.dataZoneCtrls->TempControlledZone,
                                              TempControlledZoneNum - 1,
@@ -967,7 +969,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
         Item1 = Util::FindItemInList(cAlphaArgs(2), Zone);
         ZLItem = 0;
-        if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), ZoneList);
+        if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
         auto &ComfortTStatObjects = state.dataZoneCtrls->ComfortTStatObjects(Item);
         ComfortTStatObjects.Name = cAlphaArgs(1);
         if (Item1 > 0) {
@@ -977,9 +979,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             ComfortTStatObjects.ZoneListActive = false;
             ComfortTStatObjects.ZoneOrZoneListPtr = Item1;
         } else if (ZLItem > 0) {
+            auto &ZoneList = state.dataHeatBal->ZoneList(ZLItem);
             ComfortTStatObjects.ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
-            state.dataZoneCtrls->NumComfortControlledZones += ZoneList(ZLItem).NumOfZones;
-            ComfortTStatObjects.NumOfZones = ZoneList(ZLItem).NumOfZones;
+            state.dataZoneCtrls->NumComfortControlledZones += ZoneList.NumOfZones;
+            ComfortTStatObjects.NumOfZones = ZoneList.NumOfZones;
             ComfortTStatObjects.ZoneListActive = true;
             ComfortTStatObjects.ZoneOrZoneListPtr = ZLItem;
         } else {
@@ -1020,7 +1023,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 ++ComfortControlledZoneNum;
                 auto &ComfortControlledZone = state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum);
                 if (ComfortTStatObjects.ZoneListActive) {
-                    cAlphaArgs(2) = state.dataHeatBal->Zone(ZoneList(ComfortTStatObjects.ZoneOrZoneListPtr).Zone(Item1)).Name;
+                    auto &ZoneList = state.dataHeatBal->ZoneList(ComfortTStatObjects.ZoneOrZoneListPtr);
+                    cAlphaArgs(2) = state.dataHeatBal->Zone(ZoneList.Zone(Item1)).Name;
                 }
                 int ZoneAssigned = Util::FindItemInList(cAlphaArgs(2),
                                                         state.dataZoneCtrls->ComfortControlledZone,
@@ -1054,8 +1058,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (!ComfortTStatObjects.ZoneListActive) {
                     ComfortControlledZone.Name = cAlphaArgs(1);
                 } else {
-                    ComfortControlledZone.Name =
-                        state.dataHeatBal->Zone(ZoneList(ComfortTStatObjects.ZoneOrZoneListPtr).Zone(Item1)).Name + ' ' + ComfortTStatObjects.Name;
+                    auto &ZoneList = state.dataHeatBal->ZoneList(ComfortTStatObjects.ZoneOrZoneListPtr);
+                    ComfortControlledZone.Name = state.dataHeatBal->Zone(ZoneList.Zone(Item1)).Name + ' ' + ComfortTStatObjects.Name;
                 }
 
                 // Read Fields A3 and A4 for averaging method
@@ -1759,7 +1763,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 // multiplier values for the specified zone(s)
                 ZLItem = 0;
                 Item1 = Util::FindItemInList(cAlphaArgs(2), Zone);
-                if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), ZoneList);
+                if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
                 if (Item1 > 0) {
                     int ZoneNum = Item1;
                     Zone(ZoneNum).FlagCustomizedZoneCap = true;
@@ -1768,8 +1772,9 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     Zone(ZoneNum).ZoneVolCapMultpCO2 = rNumericArgs(3);
                     Zone(ZoneNum).ZoneVolCapMultpGenContam = rNumericArgs(4);
                 } else if (ZLItem > 0) {
-                    for (int ZonePtrNum = 1; ZonePtrNum < ZoneList(ZLItem).NumOfZones; ZonePtrNum++) {
-                        int ZoneNum = ZoneList(ZLItem).Zone(ZonePtrNum);
+                    auto &ZoneList = state.dataHeatBal->ZoneList(ZLItem);
+                    for (int ZonePtrNum = 1; ZonePtrNum < ZoneList.NumOfZones; ZonePtrNum++) {
+                        int ZoneNum = ZoneList.Zone(ZonePtrNum);
                         Zone(ZoneNum).FlagCustomizedZoneCap = true;
                         Zone(ZoneNum).ZoneVolCapMultpSens = rNumericArgs(1);
                         Zone(ZoneNum).ZoneVolCapMultpMoist = rNumericArgs(2);
@@ -2270,7 +2275,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         state.dataZoneCtrls->StagedTStatObjects(Item).Name = cAlphaArgs(1);
         Item1 = Util::FindItemInList(cAlphaArgs(2), Zone);
         ZLItem = 0;
-        if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), ZoneList);
+        if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
         if (Item1 > 0) {
             state.dataZoneCtrls->StagedTStatObjects(Item).StageControlledZoneStartPtr = state.dataZoneTempPredictorCorrector->NumStageCtrZone + 1;
             ++state.dataZoneTempPredictorCorrector->NumStageCtrZone;
@@ -2278,9 +2283,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive = false;
             state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr = Item1;
         } else if (ZLItem > 0) {
+            auto &ZoneList = state.dataHeatBal->ZoneList(ZLItem);
             state.dataZoneCtrls->StagedTStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneTempPredictorCorrector->NumStageCtrZone + 1;
-            state.dataZoneTempPredictorCorrector->NumStageCtrZone += ZoneList(ZLItem).NumOfZones;
-            state.dataZoneCtrls->StagedTStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
+            state.dataZoneTempPredictorCorrector->NumStageCtrZone += ZoneList.NumOfZones;
+            state.dataZoneCtrls->StagedTStatObjects(Item).NumOfZones = ZoneList.NumOfZones;
             state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive = true;
             state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
         } else {
@@ -2317,8 +2323,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             for (Item1 = 1; Item1 <= state.dataZoneCtrls->StagedTStatObjects(Item).NumOfZones; ++Item1) {
                 ++StageControlledZoneNum;
                 if (state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive) {
-                    cAlphaArgs(2) =
-                        state.dataHeatBal->Zone(ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
+                    auto &ZoneList = state.dataHeatBal->ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr);
+                    cAlphaArgs(2) = state.dataHeatBal->Zone(ZoneList.Zone(Item1)).Name;
                 }
                 int ZoneAssigned = Util::FindItemInList(cAlphaArgs(2),
                                                         state.dataZoneCtrls->StageControlledZone,
@@ -2357,17 +2363,17 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (!state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive) {
                     stageControlledZone.Name = cAlphaArgs(1);
                 } else {
-                    CheckCreatedZoneItemName(
-                        state,
-                        RoutineName,
-                        cCurrentModuleObject,
-                        state.dataHeatBal->Zone(ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name,
-                        ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                        state.dataZoneCtrls->StagedTStatObjects(Item).Name,
-                        state.dataZoneCtrls->StageControlledZone,
-                        StageControlledZoneNum - 1,
-                        stageControlledZone.Name,
-                        errFlag);
+                    auto &ZoneList = state.dataHeatBal->ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr);
+                    CheckCreatedZoneItemName(state,
+                                             RoutineName,
+                                             cCurrentModuleObject,
+                                             state.dataHeatBal->Zone(ZoneList.Zone(Item1)).Name,
+                                             ZoneList.MaxZoneNameLength,
+                                             state.dataZoneCtrls->StagedTStatObjects(Item).Name,
+                                             state.dataZoneCtrls->StageControlledZone,
+                                             StageControlledZoneNum - 1,
+                                             stageControlledZone.Name,
+                                             errFlag);
                     if (errFlag) ErrorsFound = true;
                 }
 
