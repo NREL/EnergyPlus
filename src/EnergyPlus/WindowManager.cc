@@ -4027,7 +4027,6 @@ namespace Window {
         Real64 pr;                        // Gap gas Prandtl number
         Real64 nu;                        // Gap gas Nusselt number
         WinShadingType ShadeFlag;         // Shading flag
-        int BlNum;                        // Blind number
         int IGapInc;                      // Gap increment (0 or 1)
 
         auto &wm = state.dataWindowManager;
@@ -4091,7 +4090,7 @@ namespace Window {
             AHolesGap = thisMaterialShade->WinShadeAirFlowPermeability * GapHeight * state.dataSurface->Surface(SurfNum).Width;
         } else {
             // Blind on
-            BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
+            int BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
             auto const &blind = state.dataMaterial->Blind(BlNum);
             ATopGap = blind.BlindTopOpeningMult * AGap;
             ABotGap = blind.BlindBottomOpeningMult * AGap;
@@ -4501,13 +4500,11 @@ namespace Window {
         //   b is also output as the solution, x
         //   b is also output as the solution, x
 
-        int ii; // Intermediate variables
-        int ll;
         Real64 sum; // Summation variable
 
-        ii = 0;
+        int ii = 0;
         for (int i = 1; i <= n; ++i) {
-            ll = indx(i);
+            int ll = indx(i);
             sum = b(ll);
             b(ll) = b(i);
             if (ii != 0) {
@@ -4827,7 +4824,6 @@ namespace Window {
         Real64 ressum;           // Resistance sum (m2-K/W)
         int StormWinFlagPrevDay; // Previous time step value (day) of storm window flag
         int StormWinFlagThisDay; // Current time step value (day) of storm window flag
-        int nglfacePrevDay;      // Previous time step value (dya) of number of glass faces (may differ
         //   current time step value, nglface, if storm window was
         //   added or removed during the current time step).
 
@@ -4886,7 +4882,7 @@ namespace Window {
             // temperature values, although calculated here, are not used. The shade/blind face numbers
             // during the previous time step depend on whether a storm window glass layer was added to
             // or removed from the window during the current time step.
-            nglfacePrevDay = wm->nglface;
+            int nglfacePrevDay = wm->nglface;
             if (StormWinFlagPrevDay == 0 && StormWinFlagThisDay == 1) nglfacePrevDay = wm->nglface - 2;
             if (StormWinFlagPrevDay == 1 && StormWinFlagThisDay == 0) nglfacePrevDay = wm->nglface + 2;
             wm->thetas[wm->nglface] = state.dataSurface->SurfaceWindow(SurfNum).thetaFace[nglfacePrevDay + 1];
@@ -5603,7 +5599,6 @@ namespace Window {
         Array2D<Real64> D(6, 16); // Powers of independent variable
         Real64 ACON;              // Intermediate variables
         Real64 SUM;
-        int KP1;
         int LP1;
         int NM1;
 
@@ -5637,7 +5632,7 @@ namespace Window {
         // Solve the simultaneous equations using Gauss elimination
         NM1 = N - 1;
         for (int K = 1; K <= NM1; ++K) {
-            KP1 = K + 1;
+            int KP1 = K + 1;
             for (int i = KP1; i <= N; ++i) {
                 ACON = A(K, i) / A(K, K);
                 B(i) -= B(K) * ACON;
@@ -5698,7 +5693,6 @@ namespace Window {
         Array2D<Real64> D(6, 16); // Powers of independent variable
         Real64 ACON;              // Intermediate variables
         Real64 SUM;
-        int KP1;
         int LP1;
         int NM1;
 
@@ -5732,7 +5726,7 @@ namespace Window {
         // Solve the simultaneous equations using Gauss elimination
         NM1 = N - 1;
         for (int K = 1; K <= NM1; ++K) {
-            KP1 = K + 1;
+            int KP1 = K + 1;
             for (int i = KP1; i <= N; ++i) {
                 ACON = A(K, i) / A(K, K);
                 B(i) -= B(K) * ACON;
@@ -6933,8 +6927,6 @@ namespace Window {
         Real64 TempVar(0.0); // just temporary usage for complex fenestration
 
         int ThisNum;
-        int Layer;
-        int BlNum;                       // Blind number
         Real64 NominalConductanceWinter; // Nominal center-of-glass conductance of a window construction
         // for ASHRAE winter conditions (W/m2-K):
         // Inside air temperature = 21.1C (70F)
@@ -6950,13 +6942,9 @@ namespace Window {
         Real64 SHGCWinter(0.0); // Center-of-glass solar heat gain coefficient for ASHRAE
         Real64 SHGCSummer(0.0);
         // winter and summer conditions
-        Real64 TransSolNorm;        // Window construction solar transmittance at normal incidence
-        Real64 TransVisNorm;        // Window construction visible transmittance at normal incidence
-        int errFlag;                // Error flag
-        std::string SolarDiffusing; // 'Yes' if glass is solar diffusing; otherwise 'No' (clear glass)
-        std::string SpectralDataName;
-        std::string OpticalDataType;
-        std::string SlateOrientation;
+        Real64 TransSolNorm; // Window construction solar transmittance at normal incidence
+        Real64 TransVisNorm; // Window construction visible transmittance at normal incidence
+        int errFlag;         // Error flag
 
         auto &wm = state.dataWindowManager;
 
@@ -7156,8 +7144,10 @@ namespace Window {
                     //    Write(OutputFileConstrainParams, 705)  TRIM(Construct(ThisNum)%Name), SHGCSummer ,TransVisNorm
 
                     for (int i = 1; i <= construct.TotLayers; ++i) {
-                        Layer = construct.LayerPoint(i);
+                        int Layer = construct.LayerPoint(i);
                         auto const *mat = state.dataMaterial->Material(Layer);
+                        std::string SpectralDataName;
+                        std::string OpticalDataType;
 
                         switch (mat->group) {
                         case Material::Group::WindowGas: {
@@ -7185,7 +7175,7 @@ namespace Window {
                         case Material::Group::WindowBlind: {
                             auto const *thisMaterial = dynamic_cast<Material::MaterialChild const *>(mat);
                             assert(thisMaterial != nullptr);
-                            BlNum = thisMaterial->BlindDataPtr;
+                            int BlNum = thisMaterial->BlindDataPtr;
                             auto const &blind = state.dataMaterial->Blind(BlNum);
                             static constexpr std::string_view Format_704(
                                 " WindowMaterial:Blind,{},{:.4R},{:.4R},{:.4R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
@@ -7227,7 +7217,7 @@ namespace Window {
                         case Material::Group::WindowSimpleGlazing: {
                             auto const *thisMaterial = dynamic_cast<Material::MaterialChild const *>(mat);
                             assert(thisMaterial != nullptr);
-                            SolarDiffusing = "No";
+                            std::string SolarDiffusing = "No";
                             if (thisMaterial->SolarDiffusing) SolarDiffusing = "Yes";
                             OpticalDataType = "SpectralAverage";
                             SpectralDataName = "";
@@ -7352,7 +7342,7 @@ namespace Window {
                         case Material::Group::BlindEquivalentLayer: {
                             auto const *thisMaterial = dynamic_cast<Material::MaterialChild const *>(mat);
                             assert(thisMaterial != nullptr);
-                            SlateOrientation = "Horizontal";
+                            std::string SlateOrientation = "Horizontal";
                             if (thisMaterial->SlatOrientation == DataWindowEquivalentLayer::Orientation::Vertical) {
                                 SlateOrientation = "Vertical";
                             }
