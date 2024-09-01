@@ -6579,7 +6579,7 @@ namespace Window {
         // init the surface convective and radiative adjustment ratio
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 int const firstSurfWin = thisSpace.WindowSurfaceFirst;
                 int const lastSurfWin = thisSpace.WindowSurfaceLast;
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -6604,7 +6604,7 @@ namespace Window {
                                Array1D<Real64> const hgap,        // Conductive gap conductance [W/m2-K]
                                Real64 &NominalConductance,        // Nominal center-of-glass conductance, including air films
                                Real64 &SHGC,                      // Nominal center-of-glass solar heat gain coefficient for
-                               Real64 &TSolNorm                   // Overall beam solar transmittance at normal incidence
+                               Real64 const TSolNorm              // Overall beam solar transmittance at normal incidence
     )
     {
         Array1D<Real64> hGapTot(5); // Combined radiative and conductive gap conductance [W/m2-K]
