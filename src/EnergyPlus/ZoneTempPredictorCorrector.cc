@@ -326,8 +326,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     auto &Zone = state.dataHeatBal->Zone;
     auto &ZoneList = state.dataHeatBal->ZoneList;
     int NumOfZones = state.dataGlobal->NumOfZones;
-    auto &SetPointSingleHeating = state.dataZoneTempPredictorCorrector->SetPointSingleHeating;
-    auto &SetPointSingleCooling = state.dataZoneTempPredictorCorrector->SetPointSingleCooling;
     auto &cAlphaArgs = state.dataIPShortCut->cAlphaArgs;
     auto &rNumericArgs = state.dataIPShortCut->rNumericArgs;
     auto &lNumericFieldBlanks = state.dataIPShortCut->lNumericFieldBlanks;
@@ -553,7 +551,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls > 0)
-        SetPointSingleHeating.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls);
+        state.dataZoneTempPredictorCorrector->SetPointSingleHeating.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls);
 
     for (int idx = 1; idx <= state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls; ++idx) {
         inputProcessor->getObjectItem(state,
@@ -569,7 +567,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       cAlphaFieldNames,
                                       cNumericFieldNames);
         Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-        auto &singleHtgSetpoint = SetPointSingleHeating(idx);
+        auto &singleHtgSetpoint = state.dataZoneTempPredictorCorrector->SetPointSingleHeating(idx);
         singleHtgSetpoint.Name = cAlphaArgs(1);
         singleHtgSetpoint.TempSchedName = cAlphaArgs(2);
         singleHtgSetpoint.TempSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
@@ -585,7 +583,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls > 0)
-        SetPointSingleCooling.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls);
+        state.dataZoneTempPredictorCorrector->SetPointSingleCooling.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls);
 
     for (int idx = 1; idx <= state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls; ++idx) {
         inputProcessor->getObjectItem(state,
@@ -601,7 +599,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       cAlphaFieldNames,
                                       cNumericFieldNames);
         Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-        auto &singleClgSetpoint = SetPointSingleCooling(idx);
+        auto &singleClgSetpoint = state.dataZoneTempPredictorCorrector->SetPointSingleCooling(idx);
         singleClgSetpoint.Name = cAlphaArgs(1);
         singleClgSetpoint.TempSchedName = cAlphaArgs(2);
         singleClgSetpoint.TempSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
@@ -690,12 +688,14 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum);
             switch (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlTypeEnum(ct)) {
             case HVAC::ThermostatType::SingleHeating:
-                setPointObjectArrayIndex = Util::FindItem(TempControlledZone.ControlTypeName(ct), SetPointSingleHeating);
+                setPointObjectArrayIndex =
+                    Util::FindItem(TempControlledZone.ControlTypeName(ct), state.dataZoneTempPredictorCorrector->SetPointSingleHeating);
                 TempControlledZone.SchIndx_SingleHeatSetPoint =
                     state.dataZoneTempPredictorCorrector->SetPointSingleHeating(setPointObjectArrayIndex).TempSchedIndex;
                 break;
             case HVAC::ThermostatType::SingleCooling:
-                setPointObjectArrayIndex = Util::FindItem(TempControlledZone.ControlTypeName(ct), SetPointSingleCooling);
+                setPointObjectArrayIndex =
+                    Util::FindItem(TempControlledZone.ControlTypeName(ct), state.dataZoneTempPredictorCorrector->SetPointSingleCooling);
                 TempControlledZone.SchIndx_SingleCoolSetPoint =
                     state.dataZoneTempPredictorCorrector->SetPointSingleCooling(setPointObjectArrayIndex).TempSchedIndex;
                 break;
