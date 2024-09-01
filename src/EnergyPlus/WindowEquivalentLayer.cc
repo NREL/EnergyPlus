@@ -6676,8 +6676,6 @@ void ASHWAT_OffNormalProperties(EnergyPlusData &state,
     //   = wall-solar azimuth angle for a vertical wall
     //     Used for PD and vertical VB
 
-    bool OKAY;
-
     LSWP_ON = L.SWP_EL; // init to normal properties
     //  calls below modify in place
 
@@ -6686,15 +6684,15 @@ void ASHWAT_OffNormalProperties(EnergyPlusData &state,
         // HBX note: ltyGZS here iff modelOption F=x; spectral cases elsewhere
         Specular_SWP(LSWP_ON, THETA);
     } else if (L.LTYPE == LayerType::VBHOR) {
-        OKAY = VB_SWP(state, L, LSWP_ON, OMEGA_V);
+        VB_SWP(state, L, LSWP_ON, OMEGA_V);
     } else if (L.LTYPE == LayerType::VBVER) {
-        OKAY = VB_SWP(state, L, LSWP_ON, OMEGA_H);
+        VB_SWP(state, L, LSWP_ON, OMEGA_H);
     } else if (L.LTYPE == LayerType::DRAPE) {
-        OKAY = PD_SWP(state, L, LSWP_ON, OMEGA_V, OMEGA_H);
+        PD_SWP(state, L, LSWP_ON, OMEGA_V, OMEGA_H);
     } else if (L.LTYPE == LayerType::ROLLB) {
-        OKAY = RB_SWP(state, L, LSWP_ON, THETA);
+        RB_SWP(state, L, LSWP_ON, THETA);
     } else if (L.LTYPE == LayerType::INSCRN) {
-        OKAY = IS_SWP(state, L, LSWP_ON, THETA);
+        IS_SWP(state, L, LSWP_ON, THETA);
     } else if (L.LTYPE == LayerType::NONE || L.LTYPE == LayerType::ROOM) {
         // none or room: do nothing
     } else {
