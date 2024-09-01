@@ -4364,9 +4364,7 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
     int NL;
     int I;
     int J;
-    int L;
     int ITRY;
-    int hin_scheme;                   // flags different schemes for indoor convection coefficients
     Array1D_int ISDL({0, FS.NL + 1}); // Flag to mark diathermanous layers, 0=opaque
     Array1D<Real64> QOCF_F(FS.NL);    // heat flux to outdoor-facing surface of layer i, from gap i-1,
                                       //   due to open channel flow, W/m2
@@ -4488,19 +4486,6 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
 
         //  CALCULATE GAS LAYER CONVECTIVE HEAT TRANSFER COEFFICIENTS
 
-        hin_scheme = 3; //  different schemes for calculating convection
-                        //  coefficients glass-to-air and shade-to-air
-                        //  if open channel air flow is allowed
-                        //  see the corresponding subroutines for detail
-                        //  = 1 gives dependence of height, spacing, delta-T
-                        //  = 2 gives dependence of spacing, delta-T but
-                        //    returns unrealistic values for large spacing
-                        //  = 3 glass-shade spacing dependence only on HCIN
-                        //  = negative, applies HCIN without adjusting for
-                        //    temperature, height, spacing, slat angle
-                        //  Recommended -> hin_scheme=3 for use with HBX,
-                        //              simplicity, right trends wrt spacing
-
         // start by assuming no open channel flow on indoor side
 
         HC[NL] = HCIN; //  default - HC[NL] supplied by calling routine
@@ -4516,6 +4501,20 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
 
         // Check for open channels -  only possible with at least two layers
         if (NL >= 2) {
+
+            int hin_scheme = 3; //  different schemes for calculating convection
+                                //  coefficients glass-to-air and shade-to-air
+                                //  if open channel air flow is allowed
+                                //  see the corresponding subroutines for detail
+                                //  = 1 gives dependence of height, spacing, delta-T
+                                //  = 2 gives dependence of spacing, delta-T but
+                                //    returns unrealistic values for large spacing
+                                //  = 3 glass-shade spacing dependence only on HCIN
+                                //  = negative, applies HCIN without adjusting for
+                                //    temperature, height, spacing, slat angle
+                                //  Recommended -> hin_scheme=3 for use with HBX,
+                                //              simplicity, right trends wrt spacing
+
             for (I = 1; I <= NL - 1; ++I) { // Scan gaps between layers
 
                 // DEAL WITH INDOOR OPEN CHANNEL FLOW HERE
@@ -4586,7 +4585,7 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
         XSOL = 0.0;
         A = 0.0;
 
-        L = 1;
+        int L = 1;
         A(1, L) = 1.0;
         A(2, L) = -1.0 * RHOB(0); //  -1.0 * RHOB_OUT
         A(ADIM + 1, L) = EPSB_OUT * Constant::StefanBoltzmann * TRMOUT_4;
@@ -4818,9 +4817,7 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
     int NL;
     int I;
     int J;
-    int L;
     int ITRY;
-    int hin_scheme;                   // flags different schemes for indoor convection coefficients
     Array1D_int ISDL({0, FS.NL + 1}); // Flag to mark diathermanous layers, 0=opaque
     int NDLIAR;                       // Number of Diathermanous Layers In A Row (i.e., consecutive)
     int IB;                           // Counter begin and end limits
@@ -4965,19 +4962,6 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
 
         //  CALCULATE GAS LAYER CONVECTIVE HEAT TRANSFER COEFFICIENTS
 
-        hin_scheme = 3; //  different schemes for calculating convection
-                        //  coefficients glass-to-air and shade-to-air
-                        //  if open channel air flow is allowed
-                        //  see the corresponding subroutines for detail
-                        //  = 1 gives dependence of height, spacing, delta-T
-                        //  = 2 gives dependence of spacing, delta-T but
-                        //    returns unrealistic values for large spacing
-                        //  = 3 glass-shade spacing dependence only on HCIN
-                        //  = negative, applies HCIN without adjusting for
-                        //    temperature, height, spacing, slat angle
-                        //  Recommended -> hin_scheme=3 for use with HBX,
-                        //              simplicity, right trends wrt spacing
-
         // start by assuming no open channel flow on indoor side
 
         HC[NL] = HCIN; //  default - HC[NL] supplied by calling routine
@@ -4991,6 +4975,20 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
 
         // Check for open channels -  only possible with at least two layers
         if (NL >= 2) {
+
+            int hin_scheme = 3; //  different schemes for calculating convection
+                                //  coefficients glass-to-air and shade-to-air
+                                //  if open channel air flow is allowed
+                                //  see the corresponding subroutines for detail
+                                //  = 1 gives dependence of height, spacing, delta-T
+                                //  = 2 gives dependence of spacing, delta-T but
+                                //    returns unrealistic values for large spacing
+                                //  = 3 glass-shade spacing dependence only on HCIN
+                                //  = negative, applies HCIN without adjusting for
+                                //    temperature, height, spacing, slat angle
+                                //  Recommended -> hin_scheme=3 for use with HBX,
+                                //              simplicity, right trends wrt spacing
+
             for (I = 1; I <= NL - 1; ++I) { // Scan gaps between layers
 
                 // DEAL WITH INDOOR OPEN CHANNEL FLOW HERE
@@ -5061,7 +5059,7 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
         XSOL = 0.0;
         A = 0.0;
 
-        L = 1;
+        int L = 1;
         A(1, L) = 1.0;
         A(2, L) = -1.0 * RHOB(0); //  -1.0 * RHOB_OUT
         A(ADIM + 1, L) = EPSB_OUT * Constant::StefanBoltzmann * TRMOUT_4;
