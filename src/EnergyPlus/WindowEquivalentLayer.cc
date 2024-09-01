@@ -7833,15 +7833,12 @@ void FillDefaultsSWP(EnergyPlusData &state,
     //       AUTHOR         The University of WaterLoo
     //       DATE WRITTEN   unknown
     //       MODIFIED       Bereket Nigusse/FSEC, June 2013
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Fills in defaulted short wave optical properties for equivalent window
-    // layers
+    // Fills in defaulted short wave optical properties for equivalent window layers
 
     // may be within L
     static constexpr std::string_view RoutineName("FillDefaultsSWP: ");
-    bool OK;
 
     // default back taus to front (often equal)
     if (SWP.TAUSBBB < 0.0) SWP.TAUSBBB = SWP.TAUSFBB;
@@ -7862,7 +7859,7 @@ void FillDefaultsSWP(EnergyPlusData &state,
     } else if (L.LTYPE == LayerType::ROLLB) {
         // estimate diffuse properties if any < 0
         if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
-            OK = RB_SWP(state, L, SWP); // TODO RB
+            RB_SWP(state, L, SWP); // TODO RB
         }
     } else if (L.LTYPE == LayerType::INSCRN) {
         if (SWP.TAUSFBB < 0.0) {
@@ -7870,7 +7867,7 @@ void FillDefaultsSWP(EnergyPlusData &state,
             if (SWP.TAUSBBB < 0.0) SWP.TAUSBBB = SWP.TAUSFBB;
         }
         if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
-            OK = IS_SWP(state, L, SWP); // TODO IS
+            IS_SWP(state, L, SWP); // TODO IS
         }
     } else if (L.LTYPE == LayerType::NONE || L.LTYPE == LayerType::ROOM) {
         // none or room: do nothing
