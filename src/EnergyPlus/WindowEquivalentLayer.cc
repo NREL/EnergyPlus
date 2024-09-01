@@ -7784,7 +7784,7 @@ int CFSNGlz(CFSTY const &FS) // CFS
     return CFSNGlz;
 }
 
-int CFSHasControlledShade(EnergyPlusData &state, CFSTY const &FS)
+int CFSHasControlledShade(EnergyPlusData const &state, CFSTY const &FS)
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP

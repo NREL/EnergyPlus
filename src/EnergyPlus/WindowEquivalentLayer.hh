@@ -744,7 +744,7 @@ namespace WindowEquivalentLayer {
 
     int CFSNGlz(CFSTY const &FS); // CFS
 
-    int CFSHasControlledShade(EnergyPlusData &state, CFSTY const &FS);
+    int CFSHasControlledShade(EnergyPlusData const &state, CFSTY const &FS);
 
     void CheckAndFixCFSLayer(EnergyPlusData &state, CFSLAYER &Layer);
 
