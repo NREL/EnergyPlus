@@ -4291,7 +4291,6 @@ namespace Window {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ConstrNumSh; // Shaded construction number
-        int MatNumSh;    // Material number of shade/blind layer
         // In the following, "gaps" refer to the gaps on either side of the shade/blind
         Array1D<Real64> TGlassFace(2); // Temperature of glass surfaces facing gaps (K)
         Array1D<Real64> TShadeFace(2); // Temperature of shade surfaces facing gaps (K)
@@ -4325,14 +4324,12 @@ namespace Window {
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
 
         if (state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers == 2) { // Double glazing
-            MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(3);
             IGapInc = 0;
             for (int IGap = 1; IGap <= 2; ++IGap) {
                 TGlassFace(IGap) = wm->thetas[IGap];
                 TShadeFace(IGap) = wm->thetas[IGap + 3];
             }
         } else { // Triple glazing
-            MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(5);
             IGapInc = 1;
             for (int IGap = 1; IGap <= 2; ++IGap) {
                 TGlassFace(IGap) = wm->thetas[IGap + 2];
