@@ -4204,9 +4204,6 @@ void SOLMATS(int const N,          // # of active rows in A
     // SUBROUTINE INFORMATION:
     //       AUTHOR         John L. Wright, University of Waterloo,
     //                      Mechanical Engineering, Advanced Glazing System Laboratory
-    //       DATE WRITTEN   Unknown
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  Matrix solver.
@@ -4214,43 +4211,27 @@ void SOLMATS(int const N,          // # of active rows in A
     //  Solves matrix by the elimination method supplemented by a search for the
     //  largest pivotal element at each stage
 
-    Real64 CMAX;
-    Real64 TEMP;
-    Real64 C;
-    Real64 Y;
-    Real64 D;
-    int NM1;
-    int NP1;
-    int NP2;
-    int I;
-    int J;
-    int L;
-    int LP;
-    int NOS;
-    int NI;
-    int NJ;
+    int NM1 = N - 1;
+    int NP1 = N + 1;
+    int NP2 = N + 2;
 
-    NM1 = N - 1;
-    NP1 = N + 1;
-    NP2 = N + 2;
-
-    for (I = 1; I <= N; ++I) {
+    for (int I = 1; I <= N; ++I) {
         A(NP2, I) = 0.0;
         // DO 1 J=1,NP1    ! TODO ?
     }
 
-    for (I = 1; I <= N; ++I) {
-        for (J = 1; J <= NP1; ++J) {
+    for (int I = 1; I <= N; ++I) {
+        for (int J = 1; J <= NP1; ++J) {
             A(NP2, I) += A(J, I);
         }
     }
 
-    for (L = 1; L <= N - 1; ++L) {
-        CMAX = A(L, L);
-        LP = L + 1;
-        NOS = L;
+    for (int L = 1; L <= N - 1; ++L) {
+        Real64 CMAX = A(L, L);
+        int LP = L + 1;
+        int NOS = L;
 
-        for (I = LP; I <= N; ++I) {
+        for (int I = LP; I <= N; ++I) {
             if (std::abs(CMAX) < std::abs(A(L, I))) {
                 CMAX = A(L, I);
                 NOS = I;
@@ -4259,20 +4240,20 @@ void SOLMATS(int const N,          // # of active rows in A
 
         // Swap rows
         if (NOS != L) {
-            for (J = 1; J <= NP2; ++J) {
-                TEMP = A(J, L);
+            for (int J = 1; J <= NP2; ++J) {
+                Real64 TEMP = A(J, L);
                 A(J, L) = A(J, NOS);
                 A(J, NOS) = TEMP;
             }
         }
 
-        for (I = LP; I <= N; ++I) {
-            C = 0.0;
-            Y = -A(L, I) / A(L, L);
-            for (J = L; J <= NP2; ++J) {
+        for (int I = LP; I <= N; ++I) {
+            Real64 C = 0.0;
+            Real64 Y = -A(L, I) / A(L, L);
+            for (int J = L; J <= NP2; ++J) {
                 A(J, I) += Y * A(J, L);
             }
-            for (J = L; J <= NP1; ++J) {
+            for (int J = L; J <= NP1; ++J) {
                 C += A(J, I);
             }
         }
@@ -4280,11 +4261,11 @@ void SOLMATS(int const N,          // # of active rows in A
 
     // back-substitute
     XSOL(N) = A(NP1, N) / A(N, N);
-    for (I = 1; I <= NM1; ++I) {
-        NI = N - I;
-        D = 0.0;
-        for (J = 1; J <= I; ++J) {
-            NJ = N + 1 - J;
+    for (int I = 1; I <= NM1; ++I) {
+        int NI = N - I;
+        Real64 D = 0.0;
+        for (int J = 1; J <= I; ++J) {
+            int NJ = N + 1 - J;
             D += A(NJ, NI) * XSOL(NJ);
         }
         XSOL(NI) = (A(NP1, NI) - D) / A(NI, NI);
