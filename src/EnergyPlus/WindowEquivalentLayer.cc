@@ -3682,7 +3682,7 @@ Real64 VB_SLAT_RADIUS_RATIO(Real64 const W, // slat tip-to-tip (chord) width (an
     return VB_SLAT_RADIUS_RATIO;
 }
 
-void VB_SOL46_CURVE(EnergyPlusData &state,
+void VB_SOL46_CURVE(EnergyPlusData const &state,
                     Real64 const S,           // slat spacing (any length units; same units as W)
                     Real64 const W,           // slat tip-to-tip (chord) width (any length units; same units as S)
                     Real64 const SL_WR,       // slat curvature radius ratio (= W/R)
