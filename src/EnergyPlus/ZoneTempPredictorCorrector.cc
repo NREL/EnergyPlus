@@ -325,7 +325,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     auto &Zone = state.dataHeatBal->Zone;
     auto &ZoneList = state.dataHeatBal->ZoneList;
-    auto &HumidityControlZone = state.dataZoneCtrls->HumidityControlZone;
     int NumOfZones = state.dataGlobal->NumOfZones;
     auto &SetPointSingleHeating = state.dataZoneTempPredictorCorrector->SetPointSingleHeating;
     auto &SetPointSingleCooling = state.dataZoneTempPredictorCorrector->SetPointSingleCooling;
@@ -883,12 +882,13 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     state.dataZoneCtrls->NumHumidityControlZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataZoneCtrls->NumHumidityControlZones > 0) {
-        HumidityControlZone.allocate(state.dataZoneCtrls->NumHumidityControlZones);
+        state.dataZoneCtrls->HumidityControlZone.allocate(state.dataZoneCtrls->NumHumidityControlZones);
         state.dataZoneTempPredictorCorrector->HumidityControlZoneUniqueNames.reserve(
             static_cast<unsigned>(state.dataZoneCtrls->NumHumidityControlZones));
     }
 
     for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HumidControlledZoneNum) {
+        auto &HumidityControlZone = state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum);
         inputProcessor->getObjectItem(state,
                                       cCurrentModuleObject,
                                       HumidControlledZoneNum,
@@ -903,7 +903,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       cNumericFieldNames);
         Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-        HumidityControlZone(HumidControlledZoneNum).ControlName = cAlphaArgs(1);
+        HumidityControlZone.ControlName = cAlphaArgs(1);
         GlobalNames::IntraObjUniquenessCheck(state,
                                              cAlphaArgs(2),
                                              cCurrentModuleObject,
@@ -911,33 +911,33 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                              state.dataZoneTempPredictorCorrector->HumidityControlZoneUniqueNames,
                                              ErrorsFound);
 
-        HumidityControlZone(HumidControlledZoneNum).ZoneName = cAlphaArgs(2);
-        HumidityControlZone(HumidControlledZoneNum).ActualZoneNum = Util::FindItem(cAlphaArgs(2), Zone);
-        if (HumidityControlZone(HumidControlledZoneNum).ActualZoneNum == 0) {
+        HumidityControlZone.ZoneName = cAlphaArgs(2);
+        HumidityControlZone.ActualZoneNum = Util::FindItem(cAlphaArgs(2), Zone);
+        if (HumidityControlZone.ActualZoneNum == 0) {
             ShowSevereError(state,
                             format("{}=\"{} invalid {}=\"{}\" not found.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
             ErrorsFound = true;
         } else {
-            state.dataHeatBal->Zone(HumidityControlZone(HumidControlledZoneNum).ActualZoneNum).humidityControlZoneIndex = HumidControlledZoneNum;
+            state.dataHeatBal->Zone(HumidityControlZone.ActualZoneNum).humidityControlZoneIndex = HumidControlledZoneNum;
         }
-        HumidityControlZone(HumidControlledZoneNum).HumidifyingSched = cAlphaArgs(3);
-        HumidityControlZone(HumidControlledZoneNum).HumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
-        if (HumidityControlZone(HumidControlledZoneNum).HumidifyingSchedIndex == 0) {
+        HumidityControlZone.HumidifyingSched = cAlphaArgs(3);
+        HumidityControlZone.HumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
+        if (HumidityControlZone.HumidifyingSchedIndex == 0) {
             ShowSevereError(state,
                             format("{}=\"{} invalid {}=\"{}\" not found.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
             ErrorsFound = true;
         }
         if (NumAlphas == 4) {
-            HumidityControlZone(HumidControlledZoneNum).DehumidifyingSched = cAlphaArgs(4);
-            HumidityControlZone(HumidControlledZoneNum).DehumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(4));
-            if (HumidityControlZone(HumidControlledZoneNum).DehumidifyingSchedIndex == 0) {
+            HumidityControlZone.DehumidifyingSched = cAlphaArgs(4);
+            HumidityControlZone.DehumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(4));
+            if (HumidityControlZone.DehumidifyingSchedIndex == 0) {
                 ShowSevereError(
                     state, format("{}=\"{} invalid {}=\"{}\" not found.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                 ErrorsFound = true;
             }
         } else {
-            HumidityControlZone(HumidControlledZoneNum).DehumidifyingSched = cAlphaArgs(3);
-            HumidityControlZone(HumidControlledZoneNum).DehumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
+            HumidityControlZone.DehumidifyingSched = cAlphaArgs(3);
+            HumidityControlZone.DehumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
         }
 
     } // HumidControlledZoneNum
@@ -1054,8 +1054,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (!ComfortTStatObjects.ZoneListActive) {
                     ComfortControlledZone.Name = cAlphaArgs(1);
                 } else {
-                    ComfortControlledZone.Name = state.dataHeatBal->Zone(ZoneList(ComfortTStatObjects.ZoneOrZoneListPtr).Zone(Item1)).Name +
-                                                 ' ' + ComfortTStatObjects.Name;
+                    ComfortControlledZone.Name =
+                        state.dataHeatBal->Zone(ZoneList(ComfortTStatObjects.ZoneOrZoneListPtr).Zone(Item1)).Name + ' ' + ComfortTStatObjects.Name;
                 }
 
                 // Read Fields A3 and A4 for averaging method
