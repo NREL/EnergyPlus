@@ -8842,7 +8842,7 @@ namespace Window {
     void initWindowModel(EnergyPlusData &state)
     {
         const std::string objectName = "WindowsCalculationEngine";
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
         wm->inExtWindowModel = CWindowModel::WindowModelFactory(state, objectName);
         wm->winOpticalModel = CWindowOpticalModel::WindowOpticalModelFactory(state);
     } // InitWindowModel()
