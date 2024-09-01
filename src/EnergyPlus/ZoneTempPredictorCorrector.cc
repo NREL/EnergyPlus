@@ -326,7 +326,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     auto &Zone = state.dataHeatBal->Zone;
     auto &ZoneList = state.dataHeatBal->ZoneList;
     auto &HumidityControlZone = state.dataZoneCtrls->HumidityControlZone;
-    auto &ComfortTStatObjects = state.dataZoneCtrls->ComfortTStatObjects;
     int NumOfZones = state.dataGlobal->NumOfZones;
     auto &SetPointSingleHeating = state.dataZoneTempPredictorCorrector->SetPointSingleHeating;
     auto &SetPointSingleCooling = state.dataZoneTempPredictorCorrector->SetPointSingleCooling;
@@ -946,7 +945,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     // Start to read Thermal comfort control objects
     cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat));
     state.dataZoneCtrls->NumComfortTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    ComfortTStatObjects.allocate(state.dataZoneCtrls->NumComfortTStatStatements);
+    state.dataZoneCtrls->ComfortTStatObjects.allocate(state.dataZoneCtrls->NumComfortTStatStatements);
 
     // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
     state.dataZoneCtrls->NumComfortControlledZones = 0;
@@ -969,19 +968,20 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         Item1 = Util::FindItemInList(cAlphaArgs(2), Zone);
         ZLItem = 0;
         if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), ZoneList);
-        ComfortTStatObjects(Item).Name = cAlphaArgs(1);
+        auto &ComfortTStatObjects = state.dataZoneCtrls->ComfortTStatObjects(Item);
+        ComfortTStatObjects.Name = cAlphaArgs(1);
         if (Item1 > 0) {
-            ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
+            ComfortTStatObjects.ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
             ++state.dataZoneCtrls->NumComfortControlledZones;
-            ComfortTStatObjects(Item).NumOfZones = 1;
-            ComfortTStatObjects(Item).ZoneListActive = false;
-            ComfortTStatObjects(Item).ZoneOrZoneListPtr = Item1;
+            ComfortTStatObjects.NumOfZones = 1;
+            ComfortTStatObjects.ZoneListActive = false;
+            ComfortTStatObjects.ZoneOrZoneListPtr = Item1;
         } else if (ZLItem > 0) {
-            ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
+            ComfortTStatObjects.ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
             state.dataZoneCtrls->NumComfortControlledZones += ZoneList(ZLItem).NumOfZones;
-            ComfortTStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
-            ComfortTStatObjects(Item).ZoneListActive = true;
-            ComfortTStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
+            ComfortTStatObjects.NumOfZones = ZoneList(ZLItem).NumOfZones;
+            ComfortTStatObjects.ZoneListActive = true;
+            ComfortTStatObjects.ZoneOrZoneListPtr = ZLItem;
         } else {
             ShowSevereError(
                 state, format("{}=\"{}\" invalid {}=\"{}\" not found.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
@@ -1003,6 +1003,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
         ComfortControlledZoneNum = 0;
         for (Item = 1; Item <= state.dataZoneCtrls->NumComfortTStatStatements; ++Item) {
+            auto &ComfortTStatObjects = state.dataZoneCtrls->ComfortTStatObjects(Item);
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
@@ -1015,11 +1016,11 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            for (Item1 = 1; Item1 <= ComfortTStatObjects(Item).NumOfZones; ++Item1) {
+            for (Item1 = 1; Item1 <= ComfortTStatObjects.NumOfZones; ++Item1) {
                 ++ComfortControlledZoneNum;
                 auto &ComfortControlledZone = state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum);
-                if (ComfortTStatObjects(Item).ZoneListActive) {
-                    cAlphaArgs(2) = state.dataHeatBal->Zone(ZoneList(ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
+                if (ComfortTStatObjects.ZoneListActive) {
+                    cAlphaArgs(2) = state.dataHeatBal->Zone(ZoneList(ComfortTStatObjects.ZoneOrZoneListPtr).Zone(Item1)).Name;
                 }
                 int ZoneAssigned = Util::FindItemInList(cAlphaArgs(2),
                                                         state.dataZoneCtrls->ComfortControlledZone,
@@ -1050,11 +1051,11 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     continue;
                 }
 
-                if (!ComfortTStatObjects(Item).ZoneListActive) {
+                if (!ComfortTStatObjects.ZoneListActive) {
                     ComfortControlledZone.Name = cAlphaArgs(1);
                 } else {
-                    ComfortControlledZone.Name = state.dataHeatBal->Zone(ZoneList(ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name +
-                                                 ' ' + ComfortTStatObjects(Item).Name;
+                    ComfortControlledZone.Name = state.dataHeatBal->Zone(ZoneList(ComfortTStatObjects.ZoneOrZoneListPtr).Zone(Item1)).Name +
+                                                 ' ' + ComfortTStatObjects.Name;
                 }
 
                 // Read Fields A3 and A4 for averaging method
