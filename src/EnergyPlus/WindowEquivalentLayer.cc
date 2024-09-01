@@ -926,26 +926,19 @@ HEMINT(EnergyPlusData &state,
 
     Array2D<Real64> T(KMAX, KMAX);
     Real64 FX;
-    Real64 X1;
-    Real64 X2;
     Real64 X;
     Real64 DX;
-    Real64 SUM;
     Real64 DIFF;
-    int nPan;
-    int I;
     int K;
-    int L;
-    int iPX;
 
-    X1 = 0.0; // integration limits
-    X2 = Constant::PiOvr2;
-    nPan = 1;
-    SUM = 0.0;
+    Real64 X1 = 0.0; // integration limits
+    Real64 X2 = Constant::PiOvr2;
+    int nPan = 1;
+    Real64 SUM = 0.0;
     for (K = 1; K <= KMAX; ++K) {
         DX = (X2 - X1) / nPan;
-        iPX = NPANMAX / nPan;
-        for (I = 0; I <= nPan; ++I) {
+        int iPX = NPANMAX / nPan;
+        for (int I = 0; I <= nPan; ++I) {
             if (K == 1 || mod(I * iPX, iPX * 2) != 0) {
                 //   evaluate integrand function for new X values
                 //   2 * sin( x) * cos( x) covers hemisphere with single integral
@@ -960,7 +953,7 @@ HEMINT(EnergyPlusData &state,
         // trapezoid result - i.e., first column Romberg entry
         // Now complete the row
         if (K > 1) {
-            for (L = 2; L <= K; ++L) {
+            for (int L = 2; L <= K; ++L) {
                 Real64 const pow_4_L_1(std::pow(4.0, L - 1));
                 T(K, L) = (pow_4_L_1 * T(K, L - 1) - T(K - 1, L - 1)) / (pow_4_L_1 - 1.0);
             }
