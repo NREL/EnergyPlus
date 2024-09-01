@@ -280,7 +280,6 @@ namespace Window {
         Real64 EpsGlIR;  // IR absorptance of front or back of isolated glass
         Real64 RhoGlIR;  // IR reflectance of inside face of inside glass
         int NGlass;      // Number of glass layers in a construction
-        int LayNum;      // Layer number for a glass layer
         int LayPtr;      // Material number corresponding to LayNum
         Real64 Phi;      // Incidence angle (deg)
         Real64 CosPhi;   // Cosine of incidence angle
@@ -501,7 +500,7 @@ namespace Window {
 
             // Loop over glass layers in the construction
             for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                LayNum = 1 + 2 * (IGlass - 1);
+                int LayNum = 1 + 2 * (IGlass - 1);
                 if (ExtShade || ExtBlind || ExtScreen) LayNum = 2 + 2 * (IGlass - 1);
                 if (BGShade || BGBlind) {
                     LayNum = 1;
@@ -795,7 +794,7 @@ namespace Window {
 
             // Loop over glass layers in the construction.
             for (int IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                LayNum = 1 + (NGlass - IGlass) * 2;
+                int LayNum = 1 + (NGlass - IGlass) * 2;
                 if (ExtShade || ExtBlind || ExtScreen) LayNum = 2 + (NGlass - IGlass) * 2;
                 if (BGShade || BGBlind) {
                     if (NGlass == 2) {
@@ -1584,7 +1583,6 @@ namespace Window {
     {
         // Initializes variables used in the window optical and thermal calculation.
 
-        int ConstrNum;        // Construction number
         Real64 FrWidth;       // Window frame width {m}
         Real64 FrEdgeWidth;   // Frame edge width {m}
         Real64 DivWidth;      // Window divider width {m}
@@ -1702,7 +1700,7 @@ namespace Window {
                 state.dataSurface->SurfWinStormWinConstr(SurfNum) != 0)
                 continue;
 
-            ConstrNum = surf.Construction;
+            int ConstrNum = surf.Construction;
             MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
             auto const *thisMaterial = dynamic_cast<Material::MaterialChild const *>(state.dataMaterial->Material(MatNum));
             assert(thisMaterial != nullptr);
