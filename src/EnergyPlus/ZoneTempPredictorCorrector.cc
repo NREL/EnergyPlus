@@ -366,7 +366,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             TStatObjects.ZoneListActive = false;
             TStatObjects.ZoneOrZoneListPtr = Item1;
         } else if (ZLItem > 0) {
-            auto &ZoneList = state.dataHeatBal->ZoneList(ZLItem);
+            auto const &ZoneList = state.dataHeatBal->ZoneList(ZLItem);
             TStatObjects.TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
             state.dataZoneCtrls->NumTempControlledZones += ZoneList.NumOfZones;
             TStatObjects.NumOfZones = ZoneList.NumOfZones;
@@ -978,7 +978,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             ComfortTStatObjects.ZoneListActive = false;
             ComfortTStatObjects.ZoneOrZoneListPtr = Item1;
         } else if (ZLItem > 0) {
-            auto &ZoneList = state.dataHeatBal->ZoneList(ZLItem);
+            auto const &ZoneList = state.dataHeatBal->ZoneList(ZLItem);
             ComfortTStatObjects.ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
             state.dataZoneCtrls->NumComfortControlledZones += ZoneList.NumOfZones;
             ComfortTStatObjects.NumOfZones = ZoneList.NumOfZones;
@@ -1810,7 +1810,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             Real64 ZoneVolCapMultpGenContam_temp = 0.0;
 
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++) {
-                auto &Zone = state.dataHeatBal->Zone(ZoneNum);
+                auto const &Zone = state.dataHeatBal->Zone(ZoneNum);
                 ZoneVolCapMultpSens_temp += Zone.ZoneVolCapMultpSens;
                 ZoneVolCapMultpMoist_temp += Zone.ZoneVolCapMultpMoist;
                 ZoneVolCapMultpCO2_temp += Zone.ZoneVolCapMultpCO2;
@@ -2285,7 +2285,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive = false;
             state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr = Item1;
         } else if (ZLItem > 0) {
-            auto &ZoneList = state.dataHeatBal->ZoneList(ZLItem);
+            auto const &ZoneList = state.dataHeatBal->ZoneList(ZLItem);
             state.dataZoneCtrls->StagedTStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneTempPredictorCorrector->NumStageCtrZone + 1;
             state.dataZoneTempPredictorCorrector->NumStageCtrZone += ZoneList.NumOfZones;
             state.dataZoneCtrls->StagedTStatObjects(Item).NumOfZones = ZoneList.NumOfZones;
