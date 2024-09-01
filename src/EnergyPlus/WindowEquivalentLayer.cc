@@ -5968,7 +5968,7 @@ Real64 HIC_ASHRAE(Real64 const L,  // glazing height, m
     return HIC_ASHRAE;
 }
 
-void SLtoGL(EnergyPlusData &state,
+void SLtoGL(EnergyPlusData const &state,
             Real64 const breal, // distance from shade to glass (m)
             Real64 const Ts,    // shade temperature (K)
             Real64 const Tg,    // glass temperature (K)

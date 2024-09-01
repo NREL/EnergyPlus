@@ -542,7 +542,7 @@ namespace WindowEquivalentLayer {
                       Real64 const TI  // inside air temp, C or K
     );
 
-    void SLtoGL(EnergyPlusData &state,
+    void SLtoGL(EnergyPlusData const &state,
                 Real64 const breal, // distance from shade to glass (m)
                 Real64 const Ts,    // shade temperature (K)
                 Real64 const Tg,    // glass temperature (K)
