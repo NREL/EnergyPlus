@@ -323,7 +323,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     static constexpr std::string_view Format_701("Zone Volume Capacitance Multiplier,{:8.3F} ,{:8.3F},{:8.3F},{:8.3F}\n");
 
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-    auto &Zone = state.dataHeatBal->Zone;
     int NumOfZones = state.dataGlobal->NumOfZones;
     auto &cAlphaArgs = state.dataIPShortCut->cAlphaArgs;
     auto &rNumericArgs = state.dataIPShortCut->rNumericArgs;
@@ -357,7 +356,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         TStatObjects.Name = cAlphaArgs(1);
-        Item1 = Util::FindItemInList(cAlphaArgs(2), Zone);
+        Item1 = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         ZLItem = 0;
         if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
         if (Item1 > 0) {
@@ -412,13 +411,13 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum);
                 if (TStatObjects.ZoneListActive) {
                     auto &ZoneList = state.dataHeatBal->ZoneList(TStatObjects.ZoneOrZoneListPtr);
-                    cAlphaArgs(2) = Zone(ZoneList.Zone(Item1)).Name;
+                    cAlphaArgs(2) = state.dataHeatBal->Zone(ZoneList.Zone(Item1)).Name;
                 }
                 int ZoneAssigned = Util::FindItemInList(
                     cAlphaArgs(2), state.dataZoneCtrls->TempControlledZone, &DataZoneControls::ZoneTempControls::ZoneName, TempControlledZoneNum - 1);
                 if (ZoneAssigned == 0) {
                     TempControlledZone.ZoneName = cAlphaArgs(2);
-                    TempControlledZone.ActualZoneNum = Util::FindItemInList(cAlphaArgs(2), Zone);
+                    TempControlledZone.ActualZoneNum = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
                     if (TempControlledZone.ActualZoneNum == 0) {
                         ShowSevereError(
                             state,
@@ -426,7 +425,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                 "{}=\"{}\" invalid {}=\"{}\" not found.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                         ErrorsFound = true;
                     } else {
-                        Zone(TempControlledZone.ActualZoneNum).TempControlledZoneIndex = TempControlledZoneNum;
+                        state.dataHeatBal->Zone(TempControlledZone.ActualZoneNum).TempControlledZoneIndex = TempControlledZoneNum;
                     }
                 } else {
                     TempControlledZone.ZoneName = cAlphaArgs(2); // for continuity
@@ -450,7 +449,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     CheckCreatedZoneItemName(state,
                                              RoutineName,
                                              cCurrentModuleObject,
-                                             Zone(ZoneList.Zone(Item1)).Name,
+                                             state.dataHeatBal->Zone(ZoneList.Zone(Item1)).Name,
                                              ZoneList.MaxZoneNameLength,
                                              TStatObjects.Name,
                                              state.dataZoneCtrls->TempControlledZone,
@@ -811,7 +810,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             default:
                 ShowSevereError(state,
                                 format("GetZoneAirSetpoints: Illegal control type for Zone={}, Found value={}, in Schedule={}",
-                                       Zone(ActualZoneNum).Name,
+                                       state.dataHeatBal->Zone(ActualZoneNum).Name,
                                        ControlTypeNum,
                                        TempControlledZone.ControlTypeSchedName));
                 ShowContinueError(state, "..valid range values are [0,4].");
@@ -914,7 +913,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                              ErrorsFound);
 
         HumidityControlZone.ZoneName = cAlphaArgs(2);
-        HumidityControlZone.ActualZoneNum = Util::FindItem(cAlphaArgs(2), Zone);
+        HumidityControlZone.ActualZoneNum = Util::FindItem(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (HumidityControlZone.ActualZoneNum == 0) {
             ShowSevereError(state,
                             format("{}=\"{} invalid {}=\"{}\" not found.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
@@ -967,7 +966,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       cNumericFieldNames);
         Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-        Item1 = Util::FindItemInList(cAlphaArgs(2), Zone);
+        Item1 = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         ZLItem = 0;
         if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
         auto &ComfortTStatObjects = state.dataZoneCtrls->ComfortTStatObjects(Item);
@@ -1032,7 +1031,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                         ComfortControlledZoneNum - 1);
                 if (ZoneAssigned == 0) {
                     ComfortControlledZone.ZoneName = cAlphaArgs(2);
-                    ComfortControlledZone.ActualZoneNum = Util::FindItemInList(cAlphaArgs(2), Zone);
+                    ComfortControlledZone.ActualZoneNum = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
                     if (ComfortControlledZone.ActualZoneNum == 0) {
                         ShowSevereError(
                             state,
@@ -1642,7 +1641,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             default:
                 ShowSevereError(state,
                                 format("GetZoneAirSetpoints: Illegal control type for Zone={}, Found value={}, in Schedule={}",
-                                       Zone(ActualZoneNum).Name,
+                                       state.dataHeatBal->Zone(ActualZoneNum).Name,
                                        ControlTypeNum,
                                        ComfortControlledZone.ControlTypeSchedName));
                 ShowContinueError(state, "..valid range values are [0,4].");
@@ -1728,10 +1727,11 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     if (NumZoneCapaMultiplier == 0) {
         // Assign default multiplier values to all zones
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++) {
-            Zone(ZoneNum).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
-            Zone(ZoneNum).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
-            Zone(ZoneNum).ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
-            Zone(ZoneNum).ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;
+            auto &Zone = state.dataHeatBal->Zone(ZoneNum);
+            Zone.ZoneVolCapMultpSens = ZoneVolCapMultpSens;
+            Zone.ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
+            Zone.ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
+            Zone.ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;
         }
 
     } else {
@@ -1762,24 +1762,24 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             } else {
                 // multiplier values for the specified zone(s)
                 ZLItem = 0;
-                Item1 = Util::FindItemInList(cAlphaArgs(2), Zone);
+                Item1 = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
                 if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
                 if (Item1 > 0) {
-                    int ZoneNum = Item1;
-                    Zone(ZoneNum).FlagCustomizedZoneCap = true;
-                    Zone(ZoneNum).ZoneVolCapMultpSens = rNumericArgs(1);
-                    Zone(ZoneNum).ZoneVolCapMultpMoist = rNumericArgs(2);
-                    Zone(ZoneNum).ZoneVolCapMultpCO2 = rNumericArgs(3);
-                    Zone(ZoneNum).ZoneVolCapMultpGenContam = rNumericArgs(4);
+                    auto &Zone = state.dataHeatBal->Zone(Item1);
+                    Zone.FlagCustomizedZoneCap = true;
+                    Zone.ZoneVolCapMultpSens = rNumericArgs(1);
+                    Zone.ZoneVolCapMultpMoist = rNumericArgs(2);
+                    Zone.ZoneVolCapMultpCO2 = rNumericArgs(3);
+                    Zone.ZoneVolCapMultpGenContam = rNumericArgs(4);
                 } else if (ZLItem > 0) {
                     auto &ZoneList = state.dataHeatBal->ZoneList(ZLItem);
                     for (int ZonePtrNum = 1; ZonePtrNum < ZoneList.NumOfZones; ZonePtrNum++) {
-                        int ZoneNum = ZoneList.Zone(ZonePtrNum);
-                        Zone(ZoneNum).FlagCustomizedZoneCap = true;
-                        Zone(ZoneNum).ZoneVolCapMultpSens = rNumericArgs(1);
-                        Zone(ZoneNum).ZoneVolCapMultpMoist = rNumericArgs(2);
-                        Zone(ZoneNum).ZoneVolCapMultpCO2 = rNumericArgs(3);
-                        Zone(ZoneNum).ZoneVolCapMultpGenContam = rNumericArgs(4);
+                        auto &Zone = state.dataHeatBal->Zone(ZoneList.Zone(ZonePtrNum));
+                        Zone.FlagCustomizedZoneCap = true;
+                        Zone.ZoneVolCapMultpSens = rNumericArgs(1);
+                        Zone.ZoneVolCapMultpMoist = rNumericArgs(2);
+                        Zone.ZoneVolCapMultpCO2 = rNumericArgs(3);
+                        Zone.ZoneVolCapMultpGenContam = rNumericArgs(4);
                     }
 
                 } else {
@@ -1793,11 +1793,12 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
         // Assign default multiplier values to all the other zones
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++) {
-            if (!Zone(ZoneNum).FlagCustomizedZoneCap) {
-                Zone(ZoneNum).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
-                Zone(ZoneNum).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
-                Zone(ZoneNum).ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
-                Zone(ZoneNum).ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;
+            auto &Zone = state.dataHeatBal->Zone(ZoneNum);
+            if (!Zone.FlagCustomizedZoneCap) {
+                Zone.ZoneVolCapMultpSens = ZoneVolCapMultpSens;
+                Zone.ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
+                Zone.ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
+                Zone.ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;
             }
         }
 
@@ -1809,10 +1810,11 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             Real64 ZoneVolCapMultpGenContam_temp = 0.0;
 
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++) {
-                ZoneVolCapMultpSens_temp += Zone(ZoneNum).ZoneVolCapMultpSens;
-                ZoneVolCapMultpMoist_temp += Zone(ZoneNum).ZoneVolCapMultpMoist;
-                ZoneVolCapMultpCO2_temp += Zone(ZoneNum).ZoneVolCapMultpCO2;
-                ZoneVolCapMultpGenContam_temp += Zone(ZoneNum).ZoneVolCapMultpGenContam;
+                auto &Zone = state.dataHeatBal->Zone(ZoneNum);
+                ZoneVolCapMultpSens_temp += Zone.ZoneVolCapMultpSens;
+                ZoneVolCapMultpMoist_temp += Zone.ZoneVolCapMultpMoist;
+                ZoneVolCapMultpCO2_temp += Zone.ZoneVolCapMultpCO2;
+                ZoneVolCapMultpGenContam_temp += Zone.ZoneVolCapMultpGenContam;
             }
 
             if (NumOfZones > 0) {
@@ -1947,7 +1949,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                         state.dataHeatBal->ZnAirRpt(TempControlledZone.ActualZoneNum).ThermOperativeTemp,
                                         OutputProcessor::TimeStepType::Zone,
                                         OutputProcessor::StoreType::Average,
-                                        Zone(TempControlledZone.ActualZoneNum).Name);
+                                        state.dataHeatBal->Zone(TempControlledZone.ActualZoneNum).Name);
                 }
             } else {
                 auto const &TStatObjects = state.dataZoneCtrls->TStatObjects(found);
@@ -2046,7 +2048,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                         state.dataHeatBal->ZnAirRpt(TempControlledZone.ActualZoneNum).ThermOperativeTemp,
                                         OutputProcessor::TimeStepType::Zone,
                                         OutputProcessor::StoreType::Average,
-                                        Zone(TempControlledZone.ActualZoneNum).Name);
+                                        state.dataHeatBal->Zone(TempControlledZone.ActualZoneNum).Name);
                 } // TStat Objects Loop
             }     // found thermostat referene
         }         // loop over NumOpTempControlledZones
@@ -2273,7 +2275,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataZoneCtrls->StagedTStatObjects(Item).Name = cAlphaArgs(1);
-        Item1 = Util::FindItemInList(cAlphaArgs(2), Zone);
+        Item1 = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         ZLItem = 0;
         if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
         if (Item1 > 0) {
@@ -2333,7 +2335,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 auto &stageControlledZone = state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum);
                 if (ZoneAssigned == 0) {
                     stageControlledZone.ZoneName = cAlphaArgs(2);
-                    stageControlledZone.ActualZoneNum = Util::FindItemInList(cAlphaArgs(2), Zone);
+                    stageControlledZone.ActualZoneNum = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
                     if (stageControlledZone.ActualZoneNum == 0) {
                         ShowSevereError(
                             state,
@@ -2729,27 +2731,20 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
     static constexpr std::string_view RoutineName("InitZoneAirSetpoints: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone;
-    auto &TempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint;
-    auto &TempControlType = state.dataHeatBalFanSys->TempControlType;
-    auto &TempControlTypeRpt = state.dataHeatBalFanSys->TempControlTypeRpt;
-    auto &ComfortControlledZone = state.dataZoneCtrls->ComfortControlledZone;
-    auto &ZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo;
-    auto &ZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi;
     int NumOfZones = state.dataGlobal->NumOfZones;
 
     if (state.dataZoneTempPredictorCorrector->InitZoneAirSetPointsOneTimeFlag) {
         int TRefFlag; // Flag for Reference Temperature process in Zones
-        TempZoneThermostatSetPoint.dimension(NumOfZones, 0.0);
+        state.dataHeatBalFanSys->TempZoneThermostatSetPoint.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->AdapComfortCoolingSetPoint.dimension(NumOfZones, 0.0);
-        ZoneThermostatSetPointHi.dimension(NumOfZones, 0.0);
-        ZoneThermostatSetPointLo.dimension(NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneThermostatSetPointHi.dimension(NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->ZoneThermostatSetPointHiAver.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->ZoneThermostatSetPointLoAver.dimension(NumOfZones, 0.0);
 
         state.dataHeatBalFanSys->LoadCorrectionFactor.dimension(NumOfZones, 0.0);
-        TempControlType.dimension(NumOfZones, HVAC::ThermostatType::Uncontrolled);
-        TempControlTypeRpt.dimension(NumOfZones, 0);
+        state.dataHeatBalFanSys->TempControlType.dimension(NumOfZones, HVAC::ThermostatType::Uncontrolled);
+        state.dataHeatBalFanSys->TempControlTypeRpt.dimension(NumOfZones, 0);
         if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
             state.dataHeatBalFanSys->ComfortControlType.dimension(NumOfZones, HVAC::ThermostatType::Uncontrolled);
             state.dataHeatBalFanSys->ComfortControlTypeRpt.dimension(NumOfZones, 0);
@@ -2853,21 +2848,21 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Thermostat Control Type",
                                 Constant::Units::None,
-                                TempControlTypeRpt(zoneNum),
+                                state.dataHeatBalFanSys->TempControlTypeRpt(zoneNum),
                                 OutputProcessor::TimeStepType::Zone,
                                 OutputProcessor::StoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Heating Setpoint Temperature",
                                 Constant::Units::C,
-                                ZoneThermostatSetPointLo(zoneNum),
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum),
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Cooling Setpoint Temperature",
                                 Constant::Units::C,
-                                ZoneThermostatSetPointHi(zoneNum),
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointHi(zoneNum),
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 thisZone.Name);
@@ -2891,7 +2886,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
             // CurrentModuleObject='ZoneControl:Thermostat:ThermalComfort'
             for (int Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
-                int zoneNum = ComfortControlledZone(Loop).ActualZoneNum;
+                int zoneNum = state.dataZoneCtrls->ComfortControlledZone(Loop).ActualZoneNum;
                 auto &thisZone = state.dataHeatBal->Zone(zoneNum);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Control Type",
@@ -2996,13 +2991,13 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                 thisSpaceHB.beginEnvironmentInit(state);
             }
         }
-        TempZoneThermostatSetPoint = 0.0;
+        state.dataHeatBalFanSys->TempZoneThermostatSetPoint = 0.0;
         state.dataHeatBalFanSys->AdapComfortCoolingSetPoint = 0.0;
-        ZoneThermostatSetPointHi = 0.0;
-        ZoneThermostatSetPointLo = 0.0;
+        state.dataHeatBalFanSys->ZoneThermostatSetPointHi = 0.0;
+        state.dataHeatBalFanSys->ZoneThermostatSetPointLo = 0.0;
 
         state.dataHeatBalFanSys->LoadCorrectionFactor = 1.0;
-        TempControlType = HVAC::ThermostatType::Uncontrolled;
+        state.dataHeatBalFanSys->TempControlType = HVAC::ThermostatType::Uncontrolled;
         for (auto &e : state.dataZoneEnergyDemand->ZoneSysEnergyDemand) {
             e.beginEnvironmentInit();
         }
@@ -3046,53 +3041,56 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
     }
 
     for (int Loop = 1; Loop <= state.dataZoneCtrls->NumTempControlledZones; ++Loop) {
+        auto &tempControlledZone = state.dataZoneCtrls->TempControlledZone(Loop);
         if (state.dataZoneEquip->ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
-            if (!VerifyControlledZoneForThermostat(state, TempControlledZone(Loop).ZoneName)) {
+            if (!VerifyControlledZoneForThermostat(state, tempControlledZone.ZoneName)) {
                 ShowSevereError(state,
                                 format("{}Zone=\"{}\" has specified a Thermostatic control but is not a controlled zone.",
                                        RoutineName,
-                                       TempControlledZone(Loop).ZoneName));
+                                       tempControlledZone.ZoneName));
                 ShowContinueError(state, "...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
                 state.dataZoneTempPredictorCorrector->ErrorsFound = true;
             }
         }
 
-        if (TempControlledZone(Loop).ManageDemand) {
-            int ZoneNum = TempControlledZone(Loop).ActualZoneNum;
+        if (tempControlledZone.ManageDemand) {
+            int ZoneNum = tempControlledZone.ActualZoneNum;
+            auto &zoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum);
+            auto &zoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum);
+            auto &tempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
+            auto &tempControlType = state.dataHeatBalFanSys->TempControlType(ZoneNum);
 
-            switch (TempControlType(ZoneNum)) {
+            switch (tempControlType) {
             case HVAC::ThermostatType::SingleHeating:
-                if (TempZoneThermostatSetPoint(ZoneNum) > TempControlledZone(Loop).HeatingResetLimit) {
-                    TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(Loop).HeatingResetLimit;
-                    ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                if (tempZoneThermostatSetPoint > tempControlledZone.HeatingResetLimit) {
+                    tempZoneThermostatSetPoint = tempControlledZone.HeatingResetLimit;
+                    zoneThermostatSetPointLo = tempZoneThermostatSetPoint;
                 }
                 break;
             case HVAC::ThermostatType::SingleCooling:
-                if (TempZoneThermostatSetPoint(ZoneNum) < TempControlledZone(Loop).CoolingResetLimit) {
-                    TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(Loop).CoolingResetLimit;
-                    ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                if (tempZoneThermostatSetPoint < tempControlledZone.CoolingResetLimit) {
+                    tempZoneThermostatSetPoint = tempControlledZone.CoolingResetLimit;
+                    zoneThermostatSetPointHi = tempZoneThermostatSetPoint;
                 }
                 break;
             case HVAC::ThermostatType::SingleHeatCool:
-                if ((TempZoneThermostatSetPoint(ZoneNum) > TempControlledZone(Loop).HeatingResetLimit) ||
-                    (TempZoneThermostatSetPoint(ZoneNum) < TempControlledZone(Loop).CoolingResetLimit)) {
+                if ((tempZoneThermostatSetPoint > tempControlledZone.HeatingResetLimit) ||
+                    (tempZoneThermostatSetPoint < tempControlledZone.CoolingResetLimit)) {
 
-                    TempControlType(ZoneNum) = HVAC::ThermostatType::DualSetPointWithDeadBand;
-                    TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
-                    ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-                    ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                    tempControlType = HVAC::ThermostatType::DualSetPointWithDeadBand;
+                    state.dataHeatBalFanSys->TempControlTypeRpt(ZoneNum) = static_cast<int>(tempControlType);
+                    zoneThermostatSetPointLo = tempZoneThermostatSetPoint;
+                    zoneThermostatSetPointHi = tempZoneThermostatSetPoint;
 
-                    if (ZoneThermostatSetPointLo(ZoneNum) > TempControlledZone(Loop).HeatingResetLimit)
-                        ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(Loop).HeatingResetLimit;
-                    if (ZoneThermostatSetPointHi(ZoneNum) < TempControlledZone(Loop).CoolingResetLimit)
-                        ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(Loop).CoolingResetLimit;
+                    if (zoneThermostatSetPointLo > tempControlledZone.HeatingResetLimit)
+                        zoneThermostatSetPointLo = tempControlledZone.HeatingResetLimit;
+                    if (zoneThermostatSetPointHi < tempControlledZone.CoolingResetLimit)
+                        zoneThermostatSetPointHi = tempControlledZone.CoolingResetLimit;
                 }
                 break;
             case HVAC::ThermostatType::DualSetPointWithDeadBand:
-                if (ZoneThermostatSetPointLo(ZoneNum) > TempControlledZone(Loop).HeatingResetLimit)
-                    ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(Loop).HeatingResetLimit;
-                if (ZoneThermostatSetPointHi(ZoneNum) < TempControlledZone(Loop).CoolingResetLimit)
-                    ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(Loop).CoolingResetLimit;
+                if (zoneThermostatSetPointLo > tempControlledZone.HeatingResetLimit) zoneThermostatSetPointLo = tempControlledZone.HeatingResetLimit;
+                if (zoneThermostatSetPointHi < tempControlledZone.CoolingResetLimit) zoneThermostatSetPointHi = tempControlledZone.CoolingResetLimit;
                 break;
             default:
                 break;
@@ -3101,58 +3099,64 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
     }
 
     for (int Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
+        auto &comfortControlledZone = state.dataZoneCtrls->ComfortControlledZone(Loop);
         if (state.dataZoneEquip->ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
-            if (!VerifyControlledZoneForThermostat(state, ComfortControlledZone(Loop).ZoneName)) {
+            if (!VerifyControlledZoneForThermostat(state, comfortControlledZone.ZoneName)) {
                 ShowSevereError(state,
                                 format("{}Zone=\"{}\" has specified a Comfort control but is not a controlled zone.",
                                        RoutineName,
-                                       ComfortControlledZone(Loop).ZoneName));
+                                       comfortControlledZone.ZoneName));
                 ShowContinueError(state, "...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
                 state.dataZoneTempPredictorCorrector->ErrorsFound = true;
             }
         }
-        if (ComfortControlledZone(Loop).ManageDemand) {
-            int ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
+        if (comfortControlledZone.ManageDemand) {
+            int ZoneNum = comfortControlledZone.ActualZoneNum;
+            auto &zoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum);
+            auto &zoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum);
+            auto &tempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
+            auto &tempControlTypeRpt = state.dataHeatBalFanSys->TempControlTypeRpt(ZoneNum);
+            auto &tempControlType = state.dataHeatBalFanSys->TempControlType(ZoneNum);
 
             switch (state.dataHeatBalFanSys->ComfortControlType(ZoneNum)) {
             case HVAC::ThermostatType::SingleHeating:
-                if (TempZoneThermostatSetPoint(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit) {
-                    TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).HeatingResetLimit;
-                    ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-                    TempControlType(ZoneNum) = HVAC::ThermostatType::SingleHeating;
-                    TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
+                if (tempZoneThermostatSetPoint >= comfortControlledZone.HeatingResetLimit) {
+                    tempZoneThermostatSetPoint = comfortControlledZone.HeatingResetLimit;
+                    zoneThermostatSetPointLo = tempZoneThermostatSetPoint;
+                    tempControlType = HVAC::ThermostatType::SingleHeating;
+                    tempControlTypeRpt = static_cast<int>(tempControlType);
                 }
                 break;
             case HVAC::ThermostatType::SingleCooling:
-                if (TempZoneThermostatSetPoint(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit) {
-                    TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).CoolingResetLimit;
-                    ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-                    TempControlType(ZoneNum) = HVAC::ThermostatType::SingleCooling;
-                    TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
+                if (tempZoneThermostatSetPoint <= comfortControlledZone.CoolingResetLimit) {
+                    tempZoneThermostatSetPoint = comfortControlledZone.CoolingResetLimit;
+                    zoneThermostatSetPointHi = tempZoneThermostatSetPoint;
+                    tempControlType = HVAC::ThermostatType::SingleCooling;
+                    tempControlTypeRpt = static_cast<int>(tempControlType);
                 }
                 break;
             case HVAC::ThermostatType::SingleHeatCool:
-                if ((TempZoneThermostatSetPoint(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit) ||
-                    (TempZoneThermostatSetPoint(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit)) {
+                if ((tempZoneThermostatSetPoint >= comfortControlledZone.HeatingResetLimit) ||
+                    (tempZoneThermostatSetPoint <= comfortControlledZone.CoolingResetLimit)) {
 
-                    TempControlType(ZoneNum) = HVAC::ThermostatType::DualSetPointWithDeadBand;
-                    TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
-                    ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-                    ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                    tempControlType = HVAC::ThermostatType::DualSetPointWithDeadBand;
+                    tempControlTypeRpt = static_cast<int>(tempControlType);
+                    zoneThermostatSetPointLo = tempZoneThermostatSetPoint;
+                    zoneThermostatSetPointHi = tempZoneThermostatSetPoint;
 
-                    if (ZoneThermostatSetPointLo(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit)
-                        ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).HeatingResetLimit;
-                    if (ZoneThermostatSetPointHi(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit)
-                        ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).CoolingResetLimit;
+                    if (zoneThermostatSetPointLo >= comfortControlledZone.HeatingResetLimit)
+                        zoneThermostatSetPointLo = comfortControlledZone.HeatingResetLimit;
+                    if (zoneThermostatSetPointHi <= comfortControlledZone.CoolingResetLimit)
+                        zoneThermostatSetPointHi = comfortControlledZone.CoolingResetLimit;
                 }
                 break;
             case HVAC::ThermostatType::DualSetPointWithDeadBand:
-                TempControlType(ZoneNum) = HVAC::ThermostatType::DualSetPointWithDeadBand;
-                TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
-                if (ZoneThermostatSetPointLo(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit)
-                    ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).HeatingResetLimit;
-                if (ZoneThermostatSetPointHi(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit)
-                    ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).CoolingResetLimit;
+                tempControlType = HVAC::ThermostatType::DualSetPointWithDeadBand;
+                tempControlTypeRpt = static_cast<int>(tempControlType);
+                if (zoneThermostatSetPointLo >= comfortControlledZone.HeatingResetLimit)
+                    zoneThermostatSetPointLo = comfortControlledZone.HeatingResetLimit;
+                if (zoneThermostatSetPointHi <= comfortControlledZone.CoolingResetLimit)
+                    zoneThermostatSetPointHi = comfortControlledZone.CoolingResetLimit;
                 break;
             default:
                 break;
