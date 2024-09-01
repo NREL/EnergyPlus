@@ -179,10 +179,7 @@ namespace Window {
 
         using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
 
-        int CoefNum;                    // Polynomial coefficient number
-        int j;                          // Wavelength counter
         int TotLay;                     // Total solid and gas layers in a window construction
-        int ConstrNum;                  // Construction number
         int ConstrNumSh;                // Shaded construction number
         int ShadeLayNum;                // Layer number for shade or blind, if present
         int ShadeLayPtr;                // Material number for shade or blind
@@ -287,7 +284,6 @@ namespace Window {
         int LayPtr;      // Material number corresponding to LayNum
         Real64 Phi;      // Incidence angle (deg)
         Real64 CosPhi;   // Cosine of incidence angle
-        int ILam;        // Wavelength counter
         Real64 tsolDiff; // Glazing system diffuse solar transmittance
         Real64 tvisDiff; // Glazing system diffuse visible transmittance
         int IGlassBack;  // Glass layer number counted from back of window
@@ -1589,7 +1585,6 @@ namespace Window {
         // Initializes variables used in the window optical and thermal calculation.
 
         int ConstrNum;        // Construction number
-        int FrDivNum;         // Pointer to frame/divider
         Real64 FrWidth;       // Window frame width {m}
         Real64 FrEdgeWidth;   // Frame edge width {m}
         Real64 DivWidth;      // Window divider width {m}
@@ -2096,10 +2091,8 @@ namespace Window {
         int TotLay;     // Total number of layers in a construction
         //   (sum of solid layers and gap layers)
         int TotGlassLay;          // Total number of glass layers in a construction
-        int Lay;                  // Layer number
         int LayPtr;               // Material number for a layer
         WinShadingType ShadeFlag; // Flag indicating whether shade or blind is on, and shade/blind position
-        int k;                    // Layer counter
         // REAL(r64) :: tsky                         ! Sky temperature [K]
         int ShadeLayPtr; // Material number corresponding to a shade layer
         Real64 dth1;     // Temperature difference across glass layers [K]
@@ -6188,7 +6181,6 @@ namespace Window {
         int TotLay; // Total number of layers in a construction
         //   (sum of solid layers and gap layers)
         int TotGlassLay; // Total number of glass layers in a construction
-        int Lay;         // Layer number
         int LayPtr;      // Material number for a layer
 
         Real64 BeamSolarInc; // Incident beam radiation at zero angle of incidence (W/m2)
@@ -6208,10 +6200,8 @@ namespace Window {
         int MatShade;             // Material number of shade layer
         Array1D<Real64> AbsBeamNorm(maxGlassLayers); // Beam absorptance at normal incidence for each glass layer
         Real64 AbsBeamShadeNorm;                     // Shade solar absorptance at normal incidence
-        int ConstrNum1;                              // Construction counter
         int ConstrNumBare;                           // Construction without shading device
         int BlNum;                                   // Blind number
-        int ScNum;                                   // Screen number
         bool VarSlats;                               // True if slats in blind are variable angle
         Real64 SlatAng;                              // Slat angle (rad)
         int LayPtrSh;                                // Layer pointer of blind
@@ -6926,7 +6916,6 @@ namespace Window {
 
         Real64 TempVar(0.0); // just temporary usage for complex fenestration
 
-        int ThisNum;
         Real64 NominalConductanceWinter; // Nominal center-of-glass conductance of a window construction
         // for ASHRAE winter conditions (W/m2-K):
         // Inside air temperature = 21.1C (70F)
@@ -7450,7 +7439,6 @@ namespace Window {
         Array1D<Real64> sun_el_deg(Material::MaxProfAngs); // Solar profile angle (deg) corresponding to sun_el values
         Real64 bld_el;                                     // Slat angle (elevation of slat normal vector in plane
         //  perpendicular to window and containing the slat normal vector) (radians)
-        int IProfAng; // Profile angle index
 
         for (int BlindNum = 1; BlindNum <= state.dataHeatBal->TotBlinds; ++BlindNum) {
             auto &blind = state.dataMaterial->Blind(BlindNum);
@@ -7623,7 +7611,6 @@ namespace Window {
         Real64 SumReflect;    // Integration variable for reflectance
         Real64 SumReflectVis; // Integration variable for visible reflectance
         Real64 SumArea;       // Integration variable for area of quarter hemisphere
-        bool FoundMaterial;   // Flag to avoid printing screen transmittance data multiple times when Material:WindowScreen
         // is used on multiple surfaces
         bool PrintTransMap; // Flag used to print transmittance map
 
