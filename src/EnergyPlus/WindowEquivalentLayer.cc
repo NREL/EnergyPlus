@@ -608,29 +608,24 @@ void CalcEQLWindowOpticalProperty(EnergyPlusData &state,
     //   + = west-of-normal
     // convect coefficients, W/m2-K
 
-    int NL;
-    int I;
-    int iL;
-    bool DoShadeControlR;
-
     // Object Data
     Array1D<CFSSWP> SWP_ON(CFSMAXNL);
 
-    NL = FS.NL;
+    int NL = FS.NL;
     Abs1 = 0.0;
 
     if (FS.ISControlled) { // at least 1 controlled layer found
-        for (iL = 1; iL <= NL; ++iL) {
+        for (int iL = 1; iL <= NL; ++iL) {
             // If there is shade control (Venetian Blind Only).
             if (IsControlledShade(state, FS.L(iL))) {
-                DoShadeControlR = DoShadeControl(state, FS.L(iL), IncA, VProfA, HProfA);
+                bool DoShadeControlR = DoShadeControl(state, FS.L(iL), IncA, VProfA, HProfA);
             }
         }
     }
 
     if (DiffBeamFlag != SolarArrays::DIFF) {
         //  Beam: Convert direct-normal solar properties to off-normal properties
-        for (I = 1; I <= NL; ++I) {
+        for (int I = 1; I <= NL; ++I) {
             ASHWAT_OffNormalProperties(state, FS.L(I), IncA, VProfA, HProfA, SWP_ON(I));
         }
         ASHWAT_Solar(FS.NL, SWP_ON, state.dataWindowEquivLayer->SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1(1, {1, FS.NL + 1}), Abs1(2, {1, FS.NL + 1}));
@@ -687,10 +682,8 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     Array1D<Real64> QAllSWwinAbs({1, CFSMAXNL + 1});
 
     int EQLNum;    // equivalent layer window index
-    int ZoneNum;   // Zone number corresponding to SurfNum
     int ConstrNum; // Construction number
 
-    int SurfNumAdj;  // An interzone surface's number in the adjacent zone
     Real64 LWAbsIn;  // effective long wave absorptance/emissivity back side
     Real64 LWAbsOut; // effective long wave absorptance/emissivity front side
     Real64 outir(0);
@@ -718,8 +711,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     HcIn = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // windows inside surface convective film conductance
 
     if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
-        ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
-        SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
+        int SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
         Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
         TaIn = RefAirTemp;
         TIN = TaIn + Constant::Kelvin; // Inside air temperature, K
