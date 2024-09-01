@@ -1786,7 +1786,7 @@ namespace Window {
         // back reflectance at angle of incidence
         std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> rbadjPhi = {0.0};
 
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
         // For each glass layer find tPhi, rfPhi, and rbPhi at each wavelength
 
         for (int in = 1; in <= ngllayer; ++in) {
@@ -1927,7 +1927,7 @@ namespace Window {
     {
         Real64 num = 0.0;
         Real64 denom = 0.0;
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
 
         for (int i = 1; i <= nume - 1; ++i) {
             Real64 const esol = (wm->wle[i] - wm->wle[i - 1]) * 0.5 * (wm->e[i - 1] + wm->e[i]);
@@ -1951,7 +1951,7 @@ namespace Window {
         Real64 y30new = 0.0;
         Real64 y30ils1 = 0.0;
 
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
 
         for (int i = 2; i <= nume; ++i) { // Autodesk:BoundsViolation e|wle|p(i-1) @ i=1: Changed start index from 1 to 2: wle
             // values prevented this violation from occurring in practice
@@ -2017,7 +2017,7 @@ namespace Window {
         //
         // PURPOSE OF THIS SUBROUTINE:
         // Subroutine to direct whether to use exterior or interior window routines
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
 
         if (state.dataGlobal->KickOffSizing || state.dataGlobal->KickOffSimulation) return;
 
