@@ -4030,7 +4030,7 @@ void VB_SOL4(EnergyPlusData const &state,
     } // END OF CHECK FOR CLOSED BLIND
 }
 
-void VB_SOL6(EnergyPlusData &state,
+void VB_SOL6(EnergyPlusData const &state,
              Real64 const S,           // slat spacing (any length units; same units as W)
              Real64 const W,           // slat tip-to-tip width (any length units; same units as S)
              Real64 const OMEGA,       // incident beam profile angle (radians)
