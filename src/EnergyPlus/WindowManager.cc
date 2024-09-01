@@ -8726,15 +8726,10 @@ namespace Window {
         int NumAlphas;           // Number of Alphas for each GetobjectItem call
         int NumNumbers;          // Number of Numbers for each GetobjectItem call
         int NumArgs;
-        int IOStatus;
         Array1D_string cAlphaArgs;    // Alpha input items for object
         Array1D<Real64> rNumericArgs; // Numeric input items for object
 
         std::string cCurrentModuleObject;
-        std::string cSolarSpectrum;
-        std::string cVisibleSpectrum;
-        int iSolarSpectrum(0);
-        int iVisibleSpectrum(0);
         int NumSiteSpectrum(0);
         int Loop;
         int iTmp;
@@ -8764,6 +8759,7 @@ namespace Window {
         rNumericArgs.dimension(NumNumbers, 0.0);
 
         if (NumSiteSpectrum == 1) {
+            int IOStatus;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      1,
@@ -8780,8 +8776,8 @@ namespace Window {
             }
 
             // now read custom solar and visible spectrum data
-            cSolarSpectrum = state.dataIPShortCut->cAlphaArgs(3);
-            cVisibleSpectrum = state.dataIPShortCut->cAlphaArgs(4);
+            std::string cSolarSpectrum = state.dataIPShortCut->cAlphaArgs(3);
+            std::string cVisibleSpectrum = state.dataIPShortCut->cAlphaArgs(4);
 
             cCurrentModuleObject = "Site:SpectrumData";
             NumSiteSpectrum = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -8797,8 +8793,8 @@ namespace Window {
             cAlphaArgs.allocate(NumAlphas);
             rNumericArgs.dimension(NumNumbers, 0.0);
 
-            iSolarSpectrum = 0;
-            iVisibleSpectrum = 0;
+            int iSolarSpectrum = 0;
+            int iVisibleSpectrum = 0;
             for (int Loop = 1; Loop <= NumSiteSpectrum; ++Loop) {
                 // Step 2 - read user-defined spectrum data
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
