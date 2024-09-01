@@ -6031,7 +6031,7 @@ void SLtoGL(EnergyPlusData const &state,
     } //  end of scheme .eq. 2
 }
 
-Real64 SLtoAMB(EnergyPlusData &state,
+Real64 SLtoAMB(EnergyPlusData const &state,
                Real64 const b,     // distance from shade to glass (m) where air flow takes place
                Real64 const L,     // window height, m (usually taken as 1 m)
                Real64 const Ts,    // shade temperature, K
@@ -6145,7 +6145,7 @@ Real64 SLtoAMB(EnergyPlusData &state,
     return SLtoAMB;
 }
 
-void GLtoAMB(EnergyPlusData &state,
+void GLtoAMB(EnergyPlusData const &state,
              Real64 const b,     // distance from shade to glass {m}
              Real64 const L,     // window height {m}, usually taken as 1 meter
              Real64 const Tg,    // glass temperature {K}
