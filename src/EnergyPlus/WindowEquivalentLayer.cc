@@ -168,8 +168,6 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Bereket Nigusse
     //       DATE WRITTEN   May 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Populates the the equivalent layer window model optical and thermal
@@ -183,8 +181,6 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
     int gLayer;                               // gap layer index
     int sLayer;                               // glazing and shade layers (non-gas layers) index
     int EQLNum;                               // equivalent layer window construction index
-    int NumGLayers;                           // number of gap layers
-    int NumSLayers;                           // number of glazing and shade layers (non-gas layers)
     Array2D<Real64> SysAbs1(2, CFSMAXNL + 1); // layers absorptance and system transmittance
 
     if (!allocated(state.dataWindowEquivLayer->CFSLayers))
@@ -338,8 +334,6 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
         }
         // beam beam transmittance is the same for front and back side
         CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB;
-        NumSLayers = sLayer;
-        NumGLayers = gLayer;
         CFS(EQLNum).NL = sLayer;
 
         // checks optical properties and fill in default values for diffuse optical
@@ -545,26 +539,26 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
 
     // Calculate SHGC using net radiation method (ASHWAT Model)
     bool CFSSHGC = ASHWAT_ThermalRatings(state,
-                                    FS,
-                                    TIN,
-                                    TOUT,
-                                    HCIN,
-                                    HCOUT,
-                                    TRMOUT,
-                                    TRMIN,
-                                    BeamSolarInc,
-                                    BeamSolarInc * Abs1(1, {1, NL + 1}),
-                                    TOL,
-                                    QOCF,
-                                    QOCFRoom,
-                                    T,
-                                    Q,
-                                    JF,
-                                    JB,
-                                    H,
-                                    UCG,
-                                    SHGC,
-                                    true);
+                                         FS,
+                                         TIN,
+                                         TOUT,
+                                         HCIN,
+                                         HCOUT,
+                                         TRMOUT,
+                                         TRMIN,
+                                         BeamSolarInc,
+                                         BeamSolarInc * Abs1(1, {1, NL + 1}),
+                                         TOL,
+                                         QOCF,
+                                         QOCFRoom,
+                                         T,
+                                         Q,
+                                         JF,
+                                         JB,
+                                         H,
+                                         UCG,
+                                         SHGC,
+                                         true);
 
     if (!CFSSHGC) {
         ShowWarningMessage(state, format("{}Solar heat gain coefficient calculation failed for {}", RoutineName, FS.Name));
