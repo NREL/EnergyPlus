@@ -2084,7 +2084,6 @@ namespace Window {
 
         int BlNum;      // Window blind number
         int SurfNumAdj; // An interzone surface's number in the adjacent zone
-        int ZoneNumAdj; // An interzone surface's adjacent zone number
         int TotLay;     // Total number of layers in a construction
         //   (sum of solid layers and gap layers)
         int LayPtr;               // Material number for a layer
@@ -2429,7 +2428,6 @@ namespace Window {
 
             if (SurfNumAdj > 0) { // Interzone window
 
-                ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
                 Real64 RefAirTempAdj = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj) = RefAirTempAdj;
                 wm->tout = RefAirTempAdj + Constant::Kelvin; // outside air temperature
@@ -3394,7 +3392,6 @@ namespace Window {
         Real64 CpAirOutlet = 0.0;    // Heat capacity of air from window gap (J/kg-K)
         Real64 CpAirZone = 0.0;      // Heat capacity of zone air (J/kg-K)
         Real64 InletAirHumRat = 0.0; // Humidity ratio of air from window gap entering fan
-        int InsideFaceIndex = 0;     // intermediate variable for index of inside face in thetas
 
         Array1D<Real64> hr = Array1D<Real64>(2 * maxGlassLayers); // Radiative conductance (W/m2-K)
         Array1D<Real64> AbsRadShadeFace(2);                       // Solar radiation, short-wave radiation from lights, and long-wave
@@ -3458,6 +3455,7 @@ namespace Window {
                 (state.dataSurface->surfIntConv(SurfNum).model == Convect::HcInt::ASHRAETARP)) {
                 // coef model is "detailed" and not prescribed by user
                 // need to find inside face index, varies with shade/blind etc.
+                int InsideFaceIndex; // intermediate variable for index of inside face in thetas
                 if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                     InsideFaceIndex = wm->nglfacep;
                 } else {
@@ -3977,7 +3975,6 @@ namespace Window {
 
         int ConstrNumSh; // Shaded construction number
         int MatNumSh;    // Material number of shade/blind layer
-        int nglassfaces; // Number of glass faces in contruction
         // In the following, "gaps" refer to the gaps on either side of the shade/blind
         Array1D<Real64> TGlassFace(2); // Temperature of glass surfaces facing gaps (K)
         Array1D<Real64> TShadeFace(2); // Temperature of shade surfaces facing gaps (K)
@@ -4021,7 +4018,6 @@ namespace Window {
 
         ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
-        nglassfaces = 2 * state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;
 
         if (state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers == 2) { // Double glazing
             MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(3);
