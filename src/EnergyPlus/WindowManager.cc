@@ -2743,7 +2743,7 @@ namespace Window {
         Real64 pr;  // Gap gas Prandtl number
         Real64 nu;  // Gap gas Nusselt number
 
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
 
         if (nglasslayer == 1) {
             Bface(1) = wm->Outir * wm->emis[0] + wm->hcout * wm->tout + wm->AbsRadGlassFace[0];
@@ -4204,7 +4204,7 @@ namespace Window {
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
         // DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
 
         ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
         NGlass = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
@@ -4315,7 +4315,7 @@ namespace Window {
         int IGapInc;                      // Gap increment; =0, double glass, =1, triple glass
         // REAL(r64)            :: AirProps(8)         ! Air properties
 
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
 
         // Air properties
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
@@ -4719,7 +4719,7 @@ namespace Window {
         Array1D<Real64> fvis(10);    // Viscosity of each gas in a mixture (g/m-s)
         Array1D<Real64> fdens(10);   // Density of each gas in a mixture (kg/m3)
 
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
 
         NMix = wm->gaps[IGap - 1].numGases;
 
@@ -4814,7 +4814,7 @@ namespace Window {
         //   current time step value, nglface, if storm window was
         //   added or removed during the current time step).
 
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
 
         StormWinFlagPrevDay = state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum);
         StormWinFlagThisDay = state.dataSurface->SurfWinStormWinFlag(SurfNum);
@@ -4953,7 +4953,7 @@ namespace Window {
         Real64 g;
         Real64 ang;
 
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
 
         if (SurfNum > 0) {
             asp = state.dataSurface->Surface(SurfNum).Height / wm->gaps[IGap - 1].width;
