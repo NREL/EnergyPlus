@@ -6609,7 +6609,7 @@ namespace Window {
     {
         Array1D<Real64> hGapTot(5); // Combined radiative and conductive gap conductance [W/m2-K]
 
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
         Real64 hOutRad = wm->emis[0] * Constant::StefanBoltzmann * 0.5 * pow_3(wm->tout + wm->thetas[0]);
         Real64 rOut = 1.0 / (hOutRad + wm->hcout);
         Real64 hInRad = wm->emis[wm->nglface - 1] * Constant::StefanBoltzmann * 0.5 * pow_3(wm->tin + wm->thetas[wm->nglface - 1]);
@@ -6859,7 +6859,7 @@ namespace Window {
         Real64 temdiff; // Inside/outside air temperature difference (K)
         Real64 ressum;  // Resistance sum (m2-K/W)
 
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
 
         rguess(1) = 1.0 / (wm->hcout + hrad);
         rguess(wm->nglface + 1) = 1.0 / (hcinStartValue + hrad);
@@ -7917,7 +7917,7 @@ namespace Window {
         // p(15)   IR emissivity back
         // p(16)   0.0 (unused)
 
-        auto &blind = state.dataMaterial->Blind(BlindNum);
+        auto const &blind = state.dataMaterial->Blind(BlindNum);
         //     Calculate view factors between slat sections (slat is divided longitudinally into two equal parts)
 
         ViewFac(c(2), c(3), b_el, Constant::PiOvr2, F);
@@ -8709,7 +8709,7 @@ namespace Window {
         std::string cCurrentModuleObject;
         int NumSiteSpectrum(0);
 
-        auto &wm = state.dataWindowManager;
+        auto const &wm = state.dataWindowManager;
 
         if (wm->RunMeOnceFlag) return;
 
