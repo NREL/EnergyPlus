@@ -2433,9 +2433,9 @@ namespace Window {
             if (SurfNumAdj > 0) { // Interzone window
 
                 ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
-                Real64 RefAirTemp = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj) = RefAirTemp;
-                wm->tout = RefAirTemp + Constant::Kelvin; // outside air temperature
+                Real64 RefAirTempAdj = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj) = RefAirTempAdj;
+                wm->tout = RefAirTempAdj + Constant::Kelvin; // outside air temperature
 
                 // Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
                 wm->AbsRadGlassFace[0] += state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNumAdj);
@@ -4399,8 +4399,6 @@ namespace Window {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann, adapted from Numerical Recipes
         //       DATE WRITTEN   February 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Performs LU decomposition of a matrix.
@@ -4411,8 +4409,6 @@ namespace Window {
 
         int imax; // Temporary variable
         //   as output: decomposed matrix
-
-        Real64 aamax; // Absolute value of largest element of matrix
 
         assert(n <= 10);                   // vv sizing
         std::array<Real64, 10> vv = {0.0}; // Stores the implicit scaling of each row
@@ -4434,7 +4430,7 @@ namespace Window {
                 }
                 ajac(j, i) = sum;
             }
-            aamax = 0.0;
+            Real64 aamax = 0.0;
             for (int i = j; i <= n; ++i) {
                 Real64 sum = ajac(j, i);
                 for (int k = 1; k <= j - 1; ++k) {
