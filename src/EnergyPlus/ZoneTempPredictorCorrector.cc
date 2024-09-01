@@ -338,7 +338,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     auto &cAlphaFieldNames = state.dataIPShortCut->cAlphaFieldNames;
     auto &cNumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
     auto &inputProcessor = state.dataInputProcessing->inputProcessor;
-    auto &SetPointDualHeatCool = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool;
 
     cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TStat));
     // Update Num in state and make local convenience copy
@@ -652,7 +651,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls > 0)
-        SetPointDualHeatCool.allocate(state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls);
+        state.dataZoneTempPredictorCorrector->SetPointDualHeatCool.allocate(state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls);
 
     for (int idx = 1; idx <= state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls; ++idx) {
         inputProcessor->getObjectItem(state,
@@ -668,7 +667,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       cAlphaFieldNames,
                                       cNumericFieldNames);
         Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-        auto &dualHeatCoolSetpoint = SetPointDualHeatCool(idx);
+        auto &dualHeatCoolSetpoint = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(idx);
         dualHeatCoolSetpoint.Name = cAlphaArgs(1);
         dualHeatCoolSetpoint.HeatTempSetptSchedName = cAlphaArgs(2);
         dualHeatCoolSetpoint.HeatTempSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
