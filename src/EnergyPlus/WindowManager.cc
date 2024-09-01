@@ -7885,8 +7885,6 @@ namespace Window {
         Array1D<Real64> fEdgeA(2);       // Average slat edge correction factor for upper and lower quadrants
         //  seen by window blind
         Real64 gamma; // phib - phis
-        int Iphis;    // Source elevation counter
-        int IUpDown;  // =1 for source in upper quadrant, =2 for source in lower quadrant
         Real64 fEdge; // Slat edge correction factor
         Real64 fEdge1;
         Array1D<Real64> j(6);       // Slat section radiosity vector
@@ -7895,11 +7893,9 @@ namespace Window {
         Array2D<Real64> F(6, 6);    // View factor array
         Array2D<Real64> X(4, 4);    // Exchange matrix
         Array2D<Real64> Xinv(4, 4); // Inverse of exchange matrix
-        int k;                      // Array indices
-        int m;
-        Array1D_int indx(4);     // LU decomposition indices
-        Real64 BlindIRreflFront; // Blind front IR reflectance
-        Real64 BlindIRreflBack;  // Blind back IR reflectance
+        Array1D_int indx(4);        // LU decomposition indices
+        Real64 BlindIRreflFront;    // Blind front IR reflectance
+        Real64 BlindIRreflBack;     // Blind back IR reflectance
 
         // The slat input properties are:
         // c(1)    0. (unused)
@@ -8731,8 +8727,6 @@ namespace Window {
 
         std::string cCurrentModuleObject;
         int NumSiteSpectrum(0);
-        int Loop;
-        int iTmp;
 
         auto &wm = state.dataWindowManager;
 
