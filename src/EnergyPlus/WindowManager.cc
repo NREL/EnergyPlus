@@ -1653,7 +1653,6 @@ namespace Window {
             GlWidth = surf.Width;
             NumVertDividers = frdiv.VertDividers;
             NumHorDividers = frdiv.HorDividers;
-            int BaseSurfNum = surf.BaseSurf;
             state.dataSurface->SurfWinFrameConductance(SurfNum) = frdiv.FrameConductance;
             state.dataSurface->SurfWinFrameSolAbsorp(SurfNum) = frdiv.FrameSolAbsorp;
             state.dataSurface->SurfWinFrameVisAbsorp(SurfNum) = frdiv.FrameVisAbsorp;
@@ -2088,7 +2087,6 @@ namespace Window {
         int ZoneNumAdj; // An interzone surface's adjacent zone number
         int TotLay;     // Total number of layers in a construction
         //   (sum of solid layers and gap layers)
-        int TotGlassLay;          // Total number of glass layers in a construction
         int LayPtr;               // Material number for a layer
         WinShadingType ShadeFlag; // Flag indicating whether shade or blind is on, and shade/blind position
         // REAL(r64) :: tsky                         ! Sky temperature [K]
@@ -2137,7 +2135,6 @@ namespace Window {
             CalcComplexWindowThermal(
                 state, SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::Invalid);
 
-            TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
             wm->ngllayer = state.dataConstruction->Construct(ConstrNum).TotSolidLayers; // Simon: This is necessary to keep for frame calculations
             // Simon: need to transfer surface temperatures because of frames calculation
 
@@ -2228,7 +2225,7 @@ namespace Window {
             }
             // end new TC code
 
-            TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
+            int TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
             wm->ngllayer = TotGlassLay;
             wm->nglface = 2 * wm->ngllayer;
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
