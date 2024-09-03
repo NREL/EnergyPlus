@@ -6002,7 +6002,7 @@ namespace Weather {
                     if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.TempRangeSchPtr, 0.0, false)) {
                         ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
                         ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4)));
-                        ShowSevereError(state, "Some [Schedule] Dry-bulb Range Difference Values are < 0.0 [would make max larger].");
+                        ShowContinueError(state, "Some [Schedule] Dry-bulb Range Difference Values are < 0.0 [would make max larger].");
                         ErrorsFound = true;
                     }
                 }
@@ -6211,7 +6211,7 @@ namespace Weather {
                         if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.HumIndSchPtr, 0.0, false)) {
                             ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
                             ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(6), ipsc->cAlphaArgs(6)));
-                            ShowSevereError(state, "Some [Schedule] Wet-bulb Profile Difference Values are < 0.0 [would make max larger].");
+                            ShowContinueError(state, "Some [Schedule] Wet-bulb Profile Difference Values are < 0.0 [would make max larger].");
                             ErrorsFound = true;
                         }
                     } break;

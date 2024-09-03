@@ -2470,7 +2470,9 @@ namespace Window {
 
             wm->thetas = {0.0};
             wm->thetasPrev = {0.0};
+#ifdef GET_OUT            
             wm->fvec = {0.0};
+#endif // GET_OUT            
 
             // Calculate window face temperatures
 
@@ -2582,6 +2584,7 @@ namespace Window {
 
     //****************************************************************************
 
+#ifdef GET_OUT        
     void WindowHeatBalanceEquations(EnergyPlusData &state, int const SurfNum) // Surface number
     {
 
@@ -2697,7 +2700,8 @@ namespace Window {
         } break;
         } // switch
     }     // WindowHeatBalanceEquations()
-
+#endif // GET_OUT
+        
     //****************************************************************************
 
     void GetHeatBalanceEqCoefMatrixSimple(EnergyPlusData &state,
@@ -8306,119 +8310,6 @@ namespace Window {
 
         } // End of loop over front and back side properties of blind
     }     // BlindOpticsBeam()
-
-    Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
-                         Array1S<Real64> const PropArray // Array of blind properties
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Winkelmann
-        //       DATE WRITTEN   May 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Does profile-angle interpolation of window blind solar-thermal properties
-
-        // METHODOLOGY EMPLOYED:
-        // Linear interpolation.
-
-        // DeltaAng = Pi/36
-        if (ProfAng > Constant::PiOvr2 || ProfAng < -Constant::PiOvr2) {
-            return 0.0;
-        } else {
-            Real64 constexpr DeltaAngRad(Constant::Pi / 36.0);                                             // Profile angle increment (rad)
-            int IAlpha = 1 + int((ProfAng + Constant::PiOvr2) / DeltaAngRad);                              // Profile angle index
-            Real64 InterpFac = (ProfAng - (-Constant::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad; // Interpolation factor
-            return (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
-        }
-    } // InterpProfAng()
-
-    Real64 InterpSlatAng(Real64 const SlatAng,           // Slat angle (rad)
-                         bool const VarSlats,            // True if slat angle is variable
-                         Array1S<Real64> const PropArray // Array of blind properties as function of slat angle
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Winkelmann
-        //       DATE WRITTEN   Dec 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Does slat-angle interpolation of window blind solar-thermal properties that
-        // do not depend on profile angle
-
-        // METHODOLOGY EMPLOYED:
-        // Linear interpolation.
-
-        if (VarSlats) { // Variable-angle slats
-            Real64 SlatAng1 = std::clamp(SlatAng, 0.0, Constant::Pi);
-            static Real64 constexpr DeltaAng(Constant::Pi / (double(Material::MaxSlatAngs) - 1.0));
-            static Real64 constexpr DeltaAng_inv((double(Material::MaxSlatAngs) - 1.0) / Constant::Pi);
-            int IBeta = 1 + int(SlatAng1 * DeltaAng_inv);                          // Slat angle index
-            Real64 InterpFac = (SlatAng1 - DeltaAng * (IBeta - 1)) * DeltaAng_inv; // Interpolation factor
-            return PropArray(IBeta) + InterpFac * (PropArray(min(Material::MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
-        } else { // Fixed-angle slats or shade
-            return PropArray(1);
-        }
-    } // InterpSlatAng()
-
-    Real64 InterpProfSlatAng(Real64 const ProfAng,           // Profile angle (rad)
-                             Real64 const SlatAng,           // Slat angle (rad)
-                             bool const VarSlats,            // True if variable-angle slats
-                             Array2A<Real64> const PropArray // Array of blind properties
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Winkelmann
-        //       DATE WRITTEN   Dec 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Does simultaneous profile-angle and slat-angle interpolation of window
-        // blind solar-thermal properties that depend on profile angle and slat angle
-
-        // METHODOLOGY EMPLOYED:
-        // Linear interpolation.
-
-        // Argument array dimensioning
-        PropArray.dim(Material::MaxSlatAngs, Material::MaxProfAngs);
-
-        Real64 SlatAng1 = std::clamp(SlatAng, 0.0, Constant::Pi);
-
-        // This is not correct, fixed 2/17/2010
-        // ProfAng1 = MIN(MAX(SlatAng,-PiOvr2),PiOvr2)
-        Real64 ProfAng1 = std::clamp(ProfAng, -Constant::PiOvr2, Constant::PiOvr2);
-
-        Real64 constexpr DeltaProfAng(Constant::Pi / 36.0);
-        int IAlpha = int((ProfAng1 + Constant::PiOvr2) / DeltaProfAng) + 1;                               // Profile angle index
-        Real64 ProfAngRatio = (ProfAng1 + Constant::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng; // Profile angle interpolation factor
-
-        Real64 Val1;
-        Real64 Val2;
-        if (VarSlats) { // Variable-angle slats: interpolate in profile angle and slat angle
-            Real64 constexpr DeltaSlatAng(Constant::Pi / (double(Material::MaxSlatAngs) - 1.0));
-            int IBeta = int(SlatAng1 / DeltaSlatAng) + 1;                                 // Slat angle index
-            Real64 SlatAngRatio = (SlatAng1 - (IBeta - 1) * DeltaSlatAng) / DeltaSlatAng; // Slat angle interpolation factor
-            Val1 = PropArray(IBeta, IAlpha); // Property values at points enclosing the given ProfAngle and SlatAngle
-            Val2 = PropArray(min(Material::MaxSlatAngs, IBeta + 1), IAlpha);
-            Real64 Val3 = PropArray(IBeta, min(Material::MaxProfAngs, IAlpha + 1));
-            Real64 Val4 = PropArray(min(Material::MaxSlatAngs, IBeta + 1), min(Material::MaxProfAngs, IAlpha + 1));
-            Real64 ValA = Val1 + SlatAngRatio * (Val2 - Val1); // Property values at given SlatAngle to be interpolated in profile angle
-            Real64 ValB = Val3 + SlatAngRatio * (Val4 - Val3);
-            return ValA + ProfAngRatio * (ValB - ValA);
-        } else { // Fixed-angle slats: interpolate only in profile angle
-            Val1 = PropArray(1, IAlpha);
-            Val2 = PropArray(1, min(Material::MaxProfAngs, IAlpha + 1));
-            return Val1 + ProfAngRatio * (Val2 - Val1);
-        }
-    } // InterpProfSlatAng()
-
 
     //********************************************************************************************
 

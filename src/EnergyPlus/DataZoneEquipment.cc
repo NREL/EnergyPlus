@@ -751,10 +751,8 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                                Array1D_int &NodeNums)
 {
     static constexpr std::string_view RoutineName("processZoneEquipmentInput: "); // include trailing blank space
-    std::string_view zsString = "Zone";
     int spaceFieldShift = 0;
     if (isSpace) {
-        zsString = "Space";
         spaceFieldShift = -1;
     }
 
@@ -1388,7 +1386,7 @@ void processZoneEquipMixerInput(EnergyPlusData &state,
                                                               NodeInputManager::CompFluidStream::Primary,
                                                               objectIsParent);
                 // Check space exhaust nodes
-                bool found = false;
+                found = false;
                 auto &thisSpaceEquipConfig = state.dataZoneEquip->spaceEquipConfig(thisZeqSpace.spaceIndex);
                 for (int exhNodeNum : thisSpaceEquipConfig.ExhaustNode) {
                     if (thisZeqSpace.spaceNodeNum == exhNodeNum) {
@@ -1480,7 +1478,7 @@ void processZoneReturnMixerInput(EnergyPlusData &state,
                                       NodeInputManager::CompFluidStream::Primary,
                                       objectIsParent);
                 // Check space return nodes
-                bool found = false;
+                found = false;
                 auto &thisSpaceEquipConfig = state.dataZoneEquip->spaceEquipConfig(thisZeqSpace.spaceIndex);
                 for (int retNodeNum : thisSpaceEquipConfig.ReturnNode) {
                     if (thisZeqSpace.spaceNodeNum == retNodeNum) {
@@ -1830,7 +1828,7 @@ void scaleInletFlows(EnergyPlusData &state, int const zoneNodeNum, int const spa
 {
     assert(zoneNodeNum > 0);
     assert(spaceNodeNum > 0);
-    auto &zoneNode = state.dataLoopNodes->Node(zoneNodeNum);
+    auto const &zoneNode = state.dataLoopNodes->Node(zoneNodeNum);
     auto &spaceNode = state.dataLoopNodes->Node(spaceNodeNum);
     spaceNode.MassFlowRate = zoneNode.MassFlowRate * frac;
     spaceNode.MassFlowRateMax = zoneNode.MassFlowRateMax * frac;
@@ -1944,7 +1942,7 @@ void ZoneMixer::setOutletConditions(EnergyPlusData &state)
     Real64 sumFractions = 0.0;
     auto &outletNode = state.dataLoopNodes->Node(this->outletNodeNum);
     for (auto &mixerSpace : this->spaces) {
-        auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
+        auto const &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
         sumEnthalpy += spaceOutletNode.Enthalpy * mixerSpace.fraction;
         sumHumRat += spaceOutletNode.HumRat * mixerSpace.fraction;
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
@@ -1979,7 +1977,7 @@ void ZoneReturnMixer::setInletConditions(EnergyPlusData &state)
     for (auto &mixerSpace : this->spaces) {
         auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
         int spaceZoneNodeNum = state.dataZoneEquip->spaceEquipConfig(mixerSpace.spaceIndex).ZoneNode;
-        auto &spaceNode = state.dataLoopNodes->Node(spaceZoneNodeNum);
+        auto const &spaceNode = state.dataLoopNodes->Node(spaceZoneNodeNum);
         spaceOutletNode.Temp = spaceNode.Temp;
         spaceOutletNode.HumRat = spaceNode.HumRat;
         spaceOutletNode.Enthalpy = spaceNode.Enthalpy;
@@ -2118,7 +2116,7 @@ void ZoneEquipmentSplitter::distributeOutput(EnergyPlusData &state,
         Real64 spaceFraction = splitterSpace.fraction;
         if (this->tstatControl == DataZoneEquipment::ZoneEquipTstatControl::Ideal) {
             // Proportion output by sensible space load / zone load (varies every timestep, overrides outputFraction)
-            auto &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum);
+            auto const &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum);
             if (thisZoneSysEnergyDemand.RemainingOutputRequired != 0.0) {
                 spaceFraction = state.dataZoneEnergyDemand->spaceSysEnergyDemand(splitterSpace.spaceIndex).RemainingOutputRequired /
                                 thisZoneSysEnergyDemand.RemainingOutputRequired;
@@ -2129,7 +2127,7 @@ void ZoneEquipmentSplitter::distributeOutput(EnergyPlusData &state,
         Real64 spaceLatOutputProvided = latOutputProvided * spaceFraction;
         state.dataZoneTempPredictorCorrector->spaceHeatBalance(splitterSpace.spaceIndex).NonAirSystemResponse += nonAirSysOutput * spaceFraction;
         if (this->zoneEquipOutletNodeNum > 0 && splitterSpace.spaceNodeNum > 0) {
-            auto &equipOutletNode = state.dataLoopNodes->Node(this->zoneEquipOutletNodeNum);
+            auto const &equipOutletNode = state.dataLoopNodes->Node(this->zoneEquipOutletNodeNum);
             auto &spaceInletNode = state.dataLoopNodes->Node(splitterSpace.spaceNodeNum);
             spaceInletNode.MassFlowRate = equipOutletNode.MassFlowRate * spaceFraction;
             spaceInletNode.MassFlowRateMaxAvail = equipOutletNode.MassFlowRateMaxAvail * spaceFraction;
@@ -2274,7 +2272,7 @@ void EquipConfiguration::calcReturnFlows(EnergyPlusData &state,
                 // Establish corresponding airloop inlet(s) mass flow rate and set return node max/min/maxavail
                 Real64 inletMassFlow = 0.0;
                 int maxMinNodeNum = 0;
-                auto &thisAirLoopFlow(state.dataAirLoop->AirLoopFlow(airLoop));
+                auto const &thisAirLoopFlow(state.dataAirLoop->AirLoopFlow(airLoop));
                 if (ADUNum > 0) {
                     // Zone return node could carry supply flow to zone without leaks plus any induced flow from plenum (but don't include other
                     // secondary flows from exhaust nodes)

@@ -412,17 +412,20 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath
     // METHODOLOGY EMPLOYED:
     // The method used in EnergyPlus is to simplify the main program as much
     // as possible and contain all "simulation" code in other modules and files.
-
+    using namespace EnergyPlus;
     int status = initializeEnergyPlus(state, filepath);
     if (status || state.dataGlobal->outputEpJSONConversionOnly) return status;
     try {
         EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
+#ifdef NDEBUG
     } catch (const std::exception &e) {
-        EnergyPlus::ShowSevereError(state, e.what());
+        ShowSevereError(state, e.what());
         return EnergyPlus::AbortEnergyPlus(state);
+#endif
     }
+
     return wrapUpEnergyPlus(state);
 }
 
@@ -441,7 +444,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, const std::vector<
     // METHODOLOGY EMPLOYED:
     // The method used in EnergyPlus is to simplify the main program as much
     // as possible and contain all "simulation" code in other modules and files.
-
+    using namespace EnergyPlus;
     state.dataGlobal->eplusRunningViaAPI = true;
 
     // clean out any stdin, stderr, stdout flags from a prior call
@@ -466,7 +469,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, const std::vector<
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
-        EnergyPlus::ShowSevereError(state, e.what());
+        ShowSevereError(state, e.what());
         return EnergyPlus::AbortEnergyPlus(state);
     }
     return wrapUpEnergyPlus(state);
