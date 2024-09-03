@@ -74,6 +74,8 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
     Real64 rated_total_cooling_capacity;
     Real64 rated_steady_state_heating_capacity;
 
+    void size(EnergyPlusData &state) override;
+
     void simulate(EnergyPlusData &state,
                   const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,

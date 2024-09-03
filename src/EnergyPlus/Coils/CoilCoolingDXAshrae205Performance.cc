@@ -133,6 +133,10 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
     }
 }
 
+void CoilCoolingDX205Performance::size(EnergyPlusData &state)
+{
+}
+
 void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
                                            const DataLoopNode::NodeData &inletNode,
                                            DataLoopNode::NodeData &outletNode,
