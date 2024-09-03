@@ -238,7 +238,7 @@ Built on Platform: {}
         static constexpr std::array<std::string_view, 6> logLevelStrs = {"Trace", "Debug", "Info", "Warn", "Error", "Fatal"};
 
         auto *auxiliaryToolsSubcommand = app.add_subcommand("auxiliary", "Run Auxiliary Python Tools");
-
+        auxiliaryToolsSubcommand->require_subcommand();  // should default to requiring 1 or more additional args?
         enum class ValidAuxiliaryTools
         {
             energyplus_iddidf,

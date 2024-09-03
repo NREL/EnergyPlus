@@ -61,7 +61,7 @@
 # this script must be called with two args:
 # 1 - the path to the EnergyPlus executable in the install-tree, which is used to determine where to copy the library
 #     since this is in the install-tree, you'll need to use a cmake generator expression
-# 2 - name of the folder to create to store the copied in python standard library, usually python_standard_library
+# 2 - name of the folder to create to store the copied in python standard library, usually python_library
 import ctypes
 import os
 import platform

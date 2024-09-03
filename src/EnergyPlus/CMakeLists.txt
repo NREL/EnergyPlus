@@ -967,9 +967,9 @@ if(LINK_WITH_PYTHON)
   add_custom_command(
     TARGET energyplusapi
     POST_BUILD # TODO: I don't think we want to quote the generator expression
-    COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_standard_lib"
+    COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_lib"
     COMMAND ${CMAKE_COMMAND} -E env --unset=PIP_REQUIRE_VIRTUALENV
-            ${Python_EXECUTABLE} -m pip install --target="$<TARGET_FILE_DIR:energyplusapi>/python_standard_lib" --upgrade energyplus-python-apps==24.1a1
+            ${Python_EXECUTABLE} -m pip install --target="$<TARGET_FILE_DIR:energyplusapi>/python_lib" --upgrade energyplus-python-apps==24.1a1
   )
 endif()
 
@@ -978,7 +978,7 @@ if(BUILD_PACKAGE)
   if(LINK_WITH_PYTHON)
     # we'll want to grab the standard lib for python plugins
     # TODO: I don't think we want to quote the generator expression
-    install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/python_standard_lib/" DESTINATION "./python_standard_lib")
+    install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/python_lib/" DESTINATION "./python_lib")
   endif()
   # we'll want to always provide the C API headers
   install(FILES ${API_HEADERS} DESTINATION "./include/EnergyPlus/api")

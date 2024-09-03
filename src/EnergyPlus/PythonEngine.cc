@@ -312,12 +312,12 @@ namespace Python {
         } else {
             programDir = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
         }
-        fs::path const pathToPythonPackages = programDir / "python_standard_lib";
+        fs::path const pathToPythonPackages = programDir / "python_lib";
 
         initPython(state, pathToPythonPackages);
 
         // we also need to set an extra import path to find some dynamic library loading stuff, again make it relative to the binary
-        addToPythonPath(state, programDir / "python_standard_lib/lib-dynload", false);
+        addToPythonPath(state, programDir / "python_lib/lib-dynload", false);
 
         // now for additional paths:
         // we'll always want to add the program executable directory to PATH so that Python can find the installed pyenergyplus package
