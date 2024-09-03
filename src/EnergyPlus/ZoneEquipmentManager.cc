@@ -557,7 +557,7 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
         supplyAirNode.MassFlowRate = MassFlowRate;
     } else {
         nonAirSystemResponse = SysOutputProvided;
-        if (state.dataHeatBal->doSpaceHeatBalance) {
+        if (state.dataHeatBal->doSpaceHeatBalance && spaceNum == 0) {
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                 // SpaceHB ToDo: For now allocate by space volume frac
                 state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).NonAirSystemResponse =
