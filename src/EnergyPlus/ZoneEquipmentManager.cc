@@ -558,8 +558,7 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
     } else {
         nonAirSystemResponse = SysOutputProvided;
         if (zsCalcSizing.zoneLatentSizing) {
-            int ZoneMult = zoneOrSpace.Multiplier * zoneOrSpace.ListMultiplier;
-            zoneLatentGain += (LatOutputProvided * HgAir) / ZoneMult;
+            zoneLatentGain += (LatOutputProvided * HgAir);
         }
         if (state.dataHeatBal->doSpaceHeatBalance && spaceNum == 0) {
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
