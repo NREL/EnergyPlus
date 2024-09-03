@@ -16,7 +16,7 @@ on:
 
 jobs:
   build_wheel:
-    name: Build Python Wheels
+
     strategy:
       fail-fast: false
       matrix:
