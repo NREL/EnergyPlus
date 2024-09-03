@@ -1,7 +1,10 @@
 name: epJSON dependency
 
 on:
-  push
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -9,12 +12,19 @@ env:
 
 jobs:
   release:
+    name: Testing on ${{ matrix.pretty }}
     runs-on: ${{ matrix.os }}
     strategy:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            pretty: "Ubuntu"
+          - os: windows-latest
+            pretty: "Windows"
+          - os: macos-latest
+            pretty: "Mac"
 
     steps:
     - uses: actions/checkout@v4
