@@ -179,7 +179,7 @@ std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path
     if (output_to_file) {
         tbl_stream.open(filePath);
         if (!tbl_stream) {
-            ShowFatalError(state, format("OpenOutputTabularFile: Could not open file \"{}\" for output (write).", filePath.string()));
+            ShowFatalError(state, format("OpenOutputTabularFile: Could not open file \"{}\" for output (write).", filePath));
         }
     } else {
         tbl_stream.setstate(std::ios_base::badbit);
@@ -2552,21 +2552,23 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         curReport = AddMonthlyReport(state, "WindowZoneSummaryMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Rate", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Transmitted Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Windows Total Transmitted Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(42).show) {
         curReport = AddMonthlyReport(state, "WindowEnergyZoneSummaryMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Transmitted Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Windows Total Transmitted Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(
+            state, curReport, "Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(
+            state, curReport, "Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Enclosure Interior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(43).show) {
         curReport = AddMonthlyReport(state, "AverageOutdoorConditionsMonthly", 2, true);
@@ -6895,6 +6897,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
     }
     // fill the LEED setpoint table
     ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state);
+    ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSchedules(state);
 }
 
 void WriteMonthlyTables(EnergyPlusData &state)
@@ -15351,7 +15354,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                 }
                 for (int SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
                     if (state.dataSize->SysSizInput(SysSizIndex).AirLoopNum != iAirLoop) continue;
-                    if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::Coincident) {
+                    if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::SizingConcurrence::Coincident) {
                         airLoopCoolTable.peakDesSensLoad = finalSysSizing.SysCoolCoinSpaceSens;
                         airLoopCoolTable.designPeakLoad = finalSysSizing.SysDesCoolLoad;
 
@@ -15967,7 +15970,7 @@ void CollectPeakZoneConditions(
 
         if (isCooling) {
             // Time of Peak Load
-            if ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size()) {
+            if ((desDaySelected > 0) && ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size())) {
                 compLoad.peakDateHrMin = format("{}/{} {}",
                                                 state.dataWeather->DesDayInput(desDaySelected).Month,
                                                 state.dataWeather->DesDayInput(desDaySelected).DayOfMonth,

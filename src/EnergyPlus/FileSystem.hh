@@ -70,13 +70,6 @@ namespace fs = std::experimental::filesystem;
 
 #include <EnergyPlus/EnergyPlus.hh>
 
-// Add a custom formatter for fmt
-namespace fmt {
-template <> struct formatter<fs::path> : formatter<std::string>
-{
-};
-} // namespace fmt
-
 // If we want to allow this kind of stuff
 // fs::path p = "folder/eplus";
 // std::string suffixStr = "out.audit";
@@ -320,6 +313,43 @@ namespace FileSystem {
         }
     }
 
+    std::string toString(fs::path const &p);
+
+    std::string toGenericString(fs::path const &p);
+
+    fs::path appendSuffixToPath(fs::path const &outputFilePrefixFullPath, const std::string &suffix);
+
 } // namespace FileSystem
 } // namespace EnergyPlus
+
+// Add a custom formatter for fmt
+template <> struct fmt::formatter<fs::path>
+{
+    // Presentation format: 's' - string, 'g' - generic_string.
+    char presentation = 's';
+
+    // Parses format specifications of the form ['s' | 'g'].
+    constexpr auto parse(format_parse_context &ctx) -> decltype(ctx.begin())
+    {
+        // Parse the presentation format and store it in the formatter:
+        auto it = ctx.begin(), end = ctx.end();
+        if (it != end && (*it == 's' || *it == 'g')) {
+            presentation = *it++;
+        }
+
+        // Check if reached the end of the range:
+        if (it != end && *it != '}') {
+            throw format_error("invalid format");
+        };
+
+        // Return an iterator past the end of the parsed range:
+        return it;
+    }
+
+    template <typename FormatContext> auto format(const fs::path &p, FormatContext &ctx) -> decltype(ctx.out())
+    {
+        return format_to(ctx.out(), "{}", presentation == 'g' ? EnergyPlus::FileSystem::toGenericString(p) : EnergyPlus::FileSystem::toString(p));
+    }
+};
+
 #endif

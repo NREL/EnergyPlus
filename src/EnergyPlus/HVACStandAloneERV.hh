@@ -186,6 +186,8 @@ namespace HVACStandAloneERV {
 
     bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int NodeNumber);
 
+    int getEqIndex(EnergyPlusData &state, std::string_view CompName);
+
 } // namespace HVACStandAloneERV
 
 struct HVACStandAloneERVData : BaseGlobalStruct
@@ -205,6 +207,10 @@ struct HVACStandAloneERVData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyZoneEqFlag;             // used to set up zone equipment availability managers
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

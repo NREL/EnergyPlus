@@ -71,6 +71,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
@@ -646,7 +647,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", state->dataSingleDuct->sd_airterminal(SysNum).ReheatComp);
-    EXPECT_TRUE(compare_enums(Action::Normal, state->dataSingleDuct->sd_airterminal(SysNum).DamperHeatingAction));
+    EXPECT_ENUM_EQ(Action::Normal, state->dataSingleDuct->sd_airterminal(SysNum).DamperHeatingAction);
     EXPECT_EQ(0.2, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
 
     // set air inlet node properties
@@ -1008,6 +1009,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true); // clear idf errors
     // setup variables for VAV Reheat
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1217,6 +1219,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true); // clear idf errors
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1393,6 +1396,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true); // clear idf errors
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1580,6 +1584,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true); // clear idf errors
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1726,6 +1731,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream_substring("", true); // clear idf errors
     // setup variables for VAV HeatCoolReheat
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1829,6 +1835,56 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     EXPECT_EQ(SysMaxMassFlowRes, thisHeatCoolAT.sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMaxMassFlowRes, thisHeatCoolAT.sd_airterminalOutlet.AirMassFlowRate);
     EXPECT_EQ(expect_OutdoorAirFlowRate, thisHeatCoolAT.OutdoorAirFlowRate);
+}
+
+TEST_F(EnergyPlusFixture, SingleDuctInduction_reportTerminalUnit)
+{
+    using namespace EnergyPlus::OutputReportPredefined;
+    auto &orp = *state->dataOutRptPredefined;
+
+    SetPredefinedTables(*state);
+
+    auto &adu = state->dataDefineEquipment->AirDistUnit;
+    adu.allocate(2);
+    adu(1).Name = "ADU a";
+    adu(1).TermUnitSizingNum = 1;
+
+    auto &siz = state->dataSize->TermUnitFinalZoneSizing;
+    siz.allocate(2);
+    siz(1).DesCoolVolFlowMin = 0.15;
+    siz(1).MinOA = 0.05;
+    siz(1).CoolDesTemp = 12.5;
+    siz(1).HeatDesTemp = 40.0;
+    siz(1).DesHeatLoad = 2000.0;
+    siz(1).DesCoolLoad = 3000.0;
+
+    auto &sdiu = state->dataHVACSingleDuctInduc->IndUnit;
+    sdiu.allocate(2);
+    sdiu(1).ADUNum = 1;
+    sdiu(1).UnitType = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
+    sdiu(1).MaxPriAirMassFlow = 0.30;
+    sdiu(1).MaxSecAirMassFlow = 0.15;
+    sdiu(1).HCoilType = "hotwatercoil";
+    sdiu(1).CCoilType = "coldwatercoil";
+
+    sdiu(1).reportTerminalUnit(*state);
+
+    EXPECT_EQ("0.15", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinFlow, "ADU a"));
+    EXPECT_EQ("0.05", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOutdoorFlow, "ADU a"));
+    EXPECT_EQ("12.50", RetrievePreDefTableEntry(*state, orp.pdchAirTermSupCoolingSP, "ADU a"));
+    EXPECT_EQ("40.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermSupHeatingSP, "ADU a"));
+    EXPECT_EQ("2000.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatingCap, "ADU a"));
+    EXPECT_EQ("3000.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolingCap, "ADU a"));
+    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction", RetrievePreDefTableEntry(*state, orp.pdchAirTermTypeInp, "ADU a"));
+    EXPECT_EQ("0.30", RetrievePreDefTableEntry(*state, orp.pdchAirTermPrimFlow, "ADU a"));
+    EXPECT_EQ("0.15", RetrievePreDefTableEntry(*state, orp.pdchAirTermSecdFlow, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinFlowSch, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMaxFlowReh, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOAflowSch, "ADU a"));
+    EXPECT_EQ("hotwatercoil", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatCoilType, "ADU a"));
+    EXPECT_EQ("coldwatercoil", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolCoilType, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanType, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanName, "ADU a"));
 }
 
 } // namespace EnergyPlus

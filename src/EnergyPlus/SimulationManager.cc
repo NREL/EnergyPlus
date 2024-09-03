@@ -209,9 +209,8 @@ namespace SimulationManager {
              state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || state.dataSysVars->FullAnnualRun);
         state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
 
-        OpenOutputFiles(state);
-        GetProjectData(state);
-        Psychrometrics::InitializePsychRoutines(state);
+        state.init_state(state);
+
         CheckForMisMatchedEnvironmentSpecifications(state);
         CheckForRequestedReporting(state);
         OutputReportPredefined::SetPredefinedTables(state);
@@ -766,6 +765,9 @@ namespace SimulationManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             state.dataGlobal->NumOfTimeStepInHour = Number(1);
+            if (state.dataSysVars->ciForceTimeStep) {
+                state.dataGlobal->NumOfTimeStepInHour = 2; // Force 30 minute time steps on CI
+            }
             if (state.dataGlobal->NumOfTimeStepInHour <= 0 || state.dataGlobal->NumOfTimeStepInHour > 60) {
                 Alphas(1) = fmt::to_string(state.dataGlobal->NumOfTimeStepInHour);
                 ShowWarningError(state, format("{}: Requested number ({}) invalid, Defaulted to 4", CurrentModuleObject, Alphas(1)));
@@ -1580,7 +1582,7 @@ namespace SimulationManager {
     {
         auto result = std::make_unique<std::ofstream>(filePath, mode); // (AUTO_OK_UPTR)
         if (!result->good()) {
-            ShowFatalError(state, format("OpenOutputFiles: Could not open file {} for output (write).", filePath.string()));
+            ShowFatalError(state, format("OpenOutputFiles: Could not open file {} for output (write).", filePath));
         }
         return result;
     }
@@ -1589,7 +1591,7 @@ namespace SimulationManager {
     {
         std::unique_ptr<fmt::ostream> result = nullptr;
 #ifdef _WIN32
-        std::string filePathStr = filePath.string();
+        std::string filePathStr = FileSystem::toString(filePath);
         const char *path = filePathStr.c_str();
 #else
         const char *path = filePath.c_str();
@@ -1599,7 +1601,7 @@ namespace SimulationManager {
             result = std::make_unique<fmt::ostream>(std::move(f));
         } catch (const std::system_error &error) {
             ShowSevereError(state, error.what());
-            ShowFatalError(state, format("OpenOutputFiles: Could not open file {} for output (write).", filePath.string()));
+            ShowFatalError(state, format("OpenOutputFiles: Could not open file {} for output (write).", filePath));
         }
         return result;
     }
@@ -2613,8 +2615,6 @@ namespace SimulationManager {
 
         // Using/Aliasing
         // using SQLiteProcedures::CreateSQLiteDatabase;
-        using FluidProperties::FindGlycol;
-
         state.dataGlobal->DoingInputProcessing = false;
 
         state.dataInputProcessing->inputProcessor->preProcessorCheck(

@@ -71,6 +71,7 @@ namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
 {
+    state->init_state(*state);
     Real64 MaxLoad;
     Real64 MinLoad;
     Real64 OptLoad;

@@ -281,8 +281,6 @@ void GetStandAloneERV(EnergyPlusData &state)
         GlobalNames::IntraObjUniquenessCheck(
             state, Alphas(4), CurrentModuleObject, cAlphaFields(4), state.dataHVACStandAloneERV->SupplyAirFanUniqueNames, ErrorsFound);
 
-        errFlag = false;
-
         if ((standAloneERV.SupplyAirFanIndex = Fans::GetFanIndex(state, standAloneERV.SupplyAirFanName)) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFields(4), standAloneERV.SupplyAirFanName);
             ErrorsFound = true;
@@ -297,7 +295,6 @@ void GetStandAloneERV(EnergyPlusData &state)
         standAloneERV.ExhaustAirFanName = Alphas(5);
         GlobalNames::IntraObjUniquenessCheck(
             state, Alphas(5), CurrentModuleObject, cAlphaFields(5), state.dataHVACStandAloneERV->ExhaustAirFanUniqueNames, ErrorsFound);
-        errFlag = false;
 
         if ((standAloneERV.ExhaustAirFanIndex = Fans::GetFanIndex(state, standAloneERV.ExhaustAirFanName)) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFields(5), standAloneERV.ExhaustAirFanName);
@@ -1646,7 +1643,6 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
     for (int StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
 
         auto &StandAloneERV = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex);
-        bool ErrorsFound = false;
         int SupplyFanInletNodeIndex = 0;
         int SupplyFanOutletNodeIndex = 0;
         int ExhaustFanInletNodeIndex = 0;
@@ -1684,6 +1680,21 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
     }
 
     return false;
+}
+
+int getEqIndex(EnergyPlusData &state, std::string_view CompName)
+{
+    if (state.dataHVACStandAloneERV->GetERVInputFlag) {
+        GetStandAloneERV(state);
+        state.dataHVACStandAloneERV->GetERVInputFlag = false;
+    }
+
+    for (int StandAloneERVNum = 1; StandAloneERVNum <= state.dataHVACStandAloneERV->NumStandAloneERVs; StandAloneERVNum++) {
+        if (Util::SameString(CompName, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name)) {
+            return StandAloneERVNum;
+        }
+    }
+    return 0;
 }
 
 } // namespace EnergyPlus::HVACStandAloneERV

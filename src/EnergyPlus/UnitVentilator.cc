@@ -223,7 +223,6 @@ namespace UnitVentilator {
         bool errFlag(false);           // interim error flag
         std::string cCoolingCoilType;  // Cooling coil object type
         std::string cHeatingCoilType;  // Heating coil object type
-        int FanIndex;                  // index to fan used for flow checks
         Real64 FanVolFlow;             // volumetric flow rate of fan
         Array1D_string Alphas;         // Alpha items for object
         Array1D<Real64> Numbers;       // Numeric items for object
@@ -3364,6 +3363,21 @@ namespace UnitVentilator {
         }
 
         return GetUnitVentilatorReturnAirNode;
+    }
+
+    int getUnitVentilatorIndex(EnergyPlusData &state, std::string_view CompName)
+    {
+        if (state.dataUnitVentilators->GetUnitVentilatorInputFlag) {
+            GetUnitVentilatorInput(state);
+            state.dataUnitVentilators->GetUnitVentilatorInputFlag = false;
+        }
+        for (int UnitVentNum = 1; UnitVentNum <= state.dataUnitVentilators->NumOfUnitVents; ++UnitVentNum) {
+            if (Util::SameString(state.dataUnitVentilators->UnitVent(UnitVentNum).Name, CompName)) {
+                return UnitVentNum;
+            }
+        }
+
+        return 0;
     }
 
     Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state,

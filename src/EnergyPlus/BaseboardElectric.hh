@@ -105,9 +105,13 @@ struct BaseboardElectricData : BaseGlobalStruct
     bool getInputFlag = true;
     EPVector<BaseboardElectric::BaseboardParams> baseboards;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = BaseboardElectricData();
+        new (this) BaseboardElectricData();
     }
 };
 

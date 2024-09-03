@@ -381,7 +381,7 @@ namespace IndoorGreen {
                 state,
                 "Indoor Living Wall Sensible Heat Gain Rate",
                 Constant::Units::W,
-                state.dataHeatBalSurf->SurfQConvInRep(ig.SurfPtr), // positive sign: heat loss from plants; negative sign: heat gain from plants
+                state.dataHeatBalSurf->SurfQConvInRep(ig.SurfPtr), // positive sign: heat loss from plants; negative sign: heat gain to plants
                 OutputProcessor::TimeStepType::Zone,
                 OutputProcessor::StoreType::Average,
                 ig.Name);
@@ -400,7 +400,7 @@ namespace IndoorGreen {
                                 OutputProcessor::StoreType::Average,
                                 ig.Name);
             SetupOutputVariable(state,
-                                "Indoor Living Wall Energy Required For Evapotranspiration Per Unit Area",
+                                "Indoor Living Wall Energy Rate Required For Evapotranspiration Per Unit Area",
                                 Constant::Units::W_m2,
                                 ig.LambdaET,
                                 OutputProcessor::TimeStepType::Zone,
@@ -498,7 +498,6 @@ namespace IndoorGreen {
         Real64 OutPb;       // outdoor pressure (kPa)
         Real64 vp;          // actual vapor pressure of the air (kpa)
         Real64 vpSat;       // saturated vapor pressure at air temperature (kpa)
-        std::string_view cCurrentModuleObject = "IndoorLivingWall";
         Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
         for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
             auto &ig = lw->indoorGreens(IndoorGreenNum);
@@ -581,11 +580,14 @@ namespace IndoorGreen {
                 ZoneNewTemp = Twb;
                 ZoneNewHum = ZoneSatHum;
             }
-            HMid = Psychrometrics::PsyHFnTdbW(ZoneNewTemp, ZoneNewHum);
+            HMid = Psychrometrics::PsyHFnTdbW(ZoneNewTemp, ZonePreHum);
             ig.SensibleRate = (1 - ig.LEDRadFraction) * ig.LEDActualEleP; // convective heat gain from LED lights when LED is on; heat convection from
                                                                           // plants was considered and counted from plant surface heat balance.
             ig.LatentRate = ZoneAirVol * rhoair * (HCons - HMid) / Timestep; // unit W
-            state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(ig.SurfPtr) = -1.0 * ig.LambdaET;
+            state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(ig.SurfPtr) =
+                -1.0 * ig.LambdaET +
+                ig.LEDRadFraction * 0.9 * ig.LEDActualEleP /
+                    state.dataSurface->Surface(ig.SurfPtr).Area; // assume the energy from radiation for photosynthesis is only 10%.
         }
     }
 
@@ -597,7 +599,6 @@ namespace IndoorGreen {
         // Reference: Stanghellini, C., Transpiration of greenhouse crops: an aid to climate management, 1987, Institute of Agricultural Engineering,
         // Wageningen, The Netherlands
 
-        static constexpr std::string_view RoutineName("ETBaseFunction: ");
         Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
         Real64 slopepat =
             0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; // Slope of the saturation vapor pressure-temperature curve (kPa/°C)

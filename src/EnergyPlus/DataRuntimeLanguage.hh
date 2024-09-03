@@ -737,6 +737,11 @@ namespace DataRuntimeLanguage {
 struct RuntimeLanguageData : BaseGlobalStruct
 {
 
+    // In the API, we allow the user to manipulate user-defined EMS globals, but we skip the built-in ones to avoid
+    // problems.  The built-in ones will not always start at zero, so we keep a start/end to ignore that specific range.
+    int emsVarBuiltInStart = 0;
+    int emsVarBuiltInEnd = 0;
+
     int NumProgramCallManagers = 0;       // count of Erl program managers with calling points
     int NumSensors = 0;                   // count of EMS sensors used in model (data from output variables)
     int numActuatorsUsed = 0;             // count of EMS actuators used in model
@@ -803,6 +808,10 @@ struct RuntimeLanguageData : BaseGlobalStruct
     // EMS Actuator fast duplicate check lookup support
     std::unordered_set<std::tuple<std::string, std::string, std::string>, DataRuntimeLanguage::EMSActuatorKey_hash>
         EMSActuator_lookup; // Fast duplicate lookup structure
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

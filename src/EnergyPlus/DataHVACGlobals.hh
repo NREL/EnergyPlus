@@ -66,6 +66,21 @@ namespace HVAC {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
+    enum class CtrlVarType
+    {
+        Invalid = -1,
+        Temp,
+        MaxTemp,
+        MinTemp,
+        HumRat,
+        MaxHumRat,
+        MinHumRat,
+        MassFlowRate,
+        MaxMassFlowRate,
+        MinMassFlowRate,
+        Num
+    };
+
     // MODULE PARAMETER DEFINITIONS:
 
     Real64 constexpr SmallHumRatDiff(1.0E-7);
@@ -105,6 +120,9 @@ namespace HVAC {
         Num
     };
 
+    static constexpr std::array<std::string_view, static_cast<int>(ThermostatType::Num)> thermostatTypeNames = {
+        "Uncontrolled", "SingleHeating", "SingleCooling", "SingleHeatCool", "DualSetPointWithDeadBand"};
+
     enum class AirDuctType
     // parameters describing air duct type
     {
@@ -116,6 +134,9 @@ namespace HVAC {
         RAB,
         Num
     };
+
+    static constexpr std::array<std::string_view, static_cast<int>(AirDuctType::Num)> airDuctTypeNames = {
+        "Main", "Cooling", "Heating", "Other", "Return Air Bypass"};
 
     int constexpr Cooling(2);
     int constexpr Heating(3);
@@ -411,7 +432,6 @@ namespace HVAC {
 
     int constexpr MaxSpeedLevels = 10;
 
-    // extern Array1D_string const cFanTypes;
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
     extern Array1D_string const cHeatingCoilTypes;
@@ -510,7 +530,13 @@ struct HVACGlobalsData : BaseGlobalStruct
     bool StandardRatingsMyOneTimeFlag = true;
     bool StandardRatingsMyCoolOneTimeFlag = true;
     bool StandardRatingsMyCoolOneTimeFlag2 = true;
+    bool StandardRatingsMyCoolOneTimeFlag3 = true;
     bool StandardRatingsMyHeatOneTimeFlag = true;
+    bool StandardRatingsMyHeatOneTimeFlag2 = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

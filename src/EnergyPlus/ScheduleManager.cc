@@ -490,7 +490,7 @@ namespace ScheduleManager {
                                 ShowSevereError(state, error);
                             }
                         }
-                        ShowContinueError(state, fmt::format("Error Occurred in {}", state.files.TempFullFilePath.filePath.string()));
+                        ShowContinueError(state, fmt::format("Error Occurred in {}", state.files.TempFullFilePath.filePath));
                         ShowFatalError(state, "Program terminates due to previous condition.");
                     }
                     schedule_file_shading_result = it.first;
@@ -1805,7 +1805,7 @@ namespace ScheduleManager {
                                     ShowSevereError(state, error);
                                 }
                             }
-                            ShowContinueError(state, fmt::format("Error Occurred in {}", state.files.TempFullFilePath.filePath.string()));
+                            ShowContinueError(state, fmt::format("Error Occurred in {}", state.files.TempFullFilePath.filePath));
                             ShowFatalError(state, "Program terminates due to previous condition.");
                         }
                         result = it.first;

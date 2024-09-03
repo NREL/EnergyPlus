@@ -505,7 +505,7 @@ The amount by which the overhead electric lighting power in a space or zone is m
 
 \subsection{Output:IlluminanceMap}\label{outputilluminancemap}
 
-The Output:IlluminanceMap object expands on the reporting capabilities of the daylighting simulation. For any zone simulated with \hyperref[daylightingcontrols-000]{Daylighting:Controls}, the illuminance map can generate up to 2,500 points of additional daylighting illuminance values. The resulting map is output as a comma delimited text file that can be imported into a spreadsheet program for rapid visualization of the daylighting illuminance patterns in a zone. The values are produced on an hourly basis. The Z height of the map is constant (parallel to a flat floor). More than one illuminance map can be created for a zone. IlluminanceMap output is available only when SplitFlux daylighting method is selected in \hyperref[daylightingcontrols-000]{Daylighting:Controls} object.
+The Output:IlluminanceMap object expands on the reporting capabilities of the daylighting simulation. For any space or zone simulated with \hyperref[daylightingcontrols-000]{Daylighting:Controls}, the illuminance map can generate up to 2,500 points of additional daylighting illuminance values. The resulting map is output as a comma delimited text file that can be imported into a spreadsheet program for rapid visualization of the daylighting illuminance patterns in a space or zone. The values are produced on an hourly basis. The Z height of the map is constant (parallel to a flat floor). More than one illuminance map can be created for a space or zone. IlluminanceMap output is available only when SplitFlux daylighting method is selected in \hyperref[daylightingcontrols-000]{Daylighting:Controls} object.
 
 \subsubsection{Inputs}\label{inputs-4-006}
 
@@ -513,13 +513,13 @@ The Output:IlluminanceMap object expands on the reporting capabilities of the da
 
 The name of the map object.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-2-000}
+\paragraph{Field: Zone or Space Name}\label{field-zone-name-2-000}
 
-Reference to a zone with \hyperref[daylightingcontrols-000]{Daylighting:Controls}. The zone must lie completely within a single solar enclosure.
+Reference to a zone or space with \hyperref[daylightingcontrols-000]{Daylighting:Controls}. If a zone name is specified, all spaces in the zone must be within the same solar enclosure.
 
 \paragraph{Field: Z Height}\label{field-z-height}
 
-The height or elevation of the grid of daylighting points.
+The height or elevation of the grid of daylighting points.  Coordinates may be world or relative as specified in the \hyperref[globalgeometryrules]{GlobalGeometryRules} object Daylighting Reference Point CoordinateSystem field. If a space name is specifice for this map, relative coodinates are relative to the origin of the zone that contains the space  (spaces do not have a separate origin).
 
 \paragraph{Field: X Minimum Coordinate}\label{field-x-minimum-coordinate}
 
@@ -551,7 +551,7 @@ Note:~ Daylighting factors cannot be accurately calculated for reference points 
 
 Output:IlluminanceMap,
     Daylit Map,      ! Map Name
-    Daylit Zone,     ! Zone Name
+    Daylit Zone,     ! Zone or Space Name
     0,               ! Z Height [m]
     0.1,             ! X Minimum Coordinate [m]
     4.9,             ! X Maximum Coordinate [m]

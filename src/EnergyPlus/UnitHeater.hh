@@ -202,6 +202,7 @@ namespace UnitHeater {
 
     void ReportUnitHeater(EnergyPlusData &state, int const UnitHeatNum); // Unit index in unit heater array
 
+    int getUnitHeaterIndex(EnergyPlusData &state, std::string_view CompName);
 } // namespace UnitHeater
 
 struct UnitHeatersData : BaseGlobalStruct
@@ -232,6 +233,10 @@ struct UnitHeatersData : BaseGlobalStruct
     Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 
     int RefrigIndex = 0;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

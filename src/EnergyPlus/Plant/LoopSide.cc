@@ -1945,9 +1945,6 @@ namespace DataPlant {
         //    load range based: these components do not 'alter' the load, they reject the load
         //    Therefore they are not included
 
-        // Using/Aliasing
-        using FluidProperties::GetSpecificHeatGlycol;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("PlantLoopSolver::UpdateAnyLoopDemandAlterations");
 
@@ -2001,11 +1998,11 @@ namespace DataPlant {
         Real64 const InletTemp(state.dataLoopNodes->Node(InletNode).Temp);
         Real64 const OutletTemp(state.dataLoopNodes->Node(OutletNode).Temp);
         Real64 const AverageTemp((InletTemp + OutletTemp) / 2.0);
-        Real64 const ComponentCp(GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                       AverageTemp,
-                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                                       RoutineName));
+        Real64 const ComponentCp(FluidProperties::GetSpecificHeatGlycol(state,
+                                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                        AverageTemp,
+                                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                        RoutineName));
 
         // Calculate the load altered by this component
         Real64 const LoadAlteration(ComponentMassFlowRate * ComponentCp * (OutletTemp - InletTemp));

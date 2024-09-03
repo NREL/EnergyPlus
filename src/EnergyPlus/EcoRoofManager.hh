@@ -169,6 +169,10 @@ struct EcoRoofManagerData : BaseGlobalStruct
     Real64 TestMoisture = 0.15; // This makes sure that the moisture cannot change by too much in each step
     int ErrIndex = 0;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->EcoRoofbeginFlag = true;

@@ -99,6 +99,8 @@ namespace SolarShading {
 
     void GetShadowingInput(EnergyPlusData &state);
 
+    void processShadowingInput(EnergyPlusData &state);
+
     void checkScheduledSurfacePresent(EnergyPlusData &state);
 
     void AllocateModuleArrays(EnergyPlusData &state);
@@ -133,6 +135,8 @@ namespace SolarShading {
     void ComputeIntSolarAbsorpFactors(EnergyPlusData &state);
 
     void CLIP(EnergyPlusData &state, int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT);
+
+    void CLIPLINE(Real64 &x0, Real64 &x1, Real64 &y0, Real64 &y1, Real64 maxX, Real64 minX, Real64 maxY, Real64 minY, bool &visible);
 
     void CTRANS(EnergyPlusData &state,
                 int const NS,         // Surface number whose vertex coordinates are being transformed
@@ -506,6 +510,10 @@ struct SolarShadingData : BaseGlobalStruct
     std::vector<Real64> sin_Theta;
     std::vector<Real64> cos_Theta;
     std::unique_ptr<std::iostream> shd_stream; // Shading file stream
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

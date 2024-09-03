@@ -3405,7 +3405,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
         "    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
         "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
         "    drawthrough,             !- Supply Air Fan Placement",
-        "    Fan:VariableVolume,      !- Supply Air Fan Object Type",
+        "    Fan:SystemModel,      !- Supply Air Fan Object Type",
         "    TU1 VRF Supply Fan,      !- Supply Air Fan Object Name",
         "    ,                        !- Outside Air Mixer Object Type",
         "    ,                        !- Outside Air Mixer Object Name",
@@ -3416,25 +3416,42 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
         "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
         "    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
 
-        "  Fan:VariableVolume,",
+        "  Fan:SystemModel,",
         "    TU1 VRF Supply Fan,      !- Name",
         "    VRFAvailSched,           !- Availability Schedule Name",
-        "    0.7,                     !- Fan Total Efficiency",
-        "    600,                     !- Pressure Rise {Pa}",
-        "    0.500,                   !- Maximum Flow Rate {m3/s}",
-        "    Fraction,                !- Fan Power Minimum Flow Rate Input Method",
-        "    0,                       !- Fan Power Minimum Flow Fraction",
-        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
-        "    0.9,                     !- Motor Efficiency",
-        "    1,                       !- Motor In Airstream Fraction",
-        "    0.059,                   !- Fan Power Coefficient 1",
-        "    0,                       !- Fan Power Coefficient 2",
-        "    0,                       !- Fan Power Coefficient 3",
-        "    0.928,                   !- Fan Power Coefficient 4",
-        "    0,                       !- Fan Power Coefficient 5",
         "    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
         "    TU1 Outlet Node,         !- Air Outlet Node Name",
+        "    0.500,                   !- Design Maximum Air Flow Rate {m3/s}",
+        "    Continuous,              !- Speed Control Method",
+        "    0.0,                   !- Electric Power Minimum Flow Rate Fraction",
+        "    600,                     !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    autosize,               !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,                        !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    TU1 Fan Power Curve,         !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    ,",
         "    General;                 !- End-Use Subcategory",
+
+        "  Curve:Quartic,",
+        "    TU1 Fan Power Curve , !- Name",
+        "    0.059,            !- Coefficient1 Constant",
+        "    0,                !- Coefficient2 x       ",
+        "    0,                !- Coefficient3 x**2    ",
+        "    0.928,            !- Coefficient4 x**3    ",
+        "    0,                !- Coefficient5 x**4    ",
+        "    0.0,              !- Minimum Value of x",
+        "    1.0,              !- Maximum Value of x",
+        "    0.0,              !- Minimum Curve Output",
+        "    1.0,              !- Maximum Curve Output",
+        "    Dimensionless,    !- Input Unit Type for X",
+        "    Dimensionless;    !- Output Unit Type",
 
         "  Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,",
         "    TU1 VRF DX Heating Coil, !- Name",
@@ -4965,7 +4982,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(*state); // read schedules
-    InitializePsychRoutines(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
 
     GetZoneData(*state, ErrorsFound);
@@ -5064,6 +5080,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
 
     // set secondary air mass flow rate to zero
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
+    state->dataFans->fans(1)->set_size(*state); // add sizing
+    state->dataHVACVarRefFlow->VRF(1).VRFCondCyclingRatio = 1.0;
     // Simulate zoneHVAC equipment (VRF terminal unit)
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq);
 
@@ -5165,7 +5183,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
         "    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
         "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
         "    drawthrough,             !- Supply Air Fan Placement",
-        "    Fan:VariableVolume,      !- Supply Air Fan Object Type",
+        "    Fan:SystemModel,      !- Supply Air Fan Object Type",
         "    TU1 VRF Supply Fan,      !- Supply Air Fan Object Name",
         "    ,                        !- Outside Air Mixer Object Type",
         "    ,                        !- Outside Air Mixer Object Name",
@@ -5176,25 +5194,42 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
         "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
         "    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
 
-        "  Fan:VariableVolume,",
+        "  Fan:SystemModel,",
         "    TU1 VRF Supply Fan,      !- Name",
         "    VRFAvailSched,           !- Availability Schedule Name",
-        "    0.7,                     !- Fan Total Efficiency",
-        "    600,                     !- Pressure Rise {Pa}",
-        "    0.500,                   !- Maximum Flow Rate {m3/s}",
-        "    Fraction,                !- Fan Power Minimum Flow Rate Input Method",
-        "    0,                       !- Fan Power Minimum Flow Fraction",
-        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
-        "    0.9,                     !- Motor Efficiency",
-        "    1,                       !- Motor In Airstream Fraction",
-        "    0.059,                   !- Fan Power Coefficient 1",
-        "    0,                       !- Fan Power Coefficient 2",
-        "    0,                       !- Fan Power Coefficient 3",
-        "    0.928,                   !- Fan Power Coefficient 4",
-        "    0,                       !- Fan Power Coefficient 5",
         "    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
         "    SPACE1-1 AIR TERMINAL MIXER SECONDARY INLET, !- Air Outlet Node Name",
+        "    0.500,                   !- Design Maximum Air Flow Rate {m3/s}",
+        "    Continuous,              !- Speed Control Method",
+        "    0.0,                   !- Electric Power Minimum Flow Rate Fraction",
+        "    600,                     !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    autosize,               !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,                        !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    TU1 Fan Power Curve,         !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    ,",
         "    General;                 !- End-Use Subcategory",
+
+        "  Curve:Quartic,",
+        "    TU1 Fan Power Curve , !- Name",
+        "    0.059,            !- Coefficient1 Constant",
+        "    0,                !- Coefficient2 x       ",
+        "    0,                !- Coefficient3 x**2    ",
+        "    0.928,            !- Coefficient4 x**3    ",
+        "    0,                !- Coefficient5 x**4    ",
+        "    0.0,              !- Minimum Value of x",
+        "    1.0,              !- Maximum Value of x",
+        "    0.0,              !- Minimum Curve Output",
+        "    1.0,              !- Maximum Curve Output",
+        "    Dimensionless,    !- Input Unit Type for X",
+        "    Dimensionless;    !- Output Unit Type",
 
         "  Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,",
         "    TU1 VRF DX Heating Coil, !- Name",
@@ -6818,6 +6853,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
 
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataHVACVarRefFlow->VRF(1).VRFCondCyclingRatio = 1.0;
+    state->dataFans->fans(1)->set_size(*state); // add fan sizing
 
     // set secondary air mass flow rate to zero
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
@@ -6830,8 +6867,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     // check the terminal air mixer outlet flow rate must be equal to the mass flow rate of VRFTU + the primary air
     ATMixerOutletMassFlowRate = SecondaryAirMassFlowRate + PrimaryAirMassFlowRate;
     ASSERT_EQ(ATMixerOutletMassFlowRate, state->dataSingleDuct->SysATMixer(1).MixedAirMassFlowRate);
-    // check the cooling output delivered is within 2.0 Watt of zone cooling load
-    ASSERT_NEAR(QZnReq, QUnitOutVRFTU, 2.0);
+    //    changed the threshold from 2 to 3 as the fan was changed from hard-sized to autosize, a little more error is expected
+    ASSERT_NEAR(QZnReq, QUnitOutVRFTU, 3.0);
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)

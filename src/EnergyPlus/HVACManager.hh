@@ -97,7 +97,7 @@ namespace HVACManager {
 
     void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir); // TRUE means air loops must be (re)simulated
 
-    void ResetHVACControl(EnergyPlusData &state);
+    void ResetHVACControl(EnergyPlusData const &state);
 
     void ResetNodeData(EnergyPlusData &state);
 
@@ -142,6 +142,10 @@ struct HVACManagerData : BaseGlobalStruct
     std::string ErrEnvironmentName;
     Array1D<Real64> MixSenLoad; // Mixing sensible loss or gain
     Array1D<Real64> MixLatLoad; // Mixing latent loss or gain
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

@@ -139,7 +139,6 @@ namespace VariableSpeedCoils {
         // This subroutine manages variable-speed Water to Air Heat Pump component simulation.
 
         // Using/Aliasing
-        using FluidProperties::FindGlycol;
         using General::SolveRoot;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1033,13 +1032,15 @@ namespace VariableSpeedCoils {
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower = NumArray(10);
 
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower < 0.0) {
-                ShowSevereError(
-                    state,
-                    format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(10)));
-                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(10)));
-                ErrorsFound = true;
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower != DataSizing::AutoSize) {
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower < 0.0) {
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
+                    ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(10)));
+                    ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(10)));
+                    ErrorsFound = true;
+                }
             }
 
             // Set crankcase heater capacity
@@ -5555,7 +5556,11 @@ namespace VariableSpeedCoils {
             RatedInletEnth = Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat);
             CBFRated = AdjustCBF(varSpeedCoil.MSRatedCBF(NormSpeed), varSpeedCoil.MSRatedAirMassFlowRate(NormSpeed), RatedAirMassFlowRate);
             if (CBFRated > 0.999) CBFRated = 0.999;
-            AirMassFlowRatio = RatedAirMassFlowRate / varSpeedCoil.MSRatedAirMassFlowRate(NormSpeed);
+            if (varSpeedCoil.MSRatedAirMassFlowRate(NormSpeed) > 1.0e-10) {
+                AirMassFlowRatio = RatedAirMassFlowRate / varSpeedCoil.MSRatedAirMassFlowRate(NormSpeed);
+            } else {
+                AirMassFlowRatio = 1.0;
+            }
 
             if (varSpeedCoil.MSRatedWaterVolFlowRate(NormSpeed) > 1.0e-10) {
                 WaterMassFlowRatio = varSpeedCoil.RatedWaterVolFlowRate / varSpeedCoil.MSRatedWaterVolFlowRate(NormSpeed);
@@ -5829,7 +5834,9 @@ namespace VariableSpeedCoils {
                                                           varSpeedCoil.OATempCompressorOn,
                                                           false, // varSpeedCoil.OATempCompressorOnOffBlank, // ??
                                                           DefrostControl,
-                                                          ObjexxFCL::Optional_bool_const());
+                                                          ObjexxFCL::Optional_bool_const(),
+                                                          varSpeedCoil.RatedCapCoolTotal,
+                                                          varSpeedCoil.RatedAirVolFlowRate);
             }
             break;
         default:
@@ -7745,7 +7752,6 @@ namespace VariableSpeedCoils {
         // as negative.
 
         // Using/Aliasing
-        using FluidProperties::FindGlycol;
 
         // Return value
         Real64 CoilCapacity; // returned capacity of matched coil
@@ -7805,9 +7811,6 @@ namespace VariableSpeedCoils {
         // This function looks up the coil index for the given coil and returns it.  If
         // incorrect coil type or name is given, ErrorsFound is returned as true and index is returned
         // as zero.
-
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
 
         // Return value
         int IndexNum; // returned index of matched coil
@@ -7989,9 +7992,6 @@ namespace VariableSpeedCoils {
         // incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
         // as zero.
 
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
-
         // Return value
         int NodeNumber; // returned outlet node of matched coil
 
@@ -8036,9 +8036,6 @@ namespace VariableSpeedCoils {
         // This function looks up the given coil and returns the outlet node.  If
         // incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
         // as zero.
-
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
 
         // Return value
         int NodeNumber; // returned outlet node of matched coil
@@ -8213,9 +8210,6 @@ namespace VariableSpeedCoils {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine was designed to "push" information from a parent object to
         // this WSHP coil object.
-
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataVariableSpeedCoils->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -8632,7 +8626,11 @@ namespace VariableSpeedCoils {
             Real64 tADP = PsyTsatFnHPb(state, hADP, Pressure, RoutineName); // Apparatus dew point temperature [C]
             Real64 wADP = PsyWFnTdbH(state, tADP, hADP, RoutineName);       // Apparatus dew point humidity ratio [kg/kg]
             Real64 hTinwADP = PsyHFnTdbW(InletDryBulb, wADP);               // Enthalpy at inlet dry-bulb and wADP [J/kg]
-            SHRCalc = min((hTinwADP - hADP) / (InletEnthalpy - hADP), 1.0); // temporary calculated value of SHR
+            if (TotCapCalc > 1.0e-10) {
+                SHRCalc = min((hTinwADP - hADP) / (InletEnthalpy - hADP), 1.0); // temporary calculated value of SHR
+            } else {
+                SHRCalc = 1.0;
+            }
 
             //   Check for dry evaporator conditions (win < wadp)
             if (wADP > InletHumRatCalc || (Counter >= 1 && Counter < MaxIter)) {

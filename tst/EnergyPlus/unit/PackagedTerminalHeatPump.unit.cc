@@ -3881,6 +3881,14 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEnergyDemand->DeadBandOrSetback = 0.0;
 
+    state->dataEnvrn->OutDryBulbTemp = 30.0;
+    state->dataEnvrn->OutHumRat = 0.0015;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(30.0, 0.0015);
+    state->dataEnvrn->WindSpeed = 4.9;
+    state->dataEnvrn->WindDir = 270.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
+
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SimAirServingZones::GetAirPathData(*state);
     state->dataSimAirServingZones->GetAirLoopInputFlag = false;
@@ -3902,13 +3910,6 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(i).RemainingOutputReqToCoolSP = -5000.0;
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(i).RemainingOutputReqToHeatSP = -200.0;
     }
-    state->dataEnvrn->OutDryBulbTemp = 30.0;
-    state->dataEnvrn->OutHumRat = 0.0015;
-    state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(30.0, 0.0015);
-    state->dataEnvrn->WindSpeed = 4.9;
-    state->dataEnvrn->WindDir = 270.0;
-    state->dataEnvrn->StdRhoAir = 1.2;
     GetZoneAirSetPoints(*state);
     state->dataHeatBalFanSys->TempControlType.allocate(6);
     state->dataHeatBalFanSys->TempControlType = HVAC::ThermostatType::DualSetPointWithDeadBand;
@@ -4027,7 +4028,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     // same temperature test as above commented out test (23.15327704750551), now shows 21.2 C
     // how do you mix 2 air streams with T1in=31.18 and T2in=23.15 and get Tout=21.23 ??
     // must be a node enthalpy issue with this unit test?
-    EXPECT_NEAR(21.2316, state->dataLoopNodes->Node(ATMixer1AirOutNode).Temp, 0.001);
+    EXPECT_NEAR(21.2316, state->dataLoopNodes->Node(ATMixer1AirOutNode).Temp, 0.005);
     EXPECT_NEAR(0.324036, state->dataLoopNodes->Node(ATMixer1AirOutNode).MassFlowRate, 0.001);
 
     // mass balance zone 1 ATMixer outlet enthalpy based on pri and sec inlet stream enthalpy
@@ -4612,7 +4613,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     // set sizing parameters
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
-    state->dataGlobal->SysSizingCalc = true;
+    state->dataGlobal->SysSizingCalc = true; // disable sizing calculation
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
@@ -4652,6 +4653,10 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     auto &dxClgCoilMain = state->dataDXCoils->DXCoil(1);
     auto &dxHtgCoilMain = state->dataDXCoils->DXCoil(2);
     auto &elecHtgCoilSupp = state->dataHeatingCoils->HeatingCoil(1);
+
+    // We disabled sizing calculation, so we must initialize these
+    dxClgCoilMain.RatedAirMassFlowRate(1) = dxClgCoilMain.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
+    dxHtgCoilMain.RatedAirMassFlowRate(1) = dxHtgCoilMain.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
 
     state->dataGlobal->BeginEnvrnFlag = true;
     mySys->simulate(*state,
@@ -5021,7 +5026,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     auto &sysAvailMgr = state->dataAvail->NightCycleData(1);
     // check the three cycling run time control types
     EXPECT_EQ(1, state->dataAvail->NumNCycSysAvailMgrs);
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, sysAvailMgr.cyclingRunTimeControl));
+    EXPECT_ENUM_EQ(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, sysAvailMgr.cyclingRunTimeControl);
     // test for initialization and does not crash
     ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
 

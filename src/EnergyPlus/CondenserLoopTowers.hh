@@ -387,13 +387,13 @@ namespace CondenserLoopTowers {
 
         void SizeVSMerkelTower(EnergyPlusData &state);
 
-        void calculateSingleSpeedTower(EnergyPlusData &state);
+        void calculateSingleSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void calculateTwoSpeedTower(EnergyPlusData &state);
+        void calculateTwoSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad);
+        void calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void calculateVariableSpeedTower(EnergyPlusData &state);
+        void calculateVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
         Real64 calculateSimpleTowerOutletTemp(EnergyPlusData &state, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
 
@@ -427,6 +427,8 @@ namespace CondenserLoopTowers {
 
         void report(EnergyPlusData &state, bool RunFlag);
 
+        void checkMassFlowAndLoad(EnergyPlusData &state, Real64 MyLoad, bool RunFlag, bool &returnFlagSet);
+
         static CoolingTower *factory(EnergyPlusData &state, std::string_view objectName);
     };
 
@@ -439,9 +441,13 @@ struct CondenserLoopTowersData : BaseGlobalStruct
     bool GetInput = true;
     Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
 
+    void init_state([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
+
     void clear_state() override
     {
-        *this = CondenserLoopTowersData();
+        new (this) CondenserLoopTowersData();
     }
 };
 

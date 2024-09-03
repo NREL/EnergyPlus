@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
     }
     auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(VBMatNum));
     EXPECT_EQ(1, state->dataHeatBal->TotBlindsEQL);
-    EXPECT_TRUE(compare_enums(thisMaterial->group, Material::Group::BlindEquivalentLayer));
+    EXPECT_ENUM_EQ(thisMaterial->group, Material::Group::BlindEquivalentLayer);
     EXPECT_EQ(static_cast<int>(thisMaterial->slatAngleType), state->dataWindowEquivalentLayer->lscVBNOBM);
 
     int ConstrNum = 1;
@@ -949,7 +949,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
     Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, state->dataMaterial->TotMaterials);
-    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(1)->group, Material::Group::WindowSimpleGlazing));
+    EXPECT_ENUM_EQ(state->dataMaterial->Material(1)->group, Material::Group::WindowSimpleGlazing);
     // get construction returns error forund true due to invalid layer
     GetConstructData(*state, ErrorsFound);
     EXPECT_EQ(1, state->dataHeatBal->TotConstructs);

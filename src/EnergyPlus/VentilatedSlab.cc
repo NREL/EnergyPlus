@@ -124,7 +124,6 @@ namespace VentilatedSlab {
     using HVAC::SmallAirVolFlow;
     using namespace ScheduleManager;
     using namespace Psychrometrics;
-    using namespace FluidProperties;
 
     static std::string const fluidNameSteam("STEAM");
     static std::string const fluidNameWater("WATER");
@@ -235,7 +234,6 @@ namespace VentilatedSlab {
         using namespace DataLoopNode;
         using namespace DataSurfaceLists;
 
-        using FluidProperties::FindRefrigerant;
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -763,9 +761,18 @@ namespace VentilatedSlab {
                                                            DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                            ventSlab.Name + "-OA MIXER",
                                                            DataLoopNode::NodeFluidType::Air,
-                                                           DataLoopNode::ConnectionType::Internal,
+                                                           DataLoopNode::ConnectionType::Outlet,
                                                            NodeInputManager::CompFluidStream::Primary,
                                                            ObjectIsNotParent);
+                ventSlab.ReturnAirNode = GetOnlySingleNode(state,
+                                                           state.dataIPShortCut->cAlphaArgs(18),
+                                                           ErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                                           ventSlab.Name,
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::ConnectionType::Inlet,
+                                                           NodeInputManager::CompFluidStream::Primary,
+                                                           ObjectIsParent);
                 ventSlab.RadInNode = GetOnlySingleNode(state,
                                                        state.dataIPShortCut->cAlphaArgs(19),
                                                        ErrorsFound,
@@ -803,9 +810,18 @@ namespace VentilatedSlab {
                                                            DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                            ventSlab.Name + "-OA MIXER",
                                                            DataLoopNode::NodeFluidType::Air,
-                                                           DataLoopNode::ConnectionType::Internal,
+                                                           DataLoopNode::ConnectionType::Outlet,
                                                            NodeInputManager::CompFluidStream::Primary,
                                                            ObjectIsNotParent);
+                ventSlab.ReturnAirNode = GetOnlySingleNode(state,
+                                                           state.dataIPShortCut->cAlphaArgs(18),
+                                                           ErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                                           ventSlab.Name,
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::ConnectionType::Inlet,
+                                                           NodeInputManager::CompFluidStream::Primary,
+                                                           ObjectIsParent);
                 ventSlab.RadInNode = GetOnlySingleNode(state,
                                                        state.dataIPShortCut->cAlphaArgs(19),
                                                        ErrorsFound,
@@ -842,6 +858,15 @@ namespace VentilatedSlab {
                                                            ErrorsFound,
                                                            DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                            ventSlab.Name + "-SYSTEM",
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::ConnectionType::Inlet,
+                                                           NodeInputManager::CompFluidStream::Primary,
+                                                           ObjectIsParent);
+                ventSlab.ReturnAirNode = GetOnlySingleNode(state,
+                                                           state.dataIPShortCut->cAlphaArgs(18),
+                                                           ErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                                           ventSlab.Name,
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::ConnectionType::Inlet,
                                                            NodeInputManager::CompFluidStream::Primary,
@@ -978,7 +1003,7 @@ namespace VentilatedSlab {
             // Add fan to component sets array
             SetUpCompSets(state,
                           CurrentModuleObject,
-                          ventSlab.Name + "-SYSTEM",
+                          ventSlab.Name,
                           "UNDEFINED",
                           state.dataIPShortCut->cAlphaArgs(25),
                           state.dataIPShortCut->cAlphaArgs(23),
@@ -1025,7 +1050,7 @@ namespace VentilatedSlab {
                     }
                     case HeatingCoilType::Steam: {
                         ventSlab.heatingCoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
-                        ventSlab.heatingCoil_FluidIndex = FindRefrigerant(state, "Steam");
+                        ventSlab.heatingCoil_FluidIndex = FluidProperties::GetRefrigNum(state, "STEAM");
                         if (ventSlab.heatingCoil_FluidIndex == 0) {
                             ShowSevereError(state, format("{}=\"{}Steam Properties not found.", CurrentModuleObject, ventSlab.Name));
                             if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
@@ -1246,7 +1271,7 @@ namespace VentilatedSlab {
                 // Add cooling coil to component sets array when present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(30),
                               state.dataIPShortCut->cAlphaArgs(31),
                               state.dataIPShortCut->cAlphaArgs(24),
@@ -1255,7 +1280,7 @@ namespace VentilatedSlab {
                 // Add heating coil to component sets array when cooling coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(27),
                               state.dataIPShortCut->cAlphaArgs(28),
                               "UNDEFINED",
@@ -1266,7 +1291,7 @@ namespace VentilatedSlab {
                 // Add heating coil to component sets array when no cooling coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(27),
                               state.dataIPShortCut->cAlphaArgs(28),
                               state.dataIPShortCut->cAlphaArgs(24),
@@ -1277,7 +1302,7 @@ namespace VentilatedSlab {
                 // Add cooling coil to component sets array when no heating coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(30),
                               state.dataIPShortCut->cAlphaArgs(31),
                               state.dataIPShortCut->cAlphaArgs(24),
@@ -1682,7 +1707,8 @@ namespace VentilatedSlab {
                 if (ventSlab.heatingCoilType == DataPlant::PlantEquipmentType::CoilSteamAirHeating &&
                     !state.dataVentilatedSlab->MyPlantScanFlag(Item)) {
                     TempSteamIn = 100.00;
-                    SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                    SteamDensity =
+                        FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                     ventSlab.MaxHotSteamFlow = SteamDensity * ventSlab.MaxVolHotSteamFlow;
                     ventSlab.MinHotSteamFlow = SteamDensity * ventSlab.MinVolHotSteamFlow;
 
@@ -2319,13 +2345,13 @@ namespace VentilatedSlab {
                                     DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                 }
                                 TempSteamIn = 100.00;
-                                EnthSteamInDry =
-                                    GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
-                                EnthSteamOutWet =
-                                    GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                                EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(
+                                    state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                                EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(
+                                    state, fluidNameSteam, TempSteamIn, 0.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-                                SteamDensity =
-                                    GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                                SteamDensity = FluidProperties::GetSatDensityRefrig(
+                                    state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                                 Cp = GetSpecificHeatGlycol(state, fluidNameWater, Constant::HWInitConvTemp, DummyWaterIndex, RoutineName);
                                 rho = GetDensityGlycol(state, fluidNameWater, Constant::HWInitConvTemp, DummyWaterIndex, RoutineName);
                                 MaxVolHotSteamFlowDes =
@@ -4735,6 +4761,21 @@ namespace VentilatedSlab {
         }
     }
 
+    int getVentilatedSlabIndex(EnergyPlusData &state, std::string_view CompName)
+    {
+        if (state.dataVentilatedSlab->GetInputFlag) {
+            GetVentilatedSlabInput(state);
+            state.dataVentilatedSlab->GetInputFlag = false;
+        }
+
+        for (int VentSlabNum = 1; VentSlabNum <= state.dataVentilatedSlab->NumOfVentSlabs; ++VentSlabNum) {
+            if (Util::SameString(state.dataVentilatedSlab->VentSlab(VentSlabNum).Name, CompName)) {
+                return VentSlabNum;
+            }
+        }
+
+        return 0;
+    }
     //*****************************************************************************************
 
 } // namespace VentilatedSlab

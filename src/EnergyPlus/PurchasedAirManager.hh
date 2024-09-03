@@ -379,6 +379,8 @@ namespace PurchasedAirManager {
 
     int GetPurchasedAirReturnAirNode(EnergyPlusData &state, int PurchAirNum);
 
+    int getPurchasedAirIndex(EnergyPlusData &state, std::string_view PurchAirName);
+
     Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int PurchAirNum);
 
     Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int PurchAirNum);
@@ -405,6 +407,10 @@ struct PurchasedAirManagerData : BaseGlobalStruct
     Array1D_bool InitPurchasedAirOneTimeUnitInitsDone; // True if one-time inits for PurchAirNum are completed
     Array1D<PurchasedAirManager::PurchAirPlenumArrayData>
         TempPurchAirPlenumArrays; // Used to save the indices of scalable sizing object for zone HVAC
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

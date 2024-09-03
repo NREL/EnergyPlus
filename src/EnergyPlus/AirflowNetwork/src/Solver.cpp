@@ -88,6 +88,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -100,8 +101,10 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WindowAC.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
@@ -267,12 +270,6 @@ namespace AirflowNetwork {
 
         // VAV terminal set only
         if (present(FirstHVACIteration) && FirstHVACIteration) VAVTerminalRatio = 0.0;
-
-        // Set AirLoop Number for fans
-        if (FirstHVACIteration && AssignFanAirLoopNumFlag) {
-            assign_fan_airloop();
-            AssignFanAirLoopNumFlag = false;
-        }
 
         if (AirflowNetworkFanActivated && distribution_simulated) {
             if (ValidateDistributionSystemFlag) {
@@ -462,7 +459,6 @@ namespace AirflowNetwork {
                 }
 
                 // This breaks the component model, need to fix
-                bool fanErrorFound = false;
                 int fanIndex = GetFanIndex(m_state, thisObjectName);
                 if (fanIndex == 0) {
                     ShowSevereError(m_state,
@@ -474,12 +470,8 @@ namespace AirflowNetwork {
 
                 Real64 flowRate = fan->maxAirFlowRate;
                 flowRate *= m_state.dataEnvrn->StdRhoAir;
-                bool nodeErrorsFound{false};
                 int inletNode = fan->inletNodeNum;
                 int outletNode = fan->outletNodeNum;
-                if (nodeErrorsFound) {
-                    success = false;
-                }
                 HVAC::FanType fanType = fan->type;
                 if (fanType != HVAC::FanType::Exhaust) {
                     ShowSevereError(m_state,
@@ -1387,8 +1379,6 @@ namespace AirflowNetwork {
                     }
 
                 } else {
-                    bool FanErrorFound = false;
-
                     fanIndex = GetFanIndex(m_state, fan_name);
 
                     if (fanIndex == 0) {
@@ -4613,7 +4603,7 @@ namespace AirflowNetwork {
                 int compnum = compnum_iter->second;
                 AirflowNetworkLinkageData(count).CompNum = compnum;
 
-                auto &surf = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum);
+                auto const &surf = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum);
 
                 switch (AirflowNetworkLinkageData(count).element->type()) {
                 case ComponentType::DOP: {
@@ -6315,9 +6305,6 @@ namespace AirflowNetwork {
         // Using/Aliasing
         using General::SolveRoot;
         using HVAC::VerySmallMassFlow;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -10103,24 +10090,6 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::assign_fan_airloop()
-    {
-        // Assign the system Fan AirLoop Number based on the zone inlet node
-
-        for (int i = 1; i <= AirflowNetworkNumOfZones; i++) {
-            for (int j = 1; j <= m_state.dataGlobal->NumOfZones; j++) {
-                if (!m_state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
-                if ((MultizoneZoneData(i).ZoneNum == j) && (m_state.dataZoneEquip->ZoneEquipConfig(j).NumInletNodes > 0)) {
-                    for (int k = 1; k <= DisSysNumOfCVFs; k++) {
-                        if (DisSysCompCVFData(k).AirLoopNum == 0) {
-                            DisSysCompCVFData(k).AirLoopNum = m_state.dataZoneEquip->ZoneEquipConfig(j).InletNodeAirLoopNum(1);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     void Solver::validate_distribution()
     {
 
@@ -10146,9 +10115,12 @@ namespace AirflowNetwork {
         using DXCoils::SetDXCoilAirLoopNumber;
         using HeatingCoils::SetHeatingCoilAirLoopNumber;
         using HVACStandAloneERV::GetStandAloneERVNodeNumber;
+        using HVACVariableRefrigerantFlow::getVRFTUNodeNumber;
         using SplitterComponent::GetSplitterNodeNumbers;
         using SplitterComponent::GetSplitterOutletNumber;
+        using UnitarySystems::getUnitarySystemNodeNumber;
         using WaterThermalTanks::GetHeatPumpWaterHeaterNodeNumber;
+        using WindowAC::getWindowACNodeNumber;
         using ZoneDehumidifier::GetZoneDehumidifierNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -10165,8 +10137,12 @@ namespace AirflowNetwork {
         EPVector<DataLoopNode::ConnectionType> NodeConnectionType; // Specifies the type of node connection
         std::string CurrentModuleObject;
 
-        bool HPWHFound(false);          // Flag for HPWH identification
-        bool StandaloneERVFound(false); // Flag for Standalone ERV (ZoneHVAC:EnergyRecoveryVentilator) identification
+        bool hpwhFound(false);            // Flag for HPWH identification
+        bool standaloneERVFound(false);   // Flag for Standalone ERV (ZoneHVAC:EnergyRecoveryVentilator) identification
+        bool packagedUnitaryFound(false); // Flag for packaged unitary systems (ZoneHVAC:PackagedTerminalAirConditioner,
+                                          // ZoneHVAC:PackagedTerminalHeatPump, ZoneHVAC:WaterToAirHeatPump) identification
+        bool vrfTUFound(false);
+        bool windowACFound(false); // Flag for Window AC (ZoneHVAC:WindowAirConditioner) identification
 
         // Validate supply and return connections
         NodeFound.dimension(m_state.dataLoopNodes->NumOfNodes, false);
@@ -10271,13 +10247,31 @@ namespace AirflowNetwork {
                 // Skip HPWH nodes that don't have to be included in the AFN
                 if (GetHeatPumpWaterHeaterNodeNumber(m_state, i)) {
                     NodeFound(i) = true;
-                    HPWHFound = true;
+                    hpwhFound = true;
                 }
 
                 // Skip Standalone ERV nodes that don't have to be included in the AFN
                 if (GetStandAloneERVNodeNumber(m_state, i)) {
                     NodeFound(i) = true;
-                    StandaloneERVFound = true;
+                    standaloneERVFound = true;
+                }
+
+                // Skip zonal unitary system based nodes that don't have to be included in the AFN
+                if (getUnitarySystemNodeNumber(m_state, i)) {
+                    NodeFound(i) = true;
+                    packagedUnitaryFound = true;
+                }
+
+                // Skip zonal vrf terminal nodes that don't have to be included in the AFN
+                if (getVRFTUNodeNumber(m_state, i)) {
+                    NodeFound(i) = true;
+                    vrfTUFound = true;
+                }
+
+                // Skip Window AC with no OA
+                if (getWindowACNodeNumber(m_state, i)) {
+                    NodeFound(i) = true;
+                    windowACFound = true;
                 }
             }
 
@@ -10409,14 +10403,31 @@ namespace AirflowNetwork {
                 }
             }
         }
-        if (HPWHFound) {
+        if (hpwhFound) {
             ShowWarningError(m_state,
                              format(RoutineName) + "Heat pump water heater is simulated along with an AirflowNetwork but is not included in "
                                                    "the AirflowNetwork.");
         }
-        if (StandaloneERVFound) {
+        if (standaloneERVFound) {
             ShowWarningError(m_state,
                              format(RoutineName) + "A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an AirflowNetwork but is not "
+                                                   "included in the AirflowNetwork.");
+        }
+        if (packagedUnitaryFound) {
+            ShowWarningError(m_state,
+                             format(RoutineName) + "A ZoneHVAC:PackagedTerminalAirConditioner, ZoneHVAC:PackagedTerminalHeatPump, or "
+                                                   "ZoneHVAC:WaterToAirHeatPump is simulated along with an AirflowNetwork but is not "
+                                                   "included in the AirflowNetwork.");
+        }
+        if (vrfTUFound) {
+            ShowWarningError(m_state,
+                             format(RoutineName) +
+                                 "A ZoneHVAC:TerminalUnit:VariableRefrigerantFlow is simulated along with an AirflowNetwork but is not "
+                                 "included in the AirflowNetwork.");
+        }
+        if (windowACFound) {
+            ShowWarningError(m_state,
+                             format(RoutineName) + "A ZoneHVAC:WindowAirConditioner is simulated along with an AirflowNetwork but is not "
                                                    "included in the AirflowNetwork.");
         }
         NodeFound.deallocate();
@@ -10481,8 +10492,13 @@ namespace AirflowNetwork {
                         ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
                                    .FanIndex)
                         ->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans
+                        ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
+                                   .FanIndex)
+                        ->isAFNFan = true;
                 } else {
                     m_state.dataFans->fans(n)->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans->fans(n)->isAFNFan = true;
                 }
             }
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == iEPlusComponentType::COI) {
@@ -12043,7 +12059,6 @@ namespace AirflowNetwork {
         int NodeMixer = 0;
         int NodeZoneIntlet = 0;
         int NodeZoneReturn = 0;
-        int NumOfBranches = 0;
         int AFNNodeNum;
         int AFNLinkNum;
         int AFNLinkNum1;

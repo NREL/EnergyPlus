@@ -75,7 +75,7 @@ extern "C" {
 #include <EnergyPlus/DaylightingManager.hh>
 // #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/ExternalInterface.hh>
-// #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 // #include <EnergyPlus/IOFiles.hh>
@@ -431,9 +431,9 @@ namespace Util {
                 if (state.files.outputControl.perflog) {
                     fsPerfLog.open(state.dataStrGlobals->outputPerfLogFilePath, std::fstream::out); // open file normally
                     if (!fsPerfLog) {
-                        ShowFatalError(state,
-                                       format("appendPerfLog: Could not open file \"{}\" for output (write).",
-                                              state.dataStrGlobals->outputPerfLogFilePath.string()));
+                        ShowFatalError(
+                            state,
+                            format("appendPerfLog: Could not open file \"{}\" for output (write).", state.dataStrGlobals->outputPerfLogFilePath));
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_headerRow << std::endl;
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
@@ -442,9 +442,9 @@ namespace Util {
                 if (state.files.outputControl.perflog) {
                     fsPerfLog.open(state.dataStrGlobals->outputPerfLogFilePath, std::fstream::app); // append to already existing file
                     if (!fsPerfLog) {
-                        ShowFatalError(state,
-                                       format("appendPerfLog: Could not open file \"{}\" for output (append).",
-                                              state.dataStrGlobals->outputPerfLogFilePath.string()));
+                        ShowFatalError(
+                            state,
+                            format("appendPerfLog: Could not open file \"{}\" for output (append).", state.dataStrGlobals->outputPerfLogFilePath));
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
@@ -576,7 +576,7 @@ int AbortEnergyPlus(EnergyPlusData &state)
         auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
         if (!tempfl.good()) {
-            DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
+            DisplayString(state, fmt::format("AbortEnergyPlus: Could not open file {} for output (write).", tempfl.filePath));
         }
         print(
             tempfl, "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
@@ -712,7 +712,7 @@ int EndEnergyPlus(EnergyPlusData &state)
     {
         auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
         if (!tempfl.good()) {
-            DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
+            DisplayString(state, fmt::format("EndEnergyPlus: Could not open file {} for output (write).", tempfl.filePath));
         }
         print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
     }
@@ -864,6 +864,60 @@ bool env_var_on(std::string const &env_var_str)
     // Test if a boolean environment variable value is "on" (has value starting with Y or T)
 
     return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
+}
+
+void emitErrorMessage(EnergyPlusData &state, [[maybe_unused]] ErrorMessageCategory category, std::string const &msg, bool shouldFatal)
+{
+    if (!shouldFatal) {
+        ShowSevereError(state, msg);
+    } else { // should fatal
+        ShowFatalError(state, msg);
+    }
+}
+void emitErrorMessages(EnergyPlusData &state,
+                       [[maybe_unused]] ErrorMessageCategory category,
+                       std::initializer_list<std::string> const &msgs,
+                       bool const shouldFatal,
+                       int const zeroBasedTimeStampIndex)
+{
+    for (auto msg = msgs.begin(); msg != msgs.end(); ++msg) {
+        if (msg - msgs.begin() == zeroBasedTimeStampIndex) {
+            ShowContinueErrorTimeStamp(state, *msg);
+            continue;
+        }
+        if (msg == msgs.begin()) {
+            ShowSevereError(state, *msg);
+        } else if (std::next(msg) == msgs.end() && shouldFatal) {
+            ShowFatalError(state, *msg);
+        } else { // should be an intermediate message, or a final one where there is no fatal
+            ShowContinueError(state, *msg);
+        }
+    }
+}
+void emitWarningMessage(EnergyPlusData &state, [[maybe_unused]] ErrorMessageCategory category, std::string const &msg, bool const countAsError)
+{
+    if (countAsError) { // ideally this path goes away and we just have distinct warnings and errors
+        ShowWarningError(state, msg);
+    } else {
+        ShowWarningMessage(state, msg);
+    }
+}
+void emitWarningMessages(EnergyPlusData &state,
+                         [[maybe_unused]] ErrorMessageCategory category,
+                         std::initializer_list<std::string> const &msgs,
+                         bool const countAsError)
+{
+    for (auto msg = msgs.begin(); msg != msgs.end(); ++msg) {
+        if (msg == msgs.begin()) {
+            if (countAsError) { // ideally this path goes away and we just have distinct warnings and errors
+                ShowWarningError(state, *msg);
+            } else {
+                ShowWarningMessage(state, *msg);
+            }
+        } else {
+            ShowContinueError(state, *msg);
+        }
+    }
 }
 
 void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
@@ -1231,6 +1285,56 @@ void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
         state, " ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
 }
 
+void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
+                                   std::string const &Message, // Message automatically written to "error file" at end of simulation
+                                   int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                   Real64 const val,
+                                   std::string const &units // optional char string (<=15 length) of units for sum value
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Michael J. Witte
+    //       DATE WRITTEN   August 2004
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine stores a recurring ErrorMessage with a Severe designation
+    // for output at the end of the simulation with automatic tracking of number
+    // of occurrences and optional tracking of associated min, max, and sum values
+
+    // METHODOLOGY EMPLOYED:
+    // Calls StoreRecurringErrorMessage utility routine.
+
+    // Using/Aliasing
+    using namespace DataStringGlobals;
+    using namespace DataErrorTracking;
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    //  Use for recurring "severe" error messages shown once at end of simulation
+    //  with count of occurrences and optional max, min, sum
+
+    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+        if (has(Message, MessageSearch[Loop])) {
+            ++state.dataErrTracking->MatchCounts(Loop);
+            break;
+        }
+    }
+    bool bNewMessageFound = true;
+    for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
+        if (Util::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Severe  ** " + Message)) {
+            bNewMessageFound = false;
+            MsgIndex = Loop;
+            break;
+        }
+    }
+    if (bNewMessageFound) {
+        MsgIndex = 0;
+    }
+
+    ++state.dataErrTracking->TotalSevereErrors;
+    StoreRecurringErrorMessage(state, " ** Severe  ** " + Message, MsgIndex, val, val, _, units, units, "");
+}
+
 void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
                                     std::string const &Message, // Message automatically written to "error file" at end of simulation
                                     int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
@@ -1284,6 +1388,56 @@ void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
     ++state.dataErrTracking->TotalWarningErrors;
     StoreRecurringErrorMessage(
         state, " ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
+}
+
+void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
+                                    std::string const &Message, // Message automatically written to "error file" at end of simulation
+                                    int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                    Real64 const val,
+                                    std::string const &units // optional char string (<=15 length) of units for sum value
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Michael J. Witte
+    //       DATE WRITTEN   August 2004
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine stores a recurring ErrorMessage with a Warning designation
+    // for output at the end of the simulation with automatic tracking of number
+    // of occurrences and optional tracking of associated min, max, and sum values
+
+    // METHODOLOGY EMPLOYED:
+    // Calls StoreRecurringErrorMessage utility routine.
+
+    // Using/Aliasing
+    using namespace DataStringGlobals;
+    using namespace DataErrorTracking;
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    //  Use for recurring "warning" error messages shown once at end of simulation
+    //  with count of occurrences and optional max, min, sum
+
+    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+        if (has(Message, MessageSearch[Loop])) {
+            ++state.dataErrTracking->MatchCounts(Loop);
+            break;
+        }
+    }
+    bool bNewMessageFound = true;
+    for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
+        if (Util::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Warning ** " + Message)) {
+            bNewMessageFound = false;
+            MsgIndex = Loop;
+            break;
+        }
+    }
+    if (bNewMessageFound) {
+        MsgIndex = 0;
+    }
+
+    ++state.dataErrTracking->TotalWarningErrors;
+    StoreRecurringErrorMessage(state, " ** Warning ** " + Message, MsgIndex, val, val, _, units, units, "");
 }
 
 void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,

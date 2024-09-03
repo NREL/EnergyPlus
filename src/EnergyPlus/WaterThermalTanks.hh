@@ -420,6 +420,7 @@ namespace WaterThermalTanks {
         bool myOneTimeInitFlag;
 
         // end of variables for variable-speed HPWH
+        ~HeatPumpWaterHeaterData() = default;
 
         // Default Constructor
         HeatPumpWaterHeaterData()
@@ -670,6 +671,8 @@ namespace WaterThermalTanks {
 
         int callerLoopNum;
         int waterIndex;
+
+        ~WaterThermalTankData() = default;
 
         // Default Constructor
         WaterThermalTankData()
@@ -988,6 +991,8 @@ namespace WaterThermalTanks {
 
     bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int NodeNumber);
 
+    int getHeatPumpWaterHeaterIndex(EnergyPlusData &state, std::string_view CompName);
+
 } // namespace WaterThermalTanks
 
 struct WaterThermalTanksData : BaseGlobalStruct
@@ -1013,9 +1018,13 @@ struct WaterThermalTanksData : BaseGlobalStruct
     bool getWaterThermalTankInputFlag = true; // Calls to Water Heater from multiple places in code
     bool calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = WaterThermalTanksData();
+        new (this) WaterThermalTanksData();
     }
 };
 

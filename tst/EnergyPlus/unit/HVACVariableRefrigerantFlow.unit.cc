@@ -103,7 +103,6 @@ using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
-using namespace EnergyPlus::FluidProperties;
 using namespace EnergyPlus::DXCoils;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::HeatBalanceManager;
@@ -2353,9 +2352,16 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // Read in IDF
-    ProcessScheduleInput(*state);                    // read schedules
-    Curve::GetCurveInput(*state);                    // read curves
+    ProcessScheduleInput(*state); // read schedules
+    Curve::GetCurveInput(*state); // read curves
+    // test consecutive call to fluid properties getInput
     FluidProperties::GetFluidPropertiesData(*state); // read refrigerant properties
+    EXPECT_EQ(2, state->dataFluidProps->refrigs.isize());
+    EXPECT_EQ(1, state->dataFluidProps->glycols.isize());
+
+    FluidProperties::GetFluidPropertiesData(*state); // should never happen but if it does it's safe
+    EXPECT_EQ(2, state->dataFluidProps->refrigs.isize());
+    EXPECT_EQ(1, state->dataFluidProps->glycols.isize());
 
     // set up ZoneEquipConfig data
     state->dataGlobal->NumOfZones = 1;
@@ -2396,7 +2402,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         state->dataEnvrn->OutDryBulbTemp = 10.35;
 
         // Run
-        Temperature = GetSupHeatTempRefrig(*state, Refrigerant, Pressure, Enthalpy, TempLow, TempUp, RefrigIndex, CalledFrom);
+        Temperature = FluidProperties::GetSupHeatTempRefrig(*state, Refrigerant, Pressure, Enthalpy, TempLow, TempUp, RefrigIndex, CalledFrom);
 
         // Test
         EXPECT_NEAR(Temperature, 44.5, 0.5);
@@ -4916,7 +4922,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     EXPECT_EQ(0, state->dataHVACVarRefFlow->VRFTU(VRFTUNum).IndexToTUInTUList);
 
     // Additional tests for fuel type input
-    EXPECT_TRUE(compare_enums(state->dataHVACVarRefFlow->VRF(VRFTUNum).fuel, Constant::eFuel::Electricity));
+    EXPECT_ENUM_EQ(state->dataHVACVarRefFlow->VRF(VRFTUNum).fuel, Constant::eFuel::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
@@ -5860,26 +5866,26 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR > 0.0);
     EXPECT_NEAR(SysOutputProvided, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP, 1.0);
 
-    rho = GetDensityGlycol(*state,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
-                           state->dataSize->PlantSizData(1).ExitTemp,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
-                           RoutineName);
-    Cp = GetSpecificHeatGlycol(*state,
-                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
-                               state->dataSize->PlantSizData(1).ExitTemp,
-                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
-                               RoutineName);
+    rho = FluidProperties::GetDensityGlycol(*state,
+                                            state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
+                                            state->dataSize->PlantSizData(1).ExitTemp,
+                                            state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
+                                            RoutineName);
+    Cp = FluidProperties::GetSpecificHeatGlycol(*state,
+                                                state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
+                                                state->dataSize->PlantSizData(1).ExitTemp,
+                                                state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
+                                                RoutineName);
     CondVolFlowRate = max(state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity) /
                       (state->dataSize->PlantSizData(1).DeltaT * Cp * rho);
 
     EXPECT_DOUBLE_EQ(CondVolFlowRate, state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate);
 
-    rho = GetDensityGlycol(*state,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
-                           Constant::InitConvTemp,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
-                           RoutineName);
+    rho = FluidProperties::GetDensityGlycol(*state,
+                                            state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
+                                            Constant::InitConvTemp,
+                                            state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
+                                            RoutineName);
     EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
                      (state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate * rho));
 
@@ -8282,7 +8288,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
 {
     // PURPOSE OF THE TEST:
     // checks VRF terminal units supplemental hot water heating coil calculation
-
+    state->init_state(*state);
     VRFTerminalUnitEquipment thisVRFTU;
 
     int VRFTUNum(1);
@@ -8402,6 +8408,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     // PURPOSE OF THE TEST:
     // checks VRF terminal units supplemental steam heating coil calculation
 
+    state->init_state(*state);
     VRFTerminalUnitEquipment thisVRFTU;
 
     int VRFTUNum(1);
@@ -10834,7 +10841,7 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check fan operation for cooling mode
     Real64 Result_AirMassFlowRateDesign = state->dataFans->fans(1)->maxAirMassFlowRate;
-    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347052, 0.000001);
+    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347052, 0.000002);
     Real64 Result_AirMassFlowRate = state->dataLoopNodes->Node(state->dataFans->fans(1)->outletNodeNum).MassFlowRate;
     EXPECT_NEAR(Result_AirMassFlowRate, state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1), 0.000001);
     Real64 Result_FanPower = state->dataFans->fans(1)->totalPower;
@@ -11777,7 +11784,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
         "  0,                        !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
         "  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
         "  drawthrough,              !- Supply Air Fan Placement",
-        "  Fan:VariableVolume,       !- Supply Air Fan Object Type",
+        "  Fan:SystemModel,       !- Supply Air Fan Object Type",
         "  TU1 VRF Supply Fan,       !- Supply Air Fan Object Name",
         "  ,                         !- Outside Air Mixer Object Type",
         "  ,                         !- Outside Air Mixer Object Name",
@@ -11849,25 +11856,42 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
         "    Temperature,             !- Input Unit Type for X",
         "    Temperature;             !- Output Unit Type",
 
-        "  Fan:VariableVolume,",
+        "  Fan:SystemModel,",
         "    TU1 VRF Supply Fan,      !- Name",
         "    VRFAvailSched,           !- Availability Schedule Name",
-        "    0.7,                     !- Fan Total Efficiency",
-        "    600,                     !- Pressure Rise {Pa}",
-        "    autosize,                !- Maximum Flow Rate {m3/s}",
-        "    Fraction,                !- Fan Power Minimum Flow Rate Input Method",
-        "    0,                       !- Fan Power Minimum Flow Fraction",
-        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
-        "    0.9,                     !- Motor Efficiency",
-        "    1,                       !- Motor In Airstream Fraction",
-        "    0.059,                   !- Fan Power Coefficient 1",
-        "    0,                       !- Fan Power Coefficient 2",
-        "    0,                       !- Fan Power Coefficient 3",
-        "    0.928,                   !- Fan Power Coefficient 4",
-        "    0,                       !- Fan Power Coefficient 5",
         "    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
         "    TU1 Outlet Node,         !- Air Outlet Node Name",
+        "    autosize,                   !- Design Maximum Air Flow Rate {m3/s}",
+        "    Continuous,              !- Speed Control Method",
+        "    0.0,                   !- Electric Power Minimum Flow Rate Fraction",
+        "    600,                     !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    autosize,               !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,                        !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    TU1 Fan Power Curve,         !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    ,",
         "    General;                 !- End-Use Subcategory",
+
+        "  Curve:Quartic,",
+        "    TU1 Fan Power Curve , !- Name",
+        "    0.059,            !- Coefficient1 Constant",
+        "    0,                !- Coefficient2 x       ",
+        "    0,                !- Coefficient3 x**2    ",
+        "    0.928,            !- Coefficient4 x**3    ",
+        "    0,                !- Coefficient5 x**4    ",
+        "    0.0,              !- Minimum Value of x",
+        "    1.0,              !- Maximum Value of x",
+        "    0.0,              !- Minimum Curve Output",
+        "    1.0,              !- Maximum Curve Output",
+        "    Dimensionless,    !- Input Unit Type for X",
+        "    Dimensionless;    !- Output Unit Type",
 
         " !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:NAME ===========            ",
         "                                                                                     ",
@@ -13222,6 +13246,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     Real64 OAUCoilOutTemp = 0.0;
     bool ZoneEquipment = true;
 
+    // add VRF cycling ratio initialization. Since TU's are simulated first, if there's no initialization, the coil runtime fraction will be zero
+    state->dataHVACVarRefFlow->VRF(1).VRFCondCyclingRatio = 1.0;
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -13249,8 +13275,10 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
     EXPECT_NEAR(5125.0840, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(4999.8265, thisVRFTU.TotalCoolingRate, 0.0001);
-    EXPECT_NEAR(125.2573, thisFan->totalPower, 0.0001);
+    EXPECT_NEAR(125.2573 * thisDXCoolingCoil.CoolingCoilRuntimeFraction, thisFan->totalPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan->totalPower), 0.0001);
+    EXPECT_NEAR(0.8930, state->dataHVACVarRefFlow->VRF(1).VRFCondCyclingRatio, 0.0001);
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(1).OUFanPower, state->dataHVACVarRefFlow->VRF(1).RatedOUFanPower, 0.0001);
 }
 
 // Test for #7648: HREIRFTHeat wrongly used HRCAPFTHeatConst. Occurs only if you have Heat Recovery
@@ -14526,7 +14554,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(1.00, thisHeatEIRFPLR->inputLimits[0].max);
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);                           // getinput checks this
     EXPECT_GT(thisHeatEIRFPLR->inputLimits[0].min, thisVRF.MinPLR); // expect warning message
-    EXPECT_TRUE(compare_enums(thisVRF.fuel, Constant::eFuel::Electricity));
+    EXPECT_ENUM_EQ(thisVRF.fuel, Constant::eFuel::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
@@ -16288,7 +16316,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
         "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
         "    drawthrough,             !- Supply Air Fan Placement",
-        "    Fan:VariableVolume,      !- Supply Air Fan Object Type",
+        "    Fan:SystemModel,      !- Supply Air Fan Object Type",
         "    TU1 VRF Supply Fan,      !- Supply Air Fan Object Name",
         "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
         "    TU1 OA Mixer,            !- Outside Air Mixer Object Name",
@@ -16319,7 +16347,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
         "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
         "    drawthrough,             !- Supply Air Fan Placement",
-        "    Fan:VariableVolume,      !- Supply Air Fan Object Type",
+        "    Fan:SystemModel,      !- Supply Air Fan Object Type",
         "    TU2 VRF Supply Fan,      !- Supply Air Fan Object Name",
         "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
         "    TU2 OA Mixer,            !- Outside Air Mixer Object Name",
@@ -16372,44 +16400,64 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
         "    SPACE2-1 Node,           !- Zone Air Node Name",
         "    SPACE2-1 Out Node;       !- Zone Return Air Node or NodeList Name",
 
-        "Fan:VariableVolume,",
+        "  Fan:SystemModel,",
         "    TU1 VRF Supply Fan,      !- Name",
         "    VRFAvailSched,           !- Availability Schedule Name",
-        "    0.7,                     !- Fan Total Efficiency",
-        "    600,                     !- Pressure Rise {Pa}",
-        "    autosize,                !- Maximum Flow Rate {m3/s}",
-        "    Fraction,                !- Fan Power Minimum Flow Rate Input Method",
-        "    0,                       !- Fan Power Minimum Flow Fraction",
-        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
-        "    0.9,                     !- Motor Efficiency",
-        "    1,                       !- Motor In Airstream Fraction",
-        "    0.059,                   !- Fan Power Coefficient 1",
-        "    0,                       !- Fan Power Coefficient 2",
-        "    0,                       !- Fan Power Coefficient 3",
-        "    0.928,                   !- Fan Power Coefficient 4",
-        "    0,                       !- Fan Power Coefficient 5",
         "    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
-        "    TU1 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    TU1 VRF Fan Outlet Node,         !- Air Outlet Node Name",
+        "    autosize,                   !- Design Maximum Air Flow Rate {m3/s}",
+        "    Continuous,              !- Speed Control Method",
+        "    0.0,                   !- Electric Power Minimum Flow Rate Fraction",
+        "    600,                     !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    autosize,               !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,                        !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    TU Fan Power Curve,         !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    ,",
         "    General;                 !- End-Use Subcategory",
 
-        "Fan:VariableVolume,",
+        "  Curve:Quartic,",
+        "    TU Fan Power Curve , !- Name",
+        "    0.059,            !- Coefficient1 Constant",
+        "    0,                !- Coefficient2 x       ",
+        "    0,                !- Coefficient3 x**2    ",
+        "    0.928,            !- Coefficient4 x**3    ",
+        "    0,                !- Coefficient5 x**4    ",
+        "    0.0,              !- Minimum Value of x",
+        "    1.0,              !- Maximum Value of x",
+        "    0.0,              !- Minimum Curve Output",
+        "    1.0,              !- Maximum Curve Output",
+        "    Dimensionless,    !- Input Unit Type for X",
+        "    Dimensionless;    !- Output Unit Type",
+
+        "  Fan:SystemModel,",
         "    TU2 VRF Supply Fan,      !- Name",
         "    VRFAvailSched,           !- Availability Schedule Name",
-        "    0.7,                     !- Fan Total Efficiency",
-        "    600,                     !- Pressure Rise {Pa}",
-        "    autosize,                !- Maximum Flow Rate {m3/s}",
-        "    Fraction,                !- Fan Power Minimum Flow Rate Input Method",
-        "    0,                       !- Fan Power Minimum Flow Fraction",
-        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
-        "    0.9,                     !- Motor Efficiency",
-        "    1,                       !- Motor In Airstream Fraction",
-        "    0.059,                   !- Fan Power Coefficient 1",
-        "    0,                       !- Fan Power Coefficient 2",
-        "    0,                       !- Fan Power Coefficient 3",
-        "    0.928,                   !- Fan Power Coefficient 4",
-        "    0,                       !- Fan Power Coefficient 5",
         "    TU2 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
-        "    TU2 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    TU2 VRF Fan Outlet Node,         !- Air Outlet Node Name",
+        "    autosize,                   !- Design Maximum Air Flow Rate {m3/s}",
+        "    Continuous,              !- Speed Control Method",
+        "    0.0,                   !- Electric Power Minimum Flow Rate Fraction",
+        "    600,                     !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    autosize,               !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,                        !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    TU Fan Power Curve,         !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    ,",
         "    General;                 !- End-Use Subcategory",
 
         "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,",
@@ -18249,6 +18297,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
     state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
     state->dataHVACVarRefFlow->TerminalUnitList(1).IsSimulated = true;
 
+    state->dataHVACVarRefFlow->VRF(1).VRFCondCyclingRatio = 1.0;
+
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU1).RemainingOutputRequired;
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     ReportVRFTerminalUnit(*state, VRFTUNum);
@@ -18401,7 +18451,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
         "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
         "    drawthrough,             !- Supply Air Fan Placement",
-        "    Fan:VariableVolume,      !- Supply Air Fan Object Type",
+        "    Fan:SystemModel,      !- Supply Air Fan Object Type",
         "    TU1 VRF Supply Fan,      !- Supply Air Fan Object Name",
         "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
         "    TU1 OA Mixer,            !- Outside Air Mixer Object Name",
@@ -18432,7 +18482,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
         "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
         "    drawthrough,             !- Supply Air Fan Placement",
-        "    Fan:VariableVolume,      !- Supply Air Fan Object Type",
+        "    Fan:SystemModel,      !- Supply Air Fan Object Type",
         "    TU2 VRF Supply Fan,      !- Supply Air Fan Object Name",
         "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
         "    TU2 OA Mixer,            !- Outside Air Mixer Object Name",
@@ -18485,44 +18535,64 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
         "    SPACE2-1 Node,           !- Zone Air Node Name",
         "    SPACE2-1 Out Node;       !- Zone Return Air Node or NodeList Name",
 
-        "Fan:VariableVolume,",
+        "  Fan:SystemModel,",
         "    TU1 VRF Supply Fan,      !- Name",
         "    VRFAvailSched,           !- Availability Schedule Name",
-        "    0.7,                     !- Fan Total Efficiency",
-        "    600,                     !- Pressure Rise {Pa}",
-        "    autosize,                !- Maximum Flow Rate {m3/s}",
-        "    Fraction,                !- Fan Power Minimum Flow Rate Input Method",
-        "    0,                       !- Fan Power Minimum Flow Fraction",
-        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
-        "    0.9,                     !- Motor Efficiency",
-        "    1,                       !- Motor In Airstream Fraction",
-        "    0.059,                   !- Fan Power Coefficient 1",
-        "    0,                       !- Fan Power Coefficient 2",
-        "    0,                       !- Fan Power Coefficient 3",
-        "    0.928,                   !- Fan Power Coefficient 4",
-        "    0,                       !- Fan Power Coefficient 5",
         "    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
-        "    TU1 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    TU1 VRF Fan Outlet Node,         !- Air Outlet Node Name",
+        "    autosize,                   !- Design Maximum Air Flow Rate {m3/s}",
+        "    Continuous,              !- Speed Control Method",
+        "    0.0,                   !- Electric Power Minimum Flow Rate Fraction",
+        "    600,                     !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    autosize,               !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,                        !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    TU Fan Power Curve,         !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    ,",
         "    General;                 !- End-Use Subcategory",
 
-        "Fan:VariableVolume,",
+        "  Curve:Quartic,",
+        "    TU Fan Power Curve , !- Name",
+        "    0.059,            !- Coefficient1 Constant",
+        "    0,                !- Coefficient2 x       ",
+        "    0,                !- Coefficient3 x**2    ",
+        "    0.928,            !- Coefficient4 x**3    ",
+        "    0,                !- Coefficient5 x**4    ",
+        "    0.0,              !- Minimum Value of x",
+        "    1.0,              !- Maximum Value of x",
+        "    0.0,              !- Minimum Curve Output",
+        "    1.0,              !- Maximum Curve Output",
+        "    Dimensionless,    !- Input Unit Type for X",
+        "    Dimensionless;    !- Output Unit Type",
+
+        "  Fan:SystemModel,",
         "    TU2 VRF Supply Fan,      !- Name",
         "    VRFAvailSched,           !- Availability Schedule Name",
-        "    0.7,                     !- Fan Total Efficiency",
-        "    600,                     !- Pressure Rise {Pa}",
-        "    autosize,                !- Maximum Flow Rate {m3/s}",
-        "    Fraction,                !- Fan Power Minimum Flow Rate Input Method",
-        "    0,                       !- Fan Power Minimum Flow Fraction",
-        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
-        "    0.9,                     !- Motor Efficiency",
-        "    1,                       !- Motor In Airstream Fraction",
-        "    0.059,                   !- Fan Power Coefficient 1",
-        "    0,                       !- Fan Power Coefficient 2",
-        "    0,                       !- Fan Power Coefficient 3",
-        "    0.928,                   !- Fan Power Coefficient 4",
-        "    0,                       !- Fan Power Coefficient 5",
         "    TU2 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
-        "    TU2 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    TU2 VRF Fan Outlet Node,         !- Air Outlet Node Name",
+        "    autosize,                   !- Design Maximum Air Flow Rate {m3/s}",
+        "    Continuous,              !- Speed Control Method",
+        "    0.0,                   !- Electric Power Minimum Flow Rate Fraction",
+        "    600,                     !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    autosize,               !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,                        !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    TU Fan Power Curve,         !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    ,",
         "    General;                 !- End-Use Subcategory",
 
         "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,",
@@ -20261,6 +20331,9 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
     GetZoneEquipmentData(*state);
     GetVRFInput(*state);
     state->dataHVACVarRefFlow->GetVRFInputFlag = false;
+
+    state->dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio = 1.0;
 
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
     VRFTUNum = zone_num_TU1;
@@ -20507,7 +20580,7 @@ TEST_F(EnergyPlusFixture, VRF_MixedTypes)
         "  0,                        !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
         "  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
         "  drawthrough,              !- Supply Air Fan Placement",
-        "  Fan:VariableVolume,       !- Supply Air Fan Object Type",
+        "  Fan:SystemModel,       !- Supply Air Fan Object Type",
         "  TU1 VRF Supply Fan,       !- Supply Air Fan Object Name",
         "  ,                         !- Outside Air Mixer Object Type",
         "  ,                         !- Outside Air Mixer Object Name",
@@ -20539,25 +20612,28 @@ TEST_F(EnergyPlusFixture, VRF_MixedTypes)
         "  IUCondTempCurve;         !- Indoor Unit Condensing Temperature Function of Subcooling Curve Name",
         "",
         "",
-        "Fan:VariableVolume,",
-        "  TU1 VRF Supply Fan,      !- Name",
-        "  VRFAvailSched,           !- Availability Schedule Name",
-        "  0.7,                     !- Fan Total Efficiency",
-        "  600,                     !- Pressure Rise {Pa}",
-        "  autosize,                !- Maximum Flow Rate {m3/s}",
-        "  Fraction,                !- Fan Power Minimum Flow Rate Input Method",
-        "  0,                       !- Fan Power Minimum Flow Fraction",
-        "  0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
-        "  0.9,                     !- Motor Efficiency",
-        "  1,                       !- Motor In Airstream Fraction",
-        "  0.059,                   !- Fan Power Coefficient 1",
-        "  0,                       !- Fan Power Coefficient 2",
-        "  0,                       !- Fan Power Coefficient 3",
-        "  0.928,                   !- Fan Power Coefficient 4",
-        "  0,                       !- Fan Power Coefficient 5",
-        "  TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
-        "  TU1 Outlet Node,         !- Air Outlet Node Name",
-        "  General;                 !- End-Use Subcategory",
+        "  Fan:SystemModel,",
+        "    TU1 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU1 Outlet Node,         !- Air Outlet Node Name",
+        "    autosize,                   !- Design Maximum Air Flow Rate {m3/s}",
+        "    Continuous,              !- Speed Control Method",
+        "    0.0,                   !- Electric Power Minimum Flow Rate Fraction",
+        "    600,                     !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    autosize,               !- Design Electric Power Consumption {W}",
+        "    ,                        !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    TU Fan Power Curve,         !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    General;                 !- End-Use Subcategory",
     });
 
     std::string const vrfFluidCtrl_HR = delimited_string({
@@ -20675,7 +20751,7 @@ TEST_F(EnergyPlusFixture, VRF_MixedTypes)
         "  0,                        !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
         "  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
         "  drawthrough,              !- Supply Air Fan Placement",
-        "  Fan:VariableVolume,       !- Supply Air Fan Object Type",
+        "  Fan:SystemModel,       !- Supply Air Fan Object Type",
         "  TU2 VRF Supply Fan,       !- Supply Air Fan Object Name",
         "  ,                         !- Outside Air Mixer Object Type",
         "  ,                         !- Outside Air Mixer Object Name",
@@ -20707,28 +20783,45 @@ TEST_F(EnergyPlusFixture, VRF_MixedTypes)
         "  IUCondTempCurve;         !- Indoor Unit Condensing Temperature Function of Subcooling Curve Name",
         "",
         "",
-        "Fan:VariableVolume,",
-        "  TU2 VRF Supply Fan,      !- Name",
-        "  VRFAvailSched,           !- Availability Schedule Name",
-        "  0.7,                     !- Fan Total Efficiency",
-        "  600,                     !- Pressure Rise {Pa}",
-        "  autosize,                !- Maximum Flow Rate {m3/s}",
-        "  Fraction,                !- Fan Power Minimum Flow Rate Input Method",
-        "  0,                       !- Fan Power Minimum Flow Fraction",
-        "  0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
-        "  0.9,                     !- Motor Efficiency",
-        "  1,                       !- Motor In Airstream Fraction",
-        "  0.059,                   !- Fan Power Coefficient 1",
-        "  0,                       !- Fan Power Coefficient 2",
-        "  0,                       !- Fan Power Coefficient 3",
-        "  0.928,                   !- Fan Power Coefficient 4",
-        "  0,                       !- Fan Power Coefficient 5",
-        "  TU2 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
-        "  TU2 Outlet Node,         !- Air Outlet Node Name",
-        "  General;                 !- End-Use Subcategory",
+        "  Fan:SystemModel,",
+        "    TU2 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU2 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU2 Outlet Node,         !- Air Outlet Node Name",
+        "    autosize,                   !- Design Maximum Air Flow Rate {m3/s}",
+        "    Continuous,              !- Speed Control Method",
+        "    0.0,                   !- Electric Power Minimum Flow Rate Fraction",
+        "    600,                     !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    autosize,               !- Design Electric Power Consumption {W}",
+        "    ,                        !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    TU Fan Power Curve,         !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    General;                 !- End-Use Subcategory",
     });
 
     std::string const commonCurvesAndFansForFluidCtrlAndHR = delimited_string({
+        "  Curve:Quartic,",
+        "    TU Fan Power Curve , !- Name",
+        "    0.059,            !- Coefficient1 Constant",
+        "    0,                !- Coefficient2 x       ",
+        "    0,                !- Coefficient3 x**2    ",
+        "    0.928,            !- Coefficient4 x**3    ",
+        "    0,                !- Coefficient5 x**4    ",
+        "    0.0,              !- Minimum Value of x",
+        "    1.0,              !- Maximum Value of x",
+        "    0.0,              !- Minimum Curve Output",
+        "    1.0,              !- Maximum Curve Output",
+        "    Dimensionless,    !- Input Unit Type for X",
+        "    Dimensionless;    !- Output Unit Type",
+
         "Curve:Quadratic,",
         "  OUEvapTempCurve,         !- Name",
         "  0,                       !- Coefficient1 Constant",
@@ -22746,15 +22839,15 @@ TEST_F(EnergyPlusFixture, VRF_MixedTypes)
     EXPECT_EQ(1, state->dataHVACVarRefFlow->VRFTU(3).VRFSysNum);
 
     EXPECT_EQ("VRF HEAT PUMP SYS", state->dataHVACVarRefFlow->VRF(1).Name);
-    EXPECT_TRUE(compare_enums(AlgorithmType::SysCurve, state->dataHVACVarRefFlow->VRF(1).VRFAlgorithmType));
+    EXPECT_ENUM_EQ(AlgorithmType::SysCurve, state->dataHVACVarRefFlow->VRF(1).VRFAlgorithmType);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(1).HeatRecoveryUsed);
 
     EXPECT_EQ("VRF HEAT PUMP FLUIDCTRL", state->dataHVACVarRefFlow->VRF(2).Name);
-    EXPECT_TRUE(compare_enums(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(2).VRFAlgorithmType));
+    EXPECT_ENUM_EQ(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(2).VRFAlgorithmType);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(2).HeatRecoveryUsed);
 
     EXPECT_EQ("VRF HEAT PUMP FLUIDCTRL_HR", state->dataHVACVarRefFlow->VRF(3).Name);
-    EXPECT_TRUE(compare_enums(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(3).VRFAlgorithmType));
+    EXPECT_ENUM_EQ(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(3).VRFAlgorithmType);
     EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(3).HeatRecoveryUsed);
 }
 

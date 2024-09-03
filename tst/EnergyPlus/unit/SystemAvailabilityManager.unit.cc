@@ -604,9 +604,9 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleGetInput)
     Avail::GetSysAvailManagerInputs(*state);
     // check the three cycling run time control types
     EXPECT_EQ(3, state->dataAvail->NumNCycSysAvailMgrs);
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::FixedRunTime, state->dataAvail->NightCycleData(1).cyclingRunTimeControl));
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::Thermostat, state->dataAvail->NightCycleData(2).cyclingRunTimeControl));
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, state->dataAvail->NightCycleData(3).cyclingRunTimeControl));
+    EXPECT_ENUM_EQ(Avail::CyclingRunTimeControl::FixedRunTime, state->dataAvail->NightCycleData(1).cyclingRunTimeControl);
+    EXPECT_ENUM_EQ(Avail::CyclingRunTimeControl::Thermostat, state->dataAvail->NightCycleData(2).cyclingRunTimeControl);
+    EXPECT_ENUM_EQ(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, state->dataAvail->NightCycleData(3).cyclingRunTimeControl);
 }
 
 TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)

@@ -117,10 +117,34 @@ namespace DataSizing {
         Num
     };
 
-    // parameters for sizing
+    // parameters for sizing (keep this for now to avoid plant sizing output changes)
     constexpr int NonCoincident(1);
     constexpr int Coincident(2);
-    constexpr int Combination(3);
+
+    // parameters for zone and system sizing concurrence method
+    enum class SizingConcurrence
+    {
+        Invalid = -1,
+        NonCoincident,
+        Coincident,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(SizingConcurrence::Num)> SizingConcurrenceNamesUC{"NONCOINCIDENT", "COINCIDENT"};
+
+    // parameters for coil sizing concurrence method
+    enum class CoilSizingConcurrence
+    {
+        Invalid = -1,
+        NonCoincident,
+        Coincident,
+        Combination,
+        NA,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(CoilSizingConcurrence::Num)> CoilSizingConcurrenceNames{
+        "Non-Coincident", "Coincident", "Combination", "N/A"};
 
     // parameters for Cooling Peak Load Type
     enum class PeakLoad
@@ -206,6 +230,17 @@ namespace DataSizing {
         VRPL, // Use ASHRAE Standard 62.1-2007 to calculate the system level outdoor air flow rates
         Num
     };
+
+    constexpr std::array<std::string_view, static_cast<int>(SysOAMethod::Num)> SysOAMethodNames{"Zone Sum",
+                                                                                                "Ventilation Rate Procedure",
+                                                                                                "IAQ Proc",
+                                                                                                "Proportional - Sch Occupancy",
+                                                                                                "IAQ Proc - Generic Contaminant",
+                                                                                                "IAQ Proc - Max Gen Cont or CO2.",
+                                                                                                "Proportional - Des Occupancy",
+                                                                                                "Proportional - Des OA Rate",
+                                                                                                "Simplified Procure",
+                                                                                                "Ventilation Rate Procedure Level"};
 
     // Zone HVAC Equipment Sizing Option
     enum class DesignSizingType
@@ -316,6 +351,7 @@ namespace DataSizing {
         DOASControl DOASControlStrategy = DOASControl::Invalid; // 0=neutral ventilation air; 1=neutral dehumidified ventilation air, 2 = cooled air;
         Real64 DOASLowSetpoint = 0.0;                           // Dedicated Outside Air Low Setpoint for Design [C]
         Real64 DOASHighSetpoint = 0.0;                          // Dedicated Outside Air High Setpoint for Design [C]
+        DataSizing::SizingConcurrence spaceConcurrence = DataSizing::SizingConcurrence::Coincident; // coincident or noncoincident space loads
 
         // zone latent sizing inputs
         bool zoneLatentSizing = false;
@@ -441,9 +477,10 @@ namespace DataSizing {
         bool AccountForDOAS = false;           // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
         DOASControl DOASControlStrategy = DOASControl::Invalid; // 0=neutral ventilation air; 1=neutral dehumidified ventilation air, 2 = cooled air;
         // 3=supply cold ventilation air
-        Real64 DOASLowSetpoint = 0.0;          // Dedicated Outside Air Low Setpoint for Design [C]
-        Real64 DOASHighSetpoint = 0.0;         // Dedicated Outside Air High Setpoint for Design [C]
-        bool EMSOverrideDesHeatMassOn = false; // true if EMS is acting on this structure
+        Real64 DOASLowSetpoint = 0.0;  // Dedicated Outside Air Low Setpoint for Design [C]
+        Real64 DOASHighSetpoint = 0.0; // Dedicated Outside Air High Setpoint for Design [C]
+        DataSizing::SizingConcurrence spaceConcurrence = DataSizing::SizingConcurrence::Coincident; // coincident or noncoincident space loads
+        bool EMSOverrideDesHeatMassOn = false;                                                      // true if EMS is acting on this structure
         Real64 EMSValueDesHeatMassFlow = 0.0;  // Value EMS directing to use for Design Heating air mass flow [kg/s]
         bool EMSOverrideDesCoolMassOn = false; // true if EMS is acting on this structure
         Real64 EMSValueDesCoolMassFlow = 0.0;  // Value EMS directing to use for Design Cooling air mass flow [kg/s]
@@ -618,7 +655,7 @@ namespace DataSizing {
         Real64 MaxHWVolFlow;           // design Hot Water vol flow for single duct terminal unit [m3/s]
         Real64 MaxSTVolFlow;           // design Steam vol flow rate for single duct terminal unit [m3/s]
         Real64 MaxCWVolFlow;           // design Cold Water vol flow for single duct terminal unit [m3/s]
-        Real64 MinFlowFrac;            // design minimum flow fraction for a terminal unit
+        Real64 MinPriFlowFrac;         // design minimum primary flow fraction for a terminal unit
         Real64 InducRat;               // design induction ratio for a terminal unit
         bool InducesPlenumAir;         // True if secondary air comes from the plenum
         Real64 ReheatAirFlowMult;      // multiplier for air flow in reheat coil UA calculation
@@ -630,10 +667,11 @@ namespace DataSizing {
         Real64 SpecDesSensHeatingFrac; // Fraction of Design Sensible Heating Load from DesignSpecification:AirTerminal:Sizing
         Real64 SpecDesHeatSATRatio;    // Heating Design Supply Air Temperature Difference Ratio from DesignSpecification:AirTerminal:Sizing
         Real64 SpecMinOAFrac;          // Fraction of Minimum Outdoor Air Flow from DesignSpecification:AirTerminal:Sizing
+        int plenumIndex = 0;           // plenum index for PIU inlet conditions
 
         // Default Constructor
         TermUnitSizingData()
-            : CtrlZoneNum(0), AirVolFlow(0.0), MaxHWVolFlow(0.0), MaxSTVolFlow(0.0), MaxCWVolFlow(0.0), MinFlowFrac(0.0), InducRat(0.0),
+            : CtrlZoneNum(0), AirVolFlow(0.0), MaxHWVolFlow(0.0), MaxSTVolFlow(0.0), MaxCWVolFlow(0.0), MinPriFlowFrac(0.0), InducRat(0.0),
               InducesPlenumAir(false), ReheatAirFlowMult(1.0), ReheatLoadMult(1.0), DesCoolingLoad(0.0), DesHeatingLoad(0.0),
               SpecDesSensCoolingFrac(1.0), SpecDesCoolSATRatio(1.0), SpecDesSensHeatingFrac(1.0), SpecDesHeatSATRatio(1.0), SpecMinOAFrac(1.0)
         {
@@ -770,20 +808,20 @@ namespace DataSizing {
         std::string AirPriLoopName;                      // name of an AirLoopHVAC object
         int AirLoopNum = 0;                              // index number of air loop
         LoadSizing loadSizingType = LoadSizing::Invalid; // type of load to size on sensible, latent, total, ventilation
-        int SizingOption = 0;                            // 1 = noncoincident, 2 = coincident
-        OAControl CoolOAOption = OAControl::Invalid;     // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
-        OAControl HeatOAOption = OAControl::Invalid;     // 1 = use 100% outside air; 2 = use min OA; for heating sizing
-        Real64 DesOutAirVolFlow = 0.0;                   // design (minimum) outside air flow rate [m3/s]
-        Real64 SysAirMinFlowRat = 0.0;                   // minimum system air flow ratio for heating, Central Heating Maximum System Air Flow Ratio
-        bool SysAirMinFlowRatWasAutoSized = false;       // true if central heating maximum system air flow ratio was autosize on input
-        Real64 PreheatTemp = 0.0;                        // preheat design set temperature [C]
-        Real64 PrecoolTemp = 0.0;                        // precool design set temperature [C]
-        Real64 PreheatHumRat = 0.0;                      // preheat design humidity ratio [kg water/kg dry air]
-        Real64 PrecoolHumRat = 0.0;                      // precool design humidity ratio [kg water/kg dry air]
-        Real64 CoolSupTemp = 0.0;                        // cooling design supply air temperature [C]
-        Real64 HeatSupTemp = 0.0;                        // heating design supply air temperature [C]
-        Real64 CoolSupHumRat = 0.0;                      // cooling design supply air humidity ratio [kg water/kg dry air]
-        Real64 HeatSupHumRat = 0.0;                      // heating design supply air humidity ratio [kg water/kg dry air]
+        DataSizing::SizingConcurrence SizingOption = DataSizing::SizingConcurrence::NonCoincident; // noncoincident, coincident
+        OAControl CoolOAOption = OAControl::Invalid; // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
+        OAControl HeatOAOption = OAControl::Invalid; // 1 = use 100% outside air; 2 = use min OA; for heating sizing
+        Real64 DesOutAirVolFlow = 0.0;               // design (minimum) outside air flow rate [m3/s]
+        Real64 SysAirMinFlowRat = 0.0;               // minimum system air flow ratio for heating, Central Heating Maximum System Air Flow Ratio
+        bool SysAirMinFlowRatWasAutoSized = false;   // true if central heating maximum system air flow ratio was autosize on input
+        Real64 PreheatTemp = 0.0;                    // preheat design set temperature [C]
+        Real64 PrecoolTemp = 0.0;                    // precool design set temperature [C]
+        Real64 PreheatHumRat = 0.0;                  // preheat design humidity ratio [kg water/kg dry air]
+        Real64 PrecoolHumRat = 0.0;                  // precool design humidity ratio [kg water/kg dry air]
+        Real64 CoolSupTemp = 0.0;                    // cooling design supply air temperature [C]
+        Real64 HeatSupTemp = 0.0;                    // heating design supply air temperature [C]
+        Real64 CoolSupHumRat = 0.0;                  // cooling design supply air humidity ratio [kg water/kg dry air]
+        Real64 HeatSupHumRat = 0.0;                  // heating design supply air humidity ratio [kg water/kg dry air]
         AirflowSizingMethod CoolAirDesMethod = AirflowSizingMethod::Invalid; // choice of how to get system cooling design air flow rates;
         //  1 = calc from des day simulation; 2=m3/s per system, user input
         Real64 DesCoolAirFlow = 0.0;                                         // design system supply air flow rate for cooling[m3/s]
@@ -823,20 +861,20 @@ namespace DataSizing {
         std::string CoolDesDay;                          // name of a cooling design day
         std::string HeatDesDay;                          // name of a heating design day
         LoadSizing loadSizingType = LoadSizing::Invalid; // type of load to size on Sensible, Latent, Total, Ventilation
-        int SizingOption = 0;                            // 1 = noncoincident, 2 = coincident.
-        OAControl CoolOAOption = OAControl::Invalid;     // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
-        OAControl HeatOAOption = OAControl::Invalid;     // 1 = use 100% outside air; 2 = use min OA; for heating sizing
-        Real64 DesOutAirVolFlow = 0.0;                   // design (minimum) outside air flow rate [m3/s]
-        Real64 SysAirMinFlowRat = 0.0;                   // minimum system air flow ratio for heating, Central Heating Maximum System Air Flow Ratio
-        bool SysAirMinFlowRatWasAutoSized = false;       // true if central heating maximum system air flow ratio was autosize on input
-        Real64 PreheatTemp = 0.0;                        // preheat design set temperature
-        Real64 PrecoolTemp = 0.0;                        // precool design set temperature [C]
-        Real64 PreheatHumRat = 0.0;                      // preheat design humidity ratio [kg water/kg dry air]
-        Real64 PrecoolHumRat = 0.0;                      // precool design humidity ratio [kg water/kg dry air]
-        Real64 CoolSupTemp = 0.0;                        // cooling design supply air temperature [C]
-        Real64 HeatSupTemp = 0.0;                        // heating design supply air temperature[C]
-        Real64 CoolSupHumRat = 0.0;                      // cooling design supply air humidity ratio [kg water/kg dry air]
-        Real64 HeatSupHumRat = 0.0;                      // heating design supply air humidity ratio [kg water/kg dry air]
+        DataSizing::SizingConcurrence SizingOption = DataSizing::SizingConcurrence::NonCoincident; // noncoincident, coincident.
+        OAControl CoolOAOption = OAControl::Invalid; // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
+        OAControl HeatOAOption = OAControl::Invalid; // 1 = use 100% outside air; 2 = use min OA; for heating sizing
+        Real64 DesOutAirVolFlow = 0.0;               // design (minimum) outside air flow rate [m3/s]
+        Real64 SysAirMinFlowRat = 0.0;               // minimum system air flow ratio for heating, Central Heating Maximum System Air Flow Ratio
+        bool SysAirMinFlowRatWasAutoSized = false;   // true if central heating maximum system air flow ratio was autosize on input
+        Real64 PreheatTemp = 0.0;                    // preheat design set temperature
+        Real64 PrecoolTemp = 0.0;                    // precool design set temperature [C]
+        Real64 PreheatHumRat = 0.0;                  // preheat design humidity ratio [kg water/kg dry air]
+        Real64 PrecoolHumRat = 0.0;                  // precool design humidity ratio [kg water/kg dry air]
+        Real64 CoolSupTemp = 0.0;                    // cooling design supply air temperature [C]
+        Real64 HeatSupTemp = 0.0;                    // heating design supply air temperature[C]
+        Real64 CoolSupHumRat = 0.0;                  // cooling design supply air humidity ratio [kg water/kg dry air]
+        Real64 HeatSupHumRat = 0.0;                  // heating design supply air humidity ratio [kg water/kg dry air]
         AirflowSizingMethod CoolAirDesMethod = AirflowSizingMethod::Invalid; // choice of how to get system design cooling air flow rates;
         //  1 = calc from des day simulation; 2=m3/s per system, user input
         AirflowSizingMethod HeatAirDesMethod = AirflowSizingMethod::Invalid; // choice of how to get system design heating air flow rates;
@@ -1336,6 +1374,10 @@ struct SizingData : BaseGlobalStruct
     Array1D<Real64> EvzMinBySysCool; // saved value of EvzMin used in 62.1 tabular report
     Array1D<Real64> FaByZoneCool;    // triggers allocation in UpdateSysSizing
     Array1D<Real64> SensCoolCapTemp; // triggers allocation in UpdateSysSizing
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

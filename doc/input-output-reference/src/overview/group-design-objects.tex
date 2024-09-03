@@ -752,7 +752,7 @@ The results of the component autosizing calculations are reported on the \emph{e
 The complete list of objects that have autosized fields is shown in the following table. Note that spaces may be inserted in object names to facilitate readability.
 
 % table 23
-\begin{longtable}[c]{p{3.02in}p{2.97in}}
+\begin{longtable}[c]{p{3.3in}p{3.3in}}
 \caption{Complete list of Objects with autosized Fields \label{table:complete-list-of-objects-with-autosized}} \tabularnewline
 \toprule
 Object Name & Object Name \tabularnewline
@@ -767,17 +767,22 @@ Object Name & Object Name \tabularnewline
 
 AirConditioner:VariableRefrigerantFlow & AirLoopHVAC \tabularnewline
 AirLoopHVAC:Unitary:Furnace:HeatCool & AirLoopHVAC:Unitary:Furnace:HeatOnly \tabularnewline
-AirLoopHVAC:UnitaryHeatCool & AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass \tabularnewline
+AirLoopHVAC:UnitaryHeatCool & \tabularnewline
+AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass & \tabularnewline
 AirLoopHVAC:UnitaryHeatOnly & AirLoopHVAC:UnitaryHeatPump:AirToAir \tabularnewline
-AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed & AirLoopHVAC:UnitaryHeatPump:WaterToAir \tabularnewline
+AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed & \tabularnewline
+AirLoopHVAC:UnitaryHeatPump:WaterToAir & \tabularnewline
 AirLoopHVAC:UnitarySystem & AirTerminal:DualDuct:ConstantVolume \tabularnewline
 AirTerminal:DualDuct:VAV & AirTerminal:DualDuct:VAV:OutdoorAir \tabularnewline
-AirTerminal:SingleDuct:ConstantVolume:CooledBeam & AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction \tabularnewline
+AirTerminal:SingleDuct:ConstantVolume:CooledBeam & \tabularnewline
+AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction & \tabularnewline
 AirTerminal:SingleDuct:ConstantVolume:Reheat & AirTerminal:SingleDuct:ParallelPIU:Reheat \tabularnewline
 AirTerminal:SingleDuct:SeriesPIU:Reheat & AirTerminal:SingleDuct:ConstantVolume:NoReheat \tabularnewline
-AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat & AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat \tabularnewline
+AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat & \tabularnewline
+ & AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat \tabularnewline
 AirTerminal:SingleDuct:VAV:NoReheat & AirTerminal:SingleDuct:VAV:Reheat \tabularnewline
-AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan & Boiler:HotWater \tabularnewline
+AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan & \tabularnewline
+ & Boiler:HotWater \tabularnewline
 Boiler:Steam & Branch \tabularnewline
 Chiller:Absorption & Chiller:Absorption:Indirect \tabularnewline
 Chiller:CombustionTurbine & Chiller:ConstantCOP \tabularnewline
@@ -789,13 +794,15 @@ Coil:Cooling:DX:SingleSpeed & Coil:Cooling:DX:SingleSpeed:ThermalStorage \tabula
 Coil:Cooling:DX:TwoSpeed & Coil:Cooling:DX:VariableRefrigerantFlow \tabularnewline
 Coil:Cooling:DX:VariableSpeed & Coil:Cooling:Water \tabularnewline
 Coil:Cooling:Water:DetailedGeometry & Coil:Cooling:WaterToAirHeatPump:EquationFit \tabularnewline
-Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit & Coil:Heating:DX:MultiSpeed \tabularnewline
+Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit & \tabularnewline
+ & Coil:Heating:DX:MultiSpeed \tabularnewline
 Coil:Heating:DX:SingleSpeed & Coil:Heating:DX:VariableRefrigerantFlow \tabularnewline
 Coil:Heating:DX:VariableSpeed & Coil:Heating:Electric \tabularnewline
 Coil:Heating:Electric:MultiStage & Coil:Heating:Fuel \tabularnewline
 Coil:Heating:Gas:MultiStage & Coil:Heating:Steam \tabularnewline
 Coil:Heating:Water & Coil:Heating:WaterToAirHeatPump:EquationFit \tabularnewline
-Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit & CoilPerformance:DX:Cooling \tabularnewline
+Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit & \tabularnewline
+ & CoilPerformance:DX:Cooling \tabularnewline
 CondenserLoop & Controller:OutdoorAir \tabularnewline
 Controller:WaterCoil & CoolingTower:SingleSpeed \tabularnewline
 CoolingTower:TwoSpeed & CoolingTower:VariableSpeed \tabularnewline
@@ -811,7 +818,8 @@ HVACTemplate:Plant:Boiler & HVACTemplate:Plant:Chiller \tabularnewline
 HVACTemplate:Plant:Tower & HVACTemplate:System:ConstantVolume \tabularnewline
 HVACTemplate:System:DedicatedOutdoorAir & HVACTemplate:System:DualDuct \tabularnewline
 HVACTemplate:System:PackagedVAV & HVACTemplate:System:Unitary \tabularnewline
-HVACTemplate:System:UnitaryHeatPump:AirToAir & HVACTemplate:System:UnitarySystem \tabularnewline
+HVACTemplate:System:UnitaryHeatPump:AirToAir & \tabularnewline
+ & HVACTemplate:System:UnitarySystem \tabularnewline
 HVACTemplate:System:VAV & HVACTemplate:System:VRF \tabularnewline
 HVACTemplate:Zone:BaseboardHeat & HVACTemplate:Zone:ConstantVolume \tabularnewline
 HVACTemplate:Zone:DualDuct & HVACTemplate:Zone:FanCoil \tabularnewline
@@ -1287,11 +1295,15 @@ Enter the zone relative humidity schedule used for zone latent heating calculati
 Sizing Method = Sensible Load Only No Latent Load or a zone humidistat is present. A default of 50.0 will be used if no schedule is provided and no humidistat is 
 associated with this zone.
 
+\paragraph{Field: Type of Space Sum to Use}\label{field-type-of-space-sum-to-use}
+
+If the input is \emph{coincident} the zone equipment will be sized on the coincident zone load across all spaces in the zone. If the input is \emph{noncoincident} the zone equipment will be sized on the sum of the noncoincident space loads. The default is \emph{coincident}. This field is ignored unless \hyperref[zoneairheatbalancealgorithm]{ZoneAirHeatBalanceAlgorithm} ``Do Space Heat Balance for Sizing'' is Yes.
+
 An IDF example:
 
 \begin{lstlisting}
 
-Sizing:Zone,
+  Sizing:Zone,
       SPACE5-1,                !- Name of a zone
       14.,                     !- Zone cooling design supply air temperature {C}
       50.,                     !- Zone heating design supply air temperature {C}
@@ -1323,16 +1335,17 @@ Sizing:Zone,
       ,                        !- Zone Humidification Design Supply Air Humidity Ratio
       0.005,                   !- Zone Heating Design Supply Air Humidity Ratio Difference
       ,                        !- Zone Humidistat Dehumidification Set Point Schedule Name
-      ;                        !- Zone Humidistat Humidification Set Point Schedule Name
-
+      ,                        !- Zone Humidistat Humidification Set Point Schedule Name
+      Coincident;              !- Type of Space Sum to Use
+      
   DesignSpecification:OutdoorAir,
-  DSOA1,                   !- Name
-  SUM,                     !- Outdoor Air Method
-  0.00236,                 !- Outdoor Air Flow per Person
-  0.000305,                !- Outdoor Air Flow per Zone Floor Area
-  0.0,                     !- Outdoor Air Flow per Zone
-  0.0,                     !- Outdoor Air Flow Air Changes per Hour
-  ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+      DSOA1,                   !- Name
+      SUM,                     !- Outdoor Air Method
+      0.00236,                 !- Outdoor Air Flow per Person
+      0.000305,                !- Outdoor Air Flow per Zone Floor Area
+      0.0,                     !- Outdoor Air Flow per Zone
+      0.0,                     !- Outdoor Air Flow Air Changes per Hour
+      ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
 
   DesignSpecification:ZoneAirDistribution,
       DSZADO1,                 !- Name

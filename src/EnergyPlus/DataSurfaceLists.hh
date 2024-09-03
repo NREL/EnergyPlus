@@ -117,6 +117,10 @@ struct SurfaceListsData : BaseGlobalStruct
     Array1D<DataSurfaceLists::SurfaceListData> SurfList;
     Array1D<DataSurfaceLists::SlabListData> SlabList;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->NumOfSurfaceLists = 0;

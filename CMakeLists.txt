@@ -13,6 +13,8 @@ endif()
 
 cmake_policy(SET CMP0048 NEW) # handling project_version_* variables
 
+cmake_policy(SET CMP0087 NEW) # install(CODE) and install(SCRIPT) support generator expressions.
+
 project(EnergyPlus)
 
 # Raise an error if attempting to compile on macOS older than 10.15 - it does not work
@@ -191,57 +193,17 @@ if(LINK_WITH_PYTHON)
   if(Python_REQUIRED_VERSION)
     find_package(Python ${Python_REQUIRED_VERSION} EXACT COMPONENTS Interpreter Development REQUIRED)
   else()
-    find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+    find_package(Python 3.12 COMPONENTS Interpreter Development REQUIRED)
   endif()
 else()
   find_package(Python 3.6 COMPONENTS Interpreter REQUIRED)
 endif()
 
 if(BUILD_TESTING)
-  option(ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF)
   option(ENABLE_REVERSE_DD_TESTING "Enable Reverse Design Day Tests" OFF)
   option(BUILD_WCE_TESTING "Build testing targets for Windows Calculation Engine" OFF)
-  if(ENABLE_REGRESSION_TESTING)
-    if(CMAKE_CL_64)
-      set(ARCH_FLAG "-64bit")
-    else()
-      set(ARCH_FLAG "")
-    endif()
-    set(REGRESSION_BASELINE_SHA
-        ""
-        CACHE STRING "SHA of baseline comparison")
-    set(COMMIT_SHA
-        ""
-        CACHE STRING "Commit sha of this build")
-    set(REGRESSION_SCRIPT_PATH
-        ""
-        CACHE PATH "Path to regression scripts")
-    set(REGRESSION_BASELINE_PATH
-        ""
-        CACHE PATH "Path to energyplus baseline folder to compare against")
-    set(DEVICE_ID
-        "${CMAKE_SYSTEM_NAME}-${CMAKE_CXX_COMPILER_ID}${ARCH_FLAG}"
-        CACHE STRING "Identifier for this device configuration")
-  endif()
   set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)  # This avoids all the CTest Nightly, Continuous, etc. tests.
   enable_testing()
-endif()
-
-if(ENABLE_REGRESSION_TESTING)
-  string(STRIP "${REGRESSION_SCRIPT_PATH}" REG_PATH_STRIPPED)
-  string(STRIP "${REGRESSION_BASELINE_PATH}" REG_BASELINE_STRIPPED)
-  if(REG_PATH_STRIPPED STREQUAL "" OR REG_BASELINE_STRIPPED STREQUAL "")
-    message(AUTHOR_WARNING "Regression testing is enabled, but no script or baseline has been provided, turning it off.")
-    set(DO_REGRESSION_TESTING OFF)
-  else()
-    if(BUILD_FORTRAN)
-      # No Problem
-      set(DO_REGRESSION_TESTING ON)
-    else()
-      message(AUTHOR_WARNING "For regression testing, you must enable BUILD_FORTRAN in order to call ReadVarEso, turning it off.")
-      set(DO_REGRESSION_TESTING OFF)
-    endif()
-  endif()
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -437,6 +399,7 @@ mark_as_advanced(KIVA_EXE_BUILD)
 mark_as_advanced(KIVA_GROUND_PLOT)
 mark_as_advanced(KIVA_STATIC_LIB)
 mark_as_advanced(KIVA_TESTING)
+mark_as_advanced(KIVA_WERROR)
 mark_as_advanced(BTWXT_COVERAGE)
 mark_as_advanced(BUILD_BTWXT_TESTING)
 mark_as_advanced(BTWXT_STATIC_LIB)
@@ -444,7 +407,6 @@ mark_as_advanced(RE2_BUILD_TESTING)
 mark_as_advanced(USEPCRE)
 mark_as_advanced(CCACHE_PROGRAM)
 mark_as_advanced(CMAKE_VERSION_BUILD)
-mark_as_advanced(ENABLE_REGRESSION_TESTING)
 mark_as_advanced(TEST_ANNUAL_SIMULATION)
 mark_as_advanced(gtest_build_samples)
 mark_as_advanced(gtest_build_tests)
@@ -488,3 +450,15 @@ mark_as_advanced(ENABLE_SANITIZER_LEAK)
 mark_as_advanced(ENABLE_SANITIZER_MEMORY)
 mark_as_advanced(ENABLE_SANITIZER_THREAD)
 mark_as_advanced(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR)
+mark_as_advanced(X11_xcb_xkb_INCLUDE_PATH)
+mark_as_advanced(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR)
+mark_as_advanced(JSONCPP_USE_SECURE_MEMORY)
+mark_as_advanced(JSONCPP_WITH_CMAKE_PACKAGE)
+mark_as_advanced(JSONCPP_WITH_PKGCONFIG_SUPPORT)
+mark_as_advanced(JSONCPP_WITH_POST_BUILD_UNITTE)
+mark_as_advanced(JSONCPP_WITH_STRICT_ISO)
+mark_as_advanced(JSONCPP_WITH_TESTS)
+mark_as_advanced(JSONCPP_WITH_WARNING_AS_ERROR)
+mark_as_advanced(CMAKE_CXX_COMPILER_LAUNCHER)
+mark_as_advanced(CMAKE_C_COMPILER_LAUNCHER)
+mark_as_advanced(DEBUG_LIBNAME_SUFFIX)

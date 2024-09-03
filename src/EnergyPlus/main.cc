@@ -50,19 +50,12 @@
 
 #include <CLI/CLI11.hpp>
 
-#ifdef DEBUG_ARITHM_GCC_OR_CLANG
-#include <EnergyPlus/fenv_missing.h>
-#endif
-
-int main()
+int main(int argc, char **argv)
 {
-#ifdef DEBUG_ARITHM_GCC_OR_CLANG
-    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
-#endif
-
-    int const argc = CLI::argc();
-    const char *const *argv = CLI::argv(); // This is going to use CommandLineToArgvW on Windows and **narrow** from wchar_t to char
-
+#ifdef _WIN32
+    const std::vector<std::string> args = CLI::detail::compute_win32_argv();
+#else
     const std::vector<std::string> args(argv, std::next(argv, static_cast<std::ptrdiff_t>(argc)));
+#endif
     return EnergyPlusPgm(args);
 }

@@ -2051,7 +2051,7 @@ void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir) // TRUE means air 
     }
 }
 
-void ResetHVACControl(EnergyPlusData &state)
+void ResetHVACControl(EnergyPlusData const &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2296,7 +2296,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         znAirRpt.ExhTotalLoss = 0;
         znAirRpt.ExhSensiLoss = 0;
 
-        for (int FanNum = 1; FanNum <= state.dataFans->fans.size(); ++FanNum) {
+        for (int FanNum = 1; FanNum <= (int)state.dataFans->fans.size(); ++FanNum) {
             auto const *thisFan = state.dataFans->fans(FanNum);
             //  Add reportable vars
             if (thisFan->type == HVAC::FanType::Exhaust) {

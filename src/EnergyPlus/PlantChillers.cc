@@ -496,7 +496,7 @@ namespace PlantChillers {
                     if (thisChiller.CondVolFlowRate <= 0.0) {
                         ShowSevereError(
                             state, format("Invalid {}={:.6R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
-                        ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
+                        ShowContinueError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
                         ShowContinueError(
                             state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
@@ -595,12 +595,13 @@ namespace PlantChillers {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                 thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(10));
                 if (thisChiller.BasinHeaterSchedulePtr == 0) {
-                    ShowWarningError(state,
-                                     format("{}, \"{}\" TRIM(state.dataIPShortCut->cAlphaFieldNames(10)) \"{}\" was not found. Basin heater "
-                                            "operation will not be modeled and the simulation continues",
-                                            state.dataIPShortCut->cCurrentModuleObject,
-                                            thisChiller.Name,
-                                            state.dataIPShortCut->cAlphaArgs(10)));
+                    ShowWarningError(
+                        state,
+                        format("{}, \"{}\" {} \"{}\" was not found. Basin heater operation will not be modeled and the simulation continues",
+                               state.dataIPShortCut->cCurrentModuleObject,
+                               thisChiller.Name,
+                               state.dataIPShortCut->cAlphaFieldNames(10),
+                               state.dataIPShortCut->cAlphaArgs(10)));
                 }
             }
             if (NumAlphas > 12) {
@@ -608,6 +609,16 @@ namespace PlantChillers {
             } else {
                 thisChiller.EndUseSubcategory = "General";
             }
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(14)));
+                if (thisChiller.thermosiphonTempCurveIndex == 0) {
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, thisChiller.Name));
+                    ShowContinueError(state,
+                                      format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14)));
+                    ErrorsFound = true;
+                }
+            }
+            thisChiller.thermosiphonMinTempDiff = state.dataIPShortCut->rNumericArgs(26);
         }
 
         if (ErrorsFound) {
@@ -702,6 +713,13 @@ namespace PlantChillers {
                             "Chiller Condenser Inlet Temperature",
                             Constant::Units::C,
                             this->CondInletTemp,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Thermosiphon Status",
+                            Constant::Units::None,
+                            this->thermosiphonStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             this->Name);
@@ -930,8 +948,7 @@ namespace PlantChillers {
                         } else {
                             // need call to EMS to check node
                             bool FatalError = false; // but not really fatal yet, but should be.
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(
-                                state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                             state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                             if (FatalError) {
                                 if (!this->HRSPErrDone) {
@@ -1386,6 +1403,7 @@ namespace PlantChillers {
         this->EvaporatorEnergy = 0.0;
         this->QHeatRecovered = 0.0;
         this->ActualCOP = 0.0;
+        this->thermosiphonStatus = 0;
 
         //   calculate end time of current time step
         Real64 CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
@@ -1516,6 +1534,7 @@ namespace PlantChillers {
         } // End of the Air Cooled/Evap Cooled Logic block
 
         Real64 condInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
+        this->CondInletTemp = condInletTemp; // needed if thermosiphon model is used
 
         // correct inlet temperature if using heat recovery
         if (this->HeatRecActive) {
@@ -1575,6 +1594,7 @@ namespace PlantChillers {
         } else {
             OperPartLoadRat = 0.0;
         }
+        this->partLoadRatio = OperPartLoadRat;
 
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
@@ -1594,7 +1614,7 @@ namespace PlantChillers {
             } else {
                 FRAC = 1.0;
             }
-            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / this->COP * FRAC;
+            this->cyclingRatio = FRAC;
 
             // Either set the flow to the Constant value or calculate the flow for the variable volume
             if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
@@ -1656,6 +1676,10 @@ namespace PlantChillers {
                 }
 
             } // End of Constant Variable Flow If Block
+
+            if (this->thermosiphonDisabled(state)) {
+                this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / this->COP * FRAC;
+            }
 
             // If there is a fault of Chiller SWT Sensor
             if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
@@ -1792,9 +1816,12 @@ namespace PlantChillers {
             } else {
                 FRAC = 1.0;
             }
+            this->cyclingRatio = FRAC;
 
             // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / this->COP * FRAC;
+            if (this->thermosiphonDisabled(state)) {
+                this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / this->COP * FRAC;
+            }
 
             if (this->EvapMassFlowRate == 0.0) {
                 this->QEvaporator = 0.0;
@@ -2092,8 +2119,7 @@ namespace PlantChillers {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -2120,6 +2146,26 @@ namespace PlantChillers {
                 }
             }
             this->MyFlag = false;
+        }
+    }
+    bool ElectricChillerSpecs::thermosiphonDisabled(EnergyPlusData &state)
+    {
+        if (this->thermosiphonTempCurveIndex > 0) {
+            this->thermosiphonStatus = 0;
+            Real64 dT = this->EvapOutletTemp - this->CondInletTemp;
+            if (dT < this->thermosiphonMinTempDiff) {
+                return true;
+            }
+            Real64 thermosiphonCapFrac = Curve::CurveValue(state, this->thermosiphonTempCurveIndex, dT);
+            Real64 capFrac = this->partLoadRatio * this->cyclingRatio;
+            if (thermosiphonCapFrac >= capFrac) {
+                this->thermosiphonStatus = 1;
+                this->Power = 0.0;
+                return false;
+            }
+            return true;
+        } else {
+            return true;
         }
     }
 
@@ -2545,7 +2591,7 @@ namespace PlantChillers {
                     if (thisChiller.CondVolFlowRate <= 0.0) {
                         ShowSevereError(
                             state, format("Invalid {}={:.6R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
-                        ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
+                        ShowContinueError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
                         ShowContinueError(
                             state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
@@ -4152,8 +4198,7 @@ namespace PlantChillers {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -4558,7 +4603,7 @@ namespace PlantChillers {
                     if (thisChiller.CondVolFlowRate <= 0.0) {
                         ShowSevereError(
                             state, format("Invalid {}={:.6R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
-                        ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
+                        ShowContinueError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
                         ShowContinueError(
                             state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
@@ -6135,8 +6180,7 @@ namespace PlantChillers {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -6507,6 +6551,17 @@ namespace PlantChillers {
                 }
             }
 
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                thisChiller.thermosiphonTempCurveIndex = Curve::GetCurveIndex(state, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9)));
+                if (thisChiller.thermosiphonTempCurveIndex == 0) {
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, thisChiller.Name));
+                    ShowContinueError(state,
+                                      format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
+                    ErrorsFound = true;
+                }
+            }
+            thisChiller.thermosiphonMinTempDiff = state.dataIPShortCut->rNumericArgs(8);
+
             // set default design condenser in and evaporator out temperatures
             // Values from AHRI Standard 550/590 (2023, IP Version)
             thisChiller.TempDesEvapOut = 6.67; // Degree Celsius, or 44 Degree Fahrenheit
@@ -6612,6 +6667,14 @@ namespace PlantChillers {
                             "Chiller Condenser Inlet Temperature",
                             Constant::Units::C,
                             this->CondInletTemp,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            this->Name);
+
+        SetupOutputVariable(state,
+                            "Thermosiphon Status",
+                            Constant::Units::None,
+                            this->thermosiphonStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             this->Name);
@@ -6739,6 +6802,10 @@ namespace PlantChillers {
 
         Real64 mdot = 0.0;
         Real64 mdotCond = 0.0;
+        this->thermosiphonStatus = 0;
+        this->partLoadRatio = 0.0;
+        this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
+        this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         if ((MyLoad < 0.0) && RunFlag) {
             mdot = this->EvapMassFlowRateMax;
             mdotCond = this->CondMassFlowRateMax;
@@ -7082,6 +7149,7 @@ namespace PlantChillers {
         Real64 TempEvapOutSetPoint(0.0);     // C - evaporator outlet temperature setpoint
         Real64 COP = this->COP;              // coefficient of performance
         Real64 ChillerNomCap = this->NomCap; // chiller nominal capacity
+        this->Power = 0.0;
 
         // If there is a fault of chiller fouling
         if (this->FaultyChillerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
@@ -7175,6 +7243,7 @@ namespace PlantChillers {
             this->PrintMessage = false;
             return;
         }
+        this->partLoadRatio = std::abs(MyLoad) / ChillerNomCap;
 
         //   calculate end time of current time step
         Real64 const CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
@@ -7260,7 +7329,6 @@ namespace PlantChillers {
         if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = false;
             this->QEvaporator = std::abs(MyLoad);
-            this->Power = std::abs(MyLoad) / COP;
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
@@ -7316,6 +7384,9 @@ namespace PlantChillers {
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
             } // End of Constant or Variable Flow If Block for FlowLock = 0 (or making a flow request)
+            if (this->thermosiphonDisabled(state)) {
+                this->Power = std::abs(MyLoad) / COP;
+            }
 
             // If there is a fault of Chiller SWT Sensor
             if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
@@ -7417,13 +7488,16 @@ namespace PlantChillers {
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
             }
-            // Calculate the Power consumption of the Const COP chiller which is a simplified calculation
-            this->Power = this->QEvaporator / COP;
             if (this->EvapMassFlowRate == 0.0) {
                 this->QEvaporator = 0.0;
                 this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 this->Power = 0.0;
                 this->PrintMessage = false;
+            } else {
+                // Calculate the Power consumption of the Const COP chiller which is a simplified calculation
+                if (this->thermosiphonDisabled(state)) {
+                    this->Power = this->QEvaporator / COP;
+                }
             }
             if (this->QEvaporator == 0.0 && this->CondenserType == DataPlant::CondenserType::EvapCooled) {
                 CalcBasinHeaterPower(
@@ -7501,22 +7575,18 @@ namespace PlantChillers {
             this->Energy = 0.0;
             this->EvaporatorEnergy = 0.0;
             this->CondenserEnergy = 0.0;
-            this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
-            this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
-            this->CondOutletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
-            this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
+            this->CondOutletTemp = this->CondInletTemp;
+            this->EvapOutletTemp = this->EvapInletTemp;
             this->ActualCOP = 0.0;
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
 
             // set outlet node temperatures
-            state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
-            state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
+            state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = this->EvapInletTemp;
+            state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = this->CondInletTemp;
 
         } else {
-            this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
-            this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
             if (this->Power != 0.0) {
                 this->ActualCOP = this->QEvaporator / this->Power;
             } else {
@@ -7574,8 +7644,7 @@ namespace PlantChillers {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -7598,6 +7667,27 @@ namespace PlantChillers {
                 }
             }
             this->MyFlag = false;
+        }
+    }
+
+    bool ConstCOPChillerSpecs::thermosiphonDisabled(EnergyPlusData &state)
+    {
+        if (this->thermosiphonTempCurveIndex > 0) {
+            this->thermosiphonStatus = 0;
+            Real64 dT = this->EvapOutletTemp - this->CondInletTemp;
+            if (dT < this->thermosiphonMinTempDiff) {
+                return true;
+            }
+            Real64 thermosiphonCapFrac = Curve::CurveValue(state, this->thermosiphonTempCurveIndex, dT);
+            Real64 capFrac = this->partLoadRatio * this->cyclingRatio;
+            if (thermosiphonCapFrac >= capFrac) {
+                this->thermosiphonStatus = 1;
+                this->Power = 0.0;
+                return false;
+            }
+            return true;
+        } else {
+            return true;
         }
     }
 

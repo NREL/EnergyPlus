@@ -132,6 +132,39 @@ bool env_var_on(std::string const &env_var_str);
 
 using OptionalOutputFileRef = std::optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
+enum class ErrorMessageCategory
+{
+    Invalid = -1,
+    Unclassified,
+    Input_invalid,
+    Input_field_not_found,
+    Input_field_blank,
+    Input_object_not_found,
+    Input_cannot_find_object,
+    Input_topology_problem,
+    Input_unused,
+    Input_fatal,
+    Runtime_general,
+    Runtime_flow_out_of_range,
+    Runtime_temp_out_of_range,
+    Runtime_airflow_network,
+    Fatal_general,
+    Developer_general,
+    Developer_invalid_index,
+    Num
+};
+void emitErrorMessage(EnergyPlusData &state, ErrorMessageCategory category, std::string const &msg, bool shouldFatal);
+void emitErrorMessages(EnergyPlusData &state,
+                       ErrorMessageCategory category,
+                       std::initializer_list<std::string> const &msgs,
+                       bool shouldFatal,
+                       int zeroBasedTimeStampIndex = -1);
+void emitWarningMessage(EnergyPlusData &state, ErrorMessageCategory category, std::string const &msg, bool countAsError = false);
+void emitWarningMessages(EnergyPlusData &state,
+                         ErrorMessageCategory category,
+                         std::initializer_list<std::string> const &msgs,
+                         bool countAsError = false);
+
 void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {});
 
 void ShowSevereError(EnergyPlusData &state,
@@ -163,6 +196,12 @@ void ShowWarningMessage(EnergyPlusData &state,
                         OptionalOutputFileRef OutUnit1 = {},
                         OptionalOutputFileRef OutUnit2 = {});
 
+void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
+                                   std::string const &Message, // Message automatically written to "error file" at end of simulation
+                                   int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                   Real64 const val,           // Track and report the max of the values passed to this argument
+                                   std::string const &units);
+
 void ShowRecurringSevereErrorAtEnd(
     EnergyPlusData &state,
     std::string const &Message,                        // Message automatically written to "error file" at end of simulation
@@ -173,6 +212,13 @@ void ShowRecurringSevereErrorAtEnd(
     std::string const &ReportMaxUnits = "",            // optional char string (<=15 length) of units for max value
     std::string const &ReportMinUnits = "",            // optional char string (<=15 length) of units for min value
     std::string const &ReportSumUnits = ""             // optional char string (<=15 length) of units for sum value
+);
+
+void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
+                                    std::string const &Message, // Message automatically written to "error file" at end of simulation
+                                    int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                    Real64 const val,
+                                    std::string const &units // optional char string (<=15 length) of units for sum value
 );
 
 void ShowRecurringWarningErrorAtEnd(
@@ -219,6 +265,12 @@ void ShowErrorMessage(EnergyPlusData &state,
 void SummarizeErrors(EnergyPlusData &state);
 
 void ShowRecurringErrors(EnergyPlusData &state);
+
+struct ErrorCountIndex
+{
+    int index = 0;
+    int count = 0;
+};
 
 struct ErrorObjectHeader
 {
@@ -693,10 +745,16 @@ constexpr int getEnumValue(const gsl::span<const std::string_view> sList, const 
     return -1;
 }
 
+constexpr std::array<std::string_view, 2> yesNoNamesUC = {"NO", "YES"};
+
 constexpr BooleanSwitch getYesNoValue(const std::string_view s)
 {
-    constexpr std::array<std::string_view, 2> yesNo = {"NO", "YES"};
-    return static_cast<BooleanSwitch>(getEnumValue(yesNo, s));
+    return static_cast<BooleanSwitch>(getEnumValue(yesNoNamesUC, s));
+}
+
+constexpr Real64 fclamp(Real64 v, Real64 min, Real64 max)
+{
+    return (v < min) ? min : ((v > max) ? max : v);
 }
 
 struct UtilityRoutinesData : BaseGlobalStruct
@@ -706,6 +764,10 @@ struct UtilityRoutinesData : BaseGlobalStruct
     std::string appendPerfLog_headerRow;
     std::string appendPerfLog_valuesRow;
     bool GetMatrixInputFlag = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

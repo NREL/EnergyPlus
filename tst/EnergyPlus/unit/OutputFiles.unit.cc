@@ -276,7 +276,6 @@ TEST_F(EnergyPlusFixture, OutputControlFiles)
         "   **   ~~~   **  See InputOutputReference document for more details.",
         "   ************* Object=Building=Bldg",
         "   **   ~~~   ** Object=GlobalGeometryRules",
-        "   **   ~~~   ** Object=Version",
     });
 
     compare_err_stream(expected_error);
@@ -294,6 +293,7 @@ OutputControl:Files,
   {sqlite},           !- Output SQLite
   {json},             !- Output JSON
   {audit},            !- Output AUDIT
+  {spsz},             !- Output Space Sizing
   {zsz},              !- Output Zone Sizing
   {ssz},              !- Output System Sizing
   {dxf},              !- Output DXF
@@ -330,29 +330,30 @@ OutputControl:Files,
         bool sqlite = (i == 5);
         bool json = (i == 6);
         bool audit = (i == 7);
-        bool zsz = (i == 8);
-        bool ssz = (i == 9);
-        bool dxf = (i == 10);
-        bool bnd = (i == 11);
-        bool rdd = (i == 12);
-        bool mdd = (i == 13);
-        bool mtd = (i == 14);
-        bool end = (i == 15);
-        bool shd = (i == 16);
-        bool dfs = (i == 17);
-        bool glhe = (i == 18);
-        bool delightin = (i == 19);
-        bool delighteldmp = (i == 20);
-        bool delightdfdmp = (i == 21);
-        bool edd = (i == 22);
-        bool dbg = (i == 23);
-        bool perflog = (i == 24);
-        bool sln = (i == 25);
-        bool sci = (i == 26);
-        bool wrl = (i == 27);
-        bool screen = (i == 28);
-        bool extshd = (i == 29);
-        bool tarcog = (i == 30);
+        bool spsz = (i == 8);
+        bool zsz = (i == 9);
+        bool ssz = (i == 10);
+        bool dxf = (i == 11);
+        bool bnd = (i == 12);
+        bool rdd = (i == 13);
+        bool mdd = (i == 14);
+        bool mtd = (i == 15);
+        bool end = (i == 16);
+        bool shd = (i == 17);
+        bool dfs = (i == 18);
+        bool glhe = (i == 19);
+        bool delightin = (i == 20);
+        bool delighteldmp = (i == 21);
+        bool delightdfdmp = (i == 22);
+        bool edd = (i == 23);
+        bool dbg = (i == 24);
+        bool perflog = (i == 25);
+        bool sln = (i == 26);
+        bool sci = (i == 27);
+        bool wrl = (i == 28);
+        bool screen = (i == 29);
+        bool extshd = (i == 30);
+        bool tarcog = (i == 31);
 
         std::string const idf_objects = fmt::format(idf_objects_fmt,
                                                     fmt::arg("csv", boolToString(csv)),
@@ -363,6 +364,7 @@ OutputControl:Files,
                                                     fmt::arg("sqlite", boolToString(sqlite)),
                                                     fmt::arg("json", boolToString(json)),
                                                     fmt::arg("audit", boolToString(audit)),
+                                                    fmt::arg("spsz", boolToString(spsz)),
                                                     fmt::arg("zsz", boolToString(zsz)),
                                                     fmt::arg("ssz", boolToString(ssz)),
                                                     fmt::arg("dxf", boolToString(dxf)),
@@ -399,6 +401,7 @@ OutputControl:Files,
         EXPECT_EQ(sqlite, state->files.outputControl.sqlite);
         EXPECT_EQ(json, state->files.outputControl.json);
         EXPECT_EQ(audit, state->files.outputControl.audit);
+        EXPECT_EQ(spsz, state->files.outputControl.spsz);
         EXPECT_EQ(zsz, state->files.outputControl.zsz);
         EXPECT_EQ(ssz, state->files.outputControl.ssz);
         EXPECT_EQ(dxf, state->files.outputControl.dxf);
@@ -433,6 +436,7 @@ OutputControl:Files,
         state->files.outputControl.sqlite = false;
         state->files.outputControl.json = false;
         state->files.outputControl.audit = false;
+        state->files.outputControl.spsz = false;
         state->files.outputControl.zsz = false;
         state->files.outputControl.ssz = false;
         state->files.outputControl.dxf = false;

@@ -84,6 +84,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -936,7 +937,7 @@ namespace Furnaces {
                 }
                 if (!AirNodeFound) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                    ShowSevereError(state, "Did not find Air Node (Zone with Thermostat).");
+                    ShowContinueError(state, "Did not find Air Node (Zone with Thermostat).");
                     ShowContinueError(state, format("Specified {} = {}", cAlphaFields(6), Alphas(6)));
                     ShowContinueError(
                         state, "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.");
@@ -944,7 +945,7 @@ namespace Furnaces {
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                    ShowSevereError(state, "Did not find correct Primary Air Loop.");
+                    ShowContinueError(state, "Did not find correct Primary Air Loop.");
                     ShowContinueError(state, format("Specified {} = {} is not served by this AirLoopHVAC equipment.", cAlphaFields(6), Alphas(6)));
                     ErrorsFound = true;
                 }
@@ -1477,7 +1478,7 @@ namespace Furnaces {
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                    ShowSevereError(state, "Did not find correct AirLoopHVAC.");
+                    ShowContinueError(state, "Did not find correct AirLoopHVAC.");
                     ShowContinueError(state, format("Specified {} = {}", cAlphaFields(6), Alphas(6)));
                     ErrorsFound = true;
                 }
@@ -2758,7 +2759,7 @@ namespace Furnaces {
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                    ShowSevereError(state, "Did not find correct AirLoopHVAC.");
+                    ShowContinueError(state, "Did not find correct AirLoopHVAC.");
                     ShowContinueError(state, format("Specified {} = {}", cAlphaFields(5), Alphas(5)));
                     ErrorsFound = true;
                 }
@@ -2766,8 +2767,6 @@ namespace Furnaces {
 
             // Get fan data
             FanName = Alphas(7);
-
-            errFlag = false;
 
             thisFurnace.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(6)));
 
@@ -3538,6 +3537,8 @@ namespace Furnaces {
 
             // Set maximum supply air temperature for supplemental heating coil
             thisFurnace.MaxOATSuppHeat = Numbers(5);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXHeatCoilSuppHiT, HeatingCoilName, thisFurnace.MaxOATSuppHeat);
 
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
@@ -3677,7 +3678,7 @@ namespace Furnaces {
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                    ShowSevereError(state, "Did not find correct AirLoopHVAC.");
+                    ShowContinueError(state, "Did not find correct AirLoopHVAC.");
                     ShowContinueError(state, format("Specified {} = {}", cAlphaFields(5), Alphas(5)));
                     ErrorsFound = true;
                 }
@@ -4319,6 +4320,8 @@ namespace Furnaces {
 
             // Set maximum supply air temperature for supplemental heating coil
             thisFurnace.MaxOATSuppHeat = Numbers(5);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXHeatCoilSuppHiT, HeatingCoilName, thisFurnace.MaxOATSuppHeat);
 
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
@@ -4734,11 +4737,7 @@ namespace Furnaces {
 
         if (!state.dataGlobal->DoingSizing && state.dataFurnaces->MySecondOneTimeFlag(FurnaceNum)) {
             // sizing all done.  check fan air flow rates
-            errFlag = false;
             thisFurnace.ActualFanVolFlowRate = state.dataFans->fans(thisFurnace.FanIndex)->maxAirFlowRate;
-            if (errFlag) {
-                ShowContinueError(state, format("...occurs in {} ={}", HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name));
-            }
             if (thisFurnace.ActualFanVolFlowRate != DataSizing::AutoSize) {
                 if (thisFurnace.DesignFanVolFlowRate > thisFurnace.ActualFanVolFlowRate) {
                     ShowWarningError(state,
@@ -4996,11 +4995,11 @@ namespace Furnaces {
                     thisFurnace.CoolingSpeedRatio = thisFurnace.MaxCoolAirVolFlow / thisFurnace.ActualFanVolFlowRate;
                     thisFurnace.NoHeatCoolSpeedRatio = thisFurnace.MaxNoCoolHeatAirVolFlow / thisFurnace.ActualFanVolFlowRate;
                 }
-                std::string FanName; // used in warning messages
                 if (dynamic_cast<Fans::FanComponent *>(state.dataFans->fans(thisFurnace.FanIndex))->powerRatioAtSpeedRatioCurveNum > 0) {
                     if (thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxHeatAirVolFlow &&
                         thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxCoolAirVolFlow &&
                         thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxNoCoolHeatAirVolFlow) {
+                        std::string FanName = state.dataFans->fans(thisFurnace.FanIndex)->Name;
                         ShowWarningError(state, format("{} \"{}\"", HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name));
                         ShowContinueError(state,
                                           format("...For fan type and name = {} \"{}\"", HVAC::fanTypeNames[(int)thisFurnace.fanType], FanName));

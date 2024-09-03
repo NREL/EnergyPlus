@@ -385,7 +385,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                                    state.dataIPShortCut->cAlphaArgs(7),
                                                    "Hot Water Nodes");
             } else {
-                thisChiller.SteamFluidIndex = FluidProperties::FindRefrigerant(state, fluidNameSteam);
+                thisChiller.SteamFluidIndex = FluidProperties::GetRefrigNum(state, fluidNameSteam);
                 thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                         state.dataIPShortCut->cAlphaArgs(6),
                                                                                         ErrorsFound,
@@ -725,8 +725,7 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
             } else {
                 // need call to EMS to check node
                 bool FatalError = false; // but not really fatal yet, but should be.
-                EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                 state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                 if (FatalError) {
                     if (!this->ModulatedFlowErrDone) {

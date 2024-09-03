@@ -262,6 +262,8 @@ namespace UnitVentilator {
 
     int GetUnitVentilatorReturnAirNode(EnergyPlusData &state, int const UnitVentNum);
 
+    int getUnitVentilatorIndex(EnergyPlusData &state, std::string_view CompName);
+
     Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state,
                                                       int const UnitVentNum,     // Unit Ventilator index number
                                                       Real64 const MinOAFrac,    // Minimum Outside Air Fraction
@@ -311,6 +313,10 @@ struct UnitVentilatorsData : BaseGlobalStruct
     int ATMixOutNode = 0;   // outlet node of ATM Mixer
     int ATMixerPriNode = 0; // primary air node of ATM Mixer
     int ZoneNode = 0;       // zone node
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

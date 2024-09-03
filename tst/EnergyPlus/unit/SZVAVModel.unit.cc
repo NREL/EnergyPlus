@@ -659,7 +659,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_TRUE(compare_enums(CCM::ASHRAE, thisFanCoil.CapCtrlMeth_Num));
+    EXPECT_ENUM_EQ(CCM::ASHRAE, thisFanCoil.CapCtrlMeth_Num);
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ((int)HVAC::FanType::OnOff, (int)thisFanCoil.fanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
