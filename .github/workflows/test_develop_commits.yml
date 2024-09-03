@@ -140,4 +140,4 @@ jobs:
       # Not running test on alternate build yet, I need to test things
       if: matrix.alternate == false
       working-directory: ./build
-      run: ctest -C Release -E Basement -j ${{ matrix.nproc }}
+      run: ctest -C Release -j ${{ matrix.nproc }}
