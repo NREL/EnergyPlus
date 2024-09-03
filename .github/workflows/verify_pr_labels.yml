@@ -1,4 +1,4 @@
-name: Verify Pull Request Labeling
+name: Pull Request Labels
 
 on:
   pull_request:
@@ -6,6 +6,7 @@ on:
 
 jobs:
   check_pr_labels:
+    name: Verification
     runs-on: ubuntu-latest
     steps:
       - name: Verify PR label action

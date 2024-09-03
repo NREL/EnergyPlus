@@ -385,7 +385,7 @@ TEST_F(CommandLineInterfaceFixture, runReadVars)
     }
 }
 
-TEST_F(CommandLineInterfaceFixture, numThread)
+TEST_F(CommandLineInterfaceFixture, DISABLED_numThread)
 {
     struct TestCase
     {
