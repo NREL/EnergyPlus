@@ -12,7 +12,6 @@ on:
 
 jobs:
   build:
-    name: Compute and Post Checksums
     runs-on: ubuntu-latest
     permissions:
       # Needed permission to upload the release asset
