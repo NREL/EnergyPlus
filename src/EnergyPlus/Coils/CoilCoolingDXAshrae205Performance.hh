@@ -64,7 +64,10 @@ struct EnergyPlusData;
 
 struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
 {
-    CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find);
+    CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state,
+                                const std::string &name_to_find,
+                                int evaporator_inlet_node_index,
+                                int condenser_inlet_node_index);
 
     static constexpr std::string_view object_name = "Coil:DX:ASHRAE205:Performance";
 
@@ -73,6 +76,15 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
     Btwxt::InterpolationMethod interpolation_type{Btwxt::InterpolationMethod::linear};
     Real64 rated_total_cooling_capacity;
     Real64 rated_steady_state_heating_capacity;
+
+    Real64 RatedGrossTotalCap() override
+    {
+        return rated_total_cooling_capacity;
+    }
+
+    void initialize_performance(EnergyPlus::EnergyPlusData &state,
+                                const DataLoopNode::NodeData &evaporator_inlet_node,
+                                const DataLoopNode::NodeData &condenser_inlet_node);
 
     void size(EnergyPlusData &state) override;
 

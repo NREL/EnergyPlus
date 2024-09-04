@@ -1800,9 +1800,9 @@
   Coil:Heating:DX:SingleSpeed,
     Heat Pump DX Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    35233,                   !- Gross Rated Heating Capacity {W}
+    autosize,                !- Gross Rated Heating Capacity {W}
     2.75,                    !- Gross Rated Heating COP {W/W}
-    1.5,                     !- Rated Air Flow Rate {m3/s}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name

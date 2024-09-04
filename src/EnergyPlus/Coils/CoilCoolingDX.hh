@@ -79,7 +79,9 @@ struct CoilCoolingDX
 {
     CoilCoolingDX() = default;
     static std::shared_ptr<CoilCoolingDXPerformanceBase> makePerformanceSubclass(EnergyPlus::EnergyPlusData &state,
-                                                                                 const std::string &performance_object_name);
+                                                                                 const std::string &performance_object_name,
+                                                                                 int evaporator_inlet_node_index,
+                                                                                 int condenser_inlet_node_index);
     static int factory(EnergyPlusData &state, std::string const &coilName);
     static void getInput(EnergyPlusData &state);
     static void clear_state();

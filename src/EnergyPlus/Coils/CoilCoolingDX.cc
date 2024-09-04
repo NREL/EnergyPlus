@@ -79,13 +79,15 @@
 using namespace EnergyPlus;
 
 std::shared_ptr<CoilCoolingDXPerformanceBase> CoilCoolingDX::makePerformanceSubclass(EnergyPlus::EnergyPlusData &state,
-                                                                                     const std::string &performance_object_name)
+                                                                                     const std::string &performance_object_name,
+                                                                                     int evaporator_inlet_node_index,
+                                                                                     int condenser_inlet_node_index)
 {
     const auto a205_object_name = CoilCoolingDX205Performance::object_name;
     const auto curve_fit_object_name = CoilCoolingDXCurveFitPerformance::object_name;
 
     if (findPerformanceSubclass(state, a205_object_name, performance_object_name)) {
-        return std::make_shared<CoilCoolingDX205Performance>(state, performance_object_name);
+        return std::make_shared<CoilCoolingDX205Performance>(state, performance_object_name, evaporator_inlet_node_index, condenser_inlet_node_index);
     } else if (findPerformanceSubclass(state, curve_fit_object_name, performance_object_name)) {
         return std::make_shared<CoilCoolingDXCurveFitPerformance>(state, performance_object_name);
     }
@@ -158,10 +160,6 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
     this->reclaimHeat.Name = this->name;
     this->reclaimHeat.SourceType = state.dataCoilCooingDX->coilCoolingDXObjectName;
 
-    this->performance = makePerformanceSubclass(state, input_data.performance_object_name);
-
-    this->SubcoolReheatFlag = this->performance->SubcoolReheatFlag();
-
     // other construction below
     this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
                                                                    input_data.evaporator_inlet_node_name,
@@ -201,6 +199,9 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
                                                                     DataLoopNode::ConnectionType::Outlet,
                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                     DataLoopNode::ObjectIsNotParent);
+
+    this->performance = makePerformanceSubclass(state, input_data.performance_object_name, evapInletNodeIndex, condInletNodeIndex);
+    this->SubcoolReheatFlag = this->performance->SubcoolReheatFlag();
 
     if (!input_data.condensate_collection_water_storage_tank_name.empty()) {
         WaterManager::SetupTankSupplyComponent(state,

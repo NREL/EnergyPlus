@@ -69,7 +69,10 @@ using namespace EnergyPlus;
 static std::map<std::string, Btwxt::InterpolationMethod> InterpMethods = // NOLINT(cert-err58-cpp)
     {{"LINEAR", Btwxt::InterpolationMethod::linear}, {"CUBIC", Btwxt::InterpolationMethod::cubic}};
 
-CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find)
+CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state,
+                                                         const std::string &name_to_find,
+                                                         int evaporator_inlet_node_index,
+                                                         int condenser_inlet_node_index)
 {
     static constexpr std::string_view routineName("CoilCoolingDX205Performance::CoilCoolingDX205Performance");
     using namespace tk205;
@@ -117,12 +120,13 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
         }
         this->interpolation_type =
             InterpMethods[Util::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
+        this->compressorFuelType = Constant::eFuel::Electricity;
 #if 0
         this->rated_total_cooling_capacity = fields.at("rated_total_cooling_capacity").get<Real64>();
         this->rated_steady_state_heating_capacity = fields.at("rated_steady_state_heating_capacity").get<Real64>();
 #endif
 
-        this->compressorFuelType = Constant::eFuel::Electricity;
+        initialize_performance(state, state.dataLoopNodes->Node(evaporator_inlet_node_index), state.dataLoopNodes->Node(condenser_inlet_node_index));
 
         if (errorsFound) {
             ShowFatalError(state,
@@ -133,6 +137,27 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
     }
 }
 
+void CoilCoolingDX205Performance::initialize_performance(EnergyPlus::EnergyPlusData &state,
+                                                         const DataLoopNode::NodeData &evaporator_inlet_node,
+                                                         const DataLoopNode::NodeData &condenser_inlet_node)
+{
+    auto outdoor_coil_entering_dry_bulb_temperature_K = condenser_inlet_node.Temp + Constant::Kelvin;
+    auto indoor_coil_entering_dry_bulb_temperature_K = evaporator_inlet_node.Temp + Constant::Kelvin;
+    auto indoor_coil_entering_relative_humidity =
+        Psychrometrics::PsyRhFnTdbWPb(state, evaporator_inlet_node.Temp, evaporator_inlet_node.HumRat, state.dataEnvrn->OutBaroPress);
+
+    auto max_available_speed = representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number.back();
+    const auto &[gross_total_capacity, gross_sensible_capacity, gross_power] =
+        representation->performance.performance_map_cooling.calculate_performance(outdoor_coil_entering_dry_bulb_temperature_K,
+                                                                                  indoor_coil_entering_relative_humidity,
+                                                                                  indoor_coil_entering_dry_bulb_temperature_K,
+                                                                                  state.dataHVACGlobal->MSHPMassFlowRateHigh,
+                                                                                  max_available_speed,
+                                                                                  state.dataEnvrn->OutBaroPress,
+                                                                                  interpolation_type);
+    rated_total_cooling_capacity = gross_total_capacity;
+}
+
 void CoilCoolingDX205Performance::size(EnergyPlusData &state)
 {
 }
@@ -140,8 +165,7 @@ void CoilCoolingDX205Performance::size(EnergyPlusData &state)
 void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
                                            const DataLoopNode::NodeData &inletNode,
                                            DataLoopNode::NodeData &outletNode,
-                                           HVAC::CoilMode, // useAlternateMode,
-                                           // Real64 &PLR,
+                                           HVAC::CoilMode,
                                            int const speedNum,
                                            Real64 const speedRatio,
                                            HVAC::FanOp const fanOpMode,
@@ -266,8 +290,8 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
 
     if (is_continuous) {
         // compressor_sequence_number = speed - 1 + ratio
-        // For example, a speed number of 2 with a ratio between (0,1) indicates that the compressor is modulating between speeds 1 and 2 with the given
-        // ratio. The ASHRAE205 model simply interpolates using a decimal fraction speed.
+        // For example, a speed number of 2 with a ratio between (0,1) indicates that the compressor is modulating between speeds 1 and 2 with the
+        // given ratio. The ASHRAE205 model simply interpolates using a decimal fraction speed.
         const auto &[gross_total_capacity, gross_sensible_capacity, gross_power] =
             representation->performance.performance_map_cooling.calculate_performance(outdoor_coil_entering_dry_bulb_temperature_K,
                                                                                       indoor_coil_entering_relative_humidity,
@@ -279,16 +303,16 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
 
     } else {
         // In cycling operation (continuous or discrete) this_speed = 1; compressor_sequence_number = 1;
-        // in modulation, discrete mode, compressor_sequence_number = this_speed for the first part of the 
+        // in modulation, discrete mode, compressor_sequence_number = this_speed for the first part of the
         // Calculate these two modes in common:
         const auto &[gross_total_capacity, gross_sensible_capacity, gross_power] =
             representation->performance.performance_map_cooling.calculate_performance(outdoor_coil_entering_dry_bulb_temperature_K,
-                                                                                        indoor_coil_entering_relative_humidity,
-                                                                                        indoor_coil_entering_dry_bulb_temperature_K,
-                                                                                        air_mass_flow_rate,
-                                                                                        this_speed,
-                                                                                        ambient_pressure,
-                                                                                        interpolation_type);
+                                                                                      indoor_coil_entering_relative_humidity,
+                                                                                      indoor_coil_entering_dry_bulb_temperature_K,
+                                                                                      air_mass_flow_rate,
+                                                                                      this_speed,
+                                                                                      ambient_pressure,
+                                                                                      interpolation_type);
 
         if (this_speed == 1) {
             calculate_output_nodes(state, inletNode, outletNode, gross_total_capacity, gross_sensible_capacity, air_mass_flow_rate);
@@ -341,7 +365,8 @@ void CoilCoolingDX205Performance::calculate_output_nodes(EnergyPlusData &state,
     auto delta_enthalpy = air_mass_flow_rate == 0.0 ? 0.0 : gross_total_capacity / air_mass_flow_rate;
     outletNode.Enthalpy = inletNode.Enthalpy - delta_enthalpy;
 
-    auto delta_temperature = air_mass_flow_rate == 0.0 ? 0.0 : gross_sensible_capacity / air_mass_flow_rate / Psychrometrics::PsyCpAirFnW(inletNode.HumRat);
+    auto delta_temperature =
+        air_mass_flow_rate == 0.0 ? 0.0 : gross_sensible_capacity / air_mass_flow_rate / Psychrometrics::PsyCpAirFnW(inletNode.HumRat);
     outletNode.Temp = inletNode.Temp - delta_temperature;
 
     outletNode.HumRat = Psychrometrics::PsyWFnTdbH(state, outletNode.Temp, outletNode.Enthalpy);
