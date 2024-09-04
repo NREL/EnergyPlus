@@ -4166,6 +4166,7 @@ TEST_F(EnergyPlusFixture, SizingManager_ZoneSizing_Coincident_NonAir_10x_Latent_
         "    Through: 12/31,          !- Field 9",
         "    For: Alldays,            !- Field 10",
         "    Until: 8:00,0.0,         !- Field 11",
+        "    Until: 9:00,0.5,         !- Field 11",
         "    Until: 12:00,1.0,        !- Field 11",
         "    Until: 24:00,0.0;        !- Field 11",
 
@@ -4222,7 +4223,7 @@ TEST_F(EnergyPlusFixture, SizingManager_ZoneSizing_Coincident_NonAir_10x_Latent_
     ASSERT_TRUE(process_idf(idf_objects));
     SimulationManager::ManageSimulation(*state);
 
-    EXPECT_EQ("18987.69", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpHtCalcDesLd, "SPACE 1"));
+    EXPECT_EQ("18989.14", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpHtCalcDesLd, "SPACE 1"));
     EXPECT_EQ("0.527", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpHtCalcDesAirFlow, "SPACE 1"));
     EXPECT_EQ("0.527", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpHtUserDesAirFlow, "SPACE 1"));
     EXPECT_EQ("CHICAGO_IL_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB",
@@ -4233,7 +4234,7 @@ TEST_F(EnergyPlusFixture, SizingManager_ZoneSizing_Coincident_NonAir_10x_Latent_
     EXPECT_EQ("0.669", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClUserDesAirFlow, "SPACE 1"));
     EXPECT_EQ("CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB",
               OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClDesDay, "SPACE 1"));
-    EXPECT_EQ("7/21 09:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClPkTime, "SPACE 1"));
+    EXPECT_EQ("7/21 10:20:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClPkTime, "SPACE 1"));
 
     EXPECT_EQ("6311.95", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpHtCalcDesLd, "SPACE 2"));
     EXPECT_EQ("0.175", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpHtCalcDesAirFlow, "SPACE 2"));
@@ -4262,29 +4263,15 @@ TEST_F(EnergyPlusFixture, SizingManager_ZoneSizing_Coincident_NonAir_10x_Latent_
     EXPECT_EQ("7/21 19:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClPkTime, "SPACE 3"));
 
     // For coincident, expect zone Des Cooling Load to be less than sum of space loads which is 832.44 + 940.2 + 810.65 = 2583.29
-    EXPECT_EQ("31553.14", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtCalcDesLd, "ZONE 1"));
+    EXPECT_EQ("31554.59", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtCalcDesLd, "ZONE 1"));
     EXPECT_EQ("0.876", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtCalcDesAirFlow, "ZONE 1"));
     EXPECT_EQ("0.876", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtUserDesAirFlow, "ZONE 1"));
     EXPECT_EQ("CHICAGO_IL_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB",
               OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtDesDay, "ZONE 1"));
     EXPECT_EQ("1/21 08:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtPkTime, "ZONE 1"));
-    EXPECT_EQ("19423.64", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClCalcDesLd, "ZONE 1"));
-    EXPECT_EQ("1.348", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClCalcDesAirFlow, "ZONE 1"));
-    EXPECT_EQ("1.348", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClUserDesAirFlow, "ZONE 1"));
-    EXPECT_EQ("CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB",
-              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClDesDay, "ZONE 1"));
-    EXPECT_EQ("7/21 16:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClPkTime, "ZONE 1"));
-
-    // For coincident, expect zone Des Cooling Load to be less than sum of space loads which is 832.44 + 940.2 + 810.65 = 2583.29
-    EXPECT_EQ("31553.14", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtCalcDesLd, "ZONE 1"));
-    EXPECT_EQ("0.876", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtCalcDesAirFlow, "ZONE 1"));
-    EXPECT_EQ("0.876", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtUserDesAirFlow, "ZONE 1"));
-    EXPECT_EQ("CHICAGO_IL_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB",
-              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtDesDay, "ZONE 1"));
-    EXPECT_EQ("1/21 08:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtPkTime, "ZONE 1"));
-    EXPECT_EQ("19423.64", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClCalcDesLd, "ZONE 1"));
-    EXPECT_EQ("1.348", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClCalcDesAirFlow, "ZONE 1"));
-    EXPECT_EQ("1.348", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClUserDesAirFlow, "ZONE 1"));
+    EXPECT_EQ("19406.72", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClCalcDesLd, "ZONE 1"));
+    EXPECT_EQ("1.347", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClCalcDesAirFlow, "ZONE 1"));
+    EXPECT_EQ("1.347", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClUserDesAirFlow, "ZONE 1"));
     EXPECT_EQ("CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB",
               OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClDesDay, "ZONE 1"));
     EXPECT_EQ("7/21 16:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnClPkTime, "ZONE 1"));
