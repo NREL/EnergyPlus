@@ -1685,97 +1685,97 @@
   OutdoorAir:Node,
     Heat Pump ACDXCoil 1 Condenser Inlet Node;  !- Name
 
-	Table:IndependentVariable,
-		Heat Pump ACDXCoil 1 Cooling Outdoor Drybulb,  !- Name
-		Linear,                                        !- Interpolation Method
-		Constant,                                      !- Extrapolation Method
-		,                                              !- Minimum Value
-		,                                              !- Maximum Value
-		35.00,                                         !- Normalization Reference Value
-		Temperature,                                   !- Unit Type
-		,                                              !- External File Name
-		,                                              !- External File Column Number
-		,                                              !- External File Starting Row Number
-		12.78,                                         !- Value 1
-		27.78,                                         !- Value 2
-		35.00,                                         !- Value 3
-		51.67;                                         !- Value 4
+    Table:IndependentVariable,
+        Heat Pump ACDXCoil 1 Cooling Outdoor Drybulb,  !- Name
+        Linear,                                        !- Interpolation Method
+        Constant,                                      !- Extrapolation Method
+        ,                                              !- Minimum Value
+        ,                                              !- Maximum Value
+        35.00,                                         !- Normalization Reference Value
+        Temperature,                                   !- Unit Type
+        ,                                              !- External File Name
+        ,                                              !- External File Column Number
+        ,                                              !- External File Starting Row Number
+        12.78,                                         !- Value 1
+        27.78,                                         !- Value 2
+        35.00,                                         !- Value 3
+        51.67;                                         !- Value 4
 
-	Table:IndependentVariable,
-		Heat Pump ACDXCoil 1 Cooling Indoor Wetbulb,  !- Name
-		Linear,                                       !- Interpolation Method
-		Constant,                                     !- Extrapolation Method
-		,                                             !- Minimum Value
-		,                                             !- Maximum Value
-		19.44,                                        !- Normalization Reference Value
-		Temperature,                                  !- Unit Type
-		,                                             !- External File Name
-		,                                             !- External File Column Number
-		,                                             !- External File Starting Row Number
-		10.00,                                        !- Value 1
-		19.44,                                        !- Value 2
-		26.67;                                        !- Value 3
+    Table:IndependentVariable,
+        Heat Pump ACDXCoil 1 Cooling Indoor Wetbulb,  !- Name
+        Linear,                                       !- Interpolation Method
+        Constant,                                     !- Extrapolation Method
+        ,                                             !- Minimum Value
+        ,                                             !- Maximum Value
+        19.44,                                        !- Normalization Reference Value
+        Temperature,                                  !- Unit Type
+        ,                                             !- External File Name
+        ,                                             !- External File Column Number
+        ,                                             !- External File Starting Row Number
+        10.00,                                        !- Value 1
+        19.44,                                        !- Value 2
+        26.67;                                        !- Value 3
 
-	Table:IndependentVariableList,
-		Heat Pump ACDXCoil 1 Cooling fT List,          !- Name
-		Heat Pump ACDXCoil 1 Cooling Indoor Wetbulb,   !- Independent Variable 1 Name
-		Heat Pump ACDXCoil 1 Cooling Outdoor Drybulb;  !- Independent Variable 2 Name
+    Table:IndependentVariableList,
+        Heat Pump ACDXCoil 1 Cooling fT List,          !- Name
+        Heat Pump ACDXCoil 1 Cooling Indoor Wetbulb,   !- Independent Variable 1 Name
+        Heat Pump ACDXCoil 1 Cooling Outdoor Drybulb;  !- Independent Variable 2 Name
 
-	Table:IndependentVariable,
-		Heat Pump ACDXCoil 1 Coil Flow Fraction,  !- Name
-		Linear,                                   !- Interpolation Method
-		Constant,                                 !- Extrapolation Method
-		,                                         !- Minimum Value
-		,                                         !- Maximum Value
-		1.00,                                     !- Normalization Reference Value
-		Dimensionless,                            !- Unit Type
-		,                                         !- External File Name
-		,                                         !- External File Column Number
-		,                                         !- External File Starting Row Number
-		0.75,                                     !- Value 1
-		1.00,                                     !- Value 2
-		1.25;                                     !- Value 3
+    Table:IndependentVariable,
+        Heat Pump ACDXCoil 1 Coil Flow Fraction,  !- Name
+        Linear,                                   !- Interpolation Method
+        Constant,                                 !- Extrapolation Method
+        ,                                         !- Minimum Value
+        ,                                         !- Maximum Value
+        1.00,                                     !- Normalization Reference Value
+        Dimensionless,                            !- Unit Type
+        ,                                         !- External File Name
+        ,                                         !- External File Column Number
+        ,                                         !- External File Starting Row Number
+        0.75,                                     !- Value 1
+        1.00,                                     !- Value 2
+        1.25;                                     !- Value 3
 
-	Table:IndependentVariableList,
-		Heat Pump ACDXCoil 1 fFF List,            !- Name
-		Heat Pump ACDXCoil 1 Coil Flow Fraction;  !- Independent Variable 1 Name
+    Table:IndependentVariableList,
+        Heat Pump ACDXCoil 1 fFF List,            !- Name
+        Heat Pump ACDXCoil 1 Coil Flow Fraction;  !- Independent Variable 1 Name
 
-	Table:IndependentVariable,
-		Heat Pump ACDXCoil 1 Heating Outdoor Drybulb,  !- Name
-		Linear,                                        !- Interpolation Method
-		Constant,                                      !- Extrapolation Method
-		,                                              !- Minimum Value
-		,                                              !- Maximum Value
-		8.33,                                          !- Normalization Reference Value
-		Temperature,                                   !- Unit Type
-		,                                              !- External File Name
-		,                                              !- External File Column Number
-		,                                              !- External File Starting Row Number
-		-17.78,                                        !- Value 1
-		-15.00,                                        !- Value 2
-		-8.33,                                         !- Value 3
-		8.33,                                          !- Value 4
-		15.56;                                         !- Value 5
+    Table:IndependentVariable,
+        Heat Pump ACDXCoil 1 Heating Outdoor Drybulb,  !- Name
+        Linear,                                        !- Interpolation Method
+        Constant,                                      !- Extrapolation Method
+        ,                                              !- Minimum Value
+        ,                                              !- Maximum Value
+        8.33,                                          !- Normalization Reference Value
+        Temperature,                                   !- Unit Type
+        ,                                              !- External File Name
+        ,                                              !- External File Column Number
+        ,                                              !- External File Starting Row Number
+        -17.78,                                        !- Value 1
+        -15.00,                                        !- Value 2
+        -8.33,                                         !- Value 3
+        8.33,                                          !- Value 4
+        15.56;                                         !- Value 5
 
-	Table:IndependentVariable,
-		Heat Pump ACDXCoil 1 Heating Indoor Drybulb,  !- Name
-		Linear,                                       !- Interpolation Method
-		Constant,                                     !- Extrapolation Method
-		,                                             !- Minimum Value
-		,                                             !- Maximum Value
-		21.11,                                        !- Normalization Reference Value
-		Temperature,                                  !- Unit Type
-		,                                             !- External File Name
-		,                                             !- External File Column Number
-		,                                             !- External File Starting Row Number
-		15.56,                                        !- Value 1
-		21.11,                                        !- Value 2
-		26.67;                                        !- Value 3
+    Table:IndependentVariable,
+        Heat Pump ACDXCoil 1 Heating Indoor Drybulb,  !- Name
+        Linear,                                       !- Interpolation Method
+        Constant,                                     !- Extrapolation Method
+        ,                                             !- Minimum Value
+        ,                                             !- Maximum Value
+        21.11,                                        !- Normalization Reference Value
+        Temperature,                                  !- Unit Type
+        ,                                             !- External File Name
+        ,                                             !- External File Column Number
+        ,                                             !- External File Starting Row Number
+        15.56,                                        !- Value 1
+        21.11,                                        !- Value 2
+        26.67;                                        !- Value 3
 
-	Table:IndependentVariableList,
-		Heat Pump ACDXCoil 1 Heating fT List,          !- Name
-		Heat Pump ACDXCoil 1 Heating Indoor Drybulb,   !- Independent Variable 1 Name
-		Heat Pump ACDXCoil 1 Heating Outdoor Drybulb;  !- Independent Variable 2 Name
+    Table:IndependentVariableList,
+        Heat Pump ACDXCoil 1 Heating fT List,          !- Name
+        Heat Pump ACDXCoil 1 Heating Indoor Drybulb,   !- Independent Variable 1 Name
+        Heat Pump ACDXCoil 1 Heating Outdoor Drybulb;  !- Independent Variable 2 Name
 
   Coil:Cooling:DX,
     Heat Pump ACDXCoil 1 Cooling Coil,    !- Name
