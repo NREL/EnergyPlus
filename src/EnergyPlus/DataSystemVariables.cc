@@ -111,7 +111,17 @@ namespace DataSystemVariables {
     constexpr const char *
         cDisplayInputInAuditEnvVar("DISPLAYINPUTINAUDIT"); // environmental variable that enables the echoing of the input file into the audit file
 
-    constexpr const char *ciForceTimeStepEnvVar("CI_FORCE_TIME_STEP"); // environment var forcing 30 minute time steps on CI for efficiency
+    // DERIVED TYPE DEFINITIONS
+    // na
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
+
+    // MODULE VARIABLE DECLARATIONS:
+
+    // Shading methods
+
+    // Functions
 
     fs::path CheckForActualFilePath(EnergyPlusData &state,
                                     fs::path const &originalInputFilePath, // path (or filename only) as input for object
@@ -301,9 +311,6 @@ namespace DataSystemVariables {
 
         get_environment_variable(cDisplayInputInAuditEnvVar, cEnvValue);
         if (!cEnvValue.empty()) state.dataGlobal->DisplayInputInAudit = env_var_on(cEnvValue); // Yes or True
-
-        get_environment_variable(ciForceTimeStepEnvVar, cEnvValue);
-        if (!cEnvValue.empty()) state.dataSysVars->ciForceTimeStep = env_var_on(cEnvValue); // Yes or True
     }
 
 } // namespace DataSystemVariables
