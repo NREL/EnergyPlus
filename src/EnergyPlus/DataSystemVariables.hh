@@ -150,6 +150,7 @@ struct SystemVarsData : BaseGlobalStruct
     int NumberIntRadThreads = 1;
     int iNominalTotSurfaces = 0;
     bool Threading = false;
+    bool ciForceTimeStep = false;
 
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
