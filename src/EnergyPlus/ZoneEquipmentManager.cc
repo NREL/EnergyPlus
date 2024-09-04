@@ -558,15 +558,17 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
     } else {
         nonAirSystemResponse = SysOutputProvided;
         if (zsCalcSizing.zoneLatentSizing) {
-            zoneLatentGain += (LatOutputProvided * HgAir);
+            int zoneMult = zoneOrSpace.Multiplier * zoneOrSpace.ListMultiplier;
+            zoneLatentGain += (LatOutputProvided * HgAir) / zoneMult;
         }
         if (state.dataHeatBal->doSpaceHeatBalance && spaceNum == 0) {
-            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+            for (int spaceNum2 : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                 // SpaceHB ToDo: For now allocate by space volume frac
-                auto &spHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
-                spHB.NonAirSystemResponse = nonAirSystemResponse * state.dataHeatBal->space(spaceNum).fracZoneVolume;
+                auto &spHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum2);
+                spHB.NonAirSystemResponse = nonAirSystemResponse * state.dataHeatBal->space(spaceNum2).fracZoneVolume;
                 if (zsCalcSizing.zoneLatentSizing) {
-                    spHB.latentGain += (LatOutputProvided * HgAir) * state.dataHeatBal->space(spaceNum).fracZoneVolume;
+                    int zoneMult = zoneOrSpace.Multiplier * zoneOrSpace.ListMultiplier;
+                    spHB.latentGain += (LatOutputProvided * HgAir) * state.dataHeatBal->space(spaceNum2).fracZoneVolume / zoneMult;
                 }
             }
         }
