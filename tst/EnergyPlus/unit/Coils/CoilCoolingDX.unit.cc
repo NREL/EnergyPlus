@@ -13,7 +13,7 @@
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
 //
-// (1) Redistributions of source code must retain the above copyright notice, this list of
+//// (1) Redistributions of source code must retain the above copyright notice, this list of
 //     conditions and the following disclaimer.
 //
 // (2) Redistributions in binary form must reproduce the above copyright notice, this list of
@@ -725,10 +725,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     speedRatio = 0.75;
     evapInletNode.MassFlowRate =
         speedRatio * thisCoil.performance->RatedAirMassFlowRateMaxSpeed() + (1.0 - speedRatio) * thisCoil.performance->RatedAirMassFlowRateMinSpeed();
-    thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp,
-                      singleMode);
-    EXPECT_NEAR(MultiSpeedTotalCoolingRate3, thisCoil.totalCoolingEnergyRate,
-                0.1);
+    thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp, singleMode);
+    EXPECT_NEAR(MultiSpeedTotalCoolingRate3, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate3, thisCoil.sensCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedLatCoolingRate3, thisCoil.latCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedOutletTemp3, evapOutletNode.Temp, 0.01);
@@ -771,10 +769,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     speedRatio = 0.75;
     evapInletNode.MassFlowRate =
         speedRatio * thisCoil.performance->RatedAirMassFlowRateMaxSpeed() + (1.0 - speedRatio) * thisCoil.performance->RatedAirMassFlowRateMinSpeed();
-    thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp,
-                      singleMode);
-    EXPECT_NEAR(MultiSpeedTotalCoolingRate6, thisCoil.totalCoolingEnergyRate,
-                0.1);
+    thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp, singleMode);
+    EXPECT_NEAR(MultiSpeedTotalCoolingRate6, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate6, thisCoil.sensCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedLatCoolingRate6, thisCoil.latCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedOutletTemp6, evapOutletNode.Temp, 0.01);
@@ -1147,10 +1143,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     speedRatio = 0.75;
     evapInletNode.MassFlowRate =
         speedRatio * thisCoil.performance->RatedAirMassFlowRateMaxSpeed() + (1.0 - speedRatio) * thisCoil.performance->RatedAirMassFlowRateMinSpeed();
-    thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp,
-                      singleMode);
-    EXPECT_NEAR(MultiSpeedTotalCoolingRate3, thisCoil.totalCoolingEnergyRate,
-                0.1);
+    thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp, singleMode);
+    EXPECT_NEAR(MultiSpeedTotalCoolingRate3, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate3, thisCoil.sensCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedLatCoolingRate3, thisCoil.latCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedOutletTemp3, evapOutletNode.Temp, 0.01);
@@ -1193,10 +1187,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     speedRatio = 0.75;
     evapInletNode.MassFlowRate =
         speedRatio * thisCoil.performance->RatedAirMassFlowRateMaxSpeed() + (1.0 - speedRatio) * thisCoil.performance->RatedAirMassFlowRateMinSpeed();
-    thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp,
-                      singleMode);
-    EXPECT_NEAR(MultiSpeedTotalCoolingRate6, thisCoil.totalCoolingEnergyRate,
-                0.1);
+    thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp, singleMode);
+    EXPECT_NEAR(MultiSpeedTotalCoolingRate6, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate6, thisCoil.sensCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedLatCoolingRate6, thisCoil.latCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedOutletTemp6, evapOutletNode.Temp, 0.01);
