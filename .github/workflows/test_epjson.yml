@@ -27,8 +27,11 @@ jobs:
       shell: bash
       run: pip install pytest pytest-timeout
 
+    - name: Create Build Directory
+      run: cmake -E make_directory ./build/
+
     - name: Configure CMake
-      working-directory: ./build  # TODO: Wait...it will automatically create it?
+      working-directory: ./build
       run: cmake -G "Visual Studio 17 2022" -A x64 ../
 
     - name: Test epjson
