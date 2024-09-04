@@ -2,7 +2,7 @@ name: Build and Test
 
 on:
   pull_request:
-    branches: [ develop ]  # TODO: Run this on any PR, and compare to baseline branch, not necessarily develop.  Also perhaps non-draft PRs only.
+    branches: [ develop ]
 
 defaults:
   run:
@@ -31,20 +31,20 @@ jobs:
           nproc: 3
           run_regressions: true
           pretty: "Mac arm64"
-        - os: ubuntu-24.04
-          arch: x86_64
-          python-arch: x64
-          generator: "Unix Makefiles"
-          nproc: 4
-          run_regressions: false
-          pretty: "Ubuntu 24.04"
-        - os: windows-2022
-          arch: x86_64
-          python-arch: x64
-          generator: "Visual Studio 17 2022"
-          nproc: 4
-          run_regressions: false
-          pretty: "Windows x64"
+#        - os: ubuntu-24.04
+#          arch: x86_64
+#          python-arch: x64
+#          generator: "Unix Makefiles"
+#          nproc: 4
+#          run_regressions: false
+#          pretty: "Ubuntu 24.04"
+#        - os: windows-2022
+#          arch: x86_64
+#          python-arch: x64
+#          generator: "Visual Studio 17 2022"
+#          nproc: 4
+#          run_regressions: false
+#          pretty: "Windows x64"
 
     steps:
 

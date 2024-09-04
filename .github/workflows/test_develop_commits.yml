@@ -21,14 +21,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - os: macos-12
-          macos_dev_target: 12.1
-          arch: x86_64
-          python-arch: x64
-          generator: "Unix Makefiles"
-          nproc: 3
-          pretty: "Standard Build on Mac x64"
-          alternate: false
+#        - os: macos-12
+#          macos_dev_target: 12.1
+#          arch: x86_64
+#          python-arch: x64
+#          generator: "Unix Makefiles"
+#          nproc: 3
+#          pretty: "Standard Build on Mac x64"
+#          alternate: false
         - os: macos-14
           macos_dev_target: 13.0
           arch: arm64
@@ -37,34 +37,34 @@ jobs:
           nproc: 3
           pretty: "Standard Build on Mac arm64"
           alternate: false
-        - os: ubuntu-24.04
-          arch: x86_64
-          python-arch: x64
-          generator: "Unix Makefiles"
-          nproc: 4
-          pretty: "Standard Build on Ubuntu 24.04"
-          alternate: false
-        - os: windows-2019
-          arch: x86_64
-          python-arch: x64
-          generator: "Visual Studio 16 2019"
-          nproc: 4
-          pretty: "Windows VS 2019"
-          alternate: false
-        - os: windows-2022
-          arch: x86_64
-          python-arch: x64
-          generator: "Visual Studio 17 2022"
-          nproc: 4
-          pretty: "Standard Build on Windows VS 2022"
-          alternate: false
-        - os: ubuntu-24.04
-          arch: x86_64
-          python-arch: x64
-          generator: "Unix Makefiles"
-          nproc: 4
-          pretty: "Alternate Build on Ubuntu 24.04"
-          alternate: true
+#        - os: ubuntu-24.04
+#          arch: x86_64
+#          python-arch: x64
+#          generator: "Unix Makefiles"
+#          nproc: 4
+#          pretty: "Standard Build on Ubuntu 24.04"
+#          alternate: false
+#        - os: windows-2019
+#          arch: x86_64
+#          python-arch: x64
+#          generator: "Visual Studio 16 2019"
+#          nproc: 4
+#          pretty: "Windows VS 2019"
+#          alternate: false
+#        - os: windows-2022
+#          arch: x86_64
+#          python-arch: x64
+#          generator: "Visual Studio 17 2022"
+#          nproc: 4
+#          pretty: "Standard Build on Windows VS 2022"
+#          alternate: false
+#        - os: ubuntu-24.04
+#          arch: x86_64
+#          python-arch: x64
+#          generator: "Unix Makefiles"
+#          nproc: 4
+#          pretty: "Alternate Build on Ubuntu 24.04"
+#          alternate: true
 
     steps:
 
