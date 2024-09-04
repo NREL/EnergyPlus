@@ -227,6 +227,11 @@ namespace EIRPlantLoopHeatPumps {
         Real64 maxOutdoorTemperatureDefrost = 0.0;
         Real64 defrostPowerMultiplier = 1.0; // defrost power adjustment factor
 
+        // thermosiphon model
+        int thermosiphonTempCurveIndex = 0;
+        Real64 thermosiphonMinTempDiff = 0.0;
+        int thermosiphonStatus = 0;
+
         // a couple worker functions to easily allow merging of cooling and heating operations
         std::function<Real64(Real64, Real64)> calcLoadOutletTemp;
         std::function<Real64(Real64, Real64)> calcQsource;
@@ -324,6 +329,8 @@ namespace EIRPlantLoopHeatPumps {
         void isPlantInletOrOutlet(EnergyPlusData &state);
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        bool thermosiphonDisabled(EnergyPlusData &state);
     };
 
     struct EIRFuelFiredHeatPump : public EIRPlantLoopHeatPump

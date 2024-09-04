@@ -4099,6 +4099,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.MSRatedCOP.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSRatedAirVolFlowRate.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSRatedAirMassFlowRate.allocate(thisDXCoil.NumOfSpeeds);
+        thisDXCoil.MSRatedAirMassFlowRate = 1.0; // avoid divide by 0, will get overwritten in InitDXCoil
         thisDXCoil.MSCCapFTemp.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSCCapFFlow.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSEIRFTemp.allocate(thisDXCoil.NumOfSpeeds);
@@ -4613,6 +4614,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.MSRatedCOP.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSRatedAirVolFlowRate.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSRatedAirMassFlowRate.allocate(thisDXCoil.NumOfSpeeds);
+        thisDXCoil.MSRatedAirMassFlowRate = 1.0; // avoid divide by 0, will get overwritten in InitDXCoil
         thisDXCoil.MSCCapFTemp.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSCCapFFlow.allocate(thisDXCoil.NumOfSpeeds);
         thisDXCoil.MSEIRFTemp.allocate(thisDXCoil.NumOfSpeeds);
@@ -8291,7 +8293,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             CompType = thisDXCoil.DXCoilType;
             // Sizing rated air flow rate
             if (Mode == thisDXCoil.NumOfSpeeds) {
-                FieldNum = 12 + (Mode - 1) * 5;
+                FieldNum = 12 + (Mode - 1) * 6;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = thisDXCoil.MSRatedAirVolFlowRate(Mode);
                 state.dataSize->DataEMSOverrideON = thisDXCoil.RatedAirVolFlowRateEMSOverrideON(Mode);
@@ -8314,7 +8316,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     bPRINT = true;
                 }
             } else {
-                FieldNum = 12 + (Mode - 1) * 5;
+                FieldNum = 12 + (Mode - 1) * 6;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
                     SizingMethod = HVAC::AutoCalculateSizing;
@@ -8408,7 +8410,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             if (Mode == thisDXCoil.NumOfSpeeds) {
                 SizingMethod = HVAC::HeatingCapacitySizing;
                 state.dataSize->DataFlowUsedForSizing = thisDXCoil.MSRatedAirVolFlowRate(Mode);
-                FieldNum = 10 + (Mode - 1) * 5;
+                FieldNum = 10 + (Mode - 1) * 6;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                 state.dataSize->DataTotCapCurveIndex = thisDXCoil.MSCCapFTemp(Mode);
                 if (IsAutoSize || !HardSizeNoDesRun) {
@@ -8449,7 +8451,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             } else {
                 PrintFlag = true;
                 SizingMethod = HVAC::HeatingCapacitySizing;
-                FieldNum = 10 + (Mode - 1) * 5;
+                FieldNum = 10 + (Mode - 1) * 6;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
                     SizingMethod = HVAC::AutoCalculateSizing;
