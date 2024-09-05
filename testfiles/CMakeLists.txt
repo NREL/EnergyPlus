@@ -662,6 +662,8 @@ add_simulation_test(IDF_FILE UnitarySystem_TwoSpeedDX.idf EPW_FILE USA_IL_Chicag
 add_simulation_test(IDF_FILE UnitarySystem_TwoStageDX.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE UnitarySystem_TwoStageDXWithHumidityControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE UnitarySystem_VSCoolingCoil.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE UnitarySystem_VSCoolingCoil_2.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE UnitarySystem_VSCoolingCoil_ASHRAE205.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE UnitarySystem_VSHeatPumpWaterToAirEquationFit.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE UnitarySystem_WaterCoils_wMultiSpeedFan.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE UnitarySystem_ZoneVSWSHP_wDOAS.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
