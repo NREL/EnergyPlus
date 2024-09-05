@@ -1315,9 +1315,9 @@ namespace OutputProcessor {
 
         ASSERT_EQ(2ul, errorData.size());
         std::vector<std::string> errorData0{
-            "1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "1"};
+            "1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "0"};
         std::vector<std::string> errorData1{
-            "2", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "1"};
+            "2", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "0"};
         EXPECT_EQ(errorData0, errorData[0]);
         EXPECT_EQ(errorData1, errorData[1]);
     }
@@ -2140,7 +2140,7 @@ namespace OutputProcessor {
                                             "0",
                                             "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].  ..on "
                                             "Meter=\"testMeter2\".  ..requests for IP units from this meter will be ignored.",
-                                            "1"};
+                                            "0"};
         EXPECT_EQ(errorData0, errorData[0]);
 
         ASSERT_EQ(2ul, op->meters.size());

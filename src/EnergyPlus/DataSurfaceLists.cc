@@ -224,7 +224,9 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
         cNumericFields.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowSevereError(state, format("{}{}", CurrentModuleObject1, " errors found getting input. Program will terminate."));
+        if (ErrorsFound) {
+            ShowSevereError(state, format("{}{}", CurrentModuleObject1, " errors found getting input. Program will terminate."));
+        }
     }
 
     if (NumOfSurfListVentSlab > 0) {
@@ -329,10 +331,14 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
         cNumericFields.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowSevereError(state, format("{}{}", CurrentModuleObject2, " errors found getting input. Program will terminate."));
+        if (ErrorsFound) {
+            ShowSevereError(state, format("{}{}", CurrentModuleObject2, " errors found getting input. Program will terminate."));
+        }
     }
 
-    if (ErrorsFound) ShowFatalError(state, "GetSurfaceListsInputs: Program terminates due to preceding conditions.");
+    if (ErrorsFound) {
+        ShowFatalError(state, "GetSurfaceListsInputs: Program terminates due to preceding conditions.");
+    }
 }
 
 int GetNumberOfSurfaceLists(EnergyPlusData &state)

@@ -8467,7 +8467,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
     // REFERENCES:
     // (I)BLAST legacy routine HBSRF
-    auto &Surface = state.dataSurface->Surface;
+    auto const &Surface = state.dataSurface->Surface;
 
     constexpr std::string_view Inside("Inside");
 
@@ -8652,7 +8652,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         // Loop over non-window surfaces
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 int const firstNonWinSurf = thisSpace.OpaqOrIntMassSurfaceFirst;
                 int const lastNonWinSurf = thisSpace.OpaqOrIntMassSurfaceLast;
                 Real64 const iterDampConstant = DataHeatBalSurface::IterDampConst; // local for vectorization
@@ -9056,7 +9056,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 void sumSurfQdotRadHVAC(EnergyPlusData &state)
 {
     for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
-        auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
+        auto const &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
         state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) = thisSurfQRadFromHVAC.HTRadSys + thisSurfQRadFromHVAC.HWBaseboard +
                                                                    thisSurfQRadFromHVAC.SteamBaseboard + thisSurfQRadFromHVAC.ElecBaseboard +
                                                                    thisSurfQRadFromHVAC.CoolingPanel;

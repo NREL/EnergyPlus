@@ -90,8 +90,8 @@ void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CompNum;
-    bool errorsfound = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errorsfound = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
@@ -184,7 +184,6 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     using DataZoneEquipment::CheckZoneEquipmentList;
 
     // Locals
-    int Loop;
     int InletNode;
 
     if (state.dataHybridUnitaryAC->HybridCoolOneTimeFlag) {
@@ -231,7 +230,7 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
     if (!state.dataHybridUnitaryAC->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataHybridUnitaryAC->ZoneEquipmentListChecked = true;
-        for (Loop = 1; Loop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++Loop) {
             if (CheckZoneEquipmentList(state, "ZoneHVAC:HybridUnitaryHVAC", state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(Loop).Name)) {
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
             } else {
@@ -394,10 +393,6 @@ void ReportZoneHybridUnitaryAirConditioners(EnergyPlusData &state, int const Uni
     using namespace DataLoopNode;
     using namespace Psychrometrics;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNodeNum;
-    ZoneNodeNum = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum;
-
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode =
         state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode;
 
@@ -462,10 +457,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
     int NumAlphas;                    // Number of Alphas for each GetObjectItem call
     int NumNumbers;                   // Number of Numbers for each GetObjectItem call
     int NumFields;                    // Total number of fields in object
-    int IOStatus;                     // Used in GetObjectItem
     bool ErrorsFound(false);          // Set to true if errors in input, fatal at end of routine
-    bool IsNotOK;                     // Flag to verify name
-    bool IsBlank;                     // Flag for blank name
     int UnitLoop;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -482,12 +474,11 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
     cNumericFields.allocate(MaxNumbers);
     lAlphaBlanks.dimension(MaxAlphas, true);
     lNumericBlanks.dimension(MaxNumbers, true);
-    std::vector<std::string> test;
-    std::vector<bool> blanks;
 
     if (state.dataHybridUnitaryAC->NumZoneHybridEvap > 0) {
         state.dataHybridUnitaryAC->CheckZoneHybridEvapName.dimension(state.dataHybridUnitaryAC->NumZoneHybridEvap, true);
         state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner.allocate(state.dataHybridUnitaryAC->NumZoneHybridEvap);
+        int IOStatus = 0;
 
         for (UnitLoop = 1; UnitLoop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++UnitLoop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -503,8 +494,8 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
-            IsNotOK = false;
-            IsBlank = false;
+            bool IsNotOK = false;
+            bool IsBlank = false;
             Util::VerifyName(state,
                              Alphas(1),
                              state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner,
@@ -1317,8 +1308,8 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
 }
 int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const CompNum)
 {
-    bool errorsfound = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errorsfound = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
@@ -1334,8 +1325,8 @@ int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const CompNum)
 
 int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int const CompNum)
 {
-    bool errorsfound = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errorsfound = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
@@ -1351,8 +1342,8 @@ int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int const CompNum)
 
 int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const CompNum)
 {
-    bool errorsfound = false;
     if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errorsfound = false;
         GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
@@ -1364,6 +1355,23 @@ int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const CompNum)
     }
 
     return GetHybridUnitaryACReturnAirNode;
+}
+
+int getHybridUnitaryACIndex(EnergyPlusData &state, std::string_view CompName)
+{
+    if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        bool errFlag = false;
+        GetInputZoneHybridUnitaryAirConditioners(state, errFlag);
+        state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
+    }
+
+    for (int UnitLoop = 1; UnitLoop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++UnitLoop) {
+        if (Util::SameString(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Name, CompName)) {
+            return UnitLoop;
+        }
+    }
+
+    return 0;
 }
 
 //*****************************************************************************************

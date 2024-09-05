@@ -6002,7 +6002,7 @@ namespace Weather {
                     if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.TempRangeSchPtr, 0.0, false)) {
                         ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
                         ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4)));
-                        ShowSevereError(state, "Some [Schedule] Dry-bulb Range Difference Values are < 0.0 [would make max larger].");
+                        ShowContinueError(state, "Some [Schedule] Dry-bulb Range Difference Values are < 0.0 [would make max larger].");
                         ErrorsFound = true;
                     }
                 }
@@ -6211,7 +6211,7 @@ namespace Weather {
                         if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.HumIndSchPtr, 0.0, false)) {
                             ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
                             ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(6), ipsc->cAlphaArgs(6)));
-                            ShowSevereError(state, "Some [Schedule] Wet-bulb Profile Difference Values are < 0.0 [would make max larger].");
+                            ShowContinueError(state, "Some [Schedule] Wet-bulb Profile Difference Values are < 0.0 [would make max larger].");
                             ErrorsFound = true;
                         }
                     } break;
@@ -8431,8 +8431,7 @@ namespace Weather {
             if (statFileExists) {
                 auto statFile = state.files.inStatFilePath.try_open();
                 if (!statFile.good()) {
-                    ShowSevereError(state,
-                                    format("CalcAnnualAndMonthlyDryBulbTemp: Could not open file {} for input (read).", statFile.filePath.string()));
+                    ShowSevereError(state, format("CalcAnnualAndMonthlyDryBulbTemp: Could not open file {} for input (read).", statFile.filePath));
                     ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
@@ -8453,14 +8452,14 @@ namespace Weather {
                     ShowSevereError(
                         state,
                         format("CalcAnnualAndMonthlyDryBulbTemp: Stat file '{}' does not have Monthly Statistics for Dry Bulb temperatures.",
-                               statFile.filePath.string()));
+                               statFile.filePath));
                     ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 } else if (lineAvg.find("Daily Avg") == std::string::npos) {
                     ShowSevereError(state,
                                     format("CalcAnnualAndMonthlyDryBulbTemp: Stat file '{}' does not have the 'Daily Avg' line in the Monthly "
                                            "Statistics for Dry Bulb temperatures.",
-                                           statFile.filePath.string()));
+                                           statFile.filePath));
                     ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 } else {
@@ -8481,8 +8480,7 @@ namespace Weather {
                 auto epwFile = state.files.inputWeatherFilePath.try_open();
                 bool epwHasLeapYear(false);
                 if (!epwFile.good()) {
-                    ShowSevereError(state,
-                                    format("CalcAnnualAndMonthlyDryBulbTemp: Could not open file {} for input (read).", epwFile.filePath.string()));
+                    ShowSevereError(state, format("CalcAnnualAndMonthlyDryBulbTemp: Could not open file {} for input (read).", epwFile.filePath));
                     ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
@@ -8541,8 +8539,8 @@ namespace Weather {
                 this->OADryBulbWeatherDataProcessed = true;
             } else {
                 ShowSevereError(state, "CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exist.");
-                ShowContinueError(state, format("Weather file: {}.", state.files.inputWeatherFilePath.filePath.string()));
-                ShowContinueError(state, format("Stat file: {}.", state.files.inStatFilePath.filePath.string()));
+                ShowContinueError(state, format("Weather file: {}.", state.files.inputWeatherFilePath.filePath));
+                ShowContinueError(state, format("Stat file: {}.", state.files.inStatFilePath.filePath));
                 ShowContinueError(state, "Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
                 ShowContinueError(state, "Instead a fixed default value of 10.0 C will be used.");
             }

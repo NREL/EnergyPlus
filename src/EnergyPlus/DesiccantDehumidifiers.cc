@@ -774,8 +774,8 @@ namespace DesiccantDehumidifiers {
                                                                             DataLoopNode::ObjectIsNotParent);
 
             if (desicDehum.ControlNodeNum == 0) {
-                ShowContinueError(state, format("{} = \"{}\"", desicDehum.DehumType, desicDehum.Name));
-                ShowSevereError(state, format("{} must be specified.", cAlphaFields(5)));
+                ShowSevereError(state, format("{} = \"{}\"", desicDehum.DehumType, desicDehum.Name));
+                ShowContinueError(state, format("{} must be specified.", cAlphaFields(5)));
                 ErrorsFoundGeneric = true;
             }
 
@@ -808,7 +808,6 @@ namespace DesiccantDehumidifiers {
             ErrorsFound2 = false;
             desicDehum.RegenFanIndex = Fans::GetFanIndex(state, desicDehum.RegenFanName);
             if (desicDehum.RegenFanIndex == 0) {
-                ErrorObjectHeader eoh{routineName, CurrentModuleObject, desicDehum.Name};
                 ShowSevereItemNotFound(state, eoh, cAlphaFields(7), desicDehum.RegenFanName);
                 ErrorsFoundGeneric = true;
             } else {

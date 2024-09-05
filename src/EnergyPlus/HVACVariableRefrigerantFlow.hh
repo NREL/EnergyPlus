@@ -933,6 +933,8 @@ namespace HVACVariableRefrigerantFlow {
     void getVRFTUZoneLoad(
         EnergyPlusData &state, int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP, bool const InitFlag);
 
+    bool getVRFTUNodeNumber(EnergyPlusData &state, int const nodeNumber);
+
     void ReportVRFTerminalUnit(EnergyPlusData &state, int VRFTUNum); // index to VRF terminal unit
 
     void ReportVRFCondenser(EnergyPlusData &state, int VRFCond); // index to VRF condensing unit
@@ -977,6 +979,8 @@ namespace HVACVariableRefrigerantFlow {
                                    int CAPFT,
                                    Real64 const T_suc // Compressor suction temperature Te' [C]
     );
+
+    int getEqIndex(EnergyPlusData &state, std::string_view VRFTUName);
 
 } // namespace HVACVariableRefrigerantFlow
 

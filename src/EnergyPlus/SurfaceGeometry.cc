@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -2845,7 +2846,8 @@ namespace SurfaceGeometry {
 
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
             auto &thisSurf = Surfaces(surfNum);
-            if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
+            if (!thisSurf.HeatTransSurf) continue;                               // ignore shading surfaces
+            if (thisSurf.Class == DataSurfaces::SurfaceClass::IntMass) continue; // skip internal mass surfaces for this check
             if (thisSurf.BaseSurf != surfNum) {
                 // Set space for subsurfaces
                 thisSurf.spaceNum = Surfaces(thisSurf.BaseSurf).spaceNum;
@@ -7191,7 +7193,8 @@ namespace SurfaceGeometry {
                 state.dataSurface->IntMassObjects(Item).NumOfZones = state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
                 state.dataSurface->IntMassObjects(Item).ZoneListActive = true;
                 state.dataSurface->IntMassObjects(Item).ZoneOrZoneListPtr = ZLItem;
-            } else {
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                // If Space or SpaceList Name is blank, then throw error.
                 ShowSevereError(state,
                                 format("{}=\"{}\" invalid {}=\"{}\" not found.",
                                        cCurrentModuleObject,
@@ -7216,19 +7219,9 @@ namespace SurfaceGeometry {
                     state.dataSurface->IntMassObjects(Item).numOfSpaces = 1;
                     state.dataSurface->IntMassObjects(Item).spaceListActive = false;
                     state.dataSurface->IntMassObjects(Item).spaceOrSpaceListPtr = Item1;
-                    if (!state.dataSurface->IntMassObjects(Item).ZoneListActive) {
-                        if (state.dataHeatBal->space(Item1).zoneNum != state.dataSurface->IntMassObjects(Item).ZoneOrZoneListPtr) {
-                            ShowSevereError(state,
-                                            format("{}=\"{}\" invalid {}=\"{}\" is not part of Zone =\"{}\".",
-                                                   cCurrentModuleObject,
-                                                   state.dataIPShortCut->cAlphaArgs(1),
-                                                   state.dataIPShortCut->cAlphaFieldNames(4),
-                                                   state.dataIPShortCut->cAlphaArgs(4),
-                                                   state.dataIPShortCut->cAlphaArgs(3)));
-                            ErrorsFound = true;
-                            errFlag = true;
-                        }
-                    }
+                    state.dataSurface->IntMassObjects(Item).NumOfZones = 1;
+                    state.dataSurface->IntMassObjects(Item).ZoneListActive = false;
+                    state.dataSurface->IntMassObjects(Item).ZoneOrZoneListPtr = state.dataHeatBal->space(Item1).zoneNum;
                 } else if (SLItem > 0) {
                     int numOfSpaces = int(state.dataHeatBal->spaceList(SLItem).numListSpaces);
                     NumIntMassSurfaces += numOfSpaces;
@@ -10644,7 +10637,7 @@ namespace SurfaceGeometry {
                 auto const &surf = state.dataSurface->Surface(SurfNum);
                 if (surf.Class != SurfaceClass::Window || surf.ExtBoundCond != 0) {
                     ShowSevereError(state, format("{}=\"{}\"", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                    ShowSevereError(state, format("cannot be used with surface={}", surf.Name));
+                    ShowContinueError(state, format("cannot be used with surface={}", surf.Name));
                     ShowContinueError(state, "because that surface is not an exterior window.");
                     ErrorsFound = true;
                 }
@@ -12172,10 +12165,10 @@ namespace SurfaceGeometry {
                         (MaterialLayerGroup == Material::Group::ScreenEquivalentLayer) ||
                         (MaterialLayerGroup == Material::Group::GapEquivalentLayer)) {
                         ShowSevereError(state, format("Invalid movable insulation material for {}:", cCurrentModuleObject));
-                        ShowSevereError(
+                        ShowContinueError(
                             state,
                             format("...Movable insulation material type specified = {}", cMaterialGroupType(static_cast<int>(MaterialLayerGroup))));
-                        ShowSevereError(state, format("...Movable insulation material name specified = {}", state.dataIPShortCut->cAlphaArgs(3)));
+                        ShowContinueError(state, format("...Movable insulation material name specified = {}", state.dataIPShortCut->cAlphaArgs(3)));
                         ErrorsFound = true;
                     }
                     if (SchNum == 0) {
@@ -15680,9 +15673,9 @@ namespace SurfaceGeometry {
 
             if (SignFlag != PrevSignFlag) {
                 if (state.dataGlobal->DisplayExtraWarnings && surfaceTmp.ExtSolar &&
-                    (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) &&
-                    // Warn only once
-                    surfaceTmp.IsConvex) {
+                    (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) && surfaceTmp.IsConvex &&
+                    !state.dataSysVars->SutherlandHodgman &&
+                    (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PolygonClipping)) {
                     ShowWarningError(state,
                                      format("CheckConvexity: Zone=\"{}\", Surface=\"{}\" is non-convex.",
                                             state.dataHeatBal->Zone(surfaceTmp.Zone).Name,

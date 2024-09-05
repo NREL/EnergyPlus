@@ -1802,7 +1802,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (matScreen->TransThermal + matScreen->AbsorpThermal >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowSevereError(state, "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0");
+            ShowContinueError(state, "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0");
         }
     }
 
@@ -1933,7 +1933,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (matScreen->TransThermal + matScreen->AbsorpThermal >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowSevereError(state, "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0");
+            ShowContinueError(state, "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0");
         }
 
     } // TotScreensEQL loop

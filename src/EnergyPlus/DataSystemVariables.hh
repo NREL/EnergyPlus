@@ -112,6 +112,11 @@ struct SystemVarsData : BaseGlobalStruct
     bool ReportExtShadingSunlitFrac = false; // when true, the sunlit fraction for all surfaces are exported as a csv format output
     bool DisableGroupSelfShading = false;    // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
     bool DisableAllSelfShading = false;      // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
+    bool DisableSelfShadingWithinGroup = false;
+    bool DisableSelfShadingBetweenGroup = false;
+
+    int shadingGroupsNum = 0;                 // number of shading groups
+    Array1D_string shadingGroupZoneListNames; // array of zone names in user input
 
     bool TrackAirLoopEnvFlag = false; // If TRUE generates a file with runtime statistics for each HVAC
     //  controller on each air loop
@@ -145,6 +150,7 @@ struct SystemVarsData : BaseGlobalStruct
     int NumberIntRadThreads = 1;
     int iNominalTotSurfaces = 0;
     bool Threading = false;
+    bool ciForceTimeStep = false;
 
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {

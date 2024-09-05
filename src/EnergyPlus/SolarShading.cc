@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <memory>
@@ -186,9 +187,8 @@ void InitSolarCalculations(EnergyPlusData &state)
             state.dataSolarShading->shd_stream =
                 std::make_unique<std::fstream>(state.dataStrGlobals->outputShdFilePath, std::ios_base::out | std::ios_base::trunc);
             if (!state.dataSolarShading->shd_stream) {
-                ShowFatalError(state,
-                               format("InitSolarCalculations: Could not open file \"{}\" for output (write).",
-                                      state.dataStrGlobals->outputShdFilePath.string()));
+                ShowFatalError(
+                    state, format("InitSolarCalculations: Could not open file \"{}\" for output (write).", state.dataStrGlobals->outputShdFilePath));
             }
         } else {
             state.dataSolarShading->shd_stream = std::make_unique<std::iostream>(nullptr);
@@ -196,7 +196,7 @@ void InitSolarCalculations(EnergyPlusData &state)
 
         if (state.dataSolarShading->GetInputFlag) {
             checkShadingSurfaceSchedules(state);
-            GetShadowingInput(state);
+            processShadowingInput(state);
             state.dataSolarShading->GetInputFlag = false;
             state.dataSolarShading->MaxHCV =
                 (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
@@ -415,7 +415,6 @@ void GetShadowingInput(EnergyPlusData &state)
     int NumNumbers;
     int NumAlphas;
     int IOStat;
-    int Found = 0;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     state.dataIPShortCut->rNumericArgs({1, 4}) = 0.0; // so if nothing gotten, defaults will be maintained.
     state.dataIPShortCut->cAlphaArgs(1) = "";
@@ -512,18 +511,6 @@ void GetShadowingInput(EnergyPlusData &state)
     } else {
         state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
         state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
-    }
-
-    if ((state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) &&
-        state.dataSolarShading->anyScheduledShadingSurface) {
-        ShowSevereError(state, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
-        ShowContinueError(state, "and there is at least one shading surface of type ");
-        ShowContinueError(state, "Shading:Site:Detailed, Shading:Building:Detailed, or Shading:Zone:Detailed, ");
-        ShowContinueError(state, "that has an active transmittance schedule value greater than zero or may vary.");
-        ShowContinueError(state, "With \"PixelCounting\" Shading Calculation Method, the shading surfaces will be treated as ");
-        ShowContinueError(state, "completely opaque (transmittance = 0) during the shading calculation, ");
-        ShowContinueError(state, "which may result in inaccurate or unexpected results.");
-        ShowContinueError(state, "It is suggested switching to another Shading Calculation Method, such as \"PolygonClipping\".");
     }
 
     aNum++;
@@ -629,30 +616,11 @@ void GetShadowingInput(EnergyPlusData &state)
         state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         state.dataSysVars->ReportExtShadingSunlitFrac = false;
     }
-    if (state.dataSysVars->shadingMethod == ShadingMethod::Imported) {
-        int ExtShadingSchedNum;
-        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataSurface->Surface(SurfNum).Name + "_shading");
-            if (ExtShadingSchedNum != 0) {
-                state.dataSurface->Surface(SurfNum).SurfSchedExternalShadingFrac = true;
-                state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd = ExtShadingSchedNum;
-            } else {
-                ShowWarningError(state,
-                                 format("{}: sunlit fraction schedule not found for {} when using ImportedShading.",
-                                        cCurrentModuleObject,
-                                        state.dataSurface->Surface(SurfNum).Name));
-                ShowContinueError(state, "These values are set to 1.0.");
-            }
-        }
-    }
-
-    bool DisableSelfShadingWithinGroup = false;
-    bool DisableSelfShadingBetweenGroup = false;
 
     aNum++;
     if (NumAlphas >= aNum) {
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
-            DisableSelfShadingWithinGroup = true;
+            state.dataSysVars->DisableSelfShadingWithinGroup = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
         } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
@@ -668,7 +636,7 @@ void GetShadowingInput(EnergyPlusData &state)
     aNum++;
     if (NumAlphas >= aNum) {
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
-            DisableSelfShadingBetweenGroup = true;
+            state.dataSysVars->DisableSelfShadingBetweenGroup = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
         } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
@@ -681,66 +649,17 @@ void GetShadowingInput(EnergyPlusData &state)
         state.dataIPShortCut->cAlphaArgs(aNum) = "No";
     }
 
-    if (DisableSelfShadingBetweenGroup && DisableSelfShadingWithinGroup) {
+    if (state.dataSysVars->DisableSelfShadingBetweenGroup && state.dataSysVars->DisableSelfShadingWithinGroup) {
         state.dataSysVars->DisableAllSelfShading = true;
-    } else if (DisableSelfShadingBetweenGroup || DisableSelfShadingWithinGroup) {
+    } else if (state.dataSysVars->DisableSelfShadingBetweenGroup || state.dataSysVars->DisableSelfShadingWithinGroup) {
         state.dataSysVars->DisableGroupSelfShading = true;
     }
 
     aNum++;
-    int SurfZoneGroup, CurZoneGroup;
-    if (state.dataSysVars->DisableGroupSelfShading) {
-        Array1D_int DisableSelfShadingGroups;
-        int NumOfShadingGroups;
-        if (NumAlphas >= aNum) {
-            // Read all shading groups
-            NumOfShadingGroups = NumAlphas - (aNum - 1);
-            DisableSelfShadingGroups.allocate(NumOfShadingGroups);
-            for (int i = 1; i <= NumOfShadingGroups; i++) {
-                Found = Util::FindItemInList(
-                    state.dataIPShortCut->cAlphaArgs(i + (aNum - 1)), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
-                if (Found != 0) DisableSelfShadingGroups(i) = Found;
-            }
-
-            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
-                if (state.dataSurface->Surface(SurfNum).ExtBoundCond == 0) { // Loop through all exterior surfaces
-                    SurfZoneGroup = 0;
-                    // Check the shading zone group of each exterior surface
-                    for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
-                        CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
-                        for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
-                             ZoneNum++) { // Loop through all zones in the zone list
-                            if (state.dataSurface->Surface(SurfNum).Zone == state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum)) {
-                                SurfZoneGroup = CurZoneGroup;
-                                break;
-                            }
-                        }
-                    }
-                    // if a surface is not in any zone group, no self shading is disabled for this surface
-                    if (SurfZoneGroup != 0) {
-                        // if DisableSelfShadingWithinGroup, add all zones in the same zone group to the surface's disabled zone list
-                        // if DisableSelfShadingBetweenGroups, add all zones in all other zone groups to the surface's disabled zone list
-                        for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
-                            CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
-                            if (SurfZoneGroup == CurZoneGroup && DisableSelfShadingWithinGroup) {
-                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
-                                     ZoneNum++) { // Loop through all zones in the zone list
-                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
-                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
-                                }
-                            } else if (SurfZoneGroup != CurZoneGroup && DisableSelfShadingBetweenGroup) {
-                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones; ZoneNum++) {
-                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
-                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            ShowFatalError(state, "No Shading groups are defined when disabling grouped self shading.");
-        }
+    state.dataSysVars->shadingGroupsNum = NumAlphas - (aNum - 1);
+    state.dataSysVars->shadingGroupZoneListNames.allocate(state.dataSysVars->shadingGroupsNum);
+    for (int numZone = 1; numZone <= state.dataSysVars->shadingGroupsNum; ++numZone) {
+        state.dataSysVars->shadingGroupZoneListNames(numZone) = state.dataIPShortCut->cAlphaArgs(aNum - 1 + numZone);
     }
 
     if (!state.dataSysVars->DetailedSolarTimestepIntegration && state.dataSurface->ShadingTransmittanceVaries &&
@@ -795,6 +714,93 @@ void GetShadowingInput(EnergyPlusData &state)
           state.dataIPShortCut->cAlphaArgs(5),
           state.dataIPShortCut->cAlphaArgs(6),
           state.dataIPShortCut->cAlphaArgs(7));
+}
+
+void processShadowingInput(EnergyPlusData &state)
+{
+    // all shadow input processing that needed zones and surfaces to already be read into data (part of fix for Defect #10299)
+
+    if ((state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) &&
+        state.dataSolarShading->anyScheduledShadingSurface) {
+        ShowSevereError(state, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
+        ShowContinueError(state, "and there is at least one shading surface of type ");
+        ShowContinueError(state, "Shading:Site:Detailed, Shading:Building:Detailed, or Shading:Zone:Detailed, ");
+        ShowContinueError(state, "that has an active transmittance schedule value greater than zero or may vary.");
+        ShowContinueError(state, "With \"PixelCounting\" Shading Calculation Method, the shading surfaces will be treated as ");
+        ShowContinueError(state, "completely opaque (transmittance = 0) during the shading calculation, ");
+        ShowContinueError(state, "which may result in inaccurate or unexpected results.");
+        ShowContinueError(state, "It is suggested switching to another Shading Calculation Method, such as \"PolygonClipping\".");
+    }
+
+    if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::Imported) {
+        int ExtShadingSchedNum;
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataSurface->Surface(SurfNum).Name + "_shading");
+            if (ExtShadingSchedNum != 0) {
+                state.dataSurface->Surface(SurfNum).SurfSchedExternalShadingFrac = true;
+                state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd = ExtShadingSchedNum;
+            } else {
+                ShowWarningError(state,
+                                 format("processShadowingInput: sunlit fraction schedule not found for {} when using ImportedShading.",
+                                        state.dataSurface->Surface(SurfNum).Name));
+                ShowContinueError(state, "These values are set to 1.0.");
+            }
+        }
+    }
+
+    int SurfZoneGroup, CurZoneGroup;
+    int Found = 0;
+    if (state.dataSysVars->DisableGroupSelfShading) {
+        Array1D_int DisableSelfShadingGroups;
+        int NumOfShadingGroups = state.dataSysVars->shadingGroupsNum;
+        if (NumOfShadingGroups > 0) {
+            DisableSelfShadingGroups.allocate(NumOfShadingGroups);
+            for (int i = 1; i <= NumOfShadingGroups; i++) {
+                Found = Util::FindItemInList(
+                    state.dataSysVars->shadingGroupZoneListNames(i), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
+                if (Found != 0) DisableSelfShadingGroups(i) = Found;
+            }
+
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+                if (state.dataSurface->Surface(SurfNum).ExtBoundCond == 0) { // Loop through all exterior surfaces
+                    SurfZoneGroup = 0;
+                    // Check the shading zone group of each exterior surface
+                    for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
+                        CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
+                        for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
+                             ZoneNum++) { // Loop through all zones in the zone list
+                            if (state.dataSurface->Surface(SurfNum).Zone == state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum)) {
+                                SurfZoneGroup = CurZoneGroup;
+                                break;
+                            }
+                        }
+                    }
+                    // if a surface is not in any zone group, no self shading is disabled for this surface
+                    if (SurfZoneGroup != 0) {
+                        // if DisableSelfShadingWithinGroup, add all zones in the same zone group to the surface's disabled zone list
+                        // if DisableSelfShadingBetweenGroups, add all zones in all other zone groups to the surface's disabled zone list
+                        for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
+                            CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
+                            if (SurfZoneGroup == CurZoneGroup && state.dataSysVars->DisableSelfShadingWithinGroup) {
+                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
+                                     ZoneNum++) { // Loop through all zones in the zone list
+                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
+                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
+                                }
+                            } else if (SurfZoneGroup != CurZoneGroup && state.dataSysVars->DisableSelfShadingBetweenGroup) {
+                                for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones; ZoneNum++) {
+                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
+                                        state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            ShowFatalError(state, "No Shading groups are defined when disabling grouped self shading.");
+        }
+    }
 }
 
 void checkScheduledSurfacePresent(EnergyPlusData &state)
@@ -2580,7 +2586,6 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
     Real64 Epsilon;                // Sky clearness parameter
     Real64 Delta;                  // Sky brightness parameter
     Real64 CosIncAngBeamOnSurface; // Cosine of incidence angle of beam solar on surface
-    Real64 IncAng;                 // Incidence angle of beam solar on surface (radians)
     int EpsilonBin;                // Sky clearness (Epsilon) bin index
     Real64 AirMass;                // Relative air mass
     Real64 AirMassH;               // Intermediate variable for relative air mass calculation
@@ -2644,8 +2649,6 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
             }
             CosIncAngBeamOnSurface = -1.0;
         }
-
-        IncAng = std::acos(CosIncAngBeamOnSurface);
 
         ViewFactorSkyGeom = state.dataSurface->Surface(SurfNum).ViewFactorSky;
         state.dataSolarShading->SurfMultIsoSky(SurfNum) = ViewFactorSkyGeom * (1.0 - F1);
@@ -3134,19 +3137,17 @@ bool polygon_contains_point(int const nsides,            // number of sides (ver
     // Using/Aliasing
     using namespace DataVectorTypes;
 
-    // Return value
-    bool inside; // return value, true=inside, false = not inside
+    // return value, true=inside, false = not inside
 
     EP_SIZE_CHECK(polygon_3d, nsides);
 
-    int i;
     int ip1;
 
     // Object Data
     Array1D<Vector_2d> polygon(nsides);
     Vector_2d point;
 
-    inside = false;
+    bool inside = false;
     if (ignorex) {
         for (int i = 1; i <= nsides; ++i) {
             polygon(i).x = polygon_3d(i).y;
@@ -3173,7 +3174,7 @@ bool polygon_contains_point(int const nsides,            // number of sides (ver
         point.x = point.y = 0.0; // Elim possibly used uninitialized warnings
     }
 
-    for (i = 1; i <= nsides; ++i) {
+    for (int i = 1; i <= nsides; ++i) {
 
         if (i < nsides) {
             ip1 = i + 1;
@@ -3862,161 +3863,98 @@ inline bool d_eq(Real64 a, Real64 b)
     return std::abs(a - b) < 2.0;
 }
 
-void CLIPLINE(Real64 &x1, Real64 &x2, Real64 &y1, Real64 &y2, Real64 maxX, Real64 minX, Real64 maxY, Real64 minY, bool &visible, bool &rev)
+void CLIPLINE(Real64 &x0, Real64 &x1, Real64 &y0, Real64 &y1, Real64 maxX, Real64 minX, Real64 maxY, Real64 minY, bool &visible)
 {
+
     // Line segment clipping
     // Reference:
-    // Slater, M., Barsky, B.A.
+    // Liang, Y.D., Barsky, B.A., Slater, M.
     // 2D line and polygon clipping based on space subdivision.
     // The Visual Computer 10, 407–422 (1994).
-    Real64 dx, dy, e, xinc, yinc, tempVar;
-    bool needX = true, needY = true;
-    int c1, c2;
 
-    if (x1 > x2) { // reverse for efficiency
-        tempVar = x1;
-        x1 = x2;
-        x2 = tempVar;
-        tempVar = y1;
-        y1 = y2;
-        y2 = tempVar;
+    // Tweaked via microbenchmarking to improve efficiency
+
+    bool rev = false;
+    if (x0 > x1) { // reverse for efficiency
+        std::swap(x0, x1);
+        std::swap(y0, y1);
         rev = true;
     }
-    if (x1 > maxX || x2 < minX) return; // x is positive
-    if (x1 < minX) {
-        if (y1 < minY) {
-            if (y2 < minY) return;
-            c1 = 0;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            e = dy * (minX - x1) + dx * (y1 - minY);
-        } else if (y1 > maxY) {
-            if (y2 > maxY) return;
-            c1 = 6;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            e = dy * (minX - x1) + dx * (y1 - maxY);
-        } else {
-            c1 = 3;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            if (dy > 0) {
-                e = dy * (minX - x1) + dx * (y1 - maxY);
-            } else {
-                e = dy * (minX - x1) + dx * (y1 - minY);
-            }
+
+    if (x0 > maxX || x1 < minX) {
+        // Both points are outside the clip window, so they can't cross it
+        return;
+    }
+
+    // defining variables
+    Real64 const dx = x1 - x0; // >= 0
+    Real64 const dy = y1 - y0;
+
+    Real64 const q1 = x0 - minX;
+    Real64 const q2 = maxX - x0;
+    Real64 const q3 = y0 - minY;
+    Real64 const q4 = maxY - y0;
+
+    Real64 u1 = 0;
+    Real64 u2 = 1;
+
+    if ((dx == 0 && (q1 < 0 || q2 < 0)) || (dy == 0 && (q3 < 0 || q4 < 0))) {
+        // Line is parallel to clipping window
+        return;
+    }
+    if (dx != 0) {
+        Real64 const r1 = q1 / -dx;
+        if (r1 > u1) {
+            u1 = r1;
         }
-    } else {
-        if (y1 < minY) {
-            if (y2 < minY) return;
-            c1 = 1;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            e = dy * (maxX - x1) + dx * (y1 - minY);
-        } else if (y1 > maxY) {
-            if (y2 > maxY) return;
-            c1 = 7;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            e = dy * (maxX - x1) + dx * (y1 - maxY);
+        Real64 const r2 = q2 / dx;
+        if (r2 < u2) {
+            u2 = r2;
+        }
+    }
+    if (dy != 0) {
+        Real64 const r3 = q3 / -dy;
+        Real64 const r4 = q4 / dy;
+        if (dy > 0) {
+            if (r3 > u1) {
+                u1 = r3;
+            }
+            if (r4 < u2) {
+                u2 = r4;
+            }
         } else {
-            visible = true;
-            if (x2 <= maxX && (y2 >= minY && y2 <= maxY)) return;
-            c1 = 4;
-            dx = x2 - x1;
-            dy = y2 - y1;
-            if (dy > 0) {
-                e = dy * (maxX - x1) + dx * (y1 - maxY);
-            } else {
-                e = dy * (maxX - x1) + dx * (y1 - minY);
+            if (r4 > u1) {
+                u1 = r4;
+            }
+            if (r3 < u2) {
+                u2 = r3;
             }
         }
     }
-    c2 = c1;
-    if (dy > 0) {
-        while (true) {
-            if (e < 0.0) {
-                if (c2 == 1)
-                    return;
-                else if (c2 == 3) {
-                    visible = true;
-                    x1 = minX;
-                    y1 = maxY + e / dx;
-                    if (x2 <= maxX && y2 <= maxY) return;
-                } else if (c2 == 4) {
-                    x2 = maxX;
-                    y2 = maxY + e / dx;
-                    return;
-                }
-                if (needX) {
-                    xinc = dy * (maxX - minX);
-                    needX = false;
-                }
-                e += xinc;
-                c2 += 1;
-            } else {
-                if (c2 == 3)
-                    return;
-                else if (c2 == 1) {
-                    visible = true;
-                    x1 = maxX - e / dy;
-                    y1 = minY;
-                    if (x2 <= maxX && y2 <= maxY) return;
-                } else if (c2 == 4) {
-                    x2 = maxX - e / dy;
-                    y2 = maxY;
-                    return;
-                }
-                if (needY) {
-                    yinc = dx * (maxY - minY);
-                    needY = false;
-                }
-                e -= yinc;
-                c2 += 3;
-            }
-        }
+
+    if (u1 > u2) { // reject
+        // Line is outside the clipping window
+        return;
+    }
+
+    visible = true;
+
+    Real64 const xn0 = x0 + dx * u1;
+    Real64 const yn0 = y0 + dy * u1;
+
+    Real64 const xn1 = x0 + dx * u2;
+    Real64 const yn1 = y0 + dy * u2;
+
+    if (rev) {
+        x0 = xn1;
+        y0 = yn1;
+        x1 = xn0;
+        y1 = yn0;
     } else {
-        while (true) {
-            if (e >= 0.0) {
-                if (c2 == 7)
-                    return;
-                else if (c2 == 3) {
-                    visible = true;
-                    x1 = minX;
-                    y1 = minY + e / dx;
-                    if (x2 <= maxX && y2 >= minY) return;
-                } else if (c2 == 4) {
-                    x2 = maxX;
-                    y2 = minY + e / dx;
-                    return;
-                }
-                if (needX) {
-                    xinc = dy * (maxX - minX);
-                    needX = false;
-                }
-                e += xinc;
-                c2 += 1;
-            } else {
-                if (c2 == 3)
-                    return;
-                else if (c2 == 7) {
-                    visible = true;
-                    x1 = maxX - e / dy;
-                    y1 = maxY;
-                    if (x2 <= maxX && y2 >= minY) return;
-                } else if (c2 == 4) {
-                    x2 = maxX - e / dy;
-                    y2 = minY;
-                    return;
-                }
-                if (needY) {
-                    yinc = dx * (maxY - minY);
-                    needY = false;
-                }
-                e += yinc;
-                c2 -= 3;
-            }
-        }
+        x0 = xn0;
+        y0 = yn0;
+        x1 = xn1;
+        y1 = yn1;
     }
 }
 
@@ -4057,19 +3995,10 @@ void CLIPRECT(EnergyPlusData &state, int const NS2, int const NV1, int &NV3)
         Real64 x1 = x_1, x2 = x_2, y1 = y_1, y2 = y_2;
 
         bool visible = false;
-        bool rev = false;
-        CLIPLINE(x_1, x_2, y_1, y_2, maxX, minX, maxY, minY, visible, rev);
+        CLIPLINE(x_1, x_2, y_1, y_2, maxX, minX, maxY, minY, visible);
         if (visible) {
             if ((x_1 != x1 || y_1 != y1) || (x_2 != x2 || y_2 != y2)) {
                 INTFLAG = true;
-            }
-            if (rev) { // undo reverse
-                Real64 tempVar = x_1;
-                x_1 = x_2;
-                x_2 = tempVar;
-                tempVar = y_1;
-                y_1 = y_2;
-                y_2 = tempVar;
             }
             // if line on edge, or inside, add both points
             if (arrc == 0 || ((neq(arrx[arrc - 1], x_1) || neq(arry[arrc - 1], y_1)) && (neq(arrx[0], x_1) || neq(arry[0], y_1)))) {
@@ -6512,7 +6441,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowModel::EQL && ANY_BLIND(ShadeFlag)) {
                 int SlatsAngIndexLower = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
                 int ProfAngIndexLower = state.dataSurface->SurfWinProfAngIndex(SurfNum);
-                int SlatsAngIndexUpper = std::min(Material::MaxProfAngs, SlatsAngIndexLower + 1);
+                int SlatsAngIndexUpper = std::min(Material::MaxSlatAngs, SlatsAngIndexLower + 1);
                 int ProfAngIndexUpper = std::min(Material::MaxProfAngs, ProfAngIndexLower + 1);
                 Real64 SlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
                 Real64 ProfAngInterpFac = state.dataSurface->SurfWinProfAngInterpFac(SurfNum);
@@ -7654,7 +7583,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                                     int SlatsAngIndexLowerBack = state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum);
                                     int ProfAngIndexLowerBack = state.dataSurface->SurfWinProfAngIndex(BackSurfNum);
-                                    int SlatsAngIndexUpperBack = std::min(Material::MaxProfAngs, SlatsAngIndexLowerBack + 1);
+                                    int SlatsAngIndexUpperBack = std::min(Material::MaxSlatAngs, SlatsAngIndexLowerBack + 1);
                                     int ProfAngIndexUpperBack = std::min(Material::MaxProfAngs, ProfAngIndexLowerBack + 1);
                                     Real64 SlatsAngInterpFacBack = state.dataSurface->SurfWinSlatsAngInterpFac(BackSurfNum);
                                     Real64 ProfAngInterpFacBack = state.dataSurface->SurfWinProfAngInterpFac(BackSurfNum);

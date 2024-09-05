@@ -1301,8 +1301,6 @@ namespace IceThermalStorage {
         // METHODOLOGY EMPLOYED:
         // Initializes parameters based on current status flag values.
 
-        int CompNum; // local do loop index
-
         if (this->MyPlantScanFlag) {
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state, this->Name, DataPlant::PlantEquipmentType::TS_IceDetailed, this->plantLoc, errFlag);
@@ -1334,10 +1332,10 @@ namespace IceThermalStorage {
             if ((state.dataPlnt->PlantLoop(this->plantLoc.loopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
                 (this->plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply)) {
                 // up flow priority of other components on the same branch as the Ice tank
-                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
-                                                 .LoopSide(DataPlant::LoopSideLocation::Supply)
-                                                 .Branch(this->plantLoc.branchNum)
-                                                 .TotalComponents;
+                for (int CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
+                                                     .LoopSide(DataPlant::LoopSideLocation::Supply)
+                                                     .Branch(this->plantLoc.branchNum)
+                                                     .TotalComponents;
                      ++CompNum) {
                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
                         .LoopSide(DataPlant::LoopSideLocation::Supply)
@@ -1369,11 +1367,9 @@ namespace IceThermalStorage {
     void SimpleIceStorageData::oneTimeInit(EnergyPlusData &state)
     {
 
-        bool errFlag;
-
         if (this->MyPlantScanFlag) {
             // Locate the storage on the plant loops for later usage
-            errFlag = false;
+            bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(
                 state, this->Name, DataPlant::PlantEquipmentType::TS_IceSimple, this->plantLoc, errFlag, _, _, _, _, _);
             if (errFlag) {

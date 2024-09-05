@@ -68,7 +68,7 @@ InputFile &InputFile::ensure_open(EnergyPlusData &state, const std::string &call
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(state, fmt::format("{}: Could not open file {} for input (read).", caller, filePath.string()));
+        ShowFatalError(state, fmt::format("{}: Could not open file {} for input (read).", caller, filePath));
     }
     return *this;
 }
@@ -217,7 +217,7 @@ InputOutputFile &InputOutputFile::ensure_open(EnergyPlusData &state, const std::
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(state, fmt::format("{}: Could not open file {} for output (write).", caller, filePath.string()));
+        ShowFatalError(state, fmt::format("{}: Could not open file {} for output (write).", caller, filePath));
     }
     return *this;
 }
@@ -376,6 +376,9 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
             { // "output_audit"
                 audit = boolean_choice(find_input(fields, "output_audit"));
             }
+            { // "output_space_sizing"
+                spsz = boolean_choice(find_input(fields, "output_space_sizing"));
+            }
             { // "output_zone_sizing"
                 zsz = boolean_choice(find_input(fields, "output_zone_sizing"));
             }
@@ -484,6 +487,7 @@ void IOFiles::flushAll()
     eio.flush();
     eso.flush();
     zsz.flush();
+    spsz.flush();
     ssz.flush();
     map.flush();
     mtr.flush();

@@ -448,7 +448,7 @@ namespace FuelCellElectricGenerator {
                      DataGenerators::AirSupRateMode::QuadraticFuncofPel)) {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
                     ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
-                    ShowSevereError(state, "Curve name was not found");
+                    ShowContinueError(state, "Curve name was not found");
                     ErrorsFound = true;
                 }
 
@@ -460,7 +460,7 @@ namespace FuelCellElectricGenerator {
                      DataGenerators::AirSupRateMode::QuadraticFuncofNdot)) {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), AlphArray(6)));
                     ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
-                    ShowSevereError(state, "Curve name was not found");
+                    ShowContinueError(state, "Curve name was not found");
                     ErrorsFound = true;
                 }
 

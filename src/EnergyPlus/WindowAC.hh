@@ -81,6 +81,7 @@ namespace WindowAC {
         int AirOutNode;        // outlet air node number
         int OutsideAirNode;    // outside air node number
         int AirReliefNode;     // relief air node number
+        int ReturnAirNode;     // return air node number
         int MixedAirNode;      // Mixed Air Node number
         std::string OAMixName; // name of outdoor air mixer
         std::string OAMixType; // type of outdoor air mixer
@@ -197,6 +198,8 @@ namespace WindowAC {
                                 bool &HXUnitOn                 // Used to control HX heat recovery as needed
     );
 
+    bool getWindowACNodeNumber(EnergyPlusData &state, int const WindACNum);
+
     int GetWindowACZoneInletAirNode(EnergyPlusData &state, int const WindACNum);
 
     int GetWindowACOutAirNode(EnergyPlusData &state, int const WindACNum);
@@ -204,6 +207,8 @@ namespace WindowAC {
     int GetWindowACReturnAirNode(EnergyPlusData &state, int const WindACNum);
 
     int GetWindowACMixedAirNode(EnergyPlusData &state, int const WindACNum);
+
+    int getWindowACIndex(EnergyPlusData &state, std::string_view CompName);
 
 } // namespace WindowAC
 
