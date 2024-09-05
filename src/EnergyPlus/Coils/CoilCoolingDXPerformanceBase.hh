@@ -49,6 +49,7 @@
 #define ENERGYPLUS_COILS_COIL_COOLING_DX_PERFORMANCE_BASE
 
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <optional>
 #include <string>
 #include <vector>
@@ -129,18 +130,21 @@ struct CoilCoolingDXPerformanceBase
     {
     }
 
-    virtual Real64 RatedCBF() // rated coil bypass factor at speed
+    virtual Real64 RatedCBF(EnergyPlusData &state) // rated coil bypass factor at speed
     {
+        ShowSevereError(state, "Coil Bypass Factor is not an available parameter for this coil type.");
         return 0.0;
     }
 
-    virtual Real64 grossRatedSHR() // rated sensible heat ratio at speed
+    virtual Real64 grossRatedSHR(EnergyPlusData &state) // rated sensible heat ratio at speed
     {
+        ShowSevereError(state, "Sensible Heat Ratio is not an available parameter for this coil type.");
         return 0.0;
     }
 
-    virtual Real64 GrossRatedCoolingCOPAtMaxSpeed()
+    virtual Real64 GrossRatedCoolingCOPAtMaxSpeed(EnergyPlusData &state)
     {
+        ShowSevereError(state, "Gross Rated Cooling COP is not an available parameter for this coil type.");
         return 0.0;
     }
 
@@ -149,35 +153,37 @@ struct CoilCoolingDXPerformanceBase
         return "";
     }
 
-    virtual Real64 RatedAirMassFlowRateMaxSpeed(HVAC::CoilMode const mode = HVAC::CoilMode::Normal)
+    virtual Real64 RatedAirMassFlowRateMaxSpeed(EnergyPlusData &state, HVAC::CoilMode const mode = HVAC::CoilMode::Normal)
     {
+        ShowSevereError(state, "Rated Air Mass Flow Rate is not an available parameter for this coil type.");
         return 0.0;
     }
 
-    virtual Real64 RatedAirMassFlowRateMinSpeed(HVAC::CoilMode const mode = HVAC::CoilMode::Normal)
+    virtual Real64 RatedAirMassFlowRateMinSpeed(EnergyPlusData &state, HVAC::CoilMode const mode = HVAC::CoilMode::Normal)
     {
+        ShowSevereError(state, "Rated Air Mass Flow Rate is not an available parameter for this coil type.");
         return 0.0;
     }
 
-    virtual Real64 RatedCondAirMassFlowRateNomSpeed(HVAC::CoilMode const mode) // rated condenser air mass flow rate at speed {kg/s}
+    virtual Real64 RatedCondAirMassFlowRateNomSpeed(EnergyPlusData &state, HVAC::CoilMode const mode) // rated condenser air mass flow rate at speed {kg/s}
     {
+        ShowSevereError(state, "Rated Condenser Air Mass Flow Rate is not an available parameter for this coil type.");
         return 0.0;
     }
 
-    virtual Real64 RatedEvapAirMassFlowRate()
+    virtual Real64 RatedEvapAirMassFlowRate(EnergyPlusData &state)
     {
+        ShowSevereError(state, "Rated Evaporator Air Mass Flow Rate is not an available parameter for this coil type.");
         return 0.0;
     }
 
-    virtual Real64 RatedEvapAirFlowRate()
+    virtual Real64 RatedEvapAirFlowRate(EnergyPlusData &state)
     {
+        ShowSevereError(state, "Rated Evaporator Air Flow Rate is not an available parameter for this coil type.");
         return 0.0;
     }
 
-    virtual Real64 RatedGrossTotalCap()
-    {
-        return 0.0;
-    }
+    virtual Real64 RatedGrossTotalCap() = 0;
 
     virtual int IndexCapFT(HVAC::CoilMode const mode)
     {
@@ -189,10 +195,7 @@ struct CoilCoolingDXPerformanceBase
         return false;
     }
 
-    virtual int NumSpeeds()
-    {
-        return 0;
-    }
+    virtual int NumSpeeds() = 0;
 
     virtual void calcStandardRatings210240(EnergyPlusData &)
     {
@@ -202,28 +205,29 @@ struct CoilCoolingDXPerformanceBase
     {
     }
 
-    virtual Real64 EvapAirFlowRateAtSpeed(int)
+    virtual Real64 EvapAirFlowRateAtSpeed(EnergyPlusData &state, int)
     {
+        ShowSevereError(state, "Evaporator Air Flow Rate is not an available parameter for this coil type.");
         return 0.0;
     }
 
-    virtual Real64 RatedTotalCapacityAtSpeed(int)
+    virtual Real64 RatedTotalCapacityAtSpeed(EnergyPlusData &, int) = 0;
+
+    virtual Real64 CurrentEvapCondPumpPowerAtSpeed(EnergyPlusData &state, int)
     {
+        ShowSevereError(state, "Current Evaporator Condenser Pump Power is not an available parameter for this coil type.");
         return 0.0;
     }
 
-    virtual Real64 CurrentEvapCondPumpPowerAtSpeed(int)
+    virtual Real64 EvapCondenserEffectivenessAtSpeed(EnergyPlusData &state, int)
     {
+        ShowSevereError(state, "Evaporator Condenser Effectiveness is not an available parameter for this coil type.");
         return 0.0;
     }
 
-    virtual Real64 EvapCondenserEffectivenessAtSpeed(int)
+    virtual Real64 EvapAirFlowFraction(EnergyPlusData &state)
     {
-        return 0.0;
-    }
-
-    virtual Real64 EvapAirFlowFraction()
-    {
+        ShowSevereError(state, "Evaporator Air Flow Fraction is not an available parameter for this coil type.");
         return 0.0;
     }
 };

@@ -65,9 +65,7 @@ struct EnergyPlusData;
 struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
 {
     CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state,
-                                const std::string &name_to_find,
-                                int evaporator_inlet_node_index,
-                                int condenser_inlet_node_index);
+                                const std::string &name_to_find);
 
     static constexpr std::string_view object_name = "Coil:DX:ASHRAE205:Performance";
 
@@ -77,14 +75,19 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
     Real64 rated_total_cooling_capacity;
     Real64 rated_steady_state_heating_capacity;
 
+    int NumSpeeds() override
+    {
+        return representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number.size();
+    }
+
+    Real64 RatedTotalCapacityAtSpeed(EnergyPlusData &, int) override;
+
     Real64 RatedGrossTotalCap() override
     {
         return rated_total_cooling_capacity;
     }
 
-    void initialize_performance(EnergyPlus::EnergyPlusData &state,
-                                const DataLoopNode::NodeData &evaporator_inlet_node,
-                                const DataLoopNode::NodeData &condenser_inlet_node);
+    Real64 calculate_rated_capacity(EnergyPlus::EnergyPlusData &state, int speed);
 
     void size(EnergyPlusData &state) override;
 

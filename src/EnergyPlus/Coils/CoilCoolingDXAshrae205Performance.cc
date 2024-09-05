@@ -69,10 +69,7 @@ using namespace EnergyPlus;
 static std::map<std::string, Btwxt::InterpolationMethod> InterpMethods = // NOLINT(cert-err58-cpp)
     {{"LINEAR", Btwxt::InterpolationMethod::linear}, {"CUBIC", Btwxt::InterpolationMethod::cubic}};
 
-CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state,
-                                                         const std::string &name_to_find,
-                                                         int evaporator_inlet_node_index,
-                                                         int condenser_inlet_node_index)
+CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find)
 {
     static constexpr std::string_view routineName("CoilCoolingDX205Performance::CoilCoolingDX205Performance");
     using namespace tk205;
@@ -126,7 +123,7 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
         this->rated_steady_state_heating_capacity = fields.at("rated_steady_state_heating_capacity").get<Real64>();
 #endif
 
-        initialize_performance(state, state.dataLoopNodes->Node(evaporator_inlet_node_index), state.dataLoopNodes->Node(condenser_inlet_node_index));
+        rated_total_cooling_capacity = calculate_rated_capacity(state, representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number.back());
 
         if (errorsFound) {
             ShowFatalError(state,
@@ -137,25 +134,30 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
     }
 }
 
-void CoilCoolingDX205Performance::initialize_performance(EnergyPlus::EnergyPlusData &state,
-                                                         const DataLoopNode::NodeData &evaporator_inlet_node,
-                                                         const DataLoopNode::NodeData &condenser_inlet_node)
+Real64 CoilCoolingDX205Performance::calculate_rated_capacity(EnergyPlus::EnergyPlusData &state, int speed)
 {
-    auto outdoor_coil_entering_dry_bulb_temperature_K = condenser_inlet_node.Temp + Constant::Kelvin;
-    auto indoor_coil_entering_dry_bulb_temperature_K = evaporator_inlet_node.Temp + Constant::Kelvin;
-    auto indoor_coil_entering_relative_humidity =
-        Psychrometrics::PsyRhFnTdbWPb(state, evaporator_inlet_node.Temp, evaporator_inlet_node.HumRat, state.dataEnvrn->OutBaroPress);
+    const auto outdoor_coil_entering_dry_bulb_temperature_K = 308.15; // 95F
+    const auto indoor_coil_entering_dry_bulb_temperature_K = 299.8;   // 80F
+    const auto reference_wb_temperature = 292.59;                     // 67F
+    const auto reference_pressure_sea_level = 101325.0;
+    auto humidity_ratio = Psychrometrics::PsyWFnTdbTwbPb(state,
+                                                         indoor_coil_entering_dry_bulb_temperature_K - Constant::Kelvin,
+                                                         reference_wb_temperature - Constant::Kelvin,
+                                                         reference_pressure_sea_level);
+    auto indoor_coil_entering_relative_humidity = Psychrometrics::PsyRhFnTdbWPb(
+        state, indoor_coil_entering_dry_bulb_temperature_K - Constant::Kelvin, humidity_ratio, reference_pressure_sea_level);
 
-    auto max_available_speed = representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number.back();
+    //TODO: Should the capacity at every speed use the max flow rate?
+    auto max_available_flow = representation->performance.performance_map_cooling.grid_variables.indoor_coil_air_mass_flow_rate.back();
     const auto &[gross_total_capacity, gross_sensible_capacity, gross_power] =
         representation->performance.performance_map_cooling.calculate_performance(outdoor_coil_entering_dry_bulb_temperature_K,
                                                                                   indoor_coil_entering_relative_humidity,
                                                                                   indoor_coil_entering_dry_bulb_temperature_K,
-                                                                                  state.dataHVACGlobal->MSHPMassFlowRateHigh,
-                                                                                  max_available_speed,
-                                                                                  state.dataEnvrn->OutBaroPress,
+                                                                                  max_available_flow,
+                                                                                  speed,
+                                                                                  reference_pressure_sea_level,
                                                                                   interpolation_type);
-    rated_total_cooling_capacity = gross_total_capacity;
+    return gross_total_capacity;
 }
 
 void CoilCoolingDX205Performance::size(EnergyPlusData &state)
@@ -374,4 +376,9 @@ void CoilCoolingDX205Performance::calculate_output_nodes(EnergyPlusData &state,
     outletNode.Press = inletNode.Press;
 
     return;
+}
+
+Real64 CoilCoolingDX205Performance::RatedTotalCapacityAtSpeed(EnergyPlusData &state, int speed)
+{
+    return calculate_rated_capacity(state, speed);
 }

@@ -79,9 +79,7 @@ struct CoilCoolingDX
 {
     CoilCoolingDX() = default;
     static std::shared_ptr<CoilCoolingDXPerformanceBase> makePerformanceSubclass(EnergyPlus::EnergyPlusData &state,
-                                                                                 const std::string &performance_object_name,
-                                                                                 int evaporator_inlet_node_index,
-                                                                                 int condenser_inlet_node_index);
+                                                                                 const std::string &performance_object_name);
     static int factory(EnergyPlusData &state, std::string const &coilName);
     static void getInput(EnergyPlusData &state);
     static void clear_state();
@@ -102,7 +100,8 @@ struct CoilCoolingDX
                       int &normalModeNumSpeeds,
                       CoilCoolingDXPerformanceBase::CapControlMethod &capacityControlMethod,
                       Real64 &minOutdoorDryBulb);
-    void getDataAfterSizing(Real64 &normalModeRatedEvapAirFlowRate,
+    void getDataAfterSizing(EnergyPlusData &state,
+                            Real64 &normalModeRatedEvapAirFlowRate,
                             Real64 &normalModeRatedCapacity,
                             std::vector<Real64> &normalModeFlowRates,
                             std::vector<Real64> &normalModeRatedCapacities);
@@ -111,7 +110,7 @@ struct CoilCoolingDX
 
     int getNumModes();
     int getOpModeCapFTIndex(HVAC::CoilMode mode = HVAC::CoilMode::Normal);
-    Real64 condMassFlowRate(HVAC::CoilMode mode);
+    Real64 condMassFlowRate(EnergyPlusData &state, HVAC::CoilMode mode);
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;

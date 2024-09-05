@@ -2113,7 +2113,7 @@ namespace UnitarySystems {
                         }
                     } else if (this->m_CoolingCoilType_Num == HVAC::CoilDX_Cooling) {
                         NoLoadCoolingAirFlowRateRatio =
-                            state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].performance->EvapAirFlowFraction();
+                            state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].performance->EvapAirFlowFraction(state);
                     }
                     if (this->m_HeatingCoilType_Num == HVAC::Coil_HeatingAirToAirVariableSpeed ||
                         this->m_HeatingCoilType_Num == HVAC::Coil_HeatingWaterToAirHPVSEquationFit) {
@@ -2565,7 +2565,7 @@ namespace UnitarySystems {
                 newCoil.size(state);
                 if (MSHPIndex == -1) {
                     for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
-                        this->m_CoolVolumeFlowRate[Iter] = newCoil.performance->EvapAirFlowRateAtSpeed(Iter - 1);
+                        this->m_CoolVolumeFlowRate[Iter] = newCoil.performance->EvapAirFlowRateAtSpeed(state, Iter - 1);
                         this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
                         // it seems the ratio should reference the actual flow rates, not the fan flow ???
                         if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
@@ -2638,7 +2638,7 @@ namespace UnitarySystems {
             if (MSHPIndex == -1) {
                 // Gotta loop backwards since we may try to access the last element when there are no fans
                 for (Iter = this->m_NumOfSpeedCooling; Iter >= 1; --Iter) {
-                    this->m_CoolVolumeFlowRate[Iter] = newCoil.performance->EvapAirFlowRateAtSpeed(Iter - 1);
+                    this->m_CoolVolumeFlowRate[Iter] = newCoil.performance->EvapAirFlowRateAtSpeed(state, Iter - 1);
                     this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
                     // it seems the ratio should reference the actual flow rates, not the fan flow ???
                     if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
@@ -4562,7 +4562,7 @@ namespace UnitarySystems {
                         // TODO: Need to check for autosize on these I guess
                         auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex];
                         this->m_DesignCoolingCapacity = newCoil.performance->RatedGrossTotalCap();
-                        this->m_MaxCoolAirVolFlow = newCoil.performance->RatedEvapAirFlowRate();
+                        this->m_MaxCoolAirVolFlow = newCoil.performance->RatedEvapAirFlowRate(state);
                         if (this->m_DesignCoolingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
                         if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
                         this->m_CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
@@ -4693,7 +4693,7 @@ namespace UnitarySystems {
 
                         // thisSys.m_DesignCoolingCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
                         // Get Coil:Cooling:DX coil air flow rate. Later fields will overwrite this IF input field is present
-                        this->m_MaxCoolAirVolFlow = newCoil.performance->RatedEvapAirFlowRate();
+                        this->m_MaxCoolAirVolFlow = newCoil.performance->RatedEvapAirFlowRate(state);
                         // if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                         if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
 
