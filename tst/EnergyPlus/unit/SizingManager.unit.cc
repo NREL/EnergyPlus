@@ -4223,6 +4223,17 @@ TEST_F(EnergyPlusFixture, SizingManager_ZoneSizing_Coincident_NonAir_10x_Latent_
     ASSERT_TRUE(process_idf(idf_objects));
     SimulationManager::ManageSimulation(*state);
 
+    int space1Num = 1;
+    int curSimDay = 1;
+    auto &calSpSiz = state->dataSize->CalcSpaceSizing(curSimDay, space1Num);
+
+    EXPECT_NEAR(calSpSiz.LatentCoolLoadSeq(57), 7500.00, 0.01);
+    EXPECT_NEAR(calSpSiz.LatentCoolLoadSeq(58), 8333.33, 0.01);
+    EXPECT_NEAR(calSpSiz.LatentCoolLoadSeq(59), 9166.66, 0.01);
+    EXPECT_NEAR(calSpSiz.LatentCoolLoadSeq(60), 10000.00, 0.01);
+    EXPECT_NEAR(calSpSiz.LatentCoolLoadSeq(61), 10000.00, 0.01);
+    EXPECT_TRUE(calSpSiz.LatentCoolLoadSeq(60) > calSpSiz.LatentCoolLoadSeq(59));
+    EXPECT_TRUE(calSpSiz.LatentCoolLoadSeq(61) == calSpSiz.LatentCoolLoadSeq(60));
     EXPECT_EQ("18989.14", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpHtCalcDesLd, "SPACE 1"));
     EXPECT_EQ("0.527", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpHtCalcDesAirFlow, "SPACE 1"));
     EXPECT_EQ("0.527", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpHtUserDesAirFlow, "SPACE 1"));
