@@ -11771,7 +11771,7 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_15000W_alternateMode_SEER2_2023_Valu
     EXPECT_NEAR(15000, performance->RatedGrossTotalCap(), 0.01);
 
     // Reated Air Vol Flow Rate | evap air flow rate and condenser air flow rate ??
-    EXPECT_NEAR(0.80, performance->RatedEvapAirFlowRate(), 0.01);
+    EXPECT_NEAR(0.80, performance->RatedEvapAirFlowRate(*state), 0.01);
 
     EXPECT_NEAR(7500, speed1.rated_total_capacity, 0.01);
     EXPECT_NEAR(15000, speed2.rated_total_capacity, 0.01);
@@ -12092,7 +12092,7 @@ TEST_F(EnergyPlusFixture, CurveFit_03_Speed_5000W_SEER2_2023_ValueTest)
     EXPECT_NEAR(5000, performance->RatedGrossTotalCap(), 0.01);
 
     // Reated Air Vol Flow Rate | evap air flow rate and condenser air flow rate ??
-    EXPECT_NEAR(0.25, performance->RatedEvapAirFlowRate(), 0.01);
+    EXPECT_NEAR(0.25, performance->RatedEvapAirFlowRate(*state), 0.01);
 
     EXPECT_NEAR(1666.5, speed1.rated_total_capacity, 0.01);
     EXPECT_NEAR(3333.5, speed2.rated_total_capacity, 0.01);
