@@ -6337,10 +6337,12 @@ namespace Window {
                     AbsBlDiffBack = blindTAR.Sol.Bk.Df.Abs;
                     RGlDiffFront = constructBare.ReflectSolDiffFront;
                     RGlDiffFrontVis = constructBare.ReflectVisDiffFront;
+
                     RhoBlDiffBack = blindTAR.Sol.Bk.Df.Ref;
                     RhoBlDiffBackVis = blindTAR.Vis.Bk.Df.Ref;
                     RhoBlBack = blindTAR.Sol.Bk.Bm[profIdxLo].DfRef;
                     RhoBlBackVis = blindTAR.Vis.Bk.Bm[profIdxLo].DfRef;
+
                     AbsBeamShadeNorm =
                         AbsBlFront + AbsBlBack * RGlFront * TBlBmBm +
                         (AbsBlDiffBack * RGlDiffFront / (1.0 - RhoBlDiffBack * RGlDiffFront)) * (RGlFront * TBlBmBm * RhoBlBack + TBlBmDif);
