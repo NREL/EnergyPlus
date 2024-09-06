@@ -110,7 +110,7 @@ constexpr Real64 gigaJoulesToJoules = 1.e+09;
 void SimTESCoil(EnergyPlusData &state,
                 std::string_view CompName, // name of the fan coil unit
                 int &CompIndex,
-                int const FanOpMode, // allows parent object to control fan mode
+                HVAC::FanOp const fanOp, // allows parent object to control fan mode
                 PTSCOperatingMode &TESOpMode,
                 ObjexxFCL::Optional<Real64 const> PartLoadRatio // part load ratio (for single speed cycling unit)
 )
@@ -167,13 +167,13 @@ void SimTESCoil(EnergyPlusData &state,
         CalcTESCoilOffMode(state, TESCoilNum);
         break;
     case PTSCOperatingMode::CoolingOnly:
-        CalcTESCoilCoolingOnlyMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        CalcTESCoilCoolingOnlyMode(state, TESCoilNum, fanOp, PartLoadRatio);
         break;
     case PTSCOperatingMode::CoolingAndCharge:
-        CalcTESCoilCoolingAndChargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        CalcTESCoilCoolingAndChargeMode(state, TESCoilNum, fanOp, PartLoadRatio);
         break;
     case PTSCOperatingMode::CoolingAndDischarge:
-        CalcTESCoilCoolingAndDischargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        CalcTESCoilCoolingAndDischargeMode(state, TESCoilNum, fanOp, PartLoadRatio);
         break;
     case PTSCOperatingMode::ChargeOnly:
         CalcTESCoilChargeOnlyMode(state, TESCoilNum);
@@ -199,7 +199,6 @@ void GetTESCoilInput(EnergyPlusData &state)
     using BranchNodeConnections::TestCompSet;
     using DataZoneEquipment::FindControlledZoneIndexFromSystemNodeNumberForZone;
     using FluidProperties::CheckFluidPropertyName;
-    using FluidProperties::FindGlycol;
     using FluidProperties::GetFluidDensityTemperatureLimits;
     using FluidProperties::GetFluidSpecificHeatTemperatureLimits;
     using GlobalNames::VerifyUniqueCoilName;
@@ -286,7 +285,7 @@ void GetTESCoilInput(EnergyPlusData &state)
             break;
         case MediaType::Water:
             thisTESCoil.StorageFluidName = "WATER";
-            thisTESCoil.StorageFluidIndex = FindGlycol(state, "WATER");
+            thisTESCoil.StorageFluidIndex = FluidProperties::GetGlycolNum(state, "WATER");
             break;
         default:
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, thisTESCoil.Name));
@@ -304,7 +303,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                         state, format("Check that fluid property data have been input for fluid name = {}", state.dataIPShortCut->cAlphaArgs(6)));
                     ErrorsFound = true;
                 } else {
-                    thisTESCoil.StorageFluidIndex = FindGlycol(state, state.dataIPShortCut->cAlphaArgs(6));
+                    thisTESCoil.StorageFluidIndex = FluidProperties::GetGlycolNum(state, state.dataIPShortCut->cAlphaArgs(6));
                     if (thisTESCoil.StorageFluidIndex == 0) {
                         ShowSevereError(state, format("{}{}=\"{}\", invalid fluid data", RoutineName, cCurrentModuleObject, thisTESCoil.Name));
                         ShowContinueError(state,
@@ -2494,7 +2493,7 @@ void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum)
     }
 }
 
-void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
+void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] HVAC::FanOp const fanOp, Real64 const PartLoadRatio)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2757,7 +2756,10 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
     }
 }
 
-void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
+void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
+                                     int const TESCoilNum,
+                                     [[maybe_unused]] HVAC::FanOp const fanOp,
+                                     Real64 const PartLoadRatio)
 {
 
     // SUBROUTINE INFORMATION:
@@ -3164,7 +3166,10 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
     }
 }
 
-void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
+void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state,
+                                        int const TESCoilNum,
+                                        [[maybe_unused]] HVAC::FanOp const fanOp,
+                                        Real64 const PartLoadRatio)
 {
 
     // SUBROUTINE INFORMATION:

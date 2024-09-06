@@ -64,6 +64,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 
 namespace EnergyPlus {
 
@@ -306,7 +307,6 @@ namespace AirflowNetwork {
         void venting_control(int i,                                         // AirflowNetwork surface number
                              Real64 &OpenFactor                             // Window or door opening factor (used to calculate airflow)
         );
-        void assign_fan_airloop();
         void validate_distribution();
         void validate_fan_flowrate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
         void validate_exhaust_fan_input();
@@ -324,8 +324,8 @@ namespace AirflowNetwork {
         Array1D<Real64> MA;
         Array1D<Real64> MV;
         Array1D_int IVEC;
-        int VentilationCtrl = 0;  // Hybrid ventilation control type
-        int NumOfExhaustFans = 0; // Number of exhaust fans
+        Avail::VentCtrlStatus ventCtrlStatus = Avail::VentCtrlStatus::NoAction; // Hybrid ventilation control type
+        int NumOfExhaustFans = 0;                                               // Number of exhaust fans
         int NumAirflowNetwork = 0;
         int AirflowNetworkNumOfDetOpenings = 0;
         int AirflowNetworkNumOfSimOpenings = 0;
@@ -363,7 +363,6 @@ namespace AirflowNetwork {
         int NumOfOAFans = 0;              // number of OutdoorAir fans
         int NumOfReliefFans = 0;          // number of OutdoorAir relief fans
         bool AirflowNetworkGetInputFlag = true;
-        bool AssignFanAirLoopNumFlag = true;
         bool ValidateDistributionSystemFlag = true;
         Array1D<Real64> FacadeAng =
             Array1D<Real64>(5); // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
@@ -540,6 +539,10 @@ namespace AirflowNetwork {
         Array1D<AirflowNetwork::ReliefFlow> DisSysCompReliefAirData;
         Array1D<AirflowNetwork::AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
 
+        void init_state([[maybe_unused]] EnergyPlusData &state) override
+        {
+        }
+
         void clear_state() override
         {
             OccupantVentilationControl.deallocate();
@@ -548,7 +551,7 @@ namespace AirflowNetwork {
             MA.deallocate();
             MV.deallocate();
             IVEC.deallocate();
-            VentilationCtrl = 0;
+            ventCtrlStatus = Avail::VentCtrlStatus::NoAction;
             NumOfExhaustFans = 0;
             NumAirflowNetwork = 0;
             AirflowNetworkNumOfDetOpenings = 0;
@@ -587,7 +590,6 @@ namespace AirflowNetwork {
             NumOfOAFans = 0;
             NumOfReliefFans = 0;
             AirflowNetworkGetInputFlag = true;
-            AssignFanAirLoopNumFlag = true;
             ValidateDistributionSystemFlag = true;
             FacadeAng = Array1D<Real64>(5);
             AirflowNetworkZnRpt.deallocate();

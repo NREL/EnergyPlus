@@ -117,10 +117,10 @@ namespace VariableSpeedCoils {
     int constexpr OnDemand = 2;     // defrost cycle occurs only when required
 
     void SimVariableSpeedCoils(EnergyPlusData &state,
-                               std::string_view CompName,                    // Coil Name
-                               int &CompIndex,                               // Index for Component name
-                               int const CyclingScheme,                      // Continuous fan OR cycling compressor
-                               HVAC::CompressorOperation const CompressorOp, // compressor on/off. 0 = off; 1= on
+                               std::string_view CompName,             // Coil Name
+                               int &CompIndex,                        // Index for Component name
+                               HVAC::FanOp const fanOp,               // Continuous fan OR cycling compressor
+                               HVAC::CompressorOp const compressorOp, // compressor on/off. 0 = off; 1= on
                                Real64 const PartLoadFrac,
                                int const SpeedNum,            // compressor speed number
                                Real64 const SpeedRatio,       // compressor speed ratio
@@ -139,7 +139,6 @@ namespace VariableSpeedCoils {
         // This subroutine manages variable-speed Water to Air Heat Pump component simulation.
 
         // Using/Aliasing
-        using FluidProperties::FindGlycol;
         using General::SolveRoot;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -187,20 +186,20 @@ namespace VariableSpeedCoils {
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == HVAC::Coil_CoolingWaterToAirHPVSEquationFit) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == HVAC::Coil_CoolingAirToAirVariableSpeed)) {
             // Cooling mode
-            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, fanOp, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             CalcVarSpeedCoilCooling(
-                state, DXCoilNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+                state, DXCoilNum, fanOp, SensLoad, LatentLoad, compressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             UpdateVarSpeedCoil(state, DXCoilNum);
         } else if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == HVAC::Coil_HeatingWaterToAirHPVSEquationFit) ||
                    (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == HVAC::Coil_HeatingAirToAirVariableSpeed)) {
             // Heating mode
-            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
-            CalcVarSpeedCoilHeating(state, DXCoilNum, CyclingScheme, SensLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, fanOp, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+            CalcVarSpeedCoilHeating(state, DXCoilNum, fanOp, SensLoad, compressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             UpdateVarSpeedCoil(state, DXCoilNum);
         } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == HVAC::CoilDX_HeatPumpWaterHeaterVariableSpeed) {
             // Heating mode
-            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
-            CalcVarSpeedHPWH(state, DXCoilNum, PartLoadFrac, SpeedRatio, SpeedNum, CyclingScheme);
+            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, fanOp, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+            CalcVarSpeedHPWH(state, DXCoilNum, PartLoadFrac, SpeedRatio, SpeedNum, fanOp);
             UpdateVarSpeedCoil(state, DXCoilNum);
         } else {
             ShowFatalError(state, "SimVariableSpeedCoils: WatertoAir heatpump not in either HEATING or COOLING mode");
@@ -1033,13 +1032,15 @@ namespace VariableSpeedCoils {
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower = NumArray(10);
 
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower < 0.0) {
-                ShowSevereError(
-                    state,
-                    format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(10)));
-                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(10)));
-                ErrorsFound = true;
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower != DataSizing::AutoSize) {
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower < 0.0) {
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
+                    ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(10)));
+                    ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(10)));
+                    ErrorsFound = true;
+                }
             }
 
             // Set crankcase heater capacity
@@ -2663,9 +2664,9 @@ namespace VariableSpeedCoils {
             }
 
             if (Util::SameString(AlphArray(10), "DryBulbTemperature")) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType = HVAC::DryBulbIndicator;
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType = HVAC::OATType::DryBulb;
             } else if (Util::SameString(AlphArray(10), "WetBulbTemperature")) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType = HVAC::WetBulbIndicator;
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType = HVAC::OATType::WetBulb;
             } else {
                 //   wrong temperature type selection
                 ShowSevereError(
@@ -2677,7 +2678,7 @@ namespace VariableSpeedCoils {
             }
 
             // set rated inlet air temperature for curve object verification
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType == HVAC::WetBulbIndicator) {
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType == HVAC::OATType::WetBulb) {
                 WHInletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletWBTemp;
             } else {
                 WHInletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp;
@@ -3860,7 +3861,7 @@ namespace VariableSpeedCoils {
                           int const DXCoilNum,                             // Current DXCoilNum under simulation
                           Real64 const SensLoad,                           // Control zone sensible load[W]
                           Real64 const LatentLoad,                         // Control zone latent load[W]
-                          int const CyclingScheme,                         // fan operating mode
+                          HVAC::FanOp const fanOp,                         // fan operating mode
                           [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
                           Real64 const SpeedRatio,                         // compressor speed ratio
                           int const SpeedNum                               // compressor speed number
@@ -3929,8 +3930,8 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->MyOneTimeFlag = false;
         }
 
-        state.dataHVACGlobal->DXCT = 1; // hard-code to non-DOAS sizing routine for cfm/ton until .ISHundredPercentDOASDXCoil member from DXcoils.cc
-                                        // is added to VarSpeedCoil object
+        state.dataHVACGlobal->DXCT = HVAC::DXCoilType::Regular; // hard-code to non-DOAS sizing routine for cfm/ton until .ISHundredPercentDOASDXCoil
+                                                                // member from DXcoils.cc is added to VarSpeedCoil object
 
         // variable-speed heat pump water heating, begin
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == HVAC::CoilDX_HeatPumpWaterHeaterVariableSpeed &&
@@ -4108,10 +4109,10 @@ namespace VariableSpeedCoils {
 
                 CalcVarSpeedCoilCooling(state,
                                         DXCoilNum,
-                                        2.0,
+                                        HVAC::FanOp::Continuous,
                                         SensLoad,
                                         LatentLoad,
-                                        HVAC::CompressorOperation::On,
+                                        HVAC::CompressorOp::On,
                                         1.0,
                                         1.0,
                                         1.0,
@@ -4243,9 +4244,9 @@ namespace VariableSpeedCoils {
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds);
                 CalcVarSpeedCoilHeating(state,
                                         DXCoilNum,
-                                        2.0,
+                                        HVAC::FanOp::Continuous,
                                         SensLoad,
-                                        HVAC::CompressorOperation::On,
+                                        HVAC::CompressorOp::On,
                                         1.0,
                                         1.0,
                                         1.0,
@@ -4432,7 +4433,7 @@ namespace VariableSpeedCoils {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterMassFlowRate = 0.0;
             }
 
-            if (CyclingScheme == HVAC::ContFanCycCoil) {
+            if (fanOp == HVAC::FanOp::Continuous) {
                 // continuous fan, cycling compressor
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
                 //    VarSpeedCoil(DXCoilNum)%AirMassFlowRate   = VarSpeedCoil(DXCoilNum)%DesignAirVolFlowRate*  &
@@ -5555,7 +5556,11 @@ namespace VariableSpeedCoils {
             RatedInletEnth = Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat);
             CBFRated = AdjustCBF(varSpeedCoil.MSRatedCBF(NormSpeed), varSpeedCoil.MSRatedAirMassFlowRate(NormSpeed), RatedAirMassFlowRate);
             if (CBFRated > 0.999) CBFRated = 0.999;
-            AirMassFlowRatio = RatedAirMassFlowRate / varSpeedCoil.MSRatedAirMassFlowRate(NormSpeed);
+            if (varSpeedCoil.MSRatedAirMassFlowRate(NormSpeed) > 1.0e-10) {
+                AirMassFlowRatio = RatedAirMassFlowRate / varSpeedCoil.MSRatedAirMassFlowRate(NormSpeed);
+            } else {
+                AirMassFlowRatio = 1.0;
+            }
 
             if (varSpeedCoil.MSRatedWaterVolFlowRate(NormSpeed) > 1.0e-10) {
                 WaterMassFlowRatio = varSpeedCoil.RatedWaterVolFlowRate / varSpeedCoil.MSRatedWaterVolFlowRate(NormSpeed);
@@ -5829,7 +5834,9 @@ namespace VariableSpeedCoils {
                                                           varSpeedCoil.OATempCompressorOn,
                                                           false, // varSpeedCoil.OATempCompressorOnOffBlank, // ??
                                                           DefrostControl,
-                                                          ObjexxFCL::Optional_bool_const());
+                                                          ObjexxFCL::Optional_bool_const(),
+                                                          varSpeedCoil.RatedCapCoolTotal,
+                                                          varSpeedCoil.RatedAirVolFlowRate);
             }
             break;
         default:
@@ -5839,10 +5846,10 @@ namespace VariableSpeedCoils {
 
     void CalcVarSpeedCoilCooling(EnergyPlusData &state,
                                  int const DXCoilNum,                             // Heat Pump Number
-                                 int const CyclingScheme,                         // Fan/Compressor cycling scheme indicator
+                                 HVAC::FanOp const fanOp,                         // Fan/Compressor cycling scheme indicator
                                  [[maybe_unused]] Real64 const SensDemand,        // Cooling Sensible Demand [W] !unused1208
                                  [[maybe_unused]] Real64 const LatentDemand,      // Cooling Latent Demand [W]
-                                 HVAC::CompressorOperation const CompressorOp,    // compressor operation flag
+                                 HVAC::CompressorOp const compressorOp,           // compressor operation flag
                                  Real64 const PartLoadRatio,                      // compressor part load ratio
                                  [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
                                  Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
@@ -5973,7 +5980,7 @@ namespace VariableSpeedCoils {
         }
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-        if (!(CyclingScheme == HVAC::ContFanCycCoil) && PartLoadRatio > 0.0) {
+        if (!(fanOp == HVAC::FanOp::Continuous) && PartLoadRatio > 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
                 state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate / PartLoadRatio;
         }
@@ -6088,7 +6095,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = true;
         }
 
-        if (CompressorOp == HVAC::CompressorOperation::Off || state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0) {
+        if (compressorOp == HVAC::CompressorOp::Off || state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
             return;
         }
@@ -6127,7 +6134,7 @@ namespace VariableSpeedCoils {
             if (PLF < 0.7) {
                 PLF = 0.7;
             }
-            if (CyclingScheme == HVAC::CycFanCycCoil)
+            if (fanOp == HVAC::FanOp::Cycling)
                 state.dataHVACGlobal->OnOffFanPartLoadFraction =
                     PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
             // calculate the run time fraction
@@ -6400,7 +6407,7 @@ namespace VariableSpeedCoils {
                     SHReff = CalcEffectiveSHR(state,
                                               DXCoilNum,
                                               SHRss,
-                                              CyclingScheme,
+                                              fanOp,
                                               state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac,
                                               state.dataVariableSpeedCoils->QLatRated,
                                               state.dataVariableSpeedCoils->QLatActual,
@@ -6464,7 +6471,7 @@ namespace VariableSpeedCoils {
             }
         }
 
-        if ((PartLoadRatio > 0.0 && CyclingScheme == HVAC::ContFanCycCoil) || (CyclingScheme == HVAC::CycFanCycCoil)) {
+        if ((PartLoadRatio > 0.0 && fanOp == HVAC::FanOp::Continuous) || (fanOp == HVAC::FanOp::Cycling)) {
             // calculate coil outlet state variables
             state.dataVariableSpeedCoils->LoadSideOutletEnth =
                 state.dataVariableSpeedCoils->LoadSideInletEnth -
@@ -6491,7 +6498,7 @@ namespace VariableSpeedCoils {
         }
 
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == HVAC::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             // continuous fan, cycling compressor
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy =
                 PartLoadRatio * state.dataVariableSpeedCoils->LoadSideOutletEnth +
@@ -6598,7 +6605,7 @@ namespace VariableSpeedCoils {
                           Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
                           Real64 const SpeedRatio,    // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
                           int const SpeedNum,         // Speed number, high bound
-                          int const CyclingScheme     // Continuous fan OR cycling compressor
+                          HVAC::FanOp const fanOp     // Continuous fan OR cycling compressor
     )
     {
 
@@ -6705,7 +6712,7 @@ namespace VariableSpeedCoils {
         }
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-        if (!(CyclingScheme == HVAC::ContFanCycCoil) && PartLoadRatio > 0.0) {
+        if (!(fanOp == HVAC::FanOp::Continuous) && PartLoadRatio > 0.0) {
             CondInletMassFlowRate = CondInletMassFlowRate / PartLoadRatio;
             EvapInletMassFlowRate = EvapInletMassFlowRate / PartLoadRatio;
         }
@@ -6714,7 +6721,7 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterMassFlowRate = CondInletMassFlowRate;
 
         // determine inlet air temperature type for curve objects
-        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType == HVAC::WetBulbIndicator) {
+        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType == HVAC::OATType::WetBulb) {
             InletAirTemp = state.dataHVACGlobal->HPWHInletWBTemp;
         } else {
             InletAirTemp = state.dataHVACGlobal->HPWHInletDBTemp;
@@ -6781,7 +6788,7 @@ namespace VariableSpeedCoils {
             if (PLF < 0.7) {
                 PLF = 0.7;
             }
-            if (CyclingScheme == HVAC::CycFanCycCoil)
+            if (fanOp == HVAC::FanOp::Cycling)
                 state.dataHVACGlobal->OnOffFanPartLoadFraction =
                     PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
             // calculate the run time fraction
@@ -7102,7 +7109,7 @@ namespace VariableSpeedCoils {
         }
 
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == HVAC::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             // continuous fan, cycling compressor
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy =
                 PartLoadRatio * state.dataVariableSpeedCoils->LoadSideOutletEnth +
@@ -7208,9 +7215,9 @@ namespace VariableSpeedCoils {
 
     void CalcVarSpeedCoilHeating(EnergyPlusData &state,
                                  int const DXCoilNum,                             // Heat Pump Number
-                                 int const CyclingScheme,                         // Fan/Compressor cycling scheme indicator
+                                 HVAC::FanOp const fanOp,                         // Fan/Compressor cycling scheme indicator
                                  [[maybe_unused]] Real64 const SensDemand,        // Cooling Sensible Demand [W] !unused1208
-                                 HVAC::CompressorOperation const CompressorOp,    // compressor operation flag
+                                 HVAC::CompressorOp const compressorOp,           // compressor operation flag
                                  Real64 const PartLoadRatio,                      // compressor part load ratio
                                  [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
                                  Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
@@ -7284,7 +7291,7 @@ namespace VariableSpeedCoils {
         MaxSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds;
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-        if (!(CyclingScheme == HVAC::ContFanCycCoil) && PartLoadRatio > 0.0) {
+        if (!(fanOp == HVAC::FanOp::Continuous) && PartLoadRatio > 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
                 state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate / PartLoadRatio;
         }
@@ -7362,7 +7369,7 @@ namespace VariableSpeedCoils {
             return;
         }
 
-        if (CompressorOp == HVAC::CompressorOperation::Off) {
+        if (compressorOp == HVAC::CompressorOp::Off) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
             return;
         }
@@ -7380,7 +7387,7 @@ namespace VariableSpeedCoils {
             if (PLF < 0.7) {
                 PLF = 0.7;
             }
-            if (CyclingScheme == HVAC::CycFanCycCoil)
+            if (fanOp == HVAC::FanOp::Cycling)
                 state.dataHVACGlobal->OnOffFanPartLoadFraction =
                     PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
             // calculate the run time fraction
@@ -7650,7 +7657,7 @@ namespace VariableSpeedCoils {
             PsyWFnTdbH(state, state.dataVariableSpeedCoils->LoadSideOutletDBTemp, state.dataVariableSpeedCoils->LoadSideOutletEnth, RoutineName);
 
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == HVAC::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             // continuous fan, cycling compressor
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy =
                 PartLoadRatio * state.dataVariableSpeedCoils->LoadSideOutletEnth +
@@ -7745,7 +7752,6 @@ namespace VariableSpeedCoils {
         // as negative.
 
         // Using/Aliasing
-        using FluidProperties::FindGlycol;
 
         // Return value
         Real64 CoilCapacity; // returned capacity of matched coil
@@ -7805,9 +7811,6 @@ namespace VariableSpeedCoils {
         // This function looks up the coil index for the given coil and returns it.  If
         // incorrect coil type or name is given, ErrorsFound is returned as true and index is returned
         // as zero.
-
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
 
         // Return value
         int IndexNum; // returned index of matched coil
@@ -7989,9 +7992,6 @@ namespace VariableSpeedCoils {
         // incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
         // as zero.
 
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
-
         // Return value
         int NodeNumber; // returned outlet node of matched coil
 
@@ -8036,9 +8036,6 @@ namespace VariableSpeedCoils {
         // This function looks up the given coil and returns the outlet node.  If
         // incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
         // as zero.
-
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
 
         // Return value
         int NodeNumber; // returned outlet node of matched coil
@@ -8214,9 +8211,6 @@ namespace VariableSpeedCoils {
         // This routine was designed to "push" information from a parent object to
         // this WSHP coil object.
 
-        // Using/Aliasing
-        using FluidProperties::FindGlycol;
-
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataVariableSpeedCoils->GetCoilsInputFlag) { // First time subroutine has been entered
             GetVarSpeedCoilInput(state);
@@ -8337,6 +8331,10 @@ namespace VariableSpeedCoils {
             state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
         }
 
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
+        }
+
         if (varSpeedCoil.reportCoilFinalSizes) {
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 if (varSpeedCoil.VSCoilType == HVAC::Coil_CoolingWaterToAirHPVSEquationFit ||
@@ -8378,7 +8376,7 @@ namespace VariableSpeedCoils {
     Real64 CalcEffectiveSHR(EnergyPlusData &state,
                             int const DXCoilNum,     // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
-                            int const CyclingScheme, // Fan/compressor cycling scheme indicator
+                            HVAC::FanOp const fanOp, // Fan/compressor cycling scheme indicator
                             Real64 const RTF,        // Compressor run-time fraction
                             Real64 const QLatRated,  // Rated latent capacity
                             Real64 const QLatActual, // Actual latent capacity
@@ -8459,12 +8457,12 @@ namespace VariableSpeedCoils {
         //  Calculate the compressor on and off times using a converntional thermostat curve
         Ton = 3600.0 / (4.0 * MaxONOFFCyclesperHour * (1.0 - RTF)); // duration of cooling coil on-cycle (sec)
 
-        if ((CyclingScheme == HVAC::CycFanCycCoil) && (FanDelayTime != 0.0)) {
-            // For CycFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
+        if ((fanOp == HVAC::FanOp::Cycling) && (FanDelayTime != 0.0)) {
+            // For FanOp::Cycling, moisture is evaporated from the cooling coil back to the air stream
             // until the fan cycle off. Assume no evaporation from the coil after the fan shuts off.
             Toff = FanDelayTime;
         } else {
-            // For ContFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
+            // For FanOp::Continuous, moisture is evaporated from the cooling coil back to the air stream
             // for the entire heat pump off-cycle.
             Toff = 3600.0 / (4.0 * MaxONOFFCyclesperHour * RTF); // duration of cooling coil off-cycle (sec)
         }
@@ -8628,7 +8626,11 @@ namespace VariableSpeedCoils {
             Real64 tADP = PsyTsatFnHPb(state, hADP, Pressure, RoutineName); // Apparatus dew point temperature [C]
             Real64 wADP = PsyWFnTdbH(state, tADP, hADP, RoutineName);       // Apparatus dew point humidity ratio [kg/kg]
             Real64 hTinwADP = PsyHFnTdbW(InletDryBulb, wADP);               // Enthalpy at inlet dry-bulb and wADP [J/kg]
-            SHRCalc = min((hTinwADP - hADP) / (InletEnthalpy - hADP), 1.0); // temporary calculated value of SHR
+            if (TotCapCalc > 1.0e-10) {
+                SHRCalc = min((hTinwADP - hADP) / (InletEnthalpy - hADP), 1.0); // temporary calculated value of SHR
+            } else {
+                SHRCalc = 1.0;
+            }
 
             //   Check for dry evaporator conditions (win < wadp)
             if (wADP > InletHumRatCalc || (Counter >= 1 && Counter < MaxIter)) {

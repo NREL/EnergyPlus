@@ -88,6 +88,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -100,8 +101,10 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WindowAC.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
@@ -138,8 +141,6 @@ namespace AirflowNetwork {
     using DataSurfaces::OtherSideCoefNoCalcExt;
     using DataSurfaces::SurfaceClass;
     using Fans::GetFanIndex;
-    using HVAC::ContFanCycCoil;
-    using HVAC::CycFanCycCoil;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -207,7 +208,7 @@ namespace AirflowNetwork {
                 }
             }
             Real64 FanMassFlowRate = 0.0;
-            int FanOperModeCyc = 0;
+            HVAC::FanOp FanOperModeCyc = HVAC::FanOp::Invalid;
             AFNSupplyFanType = HVAC::FanType::Invalid;
 
             for (i = 1; i <= DisSysNumOfCVFs; i++) {
@@ -218,9 +219,10 @@ namespace AirflowNetwork {
                     AFNSupplyFanType = DisSysCompCVFData(i).fanType;
                     break;
                 }
-                if (FanMassFlowRate > HVAC::VerySmallMassFlow && m_state.dataAirLoop->AirLoopAFNInfo(i).LoopFanOperationMode == CycFanCycCoil &&
+                if (FanMassFlowRate > HVAC::VerySmallMassFlow &&
+                    m_state.dataAirLoop->AirLoopAFNInfo(i).LoopFanOperationMode == HVAC::FanOp::Cycling &&
                     m_state.dataAirLoop->AirLoopAFNInfo(i).LoopSystemOnMassFlowrate > 0.0) {
-                    FanOperModeCyc = CycFanCycCoil;
+                    FanOperModeCyc = HVAC::FanOp::Cycling;
                     AFNSupplyFanType = DisSysCompCVFData(i).fanType;
                     if (AFNSupplyFanType == HVAC::FanType::OnOff) {
                         break;
@@ -229,7 +231,7 @@ namespace AirflowNetwork {
             }
             //            Revised to meet heat exchanger requirement
             if ((FanMassFlowRate > HVAC::VerySmallMassFlow) && (!FirstHVACIteration)) {
-                if (AFNSupplyFanType == HVAC::FanType::OnOff && FanOperModeCyc == CycFanCycCoil) {
+                if (AFNSupplyFanType == HVAC::FanType::OnOff && FanOperModeCyc == HVAC::FanOp::Cycling) {
                     AirflowNetworkFanActivated = true;
                 } else if (AFNSupplyFanType == HVAC::FanType::VAV) {
                     if (present(Iter) && Iter > 1) AirflowNetworkFanActivated = true;
@@ -240,11 +242,11 @@ namespace AirflowNetwork {
                 }
             }
         }
-        if (allocated(m_state.dataZoneEquip->ZoneEquipConfig) && m_state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0 &&
+        if (allocated(m_state.dataZoneEquip->ZoneEquipConfig) && m_state.dataAvail->NumHybridVentSysAvailMgrs > 0 &&
             allocated(m_state.dataAirSystemsData->PrimaryAirSystems)) {
             hybrid_ventilation_control();
         }
-        if (VentilationCtrl == 1 && m_state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0) {
+        if (ventCtrlStatus == Avail::VentCtrlStatus::Open && m_state.dataAvail->NumHybridVentSysAvailMgrs > 0) {
             AirflowNetworkFanActivated = false;
         }
 
@@ -268,12 +270,6 @@ namespace AirflowNetwork {
 
         // VAV terminal set only
         if (present(FirstHVACIteration) && FirstHVACIteration) VAVTerminalRatio = 0.0;
-
-        // Set AirLoop Number for fans
-        if (FirstHVACIteration && AssignFanAirLoopNumFlag) {
-            assign_fan_airloop();
-            AssignFanAirLoopNumFlag = false;
-        }
 
         if (AirflowNetworkFanActivated && distribution_simulated) {
             if (ValidateDistributionSystemFlag) {
@@ -463,7 +459,6 @@ namespace AirflowNetwork {
                 }
 
                 // This breaks the component model, need to fix
-                bool fanErrorFound = false;
                 int fanIndex = GetFanIndex(m_state, thisObjectName);
                 if (fanIndex == 0) {
                     ShowSevereError(m_state,
@@ -475,12 +470,8 @@ namespace AirflowNetwork {
 
                 Real64 flowRate = fan->maxAirFlowRate;
                 flowRate *= m_state.dataEnvrn->StdRhoAir;
-                bool nodeErrorsFound{false};
                 int inletNode = fan->inletNodeNum;
                 int outletNode = fan->outletNodeNum;
-                if (nodeErrorsFound) {
-                    success = false;
-                }
                 HVAC::FanType fanType = fan->type;
                 if (fanType != HVAC::FanType::Exhaust) {
                     ShowSevereError(m_state,
@@ -1388,8 +1379,6 @@ namespace AirflowNetwork {
                     }
 
                 } else {
-                    bool FanErrorFound = false;
-
                     fanIndex = GetFanIndex(m_state, fan_name);
 
                     if (fanIndex == 0) {
@@ -4614,7 +4603,7 @@ namespace AirflowNetwork {
                 int compnum = compnum_iter->second;
                 AirflowNetworkLinkageData(count).CompNum = compnum;
 
-                auto &surf = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum);
+                auto const &surf = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum);
 
                 switch (AirflowNetworkLinkageData(count).element->type()) {
                 case ComponentType::DOP: {
@@ -6317,9 +6306,6 @@ namespace AirflowNetwork {
         using General::SolveRoot;
         using HVAC::VerySmallMassFlow;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
         int j;
@@ -6535,7 +6521,7 @@ namespace AirflowNetwork {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinExhaustMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxExhaustMassFlowrate = Node(PressureControllerData(1).OANodeNum).MassFlowRate;
-            if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+            if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling &&
                 m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
                 MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
@@ -6622,7 +6608,7 @@ namespace AirflowNetwork {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinReliefMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxReliefMassFlowrate = Node(PressureControllerData(1).OANodeNum).MassFlowRate;
-            if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+            if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling &&
                 m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
                 MaxReliefMassFlowrate = MaxReliefMassFlowrate / m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
@@ -9527,7 +9513,7 @@ namespace AirflowNetwork {
             // Calculate the part load ratio, can't be greater than 1 for a simple ONOFF fan
             if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff &&
                 Node(DisSysCompCVFData(FanNum).InletNode).MassFlowRate > VerySmallMassFlow &&
-                m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
+                m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling) {
                 // Hard code here
                 PartLoadRatio = m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
                 LoopPartLoadRatio(AirLoopNum) = m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
@@ -9568,7 +9554,7 @@ namespace AirflowNetwork {
                     if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
                 }
                 if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff &&
-                    m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == ContFanCycCoil) {
+                    m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Continuous) {
                     OnOffRatio = std::abs((m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate -
                                            m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate) /
                                           m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate);
@@ -9810,7 +9796,7 @@ namespace AirflowNetwork {
                         exchangeData(i).SumMMHrGC *= OnOffFanRunTimeFraction;
                     }
                 }
-                if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
+                if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling) {
                     for (int i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
                         exchangeData(i).SumMCp += multiExchangeData(i).SumMCp * (1.0 - OnOffFanRunTimeFraction);
                         exchangeData(i).SumMCpT += multiExchangeData(i).SumMCpT * (1.0 - OnOffFanRunTimeFraction);
@@ -10104,24 +10090,6 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::assign_fan_airloop()
-    {
-        // Assign the system Fan AirLoop Number based on the zone inlet node
-
-        for (int i = 1; i <= AirflowNetworkNumOfZones; i++) {
-            for (int j = 1; j <= m_state.dataGlobal->NumOfZones; j++) {
-                if (!m_state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
-                if ((MultizoneZoneData(i).ZoneNum == j) && (m_state.dataZoneEquip->ZoneEquipConfig(j).NumInletNodes > 0)) {
-                    for (int k = 1; k <= DisSysNumOfCVFs; k++) {
-                        if (DisSysCompCVFData(k).AirLoopNum == 0) {
-                            DisSysCompCVFData(k).AirLoopNum = m_state.dataZoneEquip->ZoneEquipConfig(j).InletNodeAirLoopNum(1);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     void Solver::validate_distribution()
     {
 
@@ -10147,9 +10115,12 @@ namespace AirflowNetwork {
         using DXCoils::SetDXCoilAirLoopNumber;
         using HeatingCoils::SetHeatingCoilAirLoopNumber;
         using HVACStandAloneERV::GetStandAloneERVNodeNumber;
+        using HVACVariableRefrigerantFlow::getVRFTUNodeNumber;
         using SplitterComponent::GetSplitterNodeNumbers;
         using SplitterComponent::GetSplitterOutletNumber;
+        using UnitarySystems::getUnitarySystemNodeNumber;
         using WaterThermalTanks::GetHeatPumpWaterHeaterNodeNumber;
+        using WindowAC::getWindowACNodeNumber;
         using ZoneDehumidifier::GetZoneDehumidifierNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -10166,8 +10137,12 @@ namespace AirflowNetwork {
         EPVector<DataLoopNode::ConnectionType> NodeConnectionType; // Specifies the type of node connection
         std::string CurrentModuleObject;
 
-        bool HPWHFound(false);          // Flag for HPWH identification
-        bool StandaloneERVFound(false); // Flag for Standalone ERV (ZoneHVAC:EnergyRecoveryVentilator) identification
+        bool hpwhFound(false);            // Flag for HPWH identification
+        bool standaloneERVFound(false);   // Flag for Standalone ERV (ZoneHVAC:EnergyRecoveryVentilator) identification
+        bool packagedUnitaryFound(false); // Flag for packaged unitary systems (ZoneHVAC:PackagedTerminalAirConditioner,
+                                          // ZoneHVAC:PackagedTerminalHeatPump, ZoneHVAC:WaterToAirHeatPump) identification
+        bool vrfTUFound(false);
+        bool windowACFound(false); // Flag for Window AC (ZoneHVAC:WindowAirConditioner) identification
 
         // Validate supply and return connections
         NodeFound.dimension(m_state.dataLoopNodes->NumOfNodes, false);
@@ -10272,13 +10247,31 @@ namespace AirflowNetwork {
                 // Skip HPWH nodes that don't have to be included in the AFN
                 if (GetHeatPumpWaterHeaterNodeNumber(m_state, i)) {
                     NodeFound(i) = true;
-                    HPWHFound = true;
+                    hpwhFound = true;
                 }
 
                 // Skip Standalone ERV nodes that don't have to be included in the AFN
                 if (GetStandAloneERVNodeNumber(m_state, i)) {
                     NodeFound(i) = true;
-                    StandaloneERVFound = true;
+                    standaloneERVFound = true;
+                }
+
+                // Skip zonal unitary system based nodes that don't have to be included in the AFN
+                if (getUnitarySystemNodeNumber(m_state, i)) {
+                    NodeFound(i) = true;
+                    packagedUnitaryFound = true;
+                }
+
+                // Skip zonal vrf terminal nodes that don't have to be included in the AFN
+                if (getVRFTUNodeNumber(m_state, i)) {
+                    NodeFound(i) = true;
+                    vrfTUFound = true;
+                }
+
+                // Skip Window AC with no OA
+                if (getWindowACNodeNumber(m_state, i)) {
+                    NodeFound(i) = true;
+                    windowACFound = true;
                 }
             }
 
@@ -10410,14 +10403,31 @@ namespace AirflowNetwork {
                 }
             }
         }
-        if (HPWHFound) {
+        if (hpwhFound) {
             ShowWarningError(m_state,
                              format(RoutineName) + "Heat pump water heater is simulated along with an AirflowNetwork but is not included in "
                                                    "the AirflowNetwork.");
         }
-        if (StandaloneERVFound) {
+        if (standaloneERVFound) {
             ShowWarningError(m_state,
                              format(RoutineName) + "A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an AirflowNetwork but is not "
+                                                   "included in the AirflowNetwork.");
+        }
+        if (packagedUnitaryFound) {
+            ShowWarningError(m_state,
+                             format(RoutineName) + "A ZoneHVAC:PackagedTerminalAirConditioner, ZoneHVAC:PackagedTerminalHeatPump, or "
+                                                   "ZoneHVAC:WaterToAirHeatPump is simulated along with an AirflowNetwork but is not "
+                                                   "included in the AirflowNetwork.");
+        }
+        if (vrfTUFound) {
+            ShowWarningError(m_state,
+                             format(RoutineName) +
+                                 "A ZoneHVAC:TerminalUnit:VariableRefrigerantFlow is simulated along with an AirflowNetwork but is not "
+                                 "included in the AirflowNetwork.");
+        }
+        if (windowACFound) {
+            ShowWarningError(m_state,
+                             format(RoutineName) + "A ZoneHVAC:WindowAirConditioner is simulated along with an AirflowNetwork but is not "
                                                    "included in the AirflowNetwork.");
         }
         NodeFound.deallocate();
@@ -10482,8 +10492,13 @@ namespace AirflowNetwork {
                         ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
                                    .FanIndex)
                         ->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans
+                        ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
+                                   .FanIndex)
+                        ->isAFNFan = true;
                 } else {
                     m_state.dataFans->fans(n)->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans->fans(n)->isAFNFan = true;
                 }
             }
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == iEPlusComponentType::COI) {
@@ -11243,16 +11258,7 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs hybrid ventilation control
 
-        auto &HybridVentSysAvailActualZoneNum = m_state.dataHVACGlobal->HybridVentSysAvailActualZoneNum;
-        auto &HybridVentSysAvailAirLoopNum = m_state.dataHVACGlobal->HybridVentSysAvailAirLoopNum;
-        auto &HybridVentSysAvailANCtrlStatus = m_state.dataHVACGlobal->HybridVentSysAvailANCtrlStatus;
-        auto &HybridVentSysAvailMaster = m_state.dataHVACGlobal->HybridVentSysAvailMaster;
-        auto &HybridVentSysAvailVentCtrl = m_state.dataHVACGlobal->HybridVentSysAvailVentCtrl;
-        auto &HybridVentSysAvailWindModifier = m_state.dataHVACGlobal->HybridVentSysAvailWindModifier;
-        auto &NumHybridVentSysAvailMgrs = m_state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr HybridVentCtrl_Close(2);                                                                 // Open windows or doors
         int constexpr IndividualCtrlType(0);                                                                   // Individual window or door control
         int constexpr GlobalCtrlType(1);                                                                       // Global window or door control
         static constexpr std::string_view RoutineName("AirflowNetwork::Solver::hybrid_ventilation_control: "); // include trailing blank space
@@ -11272,11 +11278,12 @@ namespace AirflowNetwork {
         }
         ControlType = IndividualCtrlType;
 
-        for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
-            int AirLoopNum = HybridVentSysAvailAirLoopNum(SysAvailNum);
-            VentilationCtrl = HybridVentSysAvailVentCtrl(SysAvailNum);
-            if (HybridVentSysAvailANCtrlStatus(SysAvailNum) > 0) {
-                ControlType = static_cast<int>(GetCurrentScheduleValue(m_state, HybridVentSysAvailANCtrlStatus(SysAvailNum)));
+        for (SysAvailNum = 1; SysAvailNum <= m_state.dataAvail->NumHybridVentSysAvailMgrs; ++SysAvailNum) {
+            auto &hybridVentMgr = m_state.dataAvail->HybridVentData(SysAvailNum);
+            int AirLoopNum = hybridVentMgr.AirLoopNum;
+            ventCtrlStatus = hybridVentMgr.ctrlStatus;
+            if (hybridVentMgr.ANCtrlStatus > 0) {
+                ControlType = static_cast<int>(GetCurrentScheduleValue(m_state, hybridVentMgr.ANCtrlStatus));
             }
             bool Found = false; // Logical to indicate whether a master surface is found or not
             int ActualZoneNum = 0;
@@ -11290,8 +11297,8 @@ namespace AirflowNetwork {
                             break;
                         }
                     } else {
-                        if (HybridVentSysAvailActualZoneNum(SysAvailNum) == ControlledZoneNum) {
-                            ActualZoneNum = HybridVentSysAvailActualZoneNum(SysAvailNum);
+                        if (hybridVentMgr.ControlledZoneNum == ControlledZoneNum) {
+                            ActualZoneNum = hybridVentMgr.ControlledZoneNum;
                         }
                     }
                 }
@@ -11301,15 +11308,15 @@ namespace AirflowNetwork {
                         auto const &surf = m_state.dataSurface->Surface(SurfNum);
 
                         if (surf.Zone == ActualZoneNum) {
-                            if (VentilationCtrl == HybridVentCtrl_Close) {
+                            if (ventCtrlStatus == Avail::VentCtrlStatus::Close) {
                                 MultizoneSurfaceData(ANSurfaceNum).HybridVentClose = true;
                             } else {
-                                if (HybridVentSysAvailWindModifier(SysAvailNum) >= 0) {
-                                    MultizoneSurfaceData(ANSurfaceNum).WindModifier = HybridVentSysAvailWindModifier(SysAvailNum);
+                                if (hybridVentMgr.WindModifier >= 0) {
+                                    MultizoneSurfaceData(ANSurfaceNum).WindModifier = hybridVentMgr.WindModifier;
                                 }
                                 if (ControlType == GlobalCtrlType) {
                                     MultizoneSurfaceData(ANSurfaceNum).HybridCtrlGlobal = true;
-                                    if (HybridVentSysAvailMaster(SysAvailNum) == ActualZoneNum) {
+                                    if (hybridVentMgr.Master == ActualZoneNum) {
                                         if ((surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::Door ||
                                              surf.OriginalClass == SurfaceClass::GlassDoor) &&
                                             surf.ExtBoundCond == ExternalEnvironment) {
@@ -11323,13 +11330,13 @@ namespace AirflowNetwork {
                     }
                 }
             }
-            if (ControlType == GlobalCtrlType && !Found && !m_state.dataGlobal->WarmupFlag && VentilationCtrl != HybridVentCtrl_Close) {
+            if (ControlType == GlobalCtrlType && !Found && !m_state.dataGlobal->WarmupFlag && ventCtrlStatus != Avail::VentCtrlStatus::Close) {
                 ++HybridGlobalErrCount;
                 if (HybridGlobalErrCount < 2) {
                     ShowWarningError(m_state,
                                      format("{}The hybrid ventilation control schedule value indicates global control in the controlled zone = {}",
                                             RoutineName,
-                                            m_state.dataHeatBal->Zone(HybridVentSysAvailMaster(SysAvailNum)).Name));
+                                            m_state.dataHeatBal->Zone(hybridVentMgr.Master).Name));
                     ShowContinueError(m_state,
                                       "The exterior surface containing an opening component in the controlled zone is not found.  No global control "
                                       "will not be modeled.");
@@ -12052,7 +12059,6 @@ namespace AirflowNetwork {
         int NodeMixer = 0;
         int NodeZoneIntlet = 0;
         int NodeZoneReturn = 0;
-        int NumOfBranches = 0;
         int AFNNodeNum;
         int AFNLinkNum;
         int AFNLinkNum1;

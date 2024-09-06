@@ -101,6 +101,26 @@ def time_step_handler(state):
 
             wall_construction_handle = api.exchange.get_construction_handle(state, "R13WALL")
             floor_construction_handle = api.exchange.get_construction_handle(state, "FLOOR")
+
+            idf_path = api.exchange.get_input_file_path(state)
+            epw_path = api.exchange.get_weather_file_path(state)
+            print(f"Got an input file path of: {idf_path}, and weather file path of: {epw_path}")
+
+            # checking for EMS globals
+            ems_global_valid = api.exchange.get_ems_global_handle(state, "MaximumEffort")
+            ems_global_invalid = api.exchange.get_ems_global_handle(state, "4or5moments")
+            ems_global_builtin = api.exchange.get_ems_global_handle(state, "WARMUPFLAG")
+            if ems_global_valid > 0 and ems_global_invalid == 0 and ems_global_builtin == 0:
+                print("EMS Global handle lookups worked just fine!")
+            else:
+                raise Exception(
+                    "EMS Global handle lookup failed.  Make sure to call this with _1ZoneUncontrolled_ForAPITesting.idf"
+                )
+            api.exchange.set_ems_global_value(state, ems_global_valid, 2.0)
+            val = api.exchange.get_ems_global_value(state, ems_global_valid)
+            if val < 1.9999 or val > 2.0001:
+                raise Exception("EMS Global assignment/lookup didn't seem to work, odd")
+
         except Exception as e:
             # Capture ok and exception message
             exception = e

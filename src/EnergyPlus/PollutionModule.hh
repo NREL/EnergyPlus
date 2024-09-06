@@ -387,6 +387,10 @@ struct PollutionData : BaseGlobalStruct
     Real64 PurchCoolCOP = 0.0;
     Real64 SteamConvEffic = 0.0;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->PollutionReportSetup = false;

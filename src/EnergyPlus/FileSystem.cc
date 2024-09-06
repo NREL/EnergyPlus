@@ -53,6 +53,7 @@
 #include <iostream>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <type_traits>
 
 #ifdef _WIN32
 #include <Shlwapi.h>
@@ -69,6 +70,8 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+
+#include <CLI/CLI11.hpp>
 
 namespace EnergyPlus {
 
@@ -98,9 +101,13 @@ namespace FileSystem {
         // filename. Do we really need that though?
         // path.make_preferred();
         fs::path result = path;
+#ifdef _WIN32
+        result.make_preferred();
+#else
         std::string tempPathAsStr = result.make_preferred().string();
         std::replace(tempPathAsStr.begin(), tempPathAsStr.end(), DataStringGlobals::altpathChar, DataStringGlobals::pathChar);
         result = fs::path(tempPathAsStr);
+#endif
         return result;
     }
 
@@ -113,13 +120,21 @@ namespace FileSystem {
     fs::path getParentDirectoryPath(fs::path const &path)
     {
         // Note: this is needed because "/a/b/c".parent_path() = "/a/b/c/"
+#ifdef _WIN32
+        std::wstring pathStr = path.native();
+        if (!pathStr.empty()) {
+            while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
+                pathStr.erase(pathStr.size() - 1);
+            }
+        }
+#else
         std::string pathStr = path.string();
         if (!pathStr.empty()) {
             while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
                 pathStr.erase(pathStr.size() - 1);
             }
         }
-
+#endif
         // If empty, return "./" instead
         fs::path parent_path = fs::path(pathStr).parent_path();
         if (parent_path.empty()) {
@@ -216,7 +231,7 @@ namespace FileSystem {
     // just compare to ".EPJSON" instead of "EPJSON"...
     fs::path getFileExtension(fs::path const &filePath)
     {
-        std::string pext = fs::path(filePath).extension().string();
+        std::string pext = toString(filePath.extension());
         if (!pext.empty()) {
             // remove '.'
             pext = std::string(++pext.begin(), pext.end());
@@ -226,15 +241,8 @@ namespace FileSystem {
 
     FileTypes getFileType(fs::path const &filePath)
     {
-#ifdef _WIN32
-        std::string const filePathStr = fs::path(filePath).extension().string();
-        std::string_view extension = filePathStr.c_str();
-#else
-        std::string_view extension = fs::path(filePath).extension().c_str();
-#endif
-
-        extension.remove_prefix(extension.find_last_of('.') + 1);
-        std::string stringExtension = std::string(extension);
+        std::string stringExtension = toString(filePath.extension());
+        stringExtension = stringExtension.substr(stringExtension.rfind('.') + 1);
         return static_cast<FileTypes>(getEnumValue(FileTypesExtUC, Util::makeUPPER(stringExtension)));
     }
 
@@ -257,7 +265,7 @@ namespace FileSystem {
         // Create a directory if doesn't already exist
         if (pathExists(directoryPath)) { // path already exists
             if (!directoryExists(directoryPath)) {
-                std::cout << "ERROR: " << getAbsolutePath(directoryPath).string() << " already exists and is not a directory." << std::endl;
+                std::cout << "ERROR: " << toString(getAbsolutePath(directoryPath)) << " already exists and is not a directory." << std::endl;
                 std::exit(EXIT_FAILURE);
             }
         } else { // directory does not already exist
@@ -338,98 +346,87 @@ namespace FileSystem {
 
     std::string readFile(fs::path const &filePath, std::ios_base::openmode mode)
     {
-#ifdef _WIN32
-        std::string filePathStr = filePath.string();
-        const char *path = filePathStr.c_str();
-#else
-        const char *path = filePath.c_str();
-#endif
-
+        // Shenanigans would not be needed with fmt 10+ (maybe earlier), because fmt has native fs::path support
         if (!fileExists(filePath)) {
-            throw FatalError(fmt::format("File does not exists: {}", path));
+            throw FatalError(fmt::format("File does not exists: {}", filePath));
         }
 
-        std::string_view fopen_mode;
-        if (mode == std::ios_base::in) {
-            fopen_mode = "r";
-        } else if (mode == std::ios_base::binary) {
-            fopen_mode = "b";
-        } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
-            fopen_mode = "rb";
-        } else {
+        // Can only be 'r', 'b' or 'rb'
+        if ((mode & (std::ios_base::in | std::ios_base::binary)) == 0) {
             throw FatalError("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary");
         }
 
-        auto close_file = [](FILE *f) { fclose(f); };
-        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file); // (THIS_AUTO_OK)
-        if (!holder) {
-            throw FatalError(fmt::format("Could not open file: {}", path));
+        const std::uintmax_t file_size = fs::file_size(filePath);
+        std::ifstream file(filePath, mode);
+        if (!file.is_open()) {
+            throw FatalError(fmt::format("Could not open file: {}", filePath));
         }
-
-        auto f = holder.get(); // (THIS_AUTO_OK)
-        const std::uintmax_t size = fs::file_size(filePath);
-        std::string result;
-        result.resize(size);
-
-        size_t bytes_read = fread(result.data(), 1, size, f);
-        bool is_eof = feof(f);
-        bool has_error = ferror(f);
-        if (is_eof != 0) {
-            return result;
-        }
-        if (has_error != 0 || bytes_read != size) {
-            throw FatalError(fmt::format("Error reading file: {}", path));
-        }
+        std::string result(file_size, '\0');
+        file.read(result.data(), file_size);
         return result;
     }
 
     nlohmann::json readJSON(fs::path const &filePath, std::ios_base::openmode mode)
     {
-#ifdef _WIN32
-        std::string filePathStr = filePath.string();
-        const char *path = filePathStr.c_str();
-#else
-        const char *path = filePath.c_str();
-#endif
 
+        // Shenanigans would not be needed with fmt 10+ (maybe earlier), because fmt has native fs::path support
         if (!fileExists(filePath)) {
-            throw FatalError(fmt::format("File does not exists: {}", path));
+            throw FatalError(fmt::format("File does not exists: {}", filePath));
         }
 
-        std::string_view fopen_mode;
-        if (mode == std::ios_base::in) {
-            fopen_mode = "r";
-        } else if (mode == std::ios_base::binary) {
-            fopen_mode = "b";
-        } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
-            fopen_mode = "rb";
-        } else {
+        // Can only be 'r', 'b' or 'rb'
+        if ((mode & (std::ios_base::in | std::ios_base::binary)) == 0) {
             throw FatalError("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary");
         }
 
-        auto close_file = [](FILE *f) { fclose(f); };
-        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file); // (THIS_AUTO_OK)
-        if (!holder) {
-            throw FatalError(fmt::format("Could not open file: {}", path));
+        std::ifstream file(filePath, mode);
+        if (!file.is_open()) {
+            throw FatalError(fmt::format("Could not open file: {}", filePath));
         }
-        auto f = holder.get(); // (THIS_AUTO_OK)
 
         FileTypes const ext = getFileType(filePath);
         switch (ext) {
         case FileTypes::EpJSON:
         case FileTypes::JSON:
         case FileTypes::GLHE:
-            return nlohmann::json::parse(f, nullptr, true, true);
+            return nlohmann::json::parse(file, nullptr, true, true);
         case FileTypes::CBOR:
-            return nlohmann::json::from_cbor(f);
+            return nlohmann::json::from_cbor(file);
         case FileTypes::MsgPack:
-            return nlohmann::json::from_msgpack(f);
+            return nlohmann::json::from_msgpack(file);
         case FileTypes::UBJSON:
-            return nlohmann::json::from_ubjson(f);
+            return nlohmann::json::from_ubjson(file);
         case FileTypes::BSON:
-            return nlohmann::json::from_bson(f);
+            return nlohmann::json::from_bson(file);
         default:
             throw FatalError("Invalid file extension. Must be epJSON, JSON, or other experimental extensions");
+        }
+    }
+
+    std::string toString(fs::path const &p)
+    {
+        if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
+            return CLI::narrow(p.wstring());
+        } else {
+            return p.string();
+        }
+    }
+
+    std::string toGenericString(fs::path const &p)
+    {
+        if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
+            return CLI::narrow(p.generic_wstring());
+        } else {
+            return p.generic_string();
+        }
+    }
+
+    fs::path appendSuffixToPath(fs::path const &outputFilePrefixFullPath, const std::string &suffix)
+    {
+        if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
+            return {outputFilePrefixFullPath.wstring() + CLI::widen(suffix)};
+        } else {
+            return {outputFilePrefixFullPath.string() + suffix};
         }
     }
 

@@ -482,6 +482,17 @@ namespace ScheduleManager {
                     skiprowCount = 1; // make sure to parse header row only for Schedule:File:Shading
                     auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(state.files.TempFullFilePath.filePath,
                                                                                           csvParser.decode(schedule_data, ColumnSep, skiprowCount));
+                    if (csvParser.hasErrors()) {
+                        for (const auto &[error, isContinued] : csvParser.errors()) {
+                            if (isContinued) {
+                                ShowContinueError(state, error);
+                            } else {
+                                ShowSevereError(state, error);
+                            }
+                        }
+                        ShowContinueError(state, fmt::format("Error Occurred in {}", state.files.TempFullFilePath.filePath));
+                        ShowFatalError(state, "Program terminates due to previous condition.");
+                    }
                     schedule_file_shading_result = it.first;
                 } else if (FileSystem::is_all_json_type(ext)) {
                     auto schedule_data = FileSystem::readJSON(state.files.TempFullFilePath.filePath);
@@ -513,7 +524,7 @@ namespace ScheduleManager {
                                         Alphas(1)));
                 ShowContinueError(state, "This was a problem in E+ 22.2.0 and below, consider removing it from the file to suppress this warning.");
                 schedule_file_shading_result->second["header"].erase(NumCSVAllColumnsSchedules);
-                schedule_file_shading_result->second["values"].erase(NumCSVAllColumnsSchedules);
+                assert(schedule_file_shading_result->second["header"].size() == schedule_file_shading_result->second["values"].size());
                 --NumCSVAllColumnsSchedules;
             }
 
@@ -1786,6 +1797,17 @@ namespace ScheduleManager {
                         CsvParser csvParser;
                         auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(
                             state.files.TempFullFilePath.filePath, csvParser.decode(schedule_data, ColumnSep, skiprowCount));
+                        if (csvParser.hasErrors()) {
+                            for (const auto &[error, isContinued] : csvParser.errors()) {
+                                if (isContinued) {
+                                    ShowContinueError(state, error);
+                                } else {
+                                    ShowSevereError(state, error);
+                                }
+                            }
+                            ShowContinueError(state, fmt::format("Error Occurred in {}", state.files.TempFullFilePath.filePath));
+                            ShowFatalError(state, "Program terminates due to previous condition.");
+                        }
                         result = it.first;
                     } else if (FileSystem::is_all_json_type(ext)) {
                         auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(

@@ -221,7 +221,7 @@ namespace OutdoorAirUnit {
         int NumComponents;
         std::string ComponentListName;
         Real64 CompOutSetTemp; // component outlet setpoint temperature
-        int AvailStatus;
+        Avail::Status availStatus = Avail::Status::NoAction;
         std::string AvailManagerListName; // Name of an availability manager list object
         Array1D<OAEquipList> OAEquip;
         // Report data
@@ -249,9 +249,9 @@ namespace OutdoorAirUnit {
               OutsideAirNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), ExtAirVolFlow(0.0), ExtAirMassFlow(0.0), ExtOutAirSchedPtr(0),
               SMaxAirMassFlow(0.0), EMaxAirMassFlow(0.0), SFanMaxAirVolFlow(0.0), EFanMaxAirVolFlow(0.0), HiCtrlTempSchedPtr(0),
               LoCtrlTempSchedPtr(0), OperatingMode(Operation::Invalid), ControlCompTypeNum(0), CompErrIndex(0), AirMassFlow(0.0), FlowError(false),
-              NumComponents(0), CompOutSetTemp(0.0), AvailStatus(0), TotCoolingRate(0.0), TotCoolingEnergy(0.0), SensCoolingRate(0.0),
-              SensCoolingEnergy(0.0), LatCoolingRate(0.0), LatCoolingEnergy(0.0), ElecFanRate(0.0), ElecFanEnergy(0.0), SensHeatingEnergy(0.0),
-              SensHeatingRate(0.0), LatHeatingEnergy(0.0), LatHeatingRate(0.0), TotHeatingEnergy(0.0), TotHeatingRate(0.0), FirstPass(true)
+              NumComponents(0), CompOutSetTemp(0.0), TotCoolingRate(0.0), TotCoolingEnergy(0.0), SensCoolingRate(0.0), SensCoolingEnergy(0.0),
+              LatCoolingRate(0.0), LatCoolingEnergy(0.0), ElecFanRate(0.0), ElecFanEnergy(0.0), SensHeatingEnergy(0.0), SensHeatingRate(0.0),
+              LatHeatingEnergy(0.0), LatHeatingRate(0.0), TotHeatingEnergy(0.0), TotHeatingRate(0.0), FirstPass(true)
         {
         }
     };
@@ -309,6 +309,8 @@ namespace OutdoorAirUnit {
     int GetOutdoorAirUnitZoneInletNode(EnergyPlusData &state, int OAUnitNum);
 
     int GetOutdoorAirUnitReturnAirNode(EnergyPlusData &state, int OAUnitNum);
+
+    int getOutdoorAirUnitEqIndex(EnergyPlusData &state, std::string_view EquipName);
 } // namespace OutdoorAirUnit
 
 struct OutdoorAirUnitData : BaseGlobalStruct
@@ -331,9 +333,13 @@ struct OutdoorAirUnitData : BaseGlobalStruct
     bool HeatActive = false;
     bool CoolActive = false;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = OutdoorAirUnitData();
+        new (this) OutdoorAirUnitData();
     }
 };
 

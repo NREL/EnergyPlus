@@ -47,7 +47,7 @@
 
 // C++ Headers
 #include <algorithm>
-#include <cmath>
+
 #include <string>
 
 // ObjexxFCL Headers
@@ -119,6 +119,8 @@ namespace EnergyPlus::HVACManager {
 // The timestep is shortened using a bisection method.
 
 static constexpr std::array<Real64, DataPlant::NumConvergenceHistoryTerms> ConvergenceHistoryARR = {0.0, -1.0, -2.0, -3.0, -4.0};
+static constexpr std::array<std::string_view, static_cast<int>(ConvErrorCallType::Num)> ConvErrorCallString = {
+    "mass flow rate", "humidity ratio", "temperature", "energy", "CO2", "generic contaminant"};
 constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
 constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
 constexpr Real64 sum_square_ConvergenceHistoryARR(30.0);
@@ -226,7 +228,7 @@ void ManageHVAC(EnergyPlusData &state)
                                                                        state.dataHVACGlobal->UseZoneTimeStepHistory,
                                                                        PriorTimeStep);
 
-    SystemAvailabilityManager::ManageHybridVentilation(state);
+    Avail::ManageHybridVentilation(state);
 
     ZoneEquipmentManager::CalcAirFlowSimple(state);
     if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
@@ -319,7 +321,7 @@ void ManageHVAC(EnergyPlusData &state)
 
         if (state.dataHVACGlobal->TimeStepSys < state.dataGlobal->TimeStepZone) {
 
-            SystemAvailabilityManager::ManageHybridVentilation(state);
+            Avail::ManageHybridVentilation(state);
             ZoneEquipmentManager::CalcAirFlowSimple(state, SysTimestepLoop);
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 state.afn->RollBackFlag = false;
@@ -811,7 +813,7 @@ void SimHVAC(EnergyPlusData &state)
     PlantManager::ReInitPlantLoopsAtFirstHVACIteration(state);
 
     // Before the HVAC simulation, call ManageSystemAvailability to set the system on/off flags
-    SystemAvailabilityManager::ManageSystemAvailability(state);
+    Avail::ManageSystemAvailability(state);
 
     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::AfterHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
@@ -978,145 +980,55 @@ void SimHVAC(EnergyPlusData &state)
             if (state.dataGlobal->DisplayExtraWarnings) {
 
                 for (int AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
-
-                    auto &arrayRef = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACMassFlowNotConverged;
-                    if (std::any_of(std::begin(arrayRef), std::end(arrayRef), [](bool i) { return i; })) {
-
-                        ShowContinueError(state,
-                                          format("Air System Named = {} did not converge for mass flow rate",
-                                                 state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName));
-                        ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        std::string HistoryTrace = "";
-                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                            HistoryTrace +=
-                                format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACFlowDemandToSupplyTolValue[StackDepth]);
-                        }
-
-                        ShowContinueError(state,
-                                          format("Demand-to-Supply interface mass flow rate check value iteration history trace: {}", HistoryTrace));
-                        HistoryTrace = "";
-                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                            HistoryTrace += format(
-                                "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck1ToDemandTolValue[StackDepth]);
-                        }
-                        ShowContinueError(
-                            state, format("Supply-to-demand interface deck 1 mass flow rate check value iteration history trace: {}", HistoryTrace));
-
-                        if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
-                            HistoryTrace = "";
-                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace +=
-                                    format("{:.6R},",
-                                           state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck2ToDemandTolValue[StackDepth]);
-                            }
-                            ShowContinueError(
-                                state,
-                                format("Supply-to-demand interface deck 2 mass flow rate check value iteration history trace: {}", HistoryTrace));
-                        }
-                    } // mass flow rate not converged
-
-                    auto &arrayRef2 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumRatNotConverged;
-                    if (std::any_of(std::begin(arrayRef2), std::end(arrayRef2), [](bool i) { return i; })) {
-
-                        ShowContinueError(state,
-                                          format("Air System Named = {} did not converge for humidity ratio",
-                                                 state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName));
-                        ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        std::string HistoryTrace = "";
-                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                            HistoryTrace +=
-                                format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumDemandToSupplyTolValue[StackDepth]);
-                        }
-                        ShowContinueError(state,
-                                          format("Demand-to-Supply interface humidity ratio check value iteration history trace: {}", HistoryTrace));
-                        HistoryTrace = "";
-                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                            HistoryTrace += format(
-                                "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumSupplyDeck1ToDemandTolValue[StackDepth]);
-                        }
-                        ShowContinueError(
-                            state, format("Supply-to-demand interface deck 1 humidity ratio check value iteration history trace: {}", HistoryTrace));
-
-                        if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
-                            HistoryTrace = "";
-                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace +=
-                                    format("{:.6R},",
-                                           state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumSupplyDeck2ToDemandTolValue[StackDepth]);
-                            }
-                            ShowContinueError(
-                                state,
-                                format("Supply-to-demand interface deck 2 humidity ratio check value iteration history trace: {}", HistoryTrace));
-                        }
-                    } // humidity ratio not converged
-
-                    auto &arrayRef3 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempNotConverged;
-                    if (std::any_of(std::begin(arrayRef3), std::end(arrayRef3), [](bool i) { return i; })) {
-
-                        ShowContinueError(state,
-                                          format("Air System Named = {} did not converge for temperature",
-                                                 state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName));
-                        ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        std::string HistoryTrace = "";
-                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                            HistoryTrace +=
-                                format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempDemandToSupplyTolValue[StackDepth]);
-                        }
-                        ShowContinueError(state,
-                                          format("Demand-to-Supply interface temperature check value iteration history trace: {}", HistoryTrace));
-                        HistoryTrace = "";
-                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                            HistoryTrace += format(
-                                "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue[StackDepth]);
-                        }
-                        ShowContinueError(
-                            state, format("Supply-to-demand interface deck 1 temperature check value iteration history trace: {}", HistoryTrace));
-
-                        if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
-                            HistoryTrace = "";
-                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace +=
-                                    format("{:.6R},",
-                                           state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue[StackDepth]);
-                            }
-                            ShowContinueError(
-                                state, format("Supply-to-demand interface deck 2 temperature check value iteration history trace: {}", HistoryTrace));
-                        }
-                    } // Temps not converged
-
-                    auto &arrayRef4 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergyNotConverged;
-                    if (std::any_of(std::begin(arrayRef4), std::end(arrayRef4), [](bool i) { return i; })) {
-
-                        ShowContinueError(
-                            state,
-                            format("Air System Named = {} did not converge for energy", state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName));
-                        ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        std::string HistoryTrace = "";
-                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                            HistoryTrace += format(
-                                "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergyDemandToSupplyTolValue[StackDepth]);
-                        }
-                        ShowContinueError(state, format("Demand-to-Supply interface energy check value iteration history trace: {}", HistoryTrace));
-                        HistoryTrace = "";
-                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                            HistoryTrace += format(
-                                "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck1ToDemandTolValue[StackDepth]);
-                        }
-                        ShowContinueError(state,
-                                          format("Supply-to-demand interface deck 1 energy check value iteration history trace: {}", HistoryTrace));
-
-                        if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
-                            HistoryTrace = "";
-                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace +=
-                                    format("{:.6R},",
-                                           state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck2ToDemandTolValue[StackDepth]);
-                            }
-                            ShowContinueError(
-                                state, format("Supply-to-demand interface deck 2 energy check value iteration history trace: {}", HistoryTrace));
-                        }
-                    } // energy not converged
-
+                    auto &conv = state.dataConvergeParams->AirLoopConvergence(AirSysNum);
+                    // mass flow rate
+                    ConvergenceErrors(state,
+                                      conv.HVACMassFlowNotConverged,
+                                      conv.HVACFlowDemandToSupplyTolValue,
+                                      conv.HVACFlowSupplyDeck1ToDemandTolValue,
+                                      conv.HVACFlowSupplyDeck2ToDemandTolValue,
+                                      AirSysNum,
+                                      ConvErrorCallType::MassFlow);
+                    // humidity ratio
+                    ConvergenceErrors(state,
+                                      conv.HVACHumRatNotConverged,
+                                      conv.HVACHumDemandToSupplyTolValue,
+                                      conv.HVACHumSupplyDeck1ToDemandTolValue,
+                                      conv.HVACHumSupplyDeck2ToDemandTolValue,
+                                      AirSysNum,
+                                      ConvErrorCallType::HumidityRatio);
+                    // temperature
+                    ConvergenceErrors(state,
+                                      conv.HVACTempNotConverged,
+                                      conv.HVACTempDemandToSupplyTolValue,
+                                      conv.HVACTempSupplyDeck1ToDemandTolValue,
+                                      conv.HVACTempSupplyDeck2ToDemandTolValue,
+                                      AirSysNum,
+                                      ConvErrorCallType::Temperature);
+                    // energy
+                    ConvergenceErrors(state,
+                                      conv.HVACEnergyNotConverged,
+                                      conv.HVACEnergyDemandToSupplyTolValue,
+                                      conv.HVACEnergySupplyDeck1ToDemandTolValue,
+                                      conv.HVACEnergySupplyDeck2ToDemandTolValue,
+                                      AirSysNum,
+                                      ConvErrorCallType::Energy);
+                    // CO2
+                    ConvergenceErrors(state,
+                                      conv.HVACCO2NotConverged,
+                                      conv.HVACCO2DemandToSupplyTolValue,
+                                      conv.HVACCO2SupplyDeck1ToDemandTolValue,
+                                      conv.HVACCO2SupplyDeck2ToDemandTolValue,
+                                      AirSysNum,
+                                      ConvErrorCallType::CO2);
+                    // generic contaminant
+                    ConvergenceErrors(state,
+                                      conv.HVACGenContamNotConverged,
+                                      conv.HVACGenContamDemandToSupplyTolValue,
+                                      conv.HVACGenContamSupplyDeck1ToDemandTolValue,
+                                      conv.HVACGenContamSupplyDeck2ToDemandTolValue,
+                                      AirSysNum,
+                                      ConvErrorCallType::Generic);
                 } // loop over air loop systems
 
                 // loop over zones and check for issues with zone inlet nodes
@@ -1202,7 +1114,7 @@ void SimHVAC(EnergyPlusData &state)
                         }         // last value does not equal average of stack.
 
                         if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
-                            std::string HistoryTrace = "";
+                            std::string HistoryTrace;
                             for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 HistoryTrace += format("{:.6R},", humRatInletNode[StackDepth]);
                             }
@@ -1288,7 +1200,7 @@ void SimHVAC(EnergyPlusData &state)
                         }         // last value does not equal average of stack.
 
                         if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
-                            std::string HistoryTrace = "";
+                            std::string HistoryTrace;
                             for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 HistoryTrace += format("{:.6R},", mdotInletNode[StackDepth]);
                             }
@@ -1374,7 +1286,7 @@ void SimHVAC(EnergyPlusData &state)
                         }         // last value does not equal average of stack.
 
                         if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
-                            std::string HistoryTrace = "";
+                            std::string HistoryTrace;
                             for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 HistoryTrace += format("{:.6R},", inletTemp[StackDepth]);
                             }
@@ -1398,7 +1310,7 @@ void SimHVAC(EnergyPlusData &state)
                         ShowContinueError(
                             state, format("Plant System Named = {} did not converge for mass flow rate", state.dataPlnt->PlantLoop(LoopNum).Name));
                         ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        std::string HistoryTrace = "";
+                        std::string HistoryTrace;
                         for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace +=
                                 format("{:.6R},", state.dataConvergeParams->PlantConvergence(LoopNum).PlantFlowDemandToSupplyTolValue[StackDepth]);
@@ -1579,7 +1491,7 @@ void SimHVAC(EnergyPlusData &state)
                         ShowContinueError(
                             state, format("Plant System Named = {} did not converge for temperature", state.dataPlnt->PlantLoop(LoopNum).Name));
                         ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        std::string HistoryTrace = "";
+                        std::string HistoryTrace;
                         for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace +=
                                 format("{:.6R},", state.dataConvergeParams->PlantConvergence(LoopNum).PlantTempDemandToSupplyTolValue[StackDepth]);
@@ -2139,7 +2051,7 @@ void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir) // TRUE means air 
     }
 }
 
-void ResetHVACControl(EnergyPlusData &state)
+void ResetHVACControl(EnergyPlusData const &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2275,7 +2187,8 @@ void ReportInfiltrations(EnergyPlusData &state)
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(NZ)) ADSCorrectionFactor=0
-            if ((state.dataZoneEquip->ZoneEquipAvail(NZ) == HVAC::CycleOn || state.dataZoneEquip->ZoneEquipAvail(NZ) == HVAC::CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(NZ) == Avail::Status::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(NZ) == Avail::Status::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(NZ))
                 ADSCorrectionFactor = 0.0;
         }
@@ -2373,8 +2286,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, zone.OutDryBulbTemp);
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
-            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOn ||
-                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == Avail::Status::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == Avail::Status::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(ZoneLoop)) {
                 ADSCorrectionFactor = 0.0;
             }
@@ -2383,7 +2296,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         znAirRpt.ExhTotalLoss = 0;
         znAirRpt.ExhSensiLoss = 0;
 
-        for (int FanNum = 1; FanNum <= state.dataFans->fans.size(); ++FanNum) {
+        for (int FanNum = 1; FanNum <= (int)state.dataFans->fans.size(); ++FanNum) {
             auto const *thisFan = state.dataFans->fans(FanNum);
             //  Add reportable vars
             if (thisFan->type == HVAC::FanType::Exhaust) {
@@ -2429,8 +2342,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
-            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOn ||
-                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == Avail::Status::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == Avail::Status::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(ZoneLoop))
                 ADSCorrectionFactor = 0.0;
         }
@@ -2909,9 +2822,9 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
         auto &airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo(AirLoopNum);
         if (airLoopControlInfo.CycFanSchedPtr > 0) {
             if (ScheduleManager::GetCurrentScheduleValue(state, airLoopControlInfo.CycFanSchedPtr) == 0.0) {
-                airLoopControlInfo.FanOpMode = HVAC::CycFanCycCoil;
+                airLoopControlInfo.fanOp = HVAC::FanOp::Cycling;
             } else {
-                airLoopControlInfo.FanOpMode = HVAC::ContFanCycCoil;
+                airLoopControlInfo.fanOp = HVAC::FanOp::Continuous;
             }
         }
     }
@@ -2926,7 +2839,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
             for (int zoneInNode = 1; zoneInNode <= zoneEquipConfig.NumInletNodes; ++zoneInNode) {
                 int AirLoopNum = zoneEquipConfig.InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
-                    if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == HVAC::ContFanCycCoil) {
+                    if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).fanOp == HVAC::FanOp::Continuous) {
                         thisZone.NoHeatToReturnAir = false;
                         break;
                     }
@@ -2939,7 +2852,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
 void UpdateZoneInletConvergenceLog(EnergyPlusData &state)
 {
 
-    std::array<Real64, DataConvergParams::ConvergLogStackDepth> tmpRealARR;
+    std::array<Real64, DataConvergParams::ConvergLogStackDepth> tmpRealARR = {};
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
@@ -2995,4 +2908,41 @@ void CheckAirLoopFlowBalance(EnergyPlusData &state)
     }
 }
 
+void ConvergenceErrors(EnergyPlusData &state,
+                       std::array<bool, 3> &HVACNotConverged,
+                       std::array<Real64, 10> &DemandToSupply,
+                       std::array<Real64, 10> &SupplyDeck1ToDemand,
+                       std::array<Real64, 10> &SupplyDeck2ToDemand,
+                       int const AirSysNum,
+                       ConvErrorCallType const callType)
+{
+
+    std::string_view const CaseName = ConvErrorCallString[(int)callType];
+
+    auto &arrayRef = HVACNotConverged;
+    if (std::any_of(std::begin(arrayRef), std::end(arrayRef), [](bool i) { return i; })) {
+
+        ShowContinueError(
+            state, format("Air System Named = {} did not converge for {}", state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName, CaseName));
+        ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
+        std::string HistoryTrace;
+        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+            HistoryTrace += format("{:.6R},", DemandToSupply[StackDepth]);
+        }
+        ShowContinueError(state, format("Demand-to-Supply interface {} check value iteration history trace: {}", CaseName, HistoryTrace));
+        HistoryTrace = "";
+        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+            HistoryTrace += format("{:.6R},", SupplyDeck1ToDemand[StackDepth]);
+        }
+        ShowContinueError(state, format("Supply-to-demand interface deck 1 {} check value iteration history trace: {}", CaseName, HistoryTrace));
+
+        if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
+            HistoryTrace = "";
+            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                HistoryTrace += format("{:.6R},", SupplyDeck2ToDemand[StackDepth]);
+            }
+            ShowContinueError(state, format("Supply-to-demand interface deck 2 {} check value iteration history trace: {}", CaseName, HistoryTrace));
+        }
+    } // energy not converged
+}
 } // namespace EnergyPlus::HVACManager

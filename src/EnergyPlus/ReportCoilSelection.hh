@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -98,7 +99,8 @@ public:                                  // data
     int typeof_Coil; // type of coil, e.g., PlantEquipmentType::CoilWaterSimpleHeating, PlantEquipmentType::CoilWaterDetailedFlatCooling,
                      // PlantEquipmentType::CoilWaterCooling
 
-    int coilSizingMethodConcurrence;             // 1 = noncoincident, 2 = coincident
+    DataSizing::CoilSizingConcurrence coilSizingMethodConcurrence =
+        DataSizing::CoilSizingConcurrence::NA;   // non-coincident, coincident, combination, n/a
     std::string coilSizingMethodConcurrenceName; // string name of sizing method for concurrence
 
     int coilSizingMethodCapacity; // 8=CoolingDesignCapacity, 9=HeatingDesignCapacity, 10=CapacityPerFloorArea, 11=FractionOfAutosizedCoolingCapacity,
@@ -404,6 +406,13 @@ public: // methods
                               HVAC::FanType fanType,
                               int fanIndex);
 
+    void setCoilEqNum(EnergyPlusData &state,
+                      std::string const &coilName,
+                      std::string const &coilType,
+                      int const curSysNum,
+                      int const curOASysNum,
+                      int const curZoneEqNum);
+
     static std::string getTimeText(EnergyPlusData &state, int const timeStepAtPeak);
 
     bool isCompTypeFan(std::string const &compType // string component type, input object class name
@@ -432,6 +441,8 @@ private: // methods
                                                std::string const &coilType  // idf input object class name of coil
     );
 
+    void associateZoneCoilWithParent(EnergyPlusData &state, std::unique_ptr<CoilSelectionData> &c);
+
 public: // data
     int numCoilsReported_;
     std::vector<std::unique_ptr<CoilSelectionData>> coilSelectionDataObjs;
@@ -444,6 +455,10 @@ struct ReportCoilSelectionData : BaseGlobalStruct
 {
 
     std::unique_ptr<ReportCoilSelection> coilSelectionReportObj;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

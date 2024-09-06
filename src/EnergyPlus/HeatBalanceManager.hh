@@ -117,9 +117,9 @@ namespace HeatBalanceManager {
                          std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
                          Array1D_string const &cAlphaArgs,
-                         int const &NumAlphas,
+                         int const NumAlphas,
                          Array1D<Real64> const &rNumericArgs,
-                         int const &NumNumbers,
+                         int const NumNumbers,
                          Array1D_bool const &lNumericFieldBlanks, // Unused
                          Array1D_bool const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,
@@ -235,6 +235,10 @@ struct HeatBalanceMgrData : BaseGlobalStruct
 
     Array1D<HeatBalanceManager::WarmupConvergence> WarmupConvergenceValues;
     SurfaceOctreeCube surfaceOctree;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

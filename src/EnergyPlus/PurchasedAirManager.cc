@@ -1037,7 +1037,7 @@ void GetPurchasedAir(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Zone Ideal Loads Hybrid Ventilation Available Status",
                             Constant::Units::None,
-                            PurchAir(PurchAirNum).AvailStatus,
+                            (int &)PurchAir(PurchAirNum).availStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             PurchAir(PurchAirNum).Name);
@@ -2070,11 +2070,6 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     //                      July 2012, Chandan Sharma - FSEC: Added hybrid ventilation manager
     //       RE-ENGINEERED  na
 
-    // Using/Aliasing
-    using HVAC::ForceOff;
-    using HVAC::SmallLoad;
-    auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcPurchAirLoads");
 
@@ -2148,12 +2143,12 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     QZnHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToHeatSP;
     QZnCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToCoolSP;
 
-    if (allocated(ZoneComp)) {
-        auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum);
+    if (allocated(state.dataAvail->ZoneComp)) {
+        auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum);
         availMgr.ZoneNum = ControlledZoneNum;
-        PurchAir(PurchAirNum).AvailStatus = availMgr.AvailStatus;
+        PurchAir(PurchAirNum).availStatus = availMgr.availStatus;
         // Check if the hybrid ventilation availability manager is turning the unit off
-        if (PurchAir(PurchAirNum).AvailStatus == ForceOff) {
+        if (PurchAir(PurchAirNum).availStatus == Avail::Status::ForceOff) {
             UnitOn = false;
         }
     }
@@ -3321,6 +3316,22 @@ int GetPurchasedAirReturnAirNode(EnergyPlusData &state, int const PurchAirNum)
     }
 
     return GetPurchasedAirReturnAirNode;
+}
+
+int getPurchasedAirIndex(EnergyPlusData &state, std::string_view PurchAirName)
+{
+    if (state.dataPurchasedAirMgr->GetPurchAirInputFlag) {
+        GetPurchasedAir(state);
+        state.dataPurchasedAirMgr->GetPurchAirInputFlag = false;
+    }
+
+    for (int PurchAirNum = 1; PurchAirNum <= state.dataPurchasedAirMgr->NumPurchAir; ++PurchAirNum) {
+        if (Util::SameString(state.dataPurchasedAirMgr->PurchAir(PurchAirNum).Name, PurchAirName)) {
+            return PurchAirNum;
+        }
+    }
+
+    return 0;
 }
 
 Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int const PurchAirNum)

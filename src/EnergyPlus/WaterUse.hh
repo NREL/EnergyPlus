@@ -153,7 +153,6 @@ namespace WaterUse {
     {
         std::string Name;        // Name of DHW
         bool Init = true;        // Flag for initialization:  TRUE means do the init
-        bool InitSizing = true;  // Flag for initialization of plant sizing
         bool StandAlone = false; // Flag for operation with no plant connections
         int InletNode = 0;       // Hot water demand node
         int OutletNode = 0;      // Cold water supply node
@@ -168,7 +167,6 @@ namespace WaterUse {
         Real64 Effectiveness = 0.0;
         Real64 RecoveryRate = 0.0;
         Real64 RecoveryEnergy = 0.0;
-        Real64 MainsMassFlowRate = 0.0; // Mass flow rate (kg/s)
         Real64 TankMassFlowRate = 0.0;  // Mass flow rate (kg/s)
         Real64 ColdMassFlowRate = 0.0;  // Mass flow rate (kg/s)  cold = mains + tank
         Real64 HotMassFlowRate = 0.0;   // Mass flow rate (kg/s)
@@ -176,7 +174,6 @@ namespace WaterUse {
         Real64 DrainMassFlowRate = 0.0;
         Real64 RecoveryMassFlowRate = 0.0;
         Real64 PeakVolFlowRate = 0.0;  // Volumetric flow rate, also water consumption rate (m3/s)
-        Real64 MainsVolFlowRate = 0.0; // Volumetric flow rate, also water consumption rate (m3/s)
         Real64 TankVolFlowRate = 0.0;  // Volumetric flow rate, also water consumption rate (m3/s)
         Real64 ColdVolFlowRate = 0.0;  // Volumetric flow rate, also water consumption rate (m3/s)
         Real64 HotVolFlowRate = 0.0;   // Volumetric flow rate, also water consumption rate (m3/s)
@@ -185,7 +182,6 @@ namespace WaterUse {
         Real64 PeakMassFlowRate = 0.0; // Peak Mass flow rate for MassFlowRateMax
         int ColdTempSchedule = 0;      // Index for schedule object
         int HotTempSchedule = 0;       // Index for schedule object
-        Real64 MainsTemp = 0.0;        // Cold supply water temperature (C)
         Real64 TankTemp = 0.0;         // Cold supply water temperature (C)
         Real64 ColdSupplyTemp = 0.0;   // cold from mains, schedule, or tank, depending
         Real64 ColdTemp = 0.0;         // Cold supply water temperature (C)  actual cold (could be reheated)
@@ -195,7 +191,6 @@ namespace WaterUse {
         Real64 ReturnTemp = 0.0;
         Real64 WasteTemp = 0.0;
         Real64 TempError = 0.0;
-        Real64 MainsVolume = 0.0; // Water consumption (m3)
         Real64 TankVolume = 0.0;  // Water consumption (m3)
         Real64 ColdVolume = 0.0;  // Water consumption (m3)
         Real64 HotVolume = 0.0;   // Water consumption (m3)
@@ -243,6 +238,8 @@ namespace WaterUse {
 
     void CalcWaterUseZoneGains(EnergyPlusData &state);
 
+    Real64 calcH2ODensity(EnergyPlusData &state);
+
 } // namespace WaterUse
 
 struct WaterUseData : BaseGlobalStruct
@@ -251,10 +248,16 @@ struct WaterUseData : BaseGlobalStruct
     int numWaterEquipment = 0;
     int numWaterConnections = 0;
     bool getWaterUseInputFlag = true;
+    bool calcRhoH2O = true;
     bool MyEnvrnFlagLocal = true;
+    Real64 rhoH2OStd = 1000.0;
     Array1D_bool CheckEquipName;
     EPVector<WaterUse::WaterEquipmentType> WaterEquipment;
     EPVector<WaterUse::WaterConnectionsType> WaterConnections;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

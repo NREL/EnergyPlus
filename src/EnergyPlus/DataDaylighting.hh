@@ -245,6 +245,7 @@ namespace Dayltg {
     {
         // Members
         std::string Name;                    // Map name
+        int spaceIndex = 0;                  // Index to space being mapped
         int zoneIndex = 0;                   // Index to zone being mapped
         int enclIndex = 0;                   // Index to enclosure for this map
         Real64 Z = 0.0;                      // Elevation or height

@@ -225,7 +225,7 @@ void GetBoilerInput(EnergyPlusData &state)
             ShowSevereError(
                 state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("Invalid {}={:.3R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowSevereError(state, format("...{} must be greater than 0.0", state.dataIPShortCut->cNumericFieldNames(2)));
+            ShowContinueError(state, format("...{} must be greater than 0.0", state.dataIPShortCut->cNumericFieldNames(2)));
             ErrorsFound = true;
         } else if (state.dataIPShortCut->rNumericArgs(2) > 1.0) {
             ShowWarningError(state,
@@ -288,7 +288,7 @@ void GetBoilerInput(EnergyPlusData &state)
             ShowSevereError(state,
                             fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
-            ShowSevereError(state, format("...{} not found.", state.dataIPShortCut->cAlphaFieldNames(4)));
+            ShowContinueError(state, format("...{} not found.", state.dataIPShortCut->cAlphaFieldNames(4)));
             ErrorsFound = true;
         }
         thisBoiler.VolFlowRate = state.dataIPShortCut->rNumericArgs(3);
@@ -530,8 +530,7 @@ void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
             } else {
                 // need call to EMS to check node
                 bool FatalError = false; // but not really fatal yet, but should be.
-                EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, this->BoilerOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->BoilerOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                 state.dataLoopNodes->NodeSetpointCheck(this->BoilerOutletNodeNum).needsSetpointChecking = false;
                 if (FatalError) {
                     if (!this->ModulatedFlowErrDone) {

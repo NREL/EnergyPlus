@@ -286,6 +286,10 @@ struct PipeHeatTransferData : BaseGlobalStruct
     Array1D<PipeHeatTransfer::PipeHTData> PipeHT;
     std::unordered_map<std::string, std::string> PipeHTUniqueNames;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->nsvNumOfPipeHT = 0;

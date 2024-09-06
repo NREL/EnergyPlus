@@ -134,7 +134,7 @@ struct FanCoilUnitsData;
 struct FansData;
 struct FaultsManagerData;
 struct FluidCoolersData;
-struct FluidPropertiesData;
+struct FluidData;
 struct FourPipeBeamData;
 struct FuelCellElectricGeneratorData;
 struct FurnacesData;
@@ -390,7 +390,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<FansData> dataFans;
     std::unique_ptr<FaultsManagerData> dataFaultsMgr;
     std::unique_ptr<FluidCoolersData> dataFluidCoolers;
-    std::unique_ptr<FluidPropertiesData> dataFluidProps;
+    std::unique_ptr<FluidData> dataFluidProps;
     std::unique_ptr<FourPipeBeamData> dataFourPipeBeam;
     std::unique_ptr<FuelCellElectricGeneratorData> dataFuelCellElectGen;
     std::unique_ptr<FurnacesData> dataFurnaces;
@@ -525,7 +525,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<SurfacesData> dataSurface;
     std::unique_ptr<SwimmingPoolsData> dataSwimmingPools;
     std::unique_ptr<SystemAirFlowSizerData> dataSysAirFlowSizer;
-    std::unique_ptr<SystemAvailabilityManagerData> dataSystemAvailabilityManager;
+    std::unique_ptr<SystemAvailabilityManagerData> dataAvail;
     std::unique_ptr<SystemReportsData> dataSysRpts;
     std::unique_ptr<SystemVarsData> dataSysVars;
     std::unique_ptr<TARCOGCommonData> dataTARCOGCommon;
@@ -575,6 +575,9 @@ struct EnergyPlusData : BaseGlobalStruct
     // calls to IOFiles::getSingleton and IOFiles::setSingleton
     EnergyPlusData(const EnergyPlusData &) = delete;
     EnergyPlusData(EnergyPlusData &&) = delete;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override;
+    bool init_state_called = false;
 
     void clear_state() override;
 };

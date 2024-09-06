@@ -632,7 +632,7 @@ namespace AirLoopHVACDOAS {
                         if (thisOutsideAirSys.compPointer[CompNum] == nullptr) {
                             UnitarySystems::UnitarySys thisSys;
                             thisOutsideAirSys.compPointer[CompNum] =
-                                UnitarySystems::UnitarySys::factory(state, HVAC::UnitarySys_AnyCoilType, CompName, false, 0);
+                                UnitarySystems::UnitarySys::factory(state, HVAC::UnitarySysType::Unitary_AnyCoilType, CompName, false, 0);
                         }
                         thisOutsideAirSys.InletNodeNum(CompNum) =
                             thisOutsideAirSys.compPointer[CompNum]->getAirInNode(state, CompName, 0, InletNodeErrFlag);
@@ -999,7 +999,6 @@ namespace AirLoopHVACDOAS {
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = sizingMassFlow;
         }
-        bool errorsFound = false;
         if (this->m_FanIndex > 0 && this->m_FanTypeNum == SimAirServingZones::CompType::Fan_ComponentModel) {
             state.dataFans->fans(this->m_FanIndex)->maxAirFlowRate = sizingMassFlow / state.dataEnvrn->StdRhoAir;
             state.dataFans->fans(this->m_FanIndex)->minAirFlowRate = 0.0;
@@ -1008,9 +1007,7 @@ namespace AirLoopHVACDOAS {
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = sizingMassFlow;
         }
-        if (errorsFound) {
-            ShowFatalError(state, "Preceding sizing errors cause program termination");
-        }
+
         state.dataSize->CurSysNum = state.dataHVACGlobal->NumPrimaryAirSys + this->m_AirLoopDOASNum + 1;
         state.dataSize->CurOASysNum = this->m_OASystemNum;
     }

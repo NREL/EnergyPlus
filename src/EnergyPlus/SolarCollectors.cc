@@ -1860,7 +1860,8 @@ namespace SolarCollectors {
         tempnom = state.dataSurface->Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * Constant::StefanBoltzmann *
                   ((TempOuterCover + Constant::Kelvin) + state.dataEnvrn->GroundTempKelvin) *
                   (pow_2(TempOuterCover + Constant::Kelvin) + pow_2(state.dataEnvrn->GroundTempKelvin));
-        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->GroundTemp);
+        tempdenom =
+            (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface]);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
             hRadCoefC2Gnd = tempnom;
@@ -1979,7 +1980,7 @@ namespace SolarCollectors {
             CondOfAir = Conductivity[Index];
             PrOfAir = Pr[Index];
             DensOfAir = Density[Index];
-        } else if (Index > NumOfPropDivisions) {
+        } else if (Index >= NumOfPropDivisions) { // 0-index, hence MaxIndex = NumOfPropDivisions - 1
             Index = NumOfPropDivisions - 1;
             VisDOfAir = Mu[Index];
             CondOfAir = Conductivity[Index];
@@ -2048,7 +2049,7 @@ namespace SolarCollectors {
         Real64 DeltaT = std::abs(TAbsorber - TWater);
         Real64 TReference = TAbsorber - 0.25 * (TAbsorber - TWater);
         // record fluid prop index for water
-        int WaterIndex = FluidProperties::FindGlycol(state, fluidNameWater);
+        int WaterIndex = FluidProperties::GetGlycolNum(state, fluidNameWater);
         // find properties of water - always assume water
         Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
         Real64 CondOfWater = FluidProperties::GetConductivityGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);

@@ -2576,7 +2576,7 @@ void GatherForEconomics(EnergyPlusData &state)
         for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             auto &tariff = state.dataEconTariff->tariff(iTariff);
             // if the meter is defined get the value
-            if (tariff.reportMeterIndx != 0) {
+            if (tariff.reportMeterIndx != -1) {
                 curInstantValue = GetCurrentMeterValue(state, tariff.reportMeterIndx);
             } else {
                 curInstantValue = 0.0;
@@ -3879,9 +3879,6 @@ void LEEDtariffReporting(EnergyPlusData &state)
     Real64 distHeatWaterTotalCost;
     Real64 distHeatSteamTotalCost;
     Real64 allTotalCost;
-    std::string distCoolTariffNames;
-    std::string distHeatWaterTariffNames;
-    std::string distHeatSteamTariffNames;
     EconConv elecUnits;
     EconConv gasUnits;
     EconConv distCoolUnits;

@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::Rectangle, state->dataSurface->Surface(ThisSurf).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::Rectangle, state->dataSurface->Surface(ThisSurf).Shape);
 
     // Surface 2 - Isosceles Trapezoid
     ThisSurf = 2;
@@ -152,7 +152,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::Quadrilateral, state->dataSurface->Surface(ThisSurf).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::Quadrilateral, state->dataSurface->Surface(ThisSurf).Shape);
 
     // Surface 3 - Parallelogram
     ThisSurf = 3;
@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::Quadrilateral, state->dataSurface->Surface(ThisSurf).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::Quadrilateral, state->dataSurface->Surface(ThisSurf).Shape);
 
     // Surface 4 - Triangle
     ThisSurf = 4;
@@ -202,7 +202,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::Triangle, state->dataSurface->Surface(ThisSurf).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::Triangle, state->dataSurface->Surface(ThisSurf).Shape);
 
     // Surface 5 - Polygon
     ThisSurf = 5;
@@ -233,7 +233,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::Polygonal, state->dataSurface->Surface(ThisSurf).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::Polygonal, state->dataSurface->Surface(ThisSurf).Shape);
 }
 
 TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
@@ -519,67 +519,64 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     //	"Surface 1 - Triangle"
     int surfNum = Util::FindItemInList("SURFACE 1 - TRIANGLE", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::Triangle, state->dataSurface->Surface(surfNum).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::Triangle, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:Quadrilateral = 2
     //	"Surface 2 - Quadrilateral"
     surfNum = Util::FindItemInList("SURFACE 2 - QUADRILATERAL", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::Quadrilateral, state->dataSurface->Surface(surfNum).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::Quadrilateral, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:Rectangle = 3
     //	"Surface 3 - Rectangle"
     surfNum = Util::FindItemInList("SURFACE 3 - RECTANGLE", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::Rectangle, state->dataSurface->Surface(surfNum).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::Rectangle, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:RectangularDoorWindow = 4
     //	"Surface 4 - RectangularDoorWindow"
     surfNum = Util::FindItemInList("SURFACE 4 - RECTANGULARDOORWINDOW", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::RectangularDoorWindow, state->dataSurface->Surface(surfNum).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::RectangularDoorWindow, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:RectangularOverhang = 5
     //	"Surface 5 - RectangularOverhang"
     surfNum = Util::FindItemInList("SURFACE 5 - RECTANGULAROVERHANG", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_FALSE(compare_enums(SurfaceShape::RectangularOverhang,
-                               state->dataSurface->Surface(surfNum).Shape,
-                               false)); // fins and overhangs will not get set to the proper surface shape.
+    EXPECT_ENUM_NE(SurfaceShape::RectangularOverhang,
+                   state->dataSurface->Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularLeftFin = 6
     //	"Surface 6 - RectangularLeftFin"
     surfNum = Util::FindItemInList("SURFACE 6 - RECTANGULARLEFTFIN Left", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_FALSE(compare_enums(SurfaceShape::RectangularLeftFin,
-                               state->dataSurface->Surface(surfNum).Shape,
-                               false)); // fins and overhangs will not get set to the proper surface shape.
+    EXPECT_ENUM_NE(SurfaceShape::RectangularLeftFin,
+                   state->dataSurface->Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularRightFin = 7
     //	"Surface 7 - RectangularRightFin"
     surfNum = Util::FindItemInList("SURFACE 7 - RECTANGULARRIGHTFIN Right", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_FALSE(compare_enums(SurfaceShape::RectangularRightFin,
-                               state->dataSurface->Surface(surfNum).Shape,
-                               false)); // fins and overhangs will not get set to the proper surface shape.
+    EXPECT_ENUM_NE(SurfaceShape::RectangularRightFin,
+                   state->dataSurface->Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:TriangularWindow = 8
     //	"Surface 8 - TriangularWindow"
     surfNum = Util::FindItemInList("SURFACE 8 - TRIANGULARWINDOW", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::TriangularWindow, state->dataSurface->Surface(surfNum).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::TriangularWindow, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:TriangularDoor = 9
     //	"Surface 9 - TriangularDoor"
     surfNum = Util::FindItemInList("SURFACE 9 - TRIANGULARDOOR", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::TriangularDoor, state->dataSurface->Surface(surfNum).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::TriangularDoor, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:Polygonal = 10
     //	"Surface 10 - Polygonal"
     surfNum = Util::FindItemInList("SURFACE 10 - POLYGONAL", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_TRUE(compare_enums(SurfaceShape::Polygonal, state->dataSurface->Surface(surfNum).Shape));
+    EXPECT_ENUM_EQ(SurfaceShape::Polygonal, state->dataSurface->Surface(surfNum).Shape);
 }
 
 TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
@@ -1058,9 +1055,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual3dPt)
 
     EXPECT_TRUE(isAlmostEqual3dPt(a, b));
 
-    b.x = 7.01;
-    b.y = 11.01;
-    b.z = 17.01;
+    b.x = 7.0095;
+    b.y = 11.0095;
+    b.z = 17.0095;
 
     EXPECT_TRUE(isAlmostEqual3dPt(a, b));
 
@@ -1074,9 +1071,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual3dPt)
     a.y = -11.;
     a.z = -17.;
 
-    b.x = -7.01;
-    b.y = -11.01;
-    b.z = -17.01;
+    b.x = -7.0095;
+    b.y = -11.0095;
+    b.z = -17.0095;
 
     EXPECT_TRUE(isAlmostEqual3dPt(a, b));
 }
@@ -1104,8 +1101,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual2dPt)
 
     EXPECT_TRUE(isAlmostEqual2dPt(a, b));
 
-    b.x = 7.01;
-    b.y = 11.01;
+    b.x = 7.0095;
+    b.y = 11.0095;
 
     EXPECT_TRUE(isAlmostEqual2dPt(a, b));
 
@@ -1117,8 +1114,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual2dPt)
     a.x = -7.;
     a.y = -11.;
 
-    b.x = -7.01;
-    b.y = -11.01;
+    b.x = -7.0095;
+    b.y = -11.0095;
 
     EXPECT_TRUE(isAlmostEqual2dPt(a, b));
 }
@@ -3864,15 +3861,15 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
 {
     state->dataMaterial->TotMaterials = 0;
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
+    auto *thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
     EXPECT_EQ(state->dataMaterial->TotMaterials, 1);
     EXPECT_EQ(thisMaterial->Name, "test_air_8MM");
     EXPECT_EQ(thisMaterial->Thickness, 0.008);
-    EXPECT_EQ(thisMaterial->GasCon(1, 1), 2.873e-3);
-    EXPECT_EQ(thisMaterial->GasCon(2, 1), 7.760e-5);
+    EXPECT_EQ(thisMaterial->gases[0].con.c0, 2.873e-3);
+    EXPECT_EQ(thisMaterial->gases[0].con.c1, 7.760e-5);
 
     createAirMaterialFromDistance(*state, 0.012, "test_air_");
-    thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
+    thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
     EXPECT_EQ(state->dataMaterial->TotMaterials, 2);
     EXPECT_EQ(thisMaterial->Name, "test_air_12MM");
     EXPECT_EQ(thisMaterial->Thickness, 0.012);
@@ -3915,6 +3912,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
+        "  Timestep, 20;"
         "  HeatBalanceAlgorithm,",
         "  MoisturePenetrationDepthConductionTransferFunction; !- Algorithm",
         "Material,",
@@ -4127,19 +4125,19 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     EXPECT_FALSE(ErrorsFound);           // expect no errors
 
     int surfNum = Util::FindItemInList("DATATELCOM_CEILING_1_0_0", state->dataSurface->Surface);
-    EXPECT_TRUE(compare_enums(DataSurfaces::HeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
+    EXPECT_ENUM_EQ(DataSurfaces::HeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
     EXPECT_TRUE(state->dataHeatBal->AnyCondFD);
 
     surfNum = Util::FindItemInList("ZONE1_FLOOR_4_0_10000", state->dataSurface->Surface);
-    EXPECT_TRUE(compare_enums(DataSurfaces::HeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
+    EXPECT_ENUM_EQ(DataSurfaces::HeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
     EXPECT_TRUE(state->dataHeatBal->AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
 
     surfNum = Util::FindItemInList("ZONE1_FLOOR_4_0_20000", state->dataSurface->Surface);
-    EXPECT_TRUE(compare_enums(DataSurfaces::HeatTransferModel::HAMT, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
+    EXPECT_ENUM_EQ(DataSurfaces::HeatTransferModel::HAMT, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
     EXPECT_TRUE(state->dataHeatBal->AnyHAMT);
 
     surfNum = Util::FindItemInList("ZONE1_FLOOR_4_0_30000", state->dataSurface->Surface);
-    EXPECT_TRUE(compare_enums(DataSurfaces::HeatTransferModel::CTF, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
+    EXPECT_ENUM_EQ(DataSurfaces::HeatTransferModel::CTF, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
     EXPECT_TRUE(state->dataHeatBal->AnyCTF);
 
     std::string const error_string = delimited_string({
@@ -8971,7 +8969,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
 
     int thisSurface = siteShadeShadeFlatShadeSurface;
     EXPECT_FALSE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
-    EXPECT_FALSE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
     EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
     EXPECT_TRUE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
     EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
@@ -14412,4 +14410,109 @@ TEST_F(EnergyPlusFixture, Fix_checkSubSurfAzTiltNorm_Horizontal_Surf_Random)
     EXPECT_DOUBLE_EQ(BaseSurface.lcsz.z, SubSurface_Same.lcsz.z);
     EXPECT_DOUBLE_EQ(BaseSurface.lcsz.y, SubSurface_Same.lcsz.y);
     EXPECT_DOUBLE_EQ(BaseSurface.lcsz.x, SubSurface_Same.lcsz.x);
+}
+
+TEST_F(EnergyPlusFixture, ExtSolarForShadingTest)
+{
+    // Unit test added as part of the fix for Defect #5949 (certain output variables not being produced for shading elements
+    bool ErrorsFound = false;
+    std::string const idf_objects = delimited_string({
+        "Shading:Building:Detailed,",
+        "  ShadeTest1BuildingDetailed, !- Name",
+        "  ,                           !- Transmittance Schedule Name",
+        "  4,                          !- Number of Vertices",
+        "  -20.0,4.0,10.0,             !- X,Y,Z ==> Vertex 1 {m}",
+        "  -20.0,0.00,10.0,            !- X,Y,Z ==> Vertex 2 {m}",
+        "  -55.0,0.00,0.0,             !- X,Y,Z ==> Vertex 3 {m}",
+        "  -55.0,4.0,0.0;              !- X,Y,Z ==> Vertex 4 {m}",
+
+        "Shading:Site:Detailed,",
+        "  ShadeTest2SiteDetailed, !- Name",
+        "  ,                       !- Transmittance Schedule Name",
+        "  4,                      !- Number of Vertices",
+        "  20.0,14.0,23.0,         !- X,Y,Z ==> Vertex 1 {m}",
+        "  20.0,0.00,23.0,         !- X,Y,Z ==> Vertex 2 {m}",
+        "  55.0,0.00,23.0,         !- X,Y,Z ==> Vertex 3 {m}",
+        "  55.0,14.0,23.0;         !- X,Y,Z ==> Vertex 4 {m}",
+
+        "Shading:Building,",
+        "  ShadeTest3Building, !- Name",
+        "  123.4,              !- Azimuth Angle {deg}",
+        "  45,                 !- Tilt Angle {deg}",
+        "  0.1,                !- Starting X Coordinate {m}",
+        "  2.3,                !- Starting Y Coordinate {m}",
+        "  4.5,                !- Starting Z Coordinate {m}",
+        "  6.7,                !- Length {m}",
+        "  8.9;                !- Height {m}",
+
+        "Shading:Site,",
+        "  ShadeTest4Site, !- Name",
+        "  154.1,          !- Azimuth Angle {deg}",
+        "  45,             !- Tilt Angle {deg}",
+        "  -8.5,           !- Starting X Coordinate {m}",
+        "  2.5,            !- Starting Y Coordinate {m}",
+        "  6.3,            !- Starting Z Coordinate {m}",
+        "  3.6,            !- Length {m}",
+        "  1.5;            !- Height {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    int TotSurfaces = 8;                                          // Need to double the number of surfaces because E+ will add mirrored surfaces
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(TotSurfaces); // Allocate the Surface derived type appropriately
+    state->dataSurface->Corner = LowerLeftCorner;
+    state->dataSurface->WorldCoordSystem = true;
+
+    int NumSurfs = 0;
+    int TotDetachedFixed = 1;
+    int TotDetachedBldg = 1;
+    int TotRectDetachedFixed = 1;
+    int TotRectDetachedBldg = 1;
+    SurfaceGeometry::GetDetShdSurfaceData(*state, ErrorsFound, NumSurfs, TotDetachedFixed, TotDetachedBldg);
+    SurfaceGeometry::GetRectDetShdSurfaceData(*state, ErrorsFound, NumSurfs, TotRectDetachedFixed, TotRectDetachedBldg);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    // Check set-up of select variables for all four detached shading types
+    auto &thisSG = state->dataSurfaceGeometry;
+
+    // First processed surface will be the detailed site shading surface
+    EXPECT_EQ(thisSG->SurfaceTmp(1).Name, "SHADETEST2SITEDETAILED");
+    EXPECT_ENUM_EQ(thisSG->SurfaceTmp(1).Class, SurfaceClass::Detached_F);
+    EXPECT_FALSE(thisSG->SurfaceTmp(1).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(1).ExtSolar);
+    EXPECT_EQ(thisSG->SurfaceTmp(2).Name, "Mir-SHADETEST2SITEDETAILED");
+    EXPECT_ENUM_EQ(thisSG->SurfaceTmp(2).Class, SurfaceClass::Detached_F);
+    EXPECT_FALSE(thisSG->SurfaceTmp(2).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(2).ExtSolar);
+
+    // Second processed surface will be the detailed building shading surface
+    EXPECT_EQ(thisSG->SurfaceTmp(3).Name, "SHADETEST1BUILDINGDETAILED");
+    EXPECT_ENUM_EQ(thisSG->SurfaceTmp(3).Class, SurfaceClass::Detached_B);
+    EXPECT_FALSE(thisSG->SurfaceTmp(3).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(3).ExtSolar);
+    EXPECT_EQ(thisSG->SurfaceTmp(4).Name, "Mir-SHADETEST1BUILDINGDETAILED");
+    EXPECT_ENUM_EQ(thisSG->SurfaceTmp(4).Class, SurfaceClass::Detached_B);
+    EXPECT_FALSE(thisSG->SurfaceTmp(4).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(4).ExtSolar);
+
+    // Third processed surface will be the site (simple) shading surface
+    EXPECT_EQ(thisSG->SurfaceTmp(5).Name, "SHADETEST4SITE");
+    EXPECT_ENUM_EQ(thisSG->SurfaceTmp(5).Class, SurfaceClass::Detached_F);
+    EXPECT_FALSE(thisSG->SurfaceTmp(5).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(5).ExtSolar);
+    EXPECT_EQ(thisSG->SurfaceTmp(6).Name, "Mir-SHADETEST4SITE");
+    EXPECT_ENUM_EQ(thisSG->SurfaceTmp(6).Class, SurfaceClass::Detached_F);
+    EXPECT_FALSE(thisSG->SurfaceTmp(6).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(6).ExtSolar);
+
+    // Fourth processed surface will be the building (simple) shading surface
+    EXPECT_EQ(thisSG->SurfaceTmp(7).Name, "SHADETEST3BUILDING");
+    EXPECT_ENUM_EQ(thisSG->SurfaceTmp(7).Class, SurfaceClass::Detached_B);
+    EXPECT_FALSE(thisSG->SurfaceTmp(7).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(7).ExtSolar);
+    EXPECT_EQ(thisSG->SurfaceTmp(8).Name, "Mir-SHADETEST3BUILDING");
+    EXPECT_ENUM_EQ(thisSG->SurfaceTmp(8).Class, SurfaceClass::Detached_B);
+    EXPECT_FALSE(thisSG->SurfaceTmp(8).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(8).ExtSolar);
 }

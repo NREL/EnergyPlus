@@ -3342,10 +3342,13 @@ namespace InternalHeatGains {
                             Real64 TAirInSizing = 0.0;
                             // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite
                             // object
-                            SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
-                            for (int SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZClSetPtMgrs; ++SetPtMgrNum) {
-                                if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == zoneNum) {
-                                    TAirInSizing = state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
+                            SetPointManager::GetSetPointManagerInputs(state);
+                            for (auto *spm : state.dataSetPointManager->spms) {
+                                if (spm->type != SetPointManager::SPMType::SZCooling) continue;
+                                auto *spmSZC = dynamic_cast<SetPointManager::SPMSingleZoneTemp *>(spm);
+                                assert(spmSZC != nullptr);
+                                if (spmSZC->ctrlZoneNum == zoneNum) {
+                                    TAirInSizing = spmSZC->maxSetTemp;
                                 }
                             }
 
@@ -6909,7 +6912,7 @@ namespace InternalHeatGains {
 
                 SetupOutputVariable(state,
                                     "Zone ITE Adjusted Return Air Temperature",
-                                    Constant::Units::W,
+                                    Constant::Units::C,
                                     state.dataHeatBal->ZoneRpt(zoneNum).ITEAdjReturnTemp,
                                     OutputProcessor::TimeStepType::Zone,
                                     OutputProcessor::StoreType::Average,
@@ -8214,7 +8217,7 @@ namespace InternalHeatGains {
                 state.dataHeatBal->spaceRpt(spaceNum).EnergyRpt[i] += state.dataHeatBal->ZoneITEq(Loop).EnergyRpt[i];
             }
 
-            state.dataHeatBal->ZoneITEq(Loop).AirVolFlowStdDensity = AirMassFlowRate * state.dataEnvrn->StdRhoAir;
+            state.dataHeatBal->ZoneITEq(Loop).AirVolFlowStdDensity = AirMassFlowRate / state.dataEnvrn->StdRhoAir;
             state.dataHeatBal->ZoneITEq(Loop).AirVolFlowCurDensity = AirVolFlowRate;
             state.dataHeatBal->ZoneITEq(Loop).AirMassFlow = AirMassFlowRate;
             state.dataHeatBal->ZoneITEq(Loop).AirInletDryBulbT = TAirIn;

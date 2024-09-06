@@ -143,6 +143,10 @@ struct HybridModelData : BaseGlobalStruct
 
     Array1D<HybridModel::HybridModelProperties> HybridModelZone;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->FlagHybridModel = false;

@@ -223,6 +223,9 @@ TEST_F(InputProcessorFixture, decode_encode_1)
                                        "  Relative,",
                                        "  Relative;",
                                        "",
+                                       "Timestep,",
+                                       "  4;",
+                                       "",
                                        "Version,",
                                        "  " + DataStringGlobals::MatchVersion + ";",
                                        ""});
@@ -267,6 +270,9 @@ TEST_F(InputProcessorFixture, decode_encode_2)
                                           "  Relative,",
                                           "  Relative,",
                                           "  Relative;",
+                                          "",
+                                          "Timestep,",
+                                          "  4;",
                                           "",
                                           "Version,",
                                           "  " + DataStringGlobals::MatchVersion + ";",
@@ -335,6 +341,9 @@ TEST_F(InputProcessorFixture, decode_encode_3)
                                           "  ,",
                                           "  10;",
                                           "",
+                                          "Timestep,",
+                                          "  4;",
+                                          "",
                                           "Version,",
                                           "  " + DataStringGlobals::MatchVersion + ";",
                                           ""}));
@@ -366,6 +375,9 @@ TEST_F(InputProcessorFixture, byte_order_mark)
                                           "  Relative,",
                                           "  Relative,",
                                           "  Relative;",
+                                          "",
+                                          "Timestep,",
+                                          "  4;",
                                           "",
                                           "Version,",
                                           "  " + DataStringGlobals::MatchVersion + ";",
@@ -548,6 +560,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_2)
                                "\"vertex_entry_direction\":\"Counterclockwise\""
                                "}"
                                "},"
+                               "\"Timestep\":{\"\":{\"idf_order\":0,\"number_of_timesteps_per_hour\":4}},"
                                "\"Version\":{"
                                "\"\":{"
                                "\"idf_order\":0,"
@@ -596,6 +609,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
                                "\"vertex_entry_direction\":\"Counterclockwise\""
                                "}"
                                "},"
+                               "\"Timestep\":{\"\":{\"idf_order\":0,\"number_of_timesteps_per_hour\":4}},"
                                "\"Version\":{"
                                "\"\":{"
                                "\"idf_order\":0,"
@@ -927,6 +941,9 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                                               "  Relative,",
                                               "  Relative,",
                                               "  Relative;",
+                                              "",
+                                              "Timestep,",
+                                              "  4;",
                                               "",
                                               "Version,",
                                               "  " + DataStringGlobals::MatchVersion + ";",
@@ -1980,31 +1997,31 @@ TEST_F(InputProcessorFixture, look_ahead)
     size_t index = 0;
     IdfParser::Token token = look_ahead(test_input, index);
     EXPECT_EQ(0ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     index = 2;
     token = look_ahead(test_input, index);
     EXPECT_EQ(2ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::COMMA, token);
     index = 3;
     token = look_ahead(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::EXCLAMATION, token);
     index = 5;
     token = look_ahead(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     index = 7;
     token = look_ahead(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::SEMICOLON, token);
     index = 9;
     token = look_ahead(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     index = test_input.size();
     token = look_ahead(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::END, token);
 }
 
 TEST_F(InputProcessorFixture, next_token)
@@ -2014,26 +2031,26 @@ TEST_F(InputProcessorFixture, next_token)
     std::string const test_input("B , ! t ; `");
     IdfParser::Token token = next_token(test_input, index);
     EXPECT_EQ(1ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     token = next_token(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::COMMA, token);
     token = next_token(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::EXCLAMATION, token);
     token = next_token(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     token = next_token(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::SEMICOLON, token);
     token = next_token(test_input, index);
     EXPECT_EQ(11ul, index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::STRING, token);
     index = test_input.size();
     token = next_token(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
+    EXPECT_ENUM_EQ(IdfParser::Token::END, token);
 }
 
 TEST_F(InputProcessorFixture, getObjectItem_json1)
@@ -4203,6 +4220,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
 
         // 1 fields with default, 0 Autosizable, 0 Autocalculatable
         // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Timestep,",
+        "  4;", // Has a default
+
+        // 1 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
         "Version,",
         "  9.4;", // Has a default
 
@@ -4283,11 +4305,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
     state->dataInputProcessing->inputProcessor->reportIDFRecordsStats(*state);
 
     // TOTAL:
-    // 36 fields with defaults, 6 Autosizable, 3 Autocalculatable
+    // 37 fields with defaults, 6 Autosizable, 3 Autocalculatable
     // 11 fields defaulted    , 4 Autosized  , 2 Autocalculated
 
-    EXPECT_EQ(4, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
-    EXPECT_EQ(36, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
+    EXPECT_EQ(5, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
+    EXPECT_EQ(37, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
     EXPECT_EQ(6, state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
     EXPECT_EQ(3, state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
     EXPECT_EQ(11, state->dataOutput->iNumberOfDefaultedFields);    // Number of defaulted fields in IDF
@@ -4299,6 +4321,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
 {
 
     std::string const idf_objects = delimited_string({
+
+        // 1 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Timestep,",
+        "  4;", // Has a default
 
         // 1 fields with default, 0 Autosizable, 0 Autocalculatable
         // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
@@ -4356,11 +4383,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
     state->dataInputProcessing->inputProcessor->reportIDFRecordsStats(*state);
 
     // TOTAL:
-    // 15 fields with defaults, 0 Autosizable, 0 Autocalculatable
+    // 16 fields with defaults, 0 Autosizable, 0 Autocalculatable
     // 2  fields defaulted    , 0 Autosized  , 0 Autocalculated
 
-    EXPECT_EQ(4, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
-    EXPECT_EQ(15, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
+    EXPECT_EQ(5, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
+    EXPECT_EQ(16, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
     EXPECT_EQ(0, state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
     EXPECT_EQ(0, state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
     EXPECT_EQ(2, state->dataOutput->iNumberOfDefaultedFields);     // Number of defaulted fields in IDF

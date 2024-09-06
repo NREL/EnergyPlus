@@ -126,6 +126,10 @@ struct WaterManagerData : BaseGlobalStruct
     bool MyTankDemandCheckFlag;
     Real64 overflowTwater = 0.0;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->MyOneTimeFlag = true;

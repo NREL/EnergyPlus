@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus::OutputProcessor Unit Tests
-#include <map>
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -68,6 +67,9 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/WeatherManager.hh>
+
+#include <climits>
+#include <map>
 
 using namespace EnergyPlus::PurchasedAirManager;
 using namespace EnergyPlus::OutputProcessor;
@@ -1313,9 +1315,9 @@ namespace OutputProcessor {
 
         ASSERT_EQ(2ul, errorData.size());
         std::vector<std::string> errorData0{
-            "1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "1"};
+            "1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "0"};
         std::vector<std::string> errorData1{
-            "2", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "1"};
+            "2", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "0"};
         EXPECT_EQ(errorData0, errorData[0]);
         EXPECT_EQ(errorData1, errorData[1]);
     }
@@ -2138,7 +2140,7 @@ namespace OutputProcessor {
                                             "0",
                                             "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].  ..on "
                                             "Meter=\"testMeter2\".  ..requests for IP units from this meter will be ignored.",
-                                            "1"};
+                                            "0"};
         EXPECT_EQ(errorData0, errorData[0]);
 
         ASSERT_EQ(2ul, op->meters.size());
@@ -2314,8 +2316,8 @@ namespace OutputProcessor {
             std::string stdEndUseSub = standardizeEndUseSub(endUseCat, meter[3]);
             Group group = static_cast<Group>(getEnumValue(groupNamesUC, meter[4]));
 
-            EXPECT_FALSE(compare_enums(EndUseCat::Invalid, endUseCat, false));
-            EXPECT_FALSE(compare_enums(Group::Invalid, group, false));
+            EXPECT_ENUM_NE(EndUseCat::Invalid, endUseCat);
+            EXPECT_ENUM_NE(Group::Invalid, group);
 
             AttachMeters(*state,
                          Constant::Units::J,
@@ -2988,7 +2990,8 @@ namespace OutputProcessor {
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
         compare_eso_stream(
-            delimited_string({"1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+            delimited_string({"Program Version,",
+                              "1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
                               "2,11,Boiler2,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
                               "3,11,Boiler3,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"},
                              "\n"));
@@ -3019,7 +3022,8 @@ namespace OutputProcessor {
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
         compare_eso_stream(
-            delimited_string({"1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+            delimited_string({"Program Version,",
+                              "1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
                               "2,11,Boiler3,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"},
                              "\n"));
     }
@@ -3050,7 +3054,8 @@ namespace OutputProcessor {
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
         compare_eso_stream(
-            delimited_string({"1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+            delimited_string({"Program Version,",
+                              "1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
                               "2,11,Boiler2,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
                               "3,11,Boiler3,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"},
                              "\n"));
@@ -3118,6 +3123,7 @@ namespace OutputProcessor {
 
         compare_eso_stream(delimited_string(
             {
+                "Program Version,",
                 "1,1,Zn003:Wall001,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
                 "2,1,Zn003:Wall002,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
                 "3,1,Zn003:Wall002:Win001,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
@@ -3190,6 +3196,7 @@ namespace OutputProcessor {
 
         compare_eso_stream(delimited_string(
             {
+                "Program Version,",
                 "1,1,ZN003:WALL001,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
                 "2,1,ZN003:WALL002,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
                 "3,1,ZN003:WALL002:WIN001,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
@@ -3287,7 +3294,8 @@ namespace OutputProcessor {
         UpdateMeterReporting(*state);
 
         compare_mtr_stream(
-            delimited_string({"53,9,InteriorLights:Electricity:Zone:SPACE1 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+            delimited_string({"Program Version,",
+                              "53,9,InteriorLights:Electricity:Zone:SPACE1 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
                               "102,9,InteriorLights:Electricity:Zone:SPACE2 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
                               "139,9,InteriorLights:Electricity:Zone:SPACE3 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
                               "176,9,InteriorLights:Electricity:Zone:SPACE4 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
@@ -3738,6 +3746,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
+        state->dataGlobal->TimeStep = 4;
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         state->dataEnvrn->Month = 12;
@@ -3956,6 +3965,7 @@ namespace OutputProcessor {
 
         compare_eso_stream(delimited_string(
             {
+                "Program Version,",
                 "1,1,Environment,Site Outdoor Air Drybulb Temperature [C] !TimeStep",
                 "2,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly",
                 "3,7,Environment,Site Outdoor Air Drybulb Temperature [C] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
@@ -3986,6 +3996,7 @@ namespace OutputProcessor {
 
         compare_mtr_stream(delimited_string(
             {
+                "Program Version,",
                 "7,1,Electricity:Facility [J] !TimeStep",
                 "8,1,Electricity:Facility [J] !Hourly",
                 "9,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
@@ -4027,6 +4038,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
+        state->dataGlobal->TimeStep = 4;
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         state->dataEnvrn->Month = 12;
@@ -4253,6 +4265,7 @@ namespace OutputProcessor {
 
         compare_eso_stream(delimited_string(
             {
+                "Program Version,",
                 "1,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Each Call",
                 "2,1,Environment,Site Outdoor Air Drybulb Temperature [C] !TimeStep",
                 "3,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly",
@@ -4287,6 +4300,7 @@ namespace OutputProcessor {
 
         compare_mtr_stream(delimited_string(
             {
+                "Program Version,",
                 "8,1,Electricity:Facility [J] !Each Call",
                 "9,1,Electricity:Facility [J] !Hourly",
                 "10,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
@@ -4530,6 +4544,7 @@ namespace OutputProcessor {
 
         compare_eso_stream(delimited_string(
             {
+                "Program Version,",
                 "1,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Each Call",
                 "2,1,Environment,Site Outdoor Air Drybulb Temperature [C] !TimeStep",
                 "3,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly",
@@ -4551,6 +4566,7 @@ namespace OutputProcessor {
 
         compare_mtr_stream(delimited_string(
             {
+                "Program Version,",
                 "8,1,Electricity:Facility [J] !Each Call",
                 "9,1,Electricity:Facility [J] !Hourly",
                 "10,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
@@ -4569,6 +4585,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
+        state->dataGlobal->TimeStep = 4;
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         state->dataEnvrn->Month = 12;
@@ -4626,6 +4643,7 @@ namespace OutputProcessor {
 
         compare_eso_stream(delimited_string(
             {
+                "Program Version,",
                 "2,1,Electricity:Facility [J] !TimeStep",
                 ",365,12,31, 0,24,50.00,60.00,Tuesday",
                 "2,0.0",
@@ -5349,6 +5367,138 @@ namespace OutputProcessor {
 
         for (int i = 0; i < (int)reportDataDictionary.size(); ++i)
             EXPECT_EQ(reportDataDictionary[i], reportDataDictionaryResults[i]);
+    }
+
+    TEST_F(EnergyPlusFixture, OutputProcessor_StdoutRecordCount)
+    {
+        auto &op = state->dataOutputProcessor;
+        std::string const idf_objects = delimited_string({
+            "Output:Meter,Electricity:Facility,Timestep;",
+            "Output:Variable,*,Lights Electricity Energy,Timestep;",
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        // Demonstrate that it's not unreasonable to reach the INT_MAX limit at all
+        constexpr int numOfTimeStepInHour = 60;
+        constexpr int hoursInYear = 8760;
+        constexpr int numOutputVariables = 4200;
+        constexpr size_t totalRecords =
+            static_cast<size_t>(numOfTimeStepInHour) * static_cast<size_t>(hoursInYear) * static_cast<size_t>(numOutputVariables);
+
+        constexpr auto INT_MAX_AS_SIZE_T = static_cast<size_t>(INT_MAX);
+        EXPECT_GT(totalRecords, INT_MAX_AS_SIZE_T);
+
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataGlobal->NumOfDayInEnvrn = 365;
+        state->dataGlobal->MinutesPerTimeStep = 1;
+        state->dataGlobal->NumOfTimeStepInHour = 60;
+
+        Real64 timeStep = 1.0 / state->dataGlobal->NumOfTimeStepInHour;
+
+        SetupTimePointers(*state, TimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, TimeStepType::System, timeStep);
+
+        GetReportVariableInput(*state);
+        Real64 light_consumption = 999;
+        for (int i = 0; i < numOutputVariables; ++i) {
+            SetupOutputVariable(*state,
+                                "Lights Electricity Energy",
+                                Constant::Units::J,
+                                light_consumption,
+                                TimeStepType::Zone,
+                                StoreType::Sum,
+                                fmt::format("LIGHTS {}", i + 1),
+                                Constant::eResource::Electricity,
+                                Group::Building,
+                                EndUseCat::InteriorLights,
+                                "GeneralLights",
+                                "SPACE1-1",
+                                1,
+                                1);
+        }
+        state->dataGlobal->WarmupFlag = false;
+
+        state->dataGlobal->DayOfSim = 0;
+        state->dataEnvrn->DayOfWeek = 0;
+        state->dataEnvrn->Year = 2005;
+        state->dataGlobal->CalendarYear = 2005;
+
+        // NOTE: the test takes way to long to run if do call UpdateMeterReporting and UpdateDataandReport
+        // So I'm going to just scan for a timestamp were we're about to overflow, and fake it
+        size_t records_written = 0;
+        bool found_about_to_overflow = false;
+        for (state->dataEnvrn->Month = 1; state->dataEnvrn->Month <= 12; ++state->dataEnvrn->Month) {
+            state->dataEnvrn->EndMonthFlag = false;
+            for (state->dataEnvrn->DayOfMonth = 1; state->dataEnvrn->DayOfMonth <= state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month);
+                 ++state->dataEnvrn->DayOfMonth) {
+
+                ++state->dataGlobal->DayOfSim;
+                state->dataGlobal->DayOfSimChr = fmt::to_string(state->dataGlobal->DayOfSim);
+
+                ++state->dataEnvrn->DayOfWeek;
+                if (state->dataEnvrn->DayOfWeek > 7) {
+                    state->dataEnvrn->DayOfWeek = 1;
+                }
+
+                state->dataGlobal->EndDayFlag = false;
+                for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) {
+                    for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
+                         ++state->dataGlobal->TimeStep) {
+                        if (state->dataGlobal->TimeStep == state->dataGlobal->NumOfTimeStepInHour) {
+                            state->dataGlobal->EndHourFlag = true;
+                            if (state->dataGlobal->HourOfDay == 24) {
+                                state->dataGlobal->EndDayFlag = true;
+                                if ((!state->dataGlobal->WarmupFlag) && (state->dataGlobal->DayOfSim == state->dataGlobal->NumOfDayInEnvrn)) {
+                                    state->dataGlobal->EndEnvrnFlag = true;
+                                }
+                            }
+                        }
+
+                        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
+                            state->dataEnvrn->EndMonthFlag = true;
+                        }
+                        records_written += numOutputVariables;
+                        if (records_written > (INT_MAX_AS_SIZE_T - numOutputVariables)) {
+                            EXPECT_EQ("2005-12-22 02:45",
+                                      fmt::format("{:04d}-{:02d}-{:02d} {:02d}:{:02d}",
+                                                  state->dataGlobal->CalendarYear,
+                                                  state->dataEnvrn->Month,
+                                                  state->dataEnvrn->DayOfMonth,
+                                                  state->dataGlobal->HourOfDay,
+                                                  state->dataGlobal->TimeStep));
+                            UpdateMeterReporting(*state);
+                            UpdateDataandReport(*state, TimeStepType::Zone);
+                            found_about_to_overflow = true;
+                            break;
+                        }
+                    }
+                    if (found_about_to_overflow) {
+                        break;
+                    }
+                }
+                if (found_about_to_overflow) {
+                    break;
+                }
+            }
+            if (found_about_to_overflow) {
+                break;
+            }
+        }
+        ASSERT_TRUE(found_about_to_overflow);
+        EXPECT_EQ(numOutputVariables + 1, state->dataGlobal->StdOutputRecordCount);
+        EXPECT_EQ(1, state->dataGlobal->StdMeterRecordCount);
+        EXPECT_TRUE(has_eso_output(true));
+        state->dataGlobal->StdOutputRecordCount = records_written;
+        state->dataGlobal->StdMeterRecordCount = INT_MAX;
+
+        ++state->dataGlobal->TimeStep;
+
+        UpdateMeterReporting(*state);
+        UpdateDataandReport(*state, TimeStepType::Zone);
+        EXPECT_GT(state->dataGlobal->StdOutputRecordCount, 0);
+        EXPECT_GT(state->dataGlobal->StdMeterRecordCount, 0);
     }
 } // namespace OutputProcessor
 

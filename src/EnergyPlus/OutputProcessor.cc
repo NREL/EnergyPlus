@@ -1572,7 +1572,7 @@ namespace OutputProcessor {
         //  write(outputfiledebug,*) 'resourcetype=',TRIM(resourcetype)
         //  write(outputfiledebug,*) 'ipunits type=',CodeForIPUnits
         if (units != Constant::Units::kg && units != Constant::Units::J && units != Constant::Units::m3 && units != Constant::Units::L) {
-            ShowWarningError(
+            ShowWarningMessage(
                 state, format("DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[{}].", Constant::unitNames[(int)units]));
             ErrorsFound = true;
         }
@@ -3647,13 +3647,13 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
         if (reqVar->key.empty()) reqVar->key = "*";
         if (has(reqVar->name, "OPAQUE SURFACE INSIDE FACE CONDUCTION") && !state.dataGlobal->DisplayAdvancedReportVariables &&
             !state.dataOutputProcessor->OpaqSurfWarned) {
-            ShowWarningError(state, R"(Variables containing "Opaque Surface Inside Face Conduction" are now "advanced" variables.)");
+            ShowWarningMessage(state, R"(Variables containing "Opaque Surface Inside Face Conduction" are now "advanced" variables.)");
             ShowContinueError(state, "You must enter the \"Output:Diagnostics,DisplayAdvancedReportVariables;\" statement to view.");
             ShowContinueError(state, "First, though, read cautionary statements in the \"InputOutputReference\" document.");
             state.dataOutputProcessor->OpaqSurfWarned = true;
         }
         if (!state.dataOutputProcessor->Rept) {
-            ShowWarningError(state, "The following Report Variables were requested but not generated -- check.rdd file");
+            ShowWarningMessage(state, "The following Report Variables were requested but not generated -- check.rdd file");
             ShowContinueError(state, "Either the IDF did not contain these elements, the variable name is misspelled,");
             ShowContinueError(state,
                               "or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;");
@@ -3913,8 +3913,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                              format(R"(Output:Meter:MeterFileOnly requested for "{}" ({}), already on "Output:Meter". Will report to both {} and {})",
                                     meter->Name,
                                     reportFreqNames[(freq == ReportFreq::EachCall) ? (int)ReportFreq::TimeStep : (int)freq],
-                                    state.files.eso.filePath.filename().string(),
-                                    state.files.mtr.filePath.filename().string()));
+                                    state.files.eso.filePath.filename(),
+                                    state.files.mtr.filePath.filename()));
         }
         if (!period.Rpt) {
             period.Rpt = true;
@@ -3933,8 +3933,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                              format("Output:Meter:MeterFileOnly requested for \"Cumulative {}\" (TimeStep), already on \"Output:Meter\". "
                                     "Will report to both {} and {}",
                                     meter->Name,
-                                    state.files.eso.filePath.filename().string(),
-                                    state.files.mtr.filePath.filename().string()));
+                                    state.files.eso.filePath.filename(),
+                                    state.files.mtr.filePath.filename()));
         }
 
         if (!period.accRpt) {
@@ -4730,7 +4730,7 @@ int initErrorFile(EnergyPlusData &state)
 {
     state.files.err_stream = std::make_unique<std::ofstream>(state.files.outputErrFilePath);
     if (state.files.err_stream->bad()) {
-        DisplayString(state, "ERROR: Could not open file " + state.files.outputErrFilePath.string() + " for output (write).");
+        DisplayString(state, fmt::format("ERROR: Could not open file {} for output (write).", state.files.outputErrFilePath));
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

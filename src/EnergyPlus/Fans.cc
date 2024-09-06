@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Solver.hpp>
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -90,6 +91,10 @@ namespace EnergyPlus::Fans {
 // PURPOSE OF THIS MODULE:
 // To encapsulate the data and algorithms required to
 // manage the Fan System Component
+
+constexpr std::array<std::string_view, (int)MinFlowFracMethod::Num> minFlowFracMethodNames = {"Fraction", "FixedFlowRate"};
+
+constexpr std::array<std::string_view, (int)MinFlowFracMethod::Num> minFlowFracMethodNamesUC = {"FRACTION", "FIXEDFLOWRATE"};
 
 void FanBase::simulate(EnergyPlusData &state,
                        bool const _FirstHVACIteration,
@@ -395,11 +400,8 @@ void GetFanInput(EnergyPlusData &state)
                 format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.", cCurrentModuleObject, fan->Name));
         }
         fan->maxAirFlowRateIsAutosized = true;
-        if (Util::SameString(cAlphaArgs(3), "Fraction")) {
-            fan->minAirFracMethod = HVAC::MinFrac;
-        } else if (Util::SameString(cAlphaArgs(3), "FixedFlowRate")) {
-            fan->minAirFracMethod = HVAC::FixedMin;
-        }
+        fan->minAirFracMethod = static_cast<MinFlowFracMethod>(getEnumValue(minFlowFracMethodNamesUC, cAlphaArgs(3)));
+
         fan->minFrac = rNumericArgs(4);
         fan->fixedMin = rNumericArgs(5);
         fan->motorEff = rNumericArgs(6);
@@ -844,7 +846,7 @@ void GetFanInput(EnergyPlusData &state)
     } // end Number of Component Model FAN Loop
 
     for (int SystemFanNum = 1; SystemFanNum <= NumSystemModelFan; ++SystemFanNum) {
-        constexpr std::string_view cCurrentModuleObject = "Fan:SystemModel";
+        cCurrentModuleObject = "Fan:SystemModel";
 
         ip->getObjectItem(state,
                           cCurrentModuleObject,
@@ -1255,10 +1257,10 @@ void FanComponent::init(EnergyPlusData &state)
         // Change the Volume Flow Rates to Mass Flow Rates
 
         maxAirMassFlowRate = maxAirFlowRate * rhoAirStdInit;
-        if (minAirFracMethod == HVAC::MinFrac) {
+        if (minAirFracMethod == MinFlowFracMethod::MinFrac) {
             minAirFlowRate = maxAirFlowRate * minFrac;
             minAirMassFlowRate = minAirFlowRate * rhoAirStdInit;
-        } else if (minAirFracMethod == HVAC::FixedMin) {
+        } else if (minAirFracMethod == MinFlowFracMethod::FixedMin) {
             minAirFlowRate = fixedMin;
             minAirMassFlowRate = minAirFlowRate * rhoAirStdInit;
         }
@@ -1341,8 +1343,7 @@ void FanComponent::set_size(EnergyPlusData &state)
     static constexpr std::string_view routineName = "FanComponent::set_size()"; // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool _bPRINT = true;  // TRUE if sizing is reported to output (eio)
-    int NumFansSized = 0; // counter used to deallocate temporary string array after all fans have been sized
+    bool _bPRINT = true; // TRUE if sizing is reported to output (eio)
 
     std::string SizingString = sizingPrefix + " [m3/s]";
 
@@ -1350,6 +1351,7 @@ void FanComponent::set_size(EnergyPlusData &state)
     state.dataSize->DataAutosizable = maxAirFlowRateIsAutosized;
     state.dataSize->DataEMSOverrideON = EMSMaxAirFlowRateOverrideOn;
     state.dataSize->DataEMSOverride = EMSMaxAirFlowRateValue;
+    airLoopNum = state.dataSize->CurSysNum;
 
     bool errorsFound = false;
     SystemAirFlowSizer sizerSystemAirFlow;
@@ -1554,8 +1556,9 @@ void FanComponent::set_size(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, Name, deltaPress);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, Name, _volFlow);
     Real64 _ratedPower = _volFlow * deltaPress / totalEff; // total fan power
+    BaseSizer::reportSizerOutput(state, HVAC::fanTypeNames[(int)type], Name, "Design Electric Power Consumption [W]", _ratedPower);
     if (type != HVAC::FanType::ComponentModel) {
-        designPointFEI = FanSystem::report_fei(state, _volFlow, _ratedPower, deltaPress, state.dataEnvrn->StdRhoAir);
+        designPointFEI = FanSystem::report_fei(state, _volFlow, _ratedPower, deltaPress);
     }
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwr, Name, _ratedPower);
     if (_volFlow != 0.0) {
@@ -1573,11 +1576,20 @@ void FanComponent::set_size(EnergyPlusData &state)
                                              Name,
                                              maxAirFlowRateIsAutosized ? "Yes" : "No"); // autosizable vs. autosized equivalent?
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, Name, motorEff);
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, Name, motorInAirFrac);
-    OutputReportPredefined::PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchFanAirLoopName,
-                                             Name,
-                                             airLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Name : "N/A");
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, Name, 0.0);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatZone, Name, "N/A");
+    if (airLoopNum == 0) {
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAirLoopName, Name, "N/A");
+    } else if (airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchFanAirLoopName, Name, state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Name);
+    } else {
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchFanAirLoopName,
+            Name,
+            state.dataAirLoopHVACDOAS->airloopDOAS[airLoopNum - state.dataHVACGlobal->NumPrimaryAirSys - 1].Name);
+    }
 
     if (nightVentPerfNum > 0) {
         if (state.dataFans->NightVentPerf(nightVentPerfNum).MaxAirFlowRate == DataSizing::AutoSize) {
@@ -2385,8 +2397,8 @@ void FanComponent::report(EnergyPlusData &state)
     totalEnergy = totalPower * state.dataHVACGlobal->TimeStepSysSec;
     deltaTemp = outletAirTemp - inletAirTemp;
 
-    if (type == HVAC::FanType::OnOff) {
-        if (airLoopNum > 0) {
+    if (isAFNFan && (airLoopNum > 0)) {
+        if (type == HVAC::FanType::OnOff) {
             state.dataAirLoop->AirLoopAFNInfo(airLoopNum).AFNLoopOnOffFanRTF = runtimeFrac;
         }
     }
@@ -2582,6 +2594,7 @@ void FanSystem::set_size(EnergyPlusData &state)
     state.dataSize->DataAutosizable = true;
     state.dataSize->DataEMSOverrideON = EMSMaxAirFlowRateOverrideOn;
     state.dataSize->DataEMSOverride = EMSMaxAirFlowRateValue;
+    airLoopNum = state.dataSize->CurSysNum;
 
     bool ErrorsFound = false;
     SystemAirFlowSizer sizerSystemAirFlow;
@@ -2642,8 +2655,7 @@ void FanSystem::set_size(EnergyPlusData &state)
             }
         }
     }
-    Real64 _rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataLoopNodes->Node(inletNodeNum).Press, inletAirTemp, inletAirHumRat);
-    designPointFEI = report_fei(state, maxAirFlowRate, designElecPower, deltaPress, _rhoAir);
+    designPointFEI = report_fei(state, maxAirFlowRate, designElecPower, deltaPress);
 
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, Name, HVAC::fanTypeNames[(int)type]);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, Name, totalEff);
@@ -2665,15 +2677,26 @@ void FanSystem::set_size(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPurpose, Name, "N/A"); // m_fanType); // purpose? not the same
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAutosized, Name, maxAirFlowRateIsAutosized ? "Yes" : "No");
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, Name, motorEff);
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, Name, motorInAirFrac);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, Name, 1 - motorInAirFrac);
     OutputReportPredefined::PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchFanAirLoopName,
+                                             state.dataOutRptPredefined->pdchFanMotorHeatZone,
                                              Name,
-                                             airLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Name : "N/A");
+                                             heatLossDest == HeatLossDest::Zone ? state.dataHeatBal->Zone(zoneNum).Name : "N/A");
+    if (airLoopNum == 0) {
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAirLoopName, Name, "N/A");
+    } else if (airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchFanAirLoopName, Name, state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Name);
+    } else {
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchFanAirLoopName,
+            Name,
+            state.dataAirLoopHVACDOAS->airloopDOAS[airLoopNum - state.dataHVACGlobal->NumPrimaryAirSys - 1].Name);
+    }
 }
 
-Real64 FanSystem::report_fei(
-    EnergyPlusData &state, Real64 const _designFlowRate, Real64 const _designElecPower, Real64 const _designDeltaPress, Real64 _inletRhoAir)
+Real64 FanSystem::report_fei(EnergyPlusData &state, Real64 const _designFlowRate, Real64 const _designElecPower, Real64 const _designDeltaPress)
 {
     // PURPOSE OF THIS SUBROUTINE:
     // Calculate the Fan Energy Index
@@ -2682,9 +2705,14 @@ Real64 FanSystem::report_fei(
     // ANSI/AMCA Standard 207-17: Fan System Efficiency and Fan System Input Power Calculation, 2017.
     // AANSI / AMCA Standard 208 - 18: Calculation of the Fan Energy Index, 2018.
 
-    assert(state.dataEnvrn->StdRhoAir > 0.0);
+    Real64 constexpr rhoAirStd = 1.2;   // Value from the above referenced standard
+    Real64 constexpr tempAirFan = 21.0; // Standard fan inlet temperature in Celsius
+    Real64 constexpr hrAirFan = 0.5;    // Standard fan inlet humidity ratio (50%)
+    Real64 _wAirFan = Psychrometrics::PsyWFnTdbRhPb(state, tempAirFan, hrAirFan, state.dataEnvrn->StdBaroPress);
+    Real64 _rhoAirFan = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, tempAirFan, _wAirFan);
+
     // Calculate reference fan shaft power
-    Real64 _refFanShaftPower = (_designFlowRate + 0.118) * (_designDeltaPress + 100 * _inletRhoAir / state.dataEnvrn->StdRhoAir) / (1000 * 0.66);
+    Real64 _refFanShaftPower = (_designFlowRate + 0.118) * (_designDeltaPress + 100 * _rhoAirFan / rhoAirStd) / (1000 * 0.66);
 
     // Calculate reference reference fan transmission efficiency
     Real64 _refFanTransEff = 0.96 * pow((_refFanShaftPower / (_refFanShaftPower + 1.64)), 0.05);
@@ -3071,12 +3099,10 @@ void FanSystem::update(EnergyPlusData &state) // does not change state of object
         state.dataLoopNodes->Node(outletNodeNum).GenContam = state.dataLoopNodes->Node(inletNodeNum).GenContam;
     }
 
-    if (speedControl == SpeedControl::Continuous) {
-        if (airLoopNum > 0) {
+    if (isAFNFan && (airLoopNum > 0)) {
+        if (speedControl == SpeedControl::Continuous) {
             state.dataAirLoop->AirLoopAFNInfo(airLoopNum).AFNLoopOnOffFanRTF = runtimeFracAtSpeed[0];
-        }
-    } else {
-        if (airLoopNum > 0) {
+        } else {
             if (numSpeeds == 1) {
                 state.dataAirLoop->AirLoopAFNInfo(airLoopNum).AFNLoopOnOffFanRTF = outletAirMassFlowRate / maxAirMassFlowRate;
             } else if (outletAirMassFlowRate <= massFlowAtSpeed[0]) {

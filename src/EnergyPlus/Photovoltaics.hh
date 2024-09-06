@@ -135,8 +135,8 @@ namespace Photovoltaics {
                 Real64 &XX,
                 std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
                 std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
-                Real64 const &II, // Autodesk Aliased to XX in some calls
-                Real64 const &VV, // Autodesk Aliased to XX in some calls
+                Real64 const &II, // Autodesk Aliased to XX in some calls, this is absolutely wacky and needs to go
+                Real64 const &VV, // Autodesk Aliased to XX in some calls, this too
                 Real64 const IO,
                 Real64 const IL,
                 Real64 const RSER,
@@ -333,6 +333,10 @@ struct PhotovoltaicStateData : BaseGlobalStruct
     bool firstTime = true;
     Real64 PVTimeStep; // internal timestep (in seconds) for cell temperature mode 3
     Array1D_bool MyEnvrnFlag;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

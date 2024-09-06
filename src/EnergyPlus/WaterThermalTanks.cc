@@ -77,6 +77,7 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -114,7 +115,7 @@ namespace EnergyPlus::WaterThermalTanks {
 // WaterHeater:Mixed simulates a well-mixed, single-node tank for hot water applications.  Source (e.g. heat recovery) and
 // use plant connections are allowed.  A scheduled domestic hot water demand can also be specified
 // to directly utilize the hot water without use side connections.
-// WaterHeater:Stratified simulates a stratified, multi-node tank for hot water applicatons.
+// WaterHeater:Stratified simulates a stratified, multi-node tank for hot water applications.
 // The model shares most of the same capabilities as WaterHeater:Mixed
 // but also has up to two heating elements which can be operated in
 // a master-slave mode or simultaneous mode.
@@ -425,7 +426,7 @@ void HeatPumpWaterHeaterData::simulate(
                                                                    state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).DWHCoilName,
                                                                    bDWHCoilReading);
             this->DXCoilAirInletNode = this->HeatPumpAirInletNode;
-        } else // default is to input outdoor fan to the the this
+        } else // default is to input outdoor fan to the HPWH
         {
             this->FanNum = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).IDFanID;
             this->FanName = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).IDFanName;
@@ -6664,8 +6665,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                       std::string(),
                                                       state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                                      0,
-                                                      HVAC::CompressorOperation::Off,
+                                                      HVAC::FanOp::Invalid, // Invalid instead of off?
+                                                      HVAC::CompressorOp::Off,
                                                       0.0,
                                                       1,
                                                       0.0,
@@ -8998,7 +8999,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     int OutletAirSplitterNode = HeatPump.OutletAirSplitterNode;
     int DXCoilAirInletNode = HeatPump.DXCoilAirInletNode;
     state.dataWaterThermalTanks->hpPartLoadRatio = 0.0;
-    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::Off; // DX compressor operation; 1=on, 0=off
+    HVAC::CompressorOp compressorOp = HVAC::CompressorOp::Off; // DX compressor operation; 1=on, 0=off
     HeatPump.OnCycParaFuelRate = 0.0;
     HeatPump.OnCycParaFuelEnergy = 0.0;
     HeatPump.OffCycParaFuelRate = 0.0;
@@ -9057,8 +9058,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               "",
                                                               VSCoilNum,
-                                                              HVAC::CycFanCycCoil,
-                                                              HVAC::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9069,8 +9070,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               HeatPump.DXCoilName,
                                                               VSCoilNum,
-                                                              HVAC::CycFanCycCoil,
-                                                              HVAC::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9083,8 +9084,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               "",
                                                               VSCoilNum,
-                                                              HVAC::CycFanCycCoil,
-                                                              HVAC::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9095,8 +9096,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               HeatPump.DXCoilName,
                                                               VSCoilNum,
-                                                              HVAC::CycFanCycCoil,
-                                                              HVAC::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9119,8 +9120,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                   "",
                                                                   VSCoilNum,
-                                                                  HVAC::CycFanCycCoil,
-                                                                  HVAC::CompressorOperation::On,
+                                                                  HVAC::FanOp::Cycling,
+                                                                  HVAC::CompressorOp::On,
                                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -9132,8 +9133,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                   "",
                                                                   VSCoilNum,
-                                                                  HVAC::CycFanCycCoil,
-                                                                  HVAC::CompressorOperation::On,
+                                                                  HVAC::FanOp::Cycling,
+                                                                  HVAC::CompressorOp::On,
                                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -9151,18 +9152,18 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
                 DXCoils::SimDXCoil(state,
                                    HeatPump.DXCoilName,
-                                   CompressorOp,
+                                   compressorOp,
                                    FirstHVACIteration,
                                    HeatPump.DXCoilNum,
-                                   HVAC::CycFanCycCoil,
+                                   HVAC::FanOp::Cycling,
                                    state.dataWaterThermalTanks->hpPartLoadRatio);
             } else {
                 DXCoils::SimDXCoil(state,
                                    HeatPump.DXCoilName,
-                                   CompressorOp,
+                                   compressorOp,
                                    FirstHVACIteration,
                                    HeatPump.DXCoilNum,
-                                   HVAC::CycFanCycCoil,
+                                   HVAC::FanOp::Cycling,
                                    state.dataWaterThermalTanks->hpPartLoadRatio);
                 state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
             }
@@ -9415,8 +9416,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               "",
                                                               VSCoilNum,
-                                                              HVAC::CycFanCycCoil,
-                                                              HVAC::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9433,8 +9434,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     IntegratedHeatPump::SimIHP(state,
                                                HeatPump.DXCoilName,
                                                HeatPump.DXCoilNum,
-                                               HVAC::CycFanCycCoil,
-                                               HVAC::CompressorOperation::On,
+                                               HVAC::FanOp::Cycling,
+                                               HVAC::CompressorOp::On,
                                                state.dataWaterThermalTanks->hpPartLoadRatio,
                                                SpeedNum,
                                                SpeedRatio,
@@ -9462,8 +9463,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
-                                                          HVAC::CycFanCycCoil,
-                                                          HVAC::CompressorOperation::On,
+                                                          HVAC::FanOp::Cycling,
+                                                          HVAC::CompressorOp::On,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -9564,8 +9565,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                         IntegratedHeatPump::SimIHP(state,
                                                    HeatPump.DXCoilName,
                                                    HeatPump.DXCoilNum,
-                                                   HVAC::CycFanCycCoil,
-                                                   HVAC::CompressorOperation::On,
+                                                   HVAC::FanOp::Cycling,
+                                                   HVAC::CompressorOp::On,
                                                    state.dataWaterThermalTanks->hpPartLoadRatio,
                                                    SpeedNum,
                                                    SpeedRatio,
@@ -9579,8 +9580,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               HeatPump.DXCoilName,
                                                               HeatPump.DXCoilNum,
-                                                              HVAC::CycFanCycCoil,
-                                                              HVAC::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9610,8 +9611,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                         IntegratedHeatPump::SimIHP(state,
                                                    HeatPump.DXCoilName,
                                                    HeatPump.DXCoilNum,
-                                                   HVAC::CycFanCycCoil,
-                                                   HVAC::CompressorOperation::On,
+                                                   HVAC::FanOp::Cycling,
+                                                   HVAC::CompressorOp::On,
                                                    state.dataWaterThermalTanks->hpPartLoadRatio,
                                                    SpeedNum,
                                                    SpeedRatio,
@@ -9624,8 +9625,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                   HeatPump.DXCoilName,
                                                                   HeatPump.DXCoilNum,
-                                                                  HVAC::CycFanCycCoil,
-                                                                  HVAC::CompressorOperation::On,
+                                                                  HVAC::FanOp::Cycling,
+                                                                  HVAC::CompressorOp::On,
                                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -9734,8 +9735,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     IntegratedHeatPump::SimIHP(state,
                                                HeatPump.DXCoilName,
                                                HeatPump.DXCoilNum,
-                                               HVAC::CycFanCycCoil,
-                                               HVAC::CompressorOperation::On,
+                                               HVAC::FanOp::Cycling,
+                                               HVAC::CompressorOp::On,
                                                state.dataWaterThermalTanks->hpPartLoadRatio,
                                                SpeedNum,
                                                SpeedRatio,
@@ -9748,8 +9749,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               HeatPump.DXCoilName,
                                                               HeatPump.DXCoilNum,
-                                                              HVAC::CycFanCycCoil,
-                                                              HVAC::CompressorOperation::On,
+                                                              HVAC::FanOp::Cycling,
+                                                              HVAC::CompressorOp::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -9845,8 +9846,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 IntegratedHeatPump::SimIHP(state,
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
-                                           HVAC::CycFanCycCoil,
-                                           CompressorOp,
+                                           HVAC::FanOp::Cycling,
+                                           compressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -9860,8 +9861,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 IntegratedHeatPump::SimIHP(state,
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
-                                           HVAC::CycFanCycCoil,
-                                           CompressorOp,
+                                           HVAC::FanOp::Cycling,
+                                           compressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -9875,8 +9876,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 IntegratedHeatPump::SimIHP(state,
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
-                                           HVAC::CycFanCycCoil,
-                                           CompressorOp,
+                                           HVAC::FanOp::Cycling,
+                                           compressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -9890,8 +9891,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 IntegratedHeatPump::SimIHP(state,
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
-                                           HVAC::CycFanCycCoil,
-                                           CompressorOp,
+                                           HVAC::FanOp::Cycling,
+                                           compressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -9911,8 +9912,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
-                                                          HVAC::CycFanCycCoil,
-                                                          CompressorOp,
+                                                          HVAC::FanOp::Cycling,
+                                                          compressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -9925,8 +9926,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
-                                                          HVAC::CycFanCycCoil,
-                                                          CompressorOp,
+                                                          HVAC::FanOp::Cycling,
+                                                          compressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -9938,8 +9939,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
-                                                          HVAC::CycFanCycCoil,
-                                                          CompressorOp,
+                                                          HVAC::FanOp::Cycling,
+                                                          compressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -9952,8 +9953,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
-                                                          HVAC::CycFanCycCoil,
-                                                          CompressorOp,
+                                                          HVAC::FanOp::Cycling,
+                                                          compressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -9973,39 +9974,39 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompressorOp,
+                               compressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
-                               HVAC::CycFanCycCoil,
+                               HVAC::FanOp::Cycling,
                                state.dataWaterThermalTanks->hpPartLoadRatio);
 
             state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
 
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompressorOp,
+                               compressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
-                               HVAC::CycFanCycCoil,
+                               HVAC::FanOp::Cycling,
                                state.dataWaterThermalTanks->hpPartLoadRatio);
         } else {
             //   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompressorOp,
+                               compressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
-                               HVAC::CycFanCycCoil,
+                               HVAC::FanOp::Cycling,
                                state.dataWaterThermalTanks->hpPartLoadRatio);
 
             state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
 
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompressorOp,
+                               compressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
-                               HVAC::CycFanCycCoil,
+                               HVAC::FanOp::Cycling,
                                state.dataWaterThermalTanks->hpPartLoadRatio);
 
             state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
@@ -10242,8 +10243,8 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
         IntegratedHeatPump::SimIHP(state,
                                    state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
                                    state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                   HVAC::CycFanCycCoil,
-                                   HVAC::CompressorOperation::On,
+                                   HVAC::FanOp::Cycling,
+                                   HVAC::CompressorOp::On,
                                    state.dataWaterThermalTanks->hpPartLoadRatio,
                                    SpeedNum,
                                    SpeedRatio,
@@ -10256,8 +10257,8 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                   state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
                                                   state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                                  HVAC::CycFanCycCoil,
-                                                  HVAC::CompressorOperation::On,
+                                                  HVAC::FanOp::Cycling,
+                                                  HVAC::CompressorOp::On,
                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                   SpeedNum,
                                                   SpeedRatio,
@@ -11201,9 +11202,6 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
 
     static constexpr std::string_view RoutineName("SizeTankForSupplySide");
 
-    Real64 Tstart = 14.44;
-    Real64 Tfinish = 57.22;
-
     Real64 tmpTankVolume = this->Volume;
     Real64 tmpMaxCapacity = this->MaxCapacity;
 
@@ -11221,8 +11219,11 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
         }
         if (this->MaxCapacityWasAutoSized) {
             if (this->Sizing.RecoveryTime > 0.0) {
-                Real64 rho;
-                Real64 Cp;
+                Real64 rho = 0.0;
+                Real64 Cp = 0.0;
+                constexpr Real64 Tstart = 14.44;
+                constexpr Real64 Tfinish = 57.22;
+
                 if (this->SrcSidePlantLoc.loopNum > 0) {
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->SrcSidePlantLoc.loopNum).FluidName,
@@ -11242,8 +11243,7 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
                                  (this->Sizing.RecoveryTime * Constant::SecInHour); // m3 | kg/m3 | J/Kg/K | K | seconds
             } else {
                 ShowFatalError(
-                    state,
-                    format("SizeTankForSupplySide: Tank=\"{}\", requested sizing for max capacity but entered Recovery Time is zero.", this->Name));
+                    state, format("{}: Tank=\"{}\", requested sizing for max capacity but entered Recovery Time is zero.", RoutineName, this->Name));
             }
         }
 
@@ -11259,12 +11259,31 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
     } else if (this->Sizing.DesignMode == SizingMode::PerSolarColArea) {
 
         this->Sizing.TotalSolarCollectorArea = 0.0;
+
         for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
-            this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
+            auto const &collector = state.dataSolarCollectors->Collector(CollectorNum);
+            this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(collector.Surface).Area;
         }
 
-        if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
-        if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 0.0;
+        for (int CollectorNum = 1; CollectorNum <= state.dataPhotovoltaicThermalCollector->NumPVT; ++CollectorNum) {
+            auto const &collector = state.dataPhotovoltaicThermalCollector->PVT(CollectorNum);
+            this->Sizing.TotalSolarCollectorArea += collector.AreaCol;
+        }
+
+        if (this->VolumeWasAutoSized) {
+            if (this->Sizing.TotalSolarCollectorArea > 0) {
+                tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
+            } else {
+                ShowFatalError(state,
+                               format("{}: Tank=\"{}\", requested sizing for volume with PerSolarCollectorArea but total found "
+                                      "area of Collectors is zero.",
+                                      RoutineName,
+                                      this->Name));
+            }
+        }
+        if (this->MaxCapacityWasAutoSized) {
+            tmpMaxCapacity = 0.0;
+        }
         if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             this->Volume = tmpTankVolume;
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -11285,7 +11304,9 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
         }
     }
 
-    if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
+    if (this->MaxCapacityWasAutoSized) {
+        this->setBackupElementCapacity(state);
+    }
 
     if ((this->VolumeWasAutoSized) && (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) &&
         state.dataPlnt->PlantFirstSizesOkayToFinalize) { // might set height
@@ -11577,8 +11598,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                 } else {
                     ShowFatalError(
                         state,
-                        format("SizeStandAloneWaterHeater: Tank=\"{}\", requested sizing for max capacity but entered Recovery Time is zero.",
-                               this->Name));
+                        format("{}: Tank=\"{}\", requested sizing for max capacity but entered Recovery Time is zero.", RoutineName, this->Name));
                 }
                 this->MaxCapacity = tmpMaxCapacity;
                 BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
@@ -11800,13 +11820,34 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             break;
         }
         case SizingMode::PerSolarColArea: {
+
             this->Sizing.TotalSolarCollectorArea = 0.0;
+
             for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
-                this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
+                auto const &collector = state.dataSolarCollectors->Collector(CollectorNum);
+                this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(collector.Surface).Area;
             }
 
-            if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
-            if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 0.0;
+            for (int CollectorNum = 1; CollectorNum <= state.dataPhotovoltaicThermalCollector->NumPVT; ++CollectorNum) {
+                auto const &collector = state.dataPhotovoltaicThermalCollector->PVT(CollectorNum);
+                this->Sizing.TotalSolarCollectorArea += collector.AreaCol;
+            }
+
+            if (this->VolumeWasAutoSized) {
+                if (this->Sizing.TotalSolarCollectorArea > 0) {
+                    tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
+                } else {
+                    ShowFatalError(state,
+                                   format("{}: Tank=\"{}\", requested sizing for volume with PerSolarCollectorArea but total found "
+                                          "area of Collectors is zero.",
+                                          RoutineName,
+                                          this->Name));
+                }
+            }
+            if (this->MaxCapacityWasAutoSized) {
+                tmpMaxCapacity = 0.0;
+            }
+
             if (this->VolumeWasAutoSized) {
                 this->Volume = tmpTankVolume;
                 BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
@@ -11818,7 +11859,9 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             break;
         }
         default:
-            if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
+            if (this->MaxCapacityWasAutoSized) {
+                this->setBackupElementCapacity(state);
+            }
             break;
         }
     }
@@ -12043,8 +12086,8 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                             state,
                             VSCoilName,
                             VSCoilNum,
-                            HVAC::CycFanCycCoil,
-                            HVAC::CompressorOperation::On,
+                            HVAC::FanOp::Cycling,
+                            HVAC::CompressorOp::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                             1.0,
@@ -12058,8 +12101,8 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                             state,
                             VSCoilName,
                             VSCoilNum,
-                            HVAC::CycFanCycCoil,
-                            HVAC::CompressorOperation::On,
+                            HVAC::FanOp::Cycling,
+                            HVAC::CompressorOp::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                             1.0,
@@ -12072,8 +12115,8 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                             state,
                             VSCoilName,
                             VSCoilNum,
-                            HVAC::CycFanCycCoil,
-                            HVAC::CompressorOperation::On,
+                            HVAC::FanOp::Cycling,
+                            HVAC::CompressorOp::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                             1.0,
@@ -12087,8 +12130,8 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                             state,
                             VSCoilName,
                             VSCoilNum,
-                            HVAC::CycFanCycCoil,
-                            HVAC::CompressorOperation::On,
+                            HVAC::FanOp::Cycling,
+                            HVAC::CompressorOp::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                             1.0,
@@ -12112,10 +12155,10 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
 
                             DXCoils::SimDXCoil(state,
                                                state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                               HVAC::CompressorOperation::On,
+                                               HVAC::CompressorOp::On,
                                                true,
                                                state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                               HVAC::CycFanCycCoil,
+                                               HVAC::FanOp::Cycling,
                                                1.0);
                             state.dataLoopNodes->Node(state.dataWaterThermalTanks->HPWaterHeater(HPNum).CondWaterInletNode).Temp = this->TankTemp;
                         }
@@ -12125,30 +12168,30 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
 
                         DXCoils::SimDXCoil(state,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                           HVAC::CompressorOperation::On,
+                                           HVAC::CompressorOp::On,
                                            true,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                           HVAC::CycFanCycCoil,
+                                           HVAC::FanOp::Cycling,
                                            1.0);
 
                         state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
 
                         DXCoils::SimDXCoil(state,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                           HVAC::CompressorOperation::On,
+                                           HVAC::CompressorOp::On,
                                            true,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                           HVAC::CycFanCycCoil,
+                                           HVAC::FanOp::Cycling,
                                            1.0);
                     } else {
                         if (FirstTimeFlag) { // first time DXCoils::DXCoil is called, it's sized at the RatedCondenserWaterInlet temp, size and
                                              // reset water inlet temp. If already sized, no harm.
                             DXCoils::SimDXCoil(state,
                                                state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                               HVAC::CompressorOperation::On,
+                                               HVAC::CompressorOp::On,
                                                true,
                                                state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                               HVAC::CycFanCycCoil,
+                                               HVAC::FanOp::Cycling,
                                                1.0);
                             state.dataLoopNodes->Node(state.dataWaterThermalTanks->HPWaterHeater(HPNum).CondWaterInletNode).Temp = this->TankTemp;
                         }
@@ -12156,20 +12199,20 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                         // PLR=1 here.
                         DXCoils::SimDXCoil(state,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                           HVAC::CompressorOperation::On,
+                                           HVAC::CompressorOp::On,
                                            true,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                           HVAC::CycFanCycCoil,
+                                           HVAC::FanOp::Cycling,
                                            1.0);
 
                         state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
 
                         DXCoils::SimDXCoil(state,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
-                                           HVAC::CompressorOperation::On,
+                                           HVAC::CompressorOp::On,
                                            true,
                                            state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
-                                           HVAC::CycFanCycCoil,
+                                           HVAC::FanOp::Cycling,
                                            1.0);
 
                         state.dataFans->fans(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum)->simulate(state, true, _, _);
@@ -12433,7 +12476,6 @@ bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumbe
             }
 
             // Get fan inlet node index
-            bool ErrorsFound{false};
             int FanInletNodeIndex = state.dataFans->fans(HPWH.FanNum)->inletNodeNum;
 
             // Fan inlet node
@@ -12463,6 +12505,22 @@ bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumbe
     }
 
     return HeatPumpWaterHeaterNodeException;
+}
+
+int getHeatPumpWaterHeaterIndex(EnergyPlusData &state, std::string_view CompName)
+{
+    if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
+        GetWaterThermalTankInput(state);
+        state.dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
+    }
+
+    for (int HPNum = 1; HPNum <= state.dataWaterThermalTanks->numHeatPumpWaterHeater; ++HPNum) {
+        if (Util::SameString(state.dataWaterThermalTanks->HPWaterHeater(HPNum).Name, CompName)) {
+            return HPNum;
+        }
+    }
+
+    return 0;
 }
 
 } // namespace EnergyPlus::WaterThermalTanks
