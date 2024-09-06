@@ -962,18 +962,12 @@ void GLHEVert::calcUniformBHWallTempGFunctions(EnergyPlusData &state)
         boreholes.emplace_back(bh->props->bhLength, bh->props->bhTopDepth, bh->props->bhDiameter / 2.0, bh->xLoc, bh->yLoc);
     }
 
-    // convert time to a std::vector from an Array1D
-    std::vector<double> time;
-    for (auto &v : this->myRespFactors->time) {
-        time.push_back(v);
-    }
-
     // Obtain number of segments by adaptive discretization
     gt::segments::adaptive adptDisc;
     int nSegments = adptDisc.discretize(this->bhLength, this->totalTubeLength);
 
     this->myRespFactors->GFNC =
-        gt::gfunction::uniform_borehole_wall_temperature(boreholes, time, this->soil.diffusivity, nSegments, true, state.dataGlobal->numThread);
+        gt::gfunction::uniform_borehole_wall_temperature(boreholes, this->myRespFactors->time, this->soil.diffusivity, nSegments, true, state.dataGlobal->numThread);
 }
 
 //******************************************************************************
@@ -989,7 +983,7 @@ void GLHEVert::calcGFunctions(EnergyPlusData &state)
 
     // save data for later
     if (state.files.outputControl.glhe && !state.dataSysVars->DisableGLHECaching) {
-        myCacheData["Response Factors"]["time"] = std::vector<Real64>(this->myRespFactors->time.begin(), this->myRespFactors->time.end());
+        myCacheData["Response Factors"]["time"] = std::vector<Real64>(this->myRespFactors->time);
         myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(this->myRespFactors->LNTTS.begin(), this->myRespFactors->LNTTS.end());
         myCacheData["Response Factors"]["GFNC"] = std::vector<Real64>(this->myRespFactors->GFNC.begin(), this->myRespFactors->GFNC.end());
         writeGLHECacheToFile(state);
@@ -1026,13 +1020,13 @@ void GLHEVert::setupTimeVectors()
     }
 
     // Setup the arrays
-    this->myRespFactors->time.dimension(tempLNTTS.size(), 0.0);
+    // this->myRespFactors->time.dimension(tempLNTTS.size(), 0.0);
     this->myRespFactors->LNTTS.dimension(tempLNTTS.size(), 0.0);
     this->myRespFactors->GFNC.dimension(tempLNTTS.size(), 0.0);
 
     int index = 1;
     for (auto const &thisLNTTS : tempLNTTS) {
-        this->myRespFactors->time(index) = exp(thisLNTTS) * t_s;
+        this->myRespFactors->time.push_back(exp(thisLNTTS) * t_s);
         this->myRespFactors->LNTTS(index) = thisLNTTS;
         ++index;
     }
@@ -1049,7 +1043,7 @@ void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
         for (auto const &bh_i : this->myRespFactors->myBorholes) {
             Real64 sum_T_ji = 0;
             for (auto const &bh_j : this->myRespFactors->myBorholes) {
-                sum_T_ji += doubleIntegral(bh_i, bh_j, this->myRespFactors->time(lntts_index));
+                sum_T_ji += doubleIntegral(bh_i, bh_j, this->myRespFactors->time[lntts_index - 1]);
             }
             this->myRespFactors->GFNC(lntts_index) += sum_T_ji;
         }
@@ -1381,11 +1375,11 @@ void GLHEVert::combineShortAndLongTimestepGFunctions()
     }
 
     // Move combined values into right data struct
-    this->myRespFactors->time.deallocate();
+    // this->myRespFactors->time.deallocate();
     this->myRespFactors->LNTTS.deallocate();
     this->myRespFactors->GFNC.deallocate();
 
-    this->myRespFactors->time.dimension(GFNC_combined.size(), 0.0);
+    // this->myRespFactors->time.dimension(GFNC_combined.size(), 0.0);
     this->myRespFactors->LNTTS.dimension(GFNC_combined.size(), 0.0);
     this->myRespFactors->GFNC.dimension(GFNC_combined.size(), 0.0);
 
@@ -1460,7 +1454,7 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
 
     if (gFunctionsExist) {
         // Populate the time array
-        this->myRespFactors->time = Array1D<Real64>(myCacheData["Response Factors"]["time"].get<std::vector<Real64>>());
+        this->myRespFactors->time = std::vector<Real64>(myCacheData["Response Factors"]["time"].get<std::vector<Real64>>());
 
         // Populate the lntts array
         this->myRespFactors->LNTTS = Array1D<Real64>(myCacheData["Response Factors"]["LNTTS"].get<std::vector<Real64>>());
