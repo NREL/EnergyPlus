@@ -173,10 +173,6 @@ namespace HeatBalanceManager {
 
     void CreateTCConstructions(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void SetupComplexFenestrationMaterialInput(EnergyPlusData &state,
-                                               int MaterNum, // num of material items thus far
-                                               bool &ErrorsFound);
-
     void SetupComplexFenestrationStateInput(EnergyPlusData &state,
                                             int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);

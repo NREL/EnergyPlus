@@ -697,7 +697,7 @@ namespace HeatBalanceHAMTManager {
                 assert(matHAMT != nullptr);
                 
                 if (matHAMT->nmu < 0) {
-                    ShowSevereError(state, format("{}Construction={}", constr.Name));
+                    ShowSevereError(state, format("{}Construction={}", RoutineName, constr.Name));
                     ShowContinueError(state,
                                       format("Reference Material=\"{}\" does not have required Water Vapor Diffusion Resistance Factor (mu) data.",
                                              matHAMT->Name));

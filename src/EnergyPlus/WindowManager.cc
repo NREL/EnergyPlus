@@ -6813,8 +6813,6 @@ namespace Window {
         using WindowComplexManager::CalcComplexWindowThermal;
         using WindowComplexManager::UpdateComplexWindows;
 
-        static Array1D_string const Roughness({0, 5}, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
-
         Real64 TempVar(0.0); // just temporary usage for complex fenestration
 
         int Layer;
@@ -6919,7 +6917,7 @@ namespace Window {
                       "{}\n",
                       "! <WindowMaterial:Shade:EquivalentLayer>, Material Name, Front Side Beam-Beam Solar "
                       "Transmittance, Back Side Beam-Beam Solar Transmittance, Front Side Beam-Diffuse Solar "
-                      "Transmittance, Back Side Beam-Diffuse Solar Transmittance, , Front Side Beam-Diffuse Solar "
+                      "Transmittance, Back Side Beam-Diffuse Solar Transmittance, Front Side Beam-Diffuse Solar "
                       "Reflectance, Back Side Beam-Diffuse Solar Reflectance, Infrared Transmittance, Front Side "
                       "Infrared Emissivity, Back Side Infrared Emissivity");
 
@@ -7028,7 +7026,7 @@ namespace Window {
                               construct.Name,
                               ThisNum,
                               construct.TotLayers,
-                              Roughness(static_cast<int>(construct.OutsideRoughness)),
+                              Material::surfaceRoughnessNames[(int)construct.OutsideRoughness],
                               NominalConductanceWinter,
                               state.dataHeatBal->NominalUBeforeAdjusted(ThisNum),
                               state.dataHeatBal->CoeffAdjRatio(ThisNum),
