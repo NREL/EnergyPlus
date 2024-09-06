@@ -563,11 +563,21 @@ namespace Window {
             Aleft = matBlind->leftOpeningMult;
             Aright = matBlind->rightOpeningMult;
 
-            Afront = surfShade.blind.airFlowPermeability;
-            emissFront = surfShade.blind.TAR.IR.Ft.Emi;
-            emissBack = surfShade.blind.TAR.IR.Bk.Emi;
-            transThermalFront = surfShade.blind.TAR.IR.Ft.Tra;
-            transThermalBack = surfShade.blind.TAR.IR.Bk.Tra;
+            Real64 slatAng = matBlind->SlatAngle * Constant::DegToRad;
+            Real64 PermA = std::sin(slatAng) - matBlind->SlatThickness / matBlind->SlatSeparation;
+            Real64 PermB = 1.0 - (std::abs(matBlind->SlatWidth * std::cos(slatAng)) + matBlind->SlatThickness * std::sin(slatAng)) / matBlind->SlatSeparation;
+            Afront = min(1.0, max(0.0, PermA, PermB));
+
+            int iSlatLo, iSlatHi;
+            Real64 interpFac;
+
+            Material::GetSlatIndicesInterpFac(slatAng, iSlatLo, iSlatHi, interpFac);
+            
+            emissFront = Interp(matBlind->TARs[iSlatLo].IR.Ft.Emi, matBlind->TARs[iSlatHi].IR.Ft.Emi, interpFac);
+            emissBack = Interp(matBlind->TARs[iSlatLo].IR.Bk.Emi, matBlind->TARs[iSlatHi].IR.Bk.Emi, interpFac);
+            transThermalFront = Interp(matBlind->TARs[iSlatLo].IR.Ft.Tra, matBlind->TARs[iSlatHi].IR.Ft.Tra, interpFac);
+            transThermalBack = Interp(matBlind->TARs[iSlatLo].IR.Bk.Tra, matBlind->TARs[iSlatHi].IR.Bk.Tra, interpFac);
+            
             if (t_Index == 1) {
                 m_ExteriorShade = true;
             }
