@@ -6458,7 +6458,7 @@ namespace Window {
                     RhoBlDiffBack = InterpSlatAng(SlatAng, VarSlats, blind.SolBackDiffDiffRefl);
                     RhoBlDiffBackVis = InterpSlatAng(SlatAng, VarSlats, blind.VisBackDiffDiffRefl);
                     RhoBlBack = InterpProfSlatAng(0.0, SlatAng, VarSlats, blind.SolBackBeamDiffRefl);
-                    RhoBlBackVis = InterpProfSlatAng(0.0, SlatAng, VarSlats, blind.SolBackBeamDiffRefl);
+                    RhoBlBackVis = InterpProfSlatAng(0.0, SlatAng, VarSlats, blind.VisBackBeamDiffRefl);
                     AbsBeamShadeNorm =
                         AbsBlFront + AbsBlBack * RGlFront * TBlBmBm +
                         (AbsBlDiffBack * RGlDiffFront / (1.0 - RhoBlDiffBack * RGlDiffFront)) * (RGlFront * TBlBmBm * RhoBlBack + TBlBmDif);
