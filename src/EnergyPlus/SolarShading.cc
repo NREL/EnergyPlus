@@ -6441,7 +6441,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowModel::EQL && ANY_BLIND(ShadeFlag)) {
                 int SlatsAngIndexLower = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
                 int ProfAngIndexLower = state.dataSurface->SurfWinProfAngIndex(SurfNum);
-                int SlatsAngIndexUpper = std::min(Material::MaxProfAngs, SlatsAngIndexLower + 1);
+                int SlatsAngIndexUpper = std::min(Material::MaxSlatAngs, SlatsAngIndexLower + 1);
                 int ProfAngIndexUpper = std::min(Material::MaxProfAngs, ProfAngIndexLower + 1);
                 Real64 SlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
                 Real64 ProfAngInterpFac = state.dataSurface->SurfWinProfAngInterpFac(SurfNum);
@@ -7583,7 +7583,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                                     int SlatsAngIndexLowerBack = state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum);
                                     int ProfAngIndexLowerBack = state.dataSurface->SurfWinProfAngIndex(BackSurfNum);
-                                    int SlatsAngIndexUpperBack = std::min(Material::MaxProfAngs, SlatsAngIndexLowerBack + 1);
+                                    int SlatsAngIndexUpperBack = std::min(Material::MaxSlatAngs, SlatsAngIndexLowerBack + 1);
                                     int ProfAngIndexUpperBack = std::min(Material::MaxProfAngs, ProfAngIndexLowerBack + 1);
                                     Real64 SlatsAngInterpFacBack = state.dataSurface->SurfWinSlatsAngInterpFac(BackSurfNum);
                                     Real64 ProfAngInterpFacBack = state.dataSurface->SurfWinProfAngInterpFac(BackSurfNum);
