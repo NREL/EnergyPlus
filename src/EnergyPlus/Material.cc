@@ -1319,7 +1319,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         mat->TAR.Sol.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(2);
         mat->TAR.Sol.Bk.Bm[0].DfTra = s_ipsc->rNumericArgs(3);
         mat->TAR.Sol.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(4);
-        mat->TAR.Sol.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(5);
+        mat->TAR.Sol.Bk.Bm[0].DfRef = s_ipsc->rNumericArgs(5);
         mat->TAR.Vis.Ft.Bm[0].BmTra = s_ipsc->rNumericArgs(6);
         mat->TAR.Vis.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(7);
         mat->TAR.Vis.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(8);
