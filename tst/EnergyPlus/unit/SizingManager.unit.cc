@@ -4151,7 +4151,7 @@ TEST_F(EnergyPlusFixture, SizingManager_ZoneSizing_Coincident_NonAir_10x_Latent_
         "  ElectricEquipment,",
         "    Space 1 Latent ElecEq,   !- Name",
         "    Space 1,                 !- Zone or ZoneList Name",
-        "    Morning2,                 !- Schedule Name",
+        "    SummerMorning2,          !- Schedule Name",
         "    EquipmentLevel,          !- Design Level Calculation Method",
         "    1000.0,                  !- Design Level {W}",
         "    ,                        !- Watts per Zone Floor Area {W/m2}",
@@ -4171,15 +4171,21 @@ TEST_F(EnergyPlusFixture, SizingManager_ZoneSizing_Coincident_NonAir_10x_Latent_
         "    Until: 24:00,0.0;        !- Field 11",
 
         "  Schedule:Compact,",
-        "    Morning2,                 !- Name",
+        "    SummerMorning2,          !- Name",
         "    ,                        !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 9",
+        "    Through: 5/31,           !- Field 9",
+        "    For: Alldays,            !- Field 10",
+        "    Until: 24:00,0.0,        !- Field 11",
+        "    Through: 9/30,           !- Field 9",
         "    For: Alldays,            !- Field 10",
         "    Until: 8:00,0.0,         !- Field 11",
         "    Until: 9:00,0.5,         !- Field 11",
-        "    Until: 11:00,0.8,         !- Field 11",
+        "    Until: 11:00,0.8,        !- Field 11",
         "    Until: 12:00,1.0,        !- Field 11",
         "    Until: 13:00,0.9,        !- Field 11",
+        "    Until: 24:00,0.0,        !- Field 11",
+        "    Through: 12/31,          !- Field 9",
+        "    For: Alldays,            !- Field 10",
         "    Until: 24:00,0.0;        !- Field 11",
 
         "  ElectricEquipment,",
@@ -4246,8 +4252,8 @@ TEST_F(EnergyPlusFixture, SizingManager_ZoneSizing_Coincident_NonAir_10x_Latent_
               OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpHtDesDay, "SPACE 1"));
     EXPECT_EQ("1/21 08:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpHtPkTime, "SPACE 1"));
     EXPECT_EQ("10000.00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClCalcDesLd, "SPACE 1"));
-    EXPECT_EQ("0.669", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClCalcDesAirFlow, "SPACE 1"));
-    EXPECT_EQ("0.669", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClUserDesAirFlow, "SPACE 1"));
+    EXPECT_EQ("0.667", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClCalcDesAirFlow, "SPACE 1"));
+    EXPECT_EQ("0.667", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClUserDesAirFlow, "SPACE 1"));
     EXPECT_EQ("CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB",
               OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClDesDay, "SPACE 1"));
     EXPECT_EQ("7/21 12:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchSpClPkTime, "SPACE 1"));
