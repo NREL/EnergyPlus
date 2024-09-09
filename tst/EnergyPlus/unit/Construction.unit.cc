@@ -70,14 +70,30 @@ TEST_F(EnergyPlusFixture, Construction_reportLayers)
 
     SetPredefinedTables(*state);
 
-    auto *mata = new Material::MaterialBase; mata->Name = "mat a"; m->materials.push_back(mata);
-    auto *matb = new Material::MaterialBase; matb->Name = "mat b"; m->materials.push_back(matb);
-    auto *matc = new Material::MaterialBase; matc->Name = "mat c"; m->materials.push_back(matc);
-    auto *matd = new Material::MaterialBase; matd->Name = "mat d"; m->materials.push_back(matd);
-    auto *mate = new Material::MaterialBase; mate->Name = "mat e"; m->materials.push_back(mate);
-    auto *matf = new Material::MaterialBase; matf->Name = "mat f"; m->materials.push_back(matf);
-    auto *matg = new Material::MaterialBase; matg->Name = "mat g"; m->materials.push_back(matg);
-    auto *math = new Material::MaterialBase; math->Name = "mat h"; m->materials.push_back(math);
+    auto *mata = new Material::MaterialBase;
+    mata->Name = "mat a";
+    m->materials.push_back(mata);
+    auto *matb = new Material::MaterialBase;
+    matb->Name = "mat b";
+    m->materials.push_back(matb);
+    auto *matc = new Material::MaterialBase;
+    matc->Name = "mat c";
+    m->materials.push_back(matc);
+    auto *matd = new Material::MaterialBase;
+    matd->Name = "mat d";
+    m->materials.push_back(matd);
+    auto *mate = new Material::MaterialBase;
+    mate->Name = "mat e";
+    m->materials.push_back(mate);
+    auto *matf = new Material::MaterialBase;
+    matf->Name = "mat f";
+    m->materials.push_back(matf);
+    auto *matg = new Material::MaterialBase;
+    matg->Name = "mat g";
+    m->materials.push_back(matg);
+    auto *math = new Material::MaterialBase;
+    math->Name = "mat h";
+    m->materials.push_back(math);
 
     c->Construct.allocate(3);
 

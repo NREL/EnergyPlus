@@ -96,7 +96,7 @@ TEST_F(EnergyPlusFixture, test_overallUfactorFromFilmsAndCond)
 
     s_mat->materials.push_back(new Material::MaterialGlass);
     s_mat->materials.push_back(new Material::MaterialGlass);
-    
+
     auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, numCons);
 
     double hIntConvCoeff = 0.;

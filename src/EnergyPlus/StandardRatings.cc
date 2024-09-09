@@ -2438,8 +2438,9 @@ namespace StandardRatings {
         return EER;
     }
 
-    std::tuple<Real64, Real64, Real64, Real64>
-    SEER2CalulcationCurveFit(EnergyPlusData &state, [[maybe_unused]] std::string const &CoilType, EnergyPlus::CoilCoolingDXCurveFitOperatingMode operatingMode)
+    std::tuple<Real64, Real64, Real64, Real64> SEER2CalulcationCurveFit(EnergyPlusData &state,
+                                                                        [[maybe_unused]] std::string const &CoilType,
+                                                                        EnergyPlus::CoilCoolingDXCurveFitOperatingMode operatingMode)
     {
         Real64 EEER2(0.0);
         Real64 SEER2_User(0.0);

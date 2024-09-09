@@ -3719,7 +3719,7 @@ TEST_F(ConvectionCoefficientsFixture, testTARPNaturalConvectionAlgorithm)
 TEST_F(ConvectionCoefficientsFixture, RoofExtConvectionCoefficient)
 {
     auto &s_mat = state->dataMaterial;
-        
+
     state->dataSurface->Surface.allocate(1);
 
     auto &surf1 = state->dataSurface->Surface(1);

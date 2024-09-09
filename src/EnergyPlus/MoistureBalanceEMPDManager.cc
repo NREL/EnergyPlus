@@ -108,7 +108,7 @@ using namespace DataHeatBalance;
 using namespace DataMoistureBalanceEMPD;
 
 Real64 MaterialEMPD::calcDepthFromPeriod(EnergyPlusData &state,
-                                         Real64 const period                  // in seconds
+                                         Real64 const period // in seconds
 )
 {
     // Assume T, RH, P
@@ -156,7 +156,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
     Array1D<Real64> MaterialProps(9); // Temporary array to transfer material properties
     bool ErrorsFound(false);          // If errors detected in input
 
-    int EMPDMat; // EMPD Moisture Material additional properties for each base material
+    int EMPDMat;           // EMPD Moisture Material additional properties for each base material
     Array1D_bool EMPDzone; // EMPD property check for each zone
 
     auto &s_ip = state.dataInputProcessing->inputProcessor;
@@ -189,7 +189,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                                                                  s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, MaterialNames(1)};
-        
+
         // Load the material derived type from the input data.
         int matNum = Material::GetMaterialNum(state, MaterialNames(1));
         if (matNum == 0) {
@@ -200,8 +200,8 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
 
         auto *mat = s_mat->materials(matNum);
         if (mat->group != Material::Group::Regular || mat->ROnly) {
-            ShowSevereCustomMessage(state, eoh,
-                "Reference Material is not appropriate type for EMPD properties, must have regular properties (L,Cp,K,D)");
+            ShowSevereCustomMessage(
+                state, eoh, "Reference Material is not appropriate type for EMPD properties, must have regular properties (L,Cp,K,D)");
             ErrorsFound = true;
             continue;
         }
@@ -214,7 +214,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
         s_mat->materials(matNum) = matEMPD; // This should work, material name remains the same
 
         matEMPD->hasEMPD = true;
-        
+
         // Once the material derived type number is found then load the additional moisture material properties
         matEMPD->mu = MaterialProps(1);
         matEMPD->moistACoeff = MaterialProps(2);
@@ -261,14 +261,13 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
             }
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowMessage(state,
-                            format("GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface={}",
-                                   surf.Name));
+                            format("GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface={}", surf.Name));
                 ShowContinueError(state, format("with Construction={}", constr.Name));
             }
         }
-        
+
         if (constr.TotLayers == 1) continue; // One layer construction
-            
+
         // Multiple layer construction
         auto const *mat1 = s_mat->materials(constr.LayerPoint(1));
         if (mat1->hasEMPD && surf.ExtBoundCond <= 0) { // The external layer is not exposed to zone
@@ -292,8 +291,9 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
 
     for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
         if (!EMPDzone(Loop)) {
-            ShowSevereError(state, 
-                            format("{}: None of the constructions for zone = {} has an inside layer with EMPD properties", routineName,
+            ShowSevereError(state,
+                            format("{}: None of the constructions for zone = {} has an inside layer with EMPD properties",
+                                   routineName,
                                    state.dataHeatBal->Zone(Loop).Name));
             ShowContinueError(state, "..For each zone, the inside layer of at least one construction must have EMPD properties");
             ErrorsFound = true;
@@ -542,8 +542,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     // 2e-7*T^0.81/P = vapor diffusivity in air. [kg/m-s-Pa]
     // 461.52 = universal gas constant for water [J/kg-K]
     // EMPDdiffusivity = [m^2/s]
-    EMPDdiffusivity =
-        (2.0e-7 * pow(Taver + Constant::Kelvin, 0.81) / state.dataEnvrn->OutBaroPress) / mat->mu * 461.52 * (Taver + Constant::Kelvin);
+    EMPDdiffusivity = (2.0e-7 * pow(Taver + Constant::Kelvin, 0.81) / state.dataEnvrn->OutBaroPress) / mat->mu * 461.52 * (Taver + Constant::Kelvin);
 
     // Calculate slope of moisture sorption curve at current RH. [kg/kg-RH]
     dU_dRH = mat->moistACoeff * mat->moistBCoeff * pow(RHaver, mat->moistBCoeff - 1) +
@@ -586,8 +585,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
         mass_flux_surf_deep = mass_flux_surf_deep_max;
     }
 
-    mass_flux_zone_surf_max =
-        mat->surfaceDepth * mat->Density * dU_dRH * (RHZone - RH_surf_layer_old) / (state.dataGlobal->TimeStepZone * 3600.0);
+    mass_flux_zone_surf_max = mat->surfaceDepth * mat->Density * dU_dRH * (RHZone - RH_surf_layer_old) / (state.dataGlobal->TimeStepZone * 3600.0);
     mass_flux_zone_surf = hm_surf_layer * (rho_vapor_air_in - rv_surf_layer_old);
     if (std::abs(mass_flux_zone_surf_max) < std::abs(mass_flux_zone_surf)) {
         mass_flux_zone_surf = mass_flux_zone_surf_max;
@@ -602,8 +600,8 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     mass_flux_zone = hm_surf_layer * (rv_surf_layer_old - rho_vapor_air_in);
 
     // Calculate new surface layer RH using mass balance on surface layer
-    RH_surf_layer_tmp = RH_surf_layer_old +
-                        state.dataGlobal->TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (mat->Density * mat->surfaceDepth * dU_dRH));
+    RH_surf_layer_tmp =
+        RH_surf_layer_old + state.dataGlobal->TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (mat->Density * mat->surfaceDepth * dU_dRH));
 
     //    RH_surf_layer = RH_surf_layer_tmp;
 
@@ -651,8 +649,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     if (mat->deepDepth <= 0.0) {
         RH_deep_layer = RH_deep_layer_old;
     } else {
-        RH_deep_layer = RH_deep_layer_old +
-                        state.dataGlobal->TimeStepZone * 3600.0 * mass_flux_deep_layer / (mat->Density * mat->deepDepth * dU_dRH);
+        RH_deep_layer = RH_deep_layer_old + state.dataGlobal->TimeStepZone * 3600.0 * mass_flux_deep_layer / (mat->Density * mat->deepDepth * dU_dRH);
     }
     // Convert calculated RH back to vapor density of surface and deep layers.
     rv_surf_layer = PsyRhovFnTdbRh(state, Taver, RH_surf_layer);
@@ -680,10 +677,8 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     rvd.w_deep_layer = 0.622 * PV_deep_layer / (state.dataEnvrn->OutBaroPress - PV_deep_layer);
     rvd.mass_flux_zone = mass_flux_zone;
     rvd.mass_flux_deep = mass_flux_deep_layer;
-    rvd.u_surface_layer =
-        mat->moistACoeff * pow(RH_surf_layer, mat->moistBCoeff) + mat->moistCCoeff * pow(RH_surf_layer, mat->moistDCoeff);
-    rvd.u_deep_layer =
-        mat->moistACoeff * pow(RH_deep_layer, mat->moistBCoeff) + mat->moistCCoeff * pow(RH_deep_layer, mat->moistDCoeff);
+    rvd.u_surface_layer = mat->moistACoeff * pow(RH_surf_layer, mat->moistBCoeff) + mat->moistCCoeff * pow(RH_surf_layer, mat->moistDCoeff);
+    rvd.u_deep_layer = mat->moistACoeff * pow(RH_deep_layer, mat->moistBCoeff) + mat->moistCCoeff * pow(RH_deep_layer, mat->moistDCoeff);
 }
 
 void UpdateMoistureBalanceEMPD(EnergyPlusData &state, int const SurfNum) // Surface number
@@ -723,7 +718,7 @@ void ReportMoistureBalanceEMPD(EnergyPlusData &state)
     bool DoReport;
 
     auto &s_mat = state.dataMaterial;
-    
+
     ScanForReports(state, "Constructions", DoReport, "Constructions");
 
     if (!DoReport) return;
@@ -738,7 +733,6 @@ void ReportMoistureBalanceEMPD(EnergyPlusData &state)
         auto const &constr = state.dataConstruction->Construct(ConstrNum);
         if (constr.TypeIsWindow) continue;
 
-        
         auto const *mat = s_mat->materials(constr.LayerPoint(constr.TotLayers));
         if (!mat->hasEMPD) continue;
 

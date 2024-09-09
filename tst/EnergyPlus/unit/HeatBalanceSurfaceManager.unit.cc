@@ -8539,14 +8539,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestUpdateVariableAbsorptanc
     mat1->absorpThermalVarFuncIdx = 2;
     mat1->absorpSolarVarFuncIdx = 1;
     s_mat->materials.push_back(mat1);
-    
+
     auto *mat2 = new Material::MaterialBase;
     mat2->Name = "WALL_2";
     mat2->group = Material::Group::Regular;
     mat2->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::Scheduled;
     mat2->absorpThermalVarSchedIdx = 1;
     s_mat->materials.push_back(mat2);
-    
+
     state->dataCurveManager->allocateCurveVector(2);
     state->dataHeatBalSurf->SurfTempOut.allocate(2);
     state->dataHeatBalSurf->SurfTempOut(1) = 10;

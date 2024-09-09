@@ -13400,7 +13400,7 @@ namespace AirflowNetwork {
 
         auto &NetworkNumOfNodes = ActualNumOfNodes;
         auto &NetworkNumOfLinks = ActualNumOfLinks;
-        
+
         // Argument array dimensioning (these used to be arguments, need to also test newAU and newIK)
         EP_SIZE_CHECK(IK, NetworkNumOfNodes + 1);
         EP_SIZE_CHECK(AD, NetworkNumOfNodes);

@@ -232,7 +232,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
 TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChange)
 {
     auto &s_mat = state->dataMaterial;
-    
+
     // create a single PCM object in the input and process it
     std::string const idf_objects = delimited_string({"  MaterialProperty:PhaseChangeHysteresis,",
                                                       "    PCMNAME,   !- Name",
@@ -279,7 +279,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
     Material::GetHysteresisData(*state, ErrorsFound);
 
     auto *matPC = dynamic_cast<Material::MaterialPhaseChange *>(s_mat->materials(Material::GetMaterialNum(*state, "PCMNAME")));
-    
+
     // create local variables to calculate and call the new worker function
     Real64 newSpecificHeat, newDensity, newThermalConductivity;
     adjustPropertiesForPhaseChange(

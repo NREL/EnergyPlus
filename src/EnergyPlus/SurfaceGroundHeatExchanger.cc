@@ -475,7 +475,7 @@ namespace SurfaceGroundHeatExchanger {
         Real64 OutDryBulb; // Height Dependent dry bulb.
 
         auto &s_mat = state.dataMaterial;
-        
+
         // get QTF data - only once
         if (this->InitQTF) {
             for (Cons = 1; Cons <= state.dataHeatBal->TotConstructs; ++Cons) {

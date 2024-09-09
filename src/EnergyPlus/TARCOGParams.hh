@@ -79,7 +79,7 @@ enum class TARCOGLayerType : int
 };
 
 extern const std::array<std::string_view, (int)TARCOGLayerType::Num> layerTypeNamesUC;
-        
+
 //  Thermal models:
 enum class TARCOGThermalModel : int
 {
@@ -106,7 +106,7 @@ enum class DeflectionCalculation : int
 };
 
 extern const std::array<std::string_view, (int)DeflectionCalculation::Num> deflectionCalculationNamesUC;
-        
+
 // definition of parameters for deflection sum.  These parameters define maximum number of loop to which sum
 // will perform. By equation, these numbers will go to infinite and some test showed that going to NMax and MMax
 // values would produce enough precision

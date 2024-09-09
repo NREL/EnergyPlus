@@ -124,7 +124,7 @@ using namespace DataHeatBalance;
 using namespace DataSurfaces;
 
 constexpr std::array<std::string_view, (int)Orientation::Num> orientationNamesUC = {"HORIZONTAL", "VERTICAL"};
-        
+
 void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
 {
 
@@ -191,7 +191,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
     Array2D<Real64> SysAbs1(2, CFSMAXNL + 1); // layers absorptance and system transmittance
 
     auto &s_mat = state.dataMaterial;
-    
+
     if (!allocated(state.dataWindowEquivLayer->CFSLayers))
         state.dataWindowEquivLayer->CFSLayers.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
 
@@ -206,9 +206,8 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
     for (Layer = 1; Layer <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Layer) {
 
         Material::Group group1 = s_mat->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->group;
-        if (group1 != Material::Group::GlassEQL && group1 != Material::Group::ShadeEQL &&
-            group1 != Material::Group::DrapeEQL && group1 != Material::Group::ScreenEQL &&
-            group1 != Material::Group::BlindEQL && group1 != Material::Group::WindowGapEQL)
+        if (group1 != Material::Group::GlassEQL && group1 != Material::Group::ShadeEQL && group1 != Material::Group::DrapeEQL &&
+            group1 != Material::Group::ScreenEQL && group1 != Material::Group::BlindEQL && group1 != Material::Group::WindowGapEQL)
             continue;
 
         MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
@@ -255,7 +254,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).LWP_MAT.EPSLF = thisMaterial->TAR.IR.Ft.Emi;
             CFS(EQLNum).L(sLayer).LWP_MAT.EPSLB = thisMaterial->TAR.IR.Bk.Emi;
             CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = thisMaterial->TAR.IR.Ft.Tra;
-            
+
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::GLAZE;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = thisMaterial->TAR.Sol.Ft.Bm[0].BmRef;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBB = thisMaterial->TAR.Sol.Bk.Bm[0].BmRef;
@@ -299,7 +298,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).LWP_MAT.EPSLF = thisMaterial->TAR.IR.Ft.Emi;
             CFS(EQLNum).L(sLayer).LWP_MAT.EPSLB = thisMaterial->TAR.IR.Bk.Emi;
             CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = thisMaterial->TAR.IR.Ft.Tra;
-            
+
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::DRAPE;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TAR.Sol.Ft.Bm[0].BmTra;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = thisMaterial->TAR.Sol.Bk.Bm[0].BmTra;
@@ -314,7 +313,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = -1.0;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = -1.0;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = -1.0;
-            
+
         } else if (mat->group == Material::Group::ScreenEQL) {
             auto const *thisMaterial = dynamic_cast<Material::MaterialScreenEQL const *>(mat);
             assert(thisMaterial != nullptr);
@@ -325,7 +324,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).LWP_MAT.EPSLF = thisMaterial->TAR.IR.Ft.Emi;
             CFS(EQLNum).L(sLayer).LWP_MAT.EPSLB = thisMaterial->TAR.IR.Bk.Emi;
             CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = thisMaterial->TAR.IR.Ft.Tra;
-            
+
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::INSCRN;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TAR.Sol.Ft.Bm[0].BmTra;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = thisMaterial->TAR.Sol.Bk.Bm[0].BmTra;
@@ -337,7 +336,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             // wire geometry
             CFS(EQLNum).L(sLayer).S = thisMaterial->wireSpacing;
             CFS(EQLNum).L(sLayer).W = thisMaterial->wireDiameter;
-            
+
         } else if (mat->group == Material::Group::WindowGapEQL) {
             auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(mat);
             assert(matGas != nullptr);
@@ -8170,7 +8169,7 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
     int ConstrNum; // construction index
 
     auto &surf = state.dataSurface->Surface(SurfNum);
-    
+
     auto &CFS = state.dataWindowEquivLayer->CFS;
 
     IncAng = 0.0; // Autodesk:Init Added to elim use uninitialized

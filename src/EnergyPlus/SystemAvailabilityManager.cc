@@ -1354,7 +1354,7 @@ namespace Avail {
                                        std::string const &AvailabilityListName, // name that should be an Availability Manager List Name
                                        int const Loop,                          // which loop this is
                                        int const NumAirLoops,                   // Total number of air loops
-                                       [[maybe_unused]] bool &ErrorsFound                        // true if certain errors are detected here
+                                       [[maybe_unused]] bool &ErrorsFound       // true if certain errors are detected here
     )
     {
 
@@ -1420,9 +1420,9 @@ namespace Avail {
     }
 
     void GetZoneEqAvailabilityManager(EnergyPlusData &state,
-                                      int const ZoneEquipType, // Type of ZoneHVAC:* component
-                                      int const CompNum,       // Index of a particular ZoneHVAC:* component
-                                      [[maybe_unused]] bool &ErrorsFound        // true if certain errors are detected here
+                                      int const ZoneEquipType,           // Type of ZoneHVAC:* component
+                                      int const CompNum,                 // Index of a particular ZoneHVAC:* component
+                                      [[maybe_unused]] bool &ErrorsFound // true if certain errors are detected here
     )
     {
 
@@ -1440,7 +1440,7 @@ namespace Avail {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string AvailabilityListName; // name that should be an Availability Manager List Name
-        int CompNumAvailManagers; // Number of availability managers associated with a ZoneHVAC:* component
+        int CompNumAvailManagers;         // Number of availability managers associated with a ZoneHVAC:* component
 
         if (state.dataAvail->GetAvailListsInput) {
             GetSysAvailManagerListInputs(state);
@@ -1718,7 +1718,7 @@ namespace Avail {
             }
 
         } break;
-                
+
         default: {
             ShowSevereError(state, format("AvailabilityManager Type not found: {}", type));
             ShowContinueError(state, format("Occurs in Manager={}", SysAvailName));

@@ -110,7 +110,7 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     auto &s_mat = state->dataMaterial;
-    
+
     auto *mat1 = new Material::MaterialBase;
     mat1->Name = "WALL_1";
     mat1->group = Material::Group::Regular;
@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     s_mat->materials.push_back(mat3);
     mat3->Num = s_mat->materials.isize();
     s_mat->materialMap.insert_or_assign(mat3->Name, mat3->Num);
-    
+
     state->dataCurveManager->allocateCurveVector(2);
     state->dataCurveManager->PerfCurve(1)->Name = "THERMAL_ABSORPTANCE_TABLE";
     state->dataCurveManager->PerfCurve(2)->Name = "SOLAR_ABSORPTANCE_CURVE";
@@ -233,7 +233,8 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     });
     ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
     Material::GetVariableAbsorptanceInput(*state, errors_found);
-    compare_err_stream("   ** Severe  ** GetVariableAbsorptanceInput: MaterialProperty:VariableAbsorptance = VARIABLETHERMAL_WALL_1\n   **   ~~~   ** Reference Material Name = WALL_0, item not found.\n",
+    compare_err_stream("   ** Severe  ** GetVariableAbsorptanceInput: MaterialProperty:VariableAbsorptance = VARIABLETHERMAL_WALL_1\n   **   ~~~   "
+                       "** Reference Material Name = WALL_0, item not found.\n",
                        true);
 
     // wrong material group
@@ -250,6 +251,7 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
     mat1->group = Material::Group::Glass;
     Material::GetVariableAbsorptanceInput(*state, errors_found);
-    compare_err_stream("   ** Severe  ** MaterialProperty:VariableAbsorptance: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, material=WALL_1, must have regular properties (Thermal/Solar Absorptance)\n",
-        true);
+    compare_err_stream("   ** Severe  ** MaterialProperty:VariableAbsorptance: Reference Material is not appropriate type for Thermal/Solar "
+                       "Absorptance properties, material=WALL_1, must have regular properties (Thermal/Solar Absorptance)\n",
+                       true);
 }

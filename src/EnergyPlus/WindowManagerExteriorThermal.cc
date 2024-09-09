@@ -101,7 +101,7 @@ namespace Window {
         // Tarcog thermal system for solving heat transfer through the window
         int activeConstrNum = CWCEHeatTransferFactory::getActiveConstructionNumber(state, surf, SurfNum);
         auto aFactory = CWCEHeatTransferFactory(state, surf, SurfNum, activeConstrNum); // (AUTO_OK)
-        auto aSystem = aFactory.getTarcogSystem(state, HextConvCoeff);                     // (AUTO_OK_SPTR)
+        auto aSystem = aFactory.getTarcogSystem(state, HextConvCoeff);                  // (AUTO_OK_SPTR)
         aSystem->setTolerance(solutionTolerance);
 
         // get previous timestep temperatures solution for faster iterations
@@ -140,7 +140,7 @@ namespace Window {
             }
             SurfInsideTemp = aTemp - Constant::Kelvin;
             if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                    auto const &surfShade = state.dataSurface->surfShades(SurfNum);
+                auto const &surfShade = state.dataSurface->surfShades(SurfNum);
                 Real64 EffShBlEmiss = surfShade.effShadeEmi;
                 Real64 EffGlEmiss = surfShade.effGlassEmi;
 
@@ -198,7 +198,7 @@ namespace Window {
             Real64 glassTemperature = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getTemperature();
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                 (surfShade.effShadeEmi * SurfInsideTemp + surfShade.effGlassEmi * (glassTemperature - Constant::Kelvin)) /
-                    (surfShade.effShadeEmi + surfShade.effGlassEmi);
+                (surfShade.effShadeEmi + surfShade.effGlassEmi);
 
         } else {
             // Another adoptation to old source that looks suspicious. Check if heat flow through
@@ -229,8 +229,7 @@ namespace Window {
         }
 
         state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
-            state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surf.Area *
-                (1 - construction.ReflectSolDiffBack) +
+            state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surf.Area * (1 - construction.ReflectSolDiffBack) +
             state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(SurfNum);
         state.dataSurface->SurfWinHeatGain(SurfNum) -=
             (state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) + state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * surf.Area);
@@ -496,9 +495,8 @@ namespace Window {
 
         Material::Group matGroup = material->group;
 
-        if ((matGroup == Material::Group::Glass) || (matGroup == Material::Group::GlassSimple) ||
-            (matGroup == Material::Group::Blind) || (matGroup == Material::Group::Shade) || (matGroup == Material::Group::Screen) ||
-            (matGroup == Material::Group::ComplexShade)) {
+        if ((matGroup == Material::Group::Glass) || (matGroup == Material::Group::GlassSimple) || (matGroup == Material::Group::Blind) ||
+            (matGroup == Material::Group::Shade) || (matGroup == Material::Group::Screen) || (matGroup == Material::Group::ComplexShade)) {
             ++m_SolidLayerIndex;
             aLayer = getSolidLayer(state, material, m_SolidLayerIndex);
         } else if (matGroup == Material::Group::Gas || matGroup == Material::Group::GasMixture) {
@@ -544,7 +542,7 @@ namespace Window {
         if (mat->group == Material::Group::Glass || mat->group == Material::Group::GlassSimple) {
             auto const *matGlass = dynamic_cast<Material::MaterialGlass const *>(mat);
             assert(matGlass != nullptr);
-            
+
             emissFront = matGlass->AbsorpThermalFront;
             emissBack = matGlass->AbsorpThermalBack;
             transThermalFront = matGlass->TransThermal;
@@ -565,19 +563,20 @@ namespace Window {
 
             Real64 slatAng = matBlind->SlatAngle * Constant::DegToRad;
             Real64 PermA = std::sin(slatAng) - matBlind->SlatThickness / matBlind->SlatSeparation;
-            Real64 PermB = 1.0 - (std::abs(matBlind->SlatWidth * std::cos(slatAng)) + matBlind->SlatThickness * std::sin(slatAng)) / matBlind->SlatSeparation;
+            Real64 PermB =
+                1.0 - (std::abs(matBlind->SlatWidth * std::cos(slatAng)) + matBlind->SlatThickness * std::sin(slatAng)) / matBlind->SlatSeparation;
             Afront = min(1.0, max(0.0, PermA, PermB));
 
             int iSlatLo, iSlatHi;
             Real64 interpFac;
 
             Material::GetSlatIndicesInterpFac(slatAng, iSlatLo, iSlatHi, interpFac);
-            
+
             emissFront = Interp(matBlind->TARs[iSlatLo].IR.Ft.Emi, matBlind->TARs[iSlatHi].IR.Ft.Emi, interpFac);
             emissBack = Interp(matBlind->TARs[iSlatLo].IR.Bk.Emi, matBlind->TARs[iSlatHi].IR.Bk.Emi, interpFac);
             transThermalFront = Interp(matBlind->TARs[iSlatLo].IR.Ft.Tra, matBlind->TARs[iSlatHi].IR.Ft.Tra, interpFac);
             transThermalBack = Interp(matBlind->TARs[iSlatLo].IR.Bk.Tra, matBlind->TARs[iSlatHi].IR.Bk.Tra, interpFac);
-            
+
             if (t_Index == 1) {
                 m_ExteriorShade = true;
             }
@@ -585,7 +584,7 @@ namespace Window {
         } else if (mat->group == Material::Group::Shade) {
             auto const *matShade = dynamic_cast<Material::MaterialShade const *>(mat);
             assert(matShade != nullptr);
-            
+
             emissFront = matShade->AbsorpThermal;
             emissBack = matShade->AbsorpThermal;
             transThermalFront = matShade->TransThermal;
@@ -605,7 +604,7 @@ namespace Window {
         } else if (mat->group == Material::Group::Screen) {
             auto const *matScreen = dynamic_cast<Material::MaterialScreen const *>(mat);
             assert(matScreen != nullptr);
-            
+
             // Simon: Existing code already takes into account geometry of Woven and scales down
             // emissivity for openning area.
             emissFront = matScreen->AbsorpThermal;
@@ -627,7 +626,7 @@ namespace Window {
         } else if (mat->group == Material::Group::ComplexShade) {
             auto const *matShade = dynamic_cast<Material::MaterialComplexShade const *>(mat);
             assert(matShade != nullptr);
-            
+
             thickness = matShade->Thickness;
             conductivity = matShade->Conductivity;
             emissFront = matShade->FrontEmissivity;
@@ -707,7 +706,7 @@ namespace Window {
         auto &s_mat = state.dataMaterial;
         auto &surfWin = state.dataSurface->SurfaceWindow(m_SurfNum);
         auto const &surfShade = state.dataSurface->surfShades(m_SurfNum);
-        
+
         const WinShadingType ShadeFlag = getShadeType(state, m_ConstructionNumber);
 
         if (ShadeFlag == WinShadingType::IntBlind || ShadeFlag == WinShadingType::ExtBlind) {
@@ -934,7 +933,7 @@ namespace Window {
 
         auto const *matOut = s_mat->materials(matOutNum);
         auto const *matIn = s_mat->materials(matInNum);
-        
+
         if (matOut->group == Material::Group::Shade) { // Exterior shade present
             ShadeFlag = WinShadingType::ExtShade;
         } else if (matOut->group == Material::Group::Screen) { // Exterior screen present

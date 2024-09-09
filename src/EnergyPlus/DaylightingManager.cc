@@ -207,22 +207,20 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
             // In following, FrameArea and DividerArea can be non-zero only for exterior windows
             AInsTot += AREA + s_surf->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * s_surf->SurfWinProjCorrFrIn(ISurf)) +
                        s_surf->SurfWinDividerArea(ISurf) * (1.0 + s_surf->SurfWinProjCorrDivIn(ISurf));
-            ARHTOT += AREA * state.dataConstruction->Construct(surf.Construction).ReflectVisDiffBack +
-                      s_surf->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * s_surf->SurfWinProjCorrFrIn(ISurf)) *
-                          (1.0 - s_surf->SurfWinFrameSolAbsorp(ISurf)) +
-                      s_surf->SurfWinDividerArea(ISurf) * (1.0 + s_surf->SurfWinProjCorrDivIn(ISurf)) *
-                          (1.0 - s_surf->SurfWinDividerSolAbsorp(ISurf));
+            ARHTOT +=
+                AREA * state.dataConstruction->Construct(surf.Construction).ReflectVisDiffBack +
+                s_surf->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * s_surf->SurfWinProjCorrFrIn(ISurf)) * (1.0 - s_surf->SurfWinFrameSolAbsorp(ISurf)) +
+                s_surf->SurfWinDividerArea(ISurf) * (1.0 + s_surf->SurfWinProjCorrDivIn(ISurf)) * (1.0 - s_surf->SurfWinDividerSolAbsorp(ISurf));
 
             FWC fwc = FWC::Ceiling;                                     // Ceiling
             if (surf.Tilt > 10.0 && surf.Tilt < 170.0) fwc = FWC::Wall; // Wall
             if (surf.Tilt >= 170.0) fwc = FWC::Floor;                   // Floor
             AR[(int)fwc] += AREA + s_surf->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * s_surf->SurfWinProjCorrFrIn(ISurf)) +
                             s_surf->SurfWinDividerArea(ISurf) * (1.0 + s_surf->SurfWinProjCorrDivIn(ISurf));
-            ARH[(int)fwc] += AREA * state.dataConstruction->Construct(surf.Construction).ReflectVisDiffBack +
-                             s_surf->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * s_surf->SurfWinProjCorrFrIn(ISurf)) *
-                                 (1.0 - s_surf->SurfWinFrameSolAbsorp(ISurf)) +
-                             s_surf->SurfWinDividerArea(ISurf) * (1.0 + s_surf->SurfWinProjCorrDivIn(ISurf)) *
-                                 (1.0 - s_surf->SurfWinDividerSolAbsorp(ISurf));
+            ARH[(int)fwc] +=
+                AREA * state.dataConstruction->Construct(surf.Construction).ReflectVisDiffBack +
+                s_surf->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * s_surf->SurfWinProjCorrFrIn(ISurf)) * (1.0 - s_surf->SurfWinFrameSolAbsorp(ISurf)) +
+                s_surf->SurfWinDividerArea(ISurf) * (1.0 + s_surf->SurfWinProjCorrDivIn(ISurf)) * (1.0 - s_surf->SurfWinDividerSolAbsorp(ISurf));
         }
     }
 
@@ -257,11 +255,10 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
 
             ATWL += surfWinDr.Area + s_surf->SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * s_surf->SurfWinProjCorrFrIn(IWinDr)) +
                     s_surf->SurfWinDividerArea(IWinDr) * (1.0 + s_surf->SurfWinProjCorrDivIn(IWinDr));
-            ARHTWL += surfWinDr.Area * state.dataConstruction->Construct(surfWinDr.Construction).ReflectVisDiffBack +
-                      s_surf->SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * s_surf->SurfWinProjCorrFrIn(IWinDr)) *
-                          (1.0 - s_surf->SurfWinFrameSolAbsorp(IWinDr)) +
-                      s_surf->SurfWinDividerArea(IWinDr) * (1.0 + s_surf->SurfWinProjCorrDivIn(IWinDr)) *
-                          (1.0 - s_surf->SurfWinDividerSolAbsorp(IWinDr));
+            ARHTWL +=
+                surfWinDr.Area * state.dataConstruction->Construct(surfWinDr.Construction).ReflectVisDiffBack +
+                s_surf->SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * s_surf->SurfWinProjCorrFrIn(IWinDr)) * (1.0 - s_surf->SurfWinFrameSolAbsorp(IWinDr)) +
+                s_surf->SurfWinDividerArea(IWinDr) * (1.0 + s_surf->SurfWinProjCorrDivIn(IWinDr)) * (1.0 - s_surf->SurfWinDividerSolAbsorp(IWinDr));
         }
 
         std::array<Real64, (int)FWC::Num> AP;
@@ -586,7 +583,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
             if (surf.SolarEnclIndex == enclNum) {
 
                 int numWinCover = surf.HasShadeControl ? (int)WinCover::Num : 1;
-                
+
                 // loop over each slat angle
                 for (int iWinCover = 0; iWinCover < numWinCover; ++iWinCover) {
                     if (iWinCover == iWinCover_Bare) {
@@ -645,7 +642,7 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
     // daylighting and illuminance map reference points.
     auto &dl = state.dataDayltg;
     auto &s_surf = state.dataSurface;
-    
+
     if (dl->VeryFirstTime) {
         // make sure all necessary surfaces match to pipes
         bool ErrorsFound = false;
@@ -656,9 +653,9 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
                 // Look up the TDD:DOME object
                 int PipeNum = s_surf->SurfWinTDDPipeNum(IWin);
                 if (PipeNum == 0) {
-                    ShowSevereError(state,
-                                    format("GetTDDInput: Surface={}, TDD:Dome object does not reference a valid Diffuser object.",
-                                           s_surf->Surface(IWin).Name));
+                    ShowSevereError(
+                        state,
+                        format("GetTDDInput: Surface={}, TDD:Dome object does not reference a valid Diffuser object.", s_surf->Surface(IWin).Name));
                     ShowContinueError(state, "...needs DaylightingDevice:Tubular of same name as Surface.");
                     ErrorsFound = true;
                 }
@@ -1502,8 +1499,8 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
 
     ShelfNum = s_surf->SurfDaylightingShelfInd(IWin);
     if (ShelfNum > 0) {
-        InShelfSurf = state.dataDaylightingDevicesData->Shelf(s_surf->SurfDaylightingShelfInd(IWin))
-                          .InSurf; // Inside daylighting shelf present if > 0
+        InShelfSurf =
+            state.dataDaylightingDevicesData->Shelf(s_surf->SurfDaylightingShelfInd(IWin)).InSurf; // Inside daylighting shelf present if > 0
     } else {
         InShelfSurf = 0;
     }
@@ -1530,8 +1527,7 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
     LSHCAL = 0;
 
     // Visible transmittance at normal incidence
-    s_surf->SurfWinVisTransSelected(IWin) =
-        General::POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * surfWin.glazedFrac;
+    s_surf->SurfWinVisTransSelected(IWin) = General::POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * surfWin.glazedFrac;
     // For windows with switchable glazing, ratio of visible transmittance at normal
     // incidence for fully switched (dark) state to that of unswitched state
     s_surf->SurfWinVisTransRatio(IWin) = 1.0;
@@ -1566,7 +1562,7 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
 
     // Initialize number of window elements
     NDIVX = 40; // Does this mean that windows are split into 1,600 points for daylighting? WHYYYYYY?
-    NDIVY = 40; 
+    NDIVY = 40;
 
     // Distance from ref point to window plane
     ALF = std::abs(dot(WNORM, REFWC));
@@ -2261,7 +2257,7 @@ void InitializeCFSStateData(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // Initialize daylight state data for current
     auto &s_surf = state.dataSurface;
-        
+
     // SUBROUTINE LOCAL VARIABLES
     int curWinEl;
     bool hit;
@@ -2283,18 +2279,18 @@ void InitializeCFSStateData(EnergyPlusData &state,
     // temporary arrays for surfaces
     // Each complex fenestration state can have different number of basis elements
     // This is the reason for making these temporary arrays local
-    Array1D_int TmpSkyInd(NBasis, 0);                                         // Temporary sky index list
-    Array1D_int TmpGndInd(NBasis, 0);                                         // Temporary gnd index list
-    Array1D<Real64> TmpGndMultiplier(NBasis, 0.0);                            // Temporary ground obstruction multiplier
-    Array1D_int TmpRfSfInd(NBasis, 0);                                        // Temporary RefSurfIndex
-    Array1D_int TmpRfRyNH(NBasis, 0);                                         // Temporary RefRayNHits
+    Array1D_int TmpSkyInd(NBasis, 0);                              // Temporary sky index list
+    Array1D_int TmpGndInd(NBasis, 0);                              // Temporary gnd index list
+    Array1D<Real64> TmpGndMultiplier(NBasis, 0.0);                 // Temporary ground obstruction multiplier
+    Array1D_int TmpRfSfInd(NBasis, 0);                             // Temporary RefSurfIndex
+    Array1D_int TmpRfRyNH(NBasis, 0);                              // Temporary RefRayNHits
     Array2D_int TmpHSurfNo(s_surf->TotSurfaces, NBasis, 0);        // Temporary HitSurfNo
     Array2D<Real64> TmpHSurfDSq(s_surf->TotSurfaces, NBasis, 0.0); // Temporary HitSurfDSq
 
     // Object Data
-    Vector3<Real64> Centroid;                                                                                  // current window element centroid
-    Vector3<Real64> HitPt;                                                                                     // surface hit point
-    Array1D<Vector3<Real64>> TmpGndPt(NBasis, Vector3<Real64>(0.0, 0.0, 0.0));                                 // Temporary ground intersection list
+    Vector3<Real64> Centroid;                                                                       // current window element centroid
+    Vector3<Real64> HitPt;                                                                          // surface hit point
+    Array1D<Vector3<Real64>> TmpGndPt(NBasis, Vector3<Real64>(0.0, 0.0, 0.0));                      // Temporary ground intersection list
     Array2D<Vector3<Real64>> TmpHitPt(s_surf->TotSurfaces, NBasis, Vector3<Real64>(0.0, 0.0, 0.0)); // Temporary HitPt
 
     CFSRefPointPosFactor(state, RefPoint, StateRefPoint, iWin, CurFenState, NTrnBasis, AZVIEW);
@@ -2468,7 +2464,7 @@ void AllocateForCFSRefPointsState(
     // PURPOSE OF THIS SUBROUTINE:
     // Memory allocation for complex fenestration systems reference points geometry
     auto &s_surf = state.dataSurface;
-        
+
     if (!allocated(StateRefPoint.NSky)) {
         StateRefPoint.NSky.allocate(NumOfWinEl);
         StateRefPoint.NSky = 0;
@@ -2671,7 +2667,7 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
     // Locals
     auto &dl = state.dataDayltg;
     auto &s_surf = state.dataSurface;
-    
+
     bool hitObs; // True iff obstruction is hit
 
     Vector3<Real64> URay;     // Unit vector in (Phi,Theta) direction
@@ -2782,18 +2778,18 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     Real64 const DOMEGA,          // Solid angle subtended by window element wrt reference point (steradians)
     int const ICtrl,              // Window control counter
     WinShadingType const ShType,  // Window shading type
-    [[maybe_unused]] int const BlNum,              // Window blind number
-    Real64 const THRAY,           // Azimuth of ray from reference point to window element (radians)
-    Vector3<Real64> const &WNORM2, // Unit vector normal to window
-    ExtWinType const extWinType,   // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
-    int const IConst,              // Construction counter
-    Real64 const AZVIEW,           // Azimuth of view vector in absolute coord system for glare calculation (radians)
-    Vector3<Real64> const &RREF2,  // Location of virtual reference point in absolute coordinate system
-    bool const hitIntObs,          // True iff interior obstruction hit
-    bool const hitExtObs,          // True iff ray from ref pt to ext win hits an exterior obstruction
-    CalledFor const CalledFrom,    // indicate  which type of routine called this routine
-    Real64 TVISIntWin,             // Visible transmittance of int win at COSBIntWin for light from ext win
-    Real64 &TVISIntWinDisk,        // Visible transmittance of int win at COSBIntWin for sun
+    [[maybe_unused]] int const BlNum, // Window blind number
+    Real64 const THRAY,               // Azimuth of ray from reference point to window element (radians)
+    Vector3<Real64> const &WNORM2,    // Unit vector normal to window
+    ExtWinType const extWinType,      // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
+    int const IConst,                 // Construction counter
+    Real64 const AZVIEW,              // Azimuth of view vector in absolute coord system for glare calculation (radians)
+    Vector3<Real64> const &RREF2,     // Location of virtual reference point in absolute coordinate system
+    bool const hitIntObs,             // True iff interior obstruction hit
+    bool const hitExtObs,             // True iff ray from ref pt to ext win hits an exterior obstruction
+    CalledFor const CalledFrom,       // indicate  which type of routine called this routine
+    Real64 TVISIntWin,                // Visible transmittance of int win at COSBIntWin for light from ext win
+    Real64 &TVISIntWinDisk,           // Visible transmittance of int win at COSBIntWin for sun
     int const MapNum)
 {
 
@@ -2935,9 +2931,8 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                 } else {
                     ObsVisRefl = s_surf->SurfShadowDiffuseVisRefl(NearestHitSurfNum);
                     if (s_surf->SurfShadowGlazingConstruct(NearestHitSurfNum) > 0)
-                        ObsVisRefl +=
-                            s_surf->SurfShadowGlazingFrac(NearestHitSurfNum) *
-                            state.dataConstruction->Construct(s_surf->SurfShadowGlazingConstruct(NearestHitSurfNum)).ReflectVisDiffFront;
+                        ObsVisRefl += s_surf->SurfShadowGlazingFrac(NearestHitSurfNum) *
+                                      state.dataConstruction->Construct(s_surf->SurfShadowGlazingConstruct(NearestHitSurfNum)).ReflectVisDiffFront;
                 }
             }
             // Surface number to use when obstruction is a shadowing surface
@@ -3209,8 +3204,10 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
                         GetBilinearInterpCoeffs(
                             phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
-                        transBmBmMult = BilinearInterp(screen->btars[ip1][it1].BmTrans, screen->btars[ip1][it2].BmTrans,
-                                                       screen->btars[ip2][it1].BmTrans, screen->btars[ip2][it2].BmTrans,
+                        transBmBmMult = BilinearInterp(screen->btars[ip1][it1].BmTrans,
+                                                       screen->btars[ip1][it2].BmTrans,
+                                                       screen->btars[ip2][it1].BmTrans,
+                                                       screen->btars[ip2][it2].BmTrans,
                                                        coeffs);
 
                         dl->dirIllum(iHour)[iWinCover_Shaded].sunDisk = RAYCOS.z * TVISS * transBmBmMult * ObTransDisk;
@@ -3241,7 +3238,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             if (ANY_BLIND(ShType)) {
                                 dl->avgWinLum(iHour)[iWinCover_Shaded].sunDisk = XAVWL * TVISS * transBmBmMult * ObTransDisk;
                             } else if (ShType == WinShadingType::ExtScreen) {
-                                dl->avgWinLum(iHour)[iWinCover_Shaded].sunDisk = XAVWL * TVISS * transBmBmMult * ObTransDisk; 
+                                dl->avgWinLum(iHour)[iWinCover_Shaded].sunDisk = XAVWL * TVISS * transBmBmMult * ObTransDisk;
                             }
                         } // Position Factor
                     }     // if (calledFrom == RefPt)
@@ -3272,8 +3269,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             if (dot(RAYCOS, s_surf->Surface(ReflSurfNum).OutNormVec) < 0.0) ReflSurfNumX = ReflSurfNum + 1;
                         }
                         // Require that the surface can have specular reflection
-                        if (s_surf->Surface(ReflSurfNum).Class == SurfaceClass::Window ||
-                            s_surf->SurfShadowGlazingFrac(ReflSurfNum) > 0.0) {
+                        if (s_surf->Surface(ReflSurfNum).Class == SurfaceClass::Window || s_surf->SurfShadowGlazingFrac(ReflSurfNum) > 0.0) {
                             ReflNorm = s_surf->Surface(ReflSurfNumX).OutNormVec;
                             // Vector to sun that is mirrored in obstruction
                             SunVecMir = RAYCOS - 2.0 * dot(RAYCOS, ReflNorm) * ReflNorm;
@@ -3353,9 +3349,9 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             if (s_surf->Surface(ReflSurfNum).IsShadowing && s_surf->SurfShadowGlazingConstruct(ReflSurfNum) > 0)
                                 SpecReflectance =
                                     s_surf->SurfShadowGlazingFrac(ReflSurfNum) *
-                                    General::POLYF(std::abs(CosIncAngRefl),
-                                                   state.dataConstruction->Construct(s_surf->SurfShadowGlazingConstruct(ReflSurfNum))
-                                                       .ReflSolBeamFrontCoef);
+                                    General::POLYF(
+                                        std::abs(CosIncAngRefl),
+                                        state.dataConstruction->Construct(s_surf->SurfShadowGlazingConstruct(ReflSurfNum)).ReflSolBeamFrontCoef);
                             TVisRefl = General::POLYF(CosIncAngRec, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * surfWin.glazedFrac *
                                        surfWin.lightWellEff;
                             dl->dirIllum(iHour)[iWinCover_Bare].sunDisk += SunVecMir.z * SpecReflectance * TVisRefl; // Bare window
@@ -3364,7 +3360,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             if (ANY_BLIND(ShType)) {
                                 auto const &surfShade = s_surf->surfShades(IWin);
                                 auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfShade.blind.matNum));
-                                    
+
                                 Real64 ProfAng = ProfileAngle(state, IWin, SunVecMir, matBlind->SlatOrientation);
                                 TransBmBmMultRefl = matBlind->BeamBeamTrans(ProfAng, surfShade.blind.slatAng);
                                 dl->dirIllum(iHour)[iWinCover_Shaded].sunDisk += SunVecMir.z * SpecReflectance * TVisRefl * TransBmBmMultRefl;
@@ -3384,8 +3380,10 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 GetBilinearInterpCoeffs(
                                     phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
 
-                                TransBmBmMultRefl = BilinearInterp(screen->btars[ip1][it1].BmTrans, screen->btars[ip1][it2].BmTrans,
-                                                                   screen->btars[ip2][it1].BmTrans, screen->btars[ip2][it2].BmTrans,
+                                TransBmBmMultRefl = BilinearInterp(screen->btars[ip1][it1].BmTrans,
+                                                                   screen->btars[ip1][it2].BmTrans,
+                                                                   screen->btars[ip2][it1].BmTrans,
+                                                                   screen->btars[ip2][it2].BmTrans,
                                                                    coeffs);
                                 dl->dirIllum(iHour)[iWinCover_Shaded].sunDisk += SunVecMir.z * SpecReflectance * TVisRefl * TransBmBmMultRefl;
                             } // End of check if window has a blind or screen
@@ -3440,7 +3438,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
         dl->avgWinLum(iHour)[iWinCover_Shaded].sun += dl->winLum(iHour)[iWinCover_Shaded].sun * TVisIntWinMult;
         dl->avgWinLum(iHour)[iWinCover_Shaded].sunDisk += dl->winLum(iHour)[iWinCover_Shaded].sunDisk * TVisIntWinDiskMult;
-        
+
         if (PHRAY > 0.0) {
             dl->dirIllum(iHour)[iWinCover_Shaded].sun += dl->winLum(iHour)[iWinCover_Shaded].sun * DOMEGA_Ray_3_TVisIntWinMult;
         }
@@ -3476,7 +3474,7 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &dl = state.dataDayltg;
     auto &s_surf = state.dataSurface;
-    
+
     if (s_surf->SurfSunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return;
 
     ++ISunPos;
@@ -3487,7 +3485,7 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     auto &thisDayltgCtrl = dl->daylightControl(daylightCtrlNum);
 
     auto &surf = s_surf->Surface(IWin);
-    
+
     int const enclNum = surf.SolarEnclIndex;
 
     // Loop over shading index (1=bare window; 2=diffusing glazing, shade, screen or fixed slat-angle blind;
@@ -3529,13 +3527,14 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
         if (dl->horIllum[iHour].sun > tmpDFCalc) {
             auto &daylFac = daylFacHr(loopwin, iRefPoint)[iWinCover];
             daylFac[iLum_Illum].sun = (dl->dirIllum(iHour)[iWinCover].sun + dl->reflIllum(iHour)[iWinCover].sun) / (dl->horIllum[iHour].sun + 0.0001);
-            daylFac[iLum_Illum].sunDisk = (dl->dirIllum(iHour)[iWinCover].sunDisk + dl->reflIllum(iHour)[iWinCover].sunDisk) / (dl->horIllum[iHour].sun + 0.0001);
+            daylFac[iLum_Illum].sunDisk =
+                (dl->dirIllum(iHour)[iWinCover].sunDisk + dl->reflIllum(iHour)[iWinCover].sunDisk) / (dl->horIllum[iHour].sun + 0.0001);
             daylFac[iLum_Source].sun = dl->avgWinLum(iHour)[iWinCover].sun / (NWX * NWY * (dl->horIllum[iHour].sun + 0.0001));
             daylFac[iLum_Source].sunDisk = dl->avgWinLum(iHour)[iWinCover].sunDisk / (NWX * NWY * (dl->horIllum[iHour].sun + 0.0001));
-            daylFac[iLum_Back].sun =
-                dl->reflIllum(iHour)[iWinCover].sun * dl->enclDaylight(enclNum).aveVisDiffReflect / (Constant::Pi * (dl->horIllum[iHour].sun + 0.0001));
-            daylFac[iLum_Back].sunDisk =
-                dl->reflIllum(iHour)[iWinCover].sunDisk * dl->enclDaylight(enclNum).aveVisDiffReflect / (Constant::Pi * (dl->horIllum[iHour].sun + 0.0001));
+            daylFac[iLum_Back].sun = dl->reflIllum(iHour)[iWinCover].sun * dl->enclDaylight(enclNum).aveVisDiffReflect /
+                                     (Constant::Pi * (dl->horIllum[iHour].sun + 0.0001));
+            daylFac[iLum_Back].sunDisk = dl->reflIllum(iHour)[iWinCover].sunDisk * dl->enclDaylight(enclNum).aveVisDiffReflect /
+                                         (Constant::Pi * (dl->horIllum[iHour].sun + 0.0001));
         } else {
             daylFac[iLum_Illum].sun = 0.0;
             daylFac[iLum_Illum].sunDisk = 0.0;
@@ -3754,8 +3753,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
             }
         }
 
-        if (s_surf->WindowShadingControl(surf.activeWindowShadingControl).shadingControlType != WindowShadingControlType::MeetDaylIlumSetp)
-            continue;
+        if (s_surf->WindowShadingControl(surf.activeWindowShadingControl).shadingControlType != WindowShadingControlType::MeetDaylIlumSetp) continue;
 
         // Error if window has shadingControlType = MeetDaylightingIlluminanceSetpoint &
         // but is not in a Daylighting:Detailed zone
@@ -4813,7 +4811,7 @@ void CheckTDDsAndLightShelvesInDaylitZones(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &s_surf = state.dataSurface;
-        
+
     bool ErrorsFound = false;
 
     for (auto const &pipe : state.dataDaylightingDevicesData->TDDPipe) {
@@ -4848,7 +4846,7 @@ void AssociateWindowShadingControlWithDaylighting(EnergyPlusData &state)
 {
     auto &dl = state.dataDayltg;
     auto &s_surf = state.dataSurface;
-    
+
     for (auto &winShadeControl : s_surf->WindowShadingControl) {
         if (winShadeControl.DaylightingControlName.empty()) continue;
         int found = -1;
@@ -4967,9 +4965,9 @@ inline WinCover findWinShadingStatus(EnergyPlusData &state, int const IWin)
     auto &s_surf = state.dataSurface;
     bool WinShadedNoGlareControl = IS_SHADED_NO_GLARE_CTRL(s_surf->SurfWinShadingFlag(IWin));
 
-    return ((s_surf->SurfWinWindowModelType(IWin) != WindowModel::BSDF) &&
-            (WinShadedNoGlareControl || s_surf->SurfWinSolarDiffusing(IWin)))
-            ? WinCover::Shaded : WinCover::Bare;
+    return ((s_surf->SurfWinWindowModelType(IWin) != WindowModel::BSDF) && (WinShadedNoGlareControl || s_surf->SurfWinSolarDiffusing(IWin)))
+               ? WinCover::Shaded
+               : WinCover::Bare;
 }
 
 Real64 DayltgGlare(EnergyPlusData &state,
@@ -5265,7 +5263,7 @@ bool DayltgHitInteriorObstruction(EnergyPlusData &state,
     // This subroutine checks for interior obstructions between reference point and window element.
 
     auto &s_surf = state.dataSurface;
-        
+
     // Preconditions
     assert(magnitude(R2 - R1) > 0.0); // Protect normalize() from divide by zero
 
@@ -5344,7 +5342,7 @@ bool DayltgHitBetWinObstruction(EnergyPlusData &state,
     // on window IWin2 hits an obstruction
 
     auto &s_surf = state.dataSurface;
-    
+
     // Preconditions
     assert(magnitude(R2 - R1) > 0.0); // Protect normalize() from divide by zero
 
@@ -5887,8 +5885,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                     dfhr2.sky[iSky] = VTRatio * (wgtCurrHr * illFac2Curr.sky[iSky] + wgtPrevHr * illFac2Prev.sky[iSky]);
                     bfhr2.sky[iSky] = VTRatio * (wgtCurrHr * backFac2Curr.sky[iSky] + wgtPrevHr * backFac2Prev.sky[iSky]);
                     sfhr2.sky[iSky] = VTRatio * (wgtCurrHr * sourceFac2Curr.sky[iSky] + wgtPrevHr * sourceFac2Prev.sky[iSky]);
-                }     // End of check if window is shaded or has diffusing glass
-            }         // for (iSky)
+                } // End of check if window is shaded or has diffusing glass
+            }     // for (iSky)
 
             // Sun daylight factor for bare/shaded window
             DFHR[iWinCover_Bare].sun =
@@ -5916,7 +5914,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                     BFHR[iWinCover_Shaded].sun += VTRatio * (wgtCurrHr * backFac2Curr.sunDisk + wgtPrevHr * backFac2Prev.sunDisk);
                     SFHR[iWinCover_Shaded].sun += VTRatio * (wgtCurrHr * sourceFac2Curr.sunDisk + wgtPrevHr * sourceFac2Prev.sunDisk);
                 }
-            }     // End of check if window is shaded or has diffusing glass
+            } // End of check if window is shaded or has diffusing glass
 
             // Get illuminance at ref point from bare and shaded window by
             // multiplying daylight factors by exterior horizontal illuminance
@@ -6046,7 +6044,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                     shadeGroupLums.switchedWinLum += daylFromWinAtRefPt[(int)winCover];
                     previously_shaded(loop) = true;
                 } else {
-                    shadeGroupLums.unswitchedWinLum += !previously_shaded(loop) ? daylFromWinAtRefPt[(int)winCover] : daylFromWinAtRefPt[iWinCover_Shaded];
+                    shadeGroupLums.unswitchedWinLum +=
+                        !previously_shaded(loop) ? daylFromWinAtRefPt[(int)winCover] : daylFromWinAtRefPt[iWinCover_Shaded];
                 }
             } // for (IWin)
         }     // for (igroup)
@@ -6109,9 +6108,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                         // From this equation: SETPNT(1) = DILLUN + DILLSW/TVIS1 * VisTransSelected
                         s_surf->SurfWinVisTransSelected(IWin) =
                             max(shadeGroupLums.switchedTvis, shadeGroupLums.lumRatio * shadeGroupLums.unswitchedTvis) + 0.000001;
-                        s_surf->SurfWinSwitchingFactor(IWin) =
-                            (shadeGroupLums.unswitchedTvis - s_surf->SurfWinVisTransSelected(IWin)) /
-                            (shadeGroupLums.unswitchedTvis - shadeGroupLums.switchedTvis + 0.000001);
+                        s_surf->SurfWinSwitchingFactor(IWin) = (shadeGroupLums.unswitchedTvis - s_surf->SurfWinVisTransSelected(IWin)) /
+                                                               (shadeGroupLums.unswitchedTvis - shadeGroupLums.switchedTvis + 0.000001);
                         // bound switching factor between 0 and 1
                         s_surf->SurfWinSwitchingFactor(IWin) = min(1.0, s_surf->SurfWinSwitchingFactor(IWin));
                         s_surf->SurfWinSwitchingFactor(IWin) = max(0.0, s_surf->SurfWinSwitchingFactor(IWin));
@@ -6119,7 +6117,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                     // Adjust daylight quantities based on ratio between switched and unswitched visible transmittance
                     for (int IL = 1; IL <= NREFPT; ++IL) {
-                        // DaylIllum(IL) and BacLum(IL) were calculated at the clear state: 
+                        // DaylIllum(IL) and BacLum(IL) were calculated at the clear state:
                         //  and need to adjusted for intermediate switched state at VisTransSelected:
                         auto &daylFromWinAtRefPt = thisDayltgCtrl.refPts(IL).extWins(loop).lums;
                         auto const &tmpDayl = tmpDaylFromWinAtRefPt(IL, loop);
@@ -7023,7 +7021,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     auto &s_mat = state.dataMaterial;
     auto &dl = state.dataDayltg;
     auto &s_surf = state.dataSurface;
-    
+
     auto &thisEnclDaylight = dl->enclDaylight(enclNum);
     auto const &surf = s_surf->Surface(IWin);
     auto const &surfWin = s_surf->SurfaceWindow(IWin);
@@ -7227,9 +7225,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         } else {
                             ObsVisRefl = s_surf->SurfShadowDiffuseVisRefl(NearestHitSurfNum);
                             if (s_surf->SurfShadowGlazingConstruct(NearestHitSurfNum) > 0)
-                                ObsVisRefl += s_surf->SurfShadowGlazingFrac(NearestHitSurfNum) *
-                                              state.dataConstruction->Construct(s_surf->SurfShadowGlazingConstruct(NearestHitSurfNum))
-                                                  .ReflectVisDiffFront;
+                                ObsVisRefl +=
+                                    s_surf->SurfShadowGlazingFrac(NearestHitSurfNum) *
+                                    state.dataConstruction->Construct(s_surf->SurfShadowGlazingConstruct(NearestHitSurfNum)).ReflectVisDiffFront;
                             // Note in the above that ShadowSurfDiffuseVisRefl is the reflectance of opaque part of
                             // shadowing surface times (1 - ShadowSurfGlazingFrac)
                         }
@@ -7320,9 +7318,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                             if (hitObs) { // disk passes thru
                                 // cosine of incidence angle of light from sky or ground element for
                                 COSBintWin = SPH * std::sin(surfIntWin.phi) + CPH * std::cos(surfIntWin.phi) * std::cos(TH - surfIntWin.theta);
-                                TVISBR *= General::POLYF(
-                                    COSBintWin,
-                                    state.dataConstruction->Construct(s_surf->Surface(IntWinNum).Construction).TransVisBeamCoef);
+                                TVISBR *= General::POLYF(COSBintWin,
+                                                         state.dataConstruction->Construct(s_surf->Surface(IntWinNum).Construction).TransVisBeamCoef);
                                 break;
                             }
                         }
@@ -7396,7 +7393,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     } else { // Shade only, no TDD
                         // Calculate transmittance of the combined window and shading device for this sky/ground element
                         transMult = General::POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * surfWin.glazedFrac *
-                                       surfWin.lightWellEff;
+                                    surfWin.lightWellEff;
                     }
 
                 } else if (ScreenOn) { // Screen: get beam-beam, beam-diffuse and diffuse-diffuse vis trans/ref of screen and glazing system
@@ -7410,8 +7407,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                     Material::NormalizePhiTheta(phi, theta);
                     Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
-                    GetBilinearInterpCoeffs(
-                        phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                    GetBilinearInterpCoeffs(phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
 
                     ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
                     ReflScDiffDiffBack = screen->DfRefVis;
@@ -7424,7 +7420,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     TransScBmDiffFront = BilinearInterp(b11.DfTransVis, b12.DfTransVis, b21.DfTransVis, b22.DfTransVis, coeffs);
 
                     transMult = TransScBmDiffFront * surfWin.glazedFrac * state.dataConstruction->Construct(IConst).TransDiffVis /
-                                   (1 - ReflGlDiffDiffFront * ReflScDiffDiffBack) * surfWin.lightWellEff;
+                                (1 - ReflGlDiffDiffFront * ReflScDiffDiffBack) * surfWin.lightWellEff;
 
                     transBmBmMult = BilinearInterp(b11.BmTransVis, b12.BmTransVis, b21.BmTransVis, b22.BmTransVis, coeffs);
 
@@ -7438,7 +7434,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                     auto &btar = surfShade.blind.TAR;
                     int idxLo = surfShade.blind.profAngIdxLo;
-                    int idxHi = std::min(Material::MaxProfAngs, idxLo+1);
+                    int idxHi = std::min(Material::MaxProfAngs, idxLo + 1);
                     Real64 interpFac = surfShade.blind.profAngInterpFac;
                     TransBlBmDiffFront = Interp(btar.Vis.Ft.Bm[idxLo].DfTra, btar.Vis.Ft.Bm[idxHi].DfTra, interpFac);
 
@@ -7448,14 +7444,14 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         ReflBlDiffDiffFront = btar.Vis.Ft.Df.Ref;
                         TransBlDiffDiffFront = btar.Vis.Ft.Df.Tra;
                         transMult = TVISBR * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
-                                              (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
+                                                                       (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                     } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                         ReflGlDiffDiffFront = construct.ReflectVisDiffFront;
                         ReflBlDiffDiffBack = btar.Vis.Bk.Df.Ref;
                         transMult = TransBlBmDiffFront * surfWin.glazedFrac * construct.TransDiffVis /
-                                (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * surfWin.lightWellEff;
-                        
+                                    (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * surfWin.lightWellEff;
+
                     } else { // Between-glass blind
                         Real64 t1 = General::POLYF(COSB, construct.tBareVisCoef(1));
                         td2 = construct.tBareVisDiff(2);
@@ -7473,14 +7469,14 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                             rfd3 = construct.rfBareVisDiff(3);
                             rbd2 = construct.rbBareVisDiff(2);
                             transMult = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * td3 *
-                                    surfWin.lightWellEff;
+                                        surfWin.lightWellEff;
                         }
                     }
 
                     transBmBmMult = TVISBR * matBlind->BeamBeamTrans(ProfAng, surfShade.blind.slatAng);
                 } else { // Diffusing glass
                     transMult = General::POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * surfWin.glazedFrac *
-                                   surfWin.lightWellEff;
+                                surfWin.lightWellEff;
                 } // End of check if shade, blind or diffusing glass
 
                 if (s_surf->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
@@ -7499,13 +7495,13 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 auto &wlumsk = dl->winLum(IHR)[iWinCover_Shaded];
                 auto &flfwsk = FLFW[iWinCover_Shaded];
                 auto &flcwsk = FLCW[iWinCover_Shaded];
-                
+
                 for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-                        // Should these be bare or shaded?         
+                    // Should these be bare or shaded?
                     wlumsk.sky[iSky] += ZSK.sky[iSky] * transMult / Constant::Pi;
                     flfwsk.sky[iSky] += ZSK.sky[iSky] * transMult * (1.0 - surfWin.fractionUpgoing);
                     flcwsk.sky[iSky] += ZSK.sky[iSky] * transMult * surfWin.fractionUpgoing;
-                    
+
                     if (BlindOn || ScreenOn) {
                         if (PH > 0.0) {
                             flfwsk.sky[iSky] += ZSK.sky[iSky] * transBmBmMult;
@@ -7561,14 +7557,14 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
         auto &eintsk = dl->reflIllum(IHR)[iWinCover];
         auto const &flfwsk = FLFW[iWinCover];
         auto const &flcwsk = FLCW[iWinCover];
-    
+
         for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-        // Full area of window is used in following since effect of dividers on reducing
-        // effective window transmittance has already been accounted for in calc of FLFWSK and FLCWSK.
+            // Full area of window is used in following since effect of dividers on reducing
+            // effective window transmittance has already been accounted for in calc of FLFWSK and FLCWSK.
             eintsk.sky[iSky] = (flfwsk.sky[iSky] * surfWin.rhoFloorWall + flcwsk.sky[iSky] * surfWin.rhoCeilingWall) *
-                    (surf.Area / surfWin.glazedFrac) / (EnclInsideSurfArea * (1.0 - dl->enclDaylight(enclNum).aveVisDiffReflect));
+                               (surf.Area / surfWin.glazedFrac) / (EnclInsideSurfArea * (1.0 - dl->enclDaylight(enclNum).aveVisDiffReflect));
         } // for (iSky)
-    } // for (iWinCover)
+    }     // for (iWinCover)
 
     // BEAM SOLAR RADIATION ON WINDOW
 
@@ -7606,7 +7602,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 TVISBSun = General::POLYF(COSBSun, construct.TransVisBeamCoef) * surfWin.glazedFrac * surfWin.lightWellEff;
 
                 // Daylighting shelf simplification:  No beam makes it past end of shelf, all light is diffuse
-                if (InShelfSurf > 0) {     // Inside daylighting shelf
+                if (InShelfSurf > 0) {                  // Inside daylighting shelf
                     FLFW[iWinCover_Bare].sunDisk = 0.0; // Diffuse light only
 
                     // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
@@ -7638,17 +7634,19 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         Material::NormalizePhiTheta(phi, theta);
                         Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
                         GetBilinearInterpCoeffs(
-                                                phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
-                        Real64 BmBmTransVis = BilinearInterp(screen->btars[ip1][it1].BmTransVis, screen->btars[ip1][it2].BmTransVis,
-                                                             screen->btars[ip2][it1].BmTransVis, screen->btars[ip2][it2].BmTransVis,
+                            phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                        Real64 BmBmTransVis = BilinearInterp(screen->btars[ip1][it1].BmTransVis,
+                                                             screen->btars[ip1][it2].BmTransVis,
+                                                             screen->btars[ip2][it1].BmTransVis,
+                                                             screen->btars[ip2][it2].BmTransVis,
                                                              coeffs);
-                            
+
                         transMult = BmBmTransVis * surfWin.glazedFrac * surfWin.lightWellEff;
                     } else {
                         int IConstShaded = s_surf->SurfWinActiveShadedConstruction(IWin);
                         if (s_surf->SurfWinSolarDiffusing(IWin)) IConstShaded = surf.Construction;
-                        transMult = General::POLYF(COSBSun, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
-                                surfWin.glazedFrac * surfWin.lightWellEff;
+                        transMult = General::POLYF(COSBSun, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * surfWin.glazedFrac *
+                                    surfWin.lightWellEff;
                     }
 
                 } else { // Blind on
@@ -7657,45 +7655,44 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     // for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
                     auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfShade.blind.matNum));
                     assert(matBlind != nullptr);
-                    
+
                     // These are "cached" in the surfShade struct
                     auto &btar = surfShade.blind.TAR;
                     int idxLo = surfShade.blind.profAngIdxLo;
                     int idxHi = surfShade.blind.profAngIdxHi;
                     int interpFac = surfShade.blind.profAngInterpFac;
                     Real64 TransBlBmDiffFront = Interp(btar.Vis.Ft.Bm[idxLo].DfTra, btar.Vis.Ft.Bm[idxHi].DfTra, interpFac);
-                    
+
                     if (ShType == WinShadingType::IntBlind) { // Interior blind
                         // TH CR 8121, 7/7/2010
                         // ReflBlBmDiffFront = WindowManager::InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
                         Real64 ReflBlBmDiffFront = Interp(btar.Vis.Ft.Bm[idxLo].DfRef, btar.Vis.Ft.Bm[idxHi].DfRef, interpFac);
-                        
+
                         // TH added 7/12/2010 for CR 8121
                         Real64 ReflBlDiffDiffFront = btar.Vis.Ft.Df.Ref;
                         Real64 TransBlDiffDiffFront = btar.Vis.Ft.Df.Tra;
-                        
+
                         transMult = TVISBSun * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
-                                                (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
+                                                                         (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                     } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
-                        transMult = TransBlBmDiffFront *
-                                (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * btar.Vis.Bk.Df.Ref)) *
-                                surfWin.glazedFrac * surfWin.lightWellEff;
+                        transMult = TransBlBmDiffFront * (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * btar.Vis.Bk.Df.Ref)) *
+                                    surfWin.glazedFrac * surfWin.lightWellEff;
 
                     } else { // Between-glass blind
                         Real64 t1 = General::POLYF(COSBSun, construct.tBareVisCoef(1));
                         Real64 tfshBd = Interp(btar.Vis.Ft.Bm[idxLo].DfTra, btar.Vis.Ft.Bm[idxHi].DfTra, interpFac);
                         Real64 rfshB = Interp(btar.Vis.Ft.Bm[idxLo].DfRef, btar.Vis.Ft.Bm[idxHi].DfRef, interpFac);
                         if (construct.TotGlassLayers == 2) { // 2 glass layers
-                                transMult = t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * surfWin.lightWellEff;
+                            transMult = t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * surfWin.lightWellEff;
                         } else { // 3 glass layers; blind between layers 2 and 3
                             Real64 t2 = General::POLYF(COSBSun, construct.tBareVisCoef(2));
                             transMult = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * td3 *
-                                    surfWin.lightWellEff;
+                                        surfWin.lightWellEff;
                         }
                     }
-                    
-                    transBmBmMult =  TVISBSun * matBlind->BeamBeamTrans(surfShade.blind.profAng, surfShade.blind.slatAng);
+
+                    transBmBmMult = TVISBSun * matBlind->BeamBeamTrans(surfShade.blind.profAng, surfShade.blind.slatAng);
                 } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
 
                 if (s_surf->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
@@ -7703,7 +7700,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 }
 
                 // Daylighting shelf simplification:  No beam makes it past end of shelf, all light is diffuse
-                if (InShelfSurf > 0) {                                          // Inside daylighting shelf
+                if (InShelfSurf > 0) {   // Inside daylighting shelf
                     transBmBmMult = 0.0; // No beam, diffuse only
                     // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
                 }
@@ -7713,9 +7710,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 FLFW[iWinCover_Shaded].sun += ZSU1 * transMult * (1.0 - surfWin.fractionUpgoing);
                 FLFW[iWinCover_Shaded].sunDisk = ZSU1 * transBmBmMult;
                 FLCW[iWinCover_Shaded].sun += ZSU1 * transMult * surfWin.fractionUpgoing;
-            }     // if (BlindOn || ShadeOn)
-        }         // if (COSBSun > 0)
-    }             // if (SurfSunlitFracHR > 0)
+            } // if (BlindOn || ShadeOn)
+        }     // if (COSBSun > 0)
+    }         // if (SurfSunlitFracHR > 0)
 
     // Beam reaching window after specular reflection from exterior obstruction
 
@@ -7754,29 +7751,28 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     auto const *screen = dynamic_cast<Material::MaterialScreen const *>(s_mat->materials(surfWin.screenNum));
                     assert(screen != nullptr);
                     Real64 TransScDiffDiffFront = screen->DfTransVis;
-                    
+
                     transMult = TransScDiffDiffFront *
-                            (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
-                            surfWin.glazedFrac * surfWin.lightWellEff;
+                                (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
+                                surfWin.glazedFrac * surfWin.lightWellEff;
 
                 } else { // Blind on
-                        
+
                     auto const &surfShade = s_surf->surfShades(IWin);
                     auto const &btar = surfShade.blind.TAR;
                     auto const *matBlind = dynamic_cast<Material::MaterialBlind const *>(s_mat->materials(surfShade.blind.matNum));
-                    
+
                     assert(matBlind != nullptr);
-                    
+
                     TransBlDiffDiffFront = btar.Vis.Ft.Df.Tra;
                     if (ShType == WinShadingType::IntBlind) { // Interior blind
                         ReflBlDiffDiffFront = btar.Vis.Ft.Df.Ref;
                         transMult = TVisSunRefl * (TransBlDiffDiffFront + ReflBlDiffDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
-                                                                     (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
+                                                                              (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                     } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
-                        transMult = TransBlDiffDiffFront *
-                                (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * btar.Vis.Bk.Df.Ref)) *
-                                surfWin.glazedFrac * surfWin.lightWellEff;
+                        transMult = TransBlDiffDiffFront * (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * btar.Vis.Bk.Df.Ref)) *
+                                    surfWin.glazedFrac * surfWin.lightWellEff;
 
                     } else { // Between-glass blind
                         Real64 t1 = construct.tBareVisDiff(1);
@@ -7787,7 +7783,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         } else { // 3 glass layers; blind between layers 2 and 3
                             Real64 t2 = construct.tBareVisDiff(2);
                             transMult = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * td3 *
-                                    surfWin.lightWellEff;
+                                        surfWin.lightWellEff;
                         }
                     } // End of check of interior/exterior/between-glass blind
                 }     // if (Blind)
@@ -7795,9 +7791,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 dl->winLum(IHR)[iWinCover_Shaded].sun += ZSU1refl * transMult / Constant::Pi;
                 FLFW[iWinCover_Shaded].sun += ZSU1refl * transMult * (1.0 - surfWin.fractionUpgoing);
                 FLCW[iWinCover_Shaded].sun += ZSU1refl * transMult * surfWin.fractionUpgoing;
-            }     // End of check if window has shade, blind or diffusing glass
-        }         // End of check if ZSU1refl > 0.0
-    }             // End of check if solar reflections are in effect
+            } // End of check if window has shade, blind or diffusing glass
+        }     // End of check if ZSU1refl > 0.0
+    }         // End of check if solar reflections are in effect
 
     // Sun-related portion of internally reflected illuminance
 
@@ -7807,10 +7803,10 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     // added inside surface area of adjacent zone
     for (int iWinCover = 0; iWinCover < (int)WinCover::Num; ++iWinCover) {
         dl->reflIllum(IHR)[iWinCover].sun = (FLFW[iWinCover].sun * surfWin.rhoFloorWall + FLCW[iWinCover].sun * surfWin.rhoCeilingWall) *
-                (surf.Area / surfWin.glazedFrac) / (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
-    
+                                            (surf.Area / surfWin.glazedFrac) / (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
+
         dl->reflIllum(IHR)[iWinCover].sunDisk = FLFW[iWinCover].sunDisk * surfWin.rhoFloorWall * (surf.Area / surfWin.glazedFrac) /
-                (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
+                                                (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
     }
 } // DayltgInterReflectedIllum()
 
@@ -8399,13 +8395,13 @@ Real64 ProfileAngle(EnergyPlusData &state,
     //  which the width of the window is measured).
     // If VERTICAL, calculates ProfileAngVert
     auto &s_surf = state.dataSurface;
-        
+
     auto const &surf = s_surf->Surface(SurfNum);
-    if (HorOrVert == DataWindowEquivalentLayer::Orientation::Horizontal) { // Profile angle for horizontal structures
+    if (HorOrVert == DataWindowEquivalentLayer::Orientation::Horizontal) {  // Profile angle for horizontal structures
         Real64 ElevWin = Constant::PiOvr2 - surf.Tilt * Constant::DegToRad; // Window elevation: angle between outward normal and horizontal (radians)
-        Real64 AzimWin = (90.0 - surf.Azimuth) * Constant::DegToRad; // Window azimuth (radians)
-        Real64 ElevSun = std::asin(CosDirSun.z);                         // Sun elevation; angle between sun and horizontal (radians)
-        Real64 AzimSun = std::atan2(CosDirSun.y, CosDirSun.x);           // Sun azimuth (radians)
+        Real64 AzimWin = (90.0 - surf.Azimuth) * Constant::DegToRad;        // Window azimuth (radians)
+        Real64 ElevSun = std::asin(CosDirSun.z);                            // Sun elevation; angle between sun and horizontal (radians)
+        Real64 AzimSun = std::atan2(CosDirSun.y, CosDirSun.x);              // Sun azimuth (radians)
         return std::atan(std::sin(ElevSun) / std::abs(std::cos(ElevSun) * std::cos(AzimWin - AzimSun))) - ElevWin;
     } else { // Profile angle for vertical structures
         Real64 ElevWin = Constant::PiOvr2 - surf.Tilt * Constant::DegToRadians;
@@ -8454,7 +8450,7 @@ void DayltgClosestObstruction(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
     //  = 0 if no obstruction is hit.
     auto &s_surf = state.dataSurface;
-        
+
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Vector3<Real64> HitPt; // Hit point on an obstruction (m)
     bool hit;              // True iff obstruction is hit
@@ -8472,8 +8468,7 @@ void DayltgClosestObstruction(EnergyPlusData &state,
 
             // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
             // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
-            if ((s_surf->Surface(ObsSurfNum).Class == SurfaceClass::Window) &&
-                (s_surf->Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum)) {
+            if ((s_surf->Surface(ObsSurfNum).Class == SurfaceClass::Window) && (s_surf->Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum)) {
                 NearestHitSurfNum = ObsSurfNum;
             } else {
                 // Distance squared from receiving point to hit point
@@ -8501,8 +8496,7 @@ void DayltgClosestObstruction(EnergyPlusData &state,
 
                 // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
                 // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
-                if ((surface.Class == SurfaceClass::Window) && (surface.BaseSurf > 0) &&
-                    (&s_surf->Surface(surface.BaseSurf) == nearestHitSurface)) {
+                if ((surface.Class == SurfaceClass::Window) && (surface.BaseSurf > 0) && (&s_surf->Surface(surface.BaseSurf) == nearestHitSurface)) {
                     nearestHitSurface = &surface;
                 } else {
                     // Distance squared from receiving point to hit point
@@ -8648,7 +8642,7 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
     if (state.dataGlobal->WarmupFlag) return;
 
     auto &s_surf = state.dataSurface;
-    
+
     daylight_illum.allocate(MaxMapRefPoints);
 
     //              Initialize reference point illuminance and window background luminance
@@ -8718,7 +8712,7 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                 auto const &illSkyPrev = daylFacHrPrev(loop, ILB)[iWinCover_Bare];
                 auto const &illShSkyCurr = daylFacHrCurr(loop, ILB)[iWinCover_Shaded];
                 auto const &illShSkyPrev = daylFacHrPrev(loop, ILB)[iWinCover_Shaded];
-                
+
                 //          Daylight factors for current sun position
                 for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                     //                                ===Bare window===
@@ -8730,13 +8724,13 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                         //                                 ===Shaded window===
                         // Shade, screen, blind with fixed slats, or diffusing glass
                         dfhrSh.sky[iSky] = VTRatio * (wgtThisHr * illShSkyCurr.sky[iSky] + wgtPrevHr * illShSkyPrev.sky[iSky]);
-                    }     // End of check if window is shaded or has diffusing glass
-                }         // for (iSky)
+                    } // End of check if window is shaded or has diffusing glass
+                }     // for (iSky)
 
                 // Sun daylight factor for bare/shaded window
                 std::array<Illums, (int)DataSurfaces::WinCover::Num> tmpDFHR;
-                tmpDFHR[iWinCover_Bare].sun = VTRatio * (wgtThisHr * (illSkyCurr.sun + illSkyCurr.sunDisk) +
-                                                         wgtPrevHr * (illSkyPrev.sun + illSkyPrev.sunDisk));
+                tmpDFHR[iWinCover_Bare].sun =
+                    VTRatio * (wgtThisHr * (illSkyCurr.sun + illSkyCurr.sunDisk) + wgtPrevHr * (illSkyPrev.sun + illSkyPrev.sunDisk));
 
                 if ((s_surf->SurfWinWindowModelType(IWin) != WindowModel::BSDF) &&
                     (IS_SHADED(s_surf->SurfWinShadingFlag(IWin)) || s_surf->SurfWinSolarDiffusing(IWin))) {
@@ -8748,7 +8742,7 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                     if (!surfShade.blind.slatBlockBeam) {
                         tmpDFHR[iWinCover_Shaded].sun += VTRatio * (wgtThisHr * illShSkyCurr.sunDisk + wgtPrevHr * illShSkyPrev.sunDisk);
                     }
-                }     // End of check if window is shaded or has diffusing glass
+                } // End of check if window is shaded or has diffusing glass
 
                 //              Get illuminance at ref point from bare and shaded window by
                 //              multiplying daylight factors by exterior horizontal illuminance
@@ -9525,7 +9519,7 @@ void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int const enclNum)
 
     auto &dl = state.dataDayltg;
     auto &s_surf = state.dataSurface;
-    
+
     auto &enclDayl = dl->enclDaylight(enclNum);
     auto &enclSol = state.dataViewFactor->EnclSolInfo(enclNum);
 
@@ -9681,7 +9675,7 @@ void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64
     auto &ip = state.dataInputProcessing->inputProcessor;
     auto const &ipsc = state.dataIPShortCut;
     auto &s_surf = state.dataSurface;
-    
+
     if (ip->getNumObjectsFound(state, CurrentModuleObject) == 1) {
         int NAlphas;
         int NNum;

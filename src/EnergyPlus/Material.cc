@@ -97,7 +97,7 @@ MaterialBase *GetMaterial(EnergyPlusData &state, std::string const &matName)
     int matNum = GetMaterialNum(state, matName);
     return (matNum > 0) ? s_mat->materials(matNum) : nullptr;
 }
-        
+
 void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
 {
 
@@ -131,15 +131,15 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
     using General::ScanForReports;
 
-    int IOStat;                        // IO Status when calling get input subroutine
-    int NumAlphas;              // Number of material alpha names being passed
-    int NumNums;               // Number of material properties being passed
+    int IOStat;    // IO Status when calling get input subroutine
+    int NumAlphas; // Number of material alpha names being passed
+    int NumNums;   // Number of material properties being passed
 
     int NumGas;                         // Index for loop over gap gases in a mixture
     int NumGases;                       // Number of gasses in a mixture
     GasType gasType = GasType::Invalid; // Gas type index: 1=air, 2=argon, 3=krypton, 4=xenon
-    int ICoeff;            // Gas property coefficient index
-    Real64 MinSlatAngGeom; // Minimum and maximum slat angle allowed by slat geometry (deg)
+    int ICoeff;                         // Gas property coefficient index
+    Real64 MinSlatAngGeom;              // Minimum and maximum slat angle allowed by slat geometry (deg)
     Real64 MaxSlatAngGeom;
     Real64 ReflectivitySol;   // Glass reflectivity, solar
     Real64 ReflectivityVis;   // Glass reflectivity, visible
@@ -182,16 +182,16 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         std::vector<std::string> idfSortedKeys = s_ip->getIDFOrderedKeys(state, s_ipsc->cCurrentModuleObject);
         for (std::string const &key : idfSortedKeys) {
-        
+
             auto instance = instancesValue.find(key);
             assert(instance != instancesValue.end());
-            
+
             auto const &objectFields = instance.value();
             std::string matNameUC = Util::makeUPPER(key);
             s_ip->markObjectAsUsed(s_ipsc->cCurrentModuleObject, key);
 
             ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, key};
-            
+
             if (s_mat->materialMap.find(matNameUC) != s_mat->materialMap.end()) {
                 ShowSevereDuplicateName(state, eoh);
                 ErrorsFound = true;
@@ -228,17 +228,17 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             }
         }
     }
-    
+
     // Add the 6" heavy concrete for constructions defined with F or C factor method
     if (TotFfactorConstructs + TotCfactorConstructs >= 1) {
         auto *mat = new MaterialBase;
         mat->group = Group::Regular;
         mat->Name = "~FC_Concrete";
-        
+
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(Util::makeUPPER(mat->Name), mat->Num);
-        
+
         mat->Thickness = 0.15;    // m, 0.15m = 6 inches
         mat->Conductivity = 1.95; // W/mK
         mat->Density = 2240.0;    // kg/m3
@@ -255,17 +255,17 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
 
@@ -278,7 +278,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         auto *mat = new MaterialBase;
         mat->group = Group::Regular;
         mat->Name = s_ipsc->cAlphaArgs(1);
-        
+
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
@@ -337,17 +337,17 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
 
@@ -365,7 +365,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-        
+
         mat->Roughness = SurfaceRoughness::MediumRough;
 
         mat->NominalR = mat->Resistance = s_ipsc->rNumericArgs(1);
@@ -377,17 +377,17 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
 
@@ -424,17 +424,17 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
 
@@ -482,19 +482,19 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         mat->windowOpticalData = static_cast<Window::OpticalDataModel>(getEnumValue(Window::opticalDataModelNamesUC, s_ipsc->cAlphaArgs(2)));
-        
+
         if (mat->windowOpticalData == Window::OpticalDataModel::Spectral) {
             if (s_ipsc->lAlphaFieldBlanks(3)) {
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} = Spectral but {} is blank.", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaFieldNames(3)));
+                ShowSevereCustomMessage(
+                    state, eoh, format("{} = Spectral but {} is blank.", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaFieldNames(3)));
                 ErrorsFound = true;
             } else if ((mat->GlassSpectralDataPtr = Util::FindItemInList(s_ipsc->cAlphaArgs(3), s_mat->SpectralData)) == 0) {
                 ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(3), s_ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
             }
 
-        // TH 8/24/2011, allow glazing properties s_ipsc->rNumericArgs(2 to 10) to equal 0 or 1: 0.0 =< Prop <= 1.0
-        // Fixed CR 8413 - modeling spandrel panels as glazing systems
+            // TH 8/24/2011, allow glazing properties s_ipsc->rNumericArgs(2 to 10) to equal 0 or 1: 0.0 =< Prop <= 1.0
+            // Fixed CR 8413 - modeling spandrel panels as glazing systems
         } else if (mat->windowOpticalData == Window::OpticalDataModel::SpectralAverage) {
 
             if (s_ipsc->rNumericArgs(2) + s_ipsc->rNumericArgs(3) > 1.0) {
@@ -610,7 +610,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 mat->SolarDiffusing = (answer == BooleanSwitch::Yes);
             }
         }
-        
+
         // Get SpectralAndAngle table names
         if (mat->windowOpticalData == Window::OpticalDataModel::SpectralAndAngle) {
             if (s_ipsc->lAlphaFieldBlanks(5)) {
@@ -621,40 +621,51 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5));
             } else {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     mat->GlassSpecAngTransDataPtr,    // Curve index
-                                                     {2},                                       // Valid dimensions
-                                                     routineName,                               // Routine name
-                                                     s_ipsc->cCurrentModuleObject, // Object Type
-                                                     mat->Name,                        // Object Name
-                                                     s_ipsc->cAlphaFieldNames(5));                // Field Name
+                                                     mat->GlassSpecAngTransDataPtr, // Curve index
+                                                     {2},                           // Valid dimensions
+                                                     routineName,                   // Routine name
+                                                     s_ipsc->cCurrentModuleObject,  // Object Type
+                                                     mat->Name,                     // Object Name
+                                                     s_ipsc->cAlphaFieldNames(5));  // Field Name
 
                 GetCurveMinMaxValues(state, mat->GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                 if (minAngValue > 1.0e-6) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("{} requires the minumum value = 0.0 in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
-                    }
-                
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the minumum value = 0.0 in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
+                }
+
                 if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("{} requires the maximum value = 90.0 in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
-                    }
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the maximum value = 90.0 in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
+                }
 
                 if (minLamValue < 0.1) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("{} requires the minumum value = 0.1 micron in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the minumum value = 0.1 micron in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
                 }
 
                 if (maxLamValue > 4.0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("{} requires the maximum value = 4.0 microns in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the maximum value = 4.0 microns in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
                 }
             }
 
-        
             if (s_ipsc->lAlphaFieldBlanks(6)) {
                 ErrorsFound = true;
                 ShowSevereEmptyField(state, eoh, s_ipsc->cAlphaFieldNames(6), s_ipsc->cAlphaFieldNames(2), "SpectralAndAngle");
@@ -663,33 +674,45 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(6), s_ipsc->cAlphaArgs(6));
             } else {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     mat->GlassSpecAngFRefleDataPtr,   // Curve index
-                                                     {2},                                       // Valid dimensions
-                                                     routineName,                               // Routine name
-                                                     s_ipsc->cCurrentModuleObject, // Object Type
-                                                     mat->Name,                        // Object Name
-                                                     s_ipsc->cAlphaFieldNames(6));                // Field Name
-                
+                                                     mat->GlassSpecAngFRefleDataPtr, // Curve index
+                                                     {2},                            // Valid dimensions
+                                                     routineName,                    // Routine name
+                                                     s_ipsc->cCurrentModuleObject,   // Object Type
+                                                     mat->Name,                      // Object Name
+                                                     s_ipsc->cAlphaFieldNames(6));   // Field Name
+
                 GetCurveMinMaxValues(state, mat->GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                 if (minAngValue > 1.0e-6) {
-                        ErrorsFound = true;
-                        ShowSevereCustomMessage(state, eoh, 
-                            format("{} requires the minumum value = 0.0 in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
-                    }
+                    ErrorsFound = true;
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the minumum value = 0.0 in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
+                }
                 if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("{} requires the maximum value = 90.0 in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the maximum value = 90.0 in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
                 }
                 if (minLamValue < 0.1) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("{} requires the minumum value = 0.1 micron in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the minumum value = 0.1 micron in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
                 }
                 if (maxLamValue > 4.0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("{} requires the maximum value = 4.0 microns in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the maximum value = 4.0 microns in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
                 }
             }
 
@@ -701,33 +724,45 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(7), s_ipsc->cAlphaArgs(7));
             } else {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     mat->GlassSpecAngBRefleDataPtr,   // Curve index
-                                                     {2},                                       // Valid dimensions
-                                                     routineName,                               // Routine name
-                                                     s_ipsc->cCurrentModuleObject, // Object Type
-                                                     mat->Name,                        // Object Name
-                                                     s_ipsc->cAlphaFieldNames(7));                // Field Name
-                
+                                                     mat->GlassSpecAngBRefleDataPtr, // Curve index
+                                                     {2},                            // Valid dimensions
+                                                     routineName,                    // Routine name
+                                                     s_ipsc->cCurrentModuleObject,   // Object Type
+                                                     mat->Name,                      // Object Name
+                                                     s_ipsc->cAlphaFieldNames(7));   // Field Name
+
                 GetCurveMinMaxValues(state, mat->GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                 if (minAngValue > 1.0e-6) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("{} requires the minumum value = 0.0 in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the minumum value = 0.0 in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
                 }
                 if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("{} requires the maximum value = 90.0 in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the maximum value = 90.0 in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
                 }
                 if (minLamValue < 0.1) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("{} requires the minumum value = 0.1 micron in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the minumum value = 0.1 micron in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
                 }
                 if (maxLamValue > 4.0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("{} requires the maximum value = 4.0 microns in the entered table name={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("{} requires the maximum value = 4.0 microns in the entered table name={}",
+                                                   s_ipsc->cAlphaFieldNames(5),
+                                                   s_ipsc->cAlphaArgs(5)));
                 }
             }
         }
@@ -741,20 +776,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -768,7 +803,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-        
+
         mat->Roughness = SurfaceRoughness::VerySmooth;
         mat->Thickness = s_ipsc->rNumericArgs(1);
         mat->ROnly = true;
@@ -829,20 +864,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -856,7 +891,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-        
+
         mat->Roughness = SurfaceRoughness::VerySmooth;
         mat->ROnly = true;
 
@@ -921,20 +956,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -944,11 +979,11 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         auto *matGas = new MaterialGasMix;
         matGas->group = Group::Gas;
         matGas->Name = s_ipsc->cAlphaArgs(1);
-        
+
         s_mat->materials.push_back(matGas);
         matGas->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(matGas->Name, matGas->Num);
-        
+
         matGas->numGases = 1;
         matGas->gasFracts[0] = 1.0;
 
@@ -1024,20 +1059,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -1051,7 +1086,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(matGas);
         matGas->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(matGas->Name, matGas->Num);
-        
+
         matGas->numGases = 1;
         matGas->gasFracts[0] = 1.0;
 
@@ -1128,19 +1163,19 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -1154,7 +1189,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(matGas);
         matGas->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(matGas->Name, matGas->Num);
-        
+
         matGas->gases[0].type = matGas->gases[1].type = matGas->gases[2].type = matGas->gases[3].type = matGas->gases[4].type = GasType::Invalid;
 
         // Load the material derived type from the input data.
@@ -1200,20 +1235,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -1282,20 +1317,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -1305,11 +1340,11 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         auto *mat = new MaterialShadeEQL;
         mat->group = Group::ShadeEQL;
         mat->Name = s_ipsc->cAlphaArgs(1);
-        
+
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-        
+
         mat->Roughness = SurfaceRoughness::MediumRough;
         mat->ROnly = true;
 
@@ -1334,20 +1369,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (s_ipsc->rNumericArgs(1) + s_ipsc->rNumericArgs(2) + s_ipsc->rNumericArgs(4) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              s_ipsc->cNumericFieldNames(1) + " + " + s_ipsc->cNumericFieldNames(2) + " + " + s_ipsc->cNumericFieldNames(4) + "not < 1.0");
+            ShowContinueError(
+                state, s_ipsc->cNumericFieldNames(1) + " + " + s_ipsc->cNumericFieldNames(2) + " + " + s_ipsc->cNumericFieldNames(4) + "not < 1.0");
         }
         if (s_ipsc->rNumericArgs(1) + s_ipsc->rNumericArgs(3) + s_ipsc->rNumericArgs(5) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              s_ipsc->cNumericFieldNames(1) + " + " + s_ipsc->cNumericFieldNames(3) + " + " + s_ipsc->cNumericFieldNames(5) + "not < 1.0");
+            ShowContinueError(
+                state, s_ipsc->cNumericFieldNames(1) + " + " + s_ipsc->cNumericFieldNames(3) + " + " + s_ipsc->cNumericFieldNames(5) + "not < 1.0");
         }
         if (s_ipsc->rNumericArgs(6) + s_ipsc->rNumericArgs(7) + s_ipsc->rNumericArgs(8) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              s_ipsc->cNumericFieldNames(6) + " + " + s_ipsc->cNumericFieldNames(7) + " + " + s_ipsc->cNumericFieldNames(8) + "not < 1.0");
+            ShowContinueError(
+                state, s_ipsc->cNumericFieldNames(6) + " + " + s_ipsc->cNumericFieldNames(7) + " + " + s_ipsc->cNumericFieldNames(8) + "not < 1.0");
         }
         if (s_ipsc->rNumericArgs(9) + s_ipsc->rNumericArgs(10) >= 1.0) {
             ErrorsFound = true;
@@ -1372,20 +1407,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -1399,7 +1434,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-        
+
         mat->Roughness = SurfaceRoughness::MediumRough;
         mat->ROnly = true;
 
@@ -1435,14 +1470,14 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (s_ipsc->rNumericArgs(1) + s_ipsc->rNumericArgs(2) + s_ipsc->rNumericArgs(4) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              s_ipsc->cNumericFieldNames(1) + " + " + s_ipsc->cNumericFieldNames(2) + " + " + s_ipsc->cNumericFieldNames(4) + "not < 1.0");
+            ShowContinueError(
+                state, s_ipsc->cNumericFieldNames(1) + " + " + s_ipsc->cNumericFieldNames(2) + " + " + s_ipsc->cNumericFieldNames(4) + "not < 1.0");
         }
         if (s_ipsc->rNumericArgs(6) + s_ipsc->rNumericArgs(7) + s_ipsc->rNumericArgs(8) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              s_ipsc->cNumericFieldNames(4) + " + " + s_ipsc->cNumericFieldNames(5) + " + " + s_ipsc->cNumericFieldNames(6) + "not < 1.0");
+            ShowContinueError(
+                state, s_ipsc->cNumericFieldNames(4) + " + " + s_ipsc->cNumericFieldNames(5) + " + " + s_ipsc->cNumericFieldNames(6) + "not < 1.0");
         }
         if (s_ipsc->rNumericArgs(9) + s_ipsc->rNumericArgs(10) > 1.0) {
             ErrorsFound = true;
@@ -1460,20 +1495,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call GetObjectItem routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -1493,9 +1528,10 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             static_cast<ScreenBeamReflectanceModel>(getEnumValue(screenBeamReflectanceModelNamesUC, Util::makeUPPER(s_ipsc->cAlphaArgs(2))));
         if (matScreen->bmRefModel == ScreenBeamReflectanceModel::Invalid) {
             ShowSevereError(state, format("{}=\"{}\", Illegal value.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
-            ShowContinueError(
-                state,
-                format("{}=\"{}\", must be one of DoNotModel, ModelAsDirectBeam or ModelAsDiffuse.", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
+            ShowContinueError(state,
+                              format("{}=\"{}\", must be one of DoNotModel, ModelAsDirectBeam or ModelAsDiffuse.",
+                                     s_ipsc->cAlphaFieldNames(2),
+                                     s_ipsc->cAlphaArgs(2)));
             ErrorsFound = true;
         }
         matScreen->Roughness = SurfaceRoughness::MediumRough;
@@ -1640,20 +1676,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call GetObjectItem routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -1667,7 +1703,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(matScreen);
         matScreen->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(matScreen->Name, matScreen->Num);
-        
+
         // Load the material derived type from the input data.
         // WindowMaterial:Screen:EquivalentLayer,
         matScreen->Roughness = SurfaceRoughness::MediumRough;
@@ -1772,20 +1808,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -1798,20 +1834,19 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(matBlind);
         matBlind->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(matBlind->Name, matBlind->Num);
-        
+
         matBlind->Roughness = SurfaceRoughness::Rough;
         matBlind->ROnly = true;
 
-        matBlind->SlatOrientation = static_cast<DataWindowEquivalentLayer::Orientation>(
-            getEnumValue(DataWindowEquivalentLayer::orientationNamesUC, s_ipsc->cAlphaArgs(2)));
-        
+        matBlind->SlatOrientation =
+            static_cast<DataWindowEquivalentLayer::Orientation>(getEnumValue(DataWindowEquivalentLayer::orientationNamesUC, s_ipsc->cAlphaArgs(2)));
+
         matBlind->SlatWidth = s_ipsc->rNumericArgs(1);
         matBlind->SlatSeparation = s_ipsc->rNumericArgs(2);
         matBlind->SlatThickness = s_ipsc->rNumericArgs(3);
         matBlind->SlatAngle = s_ipsc->rNumericArgs(4);
         matBlind->SlatConductivity = s_ipsc->rNumericArgs(5);
 
-        
         matBlind->slatTAR.Sol.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(6);
         matBlind->slatTAR.Sol.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(7);
         matBlind->slatTAR.Sol.Bk.Bm[0].DfRef = s_ipsc->rNumericArgs(8);
@@ -1958,17 +1993,14 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Minimum and maximum slat angles allowed by slat geometry
         if (matBlind->SlatWidth > matBlind->SlatSeparation) {
-            MinSlatAngGeom = std::asin(matBlind->SlatThickness /
-                                       (matBlind->SlatThickness + matBlind->SlatSeparation)) /
-                             Constant::DegToRadians;
+            MinSlatAngGeom = std::asin(matBlind->SlatThickness / (matBlind->SlatThickness + matBlind->SlatSeparation)) / Constant::DegToRadians;
         } else {
             MinSlatAngGeom = 0.0;
         }
         MaxSlatAngGeom = 180.0 - MinSlatAngGeom;
 
         // Error if input slat angle not in range allowed by slat geometry
-        if ((matBlind->SlatSeparation + matBlind->SlatThickness) <
-            matBlind->SlatWidth) {
+        if ((matBlind->SlatSeparation + matBlind->SlatThickness) < matBlind->SlatWidth) {
             if (matBlind->SlatAngle < MinSlatAngGeom) {
                 ErrorsFound = true;
                 ShowSevereError(state, s_ipsc->cCurrentModuleObject + "=\"" + s_ipsc->cAlphaArgs(1) + "\", Illegal value combination.");
@@ -2042,20 +2074,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -2069,13 +2101,13 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-        
+
         mat->Roughness = SurfaceRoughness::Rough;
         mat->ROnly = true;
 
-        mat->SlatOrientation = static_cast<DataWindowEquivalentLayer::Orientation>(
-            getEnumValue(DataWindowEquivalentLayer::orientationNamesUC, s_ipsc->cAlphaArgs(2)));
-                
+        mat->SlatOrientation =
+            static_cast<DataWindowEquivalentLayer::Orientation>(getEnumValue(DataWindowEquivalentLayer::orientationNamesUC, s_ipsc->cAlphaArgs(2)));
+
         mat->SlatWidth = s_ipsc->rNumericArgs(1);
         mat->SlatSeparation = s_ipsc->rNumericArgs(2);
         mat->SlatCrown = s_ipsc->rNumericArgs(3);
@@ -2086,7 +2118,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         mat->TAR.Sol.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(7);
         mat->TAR.Sol.Bk.Bm[0].DfRef = s_ipsc->rNumericArgs(8);
 
-        if (!s_ipsc->lNumericFieldBlanks(9) && !s_ipsc->lNumericFieldBlanks(10) && !s_ipsc->lNumericFieldBlanks(11) && !s_ipsc->lNumericFieldBlanks(12)) {
+        if (!s_ipsc->lNumericFieldBlanks(9) && !s_ipsc->lNumericFieldBlanks(10) && !s_ipsc->lNumericFieldBlanks(11) &&
+            !s_ipsc->lNumericFieldBlanks(12)) {
             mat->TAR.Vis.Ft.Bm[0].DfTra = s_ipsc->rNumericArgs(9);
             mat->TAR.Vis.Bk.Bm[0].DfTra = s_ipsc->rNumericArgs(10);
             mat->TAR.Vis.Ft.Bm[0].DfRef = s_ipsc->rNumericArgs(11);
@@ -2143,22 +2176,21 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
         if (mat->SlatWidth < 0.001 || mat->SlatWidth >= 2.0 * mat->SlatSeparation) {
             ShowWarningError(state, format("{}=\"{}\", Slat Width", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
-            ShowContinueError(
-                state, format("{} [{:.2R}]. Slat width range is 0 < Width <= 2*Spacing", s_ipsc->cNumericFieldNames(1), mat->SlatWidth));
+            ShowContinueError(state,
+                              format("{} [{:.2R}]. Slat width range is 0 < Width <= 2*Spacing", s_ipsc->cNumericFieldNames(1), mat->SlatWidth));
             ShowContinueError(state, "...Setting slate width equal to slate spacing and simulation continues.");
             mat->SlatWidth = mat->SlatSeparation;
         }
         if (mat->SlatCrown < 0.0 || mat->SlatCrown >= 0.5 * mat->SlatWidth) {
             ShowWarningError(state, format("{}=\"{}\", Slat Crown", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
-            ShowContinueError(
-                state, format("{} [{:.2R}]. Slat crwon range is 0 <= crown < 0.5*Width", s_ipsc->cNumericFieldNames(3), mat->SlatCrown));
+            ShowContinueError(state,
+                              format("{} [{:.2R}]. Slat crwon range is 0 <= crown < 0.5*Width", s_ipsc->cNumericFieldNames(3), mat->SlatCrown));
             ShowContinueError(state, "...Setting slate crown to 0.0 and simulation continues.");
             mat->SlatCrown = 0.0;
         }
         if (mat->SlatAngle < -90.0 || mat->SlatAngle > 90.0) {
             ShowWarningError(state, format("{}=\"{}\", Slat Angle", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
-            ShowContinueError(state,
-                              format("{} [{:.2R}]. Slat angle range is -90.0 <= Angle < 90.0", s_ipsc->cNumericFieldNames(4), mat->SlatAngle));
+            ShowContinueError(state, format("{} [{:.2R}]. Slat angle range is -90.0 <= Angle < 90.0", s_ipsc->cNumericFieldNames(4), mat->SlatAngle));
             ShowContinueError(state, "...Setting slate angle to 0.0 and simulation continues.");
             mat->SlatAngle = 0.0;
         }
@@ -2194,20 +2226,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         // Call Input Get Routine to retrieve material data from ecoroof
 
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          Loop,
-                          s_ipsc->cAlphaArgs,
-                          NumAlphas,
-                          s_ipsc->rNumericArgs,
-                          NumNums,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            Loop,
+                            s_ipsc->cAlphaArgs,
+                            NumAlphas,
+                            s_ipsc->rNumericArgs,
+                            NumNums,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -2223,7 +2255,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-        
+
         mat->HeightOfPlants = s_ipsc->rNumericArgs(1);
         mat->LAI = s_ipsc->rNumericArgs(2);
         mat->Lreflectivity = s_ipsc->rNumericArgs(3); // Albedo
@@ -2261,12 +2293,12 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         if (mat->InitMoisture > mat->Porosity) {
             ShowWarningError(state, format("{}=\"{}\", Illegal value combination.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
-            ShowContinueError(state,
-                              format("{} is greater than {}. It must be less or equal.", s_ipsc->cNumericFieldNames(15), s_ipsc->cNumericFieldNames(13)));
+            ShowContinueError(
+                state, format("{} is greater than {}. It must be less or equal.", s_ipsc->cNumericFieldNames(15), s_ipsc->cNumericFieldNames(13)));
             ShowContinueError(state, format("{} = {:.3T}.", s_ipsc->cNumericFieldNames(13), mat->Porosity));
             ShowContinueError(state, format("{} = {:.3T}.", s_ipsc->cNumericFieldNames(15), mat->InitMoisture));
-            ShowContinueError(
-                state, format("{} is reset to the maximum (saturation) value = {:.3T}.", s_ipsc->cNumericFieldNames(15), mat->Porosity));
+            ShowContinueError(state,
+                              format("{} is reset to the maximum (saturation) value = {:.3T}.", s_ipsc->cNumericFieldNames(15), mat->Porosity));
             ShowContinueError(state, "Simulation continues.");
             mat->InitMoisture = mat->Porosity;
         }
@@ -2291,10 +2323,10 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                             s_ipsc->lAlphaFieldBlanks,
                             s_ipsc->cAlphaFieldNames,
                             s_ipsc->cNumericFieldNames);
-        
+
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
         std::string nameUC = Util::makeUPPER(s_ipsc->cAlphaArgs(1));
-        
+
         if (s_mat->materialMap.find(nameUC) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -2306,10 +2338,10 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(nameUC, mat->Num);
-        
+
         if (NumNums + 1 != NumAlphas) {
-            ShowSevereCustomMessage(state, eoh, 
-                format("Check number of {} compared to number of {}", s_ipsc->cAlphaFieldNames(2), s_ipsc->cNumericFieldNames(1)));
+            ShowSevereCustomMessage(
+                state, eoh, format("Check number of {} compared to number of {}", s_ipsc->cAlphaFieldNames(2), s_ipsc->cNumericFieldNames(1)));
             ErrorsFound = true;
             continue;
         }
@@ -2317,33 +2349,34 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         // Allocate arrays
         mat->numMatRefs = NumNums;
         mat->matRefs.allocate(mat->numMatRefs);
-        
+
         for (int iMatRef = 1; iMatRef <= mat->numMatRefs; ++iMatRef) {
             auto &matRef = mat->matRefs(iMatRef);
             matRef.specTemp = s_ipsc->rNumericArgs(iMatRef);
             // Find this glass definition
-            matRef.matNum = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(1+iMatRef));
+            matRef.matNum = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(1 + iMatRef));
             if (matRef.matNum == 0) {
-                ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(1+iMatRef), s_ipsc->cAlphaArgs(1+iMatRef));
+                ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(1 + iMatRef), s_ipsc->cAlphaArgs(1 + iMatRef));
                 ErrorsFound = true;
                 continue;
             }
-                    
+
             // TC glazing
             auto *matGlass = s_mat->materials(matRef.matNum);
             // test that named material is of the right type
             if (matGlass->group != Group::Glass) {
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} = {}, Material is not a window glazing ", s_ipsc->cAlphaFieldNames(1+iMatRef), s_ipsc->cAlphaArgs(1+iMatRef)));
+                ShowSevereCustomMessage(
+                    state,
+                    eoh,
+                    format("{} = {}, Material is not a window glazing ", s_ipsc->cAlphaFieldNames(1 + iMatRef), s_ipsc->cAlphaArgs(1 + iMatRef)));
                 ErrorsFound = true;
                 continue;
             }
 
             dynamic_cast<MaterialGlass *>(matGlass)->TCParentMatNum = mat->Num;
-                
         }
     }
-    
+
     s_ipsc->cCurrentModuleObject = "WindowMaterial:SimpleGlazingSystem";
     s_mat->NumSimpleWindows = s_ip->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
     for (int Loop = 1; Loop <= s_mat->NumSimpleWindows; ++Loop) {
@@ -2362,7 +2395,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                             s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -2376,7 +2409,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-        
+
         mat->SimpleWindowUfactor = s_ipsc->rNumericArgs(1);
         mat->SimpleWindowSHGC = s_ipsc->rNumericArgs(2);
         if (!s_ipsc->lNumericFieldBlanks(3)) {
@@ -2406,9 +2439,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                             s_ipsc->lAlphaFieldBlanks,
                             s_ipsc->cAlphaFieldNames,
                             s_ipsc->cNumericFieldNames);
-        
+
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
@@ -2417,27 +2450,27 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         auto *mat = new Material::MaterialComplexWindowGap;
         mat->Name = s_ipsc->cAlphaArgs(1);
-        
+
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-        
+
         mat->group = Material::Group::ComplexWindowGap;
         mat->Roughness = Material::SurfaceRoughness::Rough;
         mat->ROnly = true;
-        
+
         mat->Thickness = s_ipsc->rNumericArgs(1);
         if (s_ipsc->rNumericArgs(1) <= 0.0) {
             ErrorsFound = true;
             ShowSevereCustomMessage(state, eoh, format("{} must be > 0, entered {:.2R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
         }
-        
+
         mat->Pressure = s_ipsc->rNumericArgs(2);
         if (s_ipsc->rNumericArgs(2) <= 0.0) {
             ErrorsFound = true;
             ShowSevereCustomMessage(state, eoh, format("{} must be > 0, entered {:.2R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
         }
-        
+
         if (!s_ipsc->lAlphaFieldBlanks(2)) {
             int matGasNum = GetMaterialNum(state, s_ipsc->cAlphaArgs(2));
             if (matGasNum == 0) {
@@ -2467,9 +2500,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             auto itObj = instances.begin();
             // Can't use find here because epJSON keys are not upper-cased
             for (; itObj != instances.end(); ++itObj) {
-               if (Util::makeUPPER(itObj.key()) == s_ipsc->cAlphaArgs(3)) break;
+                if (Util::makeUPPER(itObj.key()) == s_ipsc->cAlphaArgs(3)) break;
             }
-                            
+
             if (itObj == instances.end()) {
                 ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(3), s_ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
@@ -2479,9 +2512,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             auto const &obj = itObj.value();
             auto const &objSchemaProps = s_ip->getObjectSchemaProps(state, "WindowGap:DeflectionState");
             mat->deflectedThickness = s_ip->getRealFieldValue(obj, objSchemaProps, "deflected_thickness");
-        }            
+        }
 
-        // Find referenced 
+        // Find referenced
         if (!s_ipsc->lAlphaFieldBlanks(4)) {
             auto const itInstances = s_ip->epJSON.find("WindowGap:SupportPillar");
             if (itInstances == s_ip->epJSON.end()) {
@@ -2491,11 +2524,11 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             }
 
             auto const &instances = itInstances.value();
-            
+
             auto itObj = instances.begin();
             // Can't use find here because epJSON keys are not upper-cased
             for (; itObj != instances.end(); ++itObj) {
-               if (Util::makeUPPER(itObj.key()) == s_ipsc->cAlphaArgs(4)) break;
+                if (Util::makeUPPER(itObj.key()) == s_ipsc->cAlphaArgs(4)) break;
             }
 
             if (itObj == instances.end()) {
@@ -2527,158 +2560,161 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                             s_ipsc->lAlphaFieldBlanks,
                             s_ipsc->cAlphaFieldNames,
                             s_ipsc->cNumericFieldNames);
-        
+
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         if (s_mat->materialMap.find(s_ipsc->cAlphaArgs(1)) != s_mat->materialMap.end()) {
             ShowSevereDuplicateName(state, eoh);
             ErrorsFound = true;
             continue;
         }
-        
+
         auto *mat = new Material::MaterialComplexShade;
         mat->Name = s_ipsc->cAlphaArgs(1);
-        
+
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-        
+
         mat->Roughness = Material::SurfaceRoughness::Rough;
         mat->ROnly = true;
-        
+
         mat->LayerType = static_cast<TARCOGParams::TARCOGLayerType>(getEnumValue(TARCOGParams::layerTypeNamesUC, s_ipsc->cAlphaArgs(2)));
-        
+
         mat->Thickness = s_ipsc->rNumericArgs(1);
         mat->Conductivity = s_ipsc->rNumericArgs(2);
         mat->TransThermal = s_ipsc->rNumericArgs(3);
         mat->FrontEmissivity = s_ipsc->rNumericArgs(4);
         mat->BackEmissivity = s_ipsc->rNumericArgs(5);
-        
+
         // Simon: in heat balance radiation exchange routines AbsorpThermal is used
         // and program will crash if value is not assigned.  Not sure if this is correct
         // or some additional calculation is necessary. Simon TODO
         mat->AbsorpThermal = s_ipsc->rNumericArgs(5);
         mat->AbsorpThermalFront = s_ipsc->rNumericArgs(4);
         mat->AbsorpThermalBack = s_ipsc->rNumericArgs(5);
-        
+
         mat->topOpeningMult = s_ipsc->rNumericArgs(6);
         mat->bottomOpeningMult = s_ipsc->rNumericArgs(7);
         mat->leftOpeningMult = s_ipsc->rNumericArgs(8);
         mat->rightOpeningMult = s_ipsc->rNumericArgs(9);
         mat->frontOpeningMult = s_ipsc->rNumericArgs(10);
-        
+
         mat->SlatWidth = s_ipsc->rNumericArgs(11);
         mat->SlatSpacing = s_ipsc->rNumericArgs(12);
         mat->SlatThickness = s_ipsc->rNumericArgs(13);
         mat->SlatAngle = s_ipsc->rNumericArgs(14);
         mat->SlatConductivity = s_ipsc->rNumericArgs(15);
         mat->SlatCurve = s_ipsc->rNumericArgs(16);
-        
+
         if (s_ipsc->rNumericArgs(1) <= 0.0) {
             ErrorsFound = true;
-            ShowSevereCustomMessage(state, eoh,
-                                    format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
+            ShowSevereCustomMessage(
+                state, eoh, format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
         }
 
         if (s_ipsc->rNumericArgs(2) <= 0.0) {
             ErrorsFound = true;
-            ShowSevereCustomMessage(state, eoh,
-                                    format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
-            }
-        
-        if ((s_ipsc->rNumericArgs(3) < 0.0) || (s_ipsc->rNumericArgs(3) > 1.0)) {
-            ErrorsFound = true;
-            ShowSevereCustomMessage(state, eoh,
-                format("{} value must be >= 0 and <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(3), s_ipsc->rNumericArgs(3)));
-            }
-
-            if ((s_ipsc->rNumericArgs(4) <= 0.0) || (s_ipsc->rNumericArgs(4) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} value must be >= 0 and <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(4), s_ipsc->rNumericArgs(4)));
-            }
-
-            if ((s_ipsc->rNumericArgs(5) <= 0.0) || (s_ipsc->rNumericArgs(5) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} value must be >= 0 and <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(5), s_ipsc->rNumericArgs(5)));
-            }
-
-            if ((s_ipsc->rNumericArgs(6) < 0.0) || (s_ipsc->rNumericArgs(6) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be >= 0 or <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(6), s_ipsc->rNumericArgs(6)));
-            }
-
-            if ((s_ipsc->rNumericArgs(7) < 0.0) || (s_ipsc->rNumericArgs(7) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be >=0 or <=1, entered {:.2R}", s_ipsc->cNumericFieldNames(7), s_ipsc->rNumericArgs(7)));
-            }
-
-            if ((s_ipsc->rNumericArgs(8) < 0.0) || (s_ipsc->rNumericArgs(8) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be >=0 or <=1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(8), s_ipsc->rNumericArgs(8)));
-            }
-
-            if ((s_ipsc->rNumericArgs(9) < 0.0) || (s_ipsc->rNumericArgs(9) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be >=0 or <=1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(9), s_ipsc->rNumericArgs(9)));
-            }
-
-            if ((s_ipsc->rNumericArgs(10) < 0.0) || (s_ipsc->rNumericArgs(10) > 1.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh,
-                    format("{} must be >=0 or <=1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(10), s_ipsc->rNumericArgs(10)));
-            }
-
-            if ((mat->LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ) ||
-                (mat->LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ)) {
-                if (s_ipsc->rNumericArgs(11) <= 0.0) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(11), s_ipsc->rNumericArgs(11)));
-                }
-
-                if (s_ipsc->rNumericArgs(12) <= 0.0) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(12), s_ipsc->rNumericArgs(12)));
-                }
-
-                if (s_ipsc->rNumericArgs(13) <= 0.0) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(13), s_ipsc->rNumericArgs(13)));
-                }
-
-                if ((s_ipsc->rNumericArgs(14) < -90.0) || (s_ipsc->rNumericArgs(14) > 90.0)) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be >=-90 and <=90, entered value = {:.2R}", s_ipsc->cNumericFieldNames(14), s_ipsc->rNumericArgs(14)));
-                }
-
-                if (s_ipsc->rNumericArgs(15) <= 0.0) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(15), s_ipsc->rNumericArgs(15)));
-                }
-
-                if ((s_ipsc->rNumericArgs(16) < 0.0) || ((s_ipsc->rNumericArgs(16) > 0.0) &&
-                     (s_ipsc->rNumericArgs(16) < (s_ipsc->rNumericArgs(11) / 2)))) {
-                    ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be =0 or greater than SlatWidth/2, entered value = {:.2R}",
-                               s_ipsc->cNumericFieldNames(16), s_ipsc->rNumericArgs(16)));
-                }
-            }
-
-            if (ErrorsFound) ShowFatalError(state, "Error in complex fenestration material input.");
+            ShowSevereCustomMessage(
+                state, eoh, format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
         }
 
-        
+        if ((s_ipsc->rNumericArgs(3) < 0.0) || (s_ipsc->rNumericArgs(3) > 1.0)) {
+            ErrorsFound = true;
+            ShowSevereCustomMessage(
+                state, eoh, format("{} value must be >= 0 and <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(3), s_ipsc->rNumericArgs(3)));
+        }
+
+        if ((s_ipsc->rNumericArgs(4) <= 0.0) || (s_ipsc->rNumericArgs(4) > 1.0)) {
+            ErrorsFound = true;
+            ShowSevereCustomMessage(
+                state, eoh, format("{} value must be >= 0 and <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(4), s_ipsc->rNumericArgs(4)));
+        }
+
+        if ((s_ipsc->rNumericArgs(5) <= 0.0) || (s_ipsc->rNumericArgs(5) > 1.0)) {
+            ErrorsFound = true;
+            ShowSevereCustomMessage(
+                state, eoh, format("{} value must be >= 0 and <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(5), s_ipsc->rNumericArgs(5)));
+        }
+
+        if ((s_ipsc->rNumericArgs(6) < 0.0) || (s_ipsc->rNumericArgs(6) > 1.0)) {
+            ErrorsFound = true;
+            ShowSevereCustomMessage(
+                state, eoh, format("{} must be >= 0 or <= 1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(6), s_ipsc->rNumericArgs(6)));
+        }
+
+        if ((s_ipsc->rNumericArgs(7) < 0.0) || (s_ipsc->rNumericArgs(7) > 1.0)) {
+            ErrorsFound = true;
+            ShowSevereCustomMessage(
+                state, eoh, format("{} must be >=0 or <=1, entered {:.2R}", s_ipsc->cNumericFieldNames(7), s_ipsc->rNumericArgs(7)));
+        }
+
+        if ((s_ipsc->rNumericArgs(8) < 0.0) || (s_ipsc->rNumericArgs(8) > 1.0)) {
+            ErrorsFound = true;
+            ShowSevereCustomMessage(
+                state, eoh, format("{} must be >=0 or <=1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(8), s_ipsc->rNumericArgs(8)));
+        }
+
+        if ((s_ipsc->rNumericArgs(9) < 0.0) || (s_ipsc->rNumericArgs(9) > 1.0)) {
+            ErrorsFound = true;
+            ShowSevereCustomMessage(
+                state, eoh, format("{} must be >=0 or <=1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(9), s_ipsc->rNumericArgs(9)));
+        }
+
+        if ((s_ipsc->rNumericArgs(10) < 0.0) || (s_ipsc->rNumericArgs(10) > 1.0)) {
+            ErrorsFound = true;
+            ShowSevereCustomMessage(
+                state, eoh, format("{} must be >=0 or <=1, entered value = {:.2R}", s_ipsc->cNumericFieldNames(10), s_ipsc->rNumericArgs(10)));
+        }
+
+        if ((mat->LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ) ||
+            (mat->LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ)) {
+            if (s_ipsc->rNumericArgs(11) <= 0.0) {
+                ErrorsFound = true;
+                ShowSevereCustomMessage(
+                    state, eoh, format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(11), s_ipsc->rNumericArgs(11)));
+            }
+
+            if (s_ipsc->rNumericArgs(12) <= 0.0) {
+                ErrorsFound = true;
+                ShowSevereCustomMessage(
+                    state, eoh, format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(12), s_ipsc->rNumericArgs(12)));
+            }
+
+            if (s_ipsc->rNumericArgs(13) <= 0.0) {
+                ErrorsFound = true;
+                ShowSevereCustomMessage(
+                    state, eoh, format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(13), s_ipsc->rNumericArgs(13)));
+            }
+
+            if ((s_ipsc->rNumericArgs(14) < -90.0) || (s_ipsc->rNumericArgs(14) > 90.0)) {
+                ErrorsFound = true;
+                ShowSevereCustomMessage(
+                    state,
+                    eoh,
+                    format("{} must be >=-90 and <=90, entered value = {:.2R}", s_ipsc->cNumericFieldNames(14), s_ipsc->rNumericArgs(14)));
+            }
+
+            if (s_ipsc->rNumericArgs(15) <= 0.0) {
+                ErrorsFound = true;
+                ShowSevereCustomMessage(
+                    state, eoh, format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(15), s_ipsc->rNumericArgs(15)));
+            }
+
+            if ((s_ipsc->rNumericArgs(16) < 0.0) ||
+                ((s_ipsc->rNumericArgs(16) > 0.0) && (s_ipsc->rNumericArgs(16) < (s_ipsc->rNumericArgs(11) / 2)))) {
+                ErrorsFound = true;
+                ShowSevereCustomMessage(state,
+                                        eoh,
+                                        format("{} must be =0 or greater than SlatWidth/2, entered value = {:.2R}",
+                                               s_ipsc->cNumericFieldNames(16),
+                                               s_ipsc->rNumericArgs(16)));
+            }
+        }
+
+        if (ErrorsFound) ShowFatalError(state, "Error in complex fenestration material input.");
+    }
+
     bool DoReport = false;
 
     ScanForReports(state, "Constructions", DoReport, "Materials");
@@ -2757,14 +2793,14 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
 {
     constexpr std::string_view routineName = "GetVariableAbsorptanceInput";
-    
+
     int IOStat; // IO Status when calling get input subroutine
     int numAlphas;
     int numNumbers;
 
     auto &s_ip = state.dataInputProcessing->inputProcessor;
     auto &s_ipsc = state.dataIPShortCut;
-    auto &s_mat = state.dataMaterial; 
+    auto &s_mat = state.dataMaterial;
 
     s_ipsc->cCurrentModuleObject = "MaterialProperty:VariableAbsorptance";
     int numVariAbs = s_ip->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
@@ -2772,20 +2808,20 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
     for (int i = 1; i <= numVariAbs; ++i) {
         // Call Input Get routine to retrieve material data
         s_ip->getObjectItem(state,
-                          s_ipsc->cCurrentModuleObject,
-                          i,
-                          s_ipsc->cAlphaArgs,
-                          numAlphas,
-                          s_ipsc->rNumericArgs,
-                          numNumbers,
-                          IOStat,
-                          s_ipsc->lNumericFieldBlanks,
-                          s_ipsc->lAlphaFieldBlanks,
-                          s_ipsc->cAlphaFieldNames,
-                          s_ipsc->cNumericFieldNames);
+                            s_ipsc->cCurrentModuleObject,
+                            i,
+                            s_ipsc->cAlphaArgs,
+                            numAlphas,
+                            s_ipsc->rNumericArgs,
+                            numNumbers,
+                            IOStat,
+                            s_ipsc->lNumericFieldBlanks,
+                            s_ipsc->lAlphaFieldBlanks,
+                            s_ipsc->cAlphaFieldNames,
+                            s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         // Load the material derived type from the input data.
         int matNum = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(2));
         if (matNum == 0) {
@@ -2858,7 +2894,7 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
 
 void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
 {
-        
+
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Winkelmann
     //       DATE WRITTEN   May 2000
@@ -2871,11 +2907,11 @@ void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound) // set
     constexpr std::string_view routineName = "GetWindowGlassSpectralData";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int IOStat;                      // IO Status when calling get input subroutine
-    int NumAlphas;            // Number of spectral data alpha names being passed
-    int NumNums;             // Number of spectral data properties being passed
-    Real64 Lam; // Wavelength (microns)
-    Real64 Tau; // Transmittance, front reflectance, back reflectance
+    int IOStat;    // IO Status when calling get input subroutine
+    int NumAlphas; // Number of spectral data alpha names being passed
+    int NumNums;   // Number of spectral data properties being passed
+    Real64 Lam;    // Wavelength (microns)
+    Real64 Tau;    // Transmittance, front reflectance, back reflectance
     Real64 RhoF;
     Real64 RhoB;
 
@@ -2884,7 +2920,7 @@ void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound) // set
     auto &s_mat = state.dataMaterial;
 
     constexpr int MaxSpectralDataElements = 800; // Maximum number in Spectral Data arrays.
-    
+
     s_ipsc->cCurrentModuleObject = "MaterialProperty:GlazingSpectralData";
     s_mat->NumSpectralData = s_ip->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
 
@@ -2893,7 +2929,7 @@ void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound) // set
     s_mat->SpectralData.allocate(s_mat->NumSpectralData);
 
     for (int Loop = 1; Loop <= s_mat->NumSpectralData; ++Loop) {
-            
+
         // Call Input Get routine to retrieve spectral data
         // Name is followed by up to 450 sets of normal-incidence measured values of
         // [wavelength (microns), transmittance, front reflectance, back reflectance] for
@@ -2901,7 +2937,7 @@ void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound) // set
         s_ip->getObjectItem(state,
                             s_ipsc->cCurrentModuleObject,
                             Loop,
-                            s_ipsc->cAlphaArgs, 
+                            s_ipsc->cAlphaArgs,
                             NumAlphas,
                             s_ipsc->rNumericArgs,
                             NumNums,
@@ -2918,11 +2954,12 @@ void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound) // set
         specData.Name = s_ipsc->cAlphaArgs(1);
         int TotLam = NumNums / 4;
         if (mod(NumNums, 4) != 0) {
-            ShowWarningCustomMessage(state, eoh,
+            ShowWarningCustomMessage(
+                state,
+                eoh,
                 format("{} of items in data set is not a multiple of 4 (Wavelength,Trans,ReflFront,ReflBack), remainder items set to 0.0", NumNums));
             ErrorsFound = true;
             continue;
-            
         }
 
         if (TotLam > MaxSpectralDataElements) {
@@ -2930,7 +2967,6 @@ void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound) // set
             ErrorsFound = true;
             continue;
         }
-            
 
         specData.NumOfWavelengths = TotLam;
         specData.WaveLength.allocate(TotLam); // Wavelength (microns)
@@ -2956,45 +2992,40 @@ void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound) // set
             RhoB = specData.ReflBack(LamNum);
             if (LamNum < TotLam && specData.WaveLength(LamNum + 1) <= Lam) {
                 ErrorsFound = true;
-                ShowSevereError(state,
-                                format("{}{}=\"{}\" invalid set.", routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}{}=\"{}\" invalid set.", routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   format("... Wavelengths not in increasing order. at wavelength#={}, value=[{:.4T}], next is [{:.4T}].",
                                          LamNum,
                                          Lam,
                                          specData.WaveLength(LamNum + 1)));
             }
-            
+
             if (Lam < 0.1 || Lam > 4.0) {
                 ErrorsFound = true;
-                ShowSevereError(state,
-                                format("{}{}=\"{}\" invalid value.", routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
-                ShowContinueError(
-                                  state, format("... A wavelength is not in the range 0.1 to 4.0 microns; at wavelength#={}, value=[{:.4T}].", LamNum, Lam));
+                ShowSevereError(state, format("{}{}=\"{}\" invalid value.", routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                ShowContinueError(state,
+                                  format("... A wavelength is not in the range 0.1 to 4.0 microns; at wavelength#={}, value=[{:.4T}].", LamNum, Lam));
             }
-            
+
             // TH 2/15/2011. CR 8343
             // IGDB (International Glazing Database) does not meet the above strict restrictions.
             //  Relax rules to allow directly use of spectral data from IGDB
             if (Tau > 1.01) {
                 ErrorsFound = true;
-                ShowSevereError(state,
-                                format("{}: {}=\"{}\" invalid value.", routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}: {}=\"{}\" invalid value.", routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, format("... A transmittance is > 1.0; at wavelength#={}, value=[{:.4T}].", LamNum, Tau));
             }
-            
+
             if (RhoF < 0.0 || RhoF > 1.02 || RhoB < 0.0 || RhoB > 1.02) {
                 ErrorsFound = true;
-                ShowSevereError(state,
-                                format("{}: {}=\"{}\" invalid value.", routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}: {}=\"{}\" invalid value.", routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, format("... A reflectance is < 0.0 or > 1.0; at wavelength#={}, RhoF value=[{:.4T}].", LamNum, RhoF));
                 ShowContinueError(state, format("... A reflectance is < 0.0 or > 1.0; at wavelength#={}, RhoB value=[{:.4T}].", LamNum, RhoB));
             }
 
             if ((Tau + RhoF) > 1.03 || (Tau + RhoB) > 1.03) {
                 ErrorsFound = true;
-                ShowSevereError(state,
-                                format("{}: {}=\"{}\" invalid value.", routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}: {}=\"{}\" invalid value.", routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   format("... Transmittance + reflectance) > 1.0 for an entry; at wavelength#={}",
                                          format("{}, value(Tau+RhoF)=[{:.4T}], value(Tau+RhoB)=[{:.4T}].", LamNum, (Tau + RhoF), (Tau + RhoB))));
@@ -3034,7 +3065,7 @@ void MaterialGlass::SetupSimpleWindowGlazingSystem(EnergyPlusData &state)
     Real64 DeltaSHGCandTsol(0.0); // intermediate difference
     Real64 RLowSide(0.0);
     Real64 RHiSide(0.0);
-    
+
     // first fill out defaults
     this->GlassSpectralDataPtr = 0;
     this->SolarDiffusing = false;
@@ -3043,7 +3074,7 @@ void MaterialGlass::SetupSimpleWindowGlazingSystem(EnergyPlusData &state)
     this->AbsorpThermalBack = 0.84;
     this->AbsorpThermalFront = 0.84;
     this->AbsorpThermal = this->AbsorpThermalBack;
-    
+
     // step 1. Determine U-factor without film coefficients
     // Simple window model has its own correlation for film coefficients (m2-K/W) under Winter conditions as function of U-factor
     if (this->SimpleWindowUfactor < 5.85) {
@@ -3064,7 +3095,7 @@ void MaterialGlass::SetupSimpleWindowGlazingSystem(EnergyPlusData &state)
     }
 
     // Step 2. determine layer thickness.
-    
+
     if ((1.0 / Rlw) > 7.0) {
         this->Thickness = 0.002;
     } else {
@@ -3078,31 +3109,30 @@ void MaterialGlass::SetupSimpleWindowGlazingSystem(EnergyPlusData &state)
         this->NominalR = this->Resistance = Rlw;
     } else {
         ErrorsFound = true;
-        ShowSevereError(
-                        state,
+        ShowSevereError(state,
                         format("WindowMaterial:SimpleGlazingSystem: {} has Conductivity <= 0.0, must be >0.0, Check value of U-factor", this->Name));
     }
 
     // step 4. determine solar transmission (revised to 10-1-2009 version from LBNL.)
-    
+
     if (this->SimpleWindowUfactor > 4.5) {
-            
+
         if (this->SimpleWindowSHGC < 0.7206) {
-                
+
             this->Trans = 0.939998 * pow_2(this->SimpleWindowSHGC) + 0.20332 * this->SimpleWindowSHGC;
         } else { // >= 0.7206
             this->Trans = 1.30415 * this->SimpleWindowSHGC - 0.30515;
         }
 
     } else if (this->SimpleWindowUfactor < 3.4) {
-            
+
         if (this->SimpleWindowSHGC <= 0.15) {
             this->Trans = 0.41040 * this->SimpleWindowSHGC;
         } else { // > 0.15
             this->Trans = 0.085775 * pow_2(this->SimpleWindowSHGC) + 0.963954 * this->SimpleWindowSHGC - 0.084958;
         }
     } else { // interpolate. 3.4 <= Ufactor <= 4.5
-            
+
         if (this->SimpleWindowSHGC < 0.7206) {
             TsolHiSide = 0.939998 * pow_2(this->SimpleWindowSHGC) + 0.20332 * this->SimpleWindowSHGC;
         } else { // >= 0.7206
@@ -3122,13 +3152,13 @@ void MaterialGlass::SetupSimpleWindowGlazingSystem(EnergyPlusData &state)
     // step 5.  determine solar reflectances
 
     DeltaSHGCandTsol = this->SimpleWindowSHGC - this->Trans;
-    
+
     if (this->SimpleWindowUfactor > 4.5) {
-            
+
         Ris = 1.0 / (29.436546 * pow_3(DeltaSHGCandTsol) - 21.943415 * pow_2(DeltaSHGCandTsol) + 9.945872 * DeltaSHGCandTsol + 7.426151);
         Ros = 1.0 / (2.225824 * DeltaSHGCandTsol + 20.577080);
     } else if (this->SimpleWindowUfactor < 3.4) {
-            
+
         Ris = 1.0 / (199.8208128 * pow_3(DeltaSHGCandTsol) - 90.639733 * pow_2(DeltaSHGCandTsol) + 19.737055 * DeltaSHGCandTsol + 6.766575);
         Ros = 1.0 / (5.763355 * DeltaSHGCandTsol + 20.541528);
     } else { // interpolate. 3.4 <= Ufactor <= 4.5
@@ -3141,13 +3171,13 @@ void MaterialGlass::SetupSimpleWindowGlazingSystem(EnergyPlusData &state)
         RHiSide = 1.0 / (2.225824 * DeltaSHGCandTsol + 20.577080);
         Ros = ((this->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (RLowSide - RHiSide) + RLowSide;
     }
-    
+
     InflowFraction = (Ros + 0.5 * Rlw) / (Ros + Rlw + Ris);
-    
+
     SolarAbsorb = (this->SimpleWindowSHGC - this->Trans) / InflowFraction;
     this->ReflectSolBeamBack = 1.0 - this->Trans - SolarAbsorb;
     this->ReflectSolBeamFront = this->ReflectSolBeamBack;
-    
+
     // step 6. determine visible properties.
     if (this->SimpleWindowVTinputByUser) {
         this->TransVis = this->SimpleWindowVisTran;
@@ -3155,7 +3185,7 @@ void MaterialGlass::SetupSimpleWindowGlazingSystem(EnergyPlusData &state)
         if (this->TransVis + this->ReflectVisBeamBack >= 1.0) {
             this->ReflectVisBeamBack = 0.999 - this->TransVis;
         }
-        
+
         this->ReflectVisBeamFront = -0.0622 * pow_3(this->TransVis) + 0.4277 * pow_2(this->TransVis) - 0.4169 * this->TransVis + 0.2399;
         if (this->TransVis + this->ReflectVisBeamFront >= 1.0) {
             this->ReflectVisBeamFront = 0.999 - this->TransVis;
@@ -3165,16 +3195,16 @@ void MaterialGlass::SetupSimpleWindowGlazingSystem(EnergyPlusData &state)
         this->ReflectVisBeamBack = this->ReflectSolBeamBack;
         this->ReflectVisBeamFront = this->ReflectSolBeamFront;
     }
-    
+
     // step 7. The dependence on incident angle is in subroutine TransAndReflAtPhi
-    
+
     // step 8.  Hemispherical terms are averaged using standard method
-    
+
     if (ErrorsFound) {
         ShowFatalError(state, "Program halted because of input problem(s) in WindowMaterial:SimpleGlazingSystem");
     }
 } // MaterialGlass::SetupSimpleWindowGlazingSystem()
-        
+
 void CalcScreenTransmittance([[maybe_unused]] EnergyPlusData &state,
                              MaterialScreen const *screen,
                              Real64 phi,   // Sun altitude relative to surface outward normal (radians, 0 to Pi)
@@ -3201,9 +3231,9 @@ void CalcScreenTransmittance([[maybe_unused]] EnergyPlusData &state,
 
     Real64 constexpr Small(1.E-9); // Small Number used to approximate zero
 
-    Real64 Tdirect;          // Beam solar transmitted through screen (dependent on sun angle)
-    Real64 Tscattered;       // Beam solar reflected through screen (dependent on sun angle)
-    Real64 TscatteredVis;    // Visible beam solar reflected through screen (dependent on sun angle)
+    Real64 Tdirect;       // Beam solar transmitted through screen (dependent on sun angle)
+    Real64 Tscattered;    // Beam solar reflected through screen (dependent on sun angle)
+    Real64 TscatteredVis; // Visible beam solar reflected through screen (dependent on sun angle)
 
     assert(phi >= 0.0 && phi <= Constant::Pi);
     assert(theta >= 0.0 && theta <= Constant::Pi);
@@ -3388,10 +3418,9 @@ void GetPhiThetaIndices(Real64 phi, Real64 theta, Real64 dPhi, Real64 dTheta, in
     iTheta2 = (iTheta1 == maxITheta - 1) ? iTheta1 : iTheta1 + 1;
 } // GetPhiThetaIndices()
 
-
-Real64 MaterialBlind::BeamBeamTrans(Real64 const ProfAng,        // Solar profile angle (rad)
-                                    Real64 const SlatAng        // Slat angle (rad)
-) const 
+Real64 MaterialBlind::BeamBeamTrans(Real64 const ProfAng, // Solar profile angle (rad)
+                                    Real64 const SlatAng  // Slat angle (rad)
+) const
 {
 
     // FUNCTION INFORMATION:
@@ -3423,30 +3452,28 @@ Real64 MaterialBlind::BeamBeamTrans(Real64 const ProfAng,        // Solar profil
         if (std::abs(std::sin(gamma)) > 0.01) {
             if ((SlatAng > 0.0 && SlatAng <= Constant::PiOvr2 && ProfAng <= SlatAng) ||
                 (SlatAng > Constant::PiOvr2 && SlatAng <= Constant::Pi && ProfAng > -(Constant::Pi - SlatAng)))
-                fEdge1 = this->SlatThickness * std::abs(std::sin(gamma)) / ((this->SlatSeparation + this->SlatThickness / std::abs(std::sin(SlatAng))) * CosProfAng);
-                fEdge = min(1.0, std::abs(fEdge1));
-            }
-            BeamBeamTrans *= (1.0 - fEdge);
+                fEdge1 = this->SlatThickness * std::abs(std::sin(gamma)) /
+                         ((this->SlatSeparation + this->SlatThickness / std::abs(std::sin(SlatAng))) * CosProfAng);
+            fEdge = min(1.0, std::abs(fEdge1));
         }
+        BeamBeamTrans *= (1.0 - fEdge);
+    }
 
-        return BeamBeamTrans;
+    return BeamBeamTrans;
 
-    } // MaterialBlind::BeamBeamTrans()
-
+} // MaterialBlind::BeamBeamTrans()
 
 void GetProfIndices(Real64 profAng, int &idxLo, int &idxHi)
 {
     idxLo = int((profAng + Constant::PiOvr2) / dProfAng) + 1;
-    idxHi = std::min(MaxProfAngs, idxLo+1);
+    idxHi = std::min(MaxProfAngs, idxLo + 1);
 }
-                
+
 void GetSlatIndicesInterpFac(Real64 slatAng, int &idxLo, int &idxHi, Real64 &interpFac)
 {
     idxLo = int(slatAng / dSlatAng);
-    idxHi = std::min(MaxSlatAngs, idxLo+1);
+    idxHi = std::min(MaxSlatAngs, idxLo + 1);
     interpFac = (slatAng - (idxLo * dSlatAng)) / dSlatAng;
 }
-        
-        
-} // namespace EnergyPlus::Material
 
+} // namespace EnergyPlus::Material

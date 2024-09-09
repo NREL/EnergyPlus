@@ -823,7 +823,7 @@ namespace PlantPipingSystemsManager {
 
         auto &s_ipsc = state.dataIPShortCut;
         auto &s_mat = state.dataMaterial;
-        
+
         for (int ZoneCoupledDomainCtr = 1; ZoneCoupledDomainCtr <= NumZoneCoupledDomains; ++ZoneCoupledDomainCtr) {
 
             // Increment the domain counters here
@@ -844,7 +844,7 @@ namespace PlantPipingSystemsManager {
                                                                      s_ipsc->cNumericFieldNames);
 
             ErrorObjectHeader eoh{routineName, ObjName_ZoneCoupled_Slab, s_ipsc->cAlphaArgs(1)};
-           
+
             auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainCtr - 1];
 
             // Get the name, validate
@@ -970,8 +970,7 @@ namespace PlantPipingSystemsManager {
                     thisDomain.VertInsProperties.Conductivity = mat->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                         ErrorsFound = true;
-                        SiteGroundDomainNoMassMatError(
-                            state, s_ipsc->cAlphaFieldNames(11), s_ipsc->cAlphaArgs(11), thisDomain.Name);
+                        SiteGroundDomainNoMassMatError(state, s_ipsc->cAlphaFieldNames(11), s_ipsc->cAlphaArgs(11), thisDomain.Name);
                     }
                 }
 
@@ -1167,10 +1166,8 @@ namespace PlantPipingSystemsManager {
             thisDomain.Moisture.Theta_sat = s_ipsc->rNumericArgs(8) / 100.0;
 
             // check if there are blank inputs related to the basement,
-            if (s_ipsc->lNumericFieldBlanks(11) || s_ipsc->lAlphaFieldBlanks(5) ||
-                s_ipsc->lAlphaFieldBlanks(10)) {
-                ShowSevereError(state,
-                                format("Erroneous basement inputs for {}={}", ObjName_ZoneCoupled_Basement, s_ipsc->cAlphaArgs(1)));
+            if (s_ipsc->lNumericFieldBlanks(11) || s_ipsc->lAlphaFieldBlanks(5) || s_ipsc->lAlphaFieldBlanks(10)) {
+                ShowSevereError(state, format("Erroneous basement inputs for {}={}", ObjName_ZoneCoupled_Basement, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, "At least one basement input was left blank.");
                 ErrorsFound = true;
             }
@@ -1549,12 +1546,8 @@ namespace PlantPipingSystemsManager {
                                            "Bad node name.",
                                            ErrorsFound);
             }
-            BranchNodeConnections::TestCompSet(state,
-                                               ObjName_Circuit,
-                                               s_ipsc->cAlphaArgs(1),
-                                               s_ipsc->cAlphaArgs(2),
-                                               s_ipsc->cAlphaArgs(3),
-                                               "Piping System Circuit Nodes");
+            BranchNodeConnections::TestCompSet(
+                state, ObjName_Circuit, s_ipsc->cAlphaArgs(1), s_ipsc->cAlphaArgs(2), s_ipsc->cAlphaArgs(3), "Piping System Circuit Nodes");
 
             // Convergence tolerance values, validated by IP
             thisCircuit.Convergence_CurrentToPrevIteration = s_ipsc->rNumericArgs(7);
@@ -1631,9 +1624,7 @@ namespace PlantPipingSystemsManager {
 
             // Issue a severe if Inner >= Outer diameter
             if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
-                ShowSevereError(
-                    state,
-                    format("{}: {}=\"{}\" has invalid pipe diameters.", routineName, ObjName_HorizTrench, s_ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}: {}=\"{}\" has invalid pipe diameters.", routineName, ObjName_HorizTrench, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   format("Outer diameter [{:.3T}] must be greater than inner diameter [{:.3T}].",
                                          thisCircuit.PipeSize.OuterDia,
@@ -1738,7 +1729,7 @@ namespace PlantPipingSystemsManager {
         int CurIndex;
 
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         // Read in all pipe segments
         int NumPipeSegmentsInInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_Segment);
         for (int SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr) {
@@ -1804,7 +1795,7 @@ namespace PlantPipingSystemsManager {
         int IOStatus;   // Used in GetObjectItem
 
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         // initialize these counters properly so they can be incremented within the DO loop
         int DomainCtr = StartingDomainNumForHorizontal - 1;
         int CircuitCtr = StartingCircuitNumForHorizontal - 1;

@@ -185,7 +185,7 @@ TEST_F(HysteresisTest, StraightUpCurve)
     args_list.push_back(GetSpecHeatArgs(25.5, 26.0, -999.000000, Material::Phase::Liquid, Material::Phase::Liquid, 25000.153605));
     args_list.push_back(GetSpecHeatArgs(26.0, 26.5, -999.000000, Material::Phase::Liquid, Material::Phase::Liquid, 25000.056508));
     for (auto &cp_call : args_list) {
-            Material::Phase calculated_pcm_state = Material::Phase::Invalid;
+        Material::Phase calculated_pcm_state = Material::Phase::Invalid;
         Real64 calculated_cp = this->ModelA.getCurrentSpecificHeat(cp_call.previousTemperature,
                                                                    cp_call.updatedTemperature,
                                                                    cp_call.temperatureReverse,

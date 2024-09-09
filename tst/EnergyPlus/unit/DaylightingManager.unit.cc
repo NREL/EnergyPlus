@@ -1473,7 +1473,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
             for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
                 for (int iWinCover = 0; iWinCover < (int)WinCover::Num; ++iWinCover) {
                     auto &daylFac = thisDaylgtCtrl.daylFac[iHr](iWin, iRefPt)[iWinCover];
-                    
+
                     daylFac[(int)Lum::Illum].sky = {0.2, 0.2, 0.2, 0.2};
                     daylFac[(int)Lum::Illum].sun = 0.02;
                     daylFac[(int)Lum::Illum].sunDisk = 0.01;

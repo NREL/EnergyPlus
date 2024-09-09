@@ -508,7 +508,7 @@ namespace EcoRoofManager {
     {
         auto const *mat = state.dataMaterial->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
         assert(mat->group == Material::Group::EcoRoof);
-        
+
         auto const *matER = dynamic_cast<Material::MaterialEcoRoof const *>(mat);
         assert(matER != nullptr);
         auto &thisEcoRoof = state.dataEcoRoofMgr;
@@ -521,17 +521,17 @@ namespace EcoRoofManager {
                             "currently works only with CTF heat balance solution algorithm.");
 
         // ONLY READ ECOROOF PROPERTIES IN THE FIRST TIME
-        thisEcoRoof->Zf = matER->HeightOfPlants;              // Plant height (m)
-        thisEcoRoof->LAI = matER->LAI;                        // Leaf Area Index
-        thisEcoRoof->Alphag = 1.0 - matER->AbsorpSolar;       // albedo rather than absorptivity
-        thisEcoRoof->Alphaf = matER->Lreflectivity;           // Leaf Reflectivity
-        thisEcoRoof->epsilonf = matER->LEmissitivity;         // Leaf Emisivity
-        thisEcoRoof->StomatalResistanceMin = matER->RStomata; // Leaf min stomatal resistance
-        thisEcoRoof->epsilong = matER->AbsorpThermal;         // Soil Emisivity
-        thisEcoRoof->MoistureMax = matER->Porosity;           // Max moisture content in soil
-        thisEcoRoof->MoistureResidual = matER->MinMoisture;   // Min moisture content in soil
-        thisEcoRoof->Moisture = matER->InitMoisture;          // Initial moisture content in soil
-        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture;  // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
+        thisEcoRoof->Zf = matER->HeightOfPlants;               // Plant height (m)
+        thisEcoRoof->LAI = matER->LAI;                         // Leaf Area Index
+        thisEcoRoof->Alphag = 1.0 - matER->AbsorpSolar;        // albedo rather than absorptivity
+        thisEcoRoof->Alphaf = matER->Lreflectivity;            // Leaf Reflectivity
+        thisEcoRoof->epsilonf = matER->LEmissitivity;          // Leaf Emisivity
+        thisEcoRoof->StomatalResistanceMin = matER->RStomata;  // Leaf min stomatal resistance
+        thisEcoRoof->epsilong = matER->AbsorpThermal;          // Soil Emisivity
+        thisEcoRoof->MoistureMax = matER->Porosity;            // Max moisture content in soil
+        thisEcoRoof->MoistureResidual = matER->MinMoisture;    // Min moisture content in soil
+        thisEcoRoof->Moisture = matER->InitMoisture;           // Initial moisture content in soil
+        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture; // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
 
         thisEcoRoof->SoilThickness = matER->Thickness; // Total thickness of soil layer (m)
 
@@ -679,9 +679,9 @@ namespace EcoRoofManager {
         // Make sure the ecoroof module resets its conditions at start of EVERY warmup day and every new design day
         // for Reverse DD testing
         if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
-            state.dataEcoRoofMgr->Moisture = matER->InitMoisture;                  // Initial moisture content in soil
+            state.dataEcoRoofMgr->Moisture = matER->InitMoisture;                    // Initial moisture content in soil
             state.dataEcoRoofMgr->MeanRootMoisture = state.dataEcoRoofMgr->Moisture; // Start the root zone moisture at the same value as the surface.
-            state.dataEcoRoofMgr->Alphag = 1.0 - matER->AbsorpSolar;               // albedo rather than absorptivity
+            state.dataEcoRoofMgr->Alphag = 1.0 - matER->AbsorpSolar;                 // albedo rather than absorptivity
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataEcoRoofMgr->CalcEcoRoofMyEnvrnFlag) {

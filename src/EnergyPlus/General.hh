@@ -82,7 +82,6 @@ namespace General {
                    Real64 X_0,  // 1st bound of interval that contains the solution
                    Real64 X_1); // 2nd bound of interval that contains the solution
 
-        
     constexpr Real64 POLYF(Real64 const X,          // Cosine of angle of incidence
                            Array1D<Real64> const &A // Polynomial coefficients
     )
@@ -257,7 +256,6 @@ namespace General {
     }
 } // namespace General
 
-
 constexpr Real64 Interp(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
 {
     return Lower + InterpFac * (Upper - Lower);
@@ -266,18 +264,20 @@ constexpr Real64 Interp(Real64 const Lower, Real64 const Upper, Real64 const Int
 struct InterpCoeffs
 {
     Real64 x1;
-    Real64 x2; 
+    Real64 x2;
 };
-        
-inline void GetInterpCoeffs(Real64 X, Real64 X1, Real64 X2, InterpCoeffs &c) {
+
+inline void GetInterpCoeffs(Real64 X, Real64 X1, Real64 X2, InterpCoeffs &c)
+{
     c.x1 = (X - X1) / (X2 - X1);
     c.x2 = (X2 - X) / (X2 - X1);
 }
 
-inline Real64 Interp2(Real64 Fx1, Real64 Fx2, InterpCoeffs const &c) {
+inline Real64 Interp2(Real64 Fx1, Real64 Fx2, InterpCoeffs const &c)
+{
     return c.x1 * Fx1 + c.x2 * Fx2;
 }
-        
+
 // Disaggregated implementation of bilinear interpolation so that coefficients can be used with multiple variables
 struct BilinearInterpCoeffs
 {
@@ -318,7 +318,6 @@ inline Real64 BilinearInterp(Real64 const Fx1y1, Real64 const Fx1y2, Real64 cons
     return (coeffs.x1y1 * Fx1y1 + coeffs.x2y1 * Fx2y1 + coeffs.x1y2 * Fx1y2 + coeffs.x2y2 * Fx2y2) / coeffs.denom;
 }
 
-        
 struct GeneralData : BaseGlobalStruct
 {
     bool GetReportInput = true;

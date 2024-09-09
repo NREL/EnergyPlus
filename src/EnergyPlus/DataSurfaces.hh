@@ -933,15 +933,17 @@ namespace DataSurfaces {
         bool hasScreen = false;
     };
 
-    struct SurfaceShade {
-        struct {    
+    struct SurfaceShade
+    {
+        struct
+        {
             int matNum = 0;
-            bool movableSlats = false;     // True if window has a blind with movable slats
-            Real64 slatAng = 0.0;  // Slat angle this time step for window with blind on (radians)
+            bool movableSlats = false;       // True if window has a blind with movable slats
+            Real64 slatAng = 0.0;            // Slat angle this time step for window with blind on (radians)
             Real64 slatAngDeg = 0.0;         // Slat angle this time step for window with blind on (deg)
-            bool slatAngDegEMSon = false;      // flag that indicate EMS system is actuating SlatAngThisTSDeg
+            bool slatAngDegEMSon = false;    // flag that indicate EMS system is actuating SlatAngThisTSDeg
             Real64 slatAngDegEMSValue = 0.0; // value that EMS sets for slat angle in degrees
-            bool slatBlockBeam = false;             // True if blind slats block incident beam solar
+            bool slatBlockBeam = false;      // True if blind slats block incident beam solar
             int slatAngIdxLo = -1;
             int slatAngIdxHi = -1;
             Real64 slatAngInterpFac = 0.0;
@@ -953,19 +955,20 @@ namespace DataSurfaces {
             Real64 airFlowPermeability = 0.0; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
 
             // Properties are profile-angle dependent
-            Material::BlindTraAbsRef<Material::MaxProfAngs+1> TAR;
+            Material::BlindTraAbsRef<Material::MaxProfAngs + 1> TAR;
         } blind;
 
         // Save these from the glass in case we need to recalculate blind properties
-        struct {
-            Real64 epsIR = 0.0; 
+        struct
+        {
+            Real64 epsIR = 0.0;
             Real64 rhoIR = 0.0;
         } glass;
-             
+
         Real64 effShadeEmi = 0.0; // Effective emissivity of interior blind or shade
-        Real64 effGlassEmi = 0.0;   // Effective emissivity of glass adjacent to interior blind or shade
+        Real64 effGlassEmi = 0.0; // Effective emissivity of glass adjacent to interior blind or shade
     };
-            
+
     struct SurfaceWindowFrameDiv
     {
     };
@@ -1771,14 +1774,14 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinOtherConvHeatGain;  // other convective = total conv - standard model prediction for EQL window model (W)
     Array1D<Real64> SurfWinEffInsSurfTemp; // Effective inside surface temperature for window with interior blind or shade; combination of shade/blind
                                            // and glass temperatures (C)
-    Array1D<Real64> SurfWinTotGlazingThickness;      // Total glazing thickness from outside of outer glass to inside of inner glass (m)
-    Array1D<Real64> SurfWinTanProfileAngHor;         // Tangent of horizontal profile angle
-    Array1D<Real64> SurfWinTanProfileAngVert;        // Tangent of vertical profile angle
-    Array1D<Real64> SurfWinInsideSillDepth;          // Depth of inside sill (m)
-    Array1D<Real64> SurfWinInsideReveal;             // Depth of inside reveal (m)
-    Array1D<Real64> SurfWinInsideSillSolAbs;         // Solar absorptance of inside sill
-    Array1D<Real64> SurfWinInsideRevealSolAbs;       // Solar absorptance of inside reveal
-    Array1D<Real64> SurfWinOutsideRevealSolAbs;      // Solar absorptance of outside reveal
+    Array1D<Real64> SurfWinTotGlazingThickness; // Total glazing thickness from outside of outer glass to inside of inner glass (m)
+    Array1D<Real64> SurfWinTanProfileAngHor;    // Tangent of horizontal profile angle
+    Array1D<Real64> SurfWinTanProfileAngVert;   // Tangent of vertical profile angle
+    Array1D<Real64> SurfWinInsideSillDepth;     // Depth of inside sill (m)
+    Array1D<Real64> SurfWinInsideReveal;        // Depth of inside reveal (m)
+    Array1D<Real64> SurfWinInsideSillSolAbs;    // Solar absorptance of inside sill
+    Array1D<Real64> SurfWinInsideRevealSolAbs;  // Solar absorptance of inside reveal
+    Array1D<Real64> SurfWinOutsideRevealSolAbs; // Solar absorptance of outside reveal
     Array1D<DataSurfaces::WindowAirFlowSource> SurfWinAirflowSource;           // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
     Array1D<DataSurfaces::WindowAirFlowDestination> SurfWinAirflowDestination; // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
     Array1D<int> SurfWinAirflowReturnNodePtr;                                  // Return node pointer for destination = ReturnAir

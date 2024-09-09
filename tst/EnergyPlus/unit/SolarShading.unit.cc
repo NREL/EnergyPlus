@@ -5226,7 +5226,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     construct1.TransSolBeamCoef(1) = 0.9;
 
     auto &s_mat = state->dataMaterial;
-    
+
     auto *mat1 = new Material::MaterialGlass;
     mat1->Name = "GLASS";
     mat1->group = Material::Group::Glass;
@@ -6201,12 +6201,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
     EXPECT_TRUE(state->dataSysVars->SlaterBarsky);
 
 #ifdef EP_NO_OPENGL
-    std::string const error_string = delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
-                                                       "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate.",
-                                                       "   ** Warning ** ShadowCalculation: invalid Shading Calculation Method",
-                                                       "   **   ~~~   ** Value entered=\"PixelCounting\"",
-                                                       "   **   ~~~   ** This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)",
-                                                       "   **   ~~~   ** PolygonClipping will be used instead"});
+    std::string const error_string =
+        delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
+                          "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate.",
+                          "   ** Warning ** ShadowCalculation: invalid Shading Calculation Method",
+                          "   **   ~~~   ** Value entered=\"PixelCounting\"",
+                          "   **   ~~~   ** This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)",
+                          "   **   ~~~   ** PolygonClipping will be used instead"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
 

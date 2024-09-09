@@ -163,7 +163,7 @@ namespace Window {
         // Reads spectral data value
 
         auto &s_mat = state.dataMaterial;
-        
+
         assert(t_SampleDataPtr != 0); // It must not be called for zero value
         std::shared_ptr<CSpectralSampleData> aSampleData = std::make_shared<CSpectralSampleData>();
         auto spectralData = s_mat->SpectralData(t_SampleDataPtr); // (AUTO_OK_OBJ)

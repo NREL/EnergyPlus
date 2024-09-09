@@ -59,7 +59,7 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-        
+
 namespace Window {
 
     enum class OpticalDataModel
@@ -74,7 +74,7 @@ namespace Window {
 
     extern const std::array<std::string_view, (int)OpticalDataModel::Num> opticalDataModelNames;
     extern const std::array<std::string_view, (int)OpticalDataModel::Num> opticalDataModelNamesUC;
-        
+
     enum class WindowsModel
     {
         Invalid = -1,

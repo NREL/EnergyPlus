@@ -1504,7 +1504,7 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
         // issue warning only since duplicate node names within a setpoint manager does not cause a conflict (i.e., same
         // value written to node) but may indicate an error in the node name.
         for (int iNode = 0; iNode < (int)spm->ctrlNodeNums.size() - 1; ++iNode) {
-                for (int jNode = iNode + 1; jNode < (int)spm->ctrlNodeNums.size(); ++jNode) {
+            for (int jNode = iNode + 1; jNode < (int)spm->ctrlNodeNums.size(); ++jNode) {
                 if (spm->ctrlNodeNums[iNode] != spm->ctrlNodeNums[jNode]) continue;
                 ShowWarningError(state, format("{} =\"{}\"", spmTypeNames[(int)spm->type], spm->Name));
                 ShowContinueError(state, format("...duplicate node specified = {}", state.dataLoopNodes->NodeID(spm->ctrlNodeNums[iNode])));

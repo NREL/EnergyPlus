@@ -135,7 +135,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
     EXPECT_TRUE(ErrorsFound);
 }
 
-#ifdef GET_OUT        
+#ifdef GET_OUT
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 {
     std::string const idf_objects = delimited_string({
@@ -172,7 +172,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 
     EXPECT_FALSE(ErrorsFound);
 }
-        
+
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_2)
 {
     std::string const idf_objects = delimited_string({
@@ -340,7 +340,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     ASSERT_TRUE(process_idf(idf_objects));
 
     auto &s_mat = state->dataMaterial;
-    
+
     bool ErrorsFound(false); // If errors detected in input
 
     auto *mat1 = new Material::MaterialGlass;
@@ -360,7 +360,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     state->dataHeatBal->NominalRforNominalUCalculation.allocate(1);
     state->dataHeatBal->NominalRforNominalUCalculation(1) = 0.0;
     mat1->NominalR = 0.4; // Set these explicity for each material layer to avoid random failures of check for
-                                           // NominalRforNominalUCalculation == 0.0 at end of GetConstructData
+                          // NominalRforNominalUCalculation == 0.0 at end of GetConstructData
     mat2->NominalR = 0.4;
 
     // call to get valid window material types

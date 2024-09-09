@@ -5142,7 +5142,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     auto *mat3 = new Material::MaterialBase;
     mat3->group = Material::Group::Regular;
     s_mat->materials.push_back(mat3);
-    
+
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 1, 2, 3);
@@ -5161,7 +5161,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     auto *mat4 = new Material::MaterialGlass;
     mat4->group = Material::Group::Glass;
     s_mat->materials.push_back(mat4);
-    
+
     mat4->Thickness = 0.15;
     mat4->ReflectSolBeamFront = 0.35;
     mat4->ReflectSolBeamBack = 0.25;
@@ -5176,11 +5176,11 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     mat4->SolarDiffusing = true;
     mat4->YoungModulus = 0.89;
     mat4->PoissonsRatio = 1.11;
-    
+
     auto *mat5 = new Material::MaterialGlass;
     mat5->group = Material::Group::Glass;
     s_mat->materials.push_back(mat5);
-    
+
     mat5->Thickness = 0.15;
     mat5->ReflectSolBeamFront = 0.25;
     mat5->ReflectSolBeamBack = 0.35;
@@ -5243,11 +5243,11 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     mat6->TAR.IR.Ft.Emi = 0.888;
     mat6->TAR.IR.Bk.Emi = 0.777;
     mat6->Resistance = 1.234;
-    
+
     auto *mat7 = new Material::MaterialGlassEQL;
     mat7->group = Material::Group::GlassEQL;
     s_mat->materials.push_back(mat7);
-    
+
     mat7->TAR.Sol.Ft.Bm[0].BmTra = 0.29;
     mat7->TAR.Sol.Bk.Bm[0].BmTra = 0.39;
     mat7->TAR.Sol.Ft.Bm[0].BmRef = 0.28;

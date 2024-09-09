@@ -215,17 +215,17 @@ namespace Window {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto &surf = state.dataSurface->Surface(SurfNum);
             auto &surfShade = state.dataSurface->surfShades(SurfNum);
-                
+
             if (!surf.HeatTransSurf) continue;
             if (!state.dataConstruction->Construct(surf.Construction).TypeIsWindow) continue;
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::BSDF) continue; // Irrelevant for Complex Fen
-            if (state.dataConstruction->Construct(surf.Construction).WindowTypeEQL) continue; // not required
+            if (state.dataConstruction->Construct(surf.Construction).WindowTypeEQL) continue;      // not required
 
             if (surf.activeShadedConstruction == 0) continue;
             auto &constrSh = state.dataConstruction->Construct(surf.activeShadedConstruction);
             int TotLay = constrSh.TotLayers;
             auto const *mat = s_mat->materials(constrSh.LayerPoint(TotLay));
-            
+
             if (mat->group == Material::Group::Shade) {
                 auto const *matShade = dynamic_cast<Material::MaterialShade const *>(mat);
                 Real64 EpsGlIR = s_mat->materials(constrSh.LayerPoint(TotLay - 1))->AbsorpThermalBack;
@@ -251,12 +251,14 @@ namespace Window {
                 }
 
                 surfShade.effShadeEmi = Interp(constrSh.effShadeBlindEmi[surfShade.blind.slatAngIdxLo],
-                                               constrSh.effShadeBlindEmi[surfShade.blind.slatAngIdxHi], surfShade.blind.slatAngInterpFac);
+                                               constrSh.effShadeBlindEmi[surfShade.blind.slatAngIdxHi],
+                                               surfShade.blind.slatAngInterpFac);
                 surfShade.effGlassEmi = Interp(constrSh.effGlassEmi[surfShade.blind.slatAngIdxLo],
-                                               constrSh.effGlassEmi[surfShade.blind.slatAngIdxHi], surfShade.blind.slatAngInterpFac);
-            }     // End of check if interior shade or interior blind
-        }         // End of surface loop
-    } // InitWCE_SimplifiedOpticalData()
+                                               constrSh.effGlassEmi[surfShade.blind.slatAngIdxHi],
+                                               surfShade.blind.slatAngInterpFac);
+            } // End of check if interior shade or interior blind
+        }     // End of surface loop
+    }         // InitWCE_SimplifiedOpticalData()
 
     Real64 GetSolarTransDirectHemispherical(EnergyPlusData &state, int ConstrNum)
     {
@@ -303,7 +305,7 @@ namespace Window {
     {
         auto const *matGlass = dynamic_cast<Material::MaterialGlass const *>(m_MaterialProperties);
         assert(matGlass != nullptr);
-        
+
         if (matGlass->GlassSpectralDataPtr > 0) {
             auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(state); // (AUTO_OK_OBJ)
             std::shared_ptr<CSpectralSampleData> aSampleData = nullptr;
@@ -326,18 +328,12 @@ namespace Window {
             m_Material = std::make_shared<CMaterialSample>(aSample, thickness, aType, lowLambda, highLambda);
         } else {
             if (m_Range == WavelengthRange::Solar) {
-                m_Material = std::make_shared<CMaterialSingleBand>(matGlass->Trans,
-                                                                   matGlass->Trans,
-                                                                   matGlass->ReflectSolBeamFront,
-                                                                   matGlass->ReflectSolBeamBack,
-                                                                   m_Range);
+                m_Material = std::make_shared<CMaterialSingleBand>(
+                    matGlass->Trans, matGlass->Trans, matGlass->ReflectSolBeamFront, matGlass->ReflectSolBeamBack, m_Range);
             }
             if (m_Range == WavelengthRange::Visible) {
-                m_Material = std::make_shared<CMaterialSingleBand>(matGlass->TransVis,
-                                                                   matGlass->TransVis,
-                                                                   matGlass->ReflectVisBeamFront,
-                                                                   matGlass->ReflectVisBeamBack,
-                                                                   m_Range);
+                m_Material = std::make_shared<CMaterialSingleBand>(
+                    matGlass->TransVis, matGlass->TransVis, matGlass->ReflectVisBeamFront, matGlass->ReflectVisBeamBack, m_Range);
             }
         }
     }
@@ -522,8 +518,8 @@ namespace Window {
         Real64 slatWidth = matBlind->SlatWidth;
         Real64 slatSpacing = matBlind->SlatSeparation;
         Real64 slatTiltAngle = 90.0 - matBlind->SlatAngle; // Need to convert to WCE system
-        Real64 curvatureRadius = 0.0;                  // No curvature radius in current IDF definition
-        size_t numOfSlatSegments = 5;                  // Number of segments to use in venetian calculations
+        Real64 curvatureRadius = 0.0;                      // No curvature radius in current IDF definition
+        size_t numOfSlatSegments = 5;                      // Number of segments to use in venetian calculations
         return std::make_shared<CVenetianCellDescription>(slatWidth, slatSpacing, slatTiltAngle, curvatureRadius, numOfSlatSegments);
     }
 

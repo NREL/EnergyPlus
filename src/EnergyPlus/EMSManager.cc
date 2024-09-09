@@ -1700,7 +1700,7 @@ namespace EMSManager {
 
         for (int loopSurfNum = 1; loopSurfNum <= state.dataSurface->TotSurfaces; ++loopSurfNum) {
             auto &surf = state.dataSurface->Surface(loopSurfNum);
-            
+
             if (surf.Class != DataSurfaces::SurfaceClass::Window) continue;
             if (surf.ExtBoundCond != DataSurfaces::ExternalEnvironment) continue;
             if (!surf.HasShadeControl) continue;

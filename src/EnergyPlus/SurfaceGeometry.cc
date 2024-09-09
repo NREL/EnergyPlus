@@ -2429,7 +2429,7 @@ namespace SurfaceGeometry {
             for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
                 auto &surf = state.dataSurface->Surface(SurfNum);
                 if (!surf.HasShadeControl) continue;
-                
+
                 ConstrNumSh = surf.activeShadedConstruction;
                 if (ConstrNumSh <= 0) continue;
 
@@ -2443,12 +2443,12 @@ namespace SurfaceGeometry {
                 // Use the new generic code (assuming only one blind) as follows
                 for (int iMatNum = 1; iMatNum <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iMatNum) {
                     auto *mat = s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iMatNum));
-                    
+
                     if (mat->group != Material::Group::Blind) continue;
-                    
+
                     auto *matBlind = dynamic_cast<Material::MaterialBlind *>(mat);
                     assert(matBlind != nullptr);
-                    
+
                     surfShade.blind.matNum = mat->Num;
                     break;
                 }
@@ -2476,7 +2476,7 @@ namespace SurfaceGeometry {
             int OpaqueHTSurfsWithWin = 0; // Number of floors, walls and roofs with windows in a zone
             int InternalMassSurfs = 0;    // Number of internal mass surfaces in a zone
             int priorBaseSurfNum = 0;
-            
+
             for (int spaceNum : thisZone.spaceIndexes) {
                 auto &thisSpace = state.dataHeatBal->space(spaceNum);
                 if (thisSpace.HTSurfaceFirst == 0) continue; // Zone with no surfaces
@@ -2507,13 +2507,13 @@ namespace SurfaceGeometry {
         CalcSurfaceCentroid(state);
 
         SetupShadeSurfacesForSolarCalcs(state); // if shading surfaces are solar collectors or PV, then we need full solar calc.
-        
+
         GetMovableInsulationData(state, ErrorsFound);
-        
+
         if (state.dataSurface->CalcSolRefl) GetShadingSurfReflectanceData(state, ErrorsFound);
-        
+
         LayNumOutside = 0;
-        
+
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto &surf = state.dataSurface->Surface(SurfNum);
             // Check for EcoRoof and only 1 allowed to be used.
@@ -2534,7 +2534,7 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
             }
         }
-        
+
         // Reserve space to avoid excess allocations
         state.dataSurface->AllHTSurfaceList.reserve(state.dataSurface->TotSurfaces);
         state.dataSurface->AllExtSolarSurfaceList.reserve(state.dataSurface->TotSurfaces);
@@ -2545,7 +2545,7 @@ namespace SurfaceGeometry {
         state.dataSurface->AllExtSolWindowSurfaceList.reserve(state.dataSurface->TotWindows);
         state.dataSurface->AllExtSolWinWithFrameSurfaceList.reserve(state.dataSurface->TotWindows);
         state.dataSurface->AllHTKivaSurfaceList.reserve(state.dataSurface->TotSurfaces);
-        
+
         // Set flag that determines whether a surface can be an exterior obstruction
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
@@ -2591,7 +2591,7 @@ namespace SurfaceGeometry {
                     }
                 }
             }
-            
+
             // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
             if (surf.HeatTransSurf && surf.ExtBoundCond > 0) continue;
             if (surf.HeatTransSurf && surf.ExtBoundCond == Ground) continue;
@@ -2608,11 +2608,11 @@ namespace SurfaceGeometry {
             if (surf.MirroredSurf) continue;
             // Exclude air boundary surfaces
             if (surf.IsAirBoundarySurf) continue;
-            
+
             surf.IsShadowPossibleObstruction = true;
             state.dataSurface->AllShadowPossObstrSurfaceList.push_back(SurfNum);
         } // for (SurfNum)
-        
+
         // Check for IRT surfaces in invalid places.
         iTmp1 = 0;
         if (std::any_of(state.dataConstruction->Construct.begin(),
@@ -2636,8 +2636,8 @@ namespace SurfaceGeometry {
             }
             if (iTmp1 > 0) {
                 ShowWarningError(
-                                 state,
-                                 format("{}Surfaces use InfraredTransparent constructions {} in non-interzone surfaces. (illegal use)", RoutineName, iTmp1));
+                    state,
+                    format("{}Surfaces use InfraredTransparent constructions {} in non-interzone surfaces. (illegal use)", RoutineName, iTmp1));
                 ShowContinueError(state, "For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
             }
         }
@@ -2645,7 +2645,7 @@ namespace SurfaceGeometry {
         // Populate SurfaceFilter lists
         for (int iSurfaceFilter = 1; iSurfaceFilter < static_cast<int>(SurfaceFilter::Num); ++iSurfaceFilter)
             state.dataSurface->SurfaceFilterLists[iSurfaceFilter].reserve(state.dataSurface->TotSurfaces);
-        
+
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto const &surf = state.dataSurface->Surface(SurfNum);
             if (!surf.HeatTransSurf) continue;
@@ -2675,9 +2675,9 @@ namespace SurfaceGeometry {
                 }
             }
         } // for (SurfNum)
-        
+
         // Note, could do same for Window Area and detecting if Interzone Surface in Zone
-        
+
         if (state.dataSurfaceGeometry->Warning1Count > 0) {
             ShowWarningMessage(state,
                                format("{}Window dimensions differ from Window 5/6 data file dimensions, {} times.",
@@ -2703,7 +2703,7 @@ namespace SurfaceGeometry {
             ShowContinueError(state, "Note that originally entered dimensions are overridden.");
             ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
         }
-        
+
         if (state.dataErrTracking->TotalMultipliedWindows > 0) {
             ShowWarningMessage(state,
                                format("{}There are {} window/glass door(s) that may cause inaccurate shadowing due to Solar Distribution.",
@@ -2730,33 +2730,32 @@ namespace SurfaceGeometry {
             ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
             state.dataErrTracking->TotalSevereErrors += state.dataErrTracking->TotalDegenerateSurfaces;
         }
-        
+
         GetHTSurfExtVentedCavityData(state, ErrorsFound);
-        
+
         state.dataSurfaceGeometry->exposedFoundationPerimeter.getData(state, ErrorsFound);
-        
+
         GetSurfaceHeatTransferAlgorithmOverrides(state, ErrorsFound);
-        
+
         // Set up enclosures, process Air Boundaries if any
         SetupEnclosuresAndAirBoundaries(state, state.dataViewFactor->EnclRadInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
-        
+
         GetSurfaceGroundSurfsData(state, ErrorsFound);
-        
+
         GetSurfaceSrdSurfsData(state, ErrorsFound);
-        
+
         GetSurfaceLocalEnvData(state, ErrorsFound);
-        
+
         if (SurfError || ErrorsFound) {
             ErrorsFound = true;
             ShowFatalError(state, format("{}Errors discovered, program terminates.", RoutineName));
         }
-        
+
         int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
-            TotOverhangsProjection + TotFins + TotFinsProjection;
+                          TotOverhangsProjection + TotFins + TotFinsProjection;
         int NumDElightCmplxFen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
         if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || Dayltg::doesDayLightingUseDElight(state))) {
-            ShowWarningError(state,
-                             format("{}When using DElight daylighting the presence of exterior shading surfaces is ignored.", RoutineName));
+            ShowWarningError(state, format("{}When using DElight daylighting the presence of exterior shading surfaces is ignored.", RoutineName));
         }
 
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
@@ -2765,7 +2764,7 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfActiveConstruction(SurfNum) = surf.Construction;
             surf.RepresentativeCalcSurfNum = SurfNum;
         }
-        
+
         // Representative surface calculations: Assign representative heat transfer surfaces
         if (state.dataSurface->UseRepresentativeSurfaceCalculations &&
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName") == 0) {
@@ -2778,15 +2777,13 @@ namespace SurfaceGeometry {
                         bool forceUniqueSurface =
                             surface.HasShadeControl ||
                             state.dataSurface->SurfWinAirflowSource(surfNum) != DataSurfaces::WindowAirFlowSource::Invalid ||
-                            state.dataConstruction->Construct(surface.Construction).SourceSinkPresent ||
-                            surface.Class == SurfaceClass::TDD_Dome ||
-                            (surface.Class == SurfaceClass::Window &&
-                             (surface.OriginalClass == SurfaceClass::TDD_Diffuser ||
-                              state.dataSurface->SurfWinWindowModelType(surfNum) != WindowModel::Detailed ||
-                              state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
-                              state.dataConstruction->Construct(surface.Construction).isTCWindow));
+                            state.dataConstruction->Construct(surface.Construction).SourceSinkPresent || surface.Class == SurfaceClass::TDD_Dome ||
+                            (surface.Class == SurfaceClass::Window && (surface.OriginalClass == SurfaceClass::TDD_Diffuser ||
+                                                                       state.dataSurface->SurfWinWindowModelType(surfNum) != WindowModel::Detailed ||
+                                                                       state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
+                                                                       state.dataConstruction->Construct(surface.Construction).isTCWindow));
                         if (!forceUniqueSurface) {
-                                state.dataSurface->Surface(surfNum).set_representative_surface(state, surfNum);
+                            state.dataSurface->Surface(surfNum).set_representative_surface(state, surfNum);
                         }
                     }
                 }
@@ -2796,10 +2793,10 @@ namespace SurfaceGeometry {
         // Initialize surface with movable insulation index list
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
             if (state.dataSurface->SurfMaterialMovInsulExt(SurfNum) > 0 || state.dataSurface->SurfMaterialMovInsulInt(SurfNum) > 0) {
-                    state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
+                state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
             }
         }
-    
+
         if (SurfError || ErrorsFound) {
             ErrorsFound = true;
             ShowFatalError(state, format("{}Errors discovered, program terminates.", RoutineName));
@@ -3290,7 +3287,7 @@ namespace SurfaceGeometry {
         Real64 SchedMaxValue;
 
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
             ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
         }
@@ -3311,7 +3308,8 @@ namespace SurfaceGeometry {
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, s_ipsc->cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
             if (NumAlphas != 2) {
                 ShowSevereError(
-                    state, format("{}: Object Definition indicates not = 2 Alpha Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, NumAlphas));
+                    state,
+                    format("{}: Object Definition indicates not = 2 Alpha Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, NumAlphas));
                 ErrorsFound = true;
             }
 
@@ -3346,8 +3344,7 @@ namespace SurfaceGeometry {
                 // Base transmittance of a shadowing (sub)surface
                 if (!s_ipsc->lAlphaFieldBlanks(2)) {
                     // Schedule for a shadowing (sub)surface
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex =
-                        GetScheduleIndex(state, s_ipsc->cAlphaArgs(2));
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex = GetScheduleIndex(state, s_ipsc->cAlphaArgs(2));
                     if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex == 0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\", {} not found={}",
@@ -3434,10 +3431,8 @@ namespace SurfaceGeometry {
                                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
                                                 s_ipsc->cNumericFieldNames(1),
                                                 fmt::to_string(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides)));
-                        ShowContinueError(state,
-                                          format("...but {} were entered. Only the indicated {} will be used.",
-                                                 numSides,
-                                                 s_ipsc->cNumericFieldNames(1)));
+                        ShowContinueError(
+                            state, format("...but {} were entered. Only the indicated {} will be used.", numSides, s_ipsc->cNumericFieldNames(1)));
                     }
                 }
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
@@ -3483,7 +3478,7 @@ namespace SurfaceGeometry {
         SurfaceClass ClassItem;
 
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         if ((TotRectDetachedFixed + TotRectDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
             ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
         }
@@ -3503,7 +3498,8 @@ namespace SurfaceGeometry {
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, s_ipsc->cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
             if (NumAlphas != 1) {
                 ShowSevereError(
-                    state, format("{}: Object Definition indicates not = 1 Alpha Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, NumAlphas));
+                    state,
+                    format("{}: Object Definition indicates not = 1 Alpha Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, NumAlphas));
                 ErrorsFound = true;
             }
 
@@ -3720,7 +3716,7 @@ namespace SurfaceGeometry {
         int numSides;
 
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         GetOSCData(state, ErrorsFound);
         GetOSCMData(state, ErrorsFound);
         GetFoundationData(state, ErrorsFound);
@@ -3743,19 +3739,22 @@ namespace SurfaceGeometry {
                 ClassItem = 3;
             }
 
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, s_ipsc->cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+                state, s_ipsc->cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
             if (Item == 1) {
                 if (SurfaceNumAlpha != 9) {
-                    ShowSevereError(
-                        state,
-                        format("{}: Object Definition indicates not = 9 Alpha Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, SurfaceNumAlpha));
+                    ShowSevereError(state,
+                                    format("{}: Object Definition indicates not = 9 Alpha Objects, Number Indicated={}",
+                                           s_ipsc->cCurrentModuleObject,
+                                           SurfaceNumAlpha));
                     ErrorsFound = true;
                 }
             } else {
                 if (SurfaceNumAlpha != 8) {
-                    ShowSevereError(
-                        state,
-                        format("{}: Object Definition indicates not = 8 Alpha Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, SurfaceNumAlpha));
+                    ShowSevereError(state,
+                                    format("{}: Object Definition indicates not = 8 Alpha Objects, Number Indicated={}",
+                                           s_ipsc->cCurrentModuleObject,
+                                           SurfaceNumAlpha));
                     ErrorsFound = true;
                 }
             }
@@ -3805,8 +3804,8 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = BaseSurfIDs(ClassItem);
                 }
 
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction = Util::FindItemInList(
-                    s_ipsc->cAlphaArgs(ArgPointer), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction =
+                    Util::FindItemInList(s_ipsc->cAlphaArgs(ArgPointer), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
 
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction == 0) {
                     ErrorsFound = true;
@@ -3825,8 +3824,7 @@ namespace SurfaceGeometry {
                                            s_ipsc->cAlphaFieldNames(ArgPointer),
                                            s_ipsc->cAlphaArgs(ArgPointer)));
                     if (Item == 1) {
-                        ShowContinueError(state,
-                                          format("...because {}={}", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
+                        ShowContinueError(state, format("...because {}={}", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
                     } else {
                         ShowContinueError(state, format("...because Surface Type={}", BaseSurfCls(ClassItem)));
                     }
@@ -4157,8 +4155,7 @@ namespace SurfaceGeometry {
                 //                        state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsEcoRoof;
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = s_ipsc->rNumericArgs(1);
-                if (s_ipsc->lNumericFieldBlanks(1))
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = Constant::AutoCalculate;
+                if (s_ipsc->lNumericFieldBlanks(1)) state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = Constant::AutoCalculate;
                 if (s_ipsc->lNumericFieldBlanks(2) || s_ipsc->rNumericArgs(2) == Constant::AutoCalculate) {
                     numSides = (SurfaceNumProp - 2) / 3;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = numSides;
@@ -4191,10 +4188,8 @@ namespace SurfaceGeometry {
                                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
                                                 s_ipsc->cNumericFieldNames(2),
                                                 fmt::to_string(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides)));
-                        ShowContinueError(state,
-                                          format("...but {} were entered. Only the indicated {} will be used.",
-                                                 numSides,
-                                                 s_ipsc->cNumericFieldNames(2)));
+                        ShowContinueError(
+                            state, format("...but {} were entered. Only the indicated {} will be used.", numSides, s_ipsc->cNumericFieldNames(2)));
                     }
                 }
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
@@ -4353,7 +4348,7 @@ namespace SurfaceGeometry {
         int ZoneNum;
 
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         for (Item = 1; Item <= 10; ++Item) {
 
             s_ipsc->cCurrentModuleObject = cModuleObjects(Item);
@@ -4443,17 +4438,15 @@ namespace SurfaceGeometry {
                 }
 
                 if (NumNumbers < 7) {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", Too few number of numeric args=[{}].",
-                                           s_ipsc->cCurrentModuleObject,
-                                           s_ipsc->cAlphaArgs(1),
-                                           NumNumbers));
+                    ShowSevereError(
+                        state,
+                        format("{}=\"{}\", Too few number of numeric args=[{}].", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1), NumNumbers));
                     ErrorsFound = true;
                 }
 
                 ++SurfNum;
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = s_ipsc->cAlphaArgs(1); // Set the Surface Name in the Derived Type
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = BaseSurfIDs(ClassItem);             // Set class number
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = s_ipsc->cAlphaArgs(1);   // Set the Surface Name in the Derived Type
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = BaseSurfIDs(ClassItem); // Set class number
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction =
                     Util::FindItemInList(s_ipsc->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
@@ -4474,8 +4467,7 @@ namespace SurfaceGeometry {
                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
                                            s_ipsc->cAlphaFieldNames(3),
                                            s_ipsc->cAlphaArgs(2)));
-                    ShowContinueError(state,
-                                      format("...because {}={}", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
+                    ShowContinueError(state, format("...because {}={}", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
                 } else {
                     state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).IsUsed = true;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ConstructionStoredInputValue =
@@ -4969,20 +4961,22 @@ namespace SurfaceGeometry {
         int numSides;
 
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         GetWindowShadingControlData(state, ErrorsFound);
         s_ipsc->cCurrentModuleObject = "FenestrationSurface:Detailed";
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, s_ipsc->cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
 
         if (SurfaceNumAlpha != 6) {
             ShowSevereError(
-                state, format("{}: Object Definition indicates not = 6 Alpha Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, SurfaceNumAlpha));
+                state,
+                format("{}: Object Definition indicates not = 6 Alpha Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, SurfaceNumAlpha));
             ErrorsFound = true;
         }
 
         if (SurfaceNumProp != 15) {
             ShowSevereError(
-                state, format("{}: Object Definition indicates > 15 Numeric Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, SurfaceNumAlpha));
+                state,
+                format("{}: Object Definition indicates > 15 Numeric Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, SurfaceNumAlpha));
             ErrorsFound = true;
         }
         NeedToAddSurfaces = 0;
@@ -5084,8 +5078,7 @@ namespace SurfaceGeometry {
                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
                                            s_ipsc->cAlphaFieldNames(3),
                                            s_ipsc->cAlphaArgs(3)));
-                    ShowContinueError(state,
-                                      format("...because {}={}", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
+                    ShowContinueError(state, format("...because {}={}", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
                 }
             }
 
@@ -5209,8 +5202,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
             }
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = s_ipsc->rNumericArgs(1);
-            if (s_ipsc->lNumericFieldBlanks(1))
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = Constant::AutoCalculate;
+            if (s_ipsc->lNumericFieldBlanks(1)) state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = Constant::AutoCalculate;
 
             if (s_ipsc->lNumericFieldBlanks(3) || s_ipsc->rNumericArgs(3) == Constant::AutoCalculate) {
                 s_ipsc->rNumericArgs(3) = (SurfaceNumProp - 3) / 3;
@@ -5244,9 +5236,8 @@ namespace SurfaceGeometry {
                                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
                                             s_ipsc->cNumericFieldNames(3),
                                             fmt::to_string(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides)));
-                    ShowContinueError(
-                        state,
-                        format("...but {} were entered. Only the indicated {} will be used.", numSides, s_ipsc->cNumericFieldNames(3)));
+                    ShowContinueError(state,
+                                      format("...but {} were entered. Only the indicated {} will be used.", numSides, s_ipsc->cNumericFieldNames(3)));
                 }
             }
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
@@ -5266,9 +5257,7 @@ namespace SurfaceGeometry {
                                         s_ipsc->cNumericFieldNames(2),
                                         s_ipsc->rNumericArgs(2)));
                 ShowContinueError(state,
-                                  format("...because {}={} multiplier will be set to 1.0.",
-                                         s_ipsc->cAlphaFieldNames(2),
-                                         s_ipsc->cAlphaArgs(2)));
+                                  format("...because {}={} multiplier will be set to 1.0.", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier = 1.0;
             }
 
@@ -5333,13 +5322,8 @@ namespace SurfaceGeometry {
 
             } // check on non-opaquedoor subsurfaces
 
-            CheckSubSurfaceMiscellaneous(state,
-                                         "GetHTSubSurfaceData",
-                                         ErrorsFound,
-                                         SurfNum,
-                                         s_ipsc->cAlphaArgs(1),
-                                         s_ipsc->cAlphaArgs(3),
-                                         AddedSubSurfaces);
+            CheckSubSurfaceMiscellaneous(
+                state, "GetHTSubSurfaceData", ErrorsFound, SurfNum, s_ipsc->cAlphaArgs(1), s_ipsc->cAlphaArgs(3), AddedSubSurfaces);
 
         } // End of main loop over subsurfaces
     }
@@ -5464,17 +5448,15 @@ namespace SurfaceGeometry {
                 }
 
                 if (NumNumbers < 5) {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", Too few number of numeric args=[{}].",
-                                           s_ipsc->cCurrentModuleObject,
-                                           s_ipsc->cAlphaArgs(1),
-                                           NumNumbers));
+                    ShowSevereError(
+                        state,
+                        format("{}=\"{}\", Too few number of numeric args=[{}].", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1), NumNumbers));
                     ErrorsFound = true;
                 }
 
                 ++SurfNum;
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = s_ipsc->cAlphaArgs(1); // Set the Surface Name in the Derived Type
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SubSurfIDs(ClassItem);              // Set class number
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = s_ipsc->cAlphaArgs(1);  // Set the Surface Name in the Derived Type
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SubSurfIDs(ClassItem); // Set class number
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction =
                     Util::FindItemInList(s_ipsc->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
@@ -5578,9 +5560,10 @@ namespace SurfaceGeometry {
 
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == UnreconciledZoneSurface) { // "Surface" Base Surface
                     if (!GettingIZSurfaces) {
-                        ShowSevereError(
-                            state,
-                            format("{}=\"{}\", invalid use of object", s_ipsc->cCurrentModuleObject, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name));
+                        ShowSevereError(state,
+                                        format("{}=\"{}\", invalid use of object",
+                                               s_ipsc->cCurrentModuleObject,
+                                               state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name));
                         ShowContinueError(
                             state,
                             format(
@@ -5668,9 +5651,7 @@ namespace SurfaceGeometry {
                                             s_ipsc->cNumericFieldNames(1),
                                             s_ipsc->rNumericArgs(1)));
                     ShowContinueError(state,
-                                      format("...because {}={} multiplier will be set to 1.0.",
-                                             s_ipsc->cAlphaFieldNames(1),
-                                             s_ipsc->cAlphaArgs(1)));
+                                      format("...because {}={} multiplier will be set to 1.0.", s_ipsc->cAlphaFieldNames(1), s_ipsc->cAlphaArgs(1)));
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier = 1.0;
                 }
 
@@ -5725,13 +5706,8 @@ namespace SurfaceGeometry {
 
                 } // check on non-opaquedoor subsurfaces
 
-                CheckSubSurfaceMiscellaneous(state,
-                                             "GetRectSubSurfaces",
-                                             ErrorsFound,
-                                             SurfNum,
-                                             s_ipsc->cAlphaArgs(1),
-                                             s_ipsc->cAlphaArgs(2),
-                                             AddedSubSurfaces);
+                CheckSubSurfaceMiscellaneous(
+                    state, "GetRectSubSurfaces", ErrorsFound, SurfNum, s_ipsc->cAlphaArgs(1), s_ipsc->cAlphaArgs(2), AddedSubSurfaces);
 
             } // Getting Items
         }
@@ -5888,16 +5864,14 @@ namespace SurfaceGeometry {
                     if (state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers) !=
                         state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotShLayers)) {
                         ShowSevereError(state, format("{}: Mis-match in unshaded/shaded inside layer materials.  These should match.", cRoutineName));
-                        ShowContinueError(
-                            state,
-                            format("Unshaded construction={}, Material={}",
-                                   state.dataConstruction->Construct(ConstrNum).Name,
-                                   s_mat->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers))->Name));
-                        ShowContinueError(
-                            state,
-                            format("Shaded construction={}, Material={}",
-                                   state.dataConstruction->Construct(ConstrNumSh).Name,
-                                   s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotShLayers))->Name));
+                        ShowContinueError(state,
+                                          format("Unshaded construction={}, Material={}",
+                                                 state.dataConstruction->Construct(ConstrNum).Name,
+                                                 s_mat->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers))->Name));
+                        ShowContinueError(state,
+                                          format("Shaded construction={}, Material={}",
+                                                 state.dataConstruction->Construct(ConstrNumSh).Name,
+                                                 s_mat->materials(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotShLayers))->Name));
                         ErrorsFound = true;
                     }
                     if (state.dataConstruction->Construct(ConstrNum).LayerPoint(1) != state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1)) {
@@ -5918,8 +5892,8 @@ namespace SurfaceGeometry {
                         MatGap2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers);
                         MatSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 1);
                         if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::BGBlind) {
-                            MatGapCalc =
-                                std::abs(s_mat->materials(MatGap)->Thickness - (s_mat->materials(MatGap1)->Thickness + s_mat->materials(MatGap2)->Thickness));
+                            MatGapCalc = std::abs(s_mat->materials(MatGap)->Thickness -
+                                                  (s_mat->materials(MatGap1)->Thickness + s_mat->materials(MatGap2)->Thickness));
                             if (MatGapCalc > 0.001) {
                                 ShowSevereError(state,
                                                 format("{}: The gap width(s) for the unshaded window construction {}",
@@ -5931,10 +5905,9 @@ namespace SurfaceGeometry {
                                 ShowContinueError(state,
                                                   "for window " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                                       ", which has a between-glass blind.");
-                                ShowContinueError(state,
-                                                  format("..Material={} thickness={:.3R} -",
-                                                         s_mat->materials(MatGap)->Name,
-                                                         s_mat->materials(MatGap)->Thickness));
+                                ShowContinueError(
+                                    state,
+                                    format("..Material={} thickness={:.3R} -", s_mat->materials(MatGap)->Name, s_mat->materials(MatGap)->Thickness));
                                 ShowContinueError(state,
                                                   format("..( Material={} thickness={:.3R} +",
                                                          s_mat->materials(MatGap1)->Name,
@@ -5947,10 +5920,9 @@ namespace SurfaceGeometry {
                                 ErrorsFound = true;
                             }
                         } else { // Between-glass shade
-                            MatGapCalc =
-                                std::abs(s_mat->materials(MatGap)->Thickness -
-                                         (s_mat->materials(MatGap1)->Thickness + s_mat->materials(MatGap2)->Thickness +
-                                          s_mat->materials(MatSh)->Thickness));
+                            MatGapCalc = std::abs(
+                                s_mat->materials(MatGap)->Thickness -
+                                (s_mat->materials(MatGap1)->Thickness + s_mat->materials(MatGap2)->Thickness + s_mat->materials(MatSh)->Thickness));
                             if (MatGapCalc > 0.001) {
                                 ShowSevereError(state,
                                                 format("{}: The gap width(s) for the unshaded window construction {}",
@@ -5962,10 +5934,9 @@ namespace SurfaceGeometry {
                                 ShowContinueError(state,
                                                   "for window " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                                       ", which has a between-glass shade.");
-                                ShowContinueError(state,
-                                                  format("..Material={} thickness={:.3R} -",
-                                                         s_mat->materials(MatGap)->Name,
-                                                         s_mat->materials(MatGap)->Thickness));
+                                ShowContinueError(
+                                    state,
+                                    format("..Material={} thickness={:.3R} -", s_mat->materials(MatGap)->Name, s_mat->materials(MatGap)->Thickness));
                                 ShowContinueError(state,
                                                   format("...( Material={} thickness={:.3R} +",
                                                          s_mat->materials(MatGap1)->Name,
@@ -6136,8 +6107,7 @@ namespace SurfaceGeometry {
             for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
                 LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                 if (LayerPtr == 0) continue; // Error is caught already, will terminate later
-                if (s_mat->materials(LayerPtr)->group == Material::Group::Shade ||
-                    s_mat->materials(LayerPtr)->group == Material::Group::Blind ||
+                if (s_mat->materials(LayerPtr)->group == Material::Group::Shade || s_mat->materials(LayerPtr)->group == Material::Group::Blind ||
                     s_mat->materials(LayerPtr)->group == Material::Group::Screen)
                     ++NumShades;
             }
@@ -6160,7 +6130,7 @@ namespace SurfaceGeometry {
                     LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                     auto const *mat = s_mat->materials(LayerPtr);
                     if (mat->group != Material::Group::Glass) continue;
-                    
+
                     if (dynamic_cast<Material::MaterialGlass const *>(mat)->GlassTransDirtFactor < 1.0) {
                         ShowSevereError(state, format("{}: Interior Window or GlassDoor {} has a glass layer with", cRoutineName, SubSurfaceName));
                         ShowContinueError(state, "Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
@@ -6435,15 +6405,15 @@ namespace SurfaceGeometry {
         Real64 SchedMaxValue;
 
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
             ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
         }
         s_ipsc->cCurrentModuleObject = "Shading:Zone:Detailed";
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, s_ipsc->cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
         if (NumAlphas != 3) {
-            ShowSevereError(state,
-                            format("{}: Object Definition indicates not = 3 Alpha Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, NumAlphas));
+            ShowSevereError(
+                state, format("{}: Object Definition indicates not = 3 Alpha Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, NumAlphas));
             ErrorsFound = true;
         }
 
@@ -6669,7 +6639,7 @@ namespace SurfaceGeometry {
         bool MakeFin;
 
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         if ((TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection) > 0 &&
             state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
             ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
@@ -6715,8 +6685,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::Shading;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf = false;
                 // this object references a window or door....
-                Found =
-                    Util::FindItemInList(s_ipsc->cAlphaArgs(2), state.dataSurfaceGeometry->SurfaceTmp, state.dataSurface->TotSurfaces);
+                Found = Util::FindItemInList(s_ipsc->cAlphaArgs(2), state.dataSurfaceGeometry->SurfaceTmp, state.dataSurface->TotSurfaces);
                 if (Found > 0) {
                     BaseSurfNum = state.dataSurfaceGeometry->SurfaceTmp(Found).BaseSurf;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName = state.dataSurfaceGeometry->SurfaceTmp(Found).BaseSurfName;
@@ -6785,8 +6754,7 @@ namespace SurfaceGeometry {
                     // for projection option:
                     //   N5;  \field Depth as Fraction of Window/Door Height
                     //        \units m
-                    Length = s_ipsc->rNumericArgs(3) + s_ipsc->rNumericArgs(4) +
-                             state.dataSurfaceGeometry->SurfaceTmp(Found).Width;
+                    Length = s_ipsc->rNumericArgs(3) + s_ipsc->rNumericArgs(4) + state.dataSurfaceGeometry->SurfaceTmp(Found).Width;
                     if (Item == 1) {
                         Depth = s_ipsc->rNumericArgs(5);
                     } else if (Item == 2) {
@@ -6829,8 +6797,7 @@ namespace SurfaceGeometry {
                                                     BaseSurfNum,
                                                     SurfNum,
                                                     XLLC - s_ipsc->rNumericArgs(3),
-                                                    YLLC + state.dataSurfaceGeometry->SurfaceTmp(Found).Height +
-                                                        s_ipsc->rNumericArgs(1),
+                                                    YLLC + state.dataSurfaceGeometry->SurfaceTmp(Found).Height + s_ipsc->rNumericArgs(1),
                                                     Length,
                                                     Depth);
 
@@ -6870,8 +6837,7 @@ namespace SurfaceGeometry {
                     //   N5,  \field Left Depth as Fraction of Window/Door Width
                     //        \units m
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + " Left";
-                    Length = s_ipsc->rNumericArgs(2) + s_ipsc->rNumericArgs(3) +
-                             state.dataSurfaceGeometry->SurfaceTmp(Found).Height;
+                    Length = s_ipsc->rNumericArgs(2) + s_ipsc->rNumericArgs(3) + state.dataSurfaceGeometry->SurfaceTmp(Found).Height;
                     if (Item == 3) {
                         Depth = s_ipsc->rNumericArgs(5);
                     } else if (Item == 4) {
@@ -6926,13 +6892,8 @@ namespace SurfaceGeometry {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = 4;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
 
-                        MakeRelativeRectangularVertices(state,
-                                                        BaseSurfNum,
-                                                        SurfNum,
-                                                        XLLC - s_ipsc->rNumericArgs(1),
-                                                        YLLC - s_ipsc->rNumericArgs(3),
-                                                        -Depth,
-                                                        Length);
+                        MakeRelativeRectangularVertices(
+                            state, BaseSurfNum, SurfNum, XLLC - s_ipsc->rNumericArgs(1), YLLC - s_ipsc->rNumericArgs(3), -Depth, Length);
 
                         // Reset surface to be "detached"
                         //    SurfaceTmp(SurfNum)%BaseSurfName='  '
@@ -6985,8 +6946,7 @@ namespace SurfaceGeometry {
                         state.dataSurfaceGeometry->SurfaceTmp(Found).ZoneName; // Necessary to have surface drawn in OutputReports
 
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex = 0;
-                    Length = s_ipsc->rNumericArgs(7) + s_ipsc->rNumericArgs(8) +
-                             state.dataSurfaceGeometry->SurfaceTmp(Found).Height;
+                    Length = s_ipsc->rNumericArgs(7) + s_ipsc->rNumericArgs(8) + state.dataSurfaceGeometry->SurfaceTmp(Found).Height;
                     if (Item == 3) {
                         Depth = s_ipsc->rNumericArgs(10);
                     } else if (Item == 4) {
@@ -7043,8 +7003,7 @@ namespace SurfaceGeometry {
                         MakeRelativeRectangularVertices(state,
                                                         BaseSurfNum,
                                                         SurfNum,
-                                                        XLLC + state.dataSurfaceGeometry->SurfaceTmp(Found).Width +
-                                                            s_ipsc->rNumericArgs(6),
+                                                        XLLC + state.dataSurfaceGeometry->SurfaceTmp(Found).Width + s_ipsc->rNumericArgs(6),
                                                         YLLC - s_ipsc->rNumericArgs(8),
                                                         -Depth,
                                                         Length);
@@ -7353,7 +7312,7 @@ namespace SurfaceGeometry {
 
         auto &s_ipsc = state.dataIPShortCut;
         s_ipsc->cCurrentModuleObject = "InternalMass";
-        
+
         NumIntMassSurf = 0;
         int TotIntMass = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "InternalMass");
 
@@ -7464,8 +7423,7 @@ namespace SurfaceGeometry {
             SurfNum = Util::FindItemInList(s_ipsc->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             if (SurfNum == 0) {
                 ShowWarningError(state, format("{}=\"{}\", invalid specification", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
-                ShowContinueError(state,
-                                  format(".. not found {}=\"{}\".", s_ipsc->cAlphaFieldNames(1), s_ipsc->cAlphaArgs(1)));
+                ShowContinueError(state, format(".. not found {}=\"{}\".", s_ipsc->cAlphaFieldNames(1), s_ipsc->cAlphaArgs(1)));
                 //      ErrorsFound =.TRUE.
                 continue;
             }
@@ -7478,9 +7436,10 @@ namespace SurfaceGeometry {
                       surf.Class == SurfaceClass::Overhang || surf.Class == SurfaceClass::Fin))
                     WrongSurfaceType = true;
                 if (WrongSurfaceType) {
-                    ShowSevereError(
-                        state,
-                        format("GetShadingSurfReflectanceData: {}=\"{}\", surface is not a shading surface.", s_ipsc->cCurrentModuleObject, surf.Name));
+                    ShowSevereError(state,
+                                    format("GetShadingSurfReflectanceData: {}=\"{}\", surface is not a shading surface.",
+                                           s_ipsc->cCurrentModuleObject,
+                                           surf.Name));
                     ErrorsFound = true;
                     continue;
                 }
@@ -7488,13 +7447,10 @@ namespace SurfaceGeometry {
 
             // If associated surface is a shading surface, set reflectance values
             state.dataSurface->SurfShadowGlazingFrac(SurfNum) = s_ipsc->rNumericArgs(3);
-            state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum) =
-                (1.0 - s_ipsc->rNumericArgs(3)) * s_ipsc->rNumericArgs(1);
-            state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) =
-                (1.0 - s_ipsc->rNumericArgs(3)) * s_ipsc->rNumericArgs(2);
+            state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum) = (1.0 - s_ipsc->rNumericArgs(3)) * s_ipsc->rNumericArgs(1);
+            state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) = (1.0 - s_ipsc->rNumericArgs(3)) * s_ipsc->rNumericArgs(2);
             if (s_ipsc->rNumericArgs(3) > 0.0) {
-                GlConstrNum =
-                    Util::FindItemInList(s_ipsc->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
+                GlConstrNum = Util::FindItemInList(s_ipsc->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
                 if (GlConstrNum == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", {} not found={}",
@@ -7511,13 +7467,10 @@ namespace SurfaceGeometry {
             SurfNum = Util::FindItemInList("Mir-" + s_ipsc->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             if (SurfNum == 0) continue;
             state.dataSurface->SurfShadowGlazingFrac(SurfNum) = s_ipsc->rNumericArgs(3);
-            state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum) =
-                (1.0 - s_ipsc->rNumericArgs(3)) * s_ipsc->rNumericArgs(1);
-            state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) =
-                (1.0 - s_ipsc->rNumericArgs(3)) * s_ipsc->rNumericArgs(2);
+            state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum) = (1.0 - s_ipsc->rNumericArgs(3)) * s_ipsc->rNumericArgs(1);
+            state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) = (1.0 - s_ipsc->rNumericArgs(3)) * s_ipsc->rNumericArgs(2);
             if (s_ipsc->rNumericArgs(3) > 0.0) {
-                GlConstrNum =
-                    Util::FindItemInList(s_ipsc->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
+                GlConstrNum = Util::FindItemInList(s_ipsc->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
                 if (GlConstrNum != 0) {
                     state.dataConstruction->Construct(GlConstrNum).IsUsed = true;
                 }
@@ -7607,7 +7560,8 @@ namespace SurfaceGeometry {
 
         if (MaxNumNumbers != 8) {
             ShowSevereError(
-                state, format("{}: Object Definition indicates not = 8 Number Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, MaxNumNumbers));
+                state,
+                format("{}: Object Definition indicates not = 8 Number Objects, Number Indicated={}", s_ipsc->cCurrentModuleObject, MaxNumNumbers));
             ErrorsFound = true;
         }
 
@@ -7709,8 +7663,7 @@ namespace SurfaceGeometry {
             state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs.allocate(state.dataHeatBal->ExtVentedCavity(Item).NumSurfs);
             state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs = 0;
             for (ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
-                Found = Util::FindItemInList(
-                    s_ipsc->cAlphaArgs(ThisSurf + AlphaOffset), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
+                Found = Util::FindItemInList(s_ipsc->cAlphaArgs(ThisSurf + AlphaOffset), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
                 if (Found == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}",
@@ -7756,7 +7709,8 @@ namespace SurfaceGeometry {
                     continue;
                 }
                 if (state.dataSurface->Surface(Found).ExtBoundCond != OtherSideCondModeledExt) {
-                    ShowSevereError(state, format("{}=\"{}\", is invalid", s_ipsc->cCurrentModuleObject, state.dataHeatBal->ExtVentedCavity(Item).Name));
+                    ShowSevereError(state,
+                                    format("{}=\"{}\", is invalid", s_ipsc->cCurrentModuleObject, state.dataHeatBal->ExtVentedCavity(Item).Name));
                     ShowContinueError(state,
                                       format("...because {}=\"{}\".",
                                              s_ipsc->cAlphaFieldNames(ThisSurf + AlphaOffset),
@@ -7841,10 +7795,9 @@ namespace SurfaceGeometry {
             if (state.dataHeatBal->ExtVentedCavity(Item).PlenGapThick <= 0.0) {
                 ShowSevereError(state, format("{}=\"{}\", invalid .", s_ipsc->cCurrentModuleObject, state.dataHeatBal->ExtVentedCavity(Item).Name));
                 ErrorsFound = true;
-                ShowContinueError(state,
-                                  format("...because field \"{}\" must be greater than Zero=[{:.2T}].",
-                                         s_ipsc->cNumericFieldNames(5),
-                                         s_ipsc->rNumericArgs(5)));
+                ShowContinueError(
+                    state,
+                    format("...because field \"{}\" must be greater than Zero=[{:.2T}].", s_ipsc->cNumericFieldNames(5), s_ipsc->rNumericArgs(5)));
                 continue;
             }
             state.dataHeatBal->ExtVentedCavity(Item).AreaRatio = s_ipsc->rNumericArgs(6);
@@ -7922,7 +7875,7 @@ namespace SurfaceGeometry {
         Real64 constexpr tolerance = 1e-6;
 
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         s_ipsc->cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
         int numObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
 
@@ -7948,8 +7901,8 @@ namespace SurfaceGeometry {
             }
             alpF++;
             if (state.dataSurface->Surface(Found).Class != SurfaceClass::Floor) {
-                ShowWarningError(state,
-                                 format("{}: {}, surface is not a floor surface", s_ipsc->cCurrentModuleObject, state.dataSurface->Surface(Found).Name));
+                ShowWarningError(
+                    state, format("{}: {}, surface is not a floor surface", s_ipsc->cCurrentModuleObject, state.dataSurface->Surface(Found).Name));
                 ShowContinueError(state, format("{} will not be used", s_ipsc->cCurrentModuleObject));
                 continue;
             }
@@ -7967,8 +7920,7 @@ namespace SurfaceGeometry {
 
             constexpr std::array<std::string_view, static_cast<int>(CalculationMethod::Num)> CalculationMethodUC = {
                 "TOTALEXPOSEDPERIMETER", "EXPOSEDPERIMETERFRACTION", "BYSEGMENT"};
-            CalculationMethod calculationMethod =
-                static_cast<CalculationMethod>(getEnumValue(CalculationMethodUC, s_ipsc->cAlphaArgs(alpF)));
+            CalculationMethod calculationMethod = static_cast<CalculationMethod>(getEnumValue(CalculationMethodUC, s_ipsc->cAlphaArgs(alpF)));
             if (calculationMethod != CalculationMethod::TotalExposedPerimeter && calculationMethod != CalculationMethod::ExposedPerimeterFraction &&
                 calculationMethod != CalculationMethod::Bysegment) {
                 ShowSevereError(state,
@@ -8000,10 +7952,9 @@ namespace SurfaceGeometry {
                                                  state.dataSurface->Surface(Found).Perimeter,
                                                  s_ipsc->cCurrentModuleObject,
                                                  s_ipsc->rNumericArgs(numF)));
-                        ShowContinueError(state,
-                                          format("{} will be set equal to {} perimeter",
-                                                 s_ipsc->cNumericFieldNames(numF),
-                                                 state.dataSurface->Surface(Found).Name));
+                        ShowContinueError(
+                            state,
+                            format("{} will be set equal to {} perimeter", s_ipsc->cNumericFieldNames(numF), state.dataSurface->Surface(Found).Name));
                         data.exposedFraction = 1.0;
                     }
 
@@ -8144,7 +8095,7 @@ namespace SurfaceGeometry {
         //                SurfaceProperty:LocalEnvironment
         //-----------------------------------------------------------------------
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         s_ipsc->cCurrentModuleObject = "SurfaceProperty:LocalEnvironment";
         state.dataSurface->TotSurfLocalEnv = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
 
@@ -8350,7 +8301,7 @@ namespace SurfaceGeometry {
         //                SurfaceProperty:SurroundingSurfaces
         //-----------------------------------------------------------------------
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         s_ipsc->cCurrentModuleObject = "SurfaceProperty:SurroundingSurfaces";
         TotSrdSurfProperties = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
 
@@ -8584,8 +8535,7 @@ namespace SurfaceGeometry {
             Found = Util::FindItemInList(s_ipsc->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
 
             if (Found == 0) {
-                ShowSevereError(state,
-                                format("{}=\"{}\", did not find matching surface.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}=\"{}\", did not find matching surface.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ErrorsFound = true;
             } else if (state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule ||
                        state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule) {
@@ -8597,8 +8547,7 @@ namespace SurfaceGeometry {
             }
 
             if (!s_ipsc->lAlphaFieldBlanks(2)) {
-                state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule =
-                    ScheduleManager::GetScheduleIndex(state, s_ipsc->cAlphaArgs(2));
+                state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule = ScheduleManager::GetScheduleIndex(state, s_ipsc->cAlphaArgs(2));
                 if (state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", cannot find the matching Schedule: {}=\"{}",
@@ -8613,8 +8562,7 @@ namespace SurfaceGeometry {
             }
 
             if (!s_ipsc->lAlphaFieldBlanks(3)) {
-                state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule =
-                    ScheduleManager::GetScheduleIndex(state, s_ipsc->cAlphaArgs(3));
+                state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule = ScheduleManager::GetScheduleIndex(state, s_ipsc->cAlphaArgs(3));
                 if (state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", cannot find the matching Schedule: {}=\"{}",
@@ -8637,8 +8585,7 @@ namespace SurfaceGeometry {
             if (state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule == 0 &&
                 state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule == 0) {
                 ShowSevereError(
-                    state,
-                    format("{}=\"{}\", no schedule defined for additional heat source.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                    state, format("{}=\"{}\", no schedule defined for additional heat source.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -8668,8 +8615,7 @@ namespace SurfaceGeometry {
             Found = Util::FindItemInList(s_ipsc->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
 
             if (Found == 0) {
-                ShowSevereError(state,
-                                format("{}=\"{}\", did not find matching surface.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}=\"{}\", did not find matching surface.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ErrorsFoundSingleSurf = true;
             }
 
@@ -8927,8 +8873,7 @@ namespace SurfaceGeometry {
                 Found = Util::FindItemInList(s_ipsc->cAlphaArgs(Item1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
 
                 if (Found == 0) {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", did not find matching surface.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                    ShowSevereError(state, format("{}=\"{}\", did not find matching surface.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                     ShowContinueError(state, format("Name of surface not found = \"{}\"", s_ipsc->cAlphaArgs(Item1)));
                     ErrorsFoundSurfList = true;
                 }
@@ -9962,8 +9907,8 @@ namespace SurfaceGeometry {
                                        s_ipsc->cAlphaArgs(1)));
             }
 
-            windowShadingControl.shadingControlType = static_cast<WindowShadingControlType>(
-                getEnumValue(WindowShadingControlTypeNamesUC, Util::makeUPPER(s_ipsc->cAlphaArgs(5))));
+            windowShadingControl.shadingControlType =
+                static_cast<WindowShadingControlType>(getEnumValue(WindowShadingControlTypeNamesUC, Util::makeUPPER(s_ipsc->cAlphaArgs(5))));
 
             if (windowShadingControl.ShadingDevice > 0) {
                 if (s_mat->materials(windowShadingControl.ShadingDevice)->group == Material::Group::Screen &&
@@ -9983,8 +9928,8 @@ namespace SurfaceGeometry {
             } else {
                 if (windowShadingControl.getInputShadedConstruction > 0) {
                     state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).IsUsed = true;
-                    if (s_mat->materials(state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).LayerPoint(1))
-                                ->group == Material::Group::Screen &&
+                    if (s_mat->materials(state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).LayerPoint(1))->group ==
+                            Material::Group::Screen &&
                         !(windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOn ||
                           windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOff ||
                           windowShadingControl.shadingControlType == WindowShadingControlType::OnIfScheduled)) {
@@ -10001,17 +9946,14 @@ namespace SurfaceGeometry {
                 } else if (s_ipsc->lAlphaFieldBlanks(4)) {
                     ShowSevereError(
                         state,
-                        format(
-                            "{}=\"{}\", {} is blank.", s_ipsc->cCurrentModuleObject, windowShadingControl.Name, s_ipsc->cAlphaFieldNames(4)));
+                        format("{}=\"{}\", {} is blank.", s_ipsc->cCurrentModuleObject, windowShadingControl.Name, s_ipsc->cAlphaFieldNames(4)));
                     ShowContinueError(state, "A valid construction is required.");
                     ErrorsFound = true;
                 } else {
                     ShowSevereError(
                         state,
-                        format(
-                            "{}=\"{}\", {} is invalid.", s_ipsc->cCurrentModuleObject, windowShadingControl.Name, s_ipsc->cAlphaFieldNames(4)));
-                    ShowContinueError(state,
-                                      format("Construction=\"{}\" was used. A valid construction is required.", s_ipsc->cAlphaArgs(4)));
+                        format("{}=\"{}\", {} is invalid.", s_ipsc->cCurrentModuleObject, windowShadingControl.Name, s_ipsc->cAlphaFieldNames(4)));
+                    ShowContinueError(state, format("Construction=\"{}\" was used. A valid construction is required.", s_ipsc->cAlphaArgs(4)));
                     ErrorsFound = true;
                 }
             }
@@ -10060,8 +10002,7 @@ namespace SurfaceGeometry {
 
             // For upward compatibility change old "noninsulating" and "insulating" shade types to
             // INTERIORSHADE or EXTERIORSHADE
-            if (s_ipsc->cAlphaArgs(3) == "INTERIORNONINSULATINGSHADE" ||
-                s_ipsc->cAlphaArgs(3) == "INTERIORINSULATINGSHADE") {
+            if (s_ipsc->cAlphaArgs(3) == "INTERIORNONINSULATINGSHADE" || s_ipsc->cAlphaArgs(3) == "INTERIORINSULATINGSHADE") {
                 ShowWarningError(state,
                                  format("{}=\"{}\" is using obsolete {}=\"{}\", changing to \"InteriorShade\"",
                                         s_ipsc->cCurrentModuleObject,
@@ -10071,8 +10012,7 @@ namespace SurfaceGeometry {
                 windowShadingControl.ShadingType = WinShadingType::IntShade;
                 s_ipsc->cAlphaArgs(3) = "INTERIORSHADE";
             }
-            if (s_ipsc->cAlphaArgs(3) == "EXTERIORNONINSULATINGSHADE" ||
-                s_ipsc->cAlphaArgs(3) == "EXTERIORINSULATINGSHADE") {
+            if (s_ipsc->cAlphaArgs(3) == "EXTERIORNONINSULATINGSHADE" || s_ipsc->cAlphaArgs(3) == "EXTERIORINSULATINGSHADE") {
                 ShowWarningError(state,
                                  format("{}=\"{}\" is using obsolete {}=\"{}\", changing to \"ExteriorShade\"",
                                         s_ipsc->cCurrentModuleObject,
@@ -10117,9 +10057,10 @@ namespace SurfaceGeometry {
             IShadingDevice = windowShadingControl.ShadingDevice;
 
             if (IShadedConst == 0 && IShadingDevice == 0) {
-                ShowSevereError(
-                    state,
-                    format("{}=\"{}\" has no matching shaded construction or shading device.", s_ipsc->cCurrentModuleObject, windowShadingControl.Name));
+                ShowSevereError(state,
+                                format("{}=\"{}\" has no matching shaded construction or shading device.",
+                                       s_ipsc->cCurrentModuleObject,
+                                       windowShadingControl.Name));
                 ErrorsFound = true;
             } else if (IShadedConst == 0 && IShadingDevice > 0) {
                 if (ShTyp == WinShadingType::SwitchableGlazing) {
@@ -10137,9 +10078,7 @@ namespace SurfaceGeometry {
                                            s_ipsc->cCurrentModuleObject,
                                            windowShadingControl.Name,
                                            s_ipsc->cAlphaArgs(3)));
-                    ShowContinueError(
-                        state,
-                        format("{} in error=\"{}\".", s_ipsc->cAlphaFieldNames(8), s_mat->materials(IShadingDevice)->Name));
+                    ShowContinueError(state, format("{} in error=\"{}\".", s_ipsc->cAlphaFieldNames(8), s_mat->materials(IShadingDevice)->Name));
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WinShadingType::ExtScreen) && s_mat->materials(IShadingDevice)->group != Material::Group::Screen) {
@@ -10148,9 +10087,7 @@ namespace SurfaceGeometry {
                                            s_ipsc->cCurrentModuleObject,
                                            windowShadingControl.Name,
                                            s_ipsc->cAlphaArgs(3)));
-                    ShowContinueError(
-                        state,
-                        format("{} in error=\"{}\".", s_ipsc->cAlphaFieldNames(8), s_mat->materials(IShadingDevice)->Name));
+                    ShowContinueError(state, format("{} in error=\"{}\".", s_ipsc->cAlphaFieldNames(8), s_mat->materials(IShadingDevice)->Name));
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) &&
@@ -10160,9 +10097,7 @@ namespace SurfaceGeometry {
                                            s_ipsc->cCurrentModuleObject,
                                            windowShadingControl.Name,
                                            s_ipsc->cAlphaArgs(3)));
-                    ShowContinueError(
-                        state,
-                        format("{} in error=\"{}\".", s_ipsc->cAlphaFieldNames(8), s_mat->materials(IShadingDevice)->Name));
+                    ShowContinueError(state, format("{} in error=\"{}\".", s_ipsc->cAlphaFieldNames(8), s_mat->materials(IShadingDevice)->Name));
                     ErrorsFound = true;
                 }
                 if (ShTyp == WinShadingType::BGShade || ShTyp == WinShadingType::BGBlind) {
@@ -10171,9 +10106,8 @@ namespace SurfaceGeometry {
                                            s_ipsc->cCurrentModuleObject,
                                            windowShadingControl.Name,
                                            s_ipsc->cAlphaArgs(3)));
-                    ShowContinueError(
-                        state,
-                        format("{} is specified. This is illegal. Specify shaded construction instead.", s_ipsc->cAlphaFieldNames(8)));
+                    ShowContinueError(state,
+                                      format("{} is specified. This is illegal. Specify shaded construction instead.", s_ipsc->cAlphaFieldNames(8)));
                     ErrorsFound = true;
                 }
             } else if (IShadedConst > 0 && IShadingDevice > 0) {
@@ -10184,10 +10118,8 @@ namespace SurfaceGeometry {
                                         windowShadingControl.Name,
                                         s_ipsc->cAlphaFieldNames(4),
                                         s_ipsc->cAlphaFieldNames(9)));
-                ShowContinueError(state,
-                                  format("The {}=\"{}\" will be used.",
-                                         s_ipsc->cAlphaFieldNames(4),
-                                         state.dataConstruction->Construct(IShadedConst).Name));
+                ShowContinueError(
+                    state, format("The {}=\"{}\" will be used.", s_ipsc->cAlphaFieldNames(4), state.dataConstruction->Construct(IShadedConst).Name));
             }
 
             // If type = interior or exterior shade or blind require that the shaded construction
@@ -10200,8 +10132,7 @@ namespace SurfaceGeometry {
                 if (state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers) != 0) {
                     if (windowShadingControl.ShadingType == WinShadingType::IntShade) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers);
-                        if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->group !=
-                            Material::Group::Shade) {
+                        if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->group != Material::Group::Shade) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10216,8 +10147,7 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::ExtShade) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group !=
-                            Material::Group::Shade) {
+                        if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group != Material::Group::Shade) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10232,8 +10162,7 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::ExtScreen) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group !=
-                            Material::Group::Screen) {
+                        if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group != Material::Group::Screen) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10248,8 +10177,7 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::IntBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers);
-                        if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->group !=
-                            Material::Group::Blind) {
+                        if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->group != Material::Group::Blind) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10264,8 +10192,7 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::ExtBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group !=
-                            Material::Group::Blind) {
+                        if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group != Material::Group::Blind) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10281,13 +10208,11 @@ namespace SurfaceGeometry {
                     } else if (windowShadingControl.ShadingType == WinShadingType::BGShade) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
-                            if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->group !=
-                                Material::Group::Shade)
+                            if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->group != Material::Group::Shade)
                                 BGShadeBlindError = true;
                         }
                         if (NLayers == 7) {
-                            if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->group !=
-                                Material::Group::Shade)
+                            if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->group != Material::Group::Shade)
                                 BGShadeBlindError = true;
                         }
                         if (BGShadeBlindError) {
@@ -10307,13 +10232,11 @@ namespace SurfaceGeometry {
                     } else if (windowShadingControl.ShadingType == WinShadingType::BGBlind) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
-                            if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->group !=
-                                Material::Group::Blind)
+                            if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->group != Material::Group::Blind)
                                 BGShadeBlindError = true;
                         }
                         if (NLayers == 7) {
-                            if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->group !=
-                                Material::Group::Blind)
+                            if (s_mat->materials(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->group != Material::Group::Blind)
                                 BGShadeBlindError = true;
                         }
                         if (BGShadeBlindError) {
@@ -10639,9 +10562,7 @@ namespace SurfaceGeometry {
                 if (MatNum == 0) {
                     ShowSevereError(state, format("{}=\"{}\"", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                     ShowContinueError(state,
-                                      format("{}=\"{}\" not found as storm window layer.",
-                                             s_ipsc->cAlphaFieldNames(2),
-                                             s_ipsc->cAlphaArgs(2)));
+                                      format("{}=\"{}\" not found as storm window layer.", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
                     ErrorsFound = true;
                 } else {
                     if (s_mat->materials(MatNum)->group != Material::Group::Glass) {
@@ -10673,8 +10594,7 @@ namespace SurfaceGeometry {
                      (state.dataSurface->StormWindow(StormWinNum).MonthOn < state.dataSurface->StormWindow(StormWinNum).MonthOff)) ||
                     (state.dataEnvrn->Latitude <= 0.0 &&
                      (state.dataSurface->StormWindow(StormWinNum).MonthOn > state.dataSurface->StormWindow(StormWinNum).MonthOff))) {
-                    ShowWarningError(state,
-                                     format("{}=\"{}\" check times that storm window", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                    ShowWarningError(state, format("{}=\"{}\" check times that storm window", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("is put on (month={}, day={}) and taken off (month={}, day={});",
                                              state.dataSurface->StormWindow(StormWinNum).MonthOn,
@@ -10705,7 +10625,7 @@ namespace SurfaceGeometry {
         using ScheduleManager::GetScheduleIndex;
 
         static constexpr std::string_view routineName = "GetWindowGapAirflowControlData";
-        
+
         int IOStat;               // IO Status when calling get input subroutine
         int ControlNumAlpha;      // Number of control alpha names being passed
         int ControlNumProp;       // Number of control properties being passed
@@ -10726,7 +10646,7 @@ namespace SurfaceGeometry {
         // of the shaded construction of airflow window
         auto &s_ipsc = state.dataIPShortCut;
         auto &s_mat = state.dataMaterial;
-        
+
         // Get the total number of window airflow control statements
         s_ipsc->cCurrentModuleObject = "WindowProperty:AirflowControl";
         TotWinAirflowControl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
@@ -10765,10 +10685,9 @@ namespace SurfaceGeometry {
                     if (surf.ExtBoundCond != ExternalEnvironment) WrongSurfaceType = true;
                 }
                 if (WrongSurfaceType) {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\" is not an exterior window with 2 or 3 glass layers.",
-                                           s_ipsc->cCurrentModuleObject,
-                                           s_ipsc->cAlphaArgs(1)));
+                    ShowSevereError(
+                        state,
+                        format("{}=\"{}\" is not an exterior window with 2 or 3 glass layers.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -10785,8 +10704,7 @@ namespace SurfaceGeometry {
             }
 
             // Error if illegal airflow destination
-            if (s_ipsc->cAlphaArgs(3) != "INDOORAIR" && s_ipsc->cAlphaArgs(3) != "OUTDOORAIR" &&
-                s_ipsc->cAlphaArgs(3) != "RETURNAIR") {
+            if (s_ipsc->cAlphaArgs(3) != "INDOORAIR" && s_ipsc->cAlphaArgs(3) != "OUTDOORAIR" && s_ipsc->cAlphaArgs(3) != "RETURNAIR") {
                 ErrorsFound = true;
                 ShowSevereError(state,
                                 format("{}=\"{}\" invalid {}=\"{}\"",
@@ -10906,10 +10824,9 @@ namespace SurfaceGeometry {
                                                s_ipsc->cAlphaFieldNames(3),
                                                s_ipsc->cAlphaArgs(3)));
                         if (!s_ipsc->lAlphaFieldBlanks(7))
-                            ShowContinueError(state,
-                                              format("{}=\"{}\" did not find a matching return air node.",
-                                                     s_ipsc->cAlphaFieldNames(7),
-                                                     s_ipsc->cAlphaArgs(7)));
+                            ShowContinueError(
+                                state,
+                                format("{}=\"{}\" did not find a matching return air node.", s_ipsc->cAlphaFieldNames(7), s_ipsc->cAlphaArgs(7)));
                         ShowContinueError(state,
                                           "..Airflow windows with Airflow Destination = ReturnAir must reference a controlled Zone (appear in a "
                                           "ZoneHVAC:EquipmentConnections object) with at least one return air node.");
@@ -10963,8 +10880,7 @@ namespace SurfaceGeometry {
                     MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(2);
                     if (state.dataConstruction->Construct(ConstrNum).TotGlassLayers == 3)
                         MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(4);
-                    if (dynamic_cast<Material::MaterialGasMix const *>(s_mat->materials(MatGapFlow))->gases[0].type !=
-                        Material::GasType::Air) {
+                    if (dynamic_cast<Material::MaterialGasMix const *>(s_mat->materials(MatGapFlow))->gases[0].type != Material::GasType::Air) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", Gas type not air in airflow gap of construction {}",
@@ -11013,7 +10929,7 @@ namespace SurfaceGeometry {
         int IOStat;
 
         static constexpr std::string_view routineName = "GetFoundationData";
-        
+
         auto &s_ipsc = state.dataIPShortCut;
         auto &s_mat = state.dataMaterial;
 
@@ -11120,7 +11036,7 @@ namespace SurfaceGeometry {
                 if (Util::SameString(s_ipsc->cAlphaArgs(alpF), "Hourly")) {
                     state.dataSurfaceGeometry->kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::HOURLY;
                     state.dataSurfaceGeometry->kivaManager.timestep = 3600.; // seconds
-                } else { // if (Util::SameString(s_ipsc->cAlphaArgs( alpF ), "Timestep"))
+                } else {                                                     // if (Util::SameString(s_ipsc->cAlphaArgs( alpF ), "Timestep"))
                     state.dataSurfaceGeometry->kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP;
                     state.dataSurfaceGeometry->kivaManager.timestep = state.dataGlobal->MinutesPerTimeStep * 60.;
                 }
@@ -11233,16 +11149,14 @@ namespace SurfaceGeometry {
                     if (!s_ipsc->lNumericFieldBlanks(numF)) {
                         ShowWarningError(
                             state,
-                            format(
-                                "{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
+                            format("{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
                         ShowContinueError(state, format("{} will not be used.", s_ipsc->cNumericFieldNames(numF)));
                     }
                     numF++;
                     if (!s_ipsc->lNumericFieldBlanks(numF)) {
                         ShowWarningError(
                             state,
-                            format(
-                                "{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
+                            format("{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
                         ShowContinueError(state, format("{} will not be used.", s_ipsc->cNumericFieldNames(numF)));
                     }
                     numF++;
@@ -11298,8 +11212,7 @@ namespace SurfaceGeometry {
                     if (!s_ipsc->lNumericFieldBlanks(numF)) {
                         ShowWarningError(
                             state,
-                            format(
-                                "{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
+                            format("{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
                         ShowContinueError(state, format("{} will not be used.", s_ipsc->cNumericFieldNames(numF)));
                     }
                     numF++;
@@ -11360,16 +11273,14 @@ namespace SurfaceGeometry {
                     if (!s_ipsc->lNumericFieldBlanks(numF)) {
                         ShowWarningError(
                             state,
-                            format(
-                                "{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
+                            format("{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
                         ShowContinueError(state, format("{} will not be used.", s_ipsc->cNumericFieldNames(numF)));
                     }
                     numF++;
                     if (!s_ipsc->lNumericFieldBlanks(numF)) {
                         ShowWarningError(
                             state,
-                            format(
-                                "{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
+                            format("{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
                         ShowContinueError(state, format("{} will not be used.", s_ipsc->cNumericFieldNames(numF)));
                     }
                     numF++;
@@ -11425,8 +11336,7 @@ namespace SurfaceGeometry {
                     if (!s_ipsc->lNumericFieldBlanks(numF)) {
                         ShowWarningError(
                             state,
-                            format(
-                                "{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
+                            format("{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
                         ShowContinueError(state, format("{} will not be used.", s_ipsc->cNumericFieldNames(numF)));
                     }
                     numF++;
@@ -11523,8 +11433,7 @@ namespace SurfaceGeometry {
                     if (!s_ipsc->lNumericFieldBlanks(numF)) {
                         ShowWarningError(
                             state,
-                            format(
-                                "{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
+                            format("{}=\"{}\", no {} defined", s_ipsc->cCurrentModuleObject, fndInput.name, s_ipsc->cAlphaFieldNames(alpF - 1)));
                         ShowContinueError(state, format("{} will not be used.", s_ipsc->cNumericFieldNames(numF)));
                     }
                     numF++;
@@ -11787,15 +11696,13 @@ namespace SurfaceGeometry {
 
             if (s_ipsc->rNumericArgs(1) > 0.0 && !any_ne(s_ipsc->rNumericArgs({3, 7}), 0.0) &&
                 (!state.dataSurface->OSC(OSCNum).SinusoidalConstTempCoef)) {
-                ShowSevereError(state,
-                                format("{}=\"{}\" has zeros for all coefficients.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}=\"{}\" has zeros for all coefficients.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, "...The outdoor air temperature for surfaces using this OtherSideCoefficients object will always be 0C.");
             }
 
             if (s_ipsc->rNumericArgs(1) <= 0.0 && !any_ne(s_ipsc->rNumericArgs({3, 7}), 0.0) &&
                 (!state.dataSurface->OSC(OSCNum).SinusoidalConstTempCoef)) {
-                ShowSevereError(state,
-                                format("{}=\"{}\" has zeros for all coefficients.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}=\"{}\" has zeros for all coefficients.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   "...The outside surface temperature for surfaces using this OtherSideCoefficients object will always be 0C.");
             }
@@ -12079,7 +11986,7 @@ namespace SurfaceGeometry {
 
         auto &s_ipsc = state.dataIPShortCut;
         auto &s_mat = state.dataMaterial;
-        
+
         s_ipsc->cCurrentModuleObject = "SurfaceControl:MovableInsulation";
         NMatInsul = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
         for (Loop = 1; Loop <= NMatInsul; ++Loop) {
@@ -12101,35 +12008,23 @@ namespace SurfaceGeometry {
             SchNum = GetScheduleIndex(state, s_ipsc->cAlphaArgs(4));
             InsulationType insulationType = static_cast<InsulationType>(getEnumValue(insulationTypeNamesUC, s_ipsc->cAlphaArgs(1)));
             if (insulationType == InsulationType::Invalid) {
-                ShowSevereError(state,
-                                format("{}, {}=\"{}\", invalid data.",
-                                       s_ipsc->cCurrentModuleObject,
-                                       s_ipsc->cAlphaFieldNames(2),
-                                       s_ipsc->cAlphaArgs(2)));
+                ShowSevereError(
+                    state, format("{}, {}=\"{}\", invalid data.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
                 ShowContinueError(state,
-                                  format(" invalid {}=\"{}\", [should be Inside or Outside]",
-                                         s_ipsc->cAlphaFieldNames(1),
-                                         s_ipsc->cAlphaArgs(1)));
+                                  format(" invalid {}=\"{}\", [should be Inside or Outside]", s_ipsc->cAlphaFieldNames(1), s_ipsc->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             if (SurfNum == 0) {
-                ShowSevereError(state,
-                                format("{}, {}=\"{}\", invalid data.",
-                                       s_ipsc->cCurrentModuleObject,
-                                       s_ipsc->cAlphaFieldNames(2),
-                                       s_ipsc->cAlphaArgs(2)));
+                ShowSevereError(
+                    state, format("{}, {}=\"{}\", invalid data.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
                 ShowContinueError(state, format(" invalid (not found) {}", s_ipsc->cAlphaFieldNames(2)));
                 ErrorsFound = true;
             } else {
                 if (MaterNum == 0) {
-                    ShowSevereError(state,
-                                    format("{}, {}=\"{}\", invalid data.",
-                                           s_ipsc->cCurrentModuleObject,
-                                           s_ipsc->cAlphaFieldNames(2),
-                                           s_ipsc->cAlphaArgs(2)));
-                    ShowContinueError(
+                    ShowSevereError(
                         state,
-                        format(" invalid (not found) {}=\"{}\"", s_ipsc->cAlphaFieldNames(3), s_ipsc->cAlphaArgs(3)));
+                        format("{}, {}=\"{}\", invalid data.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
+                    ShowContinueError(state, format(" invalid (not found) {}=\"{}\"", s_ipsc->cAlphaFieldNames(3), s_ipsc->cAlphaArgs(3)));
                     ErrorsFound = true;
                 } else {
 
@@ -12156,12 +12051,9 @@ namespace SurfaceGeometry {
                                                              "WindowMaterial:Gap:EquivalentLayer"});
 
                     Material::Group const MaterialLayerGroup = thisMaterial->group;
-                    if ((MaterialLayerGroup == Material::Group::GlassSimple) ||
-                        (MaterialLayerGroup == Material::Group::ShadeEQL) ||
-                        (MaterialLayerGroup == Material::Group::DrapeEQL) ||
-                        (MaterialLayerGroup == Material::Group::BlindEQL) ||
-                        (MaterialLayerGroup == Material::Group::ScreenEQL) ||
-                        (MaterialLayerGroup == Material::Group::WindowGapEQL)) {
+                    if ((MaterialLayerGroup == Material::Group::GlassSimple) || (MaterialLayerGroup == Material::Group::ShadeEQL) ||
+                        (MaterialLayerGroup == Material::Group::DrapeEQL) || (MaterialLayerGroup == Material::Group::BlindEQL) ||
+                        (MaterialLayerGroup == Material::Group::ScreenEQL) || (MaterialLayerGroup == Material::Group::WindowGapEQL)) {
                         ShowSevereError(state, format("Invalid movable insulation material for {}:", s_ipsc->cCurrentModuleObject));
                         ShowSevereError(
                             state,
@@ -12170,14 +12062,10 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     }
                     if (SchNum == 0) {
-                        ShowSevereError(state,
-                                        format("{}, {}=\"{}\", invalid data.",
-                                               s_ipsc->cCurrentModuleObject,
-                                               s_ipsc->cAlphaFieldNames(2),
-                                               s_ipsc->cAlphaArgs(2)));
-                        ShowContinueError(
+                        ShowSevereError(
                             state,
-                            format(" invalid (not found) {}=\"{}\"", s_ipsc->cAlphaFieldNames(4), s_ipsc->cAlphaArgs(4)));
+                            format("{}, {}=\"{}\", invalid data.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
+                        ShowContinueError(state, format(" invalid (not found) {}=\"{}\"", s_ipsc->cAlphaFieldNames(4), s_ipsc->cAlphaArgs(4)));
                         ErrorsFound = true;
                     } else {
                         {
@@ -12189,10 +12077,9 @@ namespace SurfaceGeometry {
                                                            s_ipsc->cCurrentModuleObject,
                                                            s_ipsc->cAlphaFieldNames(2),
                                                            s_ipsc->cAlphaArgs(2)));
-                                    ShowContinueError(
-                                        state,
-                                        format("\"Outside\", was already assigned Material=\"{}\".",
-                                               s_mat->materials(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name));
+                                    ShowContinueError(state,
+                                                      format("\"Outside\", was already assigned Material=\"{}\".",
+                                                             s_mat->materials(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name));
                                     ShowContinueError(state, format("attempting to assign Material=\"{}\".", thisMaterial->Name));
                                     ErrorsFound = true;
                                 }
@@ -12239,8 +12126,7 @@ namespace SurfaceGeometry {
                                                         s_ipsc->cAlphaArgs(2) + "\", already assigned.");
                                     ShowContinueError(state,
                                                       "\"Inside\", was already assigned Material=\"" +
-                                                          s_mat->materials(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name +
-                                                          "\".");
+                                                          s_mat->materials(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name + "\".");
                                     ShowContinueError(state, "attempting to assign Material=\"" + thisMaterial->Name + "\".");
                                     ErrorsFound = true;
                                 }
@@ -12270,11 +12156,8 @@ namespace SurfaceGeometry {
                             }
                         }
                         if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
-                            ShowSevereError(state,
-                                            format("{}, {}=\"{}\"",
-                                                   s_ipsc->cCurrentModuleObject,
-                                                   s_ipsc->cAlphaFieldNames(2),
-                                                   s_ipsc->cAlphaArgs(2)));
+                            ShowSevereError(
+                                state, format("{}, {}=\"{}\"", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
                             ShowContinueError(state, "invalid use on a Window. Use WindowShadingControl instead.");
                             ErrorsFound = true;
                         }
@@ -13751,7 +13634,7 @@ namespace SurfaceGeometry {
         //  INTEGER :: loop                            ! DO loop index
 
         auto &s_mat = state.dataMaterial;
-        
+
         ShDevName = s_mat->materials(ShDevNum)->Name;
         ConstrNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
         ConstrName = state.dataConstruction->Construct(ConstrNum).Name;
@@ -13813,7 +13696,8 @@ namespace SurfaceGeometry {
             }
             // The following InsideAbsorpThermal applies only to inside glass; it is corrected
             //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
-            thisConstructNewSh.InsideAbsorpThermal = s_mat->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld))->AbsorpThermalBack;
+            thisConstructNewSh.InsideAbsorpThermal =
+                s_mat->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld))->AbsorpThermalBack;
             thisConstructNewSh.OutsideRoughness = Material::SurfaceRoughness::VerySmooth;
             thisConstructNewSh.DayltPropPtr = 0;
             thisConstructNewSh.CTFCross.fill(0.0);
@@ -13921,8 +13805,7 @@ namespace SurfaceGeometry {
                 int MatBetweenGlassSh = 0; // Material number of between-glass shade or blind
                 if (TotLayers == 5) MatBetweenGlassSh = state.dataConstruction->Construct(curConstruction).LayerPoint(3);
                 if (state.dataConstruction->Construct(curConstruction).TotGlassLayers <= 3 &&
-                    (s_mat->materials(MatIntSh)->group == Material::Group::Shade ||
-                     s_mat->materials(MatIntSh)->group == Material::Group::Blind))
+                    (s_mat->materials(MatIntSh)->group == Material::Group::Shade || s_mat->materials(MatIntSh)->group == Material::Group::Blind))
                     ShAndSt = true;
                 if (MatBetweenGlassSh > 0) {
                     if (s_mat->materials(MatBetweenGlassSh)->group == Material::Group::Shade ||
@@ -13951,7 +13834,7 @@ namespace SurfaceGeometry {
     int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string_view namePrefix)
     {
         auto &s_mat = state.dataMaterial;
-            
+
         int mmDistance = int(1000 * distance); // Thickness of air gap in mm (usually between storm window and rest of window)
         std::string MatNameStAir = format("{}{}MM", namePrefix, mmDistance); // Name of created air layer material
         int matNum = Material::GetMaterialNum(state, MatNameStAir);
@@ -13961,11 +13844,11 @@ namespace SurfaceGeometry {
         auto *mat = new Material::MaterialGasMix;
         mat->Name = MatNameStAir;
         mat->group = Material::Group::Gas;
-        
+
         s_mat->materials.push_back(mat);
         mat->Num = s_mat->materials.isize();
         s_mat->materialMap.insert_or_assign(Util::makeUPPER(mat->Name), mat->Num);
-        
+
         mat->Roughness = Material::SurfaceRoughness::MediumRough;
         mat->Conductivity = 0.0;
         mat->Density = 0.0;
@@ -14748,7 +14631,7 @@ namespace SurfaceGeometry {
         // get user input...
 
         auto &s_ipsc = state.dataIPShortCut;
-        
+
         if (state.dataSurfaceGeometry->firstTime) {
             if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -14767,8 +14650,7 @@ namespace SurfaceGeometry {
                 NewAspectRatio = rNumerics(2);
                 transformPlane = cAlphas(1);
                 if (transformPlane != "XY") {
-                    ShowWarningError(
-                        state, format("{}: invalid {}=\"{}...ignored.", CurrentModuleObject, s_ipsc->cAlphaFieldNames(1), cAlphas(1)));
+                    ShowWarningError(state, format("{}: invalid {}=\"{}...ignored.", CurrentModuleObject, s_ipsc->cAlphaFieldNames(1), cAlphas(1)));
                 }
                 state.dataSurfaceGeometry->firstTime = false;
                 state.dataSurfaceGeometry->noTransform = false;
@@ -15025,14 +14907,8 @@ namespace SurfaceGeometry {
             s_ipsc->cCurrentModuleObject = "SolarCollector:FlatPlate:Water";
             for (CollectorNum = 1; CollectorNum <= NumOfFlatPlateUnits; ++CollectorNum) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                         s_ipsc->cCurrentModuleObject,
-                                                                         CollectorNum,
-                                                                         s_ipsc->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         s_ipsc->rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus);
+                state.dataInputProcessing->inputProcessor->getObjectItem(
+                    state, s_ipsc->cCurrentModuleObject, CollectorNum, s_ipsc->cAlphaArgs, NumAlphas, s_ipsc->rNumericArgs, NumNumbers, IOStatus);
 
                 TmpCandidateSurfaceNames(CollectorNum) = s_ipsc->cAlphaArgs(3);
                 TmpCandidateICSBCTypeNames(CollectorNum) = "";
@@ -15043,14 +14919,8 @@ namespace SurfaceGeometry {
             s_ipsc->cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
             for (PVTnum = 1; PVTnum <= NumPVTs; ++PVTnum) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                         s_ipsc->cCurrentModuleObject,
-                                                                         PVTnum,
-                                                                         s_ipsc->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         s_ipsc->rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus);
+                state.dataInputProcessing->inputProcessor->getObjectItem(
+                    state, s_ipsc->cCurrentModuleObject, PVTnum, s_ipsc->cAlphaArgs, NumAlphas, s_ipsc->rNumericArgs, NumNumbers, IOStatus);
 
                 TmpCandidateSurfaceNames(NumOfFlatPlateUnits + PVTnum) = s_ipsc->cAlphaArgs(2);
             }
@@ -15059,14 +14929,8 @@ namespace SurfaceGeometry {
         if (NumPVs > 0) {
             s_ipsc->cCurrentModuleObject = "Generator:Photovoltaic";
             for (PVnum = 1; PVnum <= NumPVs; ++PVnum) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                         s_ipsc->cCurrentModuleObject,
-                                                                         PVnum,
-                                                                         s_ipsc->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         s_ipsc->rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus);
+                state.dataInputProcessing->inputProcessor->getObjectItem(
+                    state, s_ipsc->cCurrentModuleObject, PVnum, s_ipsc->cAlphaArgs, NumAlphas, s_ipsc->rNumericArgs, NumNumbers, IOStatus);
                 TmpCandidateSurfaceNames(NumOfFlatPlateUnits + NumPVTs + PVnum) = s_ipsc->cAlphaArgs(2);
             }
         }
@@ -15074,14 +14938,8 @@ namespace SurfaceGeometry {
         if (NumOfICSUnits > 0) {
             s_ipsc->cCurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
             for (CollectorNum = 1; CollectorNum <= NumOfICSUnits; ++CollectorNum) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                         s_ipsc->cCurrentModuleObject,
-                                                                         CollectorNum,
-                                                                         s_ipsc->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         s_ipsc->rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus);
+                state.dataInputProcessing->inputProcessor->getObjectItem(
+                    state, s_ipsc->cCurrentModuleObject, CollectorNum, s_ipsc->cAlphaArgs, NumAlphas, s_ipsc->rNumericArgs, NumNumbers, IOStatus);
                 TmpCandidateSurfaceNames(NumOfFlatPlateUnits + NumPVTs + NumPVs + CollectorNum) = s_ipsc->cAlphaArgs(3);
                 TmpCandidateICSSurfaceNames(NumOfFlatPlateUnits + CollectorNum) = s_ipsc->cAlphaArgs(3);
                 TmpCandidateICSBCTypeNames(NumOfFlatPlateUnits + CollectorNum) = s_ipsc->cAlphaArgs(4);
@@ -15874,7 +15732,7 @@ namespace SurfaceGeometry {
                 auto const *matGlassRev = dynamic_cast<Material::MaterialGlass const *>(matRev);
                 assert(matGlass != nullptr);
                 assert(matGlassRev != nullptr);
-                    
+
                 // Both layers are window glass, so need to check to see if the properties are reversed
                 if ((abs(matGlass->Thickness - matGlassRev->Thickness) > SmallDiff) ||
                     (abs(matGlass->ReflectSolBeamBack - matGlassRev->ReflectSolBeamFront) > SmallDiff) ||
@@ -15896,7 +15754,7 @@ namespace SurfaceGeometry {
             } else if ((mat->group == Material::Group::GlassEQL) && (matRev->group == Material::Group::GlassEQL)) {
                 auto const *matGlass = dynamic_cast<Material::MaterialGlassEQL const *>(mat);
                 auto const *matGlassRev = dynamic_cast<Material::MaterialGlassEQL const *>(matRev);
-                    
+
                 if ((abs(matGlass->TAR.Sol.Bk.Bm[0].BmTra - matGlassRev->TAR.Sol.Ft.Bm[0].BmTra) > SmallDiff) ||
                     (abs(matGlass->TAR.Sol.Ft.Bm[0].BmTra - matGlassRev->TAR.Sol.Bk.Bm[0].BmTra) > SmallDiff) ||
                     (abs(matGlass->TAR.Sol.Bk.Bm[0].BmRef - matGlassRev->TAR.Sol.Ft.Bm[0].BmRef) > SmallDiff) ||

@@ -216,11 +216,10 @@ namespace HeatRecovery {
                                                    EconomizerFlag,
                                                    HighHumCtrlFlag);
         } break;
-                
+
         default: {
             assert(false);
         } break;
-                
         }
 
         thisExch.UpdateHeatRecovery(state);

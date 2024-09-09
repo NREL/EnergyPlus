@@ -349,7 +349,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
     // This routine checks some properties of entered constructions; sets some properties; and sets
     // an error flag for certain error conditions.
     auto &s_mat = state.dataMaterial;
-        
+
     auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
     int TotLayers = thisConstruct.TotLayers;                // Number of layers in a construction
     if (TotLayers == 0) return;                             // error condition, hopefully caught elsewhere
@@ -389,17 +389,15 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         if (MaterNum == 0) continue; // error -- has been caught will stop program later
         auto const *mat = s_mat->materials(MaterNum);
         thisConstruct.TypeIsWindow =
-            (mat->group == Material::Group::Glass || mat->group == Material::Group::Gas ||
-             mat->group == Material::Group::GasMixture || mat->group == Material::Group::Shade ||
-             mat->group == Material::Group::Blind || mat->group == Material::Group::Screen ||
+            (mat->group == Material::Group::Glass || mat->group == Material::Group::Gas || mat->group == Material::Group::GasMixture ||
+             mat->group == Material::Group::Shade || mat->group == Material::Group::Blind || mat->group == Material::Group::Screen ||
              mat->group == Material::Group::GlassSimple || mat->group == Material::Group::ComplexShade ||
-             mat->group == Material::Group::ComplexWindowGap || mat->group == Material::Group::GlassEQL ||
-             mat->group == Material::Group::ShadeEQL || mat->group == Material::Group::DrapeEQL ||
-             mat->group == Material::Group::ScreenEQL || mat->group == Material::Group::BlindEQL ||
+             mat->group == Material::Group::ComplexWindowGap || mat->group == Material::Group::GlassEQL || mat->group == Material::Group::ShadeEQL ||
+             mat->group == Material::Group::DrapeEQL || mat->group == Material::Group::ScreenEQL || mat->group == Material::Group::BlindEQL ||
              mat->group == Material::Group::WindowGapEQL);
-        bool TypeIsNotWindow = (mat->group == Material::Group::Invalid || mat->group == Material::Group::AirGap ||
-                                mat->group == Material::Group::Regular || mat->group == Material::Group::EcoRoof ||
-                                mat->group == Material::Group::IRTransparent);
+        bool TypeIsNotWindow =
+            (mat->group == Material::Group::Invalid || mat->group == Material::Group::AirGap || mat->group == Material::Group::Regular ||
+             mat->group == Material::Group::EcoRoof || mat->group == Material::Group::IRTransparent);
         if (!thisConstruct.TypeIsWindow && !TypeIsNotWindow) assert(false);
     }
 
@@ -418,9 +416,8 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
             auto const *mat = s_mat->materials(MaterNum);
             WrongMaterialsMix =
-                !((mat->group == Material::Group::Glass) || (mat->group == Material::Group::Gas) ||
-                  (mat->group == Material::Group::GasMixture) || (mat->group == Material::Group::Shade) ||
-                  (mat->group == Material::Group::Blind) || (mat->group == Material::Group::Screen) ||
+                !((mat->group == Material::Group::Glass) || (mat->group == Material::Group::Gas) || (mat->group == Material::Group::GasMixture) ||
+                  (mat->group == Material::Group::Shade) || (mat->group == Material::Group::Blind) || (mat->group == Material::Group::Screen) ||
                   (mat->group == Material::Group::GlassSimple) || (mat->group == Material::Group::ComplexShade) ||
                   (mat->group == Material::Group::ComplexWindowGap) || (mat->group == Material::Group::GlassEQL) ||
                   (mat->group == Material::Group::ShadeEQL) || (mat->group == Material::Group::DrapeEQL) ||
@@ -446,9 +443,8 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         } else if (TotLayers == 1) {
             auto const *mat = s_mat->materials(thisConstruct.LayerPoint(1));
             Material::Group matGroup = mat->group;
-            if ((matGroup == Material::Group::Shade) || (matGroup == Material::Group::Gas) ||
-                (matGroup == Material::Group::GasMixture) || (matGroup == Material::Group::Blind) ||
-                (matGroup == Material::Group::Screen) || (matGroup == Material::Group::ComplexShade) ||
+            if ((matGroup == Material::Group::Shade) || (matGroup == Material::Group::Gas) || (matGroup == Material::Group::GasMixture) ||
+                (matGroup == Material::Group::Blind) || (matGroup == Material::Group::Screen) || (matGroup == Material::Group::ComplexShade) ||
                 (matGroup == Material::Group::ComplexWindowGap)) {
                 ShowSevereError(state,
                                 format("CheckAndSetConstructionProperties: The single-layer window construction={} has a gas, complex gap, shade, "
@@ -470,11 +466,10 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             auto const *mat = s_mat->materials(MaterNum);
             if (mat->group == Material::Group::Glass) ++TotGlassLayers;
             if (mat->group == Material::Group::GlassSimple) ++TotGlassLayers;
-            if (mat->group == Material::Group::Shade || mat->group == Material::Group::Blind ||
-                mat->group == Material::Group::Screen || mat->group == Material::Group::ComplexShade)
+            if (mat->group == Material::Group::Shade || mat->group == Material::Group::Blind || mat->group == Material::Group::Screen ||
+                mat->group == Material::Group::ComplexShade)
                 ++TotShadeLayers;
-            if (mat->group == Material::Group::Gas || mat->group == Material::Group::GasMixture ||
-                mat->group == Material::Group::ComplexWindowGap)
+            if (mat->group == Material::Group::Gas || mat->group == Material::Group::GasMixture || mat->group == Material::Group::ComplexWindowGap)
                 ++TotGasLayers;
             if (Layer < TotLayers) {
                 int const MaterNumNext = thisConstruct.LayerPoint(Layer + 1);
@@ -548,10 +543,9 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
 
         // Consistency checks for a construction with a between-glass shade or blind
 
-        if (TotShadeLayers == 1 && matOutside->group != Material::Group::Shade &&
-            matOutside->group != Material::Group::Blind && matOutside->group != Material::Group::Screen &&
-            matInside->group != Material::Group::Shade && matInside->group != Material::Group::Blind &&
-            matInside->group != Material::Group::ComplexShade && !WrongWindowLayering) {
+        if (TotShadeLayers == 1 && matOutside->group != Material::Group::Shade && matOutside->group != Material::Group::Blind &&
+            matOutside->group != Material::Group::Screen && matInside->group != Material::Group::Shade &&
+            matInside->group != Material::Group::Blind && matInside->group != Material::Group::ComplexShade && !WrongWindowLayering) {
 
             // This is a construction with a between-glass shade or blind
 
@@ -601,8 +595,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                     auto const *matSh = s_mat->materials(MatSh);
                     // For double pane, shade/blind must be layer #3.
                     // For triple pane, it must be layer #5 (i.e., between two inner panes).
-                    if (matSh->group != Material::Group::Shade && matSh->group != Material::Group::Blind)
-                        WrongWindowLayering = true;
+                    if (matSh->group != Material::Group::Shade && matSh->group != Material::Group::Blind) WrongWindowLayering = true;
                     if (TotLayers != 2 * TotGlassLayers + 1) WrongWindowLayering = true;
                     if (!WrongWindowLayering) {
                         // Gas on either side of a between-glass shade/blind must be the same
@@ -611,8 +604,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                         auto const *matGapL = dynamic_cast<const Material::MaterialGasMix *>(s_mat->materials(MatGapL));
                         auto const *matGapR = dynamic_cast<const Material::MaterialGasMix *>(s_mat->materials(MatGapR));
                         for (int IGas = 0; IGas < Material::maxMixGases; ++IGas) {
-                            if ((matGapL->gases[IGas].type != matGapR->gases[IGas].type) ||
-                                (matGapL->gasFracts[IGas] != matGapR->gasFracts[IGas]))
+                            if ((matGapL->gases[IGas].type != matGapR->gases[IGas].type) || (matGapL->gasFracts[IGas] != matGapR->gasFracts[IGas]))
                                 WrongWindowLayering = true;
                         }
                         // Gap width on either side of a between-glass shade/blind must be the same
@@ -626,11 +618,11 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                                 ShowContinueError(state, "the slat width of the between-glass blind is greater than");
                                 ShowContinueError(state, "the sum of the widths of the gas layers adjacent to the blind.");
                             }
-                        }     // End of check if material is window blind
-                    }         // End of check if WrongWindowLayering
-                }             // End of check if WrongWindowLayering
-            }                 // End of check on total glass layers
-        }                     // End of check if construction has between-glass shade/blind
+                        } // End of check if material is window blind
+                    }     // End of check if WrongWindowLayering
+                }         // End of check if WrongWindowLayering
+            }             // End of check on total glass layers
+        }                 // End of check if construction has between-glass shade/blind
 
         // Check Simple Windows,
         if (s_mat->materials(thisConstruct.LayerPoint(1))->group == Material::Group::GlassSimple) {
@@ -694,8 +686,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             thisConstruct.InsideAbsorpSolar = thisInsideMaterial->AbsorpSolar;
         }
 
-        if ((matOutside->group == Material::Group::Glass) ||
-            (matOutside->group == Material::Group::GlassSimple)) { // Glass
+        if ((matOutside->group == Material::Group::Glass) || (matOutside->group == Material::Group::GlassSimple)) { // Glass
             thisConstruct.OutsideAbsorpThermal = matOutside->AbsorpThermalFront;
         } else { // Exterior shade, blind or screen
             thisConstruct.OutsideAbsorpThermal = matOutside->AbsorpThermal;
@@ -952,7 +943,7 @@ void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state)
     int MaterNum(0);    // construction material index
 
     auto &s_mat = state.dataMaterial;
-    
+
     for (loopSurfNum = 1; loopSurfNum <= state.dataSurface->TotSurfaces; ++loopSurfNum) {
 
         if (state.dataSurface->Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;

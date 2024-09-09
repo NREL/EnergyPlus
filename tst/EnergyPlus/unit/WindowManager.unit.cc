@@ -3080,7 +3080,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     auto &s_mat = state->dataMaterial;
     auto const *matComplexShade = dynamic_cast<Material::MaterialComplexShade const *>(s_mat->materials(1));
     assert(matComplexShade != nullptr);
-    
+
     EXPECT_EQ(matComplexShade->Name, "SHADE_14_LAYER");
     EXPECT_ENUM_EQ(matComplexShade->LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ);
     EXPECT_NEAR(matComplexShade->Thickness, 1.016000e-003, 1e-5);

@@ -154,7 +154,7 @@ namespace HeatBalFiniteDiffManager {
         auto &s_ipsc = state.dataIPShortCut;
         auto &s_hbfd = state.dataHeatBalFiniteDiffMgr;
         auto &s_mat = state.dataMaterial;
-        
+
         // user settings for numerical parameters
         s_ipsc->cCurrentModuleObject = "HeatBalanceSettings:ConductionFiniteDifference";
 
@@ -162,17 +162,17 @@ namespace HeatBalFiniteDiffManager {
             int NumAlphas;
             int NumNumbers;
             s_ip->getObjectItem(state,
-                              s_ipsc->cCurrentModuleObject,
-                              1,
-                              s_ipsc->cAlphaArgs,
-                              NumAlphas,
-                              s_ipsc->rNumericArgs,
-                              NumNumbers,
-                              IOStat,
-                              s_ipsc->lNumericFieldBlanks,
-                              s_ipsc->lAlphaFieldBlanks,
-                              s_ipsc->cAlphaFieldNames,
-                              s_ipsc->cNumericFieldNames);
+                                s_ipsc->cCurrentModuleObject,
+                                1,
+                                s_ipsc->cAlphaArgs,
+                                NumAlphas,
+                                s_ipsc->rNumericArgs,
+                                NumNumbers,
+                                IOStat,
+                                s_ipsc->lNumericFieldBlanks,
+                                s_ipsc->lAlphaFieldBlanks,
+                                s_ipsc->cAlphaFieldNames,
+                                s_ipsc->cNumericFieldNames);
 
             if (!s_ipsc->lAlphaFieldBlanks(1)) {
                 {
@@ -219,17 +219,17 @@ namespace HeatBalFiniteDiffManager {
 
                 // Call Input Get routine to retrieve material data
                 s_ip->getObjectItem(state,
-                                  s_ipsc->cCurrentModuleObject,
-                                  Loop,
-                                  MaterialNames,
-                                  MaterialNumAlpha,
-                                  MaterialProps,
-                                  MaterialNumProp,
-                                  IOStat,
-                                  s_ipsc->lNumericFieldBlanks,
-                                  s_ipsc->lAlphaFieldBlanks,
-                                  s_ipsc->cAlphaFieldNames,
-                                  s_ipsc->cNumericFieldNames);
+                                    s_ipsc->cCurrentModuleObject,
+                                    Loop,
+                                    MaterialNames,
+                                    MaterialNumAlpha,
+                                    MaterialProps,
+                                    MaterialNumProp,
+                                    IOStat,
+                                    s_ipsc->lNumericFieldBlanks,
+                                    s_ipsc->lAlphaFieldBlanks,
+                                    s_ipsc->cAlphaFieldNames,
+                                    s_ipsc->cNumericFieldNames);
 
                 // Load the material derived type from the input data.
                 ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, MaterialNames(1)};
@@ -286,9 +286,8 @@ namespace HeatBalFiniteDiffManager {
                                     format("GetCondFDInput: {}=\"{}\", non increasing Temperatures. Temperatures must be strictly increasing.",
                                            s_ipsc->cCurrentModuleObject,
                                            MaterialNames(1)));
-                    ShowContinueError(
-                        state,
-                        format("...occurs first at item=[{}], value=[{:.2R}].", fmt::to_string(inegptr), matFD.TempEnth(1, inegptr)));
+                    ShowContinueError(state,
+                                      format("...occurs first at item=[{}], value=[{:.2R}].", fmt::to_string(inegptr), matFD.TempEnth(1, inegptr)));
                     ErrorsFound = true;
                 }
                 nonInc = false;
@@ -300,9 +299,9 @@ namespace HeatBalFiniteDiffManager {
                     break;
                 }
                 if (nonInc) {
-                    ShowSevereError(state, format("GetCondFDInput: {}=\"{}\", non increasing Enthalpy.", s_ipsc->cCurrentModuleObject, MaterialNames(1)));
-                    ShowContinueError(state,
-                                      format("...occurs first at item=[{}], value=[{:.2R}].", inegptr, matFD.TempEnth(2, inegptr)));
+                    ShowSevereError(state,
+                                    format("GetCondFDInput: {}=\"{}\", non increasing Enthalpy.", s_ipsc->cCurrentModuleObject, MaterialNames(1)));
+                    ShowContinueError(state, format("...occurs first at item=[{}], value=[{:.2R}].", inegptr, matFD.TempEnth(2, inegptr)));
                     ShowContinueError(state, "...These values may be Cp (Specific Heat) rather than Enthalpy.  Please correct.");
                     ErrorsFound = true;
                 }
@@ -311,7 +310,7 @@ namespace HeatBalFiniteDiffManager {
         //   Get CondFD Variable Thermal Conductivity Input
 
         s_ipsc->cCurrentModuleObject = "MaterialProperty:VariableThermalConductivity"; // Variable Thermal Conductivity Info next
-        if (vcMat != 0) {                                                      //  variable k info
+        if (vcMat != 0) {                                                              //  variable k info
             //    CondFDVariableProperties = .TRUE.
             for (int Loop = 1; Loop <= vcMat; ++Loop) {
 
@@ -339,7 +338,7 @@ namespace HeatBalFiniteDiffManager {
                 }
 
                 auto *mat = s_mat->materials(matNum);
-                
+
                 if (mat->group != Material::Group::Regular) {
                     ShowSevereError(state,
                                     format("{}: Reference Material is not appropriate type for CondFD properties, material={}, must have regular "
@@ -356,8 +355,7 @@ namespace HeatBalFiniteDiffManager {
                 matFD.numTempCond = MaterialNumProp / 2;
                 if (matFD.numTempCond * 2 != MaterialNumProp) {
                     ShowSevereError(state, format("GetCondFDInput: {}=\"{}\", mismatched pairs", s_ipsc->cCurrentModuleObject, MaterialNames(1)));
-                    ShowContinueError(
-                        state, format("...expected {} pairs, but only entered {} numbers.", matFD.numTempCond, MaterialNumProp));
+                    ShowContinueError(state, format("...expected {} pairs, but only entered {} numbers.", matFD.numTempCond, MaterialNumProp));
                     ErrorsFound = true;
                 }
                 matFD.TempCond.dimension(2, matFD.numTempCond, 0.0);
@@ -386,8 +384,7 @@ namespace HeatBalFiniteDiffManager {
                                     format("GetCondFDInput: {}=\"{}\", non increasing Temperatures. Temperatures must be strictly increasing.",
                                            s_ipsc->cCurrentModuleObject,
                                            MaterialNames(1)));
-                    ShowContinueError(state,
-                                      format("...occurs first at item=[{}], value=[{:.2R}].", inegptr, matFD.TempCond(1, inegptr)));
+                    ShowContinueError(state, format("...occurs first at item=[{}], value=[{:.2R}].", inegptr, matFD.TempCond(1, inegptr)));
                     ErrorsFound = true;
                 }
             }
@@ -419,7 +416,7 @@ namespace HeatBalFiniteDiffManager {
         int maxTotalProps = 0;
 
         auto &s_ip = state.dataInputProcessing->inputProcessor;
-        
+
         s_ip->getObjectDefMaxArgs(state, "MaterialProperty:PhaseChange", numArgs, numAlphas, numNumerics);
         maxTotalProps = max(maxTotalProps, numNumerics);
 
@@ -445,7 +442,7 @@ namespace HeatBalFiniteDiffManager {
         bool ErrorsFound;
 
         auto &s_hbfd = state.dataHeatBalFiniteDiffMgr;
-        
+
         if (s_hbfd->GetHBFiniteDiffInputFlag) {
             // Obtains conduction FD related parameters from input file
             GetCondFDInput(state);
@@ -656,7 +653,7 @@ namespace HeatBalFiniteDiffManager {
                     thisConstructFD.Thickness(Layer) = mat->Thickness;
 
                     SigmaR(ConstrNum) += mat->Resistance; // add resistance of R layer
-                    SigmaC(ConstrNum) += 0.0;                      //  no capacitance for R layer
+                    SigmaC(ConstrNum) += 0.0;             //  no capacitance for R layer
 
                     Alpha = kt / (mat->Density * mat->SpecHeat);
 
@@ -678,7 +675,7 @@ namespace HeatBalFiniteDiffManager {
                     thisConstructFD.Thickness(Layer) = mat->Thickness;
 
                     SigmaR(ConstrNum) += mat->Resistance; // add resistance of R layer
-                    SigmaC(ConstrNum) += 0.0;                      //  no capacitance for R layer
+                    SigmaC(ConstrNum) += 0.0;             //  no capacitance for R layer
 
                     Alpha = kt / (mat->Density * mat->SpecHeat);
                     mAlpha = 0.0;
@@ -727,8 +724,8 @@ namespace HeatBalFiniteDiffManager {
                             ShowContinueError(
                                 state, format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
                             if (mat->Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
-                                ShowContinueError(
-                                    state, format("Material may be too thin to be modeled well, thickness = {:.5R} [m]", mat->Thickness));
+                                ShowContinueError(state,
+                                                  format("Material may be too thin to be modeled well, thickness = {:.5R} [m]", mat->Thickness));
                                 ShowContinueError(state,
                                                   format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
                                                          DataHeatBalance::ThinMaterialLayerThreshold));
@@ -1002,14 +999,14 @@ namespace HeatBalFiniteDiffManager {
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change State {}", node),
                                     Constant::Units::None,
-                                    (int&)SurfaceFD(SurfNum).PhaseChangeStateRep(node),
+                                    (int &)SurfaceFD(SurfNum).PhaseChangeStateRep(node),
                                     OutputProcessor::TimeStepType::Zone,
                                     OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Previous State {}", node),
                                     Constant::Units::None,
-                                    (int&)SurfaceFD(SurfNum).PhaseChangeStateOldRep(node),
+                                    (int &)SurfaceFD(SurfNum).PhaseChangeStateOldRep(node),
                                     OutputProcessor::TimeStepType::Zone,
                                     OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
@@ -1125,7 +1122,7 @@ namespace HeatBalFiniteDiffManager {
 
         auto &s_hbfd = state.dataHeatBalFiniteDiffMgr;
         auto &constructFD = s_hbfd->ConstructFD(ConstrNum);
-        
+
         int const TotNodes = constructFD.TotNodes;
         int const TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
 
@@ -1142,10 +1139,10 @@ namespace HeatBalFiniteDiffManager {
         // Start stepping through the slab with time.
         for (int J = 1, J_end = nint(state.dataGlobal->TimeStepZoneSec / Delt); J <= J_end; ++J) { // PT testing higher time steps
 
-            int GSiter;                                                                       // iteration counter for implicit repeat calculation
+            int GSiter;                                               // iteration counter for implicit repeat calculation
             for (GSiter = 1; GSiter <= s_hbfd->MaxGSiter; ++GSiter) { //  Iterate implicit equations
-                surfaceFD.TDTLast = surfaceFD.TDT;                                            // Save last iteration's TDT (New temperature) values
-                surfaceFD.EnthLast = surfaceFD.EnthNew;                                       // Last iterations new enthalpy value
+                surfaceFD.TDTLast = surfaceFD.TDT;                    // Save last iteration's TDT (New temperature) values
+                surfaceFD.EnthLast = surfaceFD.EnthNew;               // Last iterations new enthalpy value
 
                 // Original loop version
                 int i(1);                                    //  Node counter
@@ -1265,8 +1262,7 @@ namespace HeatBalFiniteDiffManager {
                       surfaceFD.PhaseChangeState(I) == Material::Phase::Transition) ||
                      (surfaceFD.PhaseChangeStateOld(I) == Material::Phase::Transition &&
                       surfaceFD.PhaseChangeState(I) == Material::Phase::Freezing)) ||
-                    ((surfaceFD.PhaseChangeStateOld(I) == Material::Phase::Melting &&
-                      surfaceFD.PhaseChangeState(I) == Material::Phase::Transition) ||
+                    ((surfaceFD.PhaseChangeStateOld(I) == Material::Phase::Melting && surfaceFD.PhaseChangeState(I) == Material::Phase::Transition) ||
                      (surfaceFD.PhaseChangeStateOld(I) == Material::Phase::Transition &&
                       surfaceFD.PhaseChangeState(I) == Material::Phase::Melting))) {
                     surfaceFD.PhaseChangeTemperatureReverse(I) = surfaceFD.TDT(I);
@@ -1550,7 +1546,7 @@ namespace HeatBalFiniteDiffManager {
 
             int const ext_bound_construction(state.dataSurface->Surface(surface_ExtBoundCond).Construction);
             int const LayIn(state.dataConstruction->Construct(ext_bound_construction).TotLayers); // layer number for call to interior eqs
-            int const NodeIn(s_hbfd->ConstructFD(ext_bound_construction).TotNodes + 1);                   // node number "I" for call to interior eqs
+            int const NodeIn(s_hbfd->ConstructFD(ext_bound_construction).TotNodes + 1);           // node number "I" for call to interior eqs
             int const TotNodesPlusOne(TotNodes + 1);
             if (surface_ExtBoundCond == Surf) { // adiabatic surface, PT added since it is not the same as interzone wall
                 // as Outside Boundary Condition Object can be left blank.
@@ -1803,7 +1799,7 @@ namespace HeatBalFiniteDiffManager {
         int const ConstrNum(state.dataSurface->Surface(Surf).Construction);
 
         auto &s_hbfd = state.dataHeatBalFiniteDiffMgr;
-        
+
         int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
         auto *mat = state.dataMaterial->materials(MatLay);
         auto const &matFD = s_hbfd->MaterialFD(MatLay);
@@ -2103,7 +2099,7 @@ namespace HeatBalFiniteDiffManager {
 
                     CheckFDNodeTempLimits(state, SurfNum, i, TDT_i);
 
-                    surfFD.CpDelXRhoS1(i) = 0.0; //  - rlayer has no capacitance, so this is zero
+                    surfFD.CpDelXRhoS1(i) = 0.0;                         //  - rlayer has no capacitance, so this is zero
                     surfFD.CpDelXRhoS2(i) = (Cp2 * Delx2 * RhoS2) / 2.0; // Save this for computing node flux values
 
                 } else if (!RLayerPresent && RLayer2Present) { // R-layer second
@@ -2153,8 +2149,8 @@ namespace HeatBalFiniteDiffManager {
 
                     CheckFDNodeTempLimits(state, SurfNum, i, TDT_i);
 
-                    surfFD.CpDelXRhoS1(i) = (Cp1 * Delx1 * RhoS1) / 2.0;  // Save this for computing node flux values
-                    surfFD.CpDelXRhoS2(i) = 0.0; //  - rlayer has no capacitance, so this is zero
+                    surfFD.CpDelXRhoS1(i) = (Cp1 * Delx1 * RhoS1) / 2.0; // Save this for computing node flux values
+                    surfFD.CpDelXRhoS2(i) = 0.0;                         //  - rlayer has no capacitance, so this is zero
 
                 } else { // Regular or Phase Change on both sides of interface
 
@@ -2249,8 +2245,7 @@ namespace HeatBalFiniteDiffManager {
                         TDT_i = (2.0 * Delt_Delx1 * Delx2 * QSSFlux + (Cp_fac - Delt_sum) * TD_i + Delt_Delx1_kt2 * (TD(i + 1) + TDT_p) +
                                  Delt_Delx2_kt1 * (TD(i - 1) + TDT_m)) /
                                 (Delt_sum + Cp_fac);
-                    } else if (s_hbfd->CondFDSchemeType ==
-                               CondFDScheme::FullyImplicitFirstOrder) { // First order adams moulton
+                    } else if (s_hbfd->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) { // First order adams moulton
                         TDT_i = (2.0 * (Delt_Delx1 * Delx2 * QSSFlux + Delt_Delx2_kt1 * TDT_m + Delt_Delx1_kt2 * TDT_p) + Cp_fac * TD_i) /
                                 (2.0 * (Delt_Delx2_kt1 + Delt_Delx1_kt2) + Cp_fac);
                     }
@@ -2308,7 +2303,7 @@ namespace HeatBalFiniteDiffManager {
         // Calculate the heat transfer at the node on the surfaces inside face (facing zone)
 
         auto &s_hbfd = state.dataHeatBalFiniteDiffMgr;
-            
+
         auto const &surface(state.dataSurface->Surface(SurfNum));
         auto &surfFD = s_hbfd->SurfaceFD(SurfNum);
         int const ConstrNum(surface.Construction);
@@ -2376,9 +2371,9 @@ namespace HeatBalFiniteDiffManager {
                 auto const &matFD_TempEnth(matFD.TempEnth);
                 assert(matFD_TempEnth.u2() >= 3);
                 Real64 const lTE(matFD_TempEnth.index(2, 1));
-                if (mat->hasPCM) { 
-                   auto *matPC = dynamic_cast<Material::MaterialPhaseChange *>(mat);
-                   adjustPropertiesForPhaseChange(state, i, SurfNum, matPC, TD_i, TDT_i, Cp, RhoS, kt);
+                if (mat->hasPCM) {
+                    auto *matPC = dynamic_cast<Material::MaterialPhaseChange *>(mat);
+                    adjustPropertiesForPhaseChange(state, i, SurfNum, matPC, TD_i, TDT_i, Cp, RhoS, kt);
                 } else if (matFD_TempEnth[lTE] + matFD_TempEnth[lTE + 1] + matFD_TempEnth[lTE + 2] >=
                            0.0) {                                     // Phase change material: Use TempEnth data
                     EnthOld(i) = terpld(matFD_TempEnth, TD_i, 1, 2);  // 1: Temperature, 2: Enthalpy
@@ -2407,13 +2402,12 @@ namespace HeatBalFiniteDiffManager {
                 Real64 const Two_Delt_DelX(2.0 * Delt_DelX);
                 Real64 const Delt_kt(Delt * kt);
                 Real64 const Cp_DelX2_RhoS(Cp * pow_2(DelX) * RhoS);
-                if ((surface.ExtBoundCond > 0) && (i == 1)) { // this is for an adiabatic or interzone partition
+                if ((surface.ExtBoundCond > 0) && (i == 1)) {                                  // this is for an adiabatic or interzone partition
                     if (s_hbfd->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) { // Adams-Moulton second order
                         TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + (Cp_DelX2_RhoS - Delt_DelX * hconvi - Delt_kt) * TD_i +
                                  Delt_kt * (TD(i + 1) + TDT(i + 1))) /
                                 (Delt_DelX * hconvi + Delt_kt + Cp_DelX2_RhoS);
-                    } else if (s_hbfd->CondFDSchemeType ==
-                               CondFDScheme::FullyImplicitFirstOrder) { // Adams-Moulton First order
+                    } else if (s_hbfd->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) { // Adams-Moulton First order
                         Real64 const Two_Delt_kt(2.0 * Delt_kt);
                         TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT(i + 1)) /
                                 (Two_Delt_DelX * hconvi + Two_Delt_kt + Cp_DelX2_RhoS);
@@ -2430,7 +2424,7 @@ namespace HeatBalFiniteDiffManager {
                     }
                 }
                 surfFD.CpDelXRhoS1(i) = (Cp * DelX * RhoS) / 2.0; // Save this for computing node flux values
-                surfFD.CpDelXRhoS2(i) = 0.0; // Inside face  does not have an inner half node
+                surfFD.CpDelXRhoS2(i) = 0.0;                      // Inside face  does not have an inner half node
 
             } // Regular or R layer
 
@@ -2463,7 +2457,7 @@ namespace HeatBalFiniteDiffManager {
         // METHODOLOGY EMPLOYED:
         // Use methodology similar to HBSurfaceManager
         auto &s_hbfd = state.dataHeatBalFiniteDiffMgr;
-            
+
         int ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
 
         if (state.dataGlobal->WarmupFlag) ++s_hbfd->WarmupSurfTemp;
@@ -2585,7 +2579,7 @@ namespace HeatBalFiniteDiffManager {
     )
     {
         auto &s_hbfd = state.dataHeatBalFiniteDiffMgr;
-            
+
         auto &surfFD = s_hbfd->SurfaceFD(surfNum);
         auto &surfName = state.dataSurface->Surface(surfNum).Name;
         auto &minTempLimit = DataHeatBalSurface::MinSurfaceTempLimit;
@@ -2597,14 +2591,8 @@ namespace HeatBalFiniteDiffManager {
                 ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError(state, format("Value has been reset to the lower limit value of {:.2R}.", minTempLimit));
             }
-            ShowRecurringSevereErrorAtEnd(state,
-                                          "Node temperature (low) out of bounds for surface=" + surfName,
-                                          surfFD.indexNodeMinTempLimit,
-                                          nodeTemp,
-                                          nodeTemp,
-                                          _,
-                                          "C",
-                                          "C");
+            ShowRecurringSevereErrorAtEnd(
+                state, "Node temperature (low) out of bounds for surface=" + surfName, surfFD.indexNodeMinTempLimit, nodeTemp, nodeTemp, _, "C", "C");
             nodeTemp = minTempLimit;
         } else if (nodeTemp > maxTempLimit) {
             if (surfFD.indexNodeMaxTempLimit == 0) {
@@ -2626,7 +2614,7 @@ namespace HeatBalFiniteDiffManager {
     }
 
     void CalcNodeHeatFlux(EnergyPlusData &state,
-                          int const SurfNum,    // surface number
+                          int const SurfNum, // surface number
                           int const TotNodes // number of nodes in surface
     )
     {
@@ -2662,12 +2650,10 @@ namespace HeatBalFiniteDiffManager {
             } else {
                 sourceFlux = 0.0;
             }
-            interNodeFlux = surfFD.QDreport(node + 1) + surfFD.CpDelXRhoS1(node + 1) *
-                                                               (surfFD.TDT(node + 1) - surfFD.TDpriortimestep(node + 1)) /
-                                                               state.dataGlobal->TimeStepZoneSec;
-            surfFD.QDreport(node) =
-                interNodeFlux - sourceFlux +
-                surfFD.CpDelXRhoS2(node) * (surfFD.TDT(node) - surfFD.TDpriortimestep(node)) / state.dataGlobal->TimeStepZoneSec;
+            interNodeFlux = surfFD.QDreport(node + 1) + surfFD.CpDelXRhoS1(node + 1) * (surfFD.TDT(node + 1) - surfFD.TDpriortimestep(node + 1)) /
+                                                            state.dataGlobal->TimeStepZoneSec;
+            surfFD.QDreport(node) = interNodeFlux - sourceFlux +
+                                    surfFD.CpDelXRhoS2(node) * (surfFD.TDT(node) - surfFD.TDpriortimestep(node)) / state.dataGlobal->TimeStepZoneSec;
         }
         if (state.dataEnvrn->IsRain)
             state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum) = -surfFD.QDreport(1); // Update the outside flux if it is raining
@@ -2685,13 +2671,12 @@ namespace HeatBalFiniteDiffManager {
     {
         auto &s_hbfd = state.dataHeatBalFiniteDiffMgr;
         auto &surfFD = s_hbfd->SurfaceFD(surfNum);
-            
-        updatedSpecificHeat = mat->getCurrentSpecificHeat(
-            temperaturePrevious,
-            temperatureUpdated,
-            surfFD.PhaseChangeTemperatureReverse(finiteDifferenceLayerIndex),
-            surfFD.PhaseChangeStateOld(finiteDifferenceLayerIndex),
-            surfFD.PhaseChangeState(finiteDifferenceLayerIndex));
+
+        updatedSpecificHeat = mat->getCurrentSpecificHeat(temperaturePrevious,
+                                                          temperatureUpdated,
+                                                          surfFD.PhaseChangeTemperatureReverse(finiteDifferenceLayerIndex),
+                                                          surfFD.PhaseChangeStateOld(finiteDifferenceLayerIndex),
+                                                          surfFD.PhaseChangeState(finiteDifferenceLayerIndex));
 
         surfFD.PhaseChangeStateRep(finiteDifferenceLayerIndex) = Material::phaseInts[(int)surfFD.PhaseChangeState(finiteDifferenceLayerIndex)];
         updatedDensity = mat->getDensity(temperaturePrevious);

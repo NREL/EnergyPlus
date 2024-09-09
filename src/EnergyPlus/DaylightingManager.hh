@@ -525,7 +525,7 @@ struct DaylightingData : BaseGlobalStruct
     // J = 1 for bare window, 2 - 12 for shaded;
     // K = sun position index.
     std::array<Dayltg::Illums, (int)Constant::HoursInDay + 1> horIllum = {
-        Dayltg::Illums()};             // Horizontal illuminance from sky, by sky type, for each hour of the day
+        Dayltg::Illums()}; // Horizontal illuminance from sky, by sky type, for each hour of the day
     Array1D<std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num>> dirIllum;  // Sky-related component of direct illuminance
     Array1D<std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num>> reflIllum; // Sky-related portion of internally reflected illuminance
     Array1D<std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num>> winLum;    // Sky-related window luminance

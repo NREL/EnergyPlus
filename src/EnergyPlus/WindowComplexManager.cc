@@ -2861,7 +2861,7 @@ namespace WindowComplexManager {
             if ((mat->group == Material::Group::Glass) || (mat->group == Material::Group::GlassSimple)) {
                 auto const *matGlass = dynamic_cast<Material::MaterialGlass const *>(mat);
                 assert(matGlass != nullptr);
-                
+
                 ++IGlass;
                 LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
                 thick(IGlass) = matGlass->Thickness;
@@ -2898,7 +2898,7 @@ namespace WindowComplexManager {
                 SlatCond(IGlass) = matShade->SlatConductivity;
                 SlatSpacing(IGlass) = matShade->SlatSpacing;
                 SlatCurve(IGlass) = matShade->SlatCurve;
-                
+
             } else if (mat->group == Material::Group::ComplexWindowGap) {
                 auto const *matGap = dynamic_cast<Material::MaterialComplexWindowGap const *>(mat);
                 ++IGap;

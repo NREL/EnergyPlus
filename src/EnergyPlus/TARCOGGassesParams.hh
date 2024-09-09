@@ -67,7 +67,7 @@ enum class Stdrd
 };
 
 static constexpr std::array<std::string_view, (int)Stdrd::Num> stdrdNamesUC = {"ISO15099", "EN673DECLARED", "EN673DESIGN"};
-        
+
 int constexpr MinStandard = static_cast<int>(Stdrd::ISO15099);    // minimum index for standard
 int constexpr MaxStandard = static_cast<int>(Stdrd::EN673Design); // maximum index for standard
 

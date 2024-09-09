@@ -64,26 +64,12 @@ namespace EnergyPlus::TARCOGParams {
 // Module which contains common TARCOG parameters and constants
 
 constexpr std::array<std::string_view, (int)TARCOGLayerType::Num> layerTypeNamesUC = {
-    "SPECULAR",
-    "VENETIANHORIZONTAL",
-    "WOVEN",
-    "PERFORATED",
-    "OTHERSHADINGTYPE",
-    "BSDF",
-    "VENETIANVERTICAL"
-};
+    "SPECULAR", "VENETIANHORIZONTAL", "WOVEN", "PERFORATED", "OTHERSHADINGTYPE", "BSDF", "VENETIANVERTICAL"};
 
-constexpr std::array<std::string_view, (int)TARCOGThermalModel::Num> thermalModelNamesUC = {        
-    "ISO15099",
-    "SCALEDCAVITYWIDTH",
-    "CONVECTIVESCALARMODEL_NOSDTHICKNESS",
-    "CONVECTIVESCALARMODEL_WITHSDTHICKNESS"
-};
+constexpr std::array<std::string_view, (int)TARCOGThermalModel::Num> thermalModelNamesUC = {
+    "ISO15099", "SCALEDCAVITYWIDTH", "CONVECTIVESCALARMODEL_NOSDTHICKNESS", "CONVECTIVESCALARMODEL_WITHSDTHICKNESS"};
 
 constexpr std::array<std::string_view, (int)DeflectionCalculation::Num> deflectionCalculationNamesUC = {
-    "NODEFLECTION",
-    "TEMPERATUREANDPRESSUREINPUT",
-    "MEASUREDDEFLECTION"
-};
-        
+    "NODEFLECTION", "TEMPERATUREANDPRESSUREINPUT", "MEASUREDDEFLECTION"};
+
 } // namespace EnergyPlus::TARCOGParams

@@ -1943,9 +1943,8 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     // Commonly used routine in several places in EnergyPlus which examines if current
     // construction is glazing construction
     const Material::Group group = state.dataMaterial->materials(LayerPoint(1))->group;
-    return (group == Material::Group::Glass) || (group == Material::Group::Shade) ||
-           (group == Material::Group::Screen) || (group == Material::Group::Blind) ||
-           (group == Material::Group::GlassSimple);
+    return (group == Material::Group::Glass) || (group == Material::Group::Shade) || (group == Material::Group::Screen) ||
+           (group == Material::Group::Blind) || (group == Material::Group::GlassSimple);
 }
 
 Real64 ConstructionProps::setThicknessPerpendicular(EnergyPlusData &state, Real64 userValue)

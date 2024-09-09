@@ -55,24 +55,13 @@ namespace EnergyPlus {
 namespace Window {
 
     constexpr std::array<std::string_view, (int)OpticalDataModel::Num> opticalDataModelNames = {
-        "SpectralAverage",
-        "Spectral",
-        "BSDF",
-        "SpectralAndAngle"
-    };
+        "SpectralAverage", "Spectral", "BSDF", "SpectralAndAngle"};
 
     constexpr std::array<std::string_view, (int)OpticalDataModel::Num> opticalDataModelNamesUC = {
-        "SPECTRALAVERAGE",
-        "SPECTRAL",
-        "BSDF",
-        "SPECTRALANDANGLE"
-    };
+        "SPECTRALAVERAGE", "SPECTRAL", "BSDF", "SPECTRALANDANGLE"};
 
-    constexpr std::array<std::string_view, (int)WindowsModel::Num> windowsModelNamesUC = {
-        "BUILTINWINDOWSMODEL",
-        "EXTERNALWINDOWSMODEL"      
-    };
-        
+    constexpr std::array<std::string_view, (int)WindowsModel::Num> windowsModelNamesUC = {"BUILTINWINDOWSMODEL", "EXTERNALWINDOWSMODEL"};
+
     /////////////////////////////////////////////////////////////////////////////////////////
     //  CWindowModel
     /////////////////////////////////////////////////////////////////////////////////////////

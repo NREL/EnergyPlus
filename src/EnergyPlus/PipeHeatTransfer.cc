@@ -210,7 +210,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     using ScheduleManager::GetScheduleIndex;
 
     static constexpr std::string_view routineName = "GetPipeHeatTransfer";
-    
+
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr NumPipeSections(20);
     int constexpr NumberOfDepthNodes(8); // Number of nodes in the cartesian grid-Should be an even # for now
@@ -316,19 +316,13 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        TestCompSet(state,
-                    s_ipsc->cCurrentModuleObject,
-                    s_ipsc->cAlphaArgs(1),
-                    s_ipsc->cAlphaArgs(3),
-                    s_ipsc->cAlphaArgs(4),
-                    "Pipe Nodes");
+        TestCompSet(state, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1), s_ipsc->cAlphaArgs(3), s_ipsc->cAlphaArgs(4), "Pipe Nodes");
 
         // get environmental boundary condition type
 
         if (s_ipsc->lAlphaFieldBlanks(5)) s_ipsc->cAlphaArgs(5) = "ZONE";
 
-        PipeIndoorBoundaryType indoorType =
-            static_cast<PipeIndoorBoundaryType>(getEnumValue(pipeIndoorBoundaryTypeNamesUC, s_ipsc->cAlphaArgs(5)));
+        PipeIndoorBoundaryType indoorType = static_cast<PipeIndoorBoundaryType>(getEnumValue(pipeIndoorBoundaryTypeNamesUC, s_ipsc->cAlphaArgs(5)));
         switch (indoorType) {
         case PipeIndoorBoundaryType::Zone:
             state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ZoneEnv;
@@ -368,10 +362,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         // dimensions
         state.dataPipeHT->PipeHT(Item).PipeID = s_ipsc->rNumericArgs(1);
         if (s_ipsc->rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("GetPipesHeatTransfer: invalid {} of {:.4R}",
-                                   s_ipsc->cNumericFieldNames(1),
-                                   s_ipsc->rNumericArgs(1)));
+            ShowSevereError(state, format("GetPipesHeatTransfer: invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
             ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(1)));
             ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
 
@@ -380,10 +371,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         state.dataPipeHT->PipeHT(Item).Length = s_ipsc->rNumericArgs(2);
         if (s_ipsc->rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("GetPipesHeatTransfer: invalid {} of {:.4R}",
-                                   s_ipsc->cNumericFieldNames(2),
-                                   s_ipsc->rNumericArgs(2)));
+            ShowSevereError(state, format("GetPipesHeatTransfer: invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
             ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(2)));
             ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
@@ -470,12 +458,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        TestCompSet(state,
-                    s_ipsc->cCurrentModuleObject,
-                    s_ipsc->cAlphaArgs(1),
-                    s_ipsc->cAlphaArgs(3),
-                    s_ipsc->cAlphaArgs(4),
-                    "Pipe Nodes");
+        TestCompSet(state, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1), s_ipsc->cAlphaArgs(3), s_ipsc->cAlphaArgs(4), "Pipe Nodes");
 
         // get environmental boundary condition type
         //    PipeHT(Item)%Environment = 'OutdoorAir'
@@ -508,8 +491,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         // dimensions
         state.dataPipeHT->PipeHT(Item).PipeID = s_ipsc->rNumericArgs(1);
         if (s_ipsc->rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
+            ShowSevereError(state, format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
             ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(1)));
             ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
@@ -517,8 +499,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         state.dataPipeHT->PipeHT(Item).Length = s_ipsc->rNumericArgs(2);
         if (s_ipsc->rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
+            ShowSevereError(state, format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
             ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(2)));
             ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
@@ -553,7 +534,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                                  s_ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
-        
+
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPipeHT->PipeHTUniqueNames,
                                                  s_ipsc->cAlphaArgs(1),
@@ -607,12 +588,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        TestCompSet(state,
-                    s_ipsc->cCurrentModuleObject,
-                    s_ipsc->cAlphaArgs(1),
-                    s_ipsc->cAlphaArgs(3),
-                    s_ipsc->cAlphaArgs(4),
-                    "Pipe Nodes");
+        TestCompSet(state, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1), s_ipsc->cAlphaArgs(3), s_ipsc->cAlphaArgs(4), "Pipe Nodes");
 
         state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::GroundEnv;
 
@@ -631,8 +607,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         // dimensions
         state.dataPipeHT->PipeHT(Item).PipeID = s_ipsc->rNumericArgs(1);
         if (s_ipsc->rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
+            ShowSevereError(state, format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
             ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(1)));
             ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
@@ -640,8 +615,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         state.dataPipeHT->PipeHT(Item).Length = s_ipsc->rNumericArgs(2);
         if (s_ipsc->rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
+            ShowSevereError(state, format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
             ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(2)));
             ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
@@ -690,8 +664,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         }
 
         // Get ground temperature model
-        state.dataPipeHT->PipeHT(Item).groundTempModel =
-            GetGroundTempModelAndInit(state, s_ipsc->cAlphaArgs(7), s_ipsc->cAlphaArgs(8));
+        state.dataPipeHT->PipeHT(Item).groundTempModel = GetGroundTempModelAndInit(state, s_ipsc->cAlphaArgs(7), s_ipsc->cAlphaArgs(8));
 
         // Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
         state.dataPipeHT->PipeHT(Item).NumSections = NumPipeSections;
@@ -863,13 +836,13 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
     Real64 TotThickness = 0.0;
 
     auto &s_mat = state.dataMaterial;
-    
+
     // CTF stuff
     int TotalLayers = state.dataConstruction->Construct(ConstructionNum).TotLayers;
     // get pipe properties
     if (TotalLayers == 1) { // no insulation layer
         auto const *mat = s_mat->materials(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1));
-            
+
         this->PipeConductivity = mat->Conductivity;
         this->PipeDensity = mat->Density;
         this->PipeCp = mat->SpecHeat;

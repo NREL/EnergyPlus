@@ -70,7 +70,7 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulation)
 {
     auto &s_mat = state->dataMaterial;
-    
+
     int SurfNum = 1;
     state->dataSurface->Surface.allocate(SurfNum);
     state->dataSurface->SurfSchedMovInsulExt.allocate(SurfNum);
@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
 
     delete mat1;
     s_mat->materials.clear();
-    
+
     state->dataHeatBalSurf->SurfAbsSolarExt(1) = 0.0;
     auto *mat2 = new Material::MaterialGlass;
     s_mat->materials.push_back(mat2);
@@ -129,7 +129,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
 
     delete mat2;
     s_mat->materials.clear();
-    
+
     state->dataHeatBalSurf->SurfAbsSolarExt(1) = 0.0;
 
     auto *mat3 = new Material::MaterialGlassEQL;
@@ -336,10 +336,10 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     state->dataSurface->Surface(1) = state->dataSurfaceGeometry->SurfaceTmp(1);
     SurfaceGeometry::GetMovableInsulationData(*state, ErrorsFound);
     // check movable insulation material
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");            // base surface name
-    EXPECT_EQ(state->dataSurface->SurfMaterialMovInsulExt(1), 4);                                  // index to movable insulation material
-    EXPECT_EQ(state->dataMaterial->materials(4)->Name, "SIMPLEGLAZINGSYSTEM");                      // name of movable insulation material
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");     // base surface name
+    EXPECT_EQ(state->dataSurface->SurfMaterialMovInsulExt(1), 4);                           // index to movable insulation material
+    EXPECT_EQ(state->dataMaterial->materials(4)->Name, "SIMPLEGLAZINGSYSTEM");              // name of movable insulation material
     EXPECT_ENUM_EQ(state->dataMaterial->materials(4)->group, Material::Group::GlassSimple); // invalid material group type
-    EXPECT_TRUE(ErrorsFound);                                                                      // error found due to invalid material
+    EXPECT_TRUE(ErrorsFound);                                                               // error found due to invalid material
 }
 } // namespace EnergyPlus

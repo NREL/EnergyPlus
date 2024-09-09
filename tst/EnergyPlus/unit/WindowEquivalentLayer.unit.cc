@@ -539,7 +539,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
             break;
         }
     }
-    
+
     // get venetian blind material index
     int VBMatNum = Material::GetMaterialNum(*state, "VBU8D6+45SW1");
     auto const *matVenetBlind = dynamic_cast<Material::MaterialBlindEQL const *>(state->dataMaterial->materials(VBMatNum));

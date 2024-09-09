@@ -265,7 +265,7 @@ namespace HeatBalanceManager {
 
         Material::GetMaterialData(state, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
-        Material::GetHysteresisData(state, ErrorsFound); 
+        Material::GetHysteresisData(state, ErrorsFound);
 
         GetFrameAndDividerData(state);
 
@@ -1357,13 +1357,13 @@ namespace HeatBalanceManager {
         int TotWindow5Constructs; // Number of constructions from Window5 data file
         bool ConstructionFound;   // True if input window construction name is found in the
         //  Window5 data file
-        bool EOFonW5File;                   // True if EOF encountered reading Window5 data file
+        bool EOFonW5File; // True if EOF encountered reading Window5 data file
 
         Array1D_string WConstructNames;
 
         auto &s_ipsc = state.dataIPShortCut;
         auto &s_mat = state.dataMaterial;
-        
+
         // Get the Total number of Constructions from the input
         TotRegConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction");
         int totAirBoundaryConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:AirBoundary");
@@ -1439,7 +1439,7 @@ namespace HeatBalanceManager {
                                                                      s_ipsc->cNumericFieldNames);
 
             ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, ConstructAlphas(1)};
-            
+
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          ConstructAlphas(0),
@@ -1477,13 +1477,11 @@ namespace HeatBalanceManager {
                 } else if (mat->group == Material::Group::GlassEQL || mat->group == Material::Group::ShadeEQL ||
                            mat->group == Material::Group::DrapeEQL || mat->group == Material::Group::BlindEQL ||
                            mat->group == Material::Group::ScreenEQL || mat->group == Material::Group::WindowGapEQL) {
-                    ShowSevereError(
-                                    state,
-                                    format("Invalid material layer type in window {} = {}", s_ipsc->cCurrentModuleObject, thisConstruct.Name));
+                    ShowSevereError(state, format("Invalid material layer type in window {} = {}", s_ipsc->cCurrentModuleObject, thisConstruct.Name));
                     ShowContinueError(
-                                      state,
-                                      format("Equivalent Layer material type = {} is allowed only in Construction:WindowEquivalentLayer window object.",
-                                             ConstructAlphas(Layer)));
+                        state,
+                        format("Equivalent Layer material type = {} is allowed only in Construction:WindowEquivalentLayer window object.",
+                               ConstructAlphas(Layer)));
                     ErrorsFound = true;
                     continue;
                 } else if (mat->group == Material::Group::GlassTCParent) {
@@ -1491,7 +1489,7 @@ namespace HeatBalanceManager {
                     // reset layer pointer to the first glazing in the TC GlazingGroup
                     auto const *matGlassTC = dynamic_cast<Material::MaterialGlassTC const *>(mat);
                     assert(matGlassTC != nullptr);
-                    
+
                     thisConstruct.LayerPoint(Layer) = matGlassTC->matRefs(1).matNum;
                     thisConstruct.isTCWindow = true;
                     thisConstruct.isTCMaster = true;
@@ -1681,12 +1679,9 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     auto const *mat = s_mat->materials(state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer));
-                    if (!((mat->group == Material::Group::GlassEQL) ||
-                          (mat->group == Material::Group::ShadeEQL) ||
-                          (mat->group == Material::Group::DrapeEQL) ||
-                          (mat->group == Material::Group::BlindEQL) ||
-                          (mat->group == Material::Group::ScreenEQL) ||
-                          (mat->group == Material::Group::WindowGapEQL))) {
+                    if (!((mat->group == Material::Group::GlassEQL) || (mat->group == Material::Group::ShadeEQL) ||
+                          (mat->group == Material::Group::DrapeEQL) || (mat->group == Material::Group::BlindEQL) ||
+                          (mat->group == Material::Group::ScreenEQL) || (mat->group == Material::Group::WindowGapEQL))) {
                         ShowSevereError(state,
                                         format("Invalid material layer type in window {} = {}",
                                                state.dataHeatBalMgr->CurrentModuleObject,
@@ -2147,9 +2142,9 @@ namespace HeatBalanceManager {
             auto const *mat = s_mat->materials(Constr.LayerPoint(Constr.TotLayers));
             bool withNoncompatibleShades =
                 (mat->group == Material::Group::Shade || mat->group == Material::Group::Blind || mat->group == Material::Group::Screen ||
-                 mat->group == Material::Group::GlassEQL || mat->group == Material::Group::WindowGapEQL ||
-                 mat->group == Material::Group::ShadeEQL || mat->group == Material::Group::DrapeEQL ||
-                 mat->group == Material::Group::ScreenEQL || mat->group == Material::Group::BlindEQL || Surf.HasShadeControl);
+                 mat->group == Material::Group::GlassEQL || mat->group == Material::Group::WindowGapEQL || mat->group == Material::Group::ShadeEQL ||
+                 mat->group == Material::Group::DrapeEQL || mat->group == Material::Group::ScreenEQL || mat->group == Material::Group::BlindEQL ||
+                 Surf.HasShadeControl);
             if (withNoncompatibleShades) {
                 ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
                 ErrorsFound = true;
@@ -3625,7 +3620,7 @@ namespace HeatBalanceManager {
         int IGlass;    // Glass layer counter
         int IGap;      // Gap counter
         //  INTEGER            :: ICoeff              ! Gas property coefficient counter
-        int IGlSys;   // Glazing system counter
+        int IGlSys;                   // Glazing system counter
         int FrDivNum;                 // FrameDivider number
         Array1D<Real64> WinHeight(2); // Height, width for glazing system (m)
         Array1D<Real64> WinWidth(2);
@@ -4011,7 +4006,7 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 NGaps(IGlSys) = NGlass(IGlSys) - 1;
             }
-            
+
             // Glass objects
             NextLine = W5DataFile.readLine();
             if (NextLine.eof) goto Label1000;
@@ -4020,13 +4015,13 @@ namespace HeatBalanceManager {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     auto *mat = new Material::MaterialGlass;
                     mat->group = Material::Group::Glass;
-                    mat->Name = (NGlSys == 1) ? format("W5:{}:GLASS{}", DesiredConstructionName, NumName(IGlass)) :
-                            format("W5:{}:{}:GLASS{}", DesiredConstructionName, NumName(IGlSys), NumName(IGlass));
+                    mat->Name = (NGlSys == 1) ? format("W5:{}:GLASS{}", DesiredConstructionName, NumName(IGlass))
+                                              : format("W5:{}:{}:GLASS{}", DesiredConstructionName, NumName(IGlSys), NumName(IGlass));
 
                     s_mat->materials.push_back(mat);
                     mat->Num = s_mat->materials.isize();
                     s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
-                    
+
                     MaterNumSysGlass(IGlass, IGlSys) = mat->Num;
 
                     NextLine = W5DataFile.readLine();
@@ -4070,12 +4065,12 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
                     auto *matGas = new Material::MaterialGasMix;
-                    matGas->Name = (NGlSys == 1) ? format("W5:{}:GAP{}", DesiredConstructionName, NumName(IGap)) :
-                            format("W5:{}:{}:GAP{}", DesiredConstructionName, NumName(IGlSys), NumName(IGap));
+                    matGas->Name = (NGlSys == 1) ? format("W5:{}:GAP{}", DesiredConstructionName, NumName(IGap))
+                                                 : format("W5:{}:{}:GAP{}", DesiredConstructionName, NumName(IGlSys), NumName(IGap));
                     s_mat->materials.push_back(matGas);
                     matGas->Num = s_mat->materials.isize();
                     s_mat->materialMap.insert_or_assign(matGas->Name, matGas->Num);
-                    
+
                     MaterNumSysGap(IGap, IGlSys) = matGas->Num;
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
@@ -5176,13 +5171,13 @@ namespace HeatBalanceManager {
         // This subroutine only gets called once in the GetHeatBalanceInput subroutine
         //  after materials, constructions and building geometry data are read.
         auto &s_mat = state.dataMaterial;
-            
+
         int NumNewConst = 0;
         for (int Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
             auto &constr = state.dataConstruction->Construct(Loop);
-                
+
             if (!constr.isTCMaster) continue;
-            
+
             auto const *matGlassTC = dynamic_cast<Material::MaterialGlassTC const *>(s_mat->materials(constr.TCMasterMatNum));
             assert(matGlassTC != nullptr);
             NumNewConst += matGlassTC->numMatRefs;
@@ -5201,7 +5196,7 @@ namespace HeatBalanceManager {
         for (int Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
             auto &constr = state.dataConstruction->Construct(Loop);
             if (!constr.isTCMaster) continue;
-            
+
             auto const *matGlassTC = dynamic_cast<Material::MaterialGlassTC *>(s_mat->materials(constr.TCMasterMatNum));
             assert(matGlassTC != nullptr);
 
@@ -5217,22 +5212,20 @@ namespace HeatBalanceManager {
                 auto &constrNew = state.dataConstruction->Construct(NumNewConst);
 
                 constrNew = constr; // This should be a deep copy
-                constrNew.Name =  format("{}_TC_{:.0R}", constr.Name, matGlassTC->matRefs(iTC).specTemp);
+                constrNew.Name = format("{}_TC_{:.0R}", constr.Name, matGlassTC->matRefs(iTC).specTemp);
                 constrNew.LayerPoint(constrNew.TCLayerNum) = matGlassTC->matRefs(iTC).matNum;
                 constrNew.specTemp = matGlassTC->matRefs(iTC).specTemp;
-                
+
                 constrNew.isTCWindow = true;
                 constrNew.isTCMaster = false;
                 constrNew.TCMasterConstrNum = Loop;
-                
+
                 constr.TCChildConstrs(iTC).specTemp = matGlassTC->matRefs(iTC).specTemp;
                 constr.TCChildConstrs(iTC).constrNum = NumNewConst;
-
             }
         }
         state.dataHeatBal->TotConstructs = NumNewConst;
     }
-
 
     void SetupComplexFenestrationStateInput(EnergyPlusData &state,
                                             int &ConstrNum, // num of construction items thus far
@@ -5281,7 +5274,7 @@ namespace HeatBalanceManager {
 
         auto &s_ipsc = state.dataIPShortCut;
         auto &s_mat = state.dataMaterial;
-        
+
         // Reading WindowThermalModel:Params
         s_ipsc->cCurrentModuleObject = "WindowThermalModel:Params";
         state.dataBSDFWindow->TotThermalModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
@@ -5308,38 +5301,40 @@ namespace HeatBalanceManager {
 
             windowThermalModel.SDScalar = s_ipsc->rNumericArgs(1);
             if ((s_ipsc->rNumericArgs(1) < 0.0) || (s_ipsc->rNumericArgs(1) > 1.0)) {
-                ShowSevereCustomMessage(state, eoh,
+                ShowSevereCustomMessage(
+                    state,
+                    eoh,
                     format("{} should be >= 0.0 and <= 1.0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
                 ErrorsFound = true;
             }
 
-            windowThermalModel.CalculationStandard = static_cast<TARCOGGassesParams::Stdrd>(
-                getEnumValue(TARCOGGassesParams::stdrdNamesUC, s_ipsc->cAlphaArgs(2)));
-            windowThermalModel.ThermalModel = static_cast<TARCOGParams::TARCOGThermalModel>(
-                getEnumValue(TARCOGParams::thermalModelNamesUC, s_ipsc->cAlphaArgs(3)));
-            windowThermalModel.DeflectionModel = static_cast<TARCOGParams::DeflectionCalculation>(
-                getEnumValue(TARCOGParams::deflectionCalculationNamesUC, s_ipsc->cAlphaArgs(4)));
+            windowThermalModel.CalculationStandard =
+                static_cast<TARCOGGassesParams::Stdrd>(getEnumValue(TARCOGGassesParams::stdrdNamesUC, s_ipsc->cAlphaArgs(2)));
+            windowThermalModel.ThermalModel =
+                static_cast<TARCOGParams::TARCOGThermalModel>(getEnumValue(TARCOGParams::thermalModelNamesUC, s_ipsc->cAlphaArgs(3)));
+            windowThermalModel.DeflectionModel =
+                static_cast<TARCOGParams::DeflectionCalculation>(getEnumValue(TARCOGParams::deflectionCalculationNamesUC, s_ipsc->cAlphaArgs(4)));
 
             if (windowThermalModel.DeflectionModel == TARCOGParams::DeflectionCalculation::TEMPERATURE) {
                 windowThermalModel.VacuumPressureLimit = s_ipsc->rNumericArgs(2);
                 if (s_ipsc->rNumericArgs(2) <= 0.0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
+                    ShowSevereCustomMessage(
+                        state, eoh, format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
                 }
-                
+
                 windowThermalModel.InitialTemperature = s_ipsc->rNumericArgs(3);
                 if (s_ipsc->rNumericArgs(3) <= 0.0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(3), s_ipsc->rNumericArgs(3)));
+                    ShowSevereCustomMessage(
+                        state, eoh, format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(3), s_ipsc->rNumericArgs(3)));
                 }
 
                 windowThermalModel.InitialPressure = s_ipsc->rNumericArgs(4);
                 if (s_ipsc->rNumericArgs(4) <= 0.0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(4), s_ipsc->rNumericArgs(4)));
+                    ShowSevereCustomMessage(
+                        state, eoh, format("{} must be > 0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(4), s_ipsc->rNumericArgs(4)));
                 }
             }
 
@@ -5373,7 +5368,7 @@ namespace HeatBalanceManager {
                                                                      locNumericFieldNames);
 
             ErrorObjectHeader eoh{routineName, locCurrentModuleObject, locAlphaArgs(1)};
-            
+
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          locAlphaArgs(1),
@@ -5399,13 +5394,14 @@ namespace HeatBalanceManager {
             // Construct(ConstrNum)%BSDFInput%ThermalConstruction = ThConstNum
 
             thisConstruct.BSDFInput.BasisType = static_cast<DataBSDFWindow::Basis>(getEnumValue(DataBSDFWindow::basisNamesUC, locAlphaArgs(2)));
-            thisConstruct.BSDFInput.BasisSymmetryType = static_cast<DataBSDFWindow::BasisSymmetry>(getEnumValue(DataBSDFWindow::basisSymmetryNamesUC, locAlphaArgs(3)));
+            thisConstruct.BSDFInput.BasisSymmetryType =
+                static_cast<DataBSDFWindow::BasisSymmetry>(getEnumValue(DataBSDFWindow::basisSymmetryNamesUC, locAlphaArgs(3)));
 
             // Simon: Assign thermal model number
             thisConstruct.BSDFInput.ThermalModel = Util::FindItemInList(locAlphaArgs(4), s_mat->WindowThermalModel);
             if (thisConstruct.BSDFInput.ThermalModel == 0) {
                 ShowSevereItemNotFound(state, eoh, locAlphaFieldNames(4), locAlphaArgs(4));
-            } 
+            }
 
             // ***************************************************************************************
             // Basis matrix
@@ -5417,9 +5413,11 @@ namespace HeatBalanceManager {
 
             if (NumCols != 2 && NumCols != 1) {
                 ErrorsFound = true;
-                ShowSevereCustomMessage(state, eoh, 
-                    format("{} entered value=\"{}\" invalid matrix dimensions.  Basis matrix dimension can only be 2 x 1.",
-                           locAlphaFieldNames(5), locAlphaArgs(5)));
+                ShowSevereCustomMessage(state,
+                                        eoh,
+                                        format("{} entered value=\"{}\" invalid matrix dimensions.  Basis matrix dimension can only be 2 x 1.",
+                                               locAlphaFieldNames(5),
+                                               locAlphaArgs(5)));
             }
             thisConstruct.BSDFInput.BasisMat.allocate(NumCols, NumRows);
             MatrixDataManager::Get2DMatrix(state, thisConstruct.BSDFInput.BasisMatIndex, thisConstruct.BSDFInput.BasisMat);
@@ -5457,7 +5455,9 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Solar front transmittance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
                                "size is defined by Matrix:TwoDimension = \"{}\".",
                                locAlphaArgs(6),
@@ -5466,7 +5466,9 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Solar front transmittance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(6)));
                 }
 
@@ -5478,7 +5480,9 @@ namespace HeatBalanceManager {
                 thisConstruct.BSDFInput.SolFrtTrans.allocate(NumCols, NumRows);
                 if (thisConstruct.BSDFInput.SolFrtTransIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Solar front transmittance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(6)));
                 } else {
                     MatrixDataManager::Get2DMatrix(state, thisConstruct.BSDFInput.SolFrtTransIndex, thisConstruct.BSDFInput.SolFrtTrans);
@@ -5494,22 +5498,26 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Solar back reflectance matrix \"{}\" is not the same size as it is defined by basis definition. Basis size "
-                               "is defined by Matrix:TwoDimension = \"{}\".", locAlphaArgs(7), locAlphaArgs(5)));
+                               "is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(7),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("Solar back reflectance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(7)));
+                    ShowSevereCustomMessage(
+                        state, eoh, format("Solar back reflectance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(7)));
                 }
 
                 thisConstruct.BSDFInput.SolBkRefl.allocate(NumCols, NumRows);
                 if (thisConstruct.BSDFInput.SolBkReflIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("Solar back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(7)));
+                    ShowSevereCustomMessage(
+                        state, eoh, format("Solar back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(7)));
                 } else {
                     MatrixDataManager::Get2DMatrix(state, thisConstruct.BSDFInput.SolBkReflIndex, thisConstruct.BSDFInput.SolBkRefl);
                 }
@@ -5524,21 +5532,29 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Visible front transmittance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
-                               "size is defined by Matrix:TwoDimension = \"{}\".", locAlphaArgs(8), locAlphaArgs(5)));
+                               "size is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(8),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Visible front transmittance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(8)));
                 }
 
                 thisConstruct.BSDFInput.VisFrtTrans.allocate(NumCols, NumRows);
                 if (thisConstruct.BSDFInput.VisFrtTransIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Visible front transmittance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(8)));
                 } else {
                     MatrixDataManager::Get2DMatrix(state, thisConstruct.BSDFInput.VisFrtTransIndex, thisConstruct.BSDFInput.VisFrtTrans);
@@ -5554,22 +5570,26 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Visible back reflectance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
-                               "size is defined by Matrix:TwoDimension = \"{}\".", locAlphaArgs(9), locAlphaArgs(5)));
+                               "size is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(9),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh,
-                        format("Visible back reflectance \"{}\" must have the same number of rows and columns.", locAlphaArgs(9)));
+                    ShowSevereCustomMessage(
+                        state, eoh, format("Visible back reflectance \"{}\" must have the same number of rows and columns.", locAlphaArgs(9)));
                 }
 
                 thisConstruct.BSDFInput.VisBkRefl.allocate(NumCols, NumRows);
                 if (thisConstruct.BSDFInput.VisBkReflIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("Visble back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(9)));
+                    ShowSevereCustomMessage(
+                        state, eoh, format("Visble back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(9)));
                 } else {
                     MatrixDataManager::Get2DMatrix(state, thisConstruct.BSDFInput.VisBkReflIndex, thisConstruct.BSDFInput.VisBkRefl);
                 }
@@ -5596,27 +5616,37 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh, 
-                                format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer));
+                            ShowSevereCustomMessage(state,
+                                                    eoh,
+                                                    format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
+                                                           locAlphaArgs(AlphaIndex),
+                                                           currentOpticalLayer));
                         }
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh,
+                            ShowSevereCustomMessage(
+                                state,
+                                eoh,
                                 format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have same number of columns "
                                        "as it is defined by basis matrix."
-                                       "Matrix has {} number of columns, while basis definition specifies {} number of columns.", 
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer, NumCols, NBasis));
+                                       "Matrix has {} number of columns, while basis definition specifies {} number of columns.",
+                                       locAlphaArgs(AlphaIndex),
+                                       currentOpticalLayer,
+                                       NumCols,
+                                       NBasis));
                         }
 
                         thisConstruct.BSDFInput.Layer(currentOpticalLayer).AbsNcols = NumCols;
                         thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbs.allocate(NumCols, NumRows);
                         if (thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex == 0) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh, 
+                            ShowSevereCustomMessage(
+                                state,
+                                eoh,
                                 format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} is missing from the input file.",
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer));
+                                       locAlphaArgs(AlphaIndex),
+                                       currentOpticalLayer));
                         } else {
                             MatrixDataManager::Get2DMatrix(state,
                                                            thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex,
@@ -5634,26 +5664,36 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh, 
-                                format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer));
+                            ShowSevereCustomMessage(state,
+                                                    eoh,
+                                                    format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
+                                                           locAlphaArgs(AlphaIndex),
+                                                           currentOpticalLayer));
                         }
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh,
+                            ShowSevereCustomMessage(
+                                state,
+                                eoh,
                                 format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have same number of columns as "
                                        "it is defined by basis matrix."
                                        "Matrix has {} number of columns, while basis definition specifies {} number of columns.",
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer, NumCols, NBasis));
+                                       locAlphaArgs(AlphaIndex),
+                                       currentOpticalLayer,
+                                       NumCols,
+                                       NBasis));
                         }
 
                         thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbs.allocate(NumCols, NumRows);
                         if (thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex == 0) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh, 
+                            ShowSevereCustomMessage(
+                                state,
+                                eoh,
                                 format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} is missing from the input file.",
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer));
+                                       locAlphaArgs(AlphaIndex),
+                                       currentOpticalLayer));
                         } else {
                             MatrixDataManager::Get2DMatrix(state,
                                                            thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex,
@@ -5676,7 +5716,9 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Solar front transmittance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
                                "size is defined by Matrix:TwoDimension = \"{}\".",
                                locAlphaArgs(6),
@@ -5685,14 +5727,18 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Solar front transmittance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(6)));
                 }
 
                 thisConstruct.BSDFInput.SolFrtTrans.allocate(NBasis, NBasis);
                 if (thisConstruct.BSDFInput.SolFrtTransIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Solar front transmittance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(6)));
                 } else {
                     MatrixDataManager::Get2DMatrix(state, thisConstruct.BSDFInput.SolFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
@@ -5713,7 +5759,9 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Solar back reflectance matrix \"{}\" is not the same size as it is defined by basis definition. Basis size "
                                "is defined by Matrix:TwoDimension = \"{}\".",
                                locAlphaArgs(7),
@@ -5722,15 +5770,15 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("Solar back reflectance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(7)));
+                    ShowSevereCustomMessage(
+                        state, eoh, format("Solar back reflectance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(7)));
                 }
 
                 thisConstruct.BSDFInput.SolBkRefl.allocate(NBasis, NBasis);
                 if (thisConstruct.BSDFInput.SolBkReflIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("Solar back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(7)));
+                    ShowSevereCustomMessage(
+                        state, eoh, format("Solar back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(7)));
                 } else {
                     MatrixDataManager::Get2DMatrix(state, thisConstruct.BSDFInput.SolBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     thisConstruct.BSDFInput.SolBkRefl = 0.0;
@@ -5749,21 +5797,29 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Visible front transmittance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
-                               "size is defined by Matrix:TwoDimension = \"{}\".", locAlphaArgs(8), locAlphaArgs(5)));
+                               "size is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(8),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Visible front transmittance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(8)));
                 }
 
                 thisConstruct.BSDFInput.VisFrtTrans.allocate(NBasis, NBasis);
                 if (thisConstruct.BSDFInput.VisFrtTransIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Visible front transmittance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(8)));
                 } else {
                     MatrixDataManager::Get2DMatrix(state, thisConstruct.BSDFInput.VisFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
@@ -5783,22 +5839,26 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
+                    ShowSevereCustomMessage(
+                        state,
+                        eoh,
                         format("Visible back reflectance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
-                               "size is defined by Matrix:TwoDimension = \"{}\".", locAlphaArgs(9), locAlphaArgs(5)));
+                               "size is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(9),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("Visible back reflectance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(9)));
+                    ShowSevereCustomMessage(
+                        state, eoh, format("Visible back reflectance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(9)));
                 }
 
                 thisConstruct.BSDFInput.VisBkRefl.allocate(NBasis, NBasis);
                 if (thisConstruct.BSDFInput.VisBkReflIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereCustomMessage(state, eoh, 
-                        format("Visible back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(9)));
+                    ShowSevereCustomMessage(
+                        state, eoh, format("Visible back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(9)));
                 } else {
                     MatrixDataManager::Get2DMatrix(state, thisConstruct.BSDFInput.VisBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     thisConstruct.BSDFInput.VisBkRefl = 0.0;
@@ -5834,18 +5894,25 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh, 
-                                format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer));
+                            ShowSevereCustomMessage(state,
+                                                    eoh,
+                                                    format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
+                                                           locAlphaArgs(AlphaIndex),
+                                                           currentOpticalLayer));
                         }
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh, 
+                            ShowSevereCustomMessage(
+                                state,
+                                eoh,
                                 format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have same number of columns "
                                        "as it is defined by basis matrix."
                                        "Matrix has {} number of columns, while basis definition specifies {} number of columns.",
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer, NumCols, NBasis));
+                                       locAlphaArgs(AlphaIndex),
+                                       currentOpticalLayer,
+                                       NumCols,
+                                       NBasis));
                         }
 
                         thisConstruct.BSDFInput.Layer(currentOpticalLayer).AbsNcols = NumCols;
@@ -5853,9 +5920,12 @@ namespace HeatBalanceManager {
 
                         if (thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex == 0) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh, 
+                            ShowSevereCustomMessage(
+                                state,
+                                eoh,
                                 format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} is missing from the input file.",
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer));
+                                       locAlphaArgs(AlphaIndex),
+                                       currentOpticalLayer));
                         } else {
                             MatrixDataManager::Get2DMatrix(state,
                                                            thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex,
@@ -5873,27 +5943,37 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh, 
-                                format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer));
+                            ShowSevereCustomMessage(state,
+                                                    eoh,
+                                                    format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
+                                                           locAlphaArgs(AlphaIndex),
+                                                           currentOpticalLayer));
                         }
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh, 
+                            ShowSevereCustomMessage(
+                                state,
+                                eoh,
                                 format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have same number of columns as "
                                        "it is defined by basis matrix."
                                        "Matrix has {} number of columns, while basis definition specifies {} number of columns.",
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer, NumCols, NBasis));
+                                       locAlphaArgs(AlphaIndex),
+                                       currentOpticalLayer,
+                                       NumCols,
+                                       NBasis));
                         }
 
                         thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbs.allocate(NumCols, NumRows);
 
                         if (thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex == 0) {
                             ErrorsFound = true;
-                            ShowSevereCustomMessage(state, eoh, 
+                            ShowSevereCustomMessage(
+                                state,
+                                eoh,
                                 format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} is missing from the input file.",
-                                       locAlphaArgs(AlphaIndex), currentOpticalLayer));
+                                       locAlphaArgs(AlphaIndex),
+                                       currentOpticalLayer));
                         } else {
                             MatrixDataManager::Get2DMatrix(state,
                                                            thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex,

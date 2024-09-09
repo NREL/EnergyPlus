@@ -91,10 +91,13 @@ namespace HeatBalanceHAMTManager {
         int divmin = 3;                                      // Minimum number of cells
         int divmax = 10;                                     // Maximum number of cells
 
-        MaterialHAMT() : Material::MaterialBase() { group = Material::Group::Regular; }
+        MaterialHAMT() : Material::MaterialBase()
+        {
+            group = Material::Group::Regular;
+        }
         ~MaterialHAMT() = default;
     };
-            
+
     constexpr int ittermax(150); // Maximum Number of itterations
     constexpr int adjmax(6);     // Maximum Number of Adjacent Cells
 

@@ -1753,7 +1753,7 @@ namespace TranspiredCollector {
         Real64 sum_produc_area_wetbulb = 0.0;
 
         auto &s_mat = state.dataMaterial;
-        
+
         for (int SurfNum : SurfPtrARR) {
             sum_area += state.dataSurface->Surface(SurfNum).Area;
             sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);

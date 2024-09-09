@@ -59,7 +59,6 @@ namespace EnergyPlus {
 
 namespace Material {
 
-
     Real64 MaterialPhaseChange::getEnthalpy(Real64 T, Real64 Tc, Real64 tau1, Real64 tau2) const
     {
         // Looks up the enthalpy on the characteristic curve defined by the parameters Tc, tau1, and tau2,
@@ -74,7 +73,7 @@ namespace Material {
     }
 
     Real64 MaterialPhaseChange::getCurrentSpecificHeat(
-        Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse, Phase prevPhaseChangeState, Phase &phaseChangeState) 
+        Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse, Phase prevPhaseChangeState, Phase &phaseChangeState)
     {
         // Main public facing function; returns the current specific heat based on input properties, and current and previous conditions.
         // In a future version, this could be compartmentalized to track all states and histories, but it would require some further modification to
@@ -244,12 +243,12 @@ namespace Material {
     }
 
     Real64 MaterialPhaseChange::specHeat(Real64 temperaturePrev,
-                                           Real64 temperatureCurrent,
-                                           Real64 criticalTemperature,
-                                           Real64 tau1,
-                                           Real64 tau2,
-                                           Real64 EnthalpyOld,
-                                           Real64 EnthalpyNew) const
+                                         Real64 temperatureCurrent,
+                                         Real64 criticalTemperature,
+                                         Real64 tau1,
+                                         Real64 tau2,
+                                         Real64 EnthalpyOld,
+                                         Real64 EnthalpyNew) const
     {
 
         //    Tc                  ! Critical (Melting/Freezing) Temperature of PCM
@@ -306,7 +305,7 @@ namespace Material {
         auto &s_ipsc = state.dataIPShortCut;
         auto &s_ip = state.dataInputProcessing->inputProcessor;
         auto &s_mat = state.dataMaterial;
-        
+
         // convenience variables
         s_ipsc->cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
         int numPhaseChangeModels = s_ip->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
@@ -350,7 +349,7 @@ namespace Material {
                 ErrorsFound = true;
                 continue;
             }
-            
+
             auto *mat = s_mat->materials(matNum);
             if (mat->group != Group::Regular) {
                 ShowSevereCustomMessage(state, eoh, format("Material {} is not a Regular material.", mat->Name));
@@ -359,7 +358,8 @@ namespace Material {
             }
 
             if (mat->hasPCM) {
-                ShowSevereCustomMessage(state, eoh, format("Material {} already has {} properties defined.", mat->Name, s_ipsc->cCurrentModuleObject));
+                ShowSevereCustomMessage(
+                    state, eoh, format("Material {} already has {} properties defined.", mat->Name, s_ipsc->cCurrentModuleObject));
                 ErrorsFound = true;
                 continue;
             }
@@ -375,14 +375,14 @@ namespace Material {
                 ErrorsFound = true;
                 continue;
             }
-            
+
             // Need to upgrade this object to MaterialPhaseChange
             auto *matPC = new MaterialPhaseChange;
             matPC->MaterialBase::operator=(*mat); // Deep copy the parent object
-            
+
             delete mat;
             s_mat->materials(matNum) = matPC;
-            
+
             // now build out a new hysteresis instance and add it to the vector
             matPC->totalLatentHeat = s_ipsc->rNumericArgs(1);
             matPC->fullyLiquidThermalConductivity = s_ipsc->rNumericArgs(2);

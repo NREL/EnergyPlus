@@ -62,7 +62,7 @@ struct EnergyPlusData;
 
 namespace Material {
 
-    enum class Phase 
+    enum class Phase
     {
         Invalid = -1,
         Liquid,
@@ -74,8 +74,8 @@ namespace Material {
     };
 
     static constexpr std::array<int, (int)Phase::Num> phaseInts = {-2, -1, 0, 1, 2};
-        
-    struct MaterialPhaseChange : public MaterialBase 
+
+    struct MaterialPhaseChange : public MaterialBase
     {
         // members are pretty much all accessed outside of the class in one way or another (by the static factory, etc.)
         Real64 enthalpyM = 0.0;
@@ -114,7 +114,7 @@ namespace Material {
                         Real64 tau1,
                         Real64 tau2,
                         Real64 EnthalpyOld,
-                        Real64 EnthalpyNew) const ;
+                        Real64 EnthalpyNew) const;
 
         // This function modifies some state variables that look like they should belong to surface rather than material
         // the Cp calculation function for this class
@@ -127,13 +127,16 @@ namespace Material {
         // the density calculation function for this class
         Real64 getDensity(Real64 T) const;
 
-        MaterialPhaseChange() : MaterialBase() { group = Material::Group::Regular; }
+        MaterialPhaseChange() : MaterialBase()
+        {
+            group = Material::Group::Regular;
+        }
         ~MaterialPhaseChange() = default;
     };
 
     void GetHysteresisData(EnergyPlusData &state, bool &ErrorsFound);
 
-} // namespace HysteresisPhaseChange
+} // namespace Material
 
 struct HysteresisPhaseChangeData : BaseGlobalStruct
 {
@@ -144,7 +147,8 @@ struct HysteresisPhaseChangeData : BaseGlobalStruct
     {
     }
 
-    void clear_state() override    {
+    void clear_state() override
+    {
         getHysteresisModels = true;
     }
 };
