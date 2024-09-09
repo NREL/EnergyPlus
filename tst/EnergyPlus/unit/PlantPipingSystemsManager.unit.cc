@@ -1921,11 +1921,11 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest)
     int MaterialIndex;
 
     Material::MaterialBase *p = new Material::MaterialBase;
-    state->dataMaterial->Material.push_back(p);
+    state->dataMaterial->materials.push_back(p);
 
     // Test 1: Material has a valid thickness and is not R-only, result should be false
     MaterialIndex = 1;
-    auto *thisMaterial = state->dataMaterial->Material(MaterialIndex);
+    auto *thisMaterial = state->dataMaterial->materials(MaterialIndex);
     thisMaterial->ROnly = false;
     Thickness = 0.01;
     ExpectedResult = false;

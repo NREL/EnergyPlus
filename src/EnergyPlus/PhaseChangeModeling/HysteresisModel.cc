@@ -57,26 +57,9 @@
 
 namespace EnergyPlus {
 
-namespace HysteresisPhaseChange {
+namespace Material {
 
-    HysteresisPhaseChange *HysteresisPhaseChange::factory(EnergyPlusData &state, const std::string &objectName)
-    {
-        if (state.dataHysteresisPhaseChange->getHysteresisModels) {
-            readAllHysteresisModels(state);
-            state.dataHysteresisPhaseChange->getHysteresisModels = false;
-        }
-        for (auto &hm : state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels) {
-            if (hm.name == objectName) {
-                return &hm;
-            }
-        }
-        // because of the passive linking between materials and material property objects,
-        // we don't know ahead of time for sure whether we will have a material property
-        // so we can't return fatal here if it isn't found, just leave it null
-        return nullptr;
-    }
-
-    Real64 HysteresisPhaseChange::getEnthalpy(Real64 T, Real64 Tc, Real64 tau1, Real64 tau2)
+    Real64 MaterialPhaseChange::getEnthalpy(Real64 T, Real64 Tc, Real64 tau1, Real64 tau2) const
     {
         // Looks up the enthalpy on the characteristic curve defined by the parameters Tc, tau1, and tau2,
         // and the position on that curve defined by T.
@@ -89,8 +72,8 @@ namespace HysteresisPhaseChange {
         }
     }
 
-    Real64 HysteresisPhaseChange::getCurrentSpecificHeat(
-        Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse, int prevPhaseChangeState, int &phaseChangeState)
+    Real64 MaterialPhaseChange::getCurrentSpecificHeat(
+        Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse, Phase prevPhaseChangeState, Phase &phaseChangeState)
     {
         // Main public facing function; returns the current specific heat based on input properties, and current and previous conditions.
         // In a future version, this could be compartmentalized to track all states and histories, but it would require some further modification to
@@ -111,40 +94,41 @@ namespace HysteresisPhaseChange {
             Tau1 = this->deltaTempMeltingLow;
             Tau2 = this->deltaTempMeltingHigh;
             if (updatedTempTDT < TempLowPCM) {
-                phaseChangeState = PhaseChangeStates::CRYSTALLIZED;
+                phaseChangeState = Phase::Crystallized;
             } else if (updatedTempTDT >= TempLowPCM && updatedTempTDT <= TempHighPCM) {
-                phaseChangeState = PhaseChangeStates::MELTING;
-                if (prevPhaseChangeState == PhaseChangeStates::FREEZING || prevPhaseChangeState == PhaseChangeStates::TRANSITION) {
-                    phaseChangeState = PhaseChangeStates::TRANSITION;
+                phaseChangeState = Phase::Melting;
+                if (prevPhaseChangeState == Phase::Freezing || prevPhaseChangeState == Phase::Transition) {
+                    phaseChangeState = Phase::Transition;
                 }
             } else if (updatedTempTDT > TempHighPCM) {
-                phaseChangeState = PhaseChangeStates::LIQUID;
+                phaseChangeState = Phase::Liquid;
             }
         } else { // phaseChangeDeltaT > 0
             Tc = this->peakTempFreezing;
             Tau1 = this->deltaTempFreezingLow;
             Tau2 = this->deltaTempFreezingHigh;
             if (updatedTempTDT < TempLowPCF) {
-                phaseChangeState = PhaseChangeStates::CRYSTALLIZED;
+                phaseChangeState = Phase::Crystallized;
             } else if (updatedTempTDT >= TempLowPCF && updatedTempTDT <= TempHighPCF) {
-                phaseChangeState = PhaseChangeStates::FREEZING;
-                if (prevPhaseChangeState == PhaseChangeStates::MELTING || prevPhaseChangeState == PhaseChangeStates::TRANSITION) {
-                    phaseChangeState = PhaseChangeStates::TRANSITION;
+                phaseChangeState = Phase::Freezing;
+                if (prevPhaseChangeState == Phase::Melting || prevPhaseChangeState == Phase::Transition) {
+                    phaseChangeState = Phase::Transition;
                 }
             } else if (updatedTempTDT > TempHighPCF) {
-                phaseChangeState = PhaseChangeStates::LIQUID;
+                phaseChangeState = Phase::Liquid;
             }
         }
 
+        // Why is phaseChangeTransition a state variable of the material and not the surface?
         // determine if we are transitioning or not
-        if (prevPhaseChangeState == PhaseChangeStates::TRANSITION && phaseChangeState == PhaseChangeStates::CRYSTALLIZED) {
+        if (prevPhaseChangeState == Phase::Transition && phaseChangeState == Phase::Crystallized) {
             this->phaseChangeTransition = true;
-        } else if (prevPhaseChangeState == PhaseChangeStates::TRANSITION && phaseChangeState == PhaseChangeStates::FREEZING) {
+        } else if (prevPhaseChangeState == Phase::Transition && phaseChangeState == Phase::Freezing) {
             this->phaseChangeTransition = true;
             // this->phaseChangeState = 0; ?????
-        } else if (prevPhaseChangeState == PhaseChangeStates::FREEZING && phaseChangeState == PhaseChangeStates::TRANSITION) {
+        } else if (prevPhaseChangeState == Phase::Freezing && phaseChangeState == Phase::Transition) {
             this->phaseChangeTransition = true;
-        } else if (prevPhaseChangeState == PhaseChangeStates::CRYSTALLIZED && phaseChangeState == PhaseChangeStates::TRANSITION) {
+        } else if (prevPhaseChangeState == Phase::Crystallized && phaseChangeState == Phase::Transition) {
             this->phaseChangeTransition = true;
         } else {
             this->phaseChangeTransition = false;
@@ -155,29 +139,29 @@ namespace HysteresisPhaseChange {
             this->enthOld = this->getEnthalpy(prevTempTD, Tc, Tau1, Tau2);
             this->enthNew = this->getEnthalpy(updatedTempTDT, Tc, Tau1, Tau2);
         } else {
-            if (prevPhaseChangeState == PhaseChangeStates::FREEZING && phaseChangeState == PhaseChangeStates::TRANSITION) {
+            if (prevPhaseChangeState == Phase::Freezing && phaseChangeState == Phase::Transition) {
                 this->enthRev =
                     this->getEnthalpy(phaseChangeTempReverse, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh);
                 this->enthNew = (this->specHeatTransition * updatedTempTDT) + (this->enthOld - (this->specHeatTransition * prevTempTD));
                 this->enthalpyM = this->getEnthalpy(updatedTempTDT, this->peakTempMelting, this->deltaTempMeltingLow, this->deltaTempMeltingHigh);
                 this->enthalpyF = this->getEnthalpy(updatedTempTDT, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh);
                 if (this->enthNew < this->enthRev && this->enthNew >= this->enthalpyF && updatedTempTDT <= prevTempTD) {
-                    phaseChangeState = PhaseChangeStates::FREEZING;
+                    phaseChangeState = Phase::Freezing;
                     this->enthNew =
                         this->getEnthalpy(updatedTempTDT, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh);
                 } else if ((this->enthNew < this->enthalpyF) && (this->enthNew > this->enthalpyM)) {
-                    phaseChangeState = PhaseChangeStates::TRANSITION;
+                    phaseChangeState = Phase::Transition;
                     this->enthNew = (this->specHeatTransition * updatedTempTDT) + (this->enthOld - (this->specHeatTransition * prevTempTD));
                 } else if ((this->enthNew < this->enthalpyF) && (updatedTempTDT > phaseChangeTempReverse)) {
-                    phaseChangeState = PhaseChangeStates::TRANSITION;
+                    phaseChangeState = Phase::Transition;
                     this->enthNew =
                         (this->specHeatTransition * updatedTempTDT) + (this->enthRev - (this->specHeatTransition * phaseChangeTempReverse));
                 } else if ((this->enthNew <= this->enthalpyM) && (updatedTempTDT <= phaseChangeTempReverse)) {
-                    phaseChangeState = PhaseChangeStates::TRANSITION;
+                    phaseChangeState = Phase::Transition;
                     this->enthNew =
                         (this->specHeatTransition * updatedTempTDT) + (this->enthRev - (this->specHeatTransition * phaseChangeTempReverse));
                 }
-            } else if (prevPhaseChangeState == PhaseChangeStates::TRANSITION && phaseChangeState == PhaseChangeStates::TRANSITION) {
+            } else if (prevPhaseChangeState == Phase::Transition && phaseChangeState == Phase::Transition) {
                 if (updatedTempTDT < phaseChangeTempReverse) {
                     Tc = this->peakTempMelting;
                     Tau1 = this->deltaTempMeltingLow;
@@ -192,50 +176,50 @@ namespace HysteresisPhaseChange {
                 this->enthalpyM = this->getEnthalpy(updatedTempTDT, this->peakTempMelting, this->deltaTempMeltingLow, this->deltaTempMeltingHigh);
                 this->enthalpyF = this->getEnthalpy(updatedTempTDT, this->peakTempMelting, this->deltaTempMeltingLow, this->deltaTempMeltingHigh);
                 if ((updatedTempTDT < phaseChangeTempReverse) && (this->enthNew > this->enthalpyF)) {
-                    phaseChangeState = PhaseChangeStates::FREEZING;
+                    phaseChangeState = Phase::Freezing;
                     this->enthNew =
                         this->getEnthalpy(updatedTempTDT, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh);
                 } else if ((this->enthNew < this->enthalpyF) && (this->enthNew > this->enthalpyM) &&
                            (updatedTempTDT < prevTempTD || updatedTempTDT > prevTempTD)) {
-                    phaseChangeState = PhaseChangeStates::TRANSITION;
+                    phaseChangeState = Phase::Transition;
                     this->enthNew =
                         (this->specHeatTransition * updatedTempTDT) + (this->enthRev - (this->specHeatTransition * phaseChangeTempReverse));
                 } else if (this->enthNew <= this->enthalpyM && updatedTempTDT >= prevTempTD && this->enthNew > this->enthOld) {
-                    phaseChangeState = PhaseChangeStates::MELTING;
+                    phaseChangeState = Phase::Melting;
                     this->enthNew =
                         (this->specHeatTransition * updatedTempTDT) + (this->enthRev - (this->specHeatTransition * phaseChangeTempReverse));
                 }
-            } else if (prevPhaseChangeState == PhaseChangeStates::TRANSITION && phaseChangeState == PhaseChangeStates::CRYSTALLIZED) {
+            } else if (prevPhaseChangeState == Phase::Transition && phaseChangeState == Phase::Crystallized) {
                 this->enthRev =
                     this->getEnthalpy(phaseChangeTempReverse, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh);
                 this->enthNew = (this->specHeatTransition * updatedTempTDT) + (this->enthRev - (this->specHeatTransition * phaseChangeTempReverse));
                 this->enthalpyM = this->getEnthalpy(updatedTempTDT, this->peakTempMelting, this->deltaTempMeltingLow, this->deltaTempMeltingHigh);
                 this->enthalpyF = this->getEnthalpy(updatedTempTDT, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh);
                 if ((this->enthNew < this->enthalpyF) && (this->enthNew > this->enthalpyM)) {
-                    phaseChangeState = PhaseChangeStates::TRANSITION;
+                    phaseChangeState = Phase::Transition;
                     this->enthNew =
                         (this->specHeatTransition * updatedTempTDT) + (this->enthRev - (this->specHeatTransition * phaseChangeTempReverse));
                 } else if (this->enthNew <= this->enthalpyM && updatedTempTDT >= prevTempTD) {
-                    phaseChangeState = PhaseChangeStates::MELTING;
+                    phaseChangeState = Phase::Melting;
                     this->enthNew = this->getEnthalpy(updatedTempTDT, this->peakTempMelting, this->deltaTempMeltingLow, this->deltaTempMeltingHigh);
                 }
-            } else if (prevPhaseChangeState == PhaseChangeStates::MELTING && phaseChangeState == PhaseChangeStates::TRANSITION) {
+            } else if (prevPhaseChangeState == Phase::Melting && phaseChangeState == Phase::Transition) {
                 this->enthNew = (this->specHeatTransition * updatedTempTDT) + (this->enthOld - (this->specHeatTransition * prevTempTD));
                 this->enthalpyM = this->getEnthalpy(updatedTempTDT, this->peakTempMelting, this->deltaTempMeltingLow, this->deltaTempMeltingHigh);
                 this->enthalpyF = this->getEnthalpy(updatedTempTDT, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh);
                 if ((this->enthNew < this->enthOld) && (updatedTempTDT < prevTempTD)) {
-                    phaseChangeState = PhaseChangeStates::TRANSITION;
+                    phaseChangeState = Phase::Transition;
                     this->enthNew = (this->specHeatTransition * updatedTempTDT) + (this->enthOld - (this->specHeatTransition * prevTempTD));
                 } else if ((this->enthNew < this->enthalpyF) && (this->enthNew > this->enthalpyM) && (updatedTempTDT < prevTempTD)) {
-                    phaseChangeState = PhaseChangeStates::TRANSITION;
+                    phaseChangeState = Phase::Transition;
                     this->enthNew =
                         (this->specHeatTransition * updatedTempTDT) + (this->enthRev - (this->specHeatTransition * phaseChangeTempReverse));
                 } else if ((this->enthNew >= this->enthalpyF) && (updatedTempTDT <= phaseChangeTempReverse)) {
-                    phaseChangeState = PhaseChangeStates::TRANSITION;
+                    phaseChangeState = Phase::Transition;
                     this->enthNew =
                         (this->specHeatTransition * updatedTempTDT) + (this->enthRev - (this->specHeatTransition * phaseChangeTempReverse));
                 }
-            } else if (prevPhaseChangeState == PhaseChangeStates::TRANSITION && phaseChangeState == PhaseChangeStates::FREEZING) {
+            } else if (prevPhaseChangeState == Phase::Transition && phaseChangeState == Phase::Freezing) {
                 this->enthalpyM = this->getEnthalpy(updatedTempTDT, this->peakTempMelting, this->deltaTempMeltingLow, this->deltaTempMeltingHigh);
                 this->enthalpyF = this->getEnthalpy(updatedTempTDT, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh);
                 this->enthRev =
@@ -258,13 +242,13 @@ namespace HysteresisPhaseChange {
         return Cp;
     }
 
-    Real64 HysteresisPhaseChange::specHeat(Real64 temperaturePrev,
-                                           Real64 temperatureCurrent,
-                                           Real64 criticalTemperature,
-                                           Real64 tau1,
-                                           Real64 tau2,
-                                           Real64 EnthalpyOld,
-                                           Real64 EnthalpyNew)
+    Real64 MaterialPhaseChange::specHeat(Real64 temperaturePrev,
+                                         Real64 temperatureCurrent,
+                                         Real64 criticalTemperature,
+                                         Real64 tau1,
+                                         Real64 tau2,
+                                         Real64 EnthalpyOld,
+                                         Real64 EnthalpyNew) const
     {
 
         //    Tc                  ! Critical (Melting/Freezing) Temperature of PCM
@@ -292,7 +276,7 @@ namespace HysteresisPhaseChange {
         }
     }
 
-    Real64 HysteresisPhaseChange::getConductivity(Real64 T)
+    Real64 MaterialPhaseChange::getConductivity(Real64 T) const
     {
         if (T < this->peakTempMelting) {
             return this->fullySolidThermalConductivity;
@@ -303,7 +287,7 @@ namespace HysteresisPhaseChange {
         }
     }
 
-    Real64 HysteresisPhaseChange::getDensity(Real64 T)
+    Real64 MaterialPhaseChange::getDensity(Real64 T) const
     {
         if (T < this->peakTempMelting) {
             return this->fullySolidDensity;
@@ -314,16 +298,20 @@ namespace HysteresisPhaseChange {
         }
     }
 
-    void readAllHysteresisModels(EnergyPlusData &state)
+    void GetHysteresisData(EnergyPlusData &state, bool &ErrorsFound)
     {
+        static constexpr std::string_view routineName = "GetHysteresisData";
+
+        auto &s_ipsc = state.dataIPShortCut;
+        auto &s_ip = state.dataInputProcessing->inputProcessor;
+        auto &s_mat = state.dataMaterial;
 
         // convenience variables
-        state.dataIPShortCut->cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-        state.dataHysteresisPhaseChange->numHysteresisModels =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        s_ipsc->cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
+        int numPhaseChangeModels = s_ip->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
 
         // loop over all hysteresis input instances, if zero, this will simply not do anything
-        for (int hmNum = 1; hmNum <= state.dataHysteresisPhaseChange->numHysteresisModels; ++hmNum) {
+        for (int hmNum = 1; hmNum <= numPhaseChangeModels; ++hmNum) {
 
             // just a few vars to pass in and out to GetObjectItem
             int ioStatus;
@@ -331,57 +319,90 @@ namespace HysteresisPhaseChange {
             int numNumbers;
 
             // get the input data and store it in the Shortcuts structures
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     hmNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     numAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     numNumbers,
-                                                                     ioStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+            s_ip->getObjectItem(state,
+                                s_ipsc->cCurrentModuleObject,
+                                hmNum,
+                                s_ipsc->cAlphaArgs,
+                                numAlphas,
+                                s_ipsc->rNumericArgs,
+                                numNumbers,
+                                ioStatus,
+                                s_ipsc->lNumericFieldBlanks,
+                                s_ipsc->lAlphaFieldBlanks,
+                                s_ipsc->cAlphaFieldNames,
+                                s_ipsc->cNumericFieldNames);
 
+            ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
             // the input processor validates the numeric inputs based on the IDD definition
             // still validate the name to make sure there aren't any duplicates or blanks
             // blanks are easy: fatal if blank
-            if (state.dataIPShortCut->lAlphaFieldBlanks[0]) {
-                ShowFatalError(state, "Invalid input for " + state.dataIPShortCut->cCurrentModuleObject + " object: Name cannot be blank");
+
+            if (s_ipsc->lAlphaFieldBlanks(1)) {
+                ShowSevereEmptyField(state, eoh, s_ipsc->cAlphaFieldNames(1), s_ipsc->cAlphaArgs(1));
+                ErrorsFound = true;
+                continue;
             }
 
-            // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-            for (auto &existingHysteresisModel : state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels) {
-                if (state.dataIPShortCut->cAlphaArgs(1) == existingHysteresisModel.name) {
-                    ShowFatalError(state,
-                                   "Invalid input for " + state.dataIPShortCut->cCurrentModuleObject +
-                                       " object: Duplicate name found: " + existingHysteresisModel.name);
-                }
+            int matNum = GetMaterialNum(state, s_ipsc->cAlphaArgs(1));
+            if (matNum == 0) {
+                ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(1), s_ipsc->cAlphaArgs(1));
+                ErrorsFound = true;
+                continue;
             }
+
+            auto *mat = s_mat->materials(matNum);
+            if (mat->group != Group::Regular) {
+                ShowSevereCustomMessage(state, eoh, format("Material {} is not a Regular material.", mat->Name));
+                ErrorsFound = true;
+                continue;
+            }
+
+            if (mat->hasPCM) {
+                ShowSevereCustomMessage(
+                    state, eoh, format("Material {} already has {} properties defined.", mat->Name, s_ipsc->cCurrentModuleObject));
+                ErrorsFound = true;
+                continue;
+            }
+
+            if (mat->hasEMPD) {
+                ShowSevereCustomMessage(state, eoh, format("Material {} already has EMPD properties defined.", mat->Name));
+                ErrorsFound = true;
+                continue;
+            }
+
+            if (mat->hasHAMT) {
+                ShowSevereCustomMessage(state, eoh, format("Material {} already has HAMT properties defined.", mat->Name));
+                ErrorsFound = true;
+                continue;
+            }
+
+            // Need to upgrade this object to MaterialPhaseChange
+            auto *matPC = new MaterialPhaseChange;
+            matPC->MaterialBase::operator=(*mat); // Deep copy the parent object
+
+            delete mat;
+            s_mat->materials(matNum) = matPC;
 
             // now build out a new hysteresis instance and add it to the vector
-            HysteresisPhaseChange thisHM;
-            thisHM.name = state.dataIPShortCut->cAlphaArgs(1);
-            thisHM.totalLatentHeat = state.dataIPShortCut->rNumericArgs(1);
-            thisHM.fullyLiquidThermalConductivity = state.dataIPShortCut->rNumericArgs(2);
-            thisHM.fullyLiquidDensity = state.dataIPShortCut->rNumericArgs(3);
-            thisHM.specificHeatLiquid = state.dataIPShortCut->rNumericArgs(4);
-            thisHM.deltaTempMeltingHigh = state.dataIPShortCut->rNumericArgs(5);
-            thisHM.peakTempMelting = state.dataIPShortCut->rNumericArgs(6);
-            thisHM.deltaTempMeltingLow = state.dataIPShortCut->rNumericArgs(7);
-            thisHM.fullySolidThermalConductivity = state.dataIPShortCut->rNumericArgs(8);
-            thisHM.fullySolidDensity = state.dataIPShortCut->rNumericArgs(9);
-            thisHM.specificHeatSolid = state.dataIPShortCut->rNumericArgs(10);
-            thisHM.deltaTempFreezingHigh = state.dataIPShortCut->rNumericArgs(11);
-            thisHM.peakTempFreezing = state.dataIPShortCut->rNumericArgs(12);
-            thisHM.deltaTempFreezingLow = state.dataIPShortCut->rNumericArgs(13);
-            thisHM.specHeatTransition = (thisHM.specificHeatSolid + thisHM.specificHeatLiquid) / 2.0;
-            thisHM.CpOld = thisHM.specificHeatSolid;
-            state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels.push_back(thisHM);
+            matPC->totalLatentHeat = s_ipsc->rNumericArgs(1);
+            matPC->fullyLiquidThermalConductivity = s_ipsc->rNumericArgs(2);
+            matPC->fullyLiquidDensity = s_ipsc->rNumericArgs(3);
+            matPC->specificHeatLiquid = s_ipsc->rNumericArgs(4);
+            matPC->deltaTempMeltingHigh = s_ipsc->rNumericArgs(5);
+            matPC->peakTempMelting = s_ipsc->rNumericArgs(6);
+            matPC->deltaTempMeltingLow = s_ipsc->rNumericArgs(7);
+            matPC->fullySolidThermalConductivity = s_ipsc->rNumericArgs(8);
+            matPC->fullySolidDensity = s_ipsc->rNumericArgs(9);
+            matPC->specificHeatSolid = s_ipsc->rNumericArgs(10);
+            matPC->deltaTempFreezingHigh = s_ipsc->rNumericArgs(11);
+            matPC->peakTempFreezing = s_ipsc->rNumericArgs(12);
+            matPC->deltaTempFreezingLow = s_ipsc->rNumericArgs(13);
+            matPC->specHeatTransition = (matPC->specificHeatSolid + matPC->specificHeatLiquid) / 2.0;
+            matPC->CpOld = matPC->specificHeatSolid;
+            matPC->hasPCM = true;
         }
     }
 
-} // namespace HysteresisPhaseChange
+} // namespace Material
 
 } // namespace EnergyPlus

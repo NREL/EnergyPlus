@@ -3628,7 +3628,7 @@ Real64 EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, HcExt const
     }
 
     Material::SurfaceRoughness Roughness =
-        state.dataMaterial->Material(state.dataConstruction->Construct(surface.Construction).LayerPoint(1))->Roughness;
+        state.dataMaterial->materials(state.dataConstruction->Construct(surface.Construction).LayerPoint(1))->Roughness;
 
     switch (ForcedConvModelEqNum) {
     case HcExt::None: {
@@ -6318,7 +6318,7 @@ Real64 CalcClearRoof(EnergyPlusData &state,
                      Real64 const RoofPerimeter)
 {
     Material::SurfaceRoughness const RoughnessIndex =
-        state.dataMaterial->Material(state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1))->Roughness;
+        state.dataMaterial->materials(state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1))->Roughness;
     // find x, don't know x. avoid time consuming geometry algorithm
     Real64 x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
 
