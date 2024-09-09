@@ -494,6 +494,12 @@ if(WIN32)
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/MSINET.OCX" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Msvcrtd.dll" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Vsflex7L.ocx" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
+
+  # On Windows, if we did build with LINK_WITH_PYTHON, we should end up with the new Python Auxiliary CLI for EnergyPlus
+  # Lets create a link/shortcut to execute EnergyPlus CLI with the right arguments and make launching EP-Launch that much easier
+  install(CODE "execute_process(COMMAND powershell.exe -ExecutionPolicy Bypass -File ${PROJECT_SOURCE_DIR}/scripts/dev/create_shortcut.ps1 -TargetPath \"energyplus.exe\" -ShortcutPath \"${PROJECT_BINARY_DIR}/EPLaunchPython.lnk\" -Arguments \"auxiliary eplaunch\"")
+  install(FILES "${PROJECT_BINARY_DIR}/EPLaunchPython.lnk" DESTINATION "./PreProcess/" COMPONENT Auxiliary)
+
 endif()
 
 # The group, which will be used to configure the root package
