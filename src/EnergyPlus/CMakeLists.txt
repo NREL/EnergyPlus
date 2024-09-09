@@ -979,6 +979,12 @@ if(BUILD_PACKAGE)
     # we'll want to grab the standard lib for python plugins
     # TODO: I don't think we want to quote the generator expression
     install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/python_lib/" DESTINATION "./python_lib")
+	if(WIN32)
+	  # on Windows, with Build Package, and also Link With Python, we can also drop in shortcuts to the new auxiliary CLI
+	  # NOTE: The install command COMPONENTS should line up so that they are run at the same packaging step
+      install(CODE "execute_process(COMMAND powershell.exe -ExecutionPolicy Bypass -File ${PROJECT_SOURCE_DIR}/scripts/dev/create_shortcut.ps1 -TargetPath \"$<TARGET_FILE:energyplus>\" -ShortcutPath \"$<TARGET_FILE_DIR:energyplus>/EPLaunchPython.lnk\" -Arguments \"auxiliary eplaunch\")" COMPONENT Auxiliary)
+	  install(FILES $<TARGET_FILE_DIR:energyplus>/EPLaunchPython.lnk DESTINATION "./" COMPONENT Auxiliary)
+	endif()
   endif()
   # we'll want to always provide the C API headers
   install(FILES ${API_HEADERS} DESTINATION "./include/EnergyPlus/api")

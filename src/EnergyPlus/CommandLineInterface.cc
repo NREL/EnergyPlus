@@ -243,22 +243,16 @@ Built on Platform: {}
 
         auto *epLaunchSubcommand = auxiliaryToolsSubcommand->add_subcommand("eplaunch", "EP-Launch");
         epLaunchSubcommand->callback([&state, &python_fwd_args] {
-            EnergyPlus::Python::PythonEngine engine(state);
-            // There's probably better to be done, like instantiating the pythonEngine with the argc/argv then calling PyRun_SimpleFile but whatever
-            std::string cmd = R"python(import sys
-sys.argv.clear()
-sys.argv.append("energyplus")
-)python";
-            for (const auto &arg : python_fwd_args) {
-                cmd += fmt::format("sys.argv.append(\"{}\")\n", arg);
-            }
+            fs::path programDir = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+            fs::path const pathToPythonPackages = programDir / "python_lib";
+            fs::path const tclLibraryDir = pathToPythonPackages / "tcl8.6"; // TODO: Find this dynamically
+            std::string tclLib = "TCL_LIBRARY=" + tclLibraryDir.string();
 
-            cmd += R"python(
-from eplaunch.tk_runner import main_gui
-main_gui()
-)python";
-
-            engine.exec(cmd);
+            putenv(tclLib.c_str());
+            fs::path const pathToEPLaunchExe = pathToPythonPackages / "bin" / "energyplus_launch.exe";
+            system(pathToEPLaunchExe.string().c_str());
+            
+            
             exit(0);
         });
 

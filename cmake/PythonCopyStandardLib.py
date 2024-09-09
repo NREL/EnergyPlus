@@ -117,6 +117,12 @@ if platform.system() == 'Windows':
     dll_dir = os.path.join(python_root_dir, 'DLLs')
     shutil.copytree(dll_dir, target_dir, dirs_exist_ok=True)
 
+# And also on Windows, we now need the grab the Tcl/Tk folder that contains config, scripts, and blobs
+if platform.system() == 'Windows':
+    python_root_dir = os.path.dirname(standard_lib_dir)
+    tcl_dir = os.path.join(python_root_dir, 'tcl')
+    shutil.copytree(tcl_dir, target_dir, dirs_exist_ok=True)
+    
 # then I'm going to try to clean up any __pycache__ folders in the target dir to reduce installer size
 for root, dirs, _ in os.walk(target_dir):
     for this_dir in dirs:
