@@ -99,8 +99,6 @@ namespace HeatBalanceManager {
 
     void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
-
     void GetConstructData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void GetBuildingData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
@@ -175,12 +173,6 @@ namespace HeatBalanceManager {
 
     void CreateTCConstructions(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void SetupSimpleWindowGlazingSystem(EnergyPlusData &state, int &MaterNum);
-
-    void SetupComplexFenestrationMaterialInput(EnergyPlusData &state,
-                                               int &MaterNum, // num of material items thus far
-                                               bool &ErrorsFound);
-
     void SetupComplexFenestrationStateInput(EnergyPlusData &state,
                                             int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);
@@ -201,7 +193,6 @@ struct HeatBalanceMgrData : BaseGlobalStruct
     bool ReportWarmupConvergenceFirstWarmupWrite = true;
 
     std::string CurrentModuleObject; // to assist in getting input
-    std::unordered_map<std::string, std::string> UniqueMaterialNames;
     std::unordered_map<std::string, std::string> UniqueConstructNames;
 
     // Real Variables for the Heat Balance Simulation
@@ -244,7 +235,6 @@ struct HeatBalanceMgrData : BaseGlobalStruct
     {
 
         ManageHeatBalanceGetInputFlag = true;
-        UniqueMaterialNames.clear();
         UniqueConstructNames.clear();
         DoReport = false;
         ChangeSet = true;

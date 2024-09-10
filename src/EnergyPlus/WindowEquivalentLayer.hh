@@ -822,7 +822,7 @@ struct WindowEquivalentLayerData : BaseGlobalStruct
     {
     }
 
-    void clear_state()
+    void clear_state() override
     {
         this->CFSDiffAbsTrans.deallocate();
         this->EQLDiffPropFlag.deallocate();

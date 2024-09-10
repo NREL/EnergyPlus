@@ -1153,6 +1153,52 @@ int InputProcessor::getIDFObjNum(EnergyPlusData &state, std::string_view Object,
     return idfOrderNumber;
 }
 
+std::vector<std::string> InputProcessor::getIDFOrderedKeys(EnergyPlusData &state, std::string_view const Object)
+{
+    // Given the number (index) of an object in JSON order, return it's number in original idf order
+    std::vector<std::string> keys;
+    std::vector<int> nums;
+
+    json *obj;
+    auto obj_iter = epJSON.find(std::string(Object));
+    if (obj_iter == epJSON.end()) {
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(Object));
+        if (tmp_umit == caseInsensitiveObjectMap.end()) {
+            return keys;
+        }
+        obj = &epJSON[tmp_umit->second];
+    } else {
+        obj = &(obj_iter.value());
+    }
+
+    // Return names in JSON order
+    if (state.dataGlobal->isEpJSON || !state.dataGlobal->preserveIDFOrder) {
+        for (auto it = obj->begin(); it != obj->end(); ++it)
+            keys.emplace_back(it.key());
+
+        return keys;
+    }
+
+    // Now, the real work begins
+
+    for (auto it = obj->begin(); it != obj->end(); ++it)
+        nums.push_back(it.value()["idf_order"].get<int>());
+    std::sort(nums.begin(), nums.end());
+
+    // Reserve doesn't seem to work :(
+    for (int i = 0; i < (int)nums.size(); ++i)
+        keys.push_back("");
+
+    // get list of saved object numbers from idf processing
+    for (auto it = obj->begin(); it != obj->end(); ++it) {
+        int objNum = it.value()["idf_order"].get<int>();
+        int objIdx = std::find(nums.begin(), nums.end(), objNum) - nums.begin();
+        keys[objIdx] = it.key();
+    }
+
+    return keys;
+}
+
 int InputProcessor::getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number)
 {
     // Given the number (index) of an object in original idf order, return it's number in JSON order

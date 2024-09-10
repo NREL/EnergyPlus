@@ -68,8 +68,68 @@ namespace Construction {
     // Note Sync with SurfaceGroundHeatExchanger::local::MaxCTFTerms
     // ** has to be big enough to hold no matter what window model
     //    each window model should validate layers individually
-    int constexpr MaxSpectralDataElements(800); // Maximum number in Spectral Data arrays.
 
+    // Nested one-field structs just to keep overall structure
+    // consistent with Material::BlindTAR.  See Material.hh for
+    // discussion of this approach.
+    struct BlindSolVis
+    {
+        struct
+        {
+            struct
+            {
+                Material::BlindDfTARGS Df;
+            } Ft;
+            struct
+            {
+                Material::BlindDfTAR Df;
+            } Bk;
+        } Sol;
+        struct
+        {
+            struct
+            {
+                Material::BlindDfTAR Df;
+            } Ft;
+            struct
+            {
+                Material::BlindDfTAR Df;
+            } Bk;
+        } Vis;
+    };
+
+    // Nested one-field structs keep overall structure consistent with Material::BlindTAR
+    struct BlindSolDfAbs
+    {
+        struct
+        {
+            struct
+            {
+                struct
+                {
+                    Real64 Abs = 0.0;
+                    Real64 AbsGnd = 0.0;
+                    Real64 AbsSky = 0.0;
+                } Df;
+            } Ft; // Front
+
+            struct
+            {
+                struct
+                {
+                    Real64 Abs = 0.0;
+                } Df;
+            } Bk; // Back
+        } Sol;
+    };
+
+    struct TCLayer
+    {
+        int constrNum;
+        Real64 specTemp;
+    };
+
+    // This needs to get broken up too
     struct ConstructionProps
     {
         // Members
@@ -143,42 +203,31 @@ namespace Construction {
         // Variables for window constructions
         Array1D<Real64> AbsDiff; // Diffuse solar absorptance for each glass layer,
         // bare glass or shade on
-        Array2D<Real64> BlAbsDiff; // Diffuse solar absorptance for each glass layer vs.
-        // slat angle, blind on
-        Array2D<Real64> BlAbsDiffGnd; // Diffuse ground solar absorptance for each glass layer
-        // vs. slat angle, blind on
-        Array2D<Real64> BlAbsDiffSky; // Diffuse sky solar absorptance for each glass layer
-        // vs. slat angle, blind on
-        Array1D<Real64> AbsDiffBack;   // Diffuse back solar absorptance for each glass layer
-        Array2D<Real64> BlAbsDiffBack; // Diffuse back solar absorptance for each glass layer,
-        //  vs. slat angle, blind on
+
+        std::array<Real64, Material::MaxSlatAngs> effShadeBlindEmi;
+        std::array<Real64, Material::MaxSlatAngs> effGlassEmi;
+
+        std::array<BlindSolVis, Material::MaxSlatAngs> blindTARs;
+
+        // Sol diffuse absorptance per glass layer with blind on
+        Array1D<std::array<BlindSolDfAbs, Material::MaxSlatAngs>> layerSlatBlindDfAbs;
+
+        Array1D<Real64> AbsDiffBack;          // Diffuse back solar absorptance for each glass layer
         Real64 AbsDiffShade = 0.0;            // Diffuse solar absorptance for shade
-        Array1D<Real64> AbsDiffBlind;         // Diffuse solar absorptance for blind, vs. slat angle
-        Array1D<Real64> AbsDiffBlindGnd;      // Diffuse ground solar absorptance for blind, vs. slat angle
-        Array1D<Real64> AbsDiffBlindSky;      // Diffuse sky solar absorptance for blind, vs. slat angle
         Real64 AbsDiffBackShade = 0.0;        // Diffuse back solar absorptance for shade
-        Array1D<Real64> AbsDiffBackBlind;     // Diffuse back solar absorptance for blind, vs. slat angle
         Real64 ShadeAbsorpThermal = 0.0;      // Diffuse back thermal absorptance of shade
         Array1D<Array1D<Real64>> AbsBeamCoef; // Coefficients of incidence-angle polynomial for solar
         // absorptance for each solid glazing layer
         Array1D<Array1D<Real64>> AbsBeamBackCoef; // As for AbsBeamCoef but for back-incident solar
         Array1D<Real64> AbsBeamShadeCoef;         // Coefficients of incidence-angle polynomial for solar
         // absorptance of shade
-        Real64 TransDiff = 0.0;                // Diffuse solar transmittance, bare glass or shade on
-        Array1D<Real64> BlTransDiff;           // Diffuse solar transmittance, blind present, vs. slat angle
-        Array1D<Real64> BlTransDiffGnd;        // Ground diffuse solar transmittance, blind present, vs. slat angle
-        Array1D<Real64> BlTransDiffSky;        // Sky diffuse solar transmittance, blind present, vs. slat angle
-        Real64 TransDiffVis;                   // Diffuse visible transmittance, bare glass or shade on
-        Array1D<Real64> BlTransDiffVis;        // Diffuse visible transmittance, blind present, vs. slat angle
-        Real64 ReflectSolDiffBack = 0.0;       // Diffuse back solar reflectance, bare glass or shade on
-        Array1D<Real64> BlReflectSolDiffBack;  // Diffuse back solar reflectance, blind present, vs. slat angle
-        Real64 ReflectSolDiffFront = 0.0;      // Diffuse front solar reflectance, bare glass or shade on
-        Array1D<Real64> BlReflectSolDiffFront; // Diffuse front solar reflectance, blind present, vs. slat angle
-        Real64 ReflectVisDiffBack = 0.0;       // Diffuse back visible reflectance, bare glass or shade on
-        Array1D<Real64> BlReflectVisDiffBack;  // Diffuse back visible reflectance, blind present, vs. slat angle
-        Real64 ReflectVisDiffFront = 0.0;      // Diffuse front visible reflectance, bare glass or shade on
-        Array1D<Real64> BlReflectVisDiffFront; // Diffuse front visible reflectance, blind present, vs. slat angle
-        Array1D<Real64> TransSolBeamCoef;      // Coeffs of incidence-angle polynomial for beam sol trans,
+        Real64 TransDiff = 0.0;           // Diffuse solar transmittance, bare glass or shade on
+        Real64 TransDiffVis;              // Diffuse visible transmittance, bare glass or shade on
+        Real64 ReflectSolDiffBack = 0.0;  // Diffuse back solar reflectance, bare glass or shade on
+        Real64 ReflectSolDiffFront = 0.0; // Diffuse front solar reflectance, bare glass or shade on
+        Real64 ReflectVisDiffBack = 0.0;  // Diffuse back visible reflectance, bare glass or shade on
+        Real64 ReflectVisDiffFront = 0.0; // Diffuse front visible reflectance, bare glass or shade on
+        Array1D<Real64> TransSolBeamCoef; // Coeffs of incidence-angle polynomial for beam sol trans,
         // bare glass or shade on
         Array1D<Real64> TransVisBeamCoef; // Coeffs of incidence-angle polynomial for beam vis trans,
         // bare glass or shade on
@@ -218,13 +267,18 @@ namespace Construction {
         bool TypeIsIRT = false;          // -- true for construction with IRT material
         bool TypeIsCfactorWall = false;  // -- true for construction with Construction:CfactorUndergroundWall
         bool TypeIsFfactorFloor = false; // -- true for construction with Construction:FfactorGroundFloor
+
         // Added TH 12/22/2008 for thermochromic windows
-        int TCFlag = 0; // 0: this construction is not a thermochromic window construction
-        // 1: it is a TC window construction
-        int TCLayer = 0;       // Reference to the TC glazing material layer in the Material array
-        int TCMasterConst = 0; // The master TC construction referenced by its slave constructions
-        int TCLayerID = 0;     // Which material layer is the TC glazing, counting all material layers.
-        int TCGlassID = 0;     // Which glass layer is the TC glazing, counting from glass layers only.
+        bool isTCWindow = false;
+        bool isTCMaster = false;
+        int TCMasterConstrNum = 0; // The master TC construction referenced by its slave constructions
+        int TCMasterMatNum = 0;    // The master TC material
+        int TCLayerNum = 0;        // Which material layer is the TC glazing, counting all material layers.
+        int TCGlassNum = 0;        // Which glass layer is the TC glazing, counting from glass layers only.
+        int numTCChildConstrs;
+        Array1D<TCLayer> TCChildConstrs;
+        Real64 specTemp;
+
         // For CFactor underground walls
         Real64 CFactor = 0.0;
         Real64 Height = 0.0;
@@ -271,14 +325,9 @@ namespace Construction {
 
         // Default Constructor
         ConstructionProps()
-            : LayerPoint(MaxLayersInConstruct, 0), AbsDiffBlind(Material::MaxSlatAngs, 0.0), AbsDiffBlindGnd(Material::MaxSlatAngs, 0.0),
-              AbsDiffBlindSky(Material::MaxSlatAngs, 0.0), AbsDiffBackBlind(Material::MaxSlatAngs, 0.0), AbsBeamShadeCoef(6, 0.0),
-              BlTransDiff(Material::MaxSlatAngs, 0.0), BlTransDiffGnd(Material::MaxSlatAngs, 0.0), BlTransDiffSky(Material::MaxSlatAngs, 0.0),
-              TransDiffVis(0.0), BlTransDiffVis(Material::MaxSlatAngs, 0.0), BlReflectSolDiffBack(Material::MaxSlatAngs, 0.0),
-              BlReflectSolDiffFront(Material::MaxSlatAngs, 0.0), BlReflectVisDiffBack(Material::MaxSlatAngs, 0.0),
-              BlReflectVisDiffFront(Material::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0),
-              ReflSolBeamBackCoef(6, 0.0), tBareSolDiff(5, 0.0), tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0),
-              rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0), abBareSolDiff(5, 0.0),
+            : LayerPoint(MaxLayersInConstruct, 0), AbsBeamShadeCoef(6, 0.0), TransDiffVis(0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0),
+              ReflSolBeamFrontCoef(6, 0.0), ReflSolBeamBackCoef(6, 0.0), tBareSolDiff(5, 0.0), tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0),
+              rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0), abBareSolDiff(5, 0.0),
               AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0)
         {
             BMat.allocate(3);

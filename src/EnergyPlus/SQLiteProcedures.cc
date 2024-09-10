@@ -196,8 +196,8 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             auto const &surface = state.dataSurface->Surface(surfaceNumber);
             state.dataSQLiteProcedures->sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
-        for (int materialNum = 1; materialNum <= state.dataMaterial->TotMaterials; ++materialNum) {
-            state.dataSQLiteProcedures->sqlite->addMaterialData(materialNum, state.dataMaterial->Material(materialNum));
+        for (int materialNum = 1; materialNum <= state.dataMaterial->materials.isize(); ++materialNum) {
+            state.dataSQLiteProcedures->sqlite->addMaterialData(materialNum, state.dataMaterial->materials(materialNum));
         }
         for (int constructNum = 1; constructNum <= state.dataHeatBal->TotConstructs; ++constructNum) {
             auto const &construction = state.dataConstruction->Construct(constructNum);
@@ -2224,6 +2224,8 @@ bool SQLite::ZoneGroup::insertIntoSQLite(sqlite3_stmt *insertStmt)
 }
 bool SQLite::Material::insertIntoSQLite(sqlite3_stmt *insertStmt)
 {
+    double isoMoistCap = 0.0;
+    double thermGradCoef = 0.0;
     sqliteBindInteger(insertStmt, 1, number);
     sqliteBindText(insertStmt, 2, name);
     sqliteBindInteger(insertStmt, 3, static_cast<int>(group));

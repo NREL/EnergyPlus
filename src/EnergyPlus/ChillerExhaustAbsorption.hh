@@ -222,7 +222,7 @@ struct ChillerExhaustAbsorptionData : BaseGlobalStruct
     bool Sim_GetInput = true;
     Array1D<ChillerExhaustAbsorption::ExhaustAbsorberSpecs> ExhaustAbsorber;
 
-    void init_state([[maybe_unused]] EnergyPlusData &state)
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
 

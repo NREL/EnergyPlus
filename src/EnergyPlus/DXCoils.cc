@@ -9195,8 +9195,6 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     Real64 HeatRTF;              // heating coil part-load ratio, used for cycling fan RH control
     Real64 HeatingCoilPLF;       // heating coil PLF (function of PLR), used for cycling fan RH control
 
-    auto &DXCT = state.dataHVACGlobal->DXCT;
-
     // If Performance mode not present, then set to 1.  Used only by Multimode/Multispeed DX coil (otherwise mode = 1)
     if (present(PerfMode)) {
         Mode = PerfMode;
@@ -10228,8 +10226,6 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
         AirFlowRatio = 1.0;
     }
 
-    auto &DXCT = state.dataHVACGlobal->DXCT;
-
     MaxIter = 30;
     RF = 0.4;
     Counter = 0;
@@ -10891,10 +10887,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
         AirFlowRatio = 1.0;
     }
 
-    auto &DXCT = state.dataHVACGlobal->DXCT;
-
     auto &thisDXCoil = state.dataDXCoils->DXCoil(DXCoilNum);
-
     // Get condenser outdoor node info from DX Heating Coil
     if (thisDXCoil.CondenserInletNodeNum(1) != 0) {
         OutdoorDryBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).Temp;
@@ -11945,8 +11938,6 @@ Real64 CalcCBF(EnergyPlusData &state,
     Real64 adjustedSHR;                     // SHR calculated using adjusted outlet air properties []
     bool CBFErrors(false);                  // Set to true if errors in CBF calculation, fatal at end of routine
 
-    auto &DXCT = state.dataHVACGlobal->DXCT;
-
     if (AirVolFlowRate <= 0.0 || TotCap <= 0.0) { // Coil not running or has no capacity, don't calculate CBF
         return CBF;
     }
@@ -12617,8 +12608,6 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
     Real64 CrankcaseHeatingPower; // Power due to crank case heater
     Real64 AirVolumeFlowRate;     // Air volume flow rate across the heating coil
     Real64 VolFlowperRatedTotCap; // Air volume flow rate divided by rated total heating capacity
-
-    auto &DXCT = state.dataHVACGlobal->DXCT;
 
     auto &thisDXCoil = state.dataDXCoils->DXCoil(DXCoilNum);
 
@@ -13464,7 +13453,6 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
     // Autodesk:Uninit Initialize variables used uninitialized
     FullLoadOutAirEnth = 0.0; // Autodesk:Uninit Force default initialization
 
-    auto &DXCT = state.dataHVACGlobal->DXCT;
     auto &thisDXCoil = state.dataDXCoils->DXCoil(DXCoilNum);
 
     if (SpeedNum > 1) {
