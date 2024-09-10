@@ -51,43 +51,43 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
-#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGParams.hh>
+#include <EnergyPlus/WindowModel.hh>
 
 namespace EnergyPlus {
 
 namespace Material {
 
-    constexpr int MaxSlatAngs(181); // 1 degree increments for slat angles (We'll see what the performance implications are)
-    constexpr int MaxProfAngs(37);
-
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
+
+    // Don't change these numbers because they are printed out by number in SQLite (shouldn't print out internal enums by number)
     enum class Group
     {
         Invalid = -1,
         Regular,
-        Air,
+        AirGap,
         Shade,
-        WindowGlass,
-        WindowGas,
-        WindowBlind,
-        WindowGasMixture,
+        Glass,
+        Gas,
+        Blind,
+        GasMixture,
         Screen,
         EcoRoof,
         IRTransparent,
-        WindowSimpleGlazing,
-        ComplexWindowShade,
+        GlassSimple,
+        ComplexShade,
         ComplexWindowGap,
-        GlassEquivalentLayer,
-        ShadeEquivalentLayer,
-        DrapeEquivalentLayer,
-        BlindEquivalentLayer,
-        ScreenEquivalentLayer,
-        GapEquivalentLayer,
+        GlassEQL,
+        ShadeEQL,
+        DrapeEQL,
+        BlindEQL,
+        ScreenEQL,
+        WindowGapEQL,
+        GlassTCParent,
         Num
     };
 
@@ -101,18 +101,6 @@ namespace Material {
         Xenon,
         Num
     };
-
-#ifdef GET_OUT
-    // Air       Argon     Krypton   Xenon
-    // Gas conductivity coefficients for gases in a mixture
-    extern const std::array<std::array<Real64, 10>, 3> GasCoeffsCon;
-    // Gas viscosity coefficients for gases in a mixture
-    extern const std::array<std::array<Real64, 10>, 3> GasCoeffsVis;
-    // Gas specific heat coefficients for gases in a mixture
-    extern const std::array<std::array<Real64, 10>, 3> GasCoeffsCp;
-    extern const std::array<Real64, 10> GasWght;
-    extern const std::array<Real64, 10> GasSpecificHeatRatio;
-#endif // GET_OUT
 
     enum class GapVentType
     {
@@ -184,11 +172,52 @@ namespace Material {
 
     extern const std::array<std::string_view, (int)SurfaceRoughness::Num> surfaceRoughnessNames;
 
+    // Class Hierarchy
+    //
+    // MaterialBase: Material, Material:AirGap, Material:NoMass, Material:InfraredTransparent
+    //    |
+    //    | MaterialGasMix: WindowMaterial:Gas, WindowMaterial:GasMixture
+    //    |    | MaterialComplexGap: WindowMaterial:Gap (includes WindowGap:DeflectionState and WindowGap:SupportPillar)
+    //    |
+    //    | MaterialFen: abstract
+    //    |    | MaterialGlass: WindowMaterial:Glazing, WindowMaterial:Glazing:RefractionExtinctionMethod
+    //    |    |    | MaterialGlassEQL: WindowMaterial:Glazing:EquivalentLayer
+    //    |    |    | MaterialGlassTCParent: WindowMaterial:GlazingGroup:Thermochromic
+    //    |    |
+    //    |    | MaterialShadingDevice: abstract
+    //    |    |    | MaterialShade: WindowMaterial:Shade
+    //    |    |    | MaterialBlind: WindowMaterial:Blind
+    //    |    |    | MaterialScreen: WindowMaterial:Screen
+    //    |    |    | MaterialComplexShade: WindowMaterial:ComplexShade
+    //    |    |    |    | MaterialShadeEQL: WindowMaterial:Shade:EquivalentLayer
+    //    |    |    |    | MaterialBlindEQL: WindowMaterial:Blind:EquivalentLayer
+    //    |    |    |    | MaterialDrapeEQL: WindowMaterial:Drape:EquivalentLayer
+    //    |    |    |    | MaterialScreenEQL: WindowMaterial:Screen:EquivalentLayer
+    //    |
+    //    | MaterialEcoRoof: Material:RoofVegeration
+    //    |
+    //    | MaterialEMPD: holder of EMPD MaterialProperties.
+    //    |
+    //    | MaterialHAMT: holder of HAMT MaterialProperties.
+    //    |
+    //    | MaterialPhaseChange: holder of PhaseChange MaterialProperties.
+
+    // This class is used for Material:AirGap, Material,
+    // Material:NoMass, and Material:InfraredTransparent.  It is also
+    // the base class for all other materials.  Material:AirGap,
+    // Material:NoMass, and Material:IRT could be a much smaller
+    // parent class of this, but Material:Regular is by far the most
+    // common material so it makes sense to have it as the base class
+    // to avoid an excess of dynamic casting.
     struct MaterialBase
     {
         // Members
         std::string Name = "";        // Name of material layer
+        int Num = 0;                  // Index in material array, comes in handy sometimes
         Group group = Group::Invalid; // Material group type (see Material Parameters above.  Currently
+
+        bool isUsed = false;
+
         // active: RegularMaterial, Shade, Air, WindowGlass,
         // WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,
         // IRTMaterial, WindowSimpleGlazing, ComplexWindowShade, ComplexWindowGap)
@@ -200,7 +229,8 @@ namespace Material {
         Real64 Density = 0.0;      // Layer density (kg/m3)
         Real64 Resistance = 0.0;   // Layer thermal resistance (alternative to Density,
         // Conductivity, Thickness, and Specific Heat; K/W)
-        bool ROnly = false;     // Material defined with "R" only
+        bool ROnly = false; // Material defined with "R" only
+        Real64 NominalR = 0.0;
         Real64 SpecHeat = 0.0;  // Layer specific heat (J/kgK)
         Real64 Thickness = 0.0; // Layer thickness (m)
 
@@ -215,6 +245,43 @@ namespace Material {
         Real64 AbsorpVisible = 0.0;      // Layer Visible Absorptance
         Real64 AbsorpVisibleInput = 0.0; // Layer Visible Absorptance input by user
 
+        // Radiation parameters // Are these for windows or for opaque materials also?
+        bool AbsorpSolarEMSOverrideOn = false;   // if true, then EMS calling to override value for solar absorptance
+        Real64 AbsorpSolarEMSOverride = false;   // value to use when EMS calling to override value for solar absorptance
+        bool AbsorpThermalEMSOverrideOn = false; // if true, then EMS calling to override value for thermal absorptance
+        Real64 AbsorpThermalEMSOverride = 0.0;   // value to use when EMS calling to override value for thermal absorptance
+        bool AbsorpVisibleEMSOverrideOn = false; // if true, then EMS calling to override value for visible absorptance
+        Real64 AbsorpVisibleEMSOverride = 0.0;   // value to use when EMS calling to override value for visible absorptance
+
+        // dynamic thermal and solar absorptance coating parameters
+        VariableAbsCtrlSignal absorpVarCtrlSignal = VariableAbsCtrlSignal::Invalid;
+        int absorpThermalVarSchedIdx = 0;
+        int absorpThermalVarFuncIdx = 0;
+        int absorpSolarVarSchedIdx = 0;
+        int absorpSolarVarFuncIdx = 0;
+
+        bool hasEMPD = false;
+        bool hasHAMT = false;
+        bool hasPCM = false;
+
+        // Moved these into the base class for SQLite purposes
+        Real64 Porosity = 0.0; // Layer porosity
+        // Real64 IsoMoistCap = 0.0;   // Isothermal moisture capacity on water vapor density (m3/kg)
+        // Real64 ThermGradCoef = 0.0; // Thermal-gradient coefficient for moisture capacity based on the water vapor density (kg/kgK)
+        Real64 VaporDiffus = 0.0; // Layer vapor diffusivity
+
+        bool WarnedForHighDiffusivity = false; // used to limit error messaging to just the first instance
+
+        MaterialBase()
+        {
+            group = Group::AirGap;
+        }
+        virtual ~MaterialBase() = default;
+    };
+
+    struct MaterialFen : public MaterialBase
+    {
+        // Are these just for windows?
         Real64 Trans = 0.0;        // Transmittance of layer (glass, shade)
         Real64 TransVis = 0.0;     // Visible transmittance (at normal incidence)
         Real64 TransThermal = 0.0; // Infrared radiation transmittance
@@ -222,188 +289,219 @@ namespace Material {
         Real64 ReflectSolBeamBack = 0.0;  // Solar back reflectance (beam to everything)
         Real64 ReflectSolBeamFront = 0.0; // Solar front reflectance (beam to everything)
 
-        // TODO: these and others need to be moved to a child class
-        // Simple Glazing System
-        Real64 SimpleWindowUfactor = 0.0;       // user input for simple window U-factor with film coeffs (W/m2-k)
-        Real64 SimpleWindowSHGC = 0.0;          // user input for simple window Solar Heat Gain Coefficient (non-dimensional)
-        Real64 SimpleWindowVisTran = 0.0;       // (optional) user input for simple window Visual Transmittance (non-dimensional)
-        bool SimpleWindowVTinputByUser = false; // false means not input, true means user provide VT input
-        bool WarnedForHighDiffusivity = false;  // used to limit error messaging to just the first instance
-
-        bool isUsed = false;
-
-        // Moved these into the base class for SQLite purposes
-        Real64 Porosity = 0.0;      // Layer porosity
-        Real64 IsoMoistCap = 0.0;   // Isothermal moisture capacity on water vapor density (m3/kg)
-        Real64 ThermGradCoef = 0.0; // Thermal-gradient coefficient for moisture capacity based on the water vapor density (kg/kgK)
-        Real64 VaporDiffus = 0.0;   // Layer vapor diffusivity
-
-        virtual bool dummy()
+        MaterialFen() : MaterialBase()
         {
-            return true;
-        } // Need at least one virtual function (vtable) for dynamic casting to work (duh)
-        virtual ~MaterialBase() = default;
-    };
-
-    struct MaterialChild : public MaterialBase
-    {
-        int GlassSpectralDataPtr = 0; // Number of a spectral data set associated with a window glass material
-        // Radiation parameters
-        bool AbsorpSolarEMSOverrideOn = false;   // if true, then EMS calling to override value for solar absorptance
-        Real64 AbsorpSolarEMSOverride = false;   // value to use when EMS calling to override value for solar absorptance
-        bool AbsorpThermalEMSOverrideOn = false; // if true, then EMS calling to override value for thermal absorptance
-        Real64 AbsorpThermalEMSOverride = 0.0;   // value to use when EMS calling to override value for thermal absorptance
-        // dynamic thermal and solar absorptance coating parameters
-        VariableAbsCtrlSignal absorpVarCtrlSignal = VariableAbsCtrlSignal::Invalid;
-        int absorpThermalVarSchedIdx = 0;
-        int absorpThermalVarFuncIdx = 0;
-        int absorpSolarVarSchedIdx = 0;
-        int absorpSolarVarFuncIdx = 0;
-        bool AbsorpVisibleEMSOverrideOn = false; // if true, then EMS calling to override value for visible absorptance
-        Real64 AbsorpVisibleEMSOverride = 0.0;   // value to use when EMS calling to override value for visible absorptance
-
-        // Window-related radiation parameters
-        Real64 GlassTransDirtFactor = 1.0; // Multiplier on glass transmittance due to dirt
-        bool SolarDiffusing = false;       // True if glass diffuses beam solar radiation
-        Real64 ReflectShade = 0.0;         // Shade or screen reflectance (interior shade only)
-        Real64 ReflectShadeVis = 0.0;      // Shade reflectance for visible radiation
-        Real64 ReflectSolDiffBack = 0.0;   // Solar back diffuse reflectance
-        Real64 ReflectSolDiffFront = 0.0;  // Solar front diffuse reflectance
-        Real64 ReflectVisBeamBack = 0.0;   // Visible back reflectance (beam to everything)
-        Real64 ReflectVisBeamFront = 0.0;  // Visible front reflectance (beam to everything)
-        Real64 ReflectVisDiffBack = 0.0;   // Visible back diffuse reflectance
-        Real64 ReflectVisDiffFront = 0.0;  // Visible front diffuse reflectance
-        Real64 TransSolBeam = 0.0;         // Solar transmittance (beam to everything)
-        Real64 TransVisBeam = 0.0;         // Visible transmittance (beam to everything)
-        int BlindDataPtr = 0;              // Pointer to window blind data
-        // Complex fenestration parameters
-        Real64 YoungModulus = 0.0;       // Young's modulus (Pa) - used in window deflection calculations
-        Real64 PoissonsRatio = 0.0;      // Poisson's ratio - used in window deflection calculations
-        Real64 DeflectedThickness = 0.0; // Minimum gap thickness in deflected state (m).  Used with measured deflection
-        Real64 Pressure = 0.0;           // Window Gap pressure (Pa)
-        int SupportPillarPtr = 0;        // Pointer to support pillar data
-        int DeflectionStatePtr = 0;      // Pointer to deflection state
-        int ComplexShadePtr = 0;         // Pointer to complex shade data
-        int GasPointer = 0;              // Pointer to gas or gas mixture used in the gap
-        // Window-shade thermal model parameters
-        Real64 WinShadeToGlassDist = 0.0;    // Distance between window shade and adjacent glass (m)
-        Real64 WinShadeTopOpeningMult = 0.0; // Area of air-flow opening at top of shade, expressed as a fraction
-        //  of the shade-to-glass opening area at the top of the shade
-        Real64 WinShadeBottomOpeningMult = 0.0; // Area of air-flow opening at bottom of shade, expressed as a fraction
-        //  of the shade-to-glass opening area at the bottom of the shade
-        Real64 WinShadeLeftOpeningMult = 0.0; // Area of air-flow opening at left side of shade, expressed as a fraction
-        //  of the shade-to-glass opening area at the left side of the shade
-        Real64 WinShadeRightOpeningMult = 0.0; // Area of air-flow opening at right side of shade, expressed as a fraction
-        //  of the shade-to-glass opening area at the right side of the shade
-        Real64 WinShadeAirFlowPermeability = 0.0; // The effective area of openings in the shade itself, expressed as a
-        //  fraction of the shade area
-        bool EMPDMaterialProps = false;    // True if EMPD properties have been assigned
-        Real64 EMPDmu = 0.0;               // Water Vapor Diffusion Resistance Factor (dimensionless)
-        Real64 MoistACoeff = 0.0;          // Moisture Equation Coefficient a
-        Real64 MoistBCoeff = 0.0;          // Moisture Equation Coefficient b
-        Real64 MoistCCoeff = 0.0;          // Moisture Equation Coefficient c
-        Real64 MoistDCoeff = 0.0;          // Moisture Equation Coefficient d
-        Real64 EMPDSurfaceDepth = 0.0;     // Surface-layer penetration depth (m)
-        Real64 EMPDDeepDepth = 0.0;        // Deep-layer penetration depth (m)
-        Real64 EMPDCoatingThickness = 0.0; // Coating Layer Thickness (m)
-        Real64 EMPDmuCoating = 0.0;        // Coating Layer water vapor diffusion resistance factor (dimensionless)
-        // EcoRoof-Related properties, essentially for the plant layer,
-        //    the soil layer uses the same resource as a regular material
-        int EcoRoofCalculationMethod = 0; // 1-Simple, 2-SchaapGenuchten
-        Real64 HeightOfPlants = 0.0;      // plants' height
-        Real64 LAI = 0.0;                 // LeafAreaIndex (Dimensionless???)
-        Real64 Lreflectivity = 0.0;       // LeafReflectivity
-        Real64 LEmissitivity = 0.0;       // LeafEmissivity
-        Real64 InitMoisture = 0.0;        // Initial soil moisture DJS
-        Real64 MinMoisture = 0.0;         // Minimum moisture allowed DJS
-        Real64 RStomata = 0.0;            // Minimum stomatal resistance DJS
-        // HAMT
-        int niso = -1;                                       // Number of data points
-        Array1D<Real64> isodata = Array1D<Real64>(27, 0.0);  // isotherm values
-        Array1D<Real64> isorh = Array1D<Real64>(27, 0.0);    // isotherm RH values
-        int nsuc = -1;                                       // Number of data points
-        Array1D<Real64> sucdata = Array1D<Real64>(27, 0.0);  // suction values
-        Array1D<Real64> sucwater = Array1D<Real64>(27, 0.0); // suction water values
-        int nred = -1;                                       // Number of data points
-        Array1D<Real64> reddata = Array1D<Real64>(27, 0.0);  // redistribution values
-        Array1D<Real64> redwater = Array1D<Real64>(27, 0.0); // redistribution water values
-        int nmu = -1;                                        // Number of data points
-        Array1D<Real64> mudata = Array1D<Real64>(27, 0.0);   // mu values
-        Array1D<Real64> murh = Array1D<Real64>(27, 0.0);     // mu rh values
-        int ntc = -1;                                        // Number of data points
-        Array1D<Real64> tcdata = Array1D<Real64>(27, 0.0);   // thermal conductivity values
-        Array1D<Real64> tcwater = Array1D<Real64>(27, 0.0);  // thermal conductivity water values
-        Real64 itemp = 10.0;                                 // initial Temperature
-        Real64 irh = 0.5;                                    // Initial RH
-        Real64 iwater = 0.2;                                 // Initial water content kg/kg
-        int divs = 3;                                        // Number of divisions
-        Real64 divsize = 0.005;                              // Average Cell Size
-        int divmin = 3;                                      // Minimum number of cells
-        int divmax = 10;                                     // Maximum number of cells
-        // Added 12/22/2008 for thermochromic window glazing material
-        Real64 SpecTemp = 0.0; // Temperature corresponding to the specified material properties
-        int TCParent = 0;      // Reference to the parent object WindowMaterial:Glazing:Thermochromic
-        // Equivalent Layer (ASHWAT) Model
-        Real64 ScreenWireSpacing = 0.0;  // insect screen wire spacing
-        Real64 ScreenWireDiameter = 0.0; // insect screen wire diameter
-
-        Real64 ReflFrontBeamBeam = 0.0;    // Beam-Beam solar reflectance front at zero incident
-        Real64 ReflBackBeamBeam = 0.0;     // Beam-Beam solar reflectance back at zero incident
-        Real64 TausFrontBeamBeam = 0.0;    // Beam-Beam solar transmittance front at zero incident
-        Real64 TausBackBeamBeam = 0.0;     // Beam-Beam solar transmittance back at zero incident
-        Real64 ReflFrontBeamBeamVis = 0.0; // Beam-Beam visible reflectance front at zero incident
-        Real64 ReflBackBeamBeamVis = 0.0;  // Beam-Beam visible reflectance back at zero incident
-        Real64 TausFrontBeamBeamVis = 0.0; // Beam-Beam visible transmittance front at zero incident
-        Real64 TausBackBeamBeamVis = 0.0;  // Beam-Beam visible transmittance back at zero incident
-        Real64 ReflFrontBeamDiff = 0.0;    // Beam-Diffuse solar reflectance front at zero incident
-        Real64 ReflBackBeamDiff = 0.0;     // Beam-Diffuse solar reflectance back at zero incident
-        Real64 TausFrontBeamDiff = 0.0;    // Beam-Diffuse solar transmittance front at zero incident
-        Real64 TausBackBeamDiff = 0.0;     // Beam-Diffuse solar transmittance back at zero incident
-        Real64 ReflFrontBeamDiffVis = 0.0; // Beam-Diffuse visible reflectance front at zero incident
-        Real64 ReflBackBeamDiffVis = 0.0;  // Beam-Diffuse visible reflectance back at zero incident
-        Real64 TausFrontBeamDiffVis = 0.0; // Beam-Diffuse visible transmittance front at zero incident
-        Real64 TausBackBeamDiffVis = 0.0;  // Beam-Diffuse visible transmittance back at zero incident
-
-        Real64 ReflFrontDiffDiff = 0.0;    // Diffuse-Diffuse solar reflectance front
-        Real64 ReflBackDiffDiff = 0.0;     // Diffuse-Diffuse solar reflectance back
-        Real64 TausDiffDiff = 0.0;         // Diffuse-Diffuse solar transmittance (front and back)
-        Real64 ReflFrontDiffDiffVis = 0.0; // Diffuse-Diffuse visible reflectance front
-        Real64 ReflBackDiffDiffVis = 0.0;  // Diffuse-Diffuse visible reflectance back
-        Real64 TausDiffDiffVis = 0.0;      // Diffuse-Diffuse visible transmittance (front and back)
-        Real64 EmissThermalFront = 0.0;    // Front side thermal or infrared Emissivity
-        Real64 EmissThermalBack = 0.0;     // Back side thermal or infrared Emissivity
-        Real64 TausThermal = 0.0;          // Thermal transmittance (front and back)
-
-        bool ISPleatedDrape = false;                                 // if pleated drape= true, if nonpleated drape = false
-        Real64 PleatedDrapeWidth = 0.0;                              // width of the pleated drape fabric section
-        Real64 PleatedDrapeLength = 0.0;                             // length of the pleated drape fabric section
-        Real64 SlatWidth = 0.0;                                      // slat width
-        Real64 SlatSeparation = 0.0;                                 // slat separation
-        Real64 SlatCrown = 0.0;                                      // slat crown
-        Real64 SlatAngle = 0.0;                                      // slat angle
-        SlatAngleType slatAngleType = SlatAngleType::FixedSlatAngle; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
-        DataWindowEquivalentLayer::Orientation SlatOrientation = DataWindowEquivalentLayer::Orientation::Invalid; // horizontal or vertical
-        HysteresisPhaseChange::HysteresisPhaseChange *phaseChange = nullptr;
-        bool GlassSpectralAndAngle = false; // if SpectralAndAngle is an entered choice
-        int GlassSpecAngTransDataPtr =
-            0; // Data set index of transmittance as a function of spectral and angle associated with a window glass material
-        int GlassSpecAngFRefleDataPtr = 0; // Data set index of front reflectance as a function of spectral and angle associated with a window glass
-        // material
-        int GlassSpecAngBRefleDataPtr = 0; // Data set index of back reflectance as a function of spectral and angle associated with a window glass
-        // material
-
-        virtual bool dummy()
-        {
-            return true;
+            group = Group::Invalid;
         }
-        virtual ~MaterialChild() = default;
+        ~MaterialFen() = default;
+        virtual bool can_instantiate() = 0;
     };
 
-    struct WindowBlindProperties
+    // Abstract parent class for all WindowMaterial:X shading device materials (including Equivalent Layer).
+    struct MaterialShadingDevice : public MaterialFen
     {
-        // Members
-        std::string Name;
-        int MaterialNumber = 0; // Material pointer for the blind
+        // Some characteristics for blind thermal calculation
+        Real64 toGlassDist = 0.0;    // Distance between window shade and adjacent glass (m)
+        Real64 topOpeningMult = 0.0; // Area of air-flow opening at top of blind, expressed as a fraction
+        //  of the blind-to-glass opening area at the top of the blind
+        Real64 bottomOpeningMult = 0.0; // Area of air-flow opening at bottom of blind, expressed as a fraction
+        //  of the blind-to-glass opening area at the bottom of the blind
+        Real64 leftOpeningMult = 0.0; // Area of air-flow opening at left side of blind, expressed as a fraction
+        //  of the blind-to-glass opening area at the left side of the blind
+        Real64 rightOpeningMult = 0.0; // Area of air-flow opening at right side of blind, expressed as a fraction
+        //  of the blind-to-glass opening area at the right side of the blind
+        // Calculated blind properties
+
+        Real64 airFlowPermeability = 0.0; // The effective area of openings in the shade itself, expressed as a
+        //  fraction of the shade area
+        MaterialShadingDevice() : MaterialFen()
+        {
+            group = Group::Invalid;
+        }
+        ~MaterialShadingDevice() = default;
+        virtual bool can_instantiate() = 0; // Prevents this class from being instantiated
+    };
+
+    // Class for WindowMaterial:Shade
+    struct MaterialShade : public MaterialShadingDevice
+    {
+        Real64 ReflectShade = 0.0;    // Shade or screen reflectance (interior shade only)
+        Real64 ReflectShadeVis = 0.0; // Shade reflectance for visible radiation
+
+        MaterialShade() : MaterialShadingDevice()
+        {
+            group = Group::Shade;
+        }
+        ~MaterialShade() = default;
+        bool can_instantiate() override
+        {
+            return true;
+        } // Allows this class to be instantiated
+    };
+
+    // This may seem like an overly complicated way to handle a set of
+    // multi-dimensional variables, but I think that it is actually
+    // cleaner than either a multi-dimensional array (and certaily
+    // faster) and also better than just a long list of variables.
+
+    // Blind-properties essentially have four dimensions: property
+    // type (transmittance, reflectance, absorptance), beam or
+    // diffuse, front or back, solar or visible (maybe solar or
+    // visible or thermal/IR).  Rather than coming up with and
+    // enforcing a consistent namming scheme for these variables,
+    // arranging them into nested structres keeps the ordering (as
+    // well as the naming) of the dimensions consistent, and also
+    // inserts periods between the dimensions to help with
+    // readability.  In this case, I chose the struct nesting to be
+    // SolVis.Front.Back.BmDf.Prop.  So variables are always going to
+    // be called Sol.Front.Df.Abs and Vis.Back.Df.Ref.
+
+    // For the record, accessing variables in nested structs is as
+    // fast as accessing plain scalar variables.  The reason is that
+    // the compiler knows the position of every variable at every
+    // level of a nested struct at compile time and can load it with a
+    // single offset like it loads every other variable in an object.
+    // This is another downside of references in C++.  Accessing
+    // variables in structures (even nested structures) is fast.
+    // Acessing variables through pointer indirection is slow.
+    // W->X->Y->Z is slower than W.X.Y.Z.  References are pointers,
+    // but they use the . notation rather than -> for accessing
+    // fields.  So if W.X.Y.Z is implemented using nested structures
+    // then it is fast, but if it is implemented using references to
+    // structures then it is slow.  But without context there is no
+    // way to tell which is which.
+
+    struct BlindBmTAR
+    {
+        Real64 BmTra = 0.0; // Beam-beam transmittance
+        Real64 DfTra = 0.0; // Beam-diff transmittance
+        Real64 BmRef = 0.0; // Beam-beam reflectance
+        Real64 DfRef = 0.0; // Beam-diff reflectance
+        Real64 Abs = 0.0;   // Absorptance
+
+        void interpSlatAng(BlindBmTAR const &t1, BlindBmTAR const &t2, Real64 interpFac)
+        {
+            BmTra = Interp(t1.BmTra, t2.BmTra, interpFac);
+            DfTra = Interp(t1.DfTra, t2.DfTra, interpFac);
+            BmRef = Interp(t1.BmRef, t2.BmRef, interpFac);
+            DfRef = Interp(t1.DfRef, t2.DfRef, interpFac);
+            Abs = Interp(t1.Abs, t2.Abs, interpFac);
+        }
+    };
+
+    struct BlindDfTAR
+    {
+        Real64 Tra = 0.0;
+        Real64 Abs = 0.0;
+        Real64 Ref = 0.0;
+
+        void interpSlatAng(BlindDfTAR const &t1, BlindDfTAR const &t2, Real64 interpFac)
+        {
+            Tra = Interp(t1.Tra, t2.Tra, interpFac);
+            Ref = Interp(t1.Ref, t2.Ref, interpFac);
+            Abs = Interp(t1.Abs, t2.Abs, interpFac);
+        }
+    };
+
+    struct BlindDfTARGS
+    {
+        Real64 Tra = 0.0;
+        Real64 TraGnd = 0.0;
+        Real64 TraSky = 0.0;
+        Real64 Ref = 0.0;
+        Real64 RefGnd = 0.0;
+        Real64 RefSky = 0.0;
+        Real64 Abs = 0.0;
+        Real64 AbsGnd = 0.0;
+        Real64 AbsSky = 0.0;
+
+        void interpSlatAng(BlindDfTARGS const &t1, BlindDfTARGS const &t2, Real64 interpFac)
+        {
+            Tra = Interp(t1.Tra, t2.Tra, interpFac);
+            TraGnd = Interp(t1.TraGnd, t2.TraGnd, interpFac);
+            TraSky = Interp(t1.TraSky, t2.TraSky, interpFac);
+            Ref = Interp(t1.Ref, t2.Ref, interpFac);
+            RefGnd = Interp(t1.RefGnd, t2.RefGnd, interpFac);
+            RefSky = Interp(t1.RefSky, t2.RefSky, interpFac);
+            Abs = Interp(t1.Abs, t2.Abs, interpFac);
+            AbsGnd = Interp(t1.AbsGnd, t2.AbsGnd, interpFac);
+            AbsSky = Interp(t1.AbsSky, t2.AbsSky, interpFac);
+        }
+    };
+
+    template <int ProfAngs> struct BlindBmDf
+    {
+        std::array<BlindBmTAR, ProfAngs> Bm;
+        BlindDfTARGS Df;
+
+        void interpSlatAng(BlindBmDf const &t1, BlindBmDf const &t2, Real64 interpFac)
+        {
+            for (int i = 0; i < ProfAngs; ++i)
+                Bm[i].interpSlatAng(t1.Bm[i], t2.Bm[i], interpFac);
+            Df.interpSlatAng(t1.Df, t2.Df, interpFac);
+        }
+    };
+
+    template <int ProfAngs> struct BlindFtBk
+    {
+        BlindBmDf<ProfAngs> Ft;
+        BlindBmDf<ProfAngs> Bk;
+
+        void interpSlatAng(BlindFtBk const &t1, BlindFtBk const &t2, Real64 interpFac)
+        {
+            Ft.interpSlatAng(t1.Ft, t2.Ft, interpFac);
+            Bk.interpSlatAng(t1.Bk, t2.Bk, interpFac);
+        }
+    };
+
+    struct BlindTraEmi
+    {
+        Real64 Tra = 0.0;
+        Real64 Emi = 0.0;
+
+        void interpSlatAng(BlindTraEmi const &t1, BlindTraEmi const &t2, Real64 interpFac)
+        {
+            Tra = Interp(t1.Tra, t2.Tra, interpFac);
+            Emi = Interp(t1.Emi, t2.Emi, interpFac);
+        }
+    };
+
+    struct BlindFtBkIR
+    {
+        BlindTraEmi Ft;
+        BlindTraEmi Bk;
+
+        void interpSlatAng(BlindFtBkIR const &t1, BlindFtBkIR const &t2, Real64 interpFac)
+        {
+            Ft.interpSlatAng(t1.Ft, t2.Ft, interpFac);
+            Bk.interpSlatAng(t1.Bk, t2.Bk, interpFac);
+        }
+    };
+
+    template <int ProfAngs> struct BlindTraAbsRef
+    {
+        BlindFtBk<ProfAngs> Sol;
+        BlindFtBk<ProfAngs> Vis;
+        BlindFtBkIR IR;
+
+        void interpSlatAng(BlindTraAbsRef const &t1, BlindTraAbsRef const &t2, Real64 interpFac)
+        {
+            Sol.interpSlatAng(t1.Sol, t2.Sol, interpFac);
+            Vis.interpSlatAng(t1.Vis, t2.Vis, interpFac);
+            IR.interpSlatAng(t1.IR, t2.IR, interpFac);
+        }
+    };
+
+    // Blind
+    constexpr int MaxSlatAngs = 181;
+    constexpr int MaxProfAngs = 37;
+
+    constexpr Real64 dProfAng = Constant::Pi / (MaxProfAngs - 1);
+    constexpr Real64 dSlatAng = Constant::Pi / (MaxSlatAngs - 1);
+
+    // WindowMaterial:Blind class
+    struct MaterialBlind : public MaterialShadingDevice
+    {
         // Input properties
         DataWindowEquivalentLayer::Orientation SlatOrientation = DataWindowEquivalentLayer::Orientation::Invalid; // HORIZONTAL or VERTICAL
         DataWindowEquivalentLayer::AngleType SlatAngleType = DataWindowEquivalentLayer::AngleType::Fixed;         // FIXED or VARIABLE
@@ -415,161 +513,51 @@ namespace Material {
         Real64 MinSlatAngle = 0.0;     // Minimum slat angle for variable-angle slats (deg) (user input)
         Real64 MaxSlatAngle = 0.0;     // Maximum slat angle for variable-angle slats (deg) (user input)
         Real64 SlatConductivity = 0.0; // Slat conductivity (W/m-K)
-        // Solar slat properties
-        Real64 SlatTransSolBeamDiff = 0.0;     // Slat solar beam-diffuse transmittance
-        Real64 SlatFrontReflSolBeamDiff = 0.0; // Slat front solar beam-diffuse reflectance
-        Real64 SlatBackReflSolBeamDiff = 0.0;  // Slat back solar beam-diffuse reflectance
-        Real64 SlatTransSolDiffDiff = 0.0;     // Slat solar diffuse-diffuse transmittance
-        Real64 SlatFrontReflSolDiffDiff = 0.0; // Slat front solar diffuse-diffuse reflectance
-        Real64 SlatBackReflSolDiffDiff = 0.0;  // Slat back solar diffuse-diffuse reflectance
-        // Visible slat properties
-        Real64 SlatTransVisBeamDiff = 0.0;     // Slat visible beam-diffuse transmittance
-        Real64 SlatFrontReflVisBeamDiff = 0.0; // Slat front visible beam-diffuse reflectance
-        Real64 SlatBackReflVisBeamDiff = 0.0;  // Slat back visible beam-diffuse reflectance
-        Real64 SlatTransVisDiffDiff = 0.0;     // Slat visible diffuse-diffuse transmittance
-        Real64 SlatFrontReflVisDiffDiff = 0.0; // Slat front visible diffuse-diffuse reflectance
-        Real64 SlatBackReflVisDiffDiff = 0.0;  // Slat back visible diffuse-diffuse reflectance
-        // Long-wave (IR) slat properties
-        Real64 SlatTransIR = 0.0;      // Slat IR transmittance
-        Real64 SlatFrontEmissIR = 0.0; // Slat front emissivity
-        Real64 SlatBackEmissIR = 0.0;  // Slat back emissivity
-        // Some characteristics for blind thermal calculation
-        Real64 BlindToGlassDist = 0.0;    // Distance between window shade and adjacent glass (m)
-        Real64 BlindTopOpeningMult = 0.0; // Area of air-flow opening at top of blind, expressed as a fraction
-        //  of the blind-to-glass opening area at the top of the blind
-        Real64 BlindBottomOpeningMult = 0.0; // Area of air-flow opening at bottom of blind, expressed as a fraction
-        //  of the blind-to-glass opening area at the bottom of the blind
-        Real64 BlindLeftOpeningMult = 0.0; // Area of air-flow opening at left side of blind, expressed as a fraction
-        //  of the blind-to-glass opening area at the left side of the blind
-        Real64 BlindRightOpeningMult = 0.0; // Area of air-flow opening at right side of blind, expressed as a fraction
-        //  of the blind-to-glass opening area at the right side of the blind
-        // Calculated blind properties
-        // Blind solar properties
-        Array2D<Real64> SolFrontBeamBeamTrans; // Blind solar front beam-beam transmittance vs.
-        // profile angle, slat angle
-        Array2D<Real64> SolFrontBeamBeamRefl; // Blind solar front beam-beam reflectance vs. profile angle,
-        // slat angle (zero)
-        Array2D<Real64> SolBackBeamBeamTrans; // Blind solar back beam-beam transmittance vs. profile angle,
-        // slat angle
-        Array2D<Real64> SolBackBeamBeamRefl; // Blind solar back beam-beam reflectance vs. profile angle,
-        // slat angle (zero)
-        Array2D<Real64> SolFrontBeamDiffTrans; // Blind solar front beam-diffuse transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> SolFrontBeamDiffRefl; // Blind solar front beam-diffuse reflectance
-        // vs. profile angle, slat angle
-        Array2D<Real64> SolBackBeamDiffTrans; // Blind solar back beam-diffuse transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> SolBackBeamDiffRefl; // Blind solar back beam-diffuse reflectance
-        // vs. profile angle, slat angle
-        Array1D<Real64> SolFrontDiffDiffTrans; // Blind solar front diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffTransGnd; // Blind ground solar front diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffTransSky; // Blind sky solar front diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffRefl; // Blind solar front diffuse-diffuse reflectance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffReflGnd; // Blind ground solar front diffuse-diffuse reflectance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffReflSky; // Blind sky solar front diffuse-diffuse reflectance
-        // vs. slat angle
-        Array1D<Real64> SolBackDiffDiffTrans; // Blind solar back diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolBackDiffDiffRefl; // Blind solar back diffuse-diffuse reflectance
-        // vs. slat angle
-        Array2D<Real64> SolFrontBeamAbs;    // Blind solar front beam absorptance vs. slat angle
-        Array2D<Real64> SolBackBeamAbs;     // Blind solar back beam absorptance vs. slat angle
-        Array1D<Real64> SolFrontDiffAbs;    // Blind solar front diffuse absorptance vs. slat angle
-        Array1D<Real64> SolFrontDiffAbsGnd; // Blind ground solar front diffuse absorptance vs. slat angle
-        Array1D<Real64> SolFrontDiffAbsSky; // Blind sky solar front diffuse absorptance vs. slat angle
-        Array1D<Real64> SolBackDiffAbs;     // Blind solar back diffuse absorptance vs. slat angle
-        // Blind visible properties
-        Array2D<Real64> VisFrontBeamBeamTrans; // Blind visible front beam-beam transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> VisFrontBeamBeamRefl; // Blind visible front beam-beam reflectance
-        // vs. profile angle, slat angle (zero)
-        Array2D<Real64> VisBackBeamBeamTrans; // Blind visible back beam-beam transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> VisBackBeamBeamRefl; // Blind visible back beam-beam reflectance
-        // vs. profile angle, slat angle (zero)
-        Array2D<Real64> VisFrontBeamDiffTrans; // Blind visible front beam-diffuse transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> VisFrontBeamDiffRefl; // Blind visible front beam-diffuse reflectance
-        // vs. profile angle, slat angle
-        Array2D<Real64> VisBackBeamDiffTrans; // Blind visible back beam-diffuse transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> VisBackBeamDiffRefl; // Blind visible back beam-diffuse reflectance
-        // vs. profile angle, slat angle
-        Array1D<Real64> VisFrontDiffDiffTrans; // Blind visible front diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> VisFrontDiffDiffRefl; // Blind visible front diffuse-diffuse reflectance
-        // vs. slat angle
-        Array1D<Real64> VisBackDiffDiffTrans; // Blind visible back diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> VisBackDiffDiffRefl; // Blind visible back diffuse-diffuse reflectance
-        // vs. slat angle
-        // Long-wave (IR) blind properties
-        Array1D<Real64> IRFrontTrans; // Blind IR front transmittance vs. slat angle
-        Array1D<Real64> IRFrontEmiss; // Blind IR front emissivity vs. slat angle
-        Array1D<Real64> IRBackTrans;  // Blind IR back transmittance vs. slat angle
-        Array1D<Real64> IRBackEmiss;  // Blind IR back emissivity vs. slat angle
+
+        BlindTraAbsRef<1> slatTAR; // Beam properties for slats are not profile-angle dependent
+
+        // Beam properties for blinds are profile angle dependent, so template must be instantiated with MaxProfAngs+1
+        std::array<BlindTraAbsRef<MaxProfAngs + 1>, MaxSlatAngs> TARs;
 
         // Default Constructor
-        WindowBlindProperties()
-            : SolFrontBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0),
-              SolBackBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolBackBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0),
-              SolFrontBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0),
-              SolBackBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolBackBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0),
-              SolFrontDiffDiffTrans(MaxSlatAngs, 0.0), SolFrontDiffDiffTransGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffTransSky(MaxSlatAngs, 0.0),
-              SolFrontDiffDiffRefl(MaxSlatAngs, 0.0), SolFrontDiffDiffReflGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffReflSky(MaxSlatAngs, 0.0),
-              SolBackDiffDiffTrans(MaxSlatAngs, 0.0), SolBackDiffDiffRefl(MaxSlatAngs, 0.0), SolFrontBeamAbs(MaxSlatAngs, MaxProfAngs, 0.0),
-              SolBackBeamAbs(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontDiffAbs(MaxSlatAngs, 0.0), SolFrontDiffAbsGnd(MaxSlatAngs, 0.0),
-              SolFrontDiffAbsSky(MaxSlatAngs, 0.0), SolBackDiffAbs(MaxSlatAngs, 0.0), VisFrontBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0),
-              VisFrontBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0), VisBackBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0),
-              VisBackBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0), VisFrontBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0),
-              VisFrontBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0), VisBackBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0),
-              VisBackBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0), VisFrontDiffDiffTrans(MaxSlatAngs, 0.0), VisFrontDiffDiffRefl(MaxSlatAngs, 0.0),
-              VisBackDiffDiffTrans(MaxSlatAngs, 0.0), VisBackDiffDiffRefl(MaxSlatAngs, 0.0), IRFrontTrans(MaxSlatAngs, 0.0),
-              IRFrontEmiss(MaxSlatAngs, 0.0), IRBackTrans(MaxSlatAngs, 0.0), IRBackEmiss(MaxSlatAngs, 0.0)
+        MaterialBlind() : MaterialShadingDevice()
         {
+            group = Group::Blind;
         }
+        ~MaterialBlind() = default;
+        bool can_instantiate()
+        {
+            return true;
+        } // This function allows this class to be instantiated
+
+        Real64 BeamBeamTrans(Real64 profAng, Real64 slatAng) const;
     };
 
-    struct WindowComplexShade
+    // WindowMaterial:ComplexShade class
+    struct MaterialComplexShade : public MaterialShadingDevice
     {
-        // Members
-        std::string Name; // Name for complex shade
-        TARCOGParams::TARCOGLayerType LayerType =
-            TARCOGParams::TARCOGLayerType::Invalid; // Layer type (OtherShadingType, Venetian, Woven, Perforated)
-        Real64 Thickness = 0.0;                     // Layer thickness (m)
-        Real64 Conductivity = 0.0;                  // Layer conductivity (W/m2K)
-        Real64 IRTransmittance = 0.0;               // IR Transmittance
-        Real64 FrontEmissivity = 0.0;               // Emissivity of front surface
-        Real64 BackEmissivity = 0.0;                // Emissivity of back surface
-        Real64 TopOpeningMultiplier = 0.0;          // Coverage percent for top opening (%)
-        Real64 BottomOpeningMultiplier = 0.0;       // Coverage percent for bottom opening (%)
-        Real64 LeftOpeningMultiplier = 0.0;         // Coverage percent for left opening (%)
-        Real64 RightOpeningMultiplier = 0.0;        // Coverage percent for right opening (%)
-        Real64 FrontOpeningMultiplier = 0.0;        // Coverage percent for front opening (%)
-        Real64 SlatWidth = 0.0;                     // Slat width (m)
-        Real64 SlatSpacing = 0.0;                   // Slat spacing (m)
-        Real64 SlatThickness = 0.0;                 // Slat thickness (m)
-        Real64 SlatAngle = 0.0;                     // Slat angle (deg)
-        Real64 SlatConductivity = 0.0;              // Slat conductivity (W/m2K)
-        Real64 SlatCurve = 0.0;                     // Curvature radius of slat (if =0 then flat) (m)
-    };
+        // Layer type (OtherShadingType, Venetian, Woven, Perforated)
+        TARCOGParams::TARCOGLayerType LayerType = TARCOGParams::TARCOGLayerType::Invalid;
+        Real64 FrontEmissivity = 0.0;  // Emissivity of front surface
+        Real64 BackEmissivity = 0.0;   // Emissivity of back surface
+        Real64 SlatWidth = 0.0;        // Slat width (m)
+        Real64 SlatSpacing = 0.0;      // Slat spacing (m)
+        Real64 SlatThickness = 0.0;    // Slat thickness (m)
+        Real64 SlatAngle = 0.0;        // Slat angle (deg)
+        Real64 SlatConductivity = 0.0; // Slat conductivity (W/m2K)
+        Real64 SlatCurve = 0.0;        // Curvature radius of slat (if =0 then flat) (m)
 
-    struct WindowThermalModelParams
-    {
-        // Members
-        std::string Name;                                                                                   // Window thermal model name
-        TARCOGGassesParams::Stdrd CalculationStandard = TARCOGGassesParams::Stdrd::Invalid;                 // Tarcog calculation standard
-        TARCOGParams::TARCOGThermalModel ThermalModel = TARCOGParams::TARCOGThermalModel::Invalid;          // Tarcog thermal model
-        Real64 SDScalar = 0.0;                                                                              // SDScalar coefficient
-        TARCOGParams::DeflectionCalculation DeflectionModel = TARCOGParams::DeflectionCalculation::Invalid; // Deflection model
-        Real64 VacuumPressureLimit = 0.0; // Pressure limit at which it will be considered vacuum gas state
-        Real64 InitialTemperature = 0.0;  // Window(s) temperature in time of fabrication
-        Real64 InitialPressure = 0.0;     // Window(s) pressure in time of fabrication
+        Real64 frontOpeningMult = 0.0;
+
+        MaterialComplexShade() : MaterialShadingDevice()
+        {
+            group = Group::ComplexShade;
+        }
+        ~MaterialComplexShade() = default;
+        bool can_instantiate()
+        {
+            return true;
+        } // This function allows this class to be instantiated
     };
 
     int constexpr maxMixGases = 5;
@@ -593,6 +581,7 @@ namespace Material {
 
     extern const std::array<Gas, 10> gases;
 
+    // Class for WindowMaterial:Gas and WindowMaterial:GasMixture.  Parent class for Material:ComplexWindowGap
     struct MaterialGasMix : public MaterialBase
     {
         //  up to 5 gases in a mixture [Window gas only].  It is defined as parameter (GasCoefs)
@@ -603,17 +592,55 @@ namespace Material {
 
         GapVentType gapVentType = GapVentType::Sealed; // Gap Ven type for equivalent Layer window model
 
-        virtual bool dummy()
-        {
-            return true;
-        }
-
         MaterialGasMix() : MaterialBase()
         {
-            group = Group::WindowGas;
+            group = Group::Gas;
         }
+        ~MaterialGasMix() = default;
     };
 
+    // Class for Material:ComplexWindowGap
+    struct MaterialComplexWindowGap : public MaterialGasMix
+    {
+        Real64 Pressure = 0.0;
+        Real64 pillarSpacing = 0.0; // Spacing between centers of support pillars (m)
+        Real64 pillarRadius = 0.0;  // Support pillar radius (m)
+        Real64 deflectedThickness = 0.0;
+
+        MaterialComplexWindowGap() : MaterialGasMix()
+        {
+            group = Group::ComplexWindowGap;
+        }
+        ~MaterialComplexWindowGap() = default;
+    };
+
+    struct ScreenBmTraAbsRef
+    {
+        struct
+        {
+            Real64 Tra = 0.0;
+        } Bm;
+        struct
+        {
+            Real64 Tra = 0.0;
+        } Df;
+        Real64 Abs = 0.0;
+        Real64 Ref = 0.0;
+    };
+
+    struct ScreenBmTAR
+    {
+        struct
+        {
+            ScreenBmTraAbsRef Ft, Bk;
+        } Sol;
+        struct
+        {
+            ScreenBmTraAbsRef Ft, Bk;
+        } Vis;
+    };
+
+    // Screen Beam Transmittance, Absorptance, Reflectance (TAR) properties
     struct ScreenBmTransAbsRef
     {
         Real64 BmTrans = 0.0; // Beam solar transmittance (dependent on sun angle)
@@ -641,7 +668,8 @@ namespace Material {
     constexpr int maxIPhi = (Constant::Pi * Constant::RadToDeg / minDegResolution) + 1;
     constexpr int maxITheta = (Constant::Pi * Constant::RadToDeg / minDegResolution) + 1;
 
-    struct MaterialScreen : public MaterialBase
+    // Class for Material:Screen
+    struct MaterialScreen : public MaterialShadingDevice
     {
         Real64 diameterToSpacingRatio = 0.0; // ratio of screen material diameter to screen material spacing
 
@@ -664,32 +692,225 @@ namespace Material {
 
         std::array<std::array<ScreenBmTransAbsRef, maxITheta>, maxIPhi> btars;
 
-        // These are shared with window shade and blind
-        Real64 toGlassDist = 0.0;    // Distance between window shade and adjacent glass (m)
-        Real64 topOpeningMult = 0.0; // Area of air-flow opening at top of shade, expressed as a fraction
-        //  of the shade-to-glass opening area at the top of the shade
-        Real64 bottomOpeningMult = 0.0; // Area of air-flow opening at bottom of shade, expressed as a fraction
-        //  of the shade-to-glass opening area at the bottom of the shade
-        Real64 leftOpeningMult = 0.0; // Area of air-flow opening at left side of shade, expressed as a fraction
-        //  of the shade-to-glass opening area at the left side of the shade
-        Real64 rightOpeningMult = 0.0; // Area of air-flow opening at right side of shade, expressed as a fraction
-        //  of the shade-to-glass opening area at the right side of the shade
-        Real64 airFlowPermeability = 0.0; // The effective area of openings in the shade itself, expressed as a
-        //  fraction of the shade area
+        MaterialScreen() : MaterialShadingDevice()
+        {
+            group = Group::Screen;
+        }
+        ~MaterialScreen() = default;
+        bool can_instantiate() override
+        {
+            return true;
+        } // Allows this class to be instantiated
+    };
 
-        virtual bool dummy()
+    // Class for Material:Shade:EquivalentLayer and parent class for
+    // Material:Blind:EquivalentLayer, Material:Drape:EquivalentLayer
+    // and MaterialScreen:EquivalentLayer
+    struct MaterialShadeEQL : public MaterialShadingDevice
+    {
+        // Shading properties are profile-angle independent in EQL model
+        BlindTraAbsRef<1> TAR;
+
+        MaterialShadeEQL() : MaterialShadingDevice()
+        {
+            group = Group::ShadeEQL;
+        }
+        virtual ~MaterialShadeEQL() = default;
+        bool can_instantiate() override
+        {
+            return true;
+        } // Allows this class to be instantiated
+    };
+
+    // Class for Material:Screen:EquivalentLayer
+    struct MaterialScreenEQL : public MaterialShadeEQL
+    {
+        Real64 wireSpacing = 0.0;  // insect screen wire spacing
+        Real64 wireDiameter = 0.0; // insect screen wire diameter
+
+        MaterialScreenEQL() : MaterialShadeEQL()
+        {
+            group = Group::ScreenEQL;
+        }
+        virtual ~MaterialScreenEQL() = default;
+    };
+
+    struct MaterialDrapeEQL : public MaterialShadeEQL
+    {
+        bool isPleated = false;     // if pleated drape= true, if nonpleated drape = false
+        Real64 pleatedWidth = 0.0;  // width of the pleated drape fabric section
+        Real64 pleatedLength = 0.0; // length of the pleated drape fabric section
+
+        MaterialDrapeEQL() : MaterialShadeEQL()
+        {
+            group = Group::DrapeEQL;
+        } // Can be any number of 'group' types, so don't set it here
+        virtual ~MaterialDrapeEQL() = default;
+    };
+
+    struct MaterialBlindEQL : public MaterialShadeEQL
+    {
+        Real64 SlatWidth = 0.0;                                      // slat width
+        Real64 SlatSeparation = 0.0;                                 // slat separation
+        Real64 SlatCrown = 0.0;                                      // slat crown
+        Real64 SlatAngle = 0.0;                                      // slat angle
+        SlatAngleType slatAngleType = SlatAngleType::FixedSlatAngle; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
+        DataWindowEquivalentLayer::Orientation SlatOrientation = DataWindowEquivalentLayer::Orientation::Invalid; // horizontal or vertical
+
+        MaterialBlindEQL() : MaterialShadeEQL()
+        {
+            group = Group::BlindEQL;
+        } // Can be any number of 'group' types, so don't set it here
+        virtual ~MaterialBlindEQL() = default;
+    };
+
+    // EcoRoof
+    enum EcoRoofCalcMethod
+    {
+        Invalid = -1,
+        Simple,
+        SchaapGenuchten,
+        Num
+    };
+
+    extern const std::array<std::string_view, (int)EcoRoofCalcMethod::Num> ecoRoofCalcMethodNamesUC;
+
+    // Class for Material:RoofVegetation
+    struct MaterialEcoRoof : public MaterialBase
+    {
+        // EcoRoof-Related properties, essentially for the plant layer,
+        //    the soil layer uses the same resource as a regular material
+        EcoRoofCalcMethod calcMethod = EcoRoofCalcMethod::Invalid; // 1-Simple, 2-SchaapGenuchten
+        Real64 HeightOfPlants = 0.0;                               // plants' height
+        Real64 LAI = 0.0;                                          // LeafAreaIndex (Dimensionless???)
+        Real64 Lreflectivity = 0.0;                                // LeafReflectivity
+        Real64 LEmissitivity = 0.0;                                // LeafEmissivity
+        Real64 InitMoisture = 0.0;                                 // Initial soil moisture DJS
+        Real64 MinMoisture = 0.0;                                  // Minimum moisture allowed DJS
+        Real64 RStomata = 0.0;                                     // Minimum stomatal resistance DJS
+
+        MaterialEcoRoof() : MaterialBase()
+        {
+            group = Group::EcoRoof;
+        }
+        ~MaterialEcoRoof() = default;
+    };
+
+    struct WindowThermalModelParams
+    {
+        // Members
+        std::string Name;                                                                                   // Window thermal model name
+        TARCOGGassesParams::Stdrd CalculationStandard = TARCOGGassesParams::Stdrd::Invalid;                 // Tarcog calculation standard
+        TARCOGParams::TARCOGThermalModel ThermalModel = TARCOGParams::TARCOGThermalModel::Invalid;          // Tarcog thermal model
+        Real64 SDScalar = 0.0;                                                                              // SDScalar coefficient
+        TARCOGParams::DeflectionCalculation DeflectionModel = TARCOGParams::DeflectionCalculation::Invalid; // Deflection model
+        Real64 VacuumPressureLimit = 0.0; // Pressure limit at which it will be considered vacuum gas state
+        Real64 InitialTemperature = 0.0;  // Window(s) temperature in time of fabrication
+        Real64 InitialPressure = 0.0;     // Window(s) pressure in time of fabrication
+    };
+
+    struct SpectralDataProperties
+    {
+        // Members
+        std::string Name;           // Name of spectral data set
+        int NumOfWavelengths = 0;   // Number of wavelengths in the data set
+        Array1D<Real64> WaveLength; // Wavelength (microns)
+        Array1D<Real64> Trans;      // Transmittance at normal incidence
+        Array1D<Real64> ReflFront;  // Front reflectance at normal incidence
+        Array1D<Real64> ReflBack;   // Back reflectance at normal incidence
+    };
+
+    struct MaterialGlass : public MaterialFen
+    {
+        // Window-related radiation parameters
+        Real64 GlassTransDirtFactor = 1.0; // Multiplier on glass transmittance due to dirt
+        bool SolarDiffusing = false;       // True if glass diffuses beam solar radiation
+        Real64 ReflectSolDiffBack = 0.0;   // Solar back diffuse reflectance
+        Real64 ReflectSolDiffFront = 0.0;  // Solar front diffuse reflectance
+        Real64 ReflectVisBeamBack = 0.0;   // Visible back reflectance (beam to everything)
+        Real64 ReflectVisBeamFront = 0.0;  // Visible front reflectance (beam to everything)
+        Real64 ReflectVisDiffBack = 0.0;   // Visible back diffuse reflectance
+        Real64 ReflectVisDiffFront = 0.0;  // Visible front diffuse reflectance
+        Real64 TransSolBeam = 0.0;         // Solar transmittance (beam to everything)
+        Real64 TransVisBeam = 0.0;         // Visible transmittance (beam to everything)
+        // Complex fenestration parameters
+        Real64 YoungModulus = 0.0;  // Young's modulus (Pa) - used in window deflection calculations
+        Real64 PoissonsRatio = 0.0; // Poisson's ratio - used in window deflection calculations
+
+        // Added 12/22/2008 for thermochromic window glazing material
+        Real64 SpecTemp = 0.0;        // Temperature corresponding to the specified material properties
+        int TCParentMatNum = 0;       // Reference to the parent object WindowMaterial:Glazing:Thermochromic
+        int GlassSpectralDataPtr = 0; // Number of a spectral data set associated with a window glass material
+        int GlassSpecAngTransDataPtr =
+            0; // Data set index of transmittance as a function of spectral and angle associated with a window glass material
+        int GlassSpecAngFRefleDataPtr = 0; // Data set index of front reflectance as a function of spectral and angle associated with a window glass
+        // material
+        int GlassSpecAngBRefleDataPtr = 0; // Data set index of back reflectance as a function of spectral and angle associated with a window glass
+        // material
+
+        // TODO: these and others need to be moved to a child class
+        // Simple Glazing System
+        Real64 SimpleWindowUfactor = 0.0;       // user input for simple window U-factor with film coeffs (W/m2-k)
+        Real64 SimpleWindowSHGC = 0.0;          // user input for simple window Solar Heat Gain Coefficient (non-dimensional)
+        Real64 SimpleWindowVisTran = 0.0;       // (optional) user input for simple window Visual Transmittance (non-dimensional)
+        bool SimpleWindowVTinputByUser = false; // false means not input, true means user provide VT input
+
+        Window::OpticalDataModel windowOpticalData = Window::OpticalDataModel::SpectralAverage;
+
+        MaterialGlass() : MaterialFen()
+        {
+            group = Group::Glass;
+        }
+        ~MaterialGlass() = default;
+        bool can_instantiate()
         {
             return true;
         }
 
-        MaterialScreen() : MaterialBase()
+        void SetupSimpleWindowGlazingSystem(EnergyPlusData &state);
+    };
+
+    struct MaterialGlassEQL : public MaterialFen
+    {
+        BlindTraAbsRef<1> TAR;
+        Window::OpticalDataModel windowOpticalData = Window::OpticalDataModel::SpectralAverage;
+
+        MaterialGlassEQL() : MaterialFen()
         {
-            group = Group::Screen;
+            group = Group::GlassEQL;
+        }
+        ~MaterialGlassEQL() = default;
+        bool can_instantiate()
+        {
+            return true;
         }
     };
 
+    struct MaterialRefSpecTemp
+    {
+        int matNum = 0;
+        Real64 specTemp = 0.0;
+    };
+
+    struct MaterialGlassTC : public MaterialBase
+    {
+        // Members
+        int numMatRefs = 0; // Number of TC glazing materials
+        Array1D<MaterialRefSpecTemp> matRefs;
+
+        MaterialGlassTC() : MaterialBase()
+        {
+            group = Group::GlassTCParent;
+        }
+        ~MaterialGlassTC() = default;
+    };
+
+    int GetMaterialNum(EnergyPlusData &state, std::string const &matName);
+    MaterialBase *GetMaterial(EnergyPlusData &state, std::string const &matName);
+
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
     void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
+    void GetWindowGlassSpectralData(EnergyPlusData &state, bool &errorsFound);
 
     // Angles must be in radians
     void GetRelativePhiTheta(Real64 phiWin, Real64 thetaWin, Vector3<Real64> const &solcos, Real64 &phi, Real64 &theta);
@@ -702,17 +923,46 @@ namespace Material {
                                  Real64 theta, // Sun azimuth relative to surface outward normal (rad)
                                  ScreenBmTransAbsRef &tar);
 
+    void NormalizeProfSlat(Real64 &profAng, Real64 &slatAng);
+    void GetProfIndices(Real64 profAng, int &iProf1, int &iProf2);
+    void GetSlatIndicesInterpFac(Real64 slatAng, int &iSlat1, int &iSlat2, Real64 &interpFac);
 } // namespace Material
 
 struct MaterialData : BaseGlobalStruct
 {
-    EPVector<Material::MaterialBase *> Material;
-    int TotMaterials = 0;     // Total number of unique materials (layers) in this simulation
-    int TotComplexShades = 0; // Total number of shading materials for complex fenestrations
+    Array1D<Material::MaterialBase *> materials;
+    std::map<std::string, int> materialMap;
 
-    EPVector<Material::WindowBlindProperties> Blind;
-    EPVector<Material::WindowComplexShade> ComplexShade;
-    EPVector<Material::WindowThermalModelParams> WindowThermalModel;
+    int NumRegulars = 0;
+    int NumNoMasses = 0;
+    int NumIRTs = 0;
+    int NumAirGaps = 0;
+    int NumW5Glazings = 0;         // Window5 Glass Materials, specified by transmittance and front and back reflectance
+    int NumW5AltGlazings = 0;      // Window5 Glass Materials, specified by index of refraction and extinction coeff
+    int NumW5Gases = 0;            // Window5 Single-Gas Materials
+    int NumW5GasMixtures = 0;      // Window5 Gas Mixtures
+    int NumW7SupportPillars = 0;   // Complex fenestration support pillars
+    int NumW7DeflectionStates = 0; // Complex fenestration deflection states
+    int NumW7Gaps = 0;             // Complex fenestration material gaps
+    int NumBlinds = 0;             // Total number of blind materials
+    int NumScreens = 0;            // Total number of exterior window screen materials
+    int NumTCGlazings = 0;         // Number of TC glazing object - WindowMaterial:Glazing:Thermochromic found in the idf file
+    int NumShades = 0;             // Total number of shade materials
+    int NumComplexGaps = 0;        // Total number of window gaps for complex fenestrations
+    int NumSimpleWindows = 0;      // number of simple window systems.
+    int NumEQLGlazings = 0;        // Window5 Single-Gas Materials for Equivalent Layer window model
+    int NumEQLShades = 0;          // Total number of shade materials for Equivalent Layer window model
+    int NumEQLDrapes = 0;          // Total number of drape materials for Equivalent Layer window model
+    int NumEQLBlinds = 0;          // Total number of blind materials for Equivalent Layer window model
+    int NumEQLScreens = 0;         // Total number of exterior window screen materials for Equivalent Layer window model
+    int NumEQLGaps = 0;            // Window5 Equivalent Layer Single-Gas Materials
+    int NumEcoRoofs = 0;
+
+    bool AnyVariableAbsorptance = false;
+    int NumSpectralData = 0;
+
+    Array1D<Material::WindowThermalModelParams> WindowThermalModel;
+    Array1D<Material::SpectralDataProperties> SpectralData;
 
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
@@ -720,10 +970,11 @@ struct MaterialData : BaseGlobalStruct
 
     void clear_state() override
     {
-        for (int i = 0; i < TotMaterials; ++i) {
-            delete Material[i]; //
+        for (int i = 0; i < materials.isize(); ++i) {
+            delete materials[i];
         }
-        Material.deallocate();
+        materials.clear();
+        materialMap.clear();
     }
 };
 

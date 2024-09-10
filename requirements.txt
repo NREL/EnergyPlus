@@ -1,2 +1,5 @@
 # requirements for building an EnergyPlus wheel
 wheel
+
+# requirements for the CI regression testing scripts
+energyplus-regressions

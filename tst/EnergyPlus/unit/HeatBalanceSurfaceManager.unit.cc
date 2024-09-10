@@ -118,14 +118,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataConstruction->Construct(ConstrNum).CTFCross[0] = 0.0;
     state->dataConstruction->Construct(ConstrNum).CTFOutside[0] = 1.0;
     state->dataConstruction->Construct(ConstrNum).SourceSinkPresent = true;
-    Material::MaterialBase *p = new Material::MaterialBase;
-    state->dataMaterial->Material.push_back(p);
-    state->dataMaterial->Material(1)->Name = "TestMaterial";
+    auto *p = new Material::MaterialBase;
+    state->dataMaterial->materials.push_back(p);
+    state->dataMaterial->materials(1)->Name = "TestMaterial";
 
     state->dataSurface->TotSurfaces = SurfNum;
     state->dataGlobal->NumOfZones = ZoneNum;
 
     state->dataSurface->Surface.allocate(SurfNum);
+    state->dataSurface->SurfaceWindow.allocate(SurfNum);
     state->dataHeatBal->Zone.allocate(ZoneNum);
 
     state->dataSurface->Surface(SurfNum).Class = DataSurfaces::SurfaceClass::Wall;
@@ -288,7 +289,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
 
     state->dataSurface->TotSurfaces = 1;
     state->dataGlobal->NumOfZones = 1;
-    state->dataMaterial->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->space.allocate(1);
@@ -297,14 +297,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBal->space(1).WindowSurfaceLast = 1;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->surfShades.allocate(state->dataSurface->TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
-    for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
-        Material::MaterialBase *p = new Material::MaterialBase;
-        state->dataMaterial->Material.push_back(p);
-    }
-    state->dataSurface->SurfaceWindow(1).EffShBlindEmiss[1] = 0.1;
-    state->dataSurface->SurfaceWindow(1).EffGlassEmiss[1] = 0.1;
+
+    state->dataSurface->surfShades(1).effShadeEmi = 0.1;
+    state->dataSurface->surfShades(1).effGlassEmi = 0.1;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).Construction = 1;
@@ -3133,7 +3131,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
 
     state->dataSurface->TotSurfaces = 2;
     state->dataGlobal->NumOfZones = 2;
-    state->dataMaterial->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
     state->dataViewFactor->NumOfSolarEnclosures = 3;
 
@@ -4882,6 +4879,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_IncSolarMultiplier)
     state->dataHeatBal->TotConstructs = 1;
     int totConstructs = state->dataHeatBal->TotConstructs;
     state->dataSurface->Surface.allocate(totSurf);
+    state->dataSurface->surfShades.allocate(totSurf);
     state->dataConstruction->Construct.allocate(totConstructs);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataGlobal->NumOfTimeStepInHour = 6;
@@ -8532,21 +8530,23 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestUpdateVariableAbsorptanc
     state->dataConstruction->Construct(2).Name = "CONSTRUCT_WALL_2";
     state->dataConstruction->Construct(2).LayerPoint.allocate(1);
     state->dataConstruction->Construct(2).LayerPoint(1) = 2;
-    for (int i = 0; i < 2; i++) {
-        Material::MaterialBase *p = new Material::MaterialChild;
-        state->dataMaterial->Material.push_back(p);
-    }
-    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
-    thisMaterial_1->Name = "WALL_1";
-    thisMaterial_1->group = Material::Group::Regular;
-    thisMaterial_1->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature;
-    thisMaterial_1->absorpThermalVarFuncIdx = 2;
-    thisMaterial_1->absorpSolarVarFuncIdx = 1;
-    auto *thisMaterial_2 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(2));
-    thisMaterial_2->Name = "WALL_2";
-    thisMaterial_2->group = Material::Group::Regular;
-    thisMaterial_2->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::Scheduled;
-    thisMaterial_2->absorpThermalVarSchedIdx = 1;
+
+    auto &s_mat = state->dataMaterial;
+    auto *mat1 = new Material::MaterialBase;
+    mat1->Name = "WALL_1";
+    mat1->group = Material::Group::Regular;
+    mat1->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature;
+    mat1->absorpThermalVarFuncIdx = 2;
+    mat1->absorpSolarVarFuncIdx = 1;
+    s_mat->materials.push_back(mat1);
+
+    auto *mat2 = new Material::MaterialBase;
+    mat2->Name = "WALL_2";
+    mat2->group = Material::Group::Regular;
+    mat2->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::Scheduled;
+    mat2->absorpThermalVarSchedIdx = 1;
+    s_mat->materials.push_back(mat2);
+
     state->dataCurveManager->allocateCurveVector(2);
     state->dataHeatBalSurf->SurfTempOut.allocate(2);
     state->dataHeatBalSurf->SurfTempOut(1) = 10;

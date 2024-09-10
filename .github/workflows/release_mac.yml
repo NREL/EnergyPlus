@@ -1,4 +1,4 @@
-name: Mac Releases
+name: Releases
 
 on:
   push:
@@ -16,6 +16,7 @@ env:
 
 jobs:
   build_installer_artifact:
+    name: Build Packages for ${{ matrix.pretty }}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.allow_failure }}
     strategy:
@@ -29,11 +30,14 @@ jobs:
           allow_failure: false
           arch: x86_64
           python-arch: x64
+          pretty: "Mac x64"
         - macos_dev_target: 13.0
           os: macos-14
           allow_failure: false
           arch: arm64
           python-arch: arm64
+          pretty: "Mac arm64"
+
     permissions:
       # Needed permission to upload the release asset
       contents: write

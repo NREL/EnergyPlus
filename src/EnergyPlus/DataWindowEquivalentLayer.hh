@@ -108,6 +108,9 @@ namespace DataWindowEquivalentLayer {
         Num
     };
 
+    static constexpr std::array<std::string_view, (int)Orientation::Num> orientationNames = {"Horizontal", "Vertical"};
+    static constexpr std::array<std::string_view, (int)Orientation::Num> orientationNamesUC = {"HORIZONTAL", "VERTICAL"};
+
     enum class AngleType
     {
         Invalid = -1,
