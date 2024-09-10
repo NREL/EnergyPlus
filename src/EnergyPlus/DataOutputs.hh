@@ -112,7 +112,7 @@ struct OutputsData : BaseGlobalStruct
              Util::case_insensitive_comparator>
         OutputVariablesForSimulation;
 
-    void init_state([[maybe_unused]] EnergyPlusData &state)
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
 

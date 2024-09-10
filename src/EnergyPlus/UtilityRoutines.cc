@@ -497,9 +497,6 @@ int AbortEnergyPlus(EnergyPlusData &state)
     std::string NumSevereDuringWarmup;
     std::string NumWarningsDuringSizing;
     std::string NumSevereDuringSizing;
-    int Hours;      // Elapsed Time Hour Reporting
-    int Minutes;    // Elapsed Time Minute Reporting
-    Real64 Seconds; // Elapsed Time Second Reporting
     bool ErrFound;
     bool TerminalError;
 
@@ -660,9 +657,6 @@ int EndEnergyPlus(EnergyPlusData &state)
     std::string NumSevereDuringWarmup;
     std::string NumWarningsDuringSizing;
     std::string NumSevereDuringSizing;
-    int Hours;      // Elapsed Time Hour Reporting
-    int Minutes;    // Elapsed Time Minute Reporting
-    Real64 Seconds; // Elapsed Time Second Reporting
 
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->updateSQLiteSimulationRecord(true, true);

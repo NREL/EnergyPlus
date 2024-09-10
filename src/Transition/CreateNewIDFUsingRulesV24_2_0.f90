@@ -394,7 +394,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               OldFanVO(NumOldFanVO)%coeff5 = TRIM(IDFRecords(Num)%Numbers(12))             !- Coefficient5 x**4
               OldFanVO(NumOldFanVO)%inletAirNodeName = TRIM(IDFRecords(Num)%Alphas(4))
               OldFanVO(NumOldFanVO)%outletAirNodeName = TRIM(IDFRecords(Num)%Alphas(5))
-              OldFanVO(NumOldFanVO)%endUseSubCat = TRIM(IDFRecords(Num)%Alphas(6))
+              IF (lEN(IDFRecords(Num)%Alphas) .eq. 6) THEN
+                OldFanVO(NumOldFanVO)%endUseSubCat = TRIM(IDFRecords(Num)%Alphas(6))
+              ENDIF
               IF (FindItemInList(TRIM(IDFRecords(Num)%Alphas(1)), vavFanNameToDelete, NumVRFTU) /= 0) THEN
                 DeleteThisRecord(Num) = .TRUE.
               ENDIF

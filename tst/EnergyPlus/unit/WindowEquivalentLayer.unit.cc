@@ -180,17 +180,14 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
 
-    int VBMatNum(0);
-    for (int i = 1; i <= 4; i++) {
-        if (state->dataMaterial->Material(i)->group == Material::Group::BlindEquivalentLayer) {
-            VBMatNum = i;
-            break;
-        }
-    }
-    auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(VBMatNum));
-    EXPECT_EQ(1, state->dataHeatBal->TotBlindsEQL);
-    EXPECT_ENUM_EQ(thisMaterial->group, Material::Group::BlindEquivalentLayer);
-    EXPECT_EQ(static_cast<int>(thisMaterial->slatAngleType), state->dataWindowEquivalentLayer->lscVBNOBM);
+    EXPECT_EQ(1, state->dataMaterial->NumEQLBlinds);
+    int VBMatNum = Material::GetMaterialNum(*state, "VBU8D6+45SW1");
+
+    auto const *mat = state->dataMaterial->materials(VBMatNum);
+    EXPECT_ENUM_EQ(mat->group, Material::Group::BlindEQL);
+
+    auto const *matVenetBlind = dynamic_cast<Material::MaterialBlindEQL const *>(mat);
+    EXPECT_EQ(static_cast<int>(matVenetBlind->slatAngleType), state->dataWindowEquivalentLayer->lscVBNOBM);
 
     int ConstrNum = 1;
     int EQLNum = 0;
@@ -204,7 +201,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
 {
     // GitHub issue 5750
     int SurfNum(0);
-    int VBMatNum(0);
     Real64 ProfAngVer(0);
     static Array2D<Real64> AbsSolBeam(2, CFSMAXNL + 1);
 
@@ -543,30 +539,25 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
             break;
         }
     }
+
     // get venetian blind material index
-    for (int i = 1; i <= 7; i++) {
-        if (state->dataMaterial->Material(i)->group == Material::Group::BlindEquivalentLayer) {
-            VBMatNum = i;
-            break;
-        }
-    }
-    auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(VBMatNum));
+    int VBMatNum = Material::GetMaterialNum(*state, "VBU8D6+45SW1");
+    auto const *matVenetBlind = dynamic_cast<Material::MaterialBlindEQL const *>(state->dataMaterial->materials(VBMatNum));
     // get equivalent layer window optical properties
     CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::SolarArrays::BEAM, AbsSolBeam);
     // check that the slat angle control type is set to MaximizeSolar
-    EXPECT_EQ(static_cast<int>(thisMaterial->slatAngleType), state->dataWindowEquivalentLayer->lscVBPROF);
+    EXPECT_EQ(static_cast<int>(matVenetBlind->slatAngleType), state->dataWindowEquivalentLayer->lscVBPROF);
     // check the slat angle
-    EXPECT_NEAR(-71.0772, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
+    EXPECT_NEAR(-71.0772, state->dataSurface->surfShades(SurfNum).blind.slatAngDeg, 0.0001);
     // check that for MaximizeSolar slat angle control, the slat angle = -ve vertical profile angle
     ProfAngVer = Dayltg::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal);
-    EXPECT_NEAR(-Constant::RadToDeg * ProfAngVer, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
+    EXPECT_NEAR(-Constant::RadToDeg * ProfAngVer, state->dataSurface->surfShades(SurfNum).blind.slatAngDeg, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
 {
     // GitHub issue 5750
     int SurfNum(0);
-    int VBMatNum(0);
     Real64 ProfAngVer(0);
     static Array2D<Real64> AbsSolBeam(2, CFSMAXNL + 1);
 
@@ -906,25 +897,20 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         }
     }
     // get venetian blind material index
-    for (int i = 1; i <= 7; i++) {
-        if (state->dataMaterial->Material(i)->group == Material::Group::BlindEquivalentLayer) {
-            VBMatNum = i;
-            break;
-        }
-    }
-    auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(VBMatNum));
+    int VBMatNum = Material::GetMaterialNum(*state, "VBU8D6+45SW1");
+    auto const *matVenetBlind = dynamic_cast<Material::MaterialBlindEQL const *>(state->dataMaterial->materials(VBMatNum));
     // calc window optical property
     CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::SolarArrays::BEAM, AbsSolBeam);
     // check VB slat angle for BlockBeamSolar slat angle control
-    EXPECT_EQ(static_cast<int>(thisMaterial->slatAngleType), state->dataWindowEquivalentLayer->lscVBNOBM);
+    EXPECT_EQ(static_cast<int>(matVenetBlind->slatAngleType), state->dataWindowEquivalentLayer->lscVBNOBM);
     // check the VB slat angle
-    EXPECT_NEAR(18.9228, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
+    EXPECT_NEAR(18.9228, state->dataSurface->surfShades(SurfNum).blind.slatAngDeg, 0.0001);
     // check that for BlockBeamSolar slat angle control, the slat angle = 90 - ProfAngVer
     ProfAngVer = Dayltg::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal);
-    EXPECT_NEAR(90.0 - Constant::RadToDeg * ProfAngVer, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
+    EXPECT_NEAR(90.0 - Constant::RadToDeg * ProfAngVer, state->dataSurface->surfShades(SurfNum).blind.slatAngDeg, 0.0001);
     // get the slat angle from profile angle
     Real64 SlateAngleBlockBeamSolar = VB_CriticalSlatAngle(Constant::RadToDeg * ProfAngVer);
-    EXPECT_NEAR(SlateAngleBlockBeamSolar, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
+    EXPECT_NEAR(SlateAngleBlockBeamSolar, state->dataSurface->surfShades(SurfNum).blind.slatAngDeg, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
@@ -948,8 +934,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(1, state->dataMaterial->TotMaterials);
-    EXPECT_ENUM_EQ(state->dataMaterial->Material(1)->group, Material::Group::WindowSimpleGlazing);
+    EXPECT_ENUM_EQ(state->dataMaterial->materials(1)->group, Material::Group::GlassSimple);
     // get construction returns error forund true due to invalid layer
     GetConstructData(*state, ErrorsFound);
     EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
@@ -1977,7 +1962,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
 
     int EQLNum(0);
     int SurfNum(0);
-    int VBMatNum(0);
     int ConstrNum(0);
 
     for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
@@ -1987,13 +1971,8 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         }
     }
     // get venetian blind material index
-    for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
-        if (state->dataMaterial->Material(i)->group == Material::Group::BlindEquivalentLayer) {
-            VBMatNum = i;
-            break;
-        }
-    }
-    auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(VBMatNum));
+    int VBMatNum = Material::GetMaterialNum(*state, "WMTEUQL_BLND_KINDV_RF80_T02_A18_Rb45");
+    auto const *matVenetBlind = dynamic_cast<Material::MaterialBlindEQL const *>(state->dataMaterial->materials(VBMatNum));
     // get equivalent layer window contruction index
     for (int ConstrPtr = 1; ConstrPtr <= state->dataHeatBal->TotConstructs; ++ConstrPtr) {
         if (state->dataConstruction->Construct(ConstrPtr).WindowTypeEQL) {
@@ -2001,7 +1980,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         }
     }
     // check VB slat angle control for FixedSlatAngle
-    EXPECT_EQ(static_cast<int>(thisMaterial->slatAngleType), state->dataWindowEquivalentLayer->lscNONE);
+    EXPECT_EQ(static_cast<int>(matVenetBlind->slatAngleType), state->dataWindowEquivalentLayer->lscNONE);
 
     EQLNum = state->dataConstruction->Construct(ConstrNum).EQLConsPtr;
     // check number of solid layers
