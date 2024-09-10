@@ -1605,8 +1605,6 @@ void ClearCoils(EnergyPlusData &state, int const DXCoilNum)
 {
     using VariableSpeedCoils::SimVariableSpeedCoils;
 
-    HVAC::FanOp fanOp = HVAC::FanOp::Cycling; // fan cycl manner place holder
-
     // Obtains and Allocates WatertoAirHP related parameters from input file
     if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
         GetIHPInput(state);

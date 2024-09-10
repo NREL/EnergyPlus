@@ -352,10 +352,7 @@ namespace DElightManagerF {
                                     iMatlLayer = state.dataConstruction->Construct(iconstruct).LayerPoint(1);
                                     // Get the outside visible reflectance of this material layer
                                     // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
-                                    auto const *thisMaterial =
-                                        dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(iMatlLayer));
-                                    assert(thisMaterial != nullptr);
-                                    rExtVisRefl = 1.0 - thisMaterial->AbsorpVisible;
+                                    rExtVisRefl = 1.0 - state.dataMaterial->materials(iMatlLayer)->AbsorpVisible;
                                 } else {
                                     rExtVisRefl = 0.0;
                                 }
