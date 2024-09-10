@@ -2707,12 +2707,9 @@ namespace RoomAir {
         // number.If incorrect name is given, errorsfound is returned as true and value is returned
         // as zero.
 
-        static constexpr std::string_view routineName = "CheckEquipName";
-
         // Return value
         bool EquipFind = false; // if true, equip is found
 
-        bool errorfound;
         int SupplyNodeNum = 0;
         int ReturnNodeNum = 0;
 
@@ -2837,7 +2834,8 @@ namespace RoomAir {
 
             //            SupplyNodeName = "";                             // ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? May not use
         } break;
-        case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater: { // WaterHeater : HeatPump
+        case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeaterPumpedCondenser:
+        case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeaterWrappedCondenser: { // WaterHeater : HeatPump
             EquipIndex = WaterThermalTanks::getHeatPumpWaterHeaterIndex(state, EquipName);
             if (EquipIndex == 0) return EquipFind;
             ReturnNodeNum = state.dataWaterThermalTanks->HPWaterHeater(EquipIndex).HeatPumpAirInletNode;

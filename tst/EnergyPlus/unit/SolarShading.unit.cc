@@ -2671,6 +2671,7 @@ TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
 {
     state->dataSurface->Surface.allocate(2);
     state->dataSurface->SurfaceWindow.allocate(2);
+    state->dataSurface->surfShades.allocate(2);
 
     EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
     state->dataConstruction->Construct.allocate(1);
@@ -3916,7 +3917,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
 
 #ifdef EP_NO_OPENGL
     EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
-    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0;
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
     EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
 #else
     if (!Penumbra::Penumbra::is_valid_context()) {
@@ -5224,13 +5225,14 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     construct1.TotGlassLayers = 1;
     construct1.TransSolBeamCoef(1) = 0.9;
 
-    state->dataMaterial->TotMaterials = 1;
-    for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
-        Material::MaterialChild *p = new Material::MaterialChild;
-        state->dataMaterial->Material.push_back(p);
-    }
-    state->dataMaterial->Material(1)->Name = "GLASS";
-    state->dataMaterial->Material(1)->group = Material::Group::WindowGlass;
+    auto &s_mat = state->dataMaterial;
+
+    auto *mat1 = new Material::MaterialGlass;
+    mat1->Name = "GLASS";
+    mat1->group = Material::Group::Glass;
+    s_mat->materials.push_back(mat1);
+    mat1->Num = s_mat->materials.isize();
+    s_mat->materialMap.insert_or_assign(mat1->Name, mat1->Num);
 
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(1);
@@ -6199,10 +6201,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_GetShadowingInputTest6)
     EXPECT_TRUE(state->dataSysVars->SlaterBarsky);
 
 #ifdef EP_NO_OPENGL
-    std::string const error_string = delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
-                                                       "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate.",
-                                                       "   ** Warning ** No GPU found (required for PixelCounting)",
-                                                       "   **   ~~~   ** PolygonClipping will be used instead"});
+    std::string const error_string =
+        delimited_string({"   ** Warning ** ShadowCalculation: suspect Shading Calculation Update Frequency",
+                          "   **   ~~~   ** Value entered=[56], Shadowing Calculations will be inaccurate.",
+                          "   ** Warning ** ShadowCalculation: invalid Shading Calculation Method",
+                          "   **   ~~~   ** Value entered=\"PixelCounting\"",
+                          "   **   ~~~   ** This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)",
+                          "   **   ~~~   ** PolygonClipping will be used instead"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_ENUM_EQ(state->dataSysVars->shadingMethod, ShadingMethod::PolygonClipping);
 

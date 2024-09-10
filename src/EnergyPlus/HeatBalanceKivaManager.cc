@@ -669,7 +669,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
     auto &Surfaces = state.dataSurface->Surface;
     auto &Constructs = state.dataConstruction->Construct;
-    auto &Materials = state.dataMaterial->Material;
+    auto &materials = state.dataMaterial->materials;
 
     int inst = 0;
     int surfNum = 1;
@@ -901,7 +901,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                     // Push back construction's layers
                     for (int layer = 1; layer <= c.TotLayers; layer++) {
-                        auto const *mat = Materials(c.LayerPoint(layer));
+                        auto const *mat = materials(c.LayerPoint(layer));
                         if (mat->ROnly) {
                             ErrorsFound = true;
                             ShowSevereError(state, format("Construction=\"{}\", constructions referenced by surfaces with a", c.Name));
@@ -925,7 +925,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                 // Set slab construction
                 for (int i = 0; i < Constructs(surface.Construction).TotLayers; ++i) {
-                    auto const *mat = Materials(Constructs(surface.Construction).LayerPoint[i]);
+                    auto const *mat = materials(Constructs(surface.Construction).LayerPoint[i]);
                     if (mat->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(

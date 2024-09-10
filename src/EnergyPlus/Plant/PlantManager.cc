@@ -2097,7 +2097,6 @@ void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData 
 
         // Report for first branch
         auto &thisBranch = thisLoopSide.Branch(1);
-        constexpr std::string_view branch = "Branch";
 
         for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
             auto const &thisComp = thisBranch.Comp(compNum);
@@ -2123,7 +2122,6 @@ void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData 
                 // mixer
                 if (thisLoopSide.Mixer.Exists) {
                     rowCounter -= 1;
-                    constexpr std::string_view mixer = "Mixer";
                     fillPlantToplogyMixerRow2(state, loopType, thisLoop.Name, loopSide, thisLoopSide.Mixer.Name, rowCounter);
                     rowCounter += 1;
                 }

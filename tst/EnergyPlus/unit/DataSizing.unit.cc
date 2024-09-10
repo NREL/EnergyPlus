@@ -288,7 +288,8 @@ TEST_F(EnergyPlusFixture, OARequirements_calcDesignSpecificationOutdoorAir)
             },
             "Space 1d" : {
                  "zone_name": "Zone 1",
-                 "floor_area": 100.0
+                 "floor_area": 100.0,
+                 "volume": 300.0
             }
         },
         "DesignSpecification:OutdoorAir": {
@@ -392,6 +393,7 @@ TEST_F(EnergyPlusFixture, OARequirements_calcDesignSpecificationOutdoorAir)
     thisSpaceName = "SPACE 1D";
     spaceNum = Util::FindItemInList(thisSpaceName, state->dataHeatBal->space);
     state->dataHeatBal->space(spaceNum).FloorArea = 100.0;
+    state->dataHeatBal->space(spaceNum).Volume = 300.0;
 
     std::string thisZoneName = "ZONE 2";
     zoneNum = Util::FindItemInList(thisZoneName, state->dataHeatBal->Zone);
