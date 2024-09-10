@@ -730,18 +730,16 @@ Real64 AbsBackSide(EnergyPlusData &state, int SurfNum)
 
 void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
 {
-    if (!state.dataHeatBal->AnyVariableAbsorptance) return;
+    if (!state.dataMaterial->AnyVariableAbsorptance) return;
     for (int surfNum : state.dataSurface->AllHTSurfaceList) {
         auto const &thisSurface = state.dataSurface->Surface(surfNum);
-        int ConstrNum = thisSurface.Construction;
-        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-        int TotLayers = thisConstruct.TotLayers;
-        if (TotLayers == 0) continue;
-        int materNum = thisConstruct.LayerPoint(1);
-        if (materNum == 0) continue; // error finding material number
-        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(materNum));
-        assert(thisMaterial != nullptr);
-        if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
+        auto const &thisConstruct = state.dataConstruction->Construct(thisSurface.Construction);
+        if (thisConstruct.TotLayers == 0) continue;
+        if (thisConstruct.LayerPoint(1) == 0) continue; // error finding material number
+        auto const *mat = state.dataMaterial->materials(thisConstruct.LayerPoint(1));
+        if (mat->group != Material::Group::Regular) continue;
+
+        if (mat->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
             // check for dynamic coating defined on interior surface
             if (thisSurface.ExtBoundCond != ExternalEnvironment) {
                 ShowWarningError(state,
@@ -757,16 +755,17 @@ void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
     for (int ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
         for (int Layer = 2; Layer <= thisConstruct.TotLayers; ++Layer) {
-            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)));
-            if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
+            auto const *mat = state.dataMaterial->materials(thisConstruct.LayerPoint(Layer));
+            if (mat->group != Material::Group::Regular) continue;
+            if (mat->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
                 ShowWarningError(state,
                                  format("MaterialProperty:VariableAbsorptance defined on a inside-layer materials, {}. This VariableAbsorptance "
                                         "property will be ignored here",
-                                        thisMaterial->Name));
+                                        mat->Name));
             }
         }
     }
-}
+} // GetVariableAbsorptanceSurfaceList()
 
 Compass4 AzimuthToCompass4(Real64 azimuth)
 {

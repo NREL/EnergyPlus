@@ -4167,14 +4167,15 @@ Real64 correctZoneAirTemps(EnergyPlusData &state,
                 Real64 spaceTempChange = thisSpaceHB.correctAirTemp(state, useZoneTimeStepHistory, zoneNum, spaceNum);
                 maxTempChange = max(maxTempChange, spaceTempChange);
             } else {
-                // If no SpaceHB, then set space temps to match zone temps
-                if (state.dataHeatBal->space(spaceNum).IsControlled) {
+                // If doing sizing and zone is controled, then set space node to match zone node
+                if (state.dataHeatBal->doSpaceHeatBalanceSizing && thisZone.IsControlled) {
                     auto const &thisZoneNode = state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber);
                     auto &thisSpaceNode = state.dataLoopNodes->Node(state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber);
                     thisSpaceNode.Temp = thisZoneNode.Temp;
                     thisSpaceNode.HumRat = thisZoneNode.HumRat;
                     thisSpaceNode.Enthalpy = thisZoneNode.Enthalpy;
                 }
+                // If no SpaceHB or doing sizing, then set space temps and humrat to match zone
                 thisSpaceHB.ZT = thisZoneHB.ZT;
                 thisSpaceHB.ZTM = thisZoneHB.ZTM;
                 thisSpaceHB.MAT = thisZoneHB.MAT;

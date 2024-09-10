@@ -104,29 +104,16 @@ namespace EnergyPlus::HeatBalanceAirManager {
 enum class AirflowSpec
 {
     Invalid = -1,
-    Flow,
-    FlowPerZone,
-    FlowPerArea,
-    FlowPerPerson,
-    AirChanges,
-    Num
-};
-constexpr std::array<std::string_view, static_cast<int>(AirflowSpec::Num)> airflowNamesUC = {
-    "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/PERSON", "AIRCHANGES/HOUR"};
-
-enum class AirflowSpecAlt
-{
-    Invalid = -1,
-    Flow,
     FlowPerZone,
     FlowPerArea,
     FlowPerExteriorArea,
     FlowPerExteriorWallArea,
+    FlowPerPerson,
     AirChanges,
     Num
 };
-constexpr std::array<std::string_view, static_cast<int>(AirflowSpecAlt::Num)> airflowAltNamesUC = {
-    "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/EXTERIORAREA", "FLOW/EXTERIORWALLAREA", "AIRCHANGES/HOUR"};
+constexpr std::array<std::string_view, static_cast<int>(AirflowSpec::Num)> airflowSpecNamesUC = {
+    "FLOW/ZONE", "FLOW/AREA", "FLOW/EXTERIORAREA", "FLOW/EXTERIORWALLAREA", "FLOW/PERSON", "AIRCHANGES/HOUR"};
 
 constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::VentilationType::Num)> ventilationTypeNamesUC = {
     "NATURAL", "INTAKE", "EXHAUST", "BALANCED"};
@@ -536,7 +523,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             ErrorsFound = true;
         }
 
-        // Check whether this zone is also controleld by hybrid ventilation object with ventilation control option or not
+        // Check whether this zone is also controlled by hybrid ventilation object with ventilation control option or not
         bool ControlFlag = Avail::GetHybridVentilationControlStatus(state, thisZoneAirBalance.ZonePtr);
         if (ControlFlag && thisZoneAirBalance.BalanceMethod == DataHeatBalance::AirBalance::Quadrature) {
             thisZoneAirBalance.BalanceMethod = DataHeatBalance::AirBalance::None;
@@ -746,10 +733,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                 // Set space flow fractions
                 // Infiltration equipment design level calculation method.
-                AirflowSpecAlt flow = static_cast<AirflowSpecAlt>(getEnumValue(airflowAltNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowSpecNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
-                case AirflowSpecAlt::Flow:
-                case AirflowSpecAlt::FlowPerZone:
+                case AirflowSpec::FlowPerZone:
                     if (lNumericFieldBlanks(1)) {
                         ShowWarningError(state,
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
@@ -777,7 +763,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpecAlt::FlowPerArea:
+                case AirflowSpec::FlowPerArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(2) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(2) * thisSpace.FloorArea;
@@ -813,7 +799,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpecAlt::FlowPerExteriorArea:
+                case AirflowSpec::FlowPerExteriorArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(3) * thisSpace.ExteriorTotalSurfArea;
@@ -847,7 +833,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpecAlt::FlowPerExteriorWallArea:
+                case AirflowSpec::FlowPerExteriorWallArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(3) * thisSpace.ExtGrossWallArea;
@@ -881,7 +867,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpecAlt::AirChanges:
+                case AirflowSpec::AirChanges:
                     if (thisInfiltration.spaceIndex != 0) {
                         if (rNumericArgs(4) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(4) * thisSpace.Volume / Constant::SecInHour;
@@ -1398,9 +1384,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Ventilation equipment design level calculation method
-                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowSpecNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
-                case AirflowSpec::Flow:
                 case AirflowSpec::FlowPerZone:
                     thisVentilation.DesignLevel = rNumericArgs(1);
                     if (lNumericFieldBlanks(1)) {
@@ -2575,9 +2560,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Mixing equipment design level calculation method
-                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowSpecNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
-                case AirflowSpec::Flow:
                 case AirflowSpec::FlowPerZone:
                     thisMixing.DesignLevel = rNumericArgs(1);
                     if (lNumericFieldBlanks(1)) {
@@ -3195,9 +3179,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Mixing equipment design level calculation method.
-                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowSpecNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
-                case AirflowSpec::Flow:
                 case AirflowSpec::FlowPerZone:
                     thisMixing.DesignLevel = rNumericArgs(1);
                     if (lNumericFieldBlanks(1)) {

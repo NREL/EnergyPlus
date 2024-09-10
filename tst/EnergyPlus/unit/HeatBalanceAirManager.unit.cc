@@ -59,6 +59,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
 #include <nlohmann/json_literals.hpp>
@@ -518,6 +519,48 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
 
     state->dataInputProcessing->inputProcessor->epJSON = R"(
     {
+    "SimulationControl": {
+        "SimulationControl 1": {
+            "do_plant_sizing_calculation": "No",
+            "do_system_sizing_calculation": "No",
+            "do_zone_sizing_calculation": "No",
+            "run_simulation_for_sizing_periods": "Yes",
+            "run_simulation_for_weather_file_run_periods": "No"
+        }
+    },
+    "ZoneAirHeatBalanceAlgorithm": {
+        "ZoneAirHeatBalanceAlgorithm 1": {
+            "algorithm": "AnalyticalSolution",
+            "do_space_heat_balance_for_simulation": "Yes"
+        }
+    },
+    "Site:Location": {
+        "USA IL-CHICAGO-OHARE": {
+            "elevation": 190,
+            "latitude": 41.77,
+            "longitude": -87.75,
+            "time_zone": -6.0
+        }
+    },
+        "SizingPeriod:DesignDay": {
+        "CHICAGO Ann Clg .4% Condns WB=>MDB": {
+            "barometric_pressure": 99063.0,
+            "daily_dry_bulb_temperature_range": 10.7,
+            "day_of_month": 21,
+            "day_type": "SummerDesignDay",
+            "daylight_saving_time_indicator": "No",
+            "humidity_condition_type": "WetBulb",
+            "maximum_dry_bulb_temperature": 31.2,
+            "month": 7,
+            "rain_indicator": "No",
+            "sky_clearness": 1.0,
+            "snow_indicator": "No",
+            "solar_model_indicator": "ASHRAEClearSky",
+            "wetbulb_or_dewpoint_at_maximum_dry_bulb": 25.5,
+            "wind_direction": 230,
+            "wind_speed": 5.3
+          }
+        },
         "Zone": {
             "Zone 1" : {
                 "volume": 100.0
@@ -755,32 +798,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
     state->dataIPShortCut->rNumericArgs.dimension(MaxNumeric, 0.0);
     state->dataIPShortCut->lNumericFieldBlanks.dimension(MaxNumeric, false);
 
+    // Need to do this before ManageSimulation to get the space heat balance input
     bool ErrorsFound = false;
-    HeatBalanceManager::GetHeatBalanceInput(*state);
-    std::string const error_string = delimited_string(
-        {"   ** Warning ** GetSurfaceData: Entered Space Floor Area(s) differ more than 5% from calculated Space Floor Area(s).",
-         "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual Spaces.",
-         "   ** Warning ** CalculateZoneVolume: 1 zone is not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; ",
-         "   ** Warning ** CalcApproximateViewFactors: Zero area for all other zone surfaces.",
-         "   **   ~~~   ** Happens for Surface=\"DUMMY SPACE 1A FLOOR\" in Zone=ZONE 1",
-         "   ** Warning ** CalcApproximateViewFactors: Zero area for all other zone surfaces.",
-         "   **   ~~~   ** Happens for Surface=\"DUMMY SPACE 1B FLOOR\" in Zone=ZONE 1",
-         "   ** Warning ** Surfaces in Zone/Enclosure=\"ZONE 1\" do not define an enclosure.",
-         "   **   ~~~   ** Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.",
-         "   **   ~~~   ** Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.",
-         "   **   ~~~   ** Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity.",
-         "   **   ~~~   ** So, when there are three or less surfaces in a zone, EnergyPlus will make sure there are no losses of energy but",
-         "   **   ~~~   ** it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed "
-         "enclosure."});
-
-    compare_err_stream(error_string, true);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    state->dataHeatBalFanSys->ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
-    ErrorsFound = false;
-    HeatBalanceAirManager::GetSimpleAirModelInputs(*state, ErrorsFound);
-    compare_err_stream("", true);
-    EXPECT_FALSE(ErrorsFound);
+    SimulationManager::ManageSimulation(*state);
 
     // Expected floor areas
     Real64 constexpr Space1aFloorArea = 10.0;
