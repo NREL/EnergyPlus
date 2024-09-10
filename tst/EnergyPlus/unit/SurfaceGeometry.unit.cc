@@ -3859,50 +3859,57 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
 {
-    state->dataMaterial->TotMaterials = 0;
+    auto &s_mat = state->dataMaterial;
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    auto *thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
-    EXPECT_EQ(state->dataMaterial->TotMaterials, 1);
-    EXPECT_EQ(thisMaterial->Name, "test_air_8MM");
-    EXPECT_EQ(thisMaterial->Thickness, 0.008);
-    EXPECT_EQ(thisMaterial->gases[0].con.c0, 2.873e-3);
-    EXPECT_EQ(thisMaterial->gases[0].con.c1, 7.760e-5);
+    auto const *mat1 = dynamic_cast<Material::MaterialGasMix const *>(s_mat->materials(1));
+    EXPECT_EQ(mat1->Name, "test_air_8MM");
+    EXPECT_EQ(mat1->Thickness, 0.008);
+    EXPECT_EQ(mat1->gases[0].con.c0, 2.873e-3);
+    EXPECT_EQ(mat1->gases[0].con.c1, 7.760e-5);
 
     createAirMaterialFromDistance(*state, 0.012, "test_air_");
-    thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
-    EXPECT_EQ(state->dataMaterial->TotMaterials, 2);
-    EXPECT_EQ(thisMaterial->Name, "test_air_12MM");
-    EXPECT_EQ(thisMaterial->Thickness, 0.012);
+    auto const *mat2 = dynamic_cast<Material::MaterialGasMix const *>(s_mat->materials(2));
+    EXPECT_EQ(mat2->Name, "test_air_12MM");
+    EXPECT_EQ(mat2->Thickness, 0.012);
 
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    EXPECT_EQ(state->dataMaterial->TotMaterials, 2);
+    EXPECT_EQ(s_mat->materials.isize(), 2);
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createConstructionWithStorm_Test)
 {
+    auto &s_mat = state->dataMaterial;
     state->dataHeatBal->TotConstructs = 1;
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
 
-    for (int i = 1; i <= 60; i++) {
-        Material::MaterialBase *p = new Material::MaterialChild;
-        state->dataMaterial->Material.push_back(p);
-    }
-    dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(47))->AbsorpThermalFront = 0.11;
+    auto *matStorm = new Material::MaterialGlass;
+    s_mat->materials.push_back(matStorm);
+    matStorm->AbsorpThermalFront = 0.11;
+
+    auto *matGap = new Material::MaterialGasMix;
+    s_mat->materials.push_back(matGap);
+
+    auto *mat3 = new Material::MaterialGlass;
+    s_mat->materials.push_back(mat3);
+    auto *mat4 = new Material::MaterialGlass;
+    s_mat->materials.push_back(mat4);
+    auto *mat5 = new Material::MaterialGlass;
+    s_mat->materials.push_back(mat5);
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
     state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).TotLayers = 3;
-    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(1) = 11;
-    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(2) = 22;
-    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(3) = 33;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(1) = 3;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(2) = 4;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(3) = 5;
 
-    createConstructionWithStorm(*state, 1, "construction_A", 47, 59);
+    createConstructionWithStorm(*state, 1, "construction_A", 1, 2);
     EXPECT_EQ(state->dataHeatBal->TotConstructs, 2);
     EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).Name, "construction_A");
-    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(1), 47);
-    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(2), 59);
-    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(3), 11);
-    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(4), 22);
-    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(5), 33);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(1), 1);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(2), 2);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(3), 3);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(4), 4);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(5), 5);
     EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).OutsideAbsorpThermal, 0.11);
 }
 
@@ -5102,12 +5109,9 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
 {
+    auto &s_mat = state->dataMaterial;
     bool RevLayerDiffs;
     state->dataConstruction->Construct.allocate(6);
-    for (int i = 1; i <= 60; i++) {
-        Material::MaterialChild *p = new Material::MaterialChild;
-        state->dataMaterial->Material.push_back(p);
-    }
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
     state->dataConstruction->Construct(1).TotLayers = 3;
@@ -5126,9 +5130,19 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     // Case 1a: Constructs with regular materials are not reverse of each other--material layers do not match in reverse (should get a "true" answer)
     state->dataConstruction->Construct(2).LayerPoint(1) = 1;
     state->dataConstruction->Construct(2).LayerPoint(3) = 3;
-    state->dataMaterial->Material(1)->group = Material::Group::Regular;
-    state->dataMaterial->Material(2)->group = Material::Group::Regular;
-    state->dataMaterial->Material(3)->group = Material::Group::Regular;
+
+    auto *mat1 = new Material::MaterialBase;
+    mat1->group = Material::Group::Regular;
+    s_mat->materials.push_back(mat1);
+
+    auto *mat2 = new Material::MaterialBase;
+    mat2->group = Material::Group::Regular;
+    s_mat->materials.push_back(mat2);
+
+    auto *mat3 = new Material::MaterialBase;
+    mat3->group = Material::Group::Regular;
+    s_mat->materials.push_back(mat3);
+
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 1, 2, 3);
@@ -5143,46 +5157,52 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataConstruction->Construct(4).LayerPoint(1) = 4;
     state->dataConstruction->Construct(4).LayerPoint(2) = 2;
     state->dataConstruction->Construct(4).LayerPoint(3) = 5;
-    auto *thisMaterial_4 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(4));
-    thisMaterial_4->group = Material::Group::WindowGlass;
-    thisMaterial_4->Thickness = 0.15;
-    thisMaterial_4->ReflectSolBeamFront = 0.35;
-    thisMaterial_4->ReflectSolBeamBack = 0.25;
-    thisMaterial_4->TransVis = 0.45;
-    thisMaterial_4->ReflectVisBeamFront = 0.34;
-    thisMaterial_4->ReflectVisBeamBack = 0.24;
-    thisMaterial_4->TransThermal = 0.44;
-    thisMaterial_4->AbsorpThermalFront = 0.33;
-    thisMaterial_4->AbsorpThermalBack = 0.23;
-    thisMaterial_4->Conductivity = 0.43;
-    thisMaterial_4->GlassTransDirtFactor = 0.67;
-    thisMaterial_4->SolarDiffusing = true;
-    thisMaterial_4->YoungModulus = 0.89;
-    thisMaterial_4->PoissonsRatio = 1.11;
-    auto *thisMaterial_5 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(5));
-    thisMaterial_5->group = Material::Group::WindowGlass;
-    thisMaterial_5->Thickness = 0.15;
-    thisMaterial_5->ReflectSolBeamFront = 0.25;
-    thisMaterial_5->ReflectSolBeamBack = 0.35;
-    thisMaterial_5->TransVis = 0.45;
-    thisMaterial_5->ReflectVisBeamFront = 0.24;
-    thisMaterial_5->ReflectVisBeamBack = 0.34;
-    thisMaterial_5->TransThermal = 0.44;
-    thisMaterial_5->AbsorpThermalFront = 0.23;
-    thisMaterial_5->AbsorpThermalBack = 0.33;
-    thisMaterial_5->Conductivity = 0.43;
-    thisMaterial_5->GlassTransDirtFactor = 0.67;
-    thisMaterial_5->SolarDiffusing = true;
-    thisMaterial_5->YoungModulus = 0.89;
-    thisMaterial_5->PoissonsRatio = 1.11;
+
+    auto *mat4 = new Material::MaterialGlass;
+    mat4->group = Material::Group::Glass;
+    s_mat->materials.push_back(mat4);
+
+    mat4->Thickness = 0.15;
+    mat4->ReflectSolBeamFront = 0.35;
+    mat4->ReflectSolBeamBack = 0.25;
+    mat4->TransVis = 0.45;
+    mat4->ReflectVisBeamFront = 0.34;
+    mat4->ReflectVisBeamBack = 0.24;
+    mat4->TransThermal = 0.44;
+    mat4->AbsorpThermalFront = 0.33;
+    mat4->AbsorpThermalBack = 0.23;
+    mat4->Conductivity = 0.43;
+    mat4->GlassTransDirtFactor = 0.67;
+    mat4->SolarDiffusing = true;
+    mat4->YoungModulus = 0.89;
+    mat4->PoissonsRatio = 1.11;
+
+    auto *mat5 = new Material::MaterialGlass;
+    mat5->group = Material::Group::Glass;
+    s_mat->materials.push_back(mat5);
+
+    mat5->Thickness = 0.15;
+    mat5->ReflectSolBeamFront = 0.25;
+    mat5->ReflectSolBeamBack = 0.35;
+    mat5->TransVis = 0.45;
+    mat5->ReflectVisBeamFront = 0.24;
+    mat5->ReflectVisBeamBack = 0.34;
+    mat5->TransThermal = 0.44;
+    mat5->AbsorpThermalFront = 0.23;
+    mat5->AbsorpThermalBack = 0.33;
+    mat5->Conductivity = 0.43;
+    mat5->GlassTransDirtFactor = 0.67;
+    mat5->SolarDiffusing = true;
+    mat5->YoungModulus = 0.89;
+    mat5->PoissonsRatio = 1.11;
     RevLayerDiffs = true;
     // ExpectResult = false;
     CheckForReversedLayers(*state, RevLayerDiffs, 3, 4, 3);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 2b: Constructs are reverse of each other using WindowGlass, front/back properties NOT properly switched (should get a "true" answer)
-    thisMaterial_5->ReflectVisBeamFront = 0.34; // correct would be 0.24
-    thisMaterial_5->ReflectVisBeamBack = 0.24;  // correct would be 0.34
+    mat5->ReflectVisBeamFront = 0.34; // correct would be 0.24
+    mat5->ReflectVisBeamBack = 0.24;  // correct would be 0.34
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 3, 4, 3);
@@ -5193,69 +5213,74 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataConstruction->Construct(5).LayerPoint(1) = 6;
     state->dataConstruction->Construct(6).TotLayers = 1;
     state->dataConstruction->Construct(6).LayerPoint(1) = 7;
-    auto *thisMaterial_6 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(6));
-    thisMaterial_6->group = Material::Group::GlassEquivalentLayer;
-    thisMaterial_6->TausFrontBeamBeam = 0.39;
-    thisMaterial_6->TausBackBeamBeam = 0.29;
-    thisMaterial_6->ReflFrontBeamBeam = 0.38;
-    thisMaterial_6->ReflBackBeamBeam = 0.28;
-    thisMaterial_6->TausFrontBeamBeamVis = 0.37;
-    thisMaterial_6->TausBackBeamBeamVis = 0.27;
-    thisMaterial_6->ReflFrontBeamBeamVis = 0.36;
-    thisMaterial_6->ReflBackBeamBeamVis = 0.26;
-    thisMaterial_6->TausFrontBeamDiff = 0.35;
-    thisMaterial_6->TausBackBeamDiff = 0.25;
-    thisMaterial_6->ReflFrontBeamDiff = 0.34;
-    thisMaterial_6->ReflBackBeamDiff = 0.24;
-    thisMaterial_6->TausFrontBeamDiffVis = 0.33;
-    thisMaterial_6->TausBackBeamDiffVis = 0.23;
-    thisMaterial_6->ReflFrontBeamDiffVis = 0.32;
-    thisMaterial_6->ReflBackBeamDiffVis = 0.22;
-    thisMaterial_6->TausDiffDiff = 0.456;
-    thisMaterial_6->ReflFrontDiffDiff = 0.31;
-    thisMaterial_6->ReflBackDiffDiff = 0.21;
-    thisMaterial_6->TausDiffDiffVis = 0.345;
-    thisMaterial_6->ReflFrontDiffDiffVis = 0.30;
-    thisMaterial_6->ReflBackDiffDiffVis = 0.20;
-    thisMaterial_6->TausThermal = 0.234;
-    thisMaterial_6->EmissThermalFront = 0.888;
-    thisMaterial_6->EmissThermalBack = 0.777;
-    thisMaterial_6->Resistance = 1.234;
-    auto *thisMaterial_7 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(7));
-    thisMaterial_7->group = Material::Group::GlassEquivalentLayer;
-    thisMaterial_7->TausFrontBeamBeam = 0.29;
-    thisMaterial_7->TausBackBeamBeam = 0.39;
-    thisMaterial_7->ReflFrontBeamBeam = 0.28;
-    thisMaterial_7->ReflBackBeamBeam = 0.38;
-    thisMaterial_7->TausFrontBeamBeamVis = 0.27;
-    thisMaterial_7->TausBackBeamBeamVis = 0.37;
-    thisMaterial_7->ReflFrontBeamBeamVis = 0.26;
-    thisMaterial_7->ReflBackBeamBeamVis = 0.36;
-    thisMaterial_7->TausFrontBeamDiff = 0.25;
-    thisMaterial_7->TausBackBeamDiff = 0.35;
-    thisMaterial_7->ReflFrontBeamDiff = 0.24;
-    thisMaterial_7->ReflBackBeamDiff = 0.34;
-    thisMaterial_7->TausFrontBeamDiffVis = 0.23;
-    thisMaterial_7->TausBackBeamDiffVis = 0.33;
-    thisMaterial_7->ReflFrontBeamDiffVis = 0.22;
-    thisMaterial_7->ReflBackBeamDiffVis = 0.32;
-    thisMaterial_7->TausDiffDiff = 0.456;
-    thisMaterial_7->ReflFrontDiffDiff = 0.21;
-    thisMaterial_7->ReflBackDiffDiff = 0.31;
-    thisMaterial_7->TausDiffDiffVis = 0.345;
-    thisMaterial_7->ReflFrontDiffDiffVis = 0.20;
-    thisMaterial_7->ReflBackDiffDiffVis = 0.30;
-    thisMaterial_7->TausThermal = 0.234;
-    thisMaterial_7->EmissThermalFront = 0.777;
-    thisMaterial_7->EmissThermalBack = 0.888;
-    thisMaterial_7->Resistance = 1.234;
+
+    auto *mat6 = new Material::MaterialGlassEQL;
+    mat6->group = Material::Group::GlassEQL;
+    s_mat->materials.push_back(mat6);
+    mat6->TAR.Sol.Ft.Bm[0].BmTra = 0.39;
+    mat6->TAR.Sol.Bk.Bm[0].BmTra = 0.29;
+    mat6->TAR.Sol.Ft.Bm[0].BmRef = 0.38;
+    mat6->TAR.Sol.Bk.Bm[0].BmRef = 0.28;
+    mat6->TAR.Vis.Ft.Bm[0].BmTra = 0.37;
+    mat6->TAR.Vis.Bk.Bm[0].BmTra = 0.27;
+    mat6->TAR.Vis.Ft.Bm[0].BmRef = 0.36;
+    mat6->TAR.Vis.Bk.Bm[0].BmRef = 0.26;
+    mat6->TAR.Sol.Ft.Bm[0].DfTra = 0.35;
+    mat6->TAR.Sol.Bk.Bm[0].DfTra = 0.25;
+    mat6->TAR.Sol.Ft.Bm[0].DfRef = 0.34;
+    mat6->TAR.Sol.Bk.Bm[0].DfRef = 0.24;
+    mat6->TAR.Vis.Ft.Bm[0].DfTra = 0.33;
+    mat6->TAR.Vis.Bk.Bm[0].DfTra = 0.23;
+    mat6->TAR.Vis.Ft.Bm[0].DfRef = 0.32;
+    mat6->TAR.Vis.Bk.Bm[0].DfRef = 0.22;
+    mat6->TAR.Sol.Ft.Df.Tra = 0.456;
+    mat6->TAR.Sol.Ft.Df.Ref = 0.31;
+    mat6->TAR.Sol.Bk.Df.Ref = 0.21;
+    mat6->TAR.Vis.Ft.Df.Tra = 0.345;
+    mat6->TAR.Vis.Ft.Df.Ref = 0.30;
+    mat6->TAR.Vis.Bk.Df.Ref = 0.20;
+    mat6->TAR.IR.Ft.Tra = 0.234;
+    mat6->TAR.IR.Ft.Emi = 0.888;
+    mat6->TAR.IR.Bk.Emi = 0.777;
+    mat6->Resistance = 1.234;
+
+    auto *mat7 = new Material::MaterialGlassEQL;
+    mat7->group = Material::Group::GlassEQL;
+    s_mat->materials.push_back(mat7);
+
+    mat7->TAR.Sol.Ft.Bm[0].BmTra = 0.29;
+    mat7->TAR.Sol.Bk.Bm[0].BmTra = 0.39;
+    mat7->TAR.Sol.Ft.Bm[0].BmRef = 0.28;
+    mat7->TAR.Sol.Bk.Bm[0].BmRef = 0.38;
+    mat7->TAR.Vis.Ft.Bm[0].BmTra = 0.27;
+    mat7->TAR.Vis.Bk.Bm[0].BmTra = 0.37;
+    mat7->TAR.Vis.Ft.Bm[0].BmRef = 0.26;
+    mat7->TAR.Vis.Bk.Bm[0].BmRef = 0.36;
+    mat7->TAR.Sol.Ft.Bm[0].DfTra = 0.25;
+    mat7->TAR.Sol.Bk.Bm[0].DfTra = 0.35;
+    mat7->TAR.Sol.Ft.Bm[0].DfRef = 0.24;
+    mat7->TAR.Sol.Bk.Bm[0].DfRef = 0.34;
+    mat7->TAR.Vis.Ft.Bm[0].DfTra = 0.23;
+    mat7->TAR.Vis.Bk.Bm[0].DfTra = 0.33;
+    mat7->TAR.Vis.Ft.Bm[0].DfRef = 0.22;
+    mat7->TAR.Vis.Bk.Bm[0].DfRef = 0.32;
+    mat7->TAR.Sol.Ft.Df.Tra = 0.456;
+    mat7->TAR.Sol.Ft.Df.Ref = 0.21;
+    mat7->TAR.Sol.Bk.Df.Ref = 0.31;
+    mat7->TAR.Vis.Ft.Df.Tra = 0.345;
+    mat7->TAR.Vis.Ft.Df.Ref = 0.20;
+    mat7->TAR.Vis.Bk.Df.Ref = 0.30;
+    mat7->TAR.IR.Ft.Tra = 0.234;
+    mat7->TAR.IR.Ft.Emi = 0.777;
+    mat7->TAR.IR.Bk.Emi = 0.888;
+    mat7->Resistance = 1.234;
     RevLayerDiffs = true;
     // ExpectResult = false;
     CheckForReversedLayers(*state, RevLayerDiffs, 5, 6, 1);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 3a: Single layer constructs using Equivalent Glass, front/back properties NOT properly switched (should get a "true" answer)
-    thisMaterial_7->EmissThermalFront = 0.888;
+    mat7->TAR.IR.Ft.Emi = 0.888;
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 5, 6, 1);

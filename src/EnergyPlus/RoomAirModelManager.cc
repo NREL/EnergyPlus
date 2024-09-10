@@ -2707,12 +2707,9 @@ namespace RoomAir {
         // number.If incorrect name is given, errorsfound is returned as true and value is returned
         // as zero.
 
-        static constexpr std::string_view routineName = "CheckEquipName";
-
         // Return value
         bool EquipFind = false; // if true, equip is found
 
-        bool errorfound;
         int SupplyNodeNum = 0;
         int ReturnNodeNum = 0;
 

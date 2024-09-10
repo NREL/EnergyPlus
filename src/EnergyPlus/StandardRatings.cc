@@ -1086,8 +1086,6 @@ namespace StandardRatings {
         Real64 EER2(0.0);           // Energy Efficiency Ratio using AHRI 210/140 - 2023
         Real64 EER_2022(0.0);       // Energy Efficiency Ratio in SI [W/W]
         Real64 IEER_2022(0.0);      // Integerated Energy Efficiency Ratio in SI [W/W]
-        Real64 NetCoolingCapRated2022(0.0);
-        Real64 NetCoolingCapRatedMaxSpeed2023(0.0);
 
         Real64 HSPF(0.0);                       // Heating Seasonal Performance Factor in SI [W/W]
         Real64 NetHeatingCapRatedHighTemp(0.0); // Net Rated heating capacity at high temp [W]
@@ -2440,8 +2438,9 @@ namespace StandardRatings {
         return EER;
     }
 
-    std::tuple<Real64, Real64, Real64, Real64>
-    SEER2CalulcationCurveFit(EnergyPlusData &state, std::string const &CoilType, EnergyPlus::CoilCoolingDXCurveFitOperatingMode operatingMode)
+    std::tuple<Real64, Real64, Real64, Real64> SEER2CalulcationCurveFit(EnergyPlusData &state,
+                                                                        [[maybe_unused]] std::string const &CoilType,
+                                                                        EnergyPlus::CoilCoolingDXCurveFitOperatingMode operatingMode)
     {
         Real64 EEER2(0.0);
         Real64 SEER2_User(0.0);
@@ -4106,7 +4105,7 @@ namespace StandardRatings {
     std::pair<Real64, int> GetMatchingSpeedFromBuildingLoad(Real64 buildingLoad, const Array1A<Real64> &speedList)
     {
         std::pair<int, Real64> result = {-1, -1}; // Initialize result to indicate no suitable number found
-        for (int i = 0; i < speedList.size(); ++i) {
+        for (int i = 0; i < speedList.isize(); ++i) {
             Real64 scaledSpeed = speedList[i];
             if (scaledSpeed >= buildingLoad) {
                 result = {speedList[i], i};

@@ -808,7 +808,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("ReadZoneCoupledDomainInputs");
+        static constexpr std::string_view routineName = "ReadZoneCoupledDomainInputs";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -821,6 +821,9 @@ namespace PlantPipingSystemsManager {
         // For each domain, we need to process the inputs into a local array of derived type, then resolve each one, creating definitions for a zone
         // coupled domain. This way, the outer get input routines can handle it as though they were generalized routines
 
+        auto &s_ipsc = state.dataIPShortCut;
+        auto &s_mat = state.dataMaterial;
+
         for (int ZoneCoupledDomainCtr = 1; ZoneCoupledDomainCtr <= NumZoneCoupledDomains; ++ZoneCoupledDomainCtr) {
 
             // Increment the domain counters here
@@ -830,76 +833,77 @@ namespace PlantPipingSystemsManager {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ObjName_ZoneCoupled_Slab,
                                                                      ZoneCoupledDomainCtr,
-                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     s_ipsc->cAlphaArgs,
                                                                      NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     s_ipsc->rNumericArgs,
                                                                      NumNumbers,
                                                                      IOStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                     s_ipsc->lNumericFieldBlanks,
+                                                                     s_ipsc->lAlphaFieldBlanks,
+                                                                     s_ipsc->cAlphaFieldNames,
+                                                                     s_ipsc->cNumericFieldNames);
+
+            ErrorObjectHeader eoh{routineName, ObjName_ZoneCoupled_Slab, s_ipsc->cAlphaArgs(1)};
 
             auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainCtr - 1];
 
             // Get the name, validate
             // Domain name
-            thisDomain.Name = state.dataIPShortCut->cAlphaArgs(1);
+            thisDomain.Name = s_ipsc->cAlphaArgs(1);
 
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataPlantPipingSysMgr->GroundDomainUniqueNames,
-                                                     state.dataIPShortCut->cAlphaArgs(1),
+                                                     s_ipsc->cAlphaArgs(1),
                                                      ObjName_ZoneCoupled_Slab,
-                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     s_ipsc->cAlphaFieldNames(1),
                                                      ErrorsFound);
 
             // Read in the rest of the inputs into the local type for clarity during transition
-            thisDomain.Extents.yMax = state.dataIPShortCut->rNumericArgs(1);
-            thisDomain.PerimeterOffset = state.dataIPShortCut->rNumericArgs(3);
-            thisDomain.GroundProperties.Conductivity = state.dataIPShortCut->rNumericArgs(4);
-            thisDomain.GroundProperties.Density = state.dataIPShortCut->rNumericArgs(5);
-            thisDomain.GroundProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(6);
-            thisDomain.Moisture.Theta_liq = state.dataIPShortCut->rNumericArgs(7) / 100.0;
-            thisDomain.Moisture.Theta_sat = state.dataIPShortCut->rNumericArgs(8) / 100.0;
-            thisDomain.Moisture.GroundCoverCoefficient = state.dataIPShortCut->rNumericArgs(9);
-            thisDomain.HorizInsWidth = state.dataIPShortCut->rNumericArgs(10);
-            thisDomain.VertInsDepth = state.dataIPShortCut->rNumericArgs(11);
+            thisDomain.Extents.yMax = s_ipsc->rNumericArgs(1);
+            thisDomain.PerimeterOffset = s_ipsc->rNumericArgs(3);
+            thisDomain.GroundProperties.Conductivity = s_ipsc->rNumericArgs(4);
+            thisDomain.GroundProperties.Density = s_ipsc->rNumericArgs(5);
+            thisDomain.GroundProperties.SpecificHeat = s_ipsc->rNumericArgs(6);
+            thisDomain.Moisture.Theta_liq = s_ipsc->rNumericArgs(7) / 100.0;
+            thisDomain.Moisture.Theta_sat = s_ipsc->rNumericArgs(8) / 100.0;
+            thisDomain.Moisture.GroundCoverCoefficient = s_ipsc->rNumericArgs(9);
+            thisDomain.HorizInsWidth = s_ipsc->rNumericArgs(10);
+            thisDomain.VertInsDepth = s_ipsc->rNumericArgs(11);
 
             // Set flag for slab in-grade or slab on-grade
-            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "INGRADE")) {
+            if (Util::SameString(s_ipsc->cAlphaArgs(5), "INGRADE")) {
                 thisDomain.SlabInGradeFlag = true;
-            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "ONGRADE")) {
+            } else if (Util::SameString(s_ipsc->cAlphaArgs(5), "ONGRADE")) {
                 thisDomain.SlabInGradeFlag = false;
             } else {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
+                ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
                 ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                 ErrorsFound = true;
             }
 
             // Get slab material properties
             if (thisDomain.SlabInGradeFlag) {
-                thisDomain.SlabMaterialNum =
-                    Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+                thisDomain.SlabMaterialNum = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(6));
                 if (thisDomain.SlabMaterialNum == 0) {
-                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
-                    ShowContinueError(state, format("Found in: {}", thisDomain.Name));
+                    ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(6), s_ipsc->cAlphaArgs(6));
                     ErrorsFound = true;
                 } else {
-                    thisDomain.SlabThickness = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->Thickness;
-                    thisDomain.SlabProperties.Density = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->Density;
-                    thisDomain.SlabProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->SpecHeat;
-                    thisDomain.SlabProperties.Conductivity = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->Conductivity;
+                    auto const *mat = s_mat->materials(thisDomain.SlabMaterialNum);
+                    thisDomain.SlabThickness = mat->Thickness;
+                    thisDomain.SlabProperties.Density = mat->Density;
+                    thisDomain.SlabProperties.SpecificHeat = mat->SpecHeat;
+                    thisDomain.SlabProperties.Conductivity = mat->Conductivity;
                 }
             }
 
             // set flag for horizontal insulation
             if (thisDomain.SlabInGradeFlag) {
-                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "NO")) {
+                if (Util::SameString(s_ipsc->cAlphaArgs(7), "NO")) {
                     thisDomain.HorizInsPresentFlag = false;
-                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "YES")) {
+                } else if (Util::SameString(s_ipsc->cAlphaArgs(7), "YES")) {
                     thisDomain.HorizInsPresentFlag = true;
                 } else {
-                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
+                    ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(7), s_ipsc->cAlphaArgs(7)));
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                     ErrorsFound = true;
                 }
@@ -907,88 +911,84 @@ namespace PlantPipingSystemsManager {
 
             // Get horizontal insulation material properties
             if (thisDomain.HorizInsPresentFlag) {
-                thisDomain.HorizInsMaterialNum =
-                    Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(8), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+                thisDomain.HorizInsMaterialNum = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(8));
                 if (thisDomain.HorizInsMaterialNum == 0) {
-                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8)));
-                    ShowContinueError(state, format("Found in: {}", thisDomain.Name));
+                    ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(8), s_ipsc->cAlphaArgs(8));
                     ErrorsFound = true;
                 } else {
-                    thisDomain.HorizInsThickness = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Thickness;
-                    thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Density;
-                    thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->SpecHeat;
-                    thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Conductivity;
+                    auto const *mat = s_mat->materials(thisDomain.HorizInsMaterialNum);
+                    thisDomain.HorizInsThickness = mat->Thickness;
+                    thisDomain.HorizInsProperties.Density = mat->Density;
+                    thisDomain.HorizInsProperties.SpecificHeat = mat->SpecHeat;
+                    thisDomain.HorizInsProperties.Conductivity = mat->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                         ErrorsFound = true;
-                        SiteGroundDomainNoMassMatError(
-                            state, state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), thisDomain.Name);
+                        SiteGroundDomainNoMassMatError(state, s_ipsc->cAlphaFieldNames(8), s_ipsc->cAlphaArgs(8), thisDomain.Name);
                     }
                 }
 
                 // Set flag for horizontal insulation extents
-                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "PERIMETER")) {
+                if (Util::SameString(s_ipsc->cAlphaArgs(9), "PERIMETER")) {
                     thisDomain.FullHorizInsPresent = false;
                     // Horizontal insulation perimeter width
                     if (thisDomain.HorizInsWidth <= 0.0) {
-                        ShowSevereError(state, format("Invalid {}", state.dataIPShortCut->cNumericFieldNames(10)));
+                        ShowSevereError(state, format("Invalid {}", s_ipsc->cNumericFieldNames(10)));
                         ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                         ErrorsFound = true;
                     }
-                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "FULL")) {
+                } else if (Util::SameString(s_ipsc->cAlphaArgs(9), "FULL")) {
                     thisDomain.FullHorizInsPresent = true;
                 } else {
-                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
+                    ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(9), s_ipsc->cAlphaArgs(9)));
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                     ErrorsFound = true;
                 }
             }
 
             // set flag for vertical insulation
-            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "NO")) {
+            if (Util::SameString(s_ipsc->cAlphaArgs(10), "NO")) {
                 thisDomain.VertInsPresentFlag = false;
-            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "YES")) {
+            } else if (Util::SameString(s_ipsc->cAlphaArgs(10), "YES")) {
                 thisDomain.VertInsPresentFlag = true;
             } else {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
+                ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(10), s_ipsc->cAlphaArgs(10)));
                 ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                 ErrorsFound = true;
             }
 
             // Get vertical insulation material properties
             if (thisDomain.VertInsPresentFlag) {
-                thisDomain.VertInsMaterialNum =
-                    Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(11), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+                thisDomain.VertInsMaterialNum = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(11));
                 if (thisDomain.VertInsMaterialNum == 0) {
-                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11)));
-                    ShowContinueError(state, format("Found in: {}", thisDomain.Name));
+                    ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(11), s_ipsc->cAlphaArgs(11));
                     ErrorsFound = true;
                 } else {
-                    thisDomain.VertInsThickness = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Thickness;
-                    thisDomain.VertInsProperties.Density = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Density;
-                    thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->SpecHeat;
-                    thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Conductivity;
+                    auto const *mat = s_mat->materials(thisDomain.VertInsMaterialNum);
+                    thisDomain.VertInsThickness = mat->Thickness;
+                    thisDomain.VertInsProperties.Density = mat->Density;
+                    thisDomain.VertInsProperties.SpecificHeat = mat->SpecHeat;
+                    thisDomain.VertInsProperties.Conductivity = mat->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                         ErrorsFound = true;
-                        SiteGroundDomainNoMassMatError(
-                            state, state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11), thisDomain.Name);
+                        SiteGroundDomainNoMassMatError(state, s_ipsc->cAlphaFieldNames(11), s_ipsc->cAlphaArgs(11), thisDomain.Name);
                     }
                 }
 
                 // vertical insulation depth
                 if (thisDomain.VertInsDepth > thisDomain.Extents.yMax || thisDomain.VertInsDepth <= 0.0) {
-                    ShowSevereError(state, format("Invalid {}", state.dataIPShortCut->cNumericFieldNames(11)));
+                    ShowSevereError(state, format("Invalid {}", s_ipsc->cNumericFieldNames(11)));
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                     ErrorsFound = true;
                 }
             }
 
             // Set simulation interval flag
-            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(12), "TIMESTEP")) {
+            if (Util::SameString(s_ipsc->cAlphaArgs(12), "TIMESTEP")) {
                 thisDomain.SimTimeStepFlag = true;
-            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(12), "HOURLY")) {
+            } else if (Util::SameString(s_ipsc->cAlphaArgs(12), "HOURLY")) {
                 thisDomain.SimHourlyFlag = true;
             } else {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12)));
+                ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(12), s_ipsc->cAlphaArgs(12)));
                 ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                 ErrorsFound = true;
             }
@@ -999,14 +999,14 @@ namespace PlantPipingSystemsManager {
             thisDomain.HasZoneCoupledSlab = true;
 
             // get boundary condition model names and indices -- error check
-            thisDomain.ZoneCoupledOSCMIndex = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->OSCM);
+            thisDomain.ZoneCoupledOSCMIndex = Util::FindItemInList(s_ipsc->cAlphaArgs(4), state.dataSurface->OSCM);
             if (thisDomain.ZoneCoupledOSCMIndex <= 0) {
                 IssueSevereInputFieldError(state,
-                                           RoutineName,
+                                           routineName,
                                            ObjName_ZoneCoupled_Slab,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaFieldNames(4),
-                                           state.dataIPShortCut->cAlphaArgs(4),
+                                           s_ipsc->cAlphaArgs(1),
+                                           s_ipsc->cAlphaFieldNames(4),
+                                           s_ipsc->cAlphaArgs(4),
                                            "Could not match with an Other Side Conditions Model input object.",
                                            ErrorsFound);
                 ErrorsFound = true;
@@ -1015,11 +1015,11 @@ namespace PlantPipingSystemsManager {
                 if (NumSurfacesWithThisOSCM <= 0) {
                     IssueSevereInputFieldError(
                         state,
-                        RoutineName,
+                        routineName,
                         ObjName_ZoneCoupled_Slab,
-                        state.dataIPShortCut->cAlphaArgs(1),
-                        state.dataIPShortCut->cAlphaFieldNames(4),
-                        state.dataIPShortCut->cAlphaArgs(4),
+                        s_ipsc->cAlphaArgs(1),
+                        s_ipsc->cAlphaFieldNames(4),
+                        s_ipsc->cAlphaArgs(4),
                         "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                         ErrorsFound);
                     ErrorsFound = true;
@@ -1035,7 +1035,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.SlabArea = ThisArea / 4; // We are only interested in 1/4 of total area due to symmetry
 
             // Surface dimensions
-            Real64 thisAspectRatio = state.dataIPShortCut->rNumericArgs(2);
+            Real64 thisAspectRatio = s_ipsc->rNumericArgs(2);
             thisDomain.SlabWidth = std::sqrt(ThisArea / thisAspectRatio);
             thisDomain.SlabLength = thisDomain.SlabWidth * thisAspectRatio;
 
@@ -1044,7 +1044,7 @@ namespace PlantPipingSystemsManager {
             if (!thisDomain.FullHorizInsPresent && ThisArea > 0.0) {
                 if (2 * (thisDomain.HorizInsWidth + thisDomain.VertInsThickness) > thisDomain.SlabWidth ||
                     2 * (thisDomain.HorizInsWidth + thisDomain.VertInsThickness) > thisDomain.SlabLength) {
-                    ShowContinueError(state, format("{}: Perimeter insulation width is too large.", RoutineName));
+                    ShowContinueError(state, format("{}: Perimeter insulation width is too large.", routineName));
                     ShowContinueError(state, "This would cause overlapping insulation. Check inputs.");
                     ShowContinueError(state, "Defaulting to full horizontal insulation.");
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
@@ -1064,13 +1064,13 @@ namespace PlantPipingSystemsManager {
             thisDomain.Mesh.Y.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
             thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
 
-            Real64 MeshCoefficient = state.dataIPShortCut->rNumericArgs(12);
+            Real64 MeshCoefficient = s_ipsc->rNumericArgs(12);
             if (MeshCoefficient == 0.0) MeshCoefficient = 1.6;
             thisDomain.Mesh.X.GeometricSeriesCoefficient = MeshCoefficient;
             thisDomain.Mesh.Y.GeometricSeriesCoefficient = MeshCoefficient;
             thisDomain.Mesh.Z.GeometricSeriesCoefficient = MeshCoefficient;
 
-            int MeshCount = static_cast<int>(state.dataIPShortCut->rNumericArgs(13));
+            int MeshCount = static_cast<int>(s_ipsc->rNumericArgs(13));
             if (MeshCount == 0.0) MeshCount = 6;
             thisDomain.Mesh.X.RegionMeshCount = MeshCount;
             thisDomain.Mesh.Y.RegionMeshCount = MeshCount;
@@ -1079,7 +1079,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.NumSlabCells = thisDomain.Mesh.Y.RegionMeshCount; // Need to clean this out at some point
 
             // Farfield model
-            thisDomain.groundTempModel = GetGroundTempModelAndInit(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(3));
+            thisDomain.groundTempModel = GetGroundTempModelAndInit(state, s_ipsc->cAlphaArgs(2), s_ipsc->cAlphaArgs(3));
 
             // Other parameters
             thisDomain.SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -1100,7 +1100,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("ReadBasementInputs");
+        static constexpr std::string_view routineName = "ReadBasementInputs";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -1112,6 +1112,8 @@ namespace PlantPipingSystemsManager {
 
         // For each domain, we need to process the inputs into a local array of derived type, then resolve each one, creating definitions for a zone
         // coupled domain. This way, the outer get input routines can handle it as though they were generalized routines
+        auto &s_ipsc = state.dataIPShortCut;
+        auto &s_mat = state.dataMaterial;
 
         for (int BasementCtr = 1; BasementCtr <= NumBasements; ++BasementCtr) {
 
@@ -1122,76 +1124,75 @@ namespace PlantPipingSystemsManager {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ObjName_ZoneCoupled_Basement,
                                                                      BasementCtr,
-                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     s_ipsc->cAlphaArgs,
                                                                      NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     s_ipsc->rNumericArgs,
                                                                      NumNumbers,
                                                                      IOStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                     s_ipsc->lNumericFieldBlanks,
+                                                                     s_ipsc->lAlphaFieldBlanks,
+                                                                     s_ipsc->cAlphaFieldNames,
+                                                                     s_ipsc->cNumericFieldNames);
 
+            ErrorObjectHeader eoh{routineName, ObjName_ZoneCoupled_Basement, s_ipsc->cAlphaArgs(1)};
             auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum - 1];
 
             // Get the name, validate
-            thisDomain.Name = state.dataIPShortCut->cAlphaArgs(1);
+            thisDomain.Name = s_ipsc->cAlphaArgs(1);
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataPlantPipingSysMgr->GroundDomainUniqueNames,
-                                                     state.dataIPShortCut->cAlphaArgs(1),
+                                                     s_ipsc->cAlphaArgs(1),
                                                      ObjName_ZoneCoupled_Basement,
-                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     s_ipsc->cAlphaFieldNames(1),
                                                      ErrorsFound);
 
             // Read in the some of the inputs into the local type for clarity during transition
-            thisDomain.Extents.yMax = state.dataIPShortCut->rNumericArgs(1);
-            Real64 const thisAspectRatio = state.dataIPShortCut->rNumericArgs(2);
-            thisDomain.PerimeterOffset = state.dataIPShortCut->rNumericArgs(3);
-            thisDomain.HorizInsWidth = state.dataIPShortCut->rNumericArgs(10);
-            thisDomain.VertInsDepth = state.dataIPShortCut->rNumericArgs(12);
+            thisDomain.Extents.yMax = s_ipsc->rNumericArgs(1);
+            Real64 const thisAspectRatio = s_ipsc->rNumericArgs(2);
+            thisDomain.PerimeterOffset = s_ipsc->rNumericArgs(3);
+            thisDomain.HorizInsWidth = s_ipsc->rNumericArgs(10);
+            thisDomain.VertInsDepth = s_ipsc->rNumericArgs(12);
 
             // Other inputs
-            thisDomain.Name = state.dataIPShortCut->cAlphaArgs(1);
+            thisDomain.Name = s_ipsc->cAlphaArgs(1);
 
             // Soil properties, validated min/max by IP
-            thisDomain.GroundProperties.Conductivity = state.dataIPShortCut->rNumericArgs(4);
-            thisDomain.GroundProperties.Density = state.dataIPShortCut->rNumericArgs(5);
-            thisDomain.GroundProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(6);
+            thisDomain.GroundProperties.Conductivity = s_ipsc->rNumericArgs(4);
+            thisDomain.GroundProperties.Density = s_ipsc->rNumericArgs(5);
+            thisDomain.GroundProperties.SpecificHeat = s_ipsc->rNumericArgs(6);
 
             // Moisture properties, validated min/max by IP, and converted to a fraction for computation here
-            thisDomain.Moisture.Theta_liq = state.dataIPShortCut->rNumericArgs(7) / 100.0;
-            thisDomain.Moisture.Theta_sat = state.dataIPShortCut->rNumericArgs(8) / 100.0;
+            thisDomain.Moisture.Theta_liq = s_ipsc->rNumericArgs(7) / 100.0;
+            thisDomain.Moisture.Theta_sat = s_ipsc->rNumericArgs(8) / 100.0;
 
             // check if there are blank inputs related to the basement,
-            if (state.dataIPShortCut->lNumericFieldBlanks(11) || state.dataIPShortCut->lAlphaFieldBlanks(5) ||
-                state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                ShowSevereError(state,
-                                format("Erroneous basement inputs for {}={}", ObjName_ZoneCoupled_Basement, state.dataIPShortCut->cAlphaArgs(1)));
+            if (s_ipsc->lNumericFieldBlanks(11) || s_ipsc->lAlphaFieldBlanks(5) || s_ipsc->lAlphaFieldBlanks(10)) {
+                ShowSevereError(state, format("Erroneous basement inputs for {}={}", ObjName_ZoneCoupled_Basement, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, "At least one basement input was left blank.");
                 ErrorsFound = true;
             }
 
             // Basement zone depth
             int CurIndex = 11;
-            thisDomain.BasementZone.Depth = state.dataIPShortCut->rNumericArgs(CurIndex);
+            thisDomain.BasementZone.Depth = s_ipsc->rNumericArgs(CurIndex);
             if (thisDomain.BasementZone.Depth >= thisDomain.Extents.yMax || thisDomain.BasementZone.Depth <= 0.0) {
-                ShowSevereError(state, format("Invalid {}", state.dataIPShortCut->cNumericFieldNames(CurIndex)));
+                ShowSevereError(state, format("Invalid {}", s_ipsc->cNumericFieldNames(CurIndex)));
                 ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                 ErrorsFound = true;
             }
 
             // get boundary condition model names and indices --error check
             CurIndex = 4;
-            thisDomain.BasementZone.FloorBoundaryOSCMName = state.dataIPShortCut->cAlphaArgs(CurIndex);
+            thisDomain.BasementZone.FloorBoundaryOSCMName = s_ipsc->cAlphaArgs(CurIndex);
             thisDomain.BasementZone.FloorBoundaryOSCMIndex =
                 Util::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName, state.dataSurface->OSCM);
             if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
                 IssueSevereInputFieldError(state,
-                                           RoutineName,
+                                           routineName,
                                            ObjName_ZoneCoupled_Basement,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaFieldNames(CurIndex),
-                                           state.dataIPShortCut->cAlphaArgs(CurIndex),
+                                           s_ipsc->cAlphaArgs(1),
+                                           s_ipsc->cAlphaFieldNames(CurIndex),
+                                           s_ipsc->cAlphaArgs(CurIndex),
                                            "Could not match with an Other Side Conditions Model input object.",
                                            ErrorsFound);
             } else {
@@ -1199,11 +1200,11 @@ namespace PlantPipingSystemsManager {
                 if (floorIndexes.empty()) {
                     IssueSevereInputFieldError(
                         state,
-                        RoutineName,
+                        routineName,
                         ObjName_ZoneCoupled_Basement,
-                        state.dataIPShortCut->cAlphaArgs(1),
-                        state.dataIPShortCut->cAlphaFieldNames(CurIndex),
-                        state.dataIPShortCut->cAlphaArgs(CurIndex),
+                        s_ipsc->cAlphaArgs(1),
+                        s_ipsc->cAlphaFieldNames(CurIndex),
+                        s_ipsc->cAlphaArgs(CurIndex),
                         "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                         ErrorsFound);
                 } else {
@@ -1214,16 +1215,16 @@ namespace PlantPipingSystemsManager {
             }
 
             CurIndex = 8;
-            thisDomain.BasementZone.WallBoundaryOSCMName = state.dataIPShortCut->cAlphaArgs(CurIndex);
+            thisDomain.BasementZone.WallBoundaryOSCMName = s_ipsc->cAlphaArgs(CurIndex);
             thisDomain.BasementZone.WallBoundaryOSCMIndex =
                 Util::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName, state.dataSurface->OSCM);
             if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
                 IssueSevereInputFieldError(state,
-                                           RoutineName,
+                                           routineName,
                                            ObjName_ZoneCoupled_Basement,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaFieldNames(CurIndex),
-                                           state.dataIPShortCut->cAlphaArgs(CurIndex),
+                                           s_ipsc->cAlphaArgs(1),
+                                           s_ipsc->cAlphaFieldNames(CurIndex),
+                                           s_ipsc->cAlphaArgs(CurIndex),
                                            "Could not match with an Other Side Conditions Model input object.",
                                            ErrorsFound);
                 ErrorsFound = true;
@@ -1232,11 +1233,11 @@ namespace PlantPipingSystemsManager {
                 if (wallIndexes.empty()) {
                     IssueSevereInputFieldError(
                         state,
-                        RoutineName,
+                        routineName,
                         ObjName_ZoneCoupled_Basement,
-                        state.dataIPShortCut->cAlphaArgs(1),
-                        state.dataIPShortCut->cAlphaFieldNames(CurIndex),
-                        state.dataIPShortCut->cAlphaArgs(CurIndex),
+                        s_ipsc->cAlphaArgs(1),
+                        s_ipsc->cAlphaFieldNames(CurIndex),
+                        s_ipsc->cAlphaArgs(CurIndex),
                         "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                         ErrorsFound);
                     ErrorsFound = true;
@@ -1250,14 +1251,14 @@ namespace PlantPipingSystemsManager {
             thisDomain.SimControls.MaxIterationsPerTS = 250;
 
             // additional evapotranspiration parameter, min/max validated by IP
-            thisDomain.Moisture.GroundCoverCoefficient = state.dataIPShortCut->rNumericArgs(9);
+            thisDomain.Moisture.GroundCoverCoefficient = s_ipsc->rNumericArgs(9);
 
             // assign the mesh count
             int meshCount;
-            if (state.dataIPShortCut->lNumericFieldBlanks(13)) {
+            if (s_ipsc->lNumericFieldBlanks(13)) {
                 meshCount = 4;
             } else {
-                meshCount = static_cast<int>(state.dataIPShortCut->rNumericArgs(13));
+                meshCount = static_cast<int>(s_ipsc->rNumericArgs(13));
             }
             thisDomain.Mesh.X.RegionMeshCount = meshCount;
             thisDomain.Mesh.Y.RegionMeshCount = meshCount;
@@ -1273,62 +1274,60 @@ namespace PlantPipingSystemsManager {
             thisDomain.BasementInterfaceProperties.Density = 1.0;
 
             // set flag for horizontal insulation
-            // Check state.dataIPShortCut->cAlphaArgs value
-            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "NO")) {
+            // Check s_ipsc->cAlphaArgs value
+            if (Util::SameString(s_ipsc->cAlphaArgs(5), "NO")) {
                 thisDomain.HorizInsPresentFlag = false;
-            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "YES")) {
+            } else if (Util::SameString(s_ipsc->cAlphaArgs(5), "YES")) {
                 thisDomain.HorizInsPresentFlag = true;
             } else {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
+                ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
                 ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                 ErrorsFound = true;
             }
 
             // Get horizontal insulation material properties
             if (thisDomain.HorizInsPresentFlag) {
-                thisDomain.HorizInsMaterialNum =
-                    Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+                thisDomain.HorizInsMaterialNum = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(6));
                 if (thisDomain.HorizInsMaterialNum == 0) {
-                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
-                    ShowContinueError(state, format("Found in: {}", thisDomain.Name));
+                    ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(6), s_ipsc->cAlphaArgs(6));
                     ErrorsFound = true;
                 } else {
-                    thisDomain.HorizInsThickness = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Thickness;
-                    thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Density;
-                    thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->SpecHeat;
-                    thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Conductivity;
+                    auto const *mat = s_mat->materials(thisDomain.HorizInsMaterialNum);
+                    thisDomain.HorizInsThickness = mat->Thickness;
+                    thisDomain.HorizInsProperties.Density = mat->Density;
+                    thisDomain.HorizInsProperties.SpecificHeat = mat->SpecHeat;
+                    thisDomain.HorizInsProperties.Conductivity = mat->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                         ErrorsFound = true;
-                        SiteGroundDomainNoMassMatError(
-                            state, state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), thisDomain.Name);
+                        SiteGroundDomainNoMassMatError(state, s_ipsc->cAlphaFieldNames(6), s_ipsc->cAlphaArgs(6), thisDomain.Name);
                     }
                 }
 
                 // Set flag for horizontal insulation extents
-                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "PERIMETER")) {
+                if (Util::SameString(s_ipsc->cAlphaArgs(7), "PERIMETER")) {
                     thisDomain.FullHorizInsPresent = false;
                     // Horizontal insulation perimeter width
                     if (thisDomain.HorizInsWidth <= 0.0) {
-                        ShowSevereError(state, format("Invalid {}", state.dataIPShortCut->cNumericFieldNames(10)));
+                        ShowSevereError(state, format("Invalid {}", s_ipsc->cNumericFieldNames(10)));
                         ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                         ErrorsFound = true;
                     }
-                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "FULL")) {
+                } else if (Util::SameString(s_ipsc->cAlphaArgs(7), "FULL")) {
                     thisDomain.FullHorizInsPresent = true;
                 } else {
-                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
+                    ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(7), s_ipsc->cAlphaArgs(7)));
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                     ErrorsFound = true;
                 }
             }
 
             // set flag for vertical insulation
-            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "NO")) {
+            if (Util::SameString(s_ipsc->cAlphaArgs(9), "NO")) {
                 thisDomain.VertInsPresentFlag = false;
-            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "YES")) {
+            } else if (Util::SameString(s_ipsc->cAlphaArgs(9), "YES")) {
                 thisDomain.VertInsPresentFlag = true;
             } else {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
+                ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(9), s_ipsc->cAlphaArgs(9)));
                 ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                 ErrorsFound = true;
             }
@@ -1337,43 +1336,41 @@ namespace PlantPipingSystemsManager {
             if (thisDomain.VertInsPresentFlag) {
                 // Check if vertical insulation is in domain
                 if (thisDomain.VertInsDepth >= thisDomain.Extents.yMax || thisDomain.VertInsDepth <= 0.0) {
-                    ShowSevereError(state, format("Invalid {}", state.dataIPShortCut->cNumericFieldNames(12)));
+                    ShowSevereError(state, format("Invalid {}", s_ipsc->cNumericFieldNames(12)));
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                     ErrorsFound = true;
                 }
-                thisDomain.VertInsMaterialNum =
-                    Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(10), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+                thisDomain.VertInsMaterialNum = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(10));
                 if (thisDomain.VertInsMaterialNum == 0) {
-                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
-                    ShowContinueError(state, format("Found in: {}", thisDomain.Name));
+                    ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(10), s_ipsc->cAlphaArgs(10));
                     ErrorsFound = true;
                 } else {
-                    thisDomain.VertInsThickness = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Thickness;
-                    thisDomain.VertInsProperties.Density = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Density;
-                    thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->SpecHeat;
-                    thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Conductivity;
+                    auto const *mat = s_mat->materials(thisDomain.VertInsMaterialNum);
+                    thisDomain.VertInsThickness = mat->Thickness;
+                    thisDomain.VertInsProperties.Density = mat->Density;
+                    thisDomain.VertInsProperties.SpecificHeat = mat->SpecHeat;
+                    thisDomain.VertInsProperties.Conductivity = mat->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                         ErrorsFound = true;
-                        SiteGroundDomainNoMassMatError(
-                            state, state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), thisDomain.Name);
+                        SiteGroundDomainNoMassMatError(state, s_ipsc->cAlphaFieldNames(10), s_ipsc->cAlphaArgs(10), thisDomain.Name);
                     }
                 }
             }
 
             // Set simulation interval flag
-            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(11), "TIMESTEP")) {
+            if (Util::SameString(s_ipsc->cAlphaArgs(11), "TIMESTEP")) {
                 thisDomain.SimTimeStepFlag = true;
-            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(11), "HOURLY")) {
+            } else if (Util::SameString(s_ipsc->cAlphaArgs(11), "HOURLY")) {
                 thisDomain.SimHourlyFlag = true;
             } else {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11)));
+                ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(11), s_ipsc->cAlphaArgs(11)));
                 ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                 ErrorsFound = true;
             }
 
             // Farfield ground temperature model -- note this will overwrite the DataIPShortCuts variables
             // so any other processing below this line won't have access to the cAlphaArgs, etc., here
-            thisDomain.groundTempModel = GetGroundTempModelAndInit(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(3));
+            thisDomain.groundTempModel = GetGroundTempModelAndInit(state, s_ipsc->cAlphaArgs(2), s_ipsc->cAlphaArgs(3));
 
             // Total surface area
             Real64 ThisArea = 0.0;
@@ -1395,7 +1392,7 @@ namespace PlantPipingSystemsManager {
             if (!thisDomain.FullHorizInsPresent && ThisArea > 0.0) {
                 if ((thisDomain.HorizInsWidth + thisDomain.VertInsThickness) > thisDomain.BasementZone.Width / 2.0 ||
                     (thisDomain.HorizInsWidth + thisDomain.VertInsThickness) > thisDomain.BasementZone.Length / 2.0) {
-                    ShowContinueError(state, format("{}: Perimeter insulation width is too large.", RoutineName));
+                    ShowContinueError(state, format("{}: Perimeter insulation width is too large.", routineName));
                     ShowContinueError(state, "This would cause overlapping insulation. Check inputs.");
                     ShowContinueError(state, "Defaulting to full horizontal insulation.");
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
@@ -1418,7 +1415,7 @@ namespace PlantPipingSystemsManager {
     bool SiteGroundDomainUsingNoMassMat([[maybe_unused]] EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum)
     {
 
-        if ((MaterialThickness <= 0.0) || (state.dataMaterial->Material(MaterialNum)->ROnly)) {
+        if ((MaterialThickness <= 0.0) || (state.dataMaterial->materials(MaterialNum)->ROnly)) {
             return true;
         } else {
             return false;
@@ -1449,7 +1446,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("ReadPipeCircuitInputs");
+        static constexpr std::string_view routineName = "ReadPipeCircuitInputs";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -1457,6 +1454,7 @@ namespace PlantPipingSystemsManager {
         int IOStatus;
         int CurIndex;
 
+        auto &s_ipsc = state.dataIPShortCut;
         // get all of the actual generalized pipe circuit objects
 
         int NumPipeCircuits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
@@ -1466,52 +1464,52 @@ namespace PlantPipingSystemsManager {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ObjName_Circuit,
                                                                      PipeCircuitCounter,
-                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     s_ipsc->cAlphaArgs,
                                                                      NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     s_ipsc->rNumericArgs,
                                                                      NumNumbers,
                                                                      IOStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                     s_ipsc->lNumericFieldBlanks,
+                                                                     s_ipsc->lAlphaFieldBlanks,
+                                                                     s_ipsc->cAlphaFieldNames,
+                                                                     s_ipsc->cNumericFieldNames);
 
             Circuit thisCircuit = Circuit();
 
             // Get the name, validate
-            thisCircuit.Name = state.dataIPShortCut->cAlphaArgs(1);
-            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            thisCircuit.Name = s_ipsc->cAlphaArgs(1);
+            Util::IsNameEmpty(state, s_ipsc->cAlphaArgs(1), s_ipsc->cCurrentModuleObject, ErrorsFound);
 
             // Read pipe thermal properties, validated by IP
-            thisCircuit.PipeProperties.Conductivity = state.dataIPShortCut->rNumericArgs(1);
-            thisCircuit.PipeProperties.Density = state.dataIPShortCut->rNumericArgs(2);
-            thisCircuit.PipeProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(3);
+            thisCircuit.PipeProperties.Conductivity = s_ipsc->rNumericArgs(1);
+            thisCircuit.PipeProperties.Density = s_ipsc->rNumericArgs(2);
+            thisCircuit.PipeProperties.SpecificHeat = s_ipsc->rNumericArgs(3);
 
             // Read pipe sizing, validated individually by IP, validated comparison here
-            thisCircuit.PipeSize.InnerDia = state.dataIPShortCut->rNumericArgs(4);
-            thisCircuit.PipeSize.OuterDia = state.dataIPShortCut->rNumericArgs(5);
+            thisCircuit.PipeSize.InnerDia = s_ipsc->rNumericArgs(4);
+            thisCircuit.PipeSize.OuterDia = s_ipsc->rNumericArgs(5);
             if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                 CurIndex = 5;
                 IssueSevereInputFieldError(state,
-                                           RoutineName,
+                                           routineName,
                                            ObjName_Circuit,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cNumericFieldNames(CurIndex),
-                                           state.dataIPShortCut->rNumericArgs(CurIndex),
+                                           s_ipsc->cAlphaArgs(1),
+                                           s_ipsc->cNumericFieldNames(CurIndex),
+                                           s_ipsc->rNumericArgs(CurIndex),
                                            "Outer diameter must be greater than inner diameter.",
                                            ErrorsFound);
             }
 
             // Read design flow rate, validated positive by IP
-            thisCircuit.DesignVolumeFlowRate = state.dataIPShortCut->rNumericArgs(6);
+            thisCircuit.DesignVolumeFlowRate = s_ipsc->rNumericArgs(6);
 
             // Read inlet and outlet node names and validate them
-            thisCircuit.InletNodeName = state.dataIPShortCut->cAlphaArgs(2);
+            thisCircuit.InletNodeName = s_ipsc->cAlphaArgs(2);
             thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                           state.dataIPShortCut->cAlphaArgs(2),
+                                                                           s_ipsc->cAlphaArgs(2),
                                                                            ErrorsFound,
                                                                            DataLoopNode::ConnectionObjectType::PipingSystemUndergroundPipeCircuit,
-                                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                                           s_ipsc->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
@@ -1519,20 +1517,20 @@ namespace PlantPipingSystemsManager {
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
                 IssueSevereInputFieldError(state,
-                                           RoutineName,
+                                           routineName,
                                            ObjName_Circuit,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaFieldNames(CurIndex),
-                                           state.dataIPShortCut->cAlphaArgs(CurIndex),
+                                           s_ipsc->cAlphaArgs(1),
+                                           s_ipsc->cAlphaFieldNames(CurIndex),
+                                           s_ipsc->cAlphaArgs(CurIndex),
                                            "Bad node name.",
                                            ErrorsFound);
             }
-            thisCircuit.OutletNodeName = state.dataIPShortCut->cAlphaArgs(3);
+            thisCircuit.OutletNodeName = s_ipsc->cAlphaArgs(3);
             thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                            state.dataIPShortCut->cAlphaArgs(3),
+                                                                            s_ipsc->cAlphaArgs(3),
                                                                             ErrorsFound,
                                                                             DataLoopNode::ConnectionObjectType::PipingSystemUndergroundPipeCircuit,
-                                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                                            s_ipsc->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
@@ -1540,49 +1538,45 @@ namespace PlantPipingSystemsManager {
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
                 IssueSevereInputFieldError(state,
-                                           RoutineName,
+                                           routineName,
                                            ObjName_Circuit,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaFieldNames(CurIndex),
-                                           state.dataIPShortCut->cAlphaArgs(CurIndex),
+                                           s_ipsc->cAlphaArgs(1),
+                                           s_ipsc->cAlphaFieldNames(CurIndex),
+                                           s_ipsc->cAlphaArgs(CurIndex),
                                            "Bad node name.",
                                            ErrorsFound);
             }
-            BranchNodeConnections::TestCompSet(state,
-                                               ObjName_Circuit,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaArgs(2),
-                                               state.dataIPShortCut->cAlphaArgs(3),
-                                               "Piping System Circuit Nodes");
+            BranchNodeConnections::TestCompSet(
+                state, ObjName_Circuit, s_ipsc->cAlphaArgs(1), s_ipsc->cAlphaArgs(2), s_ipsc->cAlphaArgs(3), "Piping System Circuit Nodes");
 
             // Convergence tolerance values, validated by IP
-            thisCircuit.Convergence_CurrentToPrevIteration = state.dataIPShortCut->rNumericArgs(7);
-            thisCircuit.MaxIterationsPerTS = static_cast<int>(state.dataIPShortCut->rNumericArgs(8));
+            thisCircuit.Convergence_CurrentToPrevIteration = s_ipsc->rNumericArgs(7);
+            thisCircuit.MaxIterationsPerTS = static_cast<int>(s_ipsc->rNumericArgs(8));
 
             // Radial mesh inputs, validated by IP
             // -- mesh thickness should be considered slightly dangerous until mesh dev engine can trap erroneous values
-            thisCircuit.NumRadialCells = static_cast<int>(state.dataIPShortCut->rNumericArgs(9));
-            thisCircuit.RadialMeshThickness = state.dataIPShortCut->rNumericArgs(10);
+            thisCircuit.NumRadialCells = static_cast<int>(s_ipsc->rNumericArgs(9));
+            thisCircuit.RadialMeshThickness = s_ipsc->rNumericArgs(10);
 
             // Read number of pipe segments for this circuit, allocate arrays
-            int const NumPipeSegments = static_cast<int>(state.dataIPShortCut->rNumericArgs(11));
+            int const NumPipeSegments = static_cast<int>(s_ipsc->rNumericArgs(11));
 
             // Need to loop once to store the names ahead of time because calling the segment factory will override cAlphaArgs
             std::vector<std::string> segmentNamesToFind;
             int constexpr NumAlphasBeforeSegmentOne = 3;
             for (int ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                 CurIndex = ThisCircuitPipeSegmentCounter + NumAlphasBeforeSegmentOne;
-                if (state.dataIPShortCut->lAlphaFieldBlanks(CurIndex)) {
+                if (s_ipsc->lAlphaFieldBlanks(CurIndex)) {
                     IssueSevereInputFieldError(state,
-                                               RoutineName,
+                                               routineName,
                                                ObjName_Circuit,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaFieldNames(CurIndex),
-                                               state.dataIPShortCut->cAlphaArgs(CurIndex),
+                                               s_ipsc->cAlphaArgs(1),
+                                               s_ipsc->cAlphaFieldNames(CurIndex),
+                                               s_ipsc->cAlphaArgs(CurIndex),
                                                "Expected a pipe segment name, check pipe segment count input field.",
                                                ErrorsFound);
                 }
-                segmentNamesToFind.push_back(state.dataIPShortCut->cAlphaArgs(CurIndex));
+                segmentNamesToFind.push_back(s_ipsc->cAlphaArgs(CurIndex));
             }
             // then we can loop through and allow the factory to be called and carry on
             for (auto &segmentNameToFind : segmentNamesToFind) {
@@ -1604,35 +1598,33 @@ namespace PlantPipingSystemsManager {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ObjName_HorizTrench,
                                                                      HorizontalGHXCtr,
-                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     s_ipsc->cAlphaArgs,
                                                                      NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     s_ipsc->rNumericArgs,
                                                                      NumNumbers,
                                                                      IOStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            std::string thisTrenchName = state.dataIPShortCut->cAlphaArgs(1);
+                                                                     s_ipsc->lNumericFieldBlanks,
+                                                                     s_ipsc->lAlphaFieldBlanks,
+                                                                     s_ipsc->cAlphaFieldNames,
+                                                                     s_ipsc->cNumericFieldNames);
+            std::string thisTrenchName = s_ipsc->cAlphaArgs(1);
 
             Circuit thisCircuit;
             thisCircuit.IsActuallyPartOfAHorizontalTrench = true;
             thisCircuit.Name = thisTrenchName;
 
             // Read pipe thermal properties
-            thisCircuit.PipeProperties.Conductivity = state.dataIPShortCut->rNumericArgs(11);
-            thisCircuit.PipeProperties.Density = state.dataIPShortCut->rNumericArgs(12);
-            thisCircuit.PipeProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(13);
+            thisCircuit.PipeProperties.Conductivity = s_ipsc->rNumericArgs(11);
+            thisCircuit.PipeProperties.Density = s_ipsc->rNumericArgs(12);
+            thisCircuit.PipeProperties.SpecificHeat = s_ipsc->rNumericArgs(13);
 
             // Pipe sizing
-            thisCircuit.PipeSize.InnerDia = state.dataIPShortCut->rNumericArgs(5);
-            thisCircuit.PipeSize.OuterDia = state.dataIPShortCut->rNumericArgs(6);
+            thisCircuit.PipeSize.InnerDia = s_ipsc->rNumericArgs(5);
+            thisCircuit.PipeSize.OuterDia = s_ipsc->rNumericArgs(6);
 
             // Issue a severe if Inner >= Outer diameter
             if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
-                ShowSevereError(
-                    state,
-                    format("{}: {}=\"{}\" has invalid pipe diameters.", RoutineName, ObjName_HorizTrench, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}: {}=\"{}\" has invalid pipe diameters.", routineName, ObjName_HorizTrench, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   format("Outer diameter [{:.3T}] must be greater than inner diameter [{:.3T}].",
                                          thisCircuit.PipeSize.OuterDia,
@@ -1641,10 +1633,10 @@ namespace PlantPipingSystemsManager {
             }
 
             // Read design flow rate, validated positive by IP
-            thisCircuit.DesignVolumeFlowRate = state.dataIPShortCut->rNumericArgs(1);
+            thisCircuit.DesignVolumeFlowRate = s_ipsc->rNumericArgs(1);
 
             // Read inlet and outlet node names and validate them
-            thisCircuit.InletNodeName = state.dataIPShortCut->cAlphaArgs(2);
+            thisCircuit.InletNodeName = s_ipsc->cAlphaArgs(2);
             thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                            thisCircuit.InletNodeName,
                                                                            ErrorsFound,
@@ -1654,7 +1646,7 @@ namespace PlantPipingSystemsManager {
                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
-            thisCircuit.OutletNodeName = state.dataIPShortCut->cAlphaArgs(3);
+            thisCircuit.OutletNodeName = s_ipsc->cAlphaArgs(3);
             thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             thisCircuit.OutletNodeName,
                                                                             ErrorsFound,
@@ -1736,6 +1728,8 @@ namespace PlantPipingSystemsManager {
         int IOStatus;   // Used in GetObjectItem
         int CurIndex;
 
+        auto &s_ipsc = state.dataIPShortCut;
+
         // Read in all pipe segments
         int NumPipeSegmentsInInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_Segment);
         for (int SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr) {
@@ -1744,37 +1738,37 @@ namespace PlantPipingSystemsManager {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ObjName_Segment,
                                                                      SegmentCtr,
-                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     s_ipsc->cAlphaArgs,
                                                                      NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     s_ipsc->rNumericArgs,
                                                                      NumNumbers,
                                                                      IOStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                     s_ipsc->lNumericFieldBlanks,
+                                                                     s_ipsc->lAlphaFieldBlanks,
+                                                                     s_ipsc->cAlphaFieldNames,
+                                                                     s_ipsc->cNumericFieldNames);
 
             Segment thisSegment;
 
             // Get the name, validate
-            thisSegment.Name = state.dataIPShortCut->cAlphaArgs(1);
-            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            thisSegment.Name = s_ipsc->cAlphaArgs(1);
+            Util::IsNameEmpty(state, s_ipsc->cAlphaArgs(1), s_ipsc->cCurrentModuleObject, ErrorsFound);
             // Read in the pipe location, validated as positive by IP
             // -- note that these values will be altered by the main GetInput routine in two ways:
             //   1) shift for basement wall if selected
             //   2) invert y direction to be measured from domain bottom surface for calculations
-            thisSegment.PipeLocation = PointF(state.dataIPShortCut->rNumericArgs(1), state.dataIPShortCut->rNumericArgs(2));
+            thisSegment.PipeLocation = PointF(s_ipsc->rNumericArgs(1), s_ipsc->rNumericArgs(2));
 
             // Read in the flow direction
-            thisSegment.FlowDirection = static_cast<SegmentFlow>(getEnumValue(flowDirectionNamesUC, stripped(state.dataIPShortCut->cAlphaArgs(2))));
+            thisSegment.FlowDirection = static_cast<SegmentFlow>(getEnumValue(flowDirectionNamesUC, stripped(s_ipsc->cAlphaArgs(2))));
             if (thisSegment.FlowDirection == SegmentFlow::Invalid) {
                 CurIndex = 2;
                 IssueSevereInputFieldError(state,
                                            RoutineName,
                                            ObjName_Segment,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaFieldNames(CurIndex),
-                                           state.dataIPShortCut->cAlphaArgs(CurIndex),
+                                           s_ipsc->cAlphaArgs(1),
+                                           s_ipsc->cAlphaFieldNames(CurIndex),
+                                           s_ipsc->cAlphaArgs(CurIndex),
                                            "Invalid flow direction, use one of the available keys.",
                                            ErrorsFound);
             }
@@ -1800,6 +1794,8 @@ namespace PlantPipingSystemsManager {
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
 
+        auto &s_ipsc = state.dataIPShortCut;
+
         // initialize these counters properly so they can be incremented within the DO loop
         int DomainCtr = StartingDomainNumForHorizontal - 1;
         int CircuitCtr = StartingCircuitNumForHorizontal - 1;
@@ -1821,25 +1817,25 @@ namespace PlantPipingSystemsManager {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ObjName_HorizTrench,
                                                                      HorizontalGHXCtr,
-                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     s_ipsc->cAlphaArgs,
                                                                      NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     s_ipsc->rNumericArgs,
                                                                      NumNumbers,
                                                                      IOStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                     s_ipsc->lNumericFieldBlanks,
+                                                                     s_ipsc->lAlphaFieldBlanks,
+                                                                     s_ipsc->cAlphaFieldNames,
+                                                                     s_ipsc->cNumericFieldNames);
 
             auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainCtr - 1];
 
             // Get the name, validate
-            std::string thisTrenchName = state.dataIPShortCut->cAlphaArgs(1);
-            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            std::string thisTrenchName = s_ipsc->cAlphaArgs(1);
+            Util::IsNameEmpty(state, s_ipsc->cAlphaArgs(1), s_ipsc->cCurrentModuleObject, ErrorsFound);
 
-            int const NumPipeSegments = static_cast<int>(state.dataIPShortCut->rNumericArgs(3));
-            Real64 const thisInterPipeSpacing = state.dataIPShortCut->rNumericArgs(4);
-            Real64 const thisBurialDepth = state.dataIPShortCut->rNumericArgs(7);
+            int const NumPipeSegments = static_cast<int>(s_ipsc->rNumericArgs(3));
+            Real64 const thisInterPipeSpacing = s_ipsc->rNumericArgs(4);
+            Real64 const thisBurialDepth = s_ipsc->rNumericArgs(7);
 
             //******* We'll first set up the domain ********
             // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
@@ -1847,7 +1843,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.Name = format("HorizontalTrenchDomain{:4}", HorizontalGHXCtr);
             thisDomain.Extents.xMax = (double(NumPipeSegments) + 1.0) * thisInterPipeSpacing;
             thisDomain.Extents.yMax = 2.0 * thisBurialDepth;
-            thisDomain.Extents.zMax = state.dataIPShortCut->rNumericArgs(2);
+            thisDomain.Extents.zMax = s_ipsc->rNumericArgs(2);
 
             // set up the mesh with some default parameters
             thisDomain.Mesh.X.RegionMeshCount = 4;
@@ -1858,20 +1854,20 @@ namespace PlantPipingSystemsManager {
             thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::Uniform;
 
             // Soil properties
-            thisDomain.GroundProperties.Conductivity = state.dataIPShortCut->rNumericArgs(8);
-            thisDomain.GroundProperties.Density = state.dataIPShortCut->rNumericArgs(9);
-            thisDomain.GroundProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(10);
+            thisDomain.GroundProperties.Conductivity = s_ipsc->rNumericArgs(8);
+            thisDomain.GroundProperties.Density = s_ipsc->rNumericArgs(9);
+            thisDomain.GroundProperties.SpecificHeat = s_ipsc->rNumericArgs(10);
 
             // Moisture properties
-            thisDomain.Moisture.Theta_liq = state.dataIPShortCut->rNumericArgs(14) / 100.0;
-            thisDomain.Moisture.Theta_sat = state.dataIPShortCut->rNumericArgs(15) / 100.0;
+            thisDomain.Moisture.Theta_liq = s_ipsc->rNumericArgs(14) / 100.0;
+            thisDomain.Moisture.Theta_sat = s_ipsc->rNumericArgs(15) / 100.0;
 
             // Other parameters
             thisDomain.SimControls.Convergence_CurrentToPrevIteration = 0.001;
             thisDomain.SimControls.MaxIterationsPerTS = 250;
 
             // additional evapotranspiration parameter, min/max validated by IP
-            thisDomain.Moisture.GroundCoverCoefficient = state.dataIPShortCut->rNumericArgs(16);
+            thisDomain.Moisture.GroundCoverCoefficient = s_ipsc->rNumericArgs(16);
 
             //******* We'll next set up the circuit ********
             // then we can loop through and allow the factory to be called and carry on
@@ -1879,7 +1875,7 @@ namespace PlantPipingSystemsManager {
 
             // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
             // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values
-            thisDomain.groundTempModel = GetGroundTempModelAndInit(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(5));
+            thisDomain.groundTempModel = GetGroundTempModelAndInit(state, s_ipsc->cAlphaArgs(4), s_ipsc->cAlphaArgs(5));
 
             //******* Then we'll do the segments *******!
             for (int ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {

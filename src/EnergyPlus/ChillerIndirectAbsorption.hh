@@ -214,7 +214,7 @@ struct ChillerIndirectAbsoprtionData : BaseGlobalStruct
     bool GetInput = true;
     Array1D<ChillerIndirectAbsorption::IndirectAbsorberSpecs> IndirectAbsorber;
 
-    void init_state([[maybe_unused]] EnergyPlusData &state)
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
 
