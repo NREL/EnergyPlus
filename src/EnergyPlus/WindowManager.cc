@@ -2072,7 +2072,6 @@ namespace Window {
         // (temperature of innermost face) [C]
 
         int SurfNumAdj; // An interzone surface's number in the adjacent zone
-        int TotLay;     // Total number of layers in a construction
         //   (sum of solid layers and gap layers)
         int TotGlassLay;          // Total number of glass layers in a construction
         int LayPtr;               // Material number for a layer
@@ -2119,7 +2118,7 @@ namespace Window {
             CalcComplexWindowThermal(
                 state, SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::Invalid);
 
-            auto &constr = state.dataConstruction->Construct(ConstrNum);
+            auto const &constr = state.dataConstruction->Construct(ConstrNum);
             wm->ngllayer = constr.TotSolidLayers; // Simon: This is necessary to keep for frame calculations
             // Simon: need to transfer surface temperatures because of frames calculation
 
@@ -2166,7 +2165,7 @@ namespace Window {
 
         } else { // regular window, not BSDF, not EQL Window
             // Added for thermochromic windows
-            auto &constr = state.dataConstruction->Construct(ConstrNum);
+            auto const &constr = state.dataConstruction->Construct(ConstrNum);
             wm->locTCFlag = (constr.isTCWindow);
 
             if (wm->locTCFlag) {
@@ -2264,7 +2263,7 @@ namespace Window {
             if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
                 IConst = s_surf->SurfWinActiveShadedConstruction(SurfNum);
             }
-            TotLay = constr.TotLayers;
+            int TotLay = state.dataConstruction->Construct(IConst).TotLayers;
             int IGlass = 0;
             int IGap = 0;
 
@@ -4119,7 +4118,7 @@ namespace Window {
         auto &s_surf = state.dataSurface;
         auto const &wm = state.dataWindowManager;
 
-        auto &surf = s_surf->Surface(SurfNum);
+        auto const &surf = s_surf->Surface(SurfNum);
 
         ConstrNum = surf.Construction;
         NGlass = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
@@ -4867,10 +4866,10 @@ namespace Window {
         Real64 g;
         Real64 ang;
 
-        auto &s_surf = state.dataSurface;
         auto const &wm = state.dataWindowManager;
 
         if (SurfNum > 0) {
+            auto const &s_surf = state.dataSurface;
             asp = s_surf->Surface(SurfNum).Height / wm->gaps[IGap - 1].width;
         } else { // SurfNum = 0 when NusseltNumber is called from CalcNominalWindowCond, which applies to a
             // particular construction. So window height is not known and we assume 5 ft (1.524 m)
@@ -6764,7 +6763,6 @@ namespace Window {
         Real64 TransVisNorm; // Window construction visible transmittance at normal incidence
         int errFlag;         // Error flag
 
-        auto &s_mat = state.dataMaterial;
         auto &wm = state.dataWindowManager;
 
         ScanForReports(state, "Constructions", wm->DoReport, "Constructions");
@@ -6782,6 +6780,7 @@ namespace Window {
                         [](Construction::ConstructionProps const &e) { return e.WindowTypeEQL; }))
             wm->HasEQLWindows = true; // for reporting purpose only
         if (wm->DoReport && (wm->HasWindows || wm->HasComplexWindows || wm->HasEQLWindows)) {
+            auto const &s_mat = state.dataMaterial;
             //                                      Write Descriptions
             print(state.files.eio,
                   "{}\n",
@@ -6966,7 +6965,6 @@ namespace Window {
                         int Layer = construct.LayerPoint(i);
                         auto const *mat = s_mat->materials(Layer);
                         std::string SpectralDataName;
-                        std::string OpticalDataType;
 
                         switch (mat->group) {
 
@@ -7078,7 +7076,7 @@ namespace Window {
                         case Material::Group::GlassEQL: {
                             auto const *matEQL = dynamic_cast<Material::MaterialGlassEQL const *>(mat);
                             assert(matEQL != nullptr);
-                            OpticalDataType = "SpectralAverage";
+                            std::string OpticalDataType = "SpectralAverage";
                             SpectralDataName = "";
                             static constexpr std::string_view Format_708(
                                 " WindowMaterial:Glazing:EquivalentLayer,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}"
