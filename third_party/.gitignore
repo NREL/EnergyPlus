@@ -32,6 +32,7 @@ btwxt/.gitmodules
 btwxt/vendor/fmt
 btwxt/vendor/courierr/vendor/fmt
 btwxt/vendor/courierr/.gitmodules
+btwxt/vendor/courierr/vendor/googletest
 libtk205/.gitmodules
 
 # unused repo directories/files

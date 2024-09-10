@@ -4040,11 +4040,14 @@ void ReportVentilationLoads(EnergyPlusData &state)
             case DataZoneEquipment::ZoneEquipType::BaseboardConvectiveElectric:
             case DataZoneEquipment::ZoneEquipType::HighTemperatureRadiant:
                 //    not sure how HeatExchanger:* could be used as zone equipment ?????
-            case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiant:
+            case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiantConstFlow:
+            case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiantVarFlow:
+            case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiantElectric:
             case DataZoneEquipment::ZoneEquipType::ExhaustFan:
             case DataZoneEquipment::ZoneEquipType::HeatExchanger:
                 // HPWaterHeater can be used as zone equipment
-            case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater:
+            case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeaterPumpedCondenser:
+            case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeaterWrappedCondenser:
             case DataZoneEquipment::ZoneEquipType::BaseboardWater:
             case DataZoneEquipment::ZoneEquipType::DehumidifierDX:
             case DataZoneEquipment::ZoneEquipType::BaseboardSteam:
