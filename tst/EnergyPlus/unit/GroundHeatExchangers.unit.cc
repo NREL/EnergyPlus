@@ -87,11 +87,10 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Interpolate)
     std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
     thisGLHE.myRespFactors = thisRF;
 
-    thisGLHE.myRespFactors->LNTTS.allocate(NPairs);
     thisGLHE.myRespFactors->GFNC.allocate(NPairs);
 
-    thisGLHE.myRespFactors->LNTTS(1) = 0.0;
-    thisGLHE.myRespFactors->LNTTS(2) = 5.0;
+    thisGLHE.myRespFactors->LNTTS.push_back(0.0);
+    thisGLHE.myRespFactors->LNTTS.push_back(5.0);
     thisGLHE.myRespFactors->GFNC(1) = 0.0;
     thisGLHE.myRespFactors->GFNC(2) = 5.0;
 
@@ -124,11 +123,10 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_GetGFunc)
     std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
     thisGLHE.myRespFactors = thisRF;
 
-    thisGLHE.myRespFactors->LNTTS.allocate(NPairs);
     thisGLHE.myRespFactors->GFNC.allocate(NPairs);
 
-    thisGLHE.myRespFactors->LNTTS(1) = 0.0;
-    thisGLHE.myRespFactors->LNTTS(2) = 5.0;
+    thisGLHE.myRespFactors->LNTTS.push_back(0.0);
+    thisGLHE.myRespFactors->LNTTS.push_back(5.0);
     thisGLHE.myRespFactors->GFNC(1) = 0.0;
     thisGLHE.myRespFactors->GFNC(2) = 5.0;
 
@@ -152,11 +150,10 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_GetGFunc)
     std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
     thisGLHE.myRespFactors = thisRF;
 
-    thisGLHE.myRespFactors->LNTTS.allocate(NPairs);
     thisGLHE.myRespFactors->GFNC.allocate(NPairs);
 
-    thisGLHE.myRespFactors->LNTTS(1) = 0.0;
-    thisGLHE.myRespFactors->LNTTS(2) = 5.0;
+    thisGLHE.myRespFactors->LNTTS.push_back(0.0);
+    thisGLHE.myRespFactors->LNTTS.push_back(5.0);
     thisGLHE.myRespFactors->GFNC(1) = 0.0;
     thisGLHE.myRespFactors->GFNC(2) = 5.0;
 
@@ -528,9 +525,9 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check)
     EXPECT_EQ(4, thisRF->numBoreholes);
     EXPECT_EQ(0.00043, thisRF->gRefRatio);
     EXPECT_EQ(76, thisRF->numGFuncPairs);
-    EXPECT_EQ(-15.585075, thisRF->LNTTS(1));
+    EXPECT_EQ(-15.585075, thisRF->LNTTS[0]);
     EXPECT_EQ(-2.672011, thisRF->GFNC(1));
-    EXPECT_EQ(3.003000, thisRF->LNTTS(76));
+    EXPECT_EQ(3.003000, thisRF->LNTTS[75]);
     EXPECT_EQ(12.778359, thisRF->GFNC(76));
 }
 
@@ -1347,9 +1344,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UHF)
 TEST_F(EnergyPlusFixture, GHE_InterpTest1)
 {
     std::shared_ptr<GroundHeatExchangers::GLHEResponseFactors> thisRF(new GroundHeatExchangers::GLHEResponseFactors());
-    thisRF->LNTTS.allocate(11);
     thisRF->GFNC.allocate(11);
-    thisRF->LNTTS = {-5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0};
+    thisRF->LNTTS = std::vector<Real64> {-5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0};
     thisRF->GFNC = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0};
 
     GroundHeatExchangers::GLHEVert thisGHE = GroundHeatExchangers::GLHEVert();
@@ -1402,9 +1398,8 @@ TEST_F(EnergyPlusFixture, GHE_InterpTest1)
 TEST_F(EnergyPlusFixture, GHE_InterpTest2)
 {
     std::shared_ptr<GroundHeatExchangers::GLHEResponseFactors> thisRF(new GroundHeatExchangers::GLHEResponseFactors());
-    thisRF->LNTTS.allocate(8);
     thisRF->GFNC.allocate(8);
-    thisRF->LNTTS = {-15.2202, -15.083, -14.9459, -14.8087, -14.6716, -14.5344, -14.3973, -14.2601};
+    thisRF->LNTTS = std::vector<Real64> {-15.2202, -15.083, -14.9459, -14.8087, -14.6716, -14.5344, -14.3973, -14.2601};
     thisRF->GFNC = {-2.55692, -2.48389, -2.40819, -2.32936, -2.24715, -2.16138, -2.07195, -1.97882};
 
     GroundHeatExchangers::GLHEVert thisGHE = GroundHeatExchangers::GLHEVert();

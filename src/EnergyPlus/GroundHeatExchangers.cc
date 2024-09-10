@@ -47,6 +47,7 @@
 
 // C++ Headers
 #include <cmath>
+#include <iterator>
 #include <vector>
 
 // ObjexxFCL Headers
@@ -487,11 +488,10 @@ GLHEResponseFactors::GLHEResponseFactors(EnergyPlusData &state, std::string cons
     }
 
     this->numGFuncPairs = static_cast<int>(tmpLntts.size());
-    this->LNTTS.dimension(this->numGFuncPairs, 0.0);
     this->GFNC.dimension(this->numGFuncPairs, 0.0);
 
     for (int i = 1; i <= (int)tmpLntts.size(); ++i) {
-        this->LNTTS(i) = tmpLntts[i - 1];
+        this->LNTTS.push_back(tmpLntts[i - 1]);
         this->GFNC(i) = tmpGvals[i - 1];
     }
 }
@@ -984,7 +984,7 @@ void GLHEVert::calcGFunctions(EnergyPlusData &state)
     // save data for later
     if (state.files.outputControl.glhe && !state.dataSysVars->DisableGLHECaching) {
         myCacheData["Response Factors"]["time"] = std::vector<Real64>(this->myRespFactors->time);
-        myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(this->myRespFactors->LNTTS.begin(), this->myRespFactors->LNTTS.end());
+        myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(this->myRespFactors->LNTTS);
         myCacheData["Response Factors"]["GFNC"] = std::vector<Real64>(this->myRespFactors->GFNC.begin(), this->myRespFactors->GFNC.end());
         writeGLHECacheToFile(state);
     }
@@ -1020,13 +1020,12 @@ void GLHEVert::setupTimeVectors()
     }
 
     // Setup the arrays
-    this->myRespFactors->LNTTS.dimension(tempLNTTS.size(), 0.0);
     this->myRespFactors->GFNC.dimension(tempLNTTS.size(), 0.0);
 
     int index = 1;
     for (auto const &thisLNTTS : tempLNTTS) {
         this->myRespFactors->time.push_back(exp(thisLNTTS) * t_s);
-        this->myRespFactors->LNTTS(index) = thisLNTTS;
+        this->myRespFactors->LNTTS.push_back(thisLNTTS);
         ++index;
     }
 }
@@ -1038,15 +1037,15 @@ void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
     DisplayString(state, "Initializing GroundHeatExchanger:System: " + this->name);
 
     // Calculate the g-functions
-    for (size_t lntts_index = 1; lntts_index <= this->myRespFactors->LNTTS.size(); ++lntts_index) {
+    for (size_t lntts_index = 0; lntts_index < this->myRespFactors->LNTTS.size(); ++lntts_index) {
         for (auto const &bh_i : this->myRespFactors->myBorholes) {
             Real64 sum_T_ji = 0;
             for (auto const &bh_j : this->myRespFactors->myBorholes) {
-                sum_T_ji += doubleIntegral(bh_i, bh_j, this->myRespFactors->time[lntts_index - 1]);
+                sum_T_ji += doubleIntegral(bh_i, bh_j, this->myRespFactors->time[lntts_index]);
             }
-            this->myRespFactors->GFNC(lntts_index) += sum_T_ji;
+            this->myRespFactors->GFNC[lntts_index] += sum_T_ji;
         }
-        this->myRespFactors->GFNC(lntts_index) /= (2 * this->totalTubeLength);
+        this->myRespFactors->GFNC[lntts_index] /= (2 * this->totalTubeLength);
 
         std::stringstream ss;
         ss << std::fixed << std::setprecision(1) << float(lntts_index) / this->myRespFactors->LNTTS.size() * 100;
@@ -1370,20 +1369,19 @@ void GLHEVert::combineShortAndLongTimestepGFunctions()
     // Add the rest of the long time-step g-functions to the combined curve
     for (int index_longTS = this->myRespFactors->GFNC.l(); index_longTS <= this->myRespFactors->GFNC.u(); ++index_longTS) {
         GFNC_combined.push_back(this->myRespFactors->GFNC(index_longTS));
-        LNTTS_combined.push_back(this->myRespFactors->LNTTS(index_longTS));
+        LNTTS_combined.push_back(this->myRespFactors->LNTTS[index_longTS]);
     }
 
     // Reset vectors for final usage
     this->myRespFactors->time = std::vector<Real64>();
-    this->myRespFactors->LNTTS.deallocate();
+    this->myRespFactors->LNTTS = std::vector<Real64>();
     this->myRespFactors->GFNC.deallocate();
 
-    this->myRespFactors->LNTTS.dimension(GFNC_combined.size(), 0.0);
     this->myRespFactors->GFNC.dimension(GFNC_combined.size(), 0.0);
 
     for (unsigned int index = 0; index < GFNC_combined.size(); ++index) {
         this->myRespFactors->time.push_back(exp(LNTTS_combined[index]) * t_s);
-        this->myRespFactors->LNTTS[index] = LNTTS_combined[index];
+        this->myRespFactors->LNTTS.push_back(LNTTS_combined[index]);
         this->myRespFactors->GFNC[index] = GFNC_combined[index];
     }
 }
@@ -1455,7 +1453,7 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
         this->myRespFactors->time = std::vector<Real64>(myCacheData["Response Factors"]["time"].get<std::vector<Real64>>());
 
         // Populate the lntts array
-        this->myRespFactors->LNTTS = Array1D<Real64>(myCacheData["Response Factors"]["LNTTS"].get<std::vector<Real64>>());
+        this->myRespFactors->LNTTS = std::vector<Real64>(myCacheData["Response Factors"]["LNTTS"].get<std::vector<Real64>>());
 
         // Populate the g-function array
         this->myRespFactors->GFNC = Array1D<Real64>(myCacheData["Response Factors"]["GFNC"].get<std::vector<Real64>>());
@@ -1515,7 +1513,7 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
 
     // Allocate and setup g-function arrays
     this->myRespFactors->GFNC.allocate(NPairs);
-    this->myRespFactors->LNTTS.allocate(NPairs);
+    this->myRespFactors->LNTTS = std::vector<Real64> (NPairs, 0.0);
     this->QnMonthlyAgg.allocate(static_cast<int>(this->maxSimYears * 12));
     this->QnHr.allocate(730 + this->AGG + this->SubAGG);
     this->QnSubHr.allocate(static_cast<int>((this->SubAGG + 1) * maxTSinHr + 1));
@@ -1523,7 +1521,6 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
 
     for (int i = 1; i <= NPairs; ++i) {
         this->myRespFactors->GFNC(i) = 0.0;
-        this->myRespFactors->LNTTS(i) = 0.0;
     }
 
     // Calculate the number of loops (per trench) and number of trenches to be involved
@@ -1645,7 +1642,7 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
         }             // m1
 
         this->myRespFactors->GFNC(NT) = (gFunc * (this->coilDiameter / 2.0)) / (4 * Constant::Pi * fraction * this->numTrenches * this->numCoils);
-        this->myRespFactors->LNTTS(NT) = tLg;
+        this->myRespFactors->LNTTS[NT - 1] = tLg;
 
     } // NT time
 }
