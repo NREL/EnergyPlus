@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -198,6 +199,7 @@ namespace OutputReportTabular {
     enum class OutputType
     {
         Invalid = -1,
+        Space,
         Zone,
         AirLoop,
         Facility,
@@ -777,6 +779,21 @@ namespace OutputReportTabular {
 
     void WriteLoadComponentSummaryTables(EnergyPlusData &state);
 
+    void computeSpaceZoneCompLoads(EnergyPlusData &state,
+                                   DataSizing::ZoneSizingData &calcFinalSizing,
+                                   CompLoadTablesType &coolCompLoadTables,
+                                   CompLoadTablesType &heatCompLoadTables,
+                                   Array1D<Real64> &peopleDelaySeq,
+                                   Array1D<Real64> &equipDelaySeq,
+                                   Array1D<Real64> &hvacLossDelaySeq,
+                                   Array1D<Real64> &powerGenDelaySeq,
+                                   Array1D<Real64> &lightDelaySeq,
+                                   Array1D<Real64> &feneSolarDelaySeq,
+                                   Array3D<Real64> &feneCondInstantSeqLoc,
+                                   Array2D<Real64> &surfDelaySeq,
+                                   ZompComponentAreasType &componentAreas,
+                                   int iZone);
+
     void GetDelaySequences(EnergyPlusData &state,
                            int desDaySelected,
                            bool isCooling,
@@ -810,9 +827,11 @@ namespace OutputReportTabular {
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);
 
-    void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType> &areas);
+    void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType> &znAreas, Array1D<ZompComponentAreasType> &spAreas);
 
-    void AddAreaColumnForZone(int zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoadTotal);
+    void addSurfaceArea(DataSurfaces::SurfaceData const &curSurface, Array1D<ZompComponentAreasType> &areas, bool isZone);
+
+    void AddAreaColumnForZone(ZompComponentAreasType const &compAreas, CompLoadTablesType &compLoadTotal);
 
     void CombineLoadCompResults(CompLoadTablesType &compLoadTotal, CompLoadTablesType const &compLoadPartial, Real64 multiplier);
 

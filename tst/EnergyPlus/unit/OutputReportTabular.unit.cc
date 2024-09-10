@@ -6716,6 +6716,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ComputeEngineeringChecks_test)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
 {
     Array1D<ZompComponentAreasType> areas;
+    Array1D<ZompComponentAreasType> spaceAreas;
     areas.allocate(1);
 
     state->dataHeatBal->Zone.allocate(1);
@@ -6802,7 +6803,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
     state->dataSurface->Surface(13).Zone = 1;
     state->dataSurface->Surface(13).HeatTransSurf = true;
 
-    GetZoneComponentAreas(*state, areas);
+    GetZoneComponentAreas(*state, areas, spaceAreas);
 
     EXPECT_EQ(12., areas(1).floor);
     EXPECT_EQ(8., areas(1).roof);
