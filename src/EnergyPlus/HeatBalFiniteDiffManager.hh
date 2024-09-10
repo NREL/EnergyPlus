@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Material.hh>
+#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 
@@ -147,9 +148,12 @@ namespace HeatBalFiniteDiffManager {
         int indexNodeMinTempLimit = 0;   // index for recurring error message if node temperature is below minimum node temperature for this surfac
         Real64 EnthalpyM;                // Melting enthalpy at a particular temperature
         Real64 EnthalpyF;                // Freezing enthalpy at a particular temperature
-        Array1D<int> PhaseChangeState;
-        Array1D<int> PhaseChangeStateOld;
-        Array1D<int> PhaseChangeStateOldOld;
+        Array1D<Material::Phase> PhaseChangeState;
+        Array1D<Material::Phase> PhaseChangeStateOld;
+        Array1D<Material::Phase> PhaseChangeStateOldOld;
+        Array1D<int> PhaseChangeStateRep;
+        Array1D<int> PhaseChangeStateOldRep;
+        Array1D<int> PhaseChangeStateOldOldRep;
         Array1D<Real64> PhaseChangeTemperatureReverse;
         Array1D<MaterialActuatorData> condMaterialActuators;
         Array1D<MaterialActuatorData> specHeatMaterialActuators;
@@ -310,7 +314,7 @@ namespace HeatBalFiniteDiffManager {
     void adjustPropertiesForPhaseChange(EnergyPlusData &state,
                                         int finiteDifferenceLayerIndex,
                                         int surfaceIndex,
-                                        const Material::MaterialBase *materialDefinition,
+                                        Material::MaterialPhaseChange *mat,
                                         Real64 temperaturePrevious,
                                         Real64 temperatureUpdated,
                                         Real64 &updatedSpecificHeat,

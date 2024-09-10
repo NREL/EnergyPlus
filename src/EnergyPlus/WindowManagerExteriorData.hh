@@ -130,7 +130,7 @@ namespace Window {
     {
     public:
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(EnergyPlusData &state, int const t_SampleDataPtr);
-        static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(Material::MaterialChild const &t_MaterialProperties);
+        static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(Material::MaterialGlass const &t_MaterialProperties);
         static FenestrationCommon::CSeries getDefaultSolarRadiationSpectrum(EnergyPlusData &state);
         static FenestrationCommon::CSeries getDefaultVisiblePhotopicResponse(EnergyPlusData &state);
     };
