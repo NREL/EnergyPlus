@@ -433,6 +433,7 @@ namespace DataHeatBalance {
         Real64 Volume = Constant::AutoCalculate;        // Volume entered by user [m3] or calculated
         Real64 ExtGrossWallArea = 0.0;                  // Exterior Wall Area for Zone (Gross)
         Real64 ExteriorTotalSurfArea = 0.0;             // Total surface area of all exterior surfaces for Zone
+        Real64 extPerimeter = 0.0;                      // Total exposed perimeter (sum of width of exterior walls)
         int SystemZoneNodeNumber = 0;                   // This is the zone or space node number for the system for a controlled zone
         Real64 FloorArea = 0.0;                         // Floor area used for this space
         Real64 TotOccupants = 0.0;                      // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
@@ -447,7 +448,6 @@ namespace DataHeatBalance {
         int spaceTypeNum = 0;                                  // Points to spaceType for this space
         EPVector<std::string> tags;                            // Optional tags for reporting
         EPVector<int> surfaces;                                // Pointers to surfaces in this space
-        Real64 calcFloorArea = 0.0;                            // Calculated floor area used for this space
         bool hasFloor = false;                                 // Has "Floor" surface
         Real64 fracZoneFloorArea = 0.0;                        // fraction of total floor area for all spaces in zone
         Real64 fracZoneVolume = 0.0;                           // fraction of total volume for all spaces in zone
@@ -561,7 +561,6 @@ namespace DataHeatBalance {
         // 2=Plenum Zone, 11=Solar Wall, 12=Roof Pond
         Real64 UserEnteredFloorArea = Constant::AutoCalculate; // User input floor area for this zone
         // Calculated after input
-        Real64 CalcFloorArea = 0.0;        // Calculated floor area excluding air boundary surfaces
         Real64 geometricFloorArea = 0.0;   // Calculated floor area including air boundary surfaces
         Real64 CeilingArea = 0.0;          // Ceiling area excluding air boundary surfaces
         Real64 geometricCeilingArea = 0.0; // Ceiling area area including air boundary surfaces

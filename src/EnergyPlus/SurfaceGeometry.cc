@@ -409,6 +409,8 @@ namespace SurfaceGeometry {
                         thisZone.ExtGrossWallArea += thisSurface.GrossArea;
                         thisSpace.ExtGrossWallArea += thisSurface.GrossArea;
                         thisZone.ExtGrossWallArea_Multiplied += thisSurface.GrossArea * thisZone.Multiplier * thisZone.ListMultiplier;
+                        thisZone.extPerimeter += thisSurface.Width;
+                        thisSpace.extPerimeter += thisSurface.Width;
                         if (DetailedWWR) {
                             print(state.files.debug,
                                   "{},Wall,{:.2R},{:.1R}\n",
@@ -2242,31 +2244,28 @@ namespace SurfaceGeometry {
         Real64 constexpr floorAreaTolerance(0.05);
         Real64 constexpr floorAreaPercentTolerance(floorAreaTolerance * 100.0);
         if (!SurfError) {
-            for (auto &thisZone : state.dataHeatBal->Zone) {
-                for (int spaceNum : thisZone.spaceIndexes) {
-                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                    for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-                        auto &thisSurf = state.dataSurface->Surface(SurfNum);
-                        if (thisSurf.Class == SurfaceClass::Floor) {
-                            thisZone.HasFloor = true;
-                            thisSpace.hasFloor = true;
-                            thisSpace.calcFloorArea += thisSurf.Area;
-                        }
-                        if (thisSurf.Class == SurfaceClass::Roof) {
-                            thisZone.CeilingArea += thisSurf.Area;
-                            thisZone.HasRoof = true;
-                        }
-                    }
-                }
-            }
             ErrCount = 0;
             for (auto &thisSpace : state.dataHeatBal->space) {
+                auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
+                Real64 calcFloorArea = 0.0; // Calculated floor area used for this space
+                for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                    auto &thisSurf = state.dataSurface->Surface(SurfNum);
+                    if (thisSurf.Class == SurfaceClass::Floor) {
+                        thisZone.HasFloor = true;
+                        thisSpace.hasFloor = true;
+                        calcFloorArea += thisSurf.Area;
+                    }
+                    if (thisSurf.Class == SurfaceClass::Roof) {
+                        thisZone.CeilingArea += thisSurf.Area;
+                        thisZone.HasRoof = true;
+                    }
+                }
                 if (thisSpace.userEnteredFloorArea != Constant::AutoCalculate) {
                     // Check entered vs calculated
                     if (thisSpace.userEnteredFloorArea > 0.0) { // User entered Space floor area,
                         // produce message if not near calculated
-                        if (thisSpace.calcFloorArea > 0.0) {
-                            Real64 diffp = std::abs(thisSpace.calcFloorArea - thisSpace.userEnteredFloorArea) / thisSpace.userEnteredFloorArea;
+                        if (calcFloorArea > 0.0) {
+                            Real64 diffp = std::abs(calcFloorArea - thisSpace.userEnteredFloorArea) / thisSpace.userEnteredFloorArea;
                             if (diffp > floorAreaTolerance) {
                                 ++ErrCount;
                                 if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
@@ -2290,7 +2289,7 @@ namespace SurfaceGeometry {
                                                       format("Entered Space Floor Area={:.2R}, Calculated Space Floor Area={:.2R}, entered "
                                                              "Floor Area will be used.",
                                                              thisSpace.userEnteredFloorArea,
-                                                             thisSpace.calcFloorArea));
+                                                             calcFloorArea));
                                 }
                             }
                         }
@@ -2298,22 +2297,23 @@ namespace SurfaceGeometry {
                         thisSpace.hasFloor = true;
                     }
                 } else {
-                    thisSpace.FloorArea = thisSpace.calcFloorArea;
+                    thisSpace.FloorArea = calcFloorArea;
                 }
             }
             ErrCount = 0;
             for (auto &thisZone : state.dataHeatBal->Zone) {
                 // Calculate zone floor area as sum of space floor areas
+                Real64 zoneCalcFloorArea = 0.0; // Calculated floor area excluding air boundary surfaces
                 for (int spaceNum : thisZone.spaceIndexes) {
-                    thisZone.CalcFloorArea += state.dataHeatBal->space(spaceNum).FloorArea;
+                    zoneCalcFloorArea += state.dataHeatBal->space(spaceNum).FloorArea;
                     thisZone.HasFloor |= state.dataHeatBal->space(spaceNum).hasFloor;
                 }
                 if (thisZone.UserEnteredFloorArea != Constant::AutoCalculate) {
                     // Check entered vs calculated
                     if (thisZone.UserEnteredFloorArea > 0.0) { // User entered zone floor area,
                         // produce message if not near calculated
-                        if (thisZone.CalcFloorArea > 0.0) {
-                            Real64 diffp = std::abs(thisZone.CalcFloorArea - thisZone.UserEnteredFloorArea) / thisZone.UserEnteredFloorArea;
+                        if (zoneCalcFloorArea > 0.0) {
+                            Real64 diffp = std::abs(zoneCalcFloorArea - thisZone.UserEnteredFloorArea) / thisZone.UserEnteredFloorArea;
                             if (diffp > 0.05) {
                                 ++ErrCount;
                                 if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
@@ -2336,7 +2336,7 @@ namespace SurfaceGeometry {
                                     ShowContinueError(state,
                                                       format("Entered Zone Floor Area={:.2R}, Sum of Space Floor Area(s)={:.2R}",
                                                              thisZone.UserEnteredFloorArea,
-                                                             thisZone.CalcFloorArea));
+                                                             zoneCalcFloorArea));
                                     ShowContinueError(
                                         state, "Entered Zone Floor Area will be used and Space Floor Area(s) will be adjusted proportionately.");
                                 }
@@ -2350,9 +2350,9 @@ namespace SurfaceGeometry {
                             // If the zone contains only one space, then set the Space area to the Zone area
                             int spaceNum = thisZone.spaceIndexes(1);
                             state.dataHeatBal->space(spaceNum).FloorArea = thisZone.FloorArea;
-                        } else if (thisZone.CalcFloorArea > 0.0) {
+                        } else if (zoneCalcFloorArea > 0.0) {
                             // Adjust space areas proportionately
-                            Real64 areaRatio = thisZone.FloorArea / thisZone.CalcFloorArea;
+                            Real64 areaRatio = thisZone.FloorArea / zoneCalcFloorArea;
                             for (int spaceNum : thisZone.spaceIndexes) {
                                 state.dataHeatBal->space(spaceNum).FloorArea *= areaRatio;
                             }
@@ -2370,10 +2370,10 @@ namespace SurfaceGeometry {
                             }
                         }
                     } else {
-                        if (thisZone.CalcFloorArea > 0.0) thisZone.FloorArea = thisZone.CalcFloorArea;
+                        if (zoneCalcFloorArea > 0.0) thisZone.FloorArea = zoneCalcFloorArea;
                     }
                 } else {
-                    thisZone.FloorArea = thisZone.CalcFloorArea;
+                    thisZone.FloorArea = zoneCalcFloorArea;
                 }
                 Real64 totSpacesFloorArea = 0.0;
                 for (int spaceNum : thisZone.spaceIndexes) {
@@ -2850,6 +2850,8 @@ namespace SurfaceGeometry {
                 }
             }
         }
+        // Right-size space vector
+        state.dataHeatBal->space.resize(state.dataGlobal->numSpaces);
 
         // Assign Spaces to surfaces without one
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
@@ -12220,6 +12222,7 @@ namespace SurfaceGeometry {
             surfacenotused.dimension(NFaces, 0);
 
             for (int SurfNum = thisZone.AllSurfaceFirst; SurfNum <= thisZone.AllSurfaceLast; ++SurfNum) {
+                assert(SurfNum > 0);
                 auto &thisSurface = state.dataSurface->Surface(SurfNum);
                 // Only include Base Surfaces in Calc.
 

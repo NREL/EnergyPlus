@@ -4054,7 +4054,9 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                     }
                 } break;
                 case DataZoneEquipment::ZoneEquipType::VentilatedSlab:
-                case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiant: {
+                case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiantConstFlow:
+                case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiantVarFlow:
+                case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiantElectric: {
                     if (zoneEquipConfig.InFloorActiveElement) {
                         for (int spaceNumLoop : zone.spaceIndexes) {
                             auto const &thisSpace = state.dataHeatBal->space(spaceNumLoop);
