@@ -842,7 +842,6 @@ namespace Avail {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
                 auto &diffThermoMgr = state.dataAvail->DiffThermoData(SysAvailNum);
                 diffThermoMgr.Name = cAlphaArgs(1);
                 diffThermoMgr.type = ManagerType::DiffThermo;
@@ -922,7 +921,6 @@ namespace Avail {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
                 auto &hiTurnOffMgr = state.dataAvail->HiTurnOffData(SysAvailNum);
                 hiTurnOffMgr.Name = cAlphaArgs(1);
                 hiTurnOffMgr.type = ManagerType::HiTempTOff;
@@ -976,7 +974,6 @@ namespace Avail {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
                 auto &hiTurnOnMgr = state.dataAvail->HiTurnOnData(SysAvailNum);
                 hiTurnOnMgr.Name = cAlphaArgs(1);
                 hiTurnOnMgr.type = ManagerType::HiTempTOn;
@@ -1095,7 +1092,6 @@ namespace Avail {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
                 auto &loTurnOnMgr = state.dataAvail->LoTurnOnData(SysAvailNum);
                 loTurnOnMgr.Name = cAlphaArgs(1);
                 loTurnOnMgr.type = ManagerType::LoTempTOn;
@@ -1358,7 +1354,7 @@ namespace Avail {
                                        std::string const &AvailabilityListName, // name that should be an Availability Manager List Name
                                        int const Loop,                          // which loop this is
                                        int const NumAirLoops,                   // Total number of air loops
-                                       bool &ErrorsFound                        // true if certain errors are detected here
+                                       [[maybe_unused]] bool &ErrorsFound       // true if certain errors are detected here
     )
     {
 
@@ -1424,9 +1420,9 @@ namespace Avail {
     }
 
     void GetZoneEqAvailabilityManager(EnergyPlusData &state,
-                                      int const ZoneEquipType, // Type of ZoneHVAC:* component
-                                      int const CompNum,       // Index of a particular ZoneHVAC:* component
-                                      bool &ErrorsFound        // true if certain errors are detected here
+                                      int const ZoneEquipType,           // Type of ZoneHVAC:* component
+                                      int const CompNum,                 // Index of a particular ZoneHVAC:* component
+                                      [[maybe_unused]] bool &ErrorsFound // true if certain errors are detected here
     )
     {
 
@@ -1444,9 +1440,7 @@ namespace Avail {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string AvailabilityListName; // name that should be an Availability Manager List Name
-        int Found;
-        int Num;
-        int CompNumAvailManagers; // Number of availability managers associated with a ZoneHVAC:* component
+        int CompNumAvailManagers;         // Number of availability managers associated with a ZoneHVAC:* component
 
         if (state.dataAvail->GetAvailListsInput) {
             GetSysAvailManagerListInputs(state);
@@ -1506,7 +1500,6 @@ namespace Avail {
 
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
 
-        int ZoneEquipType;
         int ZoneListNum;
         int ScanZoneListNum;
         int ZoneNum;
@@ -1725,6 +1718,7 @@ namespace Avail {
             }
 
         } break;
+
         default: {
             ShowSevereError(state, format("AvailabilityManager Type not found: {}", type));
             ShowContinueError(state, format("Occurs in Manager={}", SysAvailName));
