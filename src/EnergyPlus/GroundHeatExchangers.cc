@@ -1020,7 +1020,6 @@ void GLHEVert::setupTimeVectors()
     }
 
     // Setup the arrays
-    // this->myRespFactors->time.dimension(tempLNTTS.size(), 0.0);
     this->myRespFactors->LNTTS.dimension(tempLNTTS.size(), 0.0);
     this->myRespFactors->GFNC.dimension(tempLNTTS.size(), 0.0);
 
@@ -1374,17 +1373,16 @@ void GLHEVert::combineShortAndLongTimestepGFunctions()
         LNTTS_combined.push_back(this->myRespFactors->LNTTS(index_longTS));
     }
 
-    // Move combined values into right data struct
-    // this->myRespFactors->time.deallocate();
+    // Reset vectors for final usage
+    this->myRespFactors->time = std::vector<Real64>();
     this->myRespFactors->LNTTS.deallocate();
     this->myRespFactors->GFNC.deallocate();
 
-    // this->myRespFactors->time.dimension(GFNC_combined.size(), 0.0);
     this->myRespFactors->LNTTS.dimension(GFNC_combined.size(), 0.0);
     this->myRespFactors->GFNC.dimension(GFNC_combined.size(), 0.0);
 
     for (unsigned int index = 0; index < GFNC_combined.size(); ++index) {
-        this->myRespFactors->time[index] = exp(LNTTS_combined[index]) * t_s;
+        this->myRespFactors->time.push_back(exp(LNTTS_combined[index]) * t_s);
         this->myRespFactors->LNTTS[index] = LNTTS_combined[index];
         this->myRespFactors->GFNC[index] = GFNC_combined[index];
     }
