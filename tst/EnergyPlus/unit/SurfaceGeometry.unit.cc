@@ -12222,17 +12222,14 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
     // Space 2 has a floor surface of area 2.0, user-entered floor area is blank
     EXPECT_EQ(state->dataHeatBal->space(1).Name, "SPACE 1A");
     EXPECT_NEAR(state->dataHeatBal->space(1).userEnteredFloorArea, Constant::AutoCalculate, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->space(1).calcFloorArea, 1.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(1).FloorArea, 10.0, 0.001);
 
     EXPECT_EQ(state->dataHeatBal->space(2).Name, "SPACE 1B");
     EXPECT_NEAR(state->dataHeatBal->space(2).userEnteredFloorArea, Constant::AutoCalculate, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->space(2).calcFloorArea, 2.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(2).FloorArea, 20.0, 0.001);
 
     EXPECT_EQ(state->dataHeatBal->Zone(1).Name, "ZONE 1");
     EXPECT_NEAR(state->dataHeatBal->Zone(1).UserEnteredFloorArea, 30.0, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->Zone(1).CalcFloorArea, 3.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->Zone(1).FloorArea, 30.0, 0.001);
     Real64 zone1Area = state->dataHeatBal->space(1).FloorArea + state->dataHeatBal->space(2).FloorArea;
     EXPECT_NEAR(state->dataHeatBal->Zone(1).FloorArea, zone1Area, 0.001);
@@ -12241,22 +12238,18 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
     // Space 3 has a floor surface of area 1.0, user-entered floor is 5.0
     EXPECT_EQ(state->dataHeatBal->Zone(3).Name, "ZONE 3");
     EXPECT_NEAR(state->dataHeatBal->Zone(3).UserEnteredFloorArea, Constant::AutoCalculate, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->Zone(3).CalcFloorArea, 5.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->Zone(3).FloorArea, 5.0, 0.001);
     EXPECT_EQ(state->dataHeatBal->space(3).Name, "SPACE 3");
     EXPECT_NEAR(state->dataHeatBal->space(3).userEnteredFloorArea, 5.0, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->space(3).calcFloorArea, 1.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(3).FloorArea, 5.0, 0.001);
 
     // Zone 2 consists of auto-generated Space 4, user-entered floor area is 20.0
     // Space 4 has a floor surface of area 1.0, user-entered floor is blank
     EXPECT_EQ(state->dataHeatBal->Zone(2).Name, "ZONE 2");
     EXPECT_NEAR(state->dataHeatBal->Zone(2).UserEnteredFloorArea, 20.0, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->Zone(2).CalcFloorArea, 1.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->Zone(2).FloorArea, 20.0, 0.001);
     EXPECT_EQ(state->dataHeatBal->space(4).Name, "ZONE 2");
     EXPECT_NEAR(state->dataHeatBal->space(4).userEnteredFloorArea, Constant::AutoCalculate, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->space(4).calcFloorArea, 1.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(4).FloorArea, 20.0, 0.001);
 }
 
@@ -12418,7 +12411,6 @@ TEST_F(EnergyPlusFixture, ZoneFloorAreaTest)
     EXPECT_FALSE(ErrorsFound);           // expect no errors
 
     EXPECT_NEAR(state->dataHeatBal->Zone(1).FloorArea, 1.0, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->Zone(1).CalcFloorArea, 1.0, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
@@ -13196,7 +13188,6 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_WithAirBoundaries)
     auto const &zone3 = state->dataHeatBal->Zone(3);
 
     EXPECT_EQ(zone1.UserEnteredFloorArea, -99999.0);
-    EXPECT_EQ(zone1.CalcFloorArea, 0.0);
     EXPECT_EQ(zone1.FloorArea, 0.0);
     EXPECT_EQ(zone1.geometricFloorArea, 1.0);
     EXPECT_FALSE(zone1.HasFloor);
@@ -13207,7 +13198,6 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_WithAirBoundaries)
     EXPECT_EQ(zone1.Volume, 2.0);
 
     EXPECT_EQ(zone2.UserEnteredFloorArea, -99999.0);
-    EXPECT_EQ(zone2.CalcFloorArea, 1.0);
     EXPECT_EQ(zone2.FloorArea, 1.0);
     EXPECT_EQ(zone2.geometricFloorArea, 1.0);
     EXPECT_TRUE(zone2.HasFloor);
@@ -13218,7 +13208,6 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_WithAirBoundaries)
     EXPECT_EQ(zone2.Volume, 2.0);
 
     EXPECT_EQ(zone3.UserEnteredFloorArea, -99999.0);
-    EXPECT_EQ(zone3.CalcFloorArea, 4.0);
     EXPECT_EQ(zone3.FloorArea, 4.0);
     EXPECT_EQ(zone3.geometricFloorArea, 4.0);
     EXPECT_TRUE(zone3.HasFloor);
@@ -13423,7 +13412,6 @@ TEST_F(EnergyPlusFixture, CalculatZoneVolume_WithoutAirBoundaries)
     auto const &zone3 = state->dataHeatBal->Zone(3);
 
     EXPECT_EQ(zone1.UserEnteredFloorArea, -99999.0);
-    EXPECT_EQ(zone1.CalcFloorArea, 1.0);
     EXPECT_EQ(zone1.FloorArea, 1.0);
     EXPECT_EQ(zone1.geometricFloorArea, 1.0);
     EXPECT_TRUE(zone1.HasFloor);
@@ -13434,7 +13422,6 @@ TEST_F(EnergyPlusFixture, CalculatZoneVolume_WithoutAirBoundaries)
     EXPECT_EQ(zone1.Volume, 2.0);
 
     EXPECT_EQ(zone2.UserEnteredFloorArea, -99999.0);
-    EXPECT_EQ(zone2.CalcFloorArea, 1.0);
     EXPECT_EQ(zone2.FloorArea, 1.0);
     EXPECT_EQ(zone2.geometricFloorArea, 1.0);
     EXPECT_TRUE(zone2.HasFloor);
@@ -13445,7 +13432,6 @@ TEST_F(EnergyPlusFixture, CalculatZoneVolume_WithoutAirBoundaries)
     EXPECT_EQ(zone2.Volume, 2.0);
 
     EXPECT_EQ(zone3.UserEnteredFloorArea, -99999.0);
-    EXPECT_EQ(zone3.CalcFloorArea, 4.0);
     EXPECT_EQ(zone3.FloorArea, 4.0);
     EXPECT_EQ(zone3.geometricFloorArea, 4.0);
     EXPECT_TRUE(zone3.HasFloor);

@@ -2834,7 +2834,8 @@ namespace RoomAir {
 
             //            SupplyNodeName = "";                             // ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? May not use
         } break;
-        case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater: { // WaterHeater : HeatPump
+        case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeaterPumpedCondenser:
+        case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeaterWrappedCondenser: { // WaterHeater : HeatPump
             EquipIndex = WaterThermalTanks::getHeatPumpWaterHeaterIndex(state, EquipName);
             if (EquipIndex == 0) return EquipFind;
             ReturnNodeNum = state.dataWaterThermalTanks->HPWaterHeater(EquipIndex).HeatPumpAirInletNode;
