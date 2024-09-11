@@ -1435,7 +1435,6 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     static constexpr std::string_view RoutineName("SizePurchasedAir: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool IsAutoSize;                  // Indicator to autosize
     Real64 MaxHeatVolFlowRateDes;     // Autosized maximum heating air flow for reporting
     Real64 MaxHeatVolFlowRateUser;    // Hardsized maximum heating air flow for reporting
     Real64 MaxCoolVolFlowRateDes;     // Autosized maximum cooling air flow for reporting
@@ -1453,7 +1452,6 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
 
     auto &PurchAir = state.dataPurchasedAirMgr->PurchAir(PurchAirNum);
 
-    IsAutoSize = false;
     MaxHeatVolFlowRateDes = 0.0;
     MaxHeatVolFlowRateUser = 0.0;
     MaxCoolVolFlowRateDes = 0.0;
@@ -1597,41 +1595,25 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                 if (MaxHeatSensCapDes < HVAC::SmallLoad) {
                     MaxHeatSensCapDes = 0.0;
                 }
-                if (IsAutoSize) {
-                    PurchAir.MaxHeatSensCap = MaxHeatSensCapDes;
-                    BaseSizer::reportSizerOutput(
-                        state, PurchAir.cObjectName, PurchAir.Name, "Design Size Maximum Sensible Heating Capacity [W]", MaxHeatSensCapDes);
-                    // If there is OA, check if sizing calcs have OA>0, throw warning if not
-                    if ((PurchAir.OutdoorAir) && (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA == 0.0)) {
-                        ShowWarningError(state, format("InitPurchasedAir: In {} = {}", PurchAir.cObjectName, PurchAir.Name));
-                        ShowContinueError(state, "There is outdoor air specified in this object, but the design outdoor air flow rate for this ");
-                        ShowContinueError(state, "zone is zero. The Maximum Sensible Heating Capacity will be autosized for zero outdoor air flow. ");
-                        ShowContinueError(state,
-                                          format("Check the outdoor air specifications in the Sizing:Zone object for zone {}.",
-                                                 state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneName));
-                    }
-                } else {
-                    if (PurchAir.MaxHeatSensCap > 0.0 && MaxHeatSensCapDes > 0.0) {
-                        MaxHeatSensCapUser = PurchAir.MaxHeatSensCap;
-                        BaseSizer::reportSizerOutput(state,
-                                                     PurchAir.cObjectName,
-                                                     PurchAir.Name,
-                                                     "Design Size Maximum Sensible Heating Capacity [W]",
-                                                     MaxHeatSensCapDes,
-                                                     "User-Specified Maximum Sensible Heating Capacity [W]",
-                                                     MaxHeatSensCapUser);
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(MaxHeatSensCapDes - MaxHeatSensCapUser) / MaxHeatSensCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(
-                                    state,
-                                    format("SizePurchasedAir: Potential issue with equipment sizing for {} {}", PurchAir.cObjectName, PurchAir.Name));
-                                ShowContinueError(state,
-                                                  format("...User-Specified Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapUser));
-                                ShowContinueError(
-                                    state, format("...differs from Design Size Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapDes));
-                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
-                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
-                            }
+                if (PurchAir.MaxHeatSensCap > 0.0 && MaxHeatSensCapDes > 0.0) {
+                    MaxHeatSensCapUser = PurchAir.MaxHeatSensCap;
+                    BaseSizer::reportSizerOutput(state,
+                                                 PurchAir.cObjectName,
+                                                 PurchAir.Name,
+                                                 "Design Size Maximum Sensible Heating Capacity [W]",
+                                                 MaxHeatSensCapDes,
+                                                 "User-Specified Maximum Sensible Heating Capacity [W]",
+                                                 MaxHeatSensCapUser);
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        if ((std::abs(MaxHeatSensCapDes - MaxHeatSensCapUser) / MaxHeatSensCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
+                            ShowMessage(
+                                state,
+                                format("SizePurchasedAir: Potential issue with equipment sizing for {} {}", PurchAir.cObjectName, PurchAir.Name));
+                            ShowContinueError(state, format("...User-Specified Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapUser));
+                            ShowContinueError(
+                                state, format("...differs from Design Size Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapDes));
+                            ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                            ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
                     }
                 }
@@ -1757,40 +1739,25 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                 if (MaxCoolTotCapDes < HVAC::SmallLoad) {
                     MaxCoolTotCapDes = 0.0;
                 }
-                if (IsAutoSize) {
-                    PurchAir.MaxCoolTotCap = MaxCoolTotCapDes;
-                    BaseSizer::reportSizerOutput(
-                        state, PurchAir.cObjectName, PurchAir.Name, "Design Size Maximum Total Cooling Capacity [W]", MaxCoolTotCapDes);
-                    // If there is OA, check if sizing calcs have OA>0, throw warning if not
-                    if ((PurchAir.OutdoorAir) && (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA == 0.0)) {
-                        ShowWarningError(state, format("SizePurchasedAir: In {} = {}", PurchAir.cObjectName, PurchAir.Name));
-                        ShowContinueError(state, "There is outdoor air specified in this object, but the design outdoor air flow rate for this ");
-                        ShowContinueError(state, "zone is zero. The Maximum Total Cooling Capacity will be autosized for zero outdoor air flow. ");
-                        ShowContinueError(state,
-                                          format("Check the outdoor air specifications in the Sizing:Zone object for zone {}.",
-                                                 state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneName));
-                    }
-                } else {
-                    if (PurchAir.MaxCoolTotCap > 0.0 && MaxCoolTotCapDes > 0.0) {
-                        MaxCoolTotCapUser = PurchAir.MaxCoolTotCap;
-                        BaseSizer::reportSizerOutput(state,
-                                                     PurchAir.cObjectName,
-                                                     PurchAir.Name,
-                                                     "Design Size Maximum Total Cooling Capacity [W]",
-                                                     MaxCoolTotCapDes,
-                                                     "User-Specified Maximum Total Cooling Capacity [W]",
-                                                     MaxCoolTotCapUser);
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(MaxCoolTotCapDes - MaxCoolTotCapUser) / MaxCoolTotCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(
-                                    state,
-                                    format("SizePurchasedAir: Potential issue with equipment sizing for {} {}", PurchAir.cObjectName, PurchAir.Name));
-                                ShowContinueError(state, format("User-Specified Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapUser));
-                                ShowContinueError(state,
-                                                  format("differs from Design Size Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapDes));
-                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
-                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
-                            }
+                if (PurchAir.MaxCoolTotCap > 0.0 && MaxCoolTotCapDes > 0.0) {
+                    MaxCoolTotCapUser = PurchAir.MaxCoolTotCap;
+                    BaseSizer::reportSizerOutput(state,
+                                                 PurchAir.cObjectName,
+                                                 PurchAir.Name,
+                                                 "Design Size Maximum Total Cooling Capacity [W]",
+                                                 MaxCoolTotCapDes,
+                                                 "User-Specified Maximum Total Cooling Capacity [W]",
+                                                 MaxCoolTotCapUser);
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        if ((std::abs(MaxCoolTotCapDes - MaxCoolTotCapUser) / MaxCoolTotCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
+                            ShowMessage(
+                                state,
+                                format("SizePurchasedAir: Potential issue with equipment sizing for {} {}", PurchAir.cObjectName, PurchAir.Name));
+                            ShowContinueError(state, format("User-Specified Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapUser));
+                            ShowContinueError(state,
+                                              format("differs from Design Size Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapDes));
+                            ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                            ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
                     }
                 }
@@ -1801,7 +1768,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
             // SizingMethod = HeatingAirflowSizing;
             FieldNum = 5;
             SizingString = state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(FieldNum) + " [m3/s]";
-            IsAutoSize = false;
+            bool IsAutoSize = false;
             PrintFlag = true;
             if ((PurchAir.MaxHeatVolFlowRate == AutoSize) &&
                 ((PurchAir.HeatingLimit == LimitType::LimitFlowRate) || (PurchAir.HeatingLimit == LimitType::LimitFlowRateAndCapacity))) {
