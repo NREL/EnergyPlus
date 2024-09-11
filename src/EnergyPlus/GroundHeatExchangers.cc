@@ -966,8 +966,8 @@ void GLHEVert::calcUniformBHWallTempGFunctions(EnergyPlusData &state)
     gt::segments::adaptive adptDisc;
     int nSegments = adptDisc.discretize(this->bhLength, this->totalTubeLength);
 
-    this->myRespFactors->GFNC =
-        gt::gfunction::uniform_borehole_wall_temperature(boreholes, this->myRespFactors->time, this->soil.diffusivity, nSegments, true, state.dataGlobal->numThread);
+    this->myRespFactors->GFNC = gt::gfunction::uniform_borehole_wall_temperature(
+        boreholes, this->myRespFactors->time, this->soil.diffusivity, nSegments, true, state.dataGlobal->numThread);
 }
 
 //******************************************************************************
@@ -1513,7 +1513,7 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
 
     // Allocate and setup g-function arrays
     this->myRespFactors->GFNC.allocate(NPairs);
-    this->myRespFactors->LNTTS = std::vector<Real64> (NPairs, 0.0);
+    this->myRespFactors->LNTTS = std::vector<Real64>(NPairs, 0.0);
     this->QnMonthlyAgg.allocate(static_cast<int>(this->maxSimYears * 12));
     this->QnHr.allocate(730 + this->AGG + this->SubAGG);
     this->QnSubHr.allocate(static_cast<int>((this->SubAGG + 1) * maxTSinHr + 1));
