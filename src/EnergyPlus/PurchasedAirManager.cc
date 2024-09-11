@@ -1447,10 +1447,6 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     std::string CompName;             // component name
     std::string CompType;             // component type
     Real64 TempSize;                  // autosized value of coil input field
-                                      // HeatingCapacitySizing, etc.)
-    int SAFMethod(0);                 // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
-                                      // FractionOfAutosizedHeatingAirflow ...)
-    int CapSizingMethod(0);           // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                       // FractionOfAutosizedHeatingCapacity )
     Real64 CoolingAirVolFlowDes(0.0); // cooling supply air flow rate
     Real64 HeatingAirVolFlowDes(0.0); // heating supply air flow rate
@@ -1482,6 +1478,9 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
         if (PurchAir.HVACSizingIndex > 0) {
             state.dataSize->DataZoneNumber = PurchAir.ZonePtr;
             int zoneHVACIndex = PurchAir.HVACSizingIndex;
+            int SAFMethod;       // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
+                                 // FractionOfAutosizedHeatingAirflow, HeatingCapacitySizing, etc.)
+            int CapSizingMethod; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
 
             FieldNum = 5; // N5 , \field Maximum Heating Air Flow Rate
             PrintFlag = true;
