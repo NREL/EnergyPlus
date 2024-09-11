@@ -14946,20 +14946,13 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
 
     // Delayed components are moved into this function so that we can calculate them one zone at a time
     // with Array1D
-    Array1D<Real64> peopleDelaySeqHeat;
-    Array1D<Real64> peopleDelaySeqCool;
-    Array1D<Real64> lightDelaySeqHeat;
-    Array1D<Real64> lightDelaySeqCool;
-    Array1D<Real64> equipDelaySeqHeat;
-    Array1D<Real64> equipDelaySeqCool;
-    Array1D<Real64> hvacLossDelaySeqHeat;
-    Array1D<Real64> hvacLossDelaySeqCool;
-    Array1D<Real64> powerGenDelaySeqHeat;
-    Array1D<Real64> powerGenDelaySeqCool;
-    Array1D<Real64> feneSolarDelaySeqHeat;
-    Array1D<Real64> feneSolarDelaySeqCool;
-    Array2D<Real64> surfDelaySeqHeat;
-    Array2D<Real64> surfDelaySeqCool;
+    Array1D<Real64> peopleDelaySeq;
+    Array1D<Real64> lightDelaySeq;
+    Array1D<Real64> equipDelaySeq;
+    Array1D<Real64> hvacLossDelaySeq;
+    Array1D<Real64> powerGenDelaySeq;
+    Array1D<Real64> feneSolarDelaySeq;
+    Array2D<Real64> surfDelaySeq;
 
     Array1D<CompLoadTablesType> SpaceHeatCompLoadTables; // for space level component load summary output tables
     Array1D<CompLoadTablesType> SpaceCoolCompLoadTables;
@@ -14987,34 +14980,20 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
         if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
         // adjusted initilization location to after variable declaration for loops 2021-01-11
-        peopleDelaySeqHeat.dimension(state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
-        peopleDelaySeqHeat = 0.0;
-        peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        peopleDelaySeqCool = 0.0;
-        lightDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        lightDelaySeqHeat = 0.0;
-        lightDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        lightDelaySeqCool = 0.0;
-        equipDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        equipDelaySeqHeat = 0.0;
-        equipDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        equipDelaySeqCool = 0.0;
-        hvacLossDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        hvacLossDelaySeqHeat = 0.0;
-        hvacLossDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        hvacLossDelaySeqCool = 0.0;
-        powerGenDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        powerGenDelaySeqHeat = 0.0;
-        powerGenDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        powerGenDelaySeqCool = 0.0;
-        feneSolarDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        feneSolarDelaySeqHeat = 0.0;
-        feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        feneSolarDelaySeqCool = 0.0;
-        surfDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
-        surfDelaySeqHeat = 0.0;
-        surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
-        surfDelaySeqCool = 0.0;
+        peopleDelaySeq.dimension(state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
+        peopleDelaySeq = 0.0;
+        lightDelaySeq.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+        lightDelaySeq = 0.0;
+        equipDelaySeq.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+        equipDelaySeq = 0.0;
+        hvacLossDelaySeq.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+        hvacLossDelaySeq = 0.0;
+        powerGenDelaySeq.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+        powerGenDelaySeq = 0.0;
+        feneSolarDelaySeq.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+        feneSolarDelaySeq = 0.0;
+        surfDelaySeq.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
+        surfDelaySeq = 0.0;
 
         // initialize arrays
         if (ort->displayZoneComponentLoadSummary) {
@@ -15130,14 +15109,14 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                                   state.dataSize->CalcFinalSpaceSizing(iSpace),
                                                   SpaceCoolCompLoadTables(iSpace),
                                                   SpaceHeatCompLoadTables(iSpace),
-                                                  peopleDelaySeqCool,
-                                                  equipDelaySeqCool,
-                                                  hvacLossDelaySeqCool,
-                                                  powerGenDelaySeqCool,
-                                                  lightDelaySeqCool,
-                                                  feneSolarDelaySeqCool,
+                                                  peopleDelaySeq,
+                                                  equipDelaySeq,
+                                                  hvacLossDelaySeq,
+                                                  powerGenDelaySeq,
+                                                  lightDelaySeq,
+                                                  feneSolarDelaySeq,
                                                   ort->feneCondInstantSeq,
-                                                  surfDelaySeqCool,
+                                                  surfDelaySeq,
                                                   spaceComponentAreas(iSpace),
                                                   iSpace);
                     }
@@ -15150,14 +15129,14 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                               state.dataSize->CalcFinalZoneSizing(iZone),
                                               ZoneCoolCompLoadTables(iZone),
                                               ZoneHeatCompLoadTables(iZone),
-                                              peopleDelaySeqCool,
-                                              equipDelaySeqCool,
-                                              hvacLossDelaySeqCool,
-                                              powerGenDelaySeqCool,
-                                              lightDelaySeqCool,
-                                              feneSolarDelaySeqCool,
+                                              peopleDelaySeq,
+                                              equipDelaySeq,
+                                              hvacLossDelaySeq,
+                                              powerGenDelaySeq,
+                                              lightDelaySeq,
+                                              feneSolarDelaySeq,
                                               ort->feneCondInstantSeq,
-                                              surfDelaySeqCool,
+                                              surfDelaySeq,
                                               ZoneComponentAreas(iZone),
                                               iZone);
                 }
@@ -15250,28 +15229,28 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                           coolDesSelected,
                                           true,
                                           iZone,
-                                          peopleDelaySeqCool,
-                                          equipDelaySeqCool,
-                                          hvacLossDelaySeqCool,
-                                          powerGenDelaySeqCool,
-                                          lightDelaySeqCool,
-                                          feneSolarDelaySeqCool,
+                                          peopleDelaySeq,
+                                          equipDelaySeq,
+                                          hvacLossDelaySeq,
+                                          powerGenDelaySeq,
+                                          lightDelaySeq,
+                                          feneSolarDelaySeq,
                                           ort->feneCondInstantSeq,
-                                          surfDelaySeqCool);
+                                          surfDelaySeq);
                         ComputeTableBodyUsingMovingAvg(state,
                                                        airLoopZonesCoolCompLoadTables.cells,
                                                        airLoopZonesCoolCompLoadTables.cellUsed,
                                                        coolDesSelected,
                                                        timeCoolMax,
                                                        iZone,
-                                                       peopleDelaySeqCool,
-                                                       equipDelaySeqCool,
-                                                       hvacLossDelaySeqCool,
-                                                       powerGenDelaySeqCool,
-                                                       lightDelaySeqCool,
-                                                       feneSolarDelaySeqCool,
+                                                       peopleDelaySeq,
+                                                       equipDelaySeq,
+                                                       hvacLossDelaySeq,
+                                                       powerGenDelaySeq,
+                                                       lightDelaySeq,
+                                                       feneSolarDelaySeq,
                                                        ort->feneCondInstantSeq,
-                                                       surfDelaySeqCool);
+                                                       surfDelaySeq);
                         CollectPeakZoneConditions(state, airLoopZonesCoolCompLoadTables, coolDesSelected, timeCoolMax, iZone, true);
                         AddAreaColumnForZone(ZoneComponentAreas(iZone), airLoopZonesCoolCompLoadTables);
                     }
@@ -15287,28 +15266,28 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                           heatDesSelected,
                                           false,
                                           iZone,
-                                          peopleDelaySeqHeat,
-                                          equipDelaySeqHeat,
-                                          hvacLossDelaySeqHeat,
-                                          powerGenDelaySeqHeat,
-                                          lightDelaySeqHeat,
-                                          feneSolarDelaySeqHeat,
+                                          peopleDelaySeq,
+                                          equipDelaySeq,
+                                          hvacLossDelaySeq,
+                                          powerGenDelaySeq,
+                                          lightDelaySeq,
+                                          feneSolarDelaySeq,
                                           ort->feneCondInstantSeq,
-                                          surfDelaySeqHeat);
+                                          surfDelaySeq);
                         ComputeTableBodyUsingMovingAvg(state,
                                                        airLoopZonesHeatCompLoadTables.cells,
                                                        airLoopZonesHeatCompLoadTables.cellUsed,
                                                        heatDesSelected,
                                                        timeHeatMax,
                                                        iZone,
-                                                       peopleDelaySeqHeat,
-                                                       equipDelaySeqHeat,
-                                                       hvacLossDelaySeqHeat,
-                                                       powerGenDelaySeqHeat,
-                                                       lightDelaySeqHeat,
-                                                       feneSolarDelaySeqHeat,
+                                                       peopleDelaySeq,
+                                                       equipDelaySeq,
+                                                       hvacLossDelaySeq,
+                                                       powerGenDelaySeq,
+                                                       lightDelaySeq,
+                                                       feneSolarDelaySeq,
                                                        ort->feneCondInstantSeq,
-                                                       surfDelaySeqHeat);
+                                                       surfDelaySeq);
                         CollectPeakZoneConditions(state, airLoopZonesHeatCompLoadTables, heatDesSelected, timeHeatMax, iZone, false);
                         AddAreaColumnForZone(ZoneComponentAreas(iZone), airLoopZonesHeatCompLoadTables);
                     }
@@ -15405,28 +15384,28 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                       coolDesSelected,
                                       true,
                                       iZone,
-                                      peopleDelaySeqCool,
-                                      equipDelaySeqCool,
-                                      hvacLossDelaySeqCool,
-                                      powerGenDelaySeqCool,
-                                      lightDelaySeqCool,
-                                      feneSolarDelaySeqCool,
+                                      peopleDelaySeq,
+                                      equipDelaySeq,
+                                      hvacLossDelaySeq,
+                                      powerGenDelaySeq,
+                                      lightDelaySeq,
+                                      feneSolarDelaySeq,
                                       ort->feneCondInstantSeq,
-                                      surfDelaySeqCool);
+                                      surfDelaySeq);
                     ComputeTableBodyUsingMovingAvg(state,
                                                    facilityZonesCoolCompLoadTables.cells,
                                                    facilityZonesCoolCompLoadTables.cellUsed,
                                                    coolDesSelected,
                                                    timeCoolMax,
                                                    iZone,
-                                                   peopleDelaySeqCool,
-                                                   equipDelaySeqCool,
-                                                   hvacLossDelaySeqCool,
-                                                   powerGenDelaySeqCool,
-                                                   lightDelaySeqCool,
-                                                   feneSolarDelaySeqCool,
+                                                   peopleDelaySeq,
+                                                   equipDelaySeq,
+                                                   hvacLossDelaySeq,
+                                                   powerGenDelaySeq,
+                                                   lightDelaySeq,
+                                                   feneSolarDelaySeq,
                                                    ort->feneCondInstantSeq,
-                                                   surfDelaySeqCool);
+                                                   surfDelaySeq);
                     CollectPeakZoneConditions(state, facilityZonesCoolCompLoadTables, coolDesSelected, timeCoolMax, iZone, true);
                     AddAreaColumnForZone(ZoneComponentAreas(iZone), facilityZonesCoolCompLoadTables);
                 }
@@ -15442,28 +15421,28 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                       heatDesSelected,
                                       false,
                                       iZone,
-                                      peopleDelaySeqHeat,
-                                      equipDelaySeqHeat,
-                                      hvacLossDelaySeqHeat,
-                                      powerGenDelaySeqHeat,
-                                      lightDelaySeqHeat,
-                                      feneSolarDelaySeqHeat,
+                                      peopleDelaySeq,
+                                      equipDelaySeq,
+                                      hvacLossDelaySeq,
+                                      powerGenDelaySeq,
+                                      lightDelaySeq,
+                                      feneSolarDelaySeq,
                                       ort->feneCondInstantSeq,
-                                      surfDelaySeqHeat);
+                                      surfDelaySeq);
                     ComputeTableBodyUsingMovingAvg(state,
                                                    facilityZonesHeatCompLoadTables.cells,
                                                    facilityZonesHeatCompLoadTables.cellUsed,
                                                    heatDesSelected,
                                                    timeHeatMax,
                                                    iZone,
-                                                   peopleDelaySeqHeat,
-                                                   equipDelaySeqHeat,
-                                                   hvacLossDelaySeqHeat,
-                                                   powerGenDelaySeqHeat,
-                                                   lightDelaySeqHeat,
-                                                   feneSolarDelaySeqHeat,
+                                                   peopleDelaySeq,
+                                                   equipDelaySeq,
+                                                   hvacLossDelaySeq,
+                                                   powerGenDelaySeq,
+                                                   lightDelaySeq,
+                                                   feneSolarDelaySeq,
                                                    ort->feneCondInstantSeq,
-                                                   surfDelaySeqHeat);
+                                                   surfDelaySeq);
                     CollectPeakZoneConditions(state, facilityZonesHeatCompLoadTables, heatDesSelected, timeHeatMax, iZone, false);
                     AddAreaColumnForZone(ZoneComponentAreas(iZone), facilityZonesHeatCompLoadTables);
                 }
@@ -15574,20 +15553,13 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
         FacilityZonesHeatCompLoadTables.deallocate();
         FacilityZonesCoolCompLoadTables.deallocate();
 
-        peopleDelaySeqHeat.deallocate();
-        peopleDelaySeqCool.deallocate();
-        lightDelaySeqHeat.deallocate();
-        lightDelaySeqCool.deallocate();
-        equipDelaySeqHeat.deallocate();
-        equipDelaySeqCool.deallocate();
-        hvacLossDelaySeqHeat.deallocate();
-        hvacLossDelaySeqCool.deallocate();
-        powerGenDelaySeqHeat.deallocate();
-        powerGenDelaySeqCool.deallocate();
-        feneSolarDelaySeqHeat.deallocate();
-        feneSolarDelaySeqCool.deallocate();
-        surfDelaySeqHeat.deallocate();
-        surfDelaySeqCool.deallocate();
+        peopleDelaySeq.deallocate();
+        lightDelaySeq.deallocate();
+        equipDelaySeq.deallocate();
+        hvacLossDelaySeq.deallocate();
+        powerGenDelaySeq.deallocate();
+        feneSolarDelaySeq.deallocate();
+        surfDelaySeq.deallocate();
     }
 }
 
