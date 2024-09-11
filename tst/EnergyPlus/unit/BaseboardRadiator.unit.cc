@@ -387,6 +387,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
         loopsidebranch.Comp.allocate(1);
     }
 
+    state->dataSize->ZoneSizingRunDone = true;
     DataZoneEquipment::GetZoneEquipmentData(*state);
     // get electric baseboard inputs
     BaseboardRadiator::GetBaseboardInput(*state);
@@ -483,6 +484,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_resetSizingFlagBasedOnInputTest)
 {
     state->dataBaseboardRadiator->baseboards.allocate(1);
     auto &thisBB = state->dataBaseboardRadiator->baseboards(1);
+    state->dataSize->ZoneSizingRunDone = true;
 
     // Test 1A: UA autosized so MySizeFlag should stay true
     thisBB.MySizeFlag = true; // reset to default/initialized value
