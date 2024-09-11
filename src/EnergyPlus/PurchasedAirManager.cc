@@ -1435,28 +1435,23 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     static constexpr std::string_view RoutineName("SizePurchasedAir: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool IsAutoSize;               // Indicator to autosize
-    Real64 MaxHeatVolFlowRateDes;  // Autosized maximum heating air flow for reporting
-    Real64 MaxHeatVolFlowRateUser; // Hardsized maximum heating air flow for reporting
-    Real64 MaxCoolVolFlowRateDes;  // Autosized maximum cooling air flow for reporting
-    Real64 MaxCoolVolFlowRateUser; // Hardsized maximum cooling air flow for reporting
-    Real64 MaxHeatSensCapDes;      // Autosized maximum sensible heating capacity for reporting
-    Real64 MaxHeatSensCapUser;     // Hardsized maximum sensible heating capacity for reporting
-    Real64 MaxCoolTotCapDes;       // Autosized maximum sensible cooling capacity for reporting
-    Real64 MaxCoolTotCapUser;      // Hardsized maximum sensible cooling capacity for reporting
-    std::string CompName;          // component name
-    std::string CompType;          // component type
-    std::string SizingString;      // input field sizing description (e.g., Nominal Capacity)
-    Real64 TempSize;               // autosized value of coil input field
-    int FieldNum;                  // IDD numeric field number where input field description is found
-    int SizingMethod;       // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
-                            // HeatingCapacitySizing, etc.)
-    bool PrintFlag;         // TRUE when sizing information is reported in the eio file
-    int zoneHVACIndex;      // index of zoneHVAC equipment sizing specification
-    int SAFMethod(0);       // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
-                            // FractionOfAutosizedHeatingAirflow ...)
-    int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
-                            // FractionOfAutosizedHeatingCapacity )
+    bool IsAutoSize;                  // Indicator to autosize
+    Real64 MaxHeatVolFlowRateDes;     // Autosized maximum heating air flow for reporting
+    Real64 MaxHeatVolFlowRateUser;    // Hardsized maximum heating air flow for reporting
+    Real64 MaxCoolVolFlowRateDes;     // Autosized maximum cooling air flow for reporting
+    Real64 MaxCoolVolFlowRateUser;    // Hardsized maximum cooling air flow for reporting
+    Real64 MaxHeatSensCapDes;         // Autosized maximum sensible heating capacity for reporting
+    Real64 MaxHeatSensCapUser;        // Hardsized maximum sensible heating capacity for reporting
+    Real64 MaxCoolTotCapDes;          // Autosized maximum sensible cooling capacity for reporting
+    Real64 MaxCoolTotCapUser;         // Hardsized maximum sensible cooling capacity for reporting
+    std::string CompName;             // component name
+    std::string CompType;             // component type
+    Real64 TempSize;                  // autosized value of coil input field
+                                      // HeatingCapacitySizing, etc.)
+    int SAFMethod(0);                 // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
+                                      // FractionOfAutosizedHeatingAirflow ...)
+    int CapSizingMethod(0);           // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
+                                      // FractionOfAutosizedHeatingCapacity )
     Real64 CoolingAirVolFlowDes(0.0); // cooling supply air flow rate
     Real64 HeatingAirVolFlowDes(0.0); // heating supply air flow rate
 
@@ -1480,9 +1475,13 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
 
     if (state.dataSize->CurZoneEqNum > 0) {
         auto &ZoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
+        std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+        int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
+        int FieldNum;     // IDD numeric field number where input field description is found
+        bool PrintFlag;   // TRUE when sizing information is reported in the eio file
         if (PurchAir.HVACSizingIndex > 0) {
             state.dataSize->DataZoneNumber = PurchAir.ZonePtr;
-            zoneHVACIndex = PurchAir.HVACSizingIndex;
+            int zoneHVACIndex = PurchAir.HVACSizingIndex;
 
             FieldNum = 5; // N5 , \field Maximum Heating Air Flow Rate
             PrintFlag = true;
