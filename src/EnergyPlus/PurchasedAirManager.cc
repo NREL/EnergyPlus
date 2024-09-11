@@ -3101,84 +3101,84 @@ void ReportPurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     // Using/Aliasing
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
-    auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
+    auto &PurchAir = state.dataPurchasedAirMgr->PurchAir(PurchAirNum);
 
     // Sort out heating and cooling rates
-    PurchAir(PurchAirNum).SenHeatRate = max(PurchAir(PurchAirNum).SenCoilLoad, 0.0);
-    PurchAir(PurchAirNum).SenCoolRate = std::abs(min(PurchAir(PurchAirNum).SenCoilLoad, 0.0));
-    PurchAir(PurchAirNum).LatHeatRate = max(PurchAir(PurchAirNum).LatCoilLoad, 0.0);
-    PurchAir(PurchAirNum).LatCoolRate = std::abs(min(PurchAir(PurchAirNum).LatCoilLoad, 0.0));
-    PurchAir(PurchAirNum).TotHeatRate = PurchAir(PurchAirNum).SenHeatRate + PurchAir(PurchAirNum).LatHeatRate;
-    PurchAir(PurchAirNum).TotCoolRate = PurchAir(PurchAirNum).SenCoolRate + PurchAir(PurchAirNum).LatCoolRate;
+    PurchAir.SenHeatRate = max(PurchAir.SenCoilLoad, 0.0);
+    PurchAir.SenCoolRate = std::abs(min(PurchAir.SenCoilLoad, 0.0));
+    PurchAir.LatHeatRate = max(PurchAir.LatCoilLoad, 0.0);
+    PurchAir.LatCoolRate = std::abs(min(PurchAir.LatCoilLoad, 0.0));
+    PurchAir.TotHeatRate = PurchAir.SenHeatRate + PurchAir.LatHeatRate;
+    PurchAir.TotCoolRate = PurchAir.SenCoolRate + PurchAir.LatCoolRate;
 
-    PurchAir(PurchAirNum).ZoneSenHeatRate = max(PurchAir(PurchAirNum).SenOutputToZone, 0.0);
-    PurchAir(PurchAirNum).ZoneSenCoolRate = std::abs(min(PurchAir(PurchAirNum).SenOutputToZone, 0.0));
-    PurchAir(PurchAirNum).ZoneLatHeatRate = max(PurchAir(PurchAirNum).LatOutputToZone, 0.0);
-    PurchAir(PurchAirNum).ZoneLatCoolRate = std::abs(min(PurchAir(PurchAirNum).LatOutputToZone, 0.0));
-    PurchAir(PurchAirNum).ZoneTotHeatRate = PurchAir(PurchAirNum).ZoneSenHeatRate + PurchAir(PurchAirNum).ZoneLatHeatRate;
-    PurchAir(PurchAirNum).ZoneTotCoolRate = PurchAir(PurchAirNum).ZoneSenCoolRate + PurchAir(PurchAirNum).ZoneLatCoolRate;
+    PurchAir.ZoneSenHeatRate = max(PurchAir.SenOutputToZone, 0.0);
+    PurchAir.ZoneSenCoolRate = std::abs(min(PurchAir.SenOutputToZone, 0.0));
+    PurchAir.ZoneLatHeatRate = max(PurchAir.LatOutputToZone, 0.0);
+    PurchAir.ZoneLatCoolRate = std::abs(min(PurchAir.LatOutputToZone, 0.0));
+    PurchAir.ZoneTotHeatRate = PurchAir.ZoneSenHeatRate + PurchAir.ZoneLatHeatRate;
+    PurchAir.ZoneTotCoolRate = PurchAir.ZoneSenCoolRate + PurchAir.ZoneLatCoolRate;
 
     // Sort out outdoor air "loads"
     // OASenOutput = Outdoor air sensible output relative to zone conditions [W], <0 means OA is cooler than zone air
     // OALatOutput  = Outdoor air latent output relative to zone conditions [W], <0 means OA is drier than zone air
-    if (PurchAir(PurchAirNum).SenCoilLoad > 0.0) { // Heating is active
-        PurchAir(PurchAirNum).OASenHeatRate = std::abs(min(PurchAir(PurchAirNum).OASenOutput, 0.0));
+    if (PurchAir.SenCoilLoad > 0.0) { // Heating is active
+        PurchAir.OASenHeatRate = std::abs(min(PurchAir.OASenOutput, 0.0));
     } else {
-        PurchAir(PurchAirNum).OASenHeatRate = 0.0;
+        PurchAir.OASenHeatRate = 0.0;
     }
-    if (PurchAir(PurchAirNum).SenCoilLoad < 0.0) { // Cooling is active
-        PurchAir(PurchAirNum).OASenCoolRate = max(PurchAir(PurchAirNum).OASenOutput, 0.0);
+    if (PurchAir.SenCoilLoad < 0.0) { // Cooling is active
+        PurchAir.OASenCoolRate = max(PurchAir.OASenOutput, 0.0);
     } else {
-        PurchAir(PurchAirNum).OASenCoolRate = 0.0;
+        PurchAir.OASenCoolRate = 0.0;
     }
-    if (PurchAir(PurchAirNum).LatCoilLoad > 0.0) { // Humidification is active
-        PurchAir(PurchAirNum).OALatHeatRate = std::abs(min(PurchAir(PurchAirNum).OALatOutput, 0.0));
+    if (PurchAir.LatCoilLoad > 0.0) { // Humidification is active
+        PurchAir.OALatHeatRate = std::abs(min(PurchAir.OALatOutput, 0.0));
     } else {
-        PurchAir(PurchAirNum).OALatHeatRate = 0.0;
+        PurchAir.OALatHeatRate = 0.0;
     }
-    if (PurchAir(PurchAirNum).LatCoilLoad < 0.0) { // Dehumidification is active
-        PurchAir(PurchAirNum).OALatCoolRate = max(PurchAir(PurchAirNum).OALatOutput, 0.0);
+    if (PurchAir.LatCoilLoad < 0.0) { // Dehumidification is active
+        PurchAir.OALatCoolRate = max(PurchAir.OALatOutput, 0.0);
     } else {
-        PurchAir(PurchAirNum).OALatCoolRate = 0.0;
+        PurchAir.OALatCoolRate = 0.0;
     }
 
-    PurchAir(PurchAirNum).OATotHeatRate = PurchAir(PurchAirNum).OASenHeatRate + PurchAir(PurchAirNum).OALatHeatRate;
-    PurchAir(PurchAirNum).OATotCoolRate = PurchAir(PurchAirNum).OASenCoolRate + PurchAir(PurchAirNum).OALatCoolRate;
+    PurchAir.OATotHeatRate = PurchAir.OASenHeatRate + PurchAir.OALatHeatRate;
+    PurchAir.OATotCoolRate = PurchAir.OASenCoolRate + PurchAir.OALatCoolRate;
 
-    PurchAir(PurchAirNum).HtRecSenHeatRate = max(PurchAir(PurchAirNum).HtRecSenOutput, 0.0);
-    PurchAir(PurchAirNum).HtRecSenCoolRate = std::abs(min(PurchAir(PurchAirNum).HtRecSenOutput, 0.0));
-    PurchAir(PurchAirNum).HtRecLatHeatRate = max(PurchAir(PurchAirNum).HtRecLatOutput, 0.0);
-    PurchAir(PurchAirNum).HtRecLatCoolRate = std::abs(min(PurchAir(PurchAirNum).HtRecLatOutput, 0.0));
-    PurchAir(PurchAirNum).HtRecTotHeatRate = PurchAir(PurchAirNum).HtRecSenHeatRate + PurchAir(PurchAirNum).HtRecLatHeatRate;
-    PurchAir(PurchAirNum).HtRecTotCoolRate = PurchAir(PurchAirNum).HtRecSenCoolRate + PurchAir(PurchAirNum).HtRecLatCoolRate;
+    PurchAir.HtRecSenHeatRate = max(PurchAir.HtRecSenOutput, 0.0);
+    PurchAir.HtRecSenCoolRate = std::abs(min(PurchAir.HtRecSenOutput, 0.0));
+    PurchAir.HtRecLatHeatRate = max(PurchAir.HtRecLatOutput, 0.0);
+    PurchAir.HtRecLatCoolRate = std::abs(min(PurchAir.HtRecLatOutput, 0.0));
+    PurchAir.HtRecTotHeatRate = PurchAir.HtRecSenHeatRate + PurchAir.HtRecLatHeatRate;
+    PurchAir.HtRecTotCoolRate = PurchAir.HtRecSenCoolRate + PurchAir.HtRecLatCoolRate;
 
-    PurchAir(PurchAirNum).SenHeatEnergy = PurchAir(PurchAirNum).SenHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).SenCoolEnergy = PurchAir(PurchAirNum).SenCoolRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).LatHeatEnergy = PurchAir(PurchAirNum).LatHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).LatCoolEnergy = PurchAir(PurchAirNum).LatCoolRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).TotHeatEnergy = PurchAir(PurchAirNum).TotHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).TotCoolEnergy = PurchAir(PurchAirNum).TotCoolRate * TimeStepSysSec;
+    PurchAir.SenHeatEnergy = PurchAir.SenHeatRate * TimeStepSysSec;
+    PurchAir.SenCoolEnergy = PurchAir.SenCoolRate * TimeStepSysSec;
+    PurchAir.LatHeatEnergy = PurchAir.LatHeatRate * TimeStepSysSec;
+    PurchAir.LatCoolEnergy = PurchAir.LatCoolRate * TimeStepSysSec;
+    PurchAir.TotHeatEnergy = PurchAir.TotHeatRate * TimeStepSysSec;
+    PurchAir.TotCoolEnergy = PurchAir.TotCoolRate * TimeStepSysSec;
 
-    PurchAir(PurchAirNum).ZoneSenHeatEnergy = PurchAir(PurchAirNum).ZoneSenHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).ZoneSenCoolEnergy = PurchAir(PurchAirNum).ZoneSenCoolRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).ZoneLatHeatEnergy = PurchAir(PurchAirNum).ZoneLatHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).ZoneLatCoolEnergy = PurchAir(PurchAirNum).ZoneLatCoolRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).ZoneTotHeatEnergy = PurchAir(PurchAirNum).ZoneTotHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).ZoneTotCoolEnergy = PurchAir(PurchAirNum).ZoneTotCoolRate * TimeStepSysSec;
+    PurchAir.ZoneSenHeatEnergy = PurchAir.ZoneSenHeatRate * TimeStepSysSec;
+    PurchAir.ZoneSenCoolEnergy = PurchAir.ZoneSenCoolRate * TimeStepSysSec;
+    PurchAir.ZoneLatHeatEnergy = PurchAir.ZoneLatHeatRate * TimeStepSysSec;
+    PurchAir.ZoneLatCoolEnergy = PurchAir.ZoneLatCoolRate * TimeStepSysSec;
+    PurchAir.ZoneTotHeatEnergy = PurchAir.ZoneTotHeatRate * TimeStepSysSec;
+    PurchAir.ZoneTotCoolEnergy = PurchAir.ZoneTotCoolRate * TimeStepSysSec;
 
-    PurchAir(PurchAirNum).OASenHeatEnergy = PurchAir(PurchAirNum).OASenHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).OASenCoolEnergy = PurchAir(PurchAirNum).OASenCoolRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).OALatHeatEnergy = PurchAir(PurchAirNum).OALatHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).OALatCoolEnergy = PurchAir(PurchAirNum).OALatCoolRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).OATotHeatEnergy = PurchAir(PurchAirNum).OATotHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).OATotCoolEnergy = PurchAir(PurchAirNum).OATotCoolRate * TimeStepSysSec;
+    PurchAir.OASenHeatEnergy = PurchAir.OASenHeatRate * TimeStepSysSec;
+    PurchAir.OASenCoolEnergy = PurchAir.OASenCoolRate * TimeStepSysSec;
+    PurchAir.OALatHeatEnergy = PurchAir.OALatHeatRate * TimeStepSysSec;
+    PurchAir.OALatCoolEnergy = PurchAir.OALatCoolRate * TimeStepSysSec;
+    PurchAir.OATotHeatEnergy = PurchAir.OATotHeatRate * TimeStepSysSec;
+    PurchAir.OATotCoolEnergy = PurchAir.OATotCoolRate * TimeStepSysSec;
 
-    PurchAir(PurchAirNum).HtRecSenHeatEnergy = PurchAir(PurchAirNum).HtRecSenHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).HtRecSenCoolEnergy = PurchAir(PurchAirNum).HtRecSenCoolRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).HtRecLatHeatEnergy = PurchAir(PurchAirNum).HtRecLatHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).HtRecLatCoolEnergy = PurchAir(PurchAirNum).HtRecLatCoolRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).HtRecTotHeatEnergy = PurchAir(PurchAirNum).HtRecTotHeatRate * TimeStepSysSec;
-    PurchAir(PurchAirNum).HtRecTotCoolEnergy = PurchAir(PurchAirNum).HtRecTotCoolRate * TimeStepSysSec;
+    PurchAir.HtRecSenHeatEnergy = PurchAir.HtRecSenHeatRate * TimeStepSysSec;
+    PurchAir.HtRecSenCoolEnergy = PurchAir.HtRecSenCoolRate * TimeStepSysSec;
+    PurchAir.HtRecLatHeatEnergy = PurchAir.HtRecLatHeatRate * TimeStepSysSec;
+    PurchAir.HtRecLatCoolEnergy = PurchAir.HtRecLatCoolRate * TimeStepSysSec;
+    PurchAir.HtRecTotHeatEnergy = PurchAir.HtRecTotHeatRate * TimeStepSysSec;
+    PurchAir.HtRecTotCoolEnergy = PurchAir.HtRecTotCoolRate * TimeStepSysSec;
 }
 
 Real64 GetPurchasedAirOutAirMassFlow(EnergyPlusData &state, int const PurchAirNum)
