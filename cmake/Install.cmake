@@ -418,6 +418,7 @@ if(WIN32)
   install(FILES "${PROJECT_SOURCE_DIR}/bin/WeatherConverter/TimeZoneCodes.txt" DESTINATION "PreProcess/WeatherConverter/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/WeatherConverter/WBANLocations.csv" DESTINATION "PreProcess/WeatherConverter/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/WeatherConverter/Weather.exe" DESTINATION "PreProcess/WeatherConverter/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/readme.txt" DESTINATION "PostProcess/EP-Compare/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/EPDraw/Run-Win/EPDrawGUI Libs/Appearance Pak.dll" DESTINATION "PreProcess/EPDraw/EPDrawGUI Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/EPDraw/Run-Win/EPDrawGUI Libs/Shell.dll" DESTINATION "PreProcess/EPDraw/EPDrawGUI Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/EPDraw/Run-Win/EPDrawGUI.exe" DESTINATION "PreProcess/EPDraw/")
@@ -498,6 +499,7 @@ if(APPLE)
 
   install(DIRECTORY "${PROJECT_SOURCE_DIR}/bin/EP-Launch-Lite/EP-Launch-Lite.app" DESTINATION "PreProcess")
   install(DIRECTORY "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Mac/IDFVersionUpdater.app" DESTINATION "PreProcess/IDFVersionUpdater")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/readme.txt" DESTINATION "PostProcess/EP-Compare/")
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/EPMacro/Mac/EPMacro" DESTINATION "./")
 
   configure_file(scripts/runenergyplus.in "${PROJECT_BINARY_DIR}/scripts/runenergyplus" @ONLY)
@@ -533,6 +535,7 @@ elseif(UNIX)
   set(CPACK_IFW_TARGET_DIRECTORY
       "/usr/local/${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
 
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/readme.txt" DESTINATION "PostProcess/EP-Compare/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBAppearancePak64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBCrypto64.so"
