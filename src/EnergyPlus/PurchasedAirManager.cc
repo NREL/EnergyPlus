@@ -2959,17 +2959,17 @@ void CalcPurchAirMixedAir(EnergyPlusData &state,
     bool HeatRecOn;
     Real64 CpAir; // Specific heat [J/kg-C] reused in multiple places
 
-    auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
+    auto &PurchAir = state.dataPurchasedAirMgr->PurchAir(PurchAirNum);
 
     // Initializations
-    OANodeNum = PurchAir(PurchAirNum).OutdoorAirNodeNum;
-    RecircNodeNum = PurchAir(PurchAirNum).ZoneRecircAirNodeNum;
+    OANodeNum = PurchAir.OutdoorAirNodeNum;
+    RecircNodeNum = PurchAir.ZoneRecircAirNodeNum;
 
     RecircMassFlowRate = 0.0;
     RecircTemp = state.dataLoopNodes->Node(RecircNodeNum).Temp;
     RecircHumRat = state.dataLoopNodes->Node(RecircNodeNum).HumRat;
     RecircEnthalpy = state.dataLoopNodes->Node(RecircNodeNum).Enthalpy;
-    if (PurchAir(PurchAirNum).OutdoorAir) {
+    if (PurchAir.OutdoorAir) {
         OAInletTemp = state.dataLoopNodes->Node(OANodeNum).Temp;
         OAInletHumRat = state.dataLoopNodes->Node(OANodeNum).HumRat;
         OAInletEnthalpy = state.dataLoopNodes->Node(OANodeNum).Enthalpy;
@@ -2986,22 +2986,22 @@ void CalcPurchAirMixedAir(EnergyPlusData &state,
     }
     HeatRecOn = false;
 
-    if (PurchAir(PurchAirNum).OutdoorAir && (OAMassFlowRate > 0.0)) {
+    if (PurchAir.OutdoorAir && (OAMassFlowRate > 0.0)) {
         // Determine if heat recovery is beneficial
-        if (PurchAir(PurchAirNum).HtRecType == HeatRecovery::Sensible) {
+        if (PurchAir.HtRecType == HeatRecovery::Sensible) {
             if ((OperatingMode == OpMode::Heat) && (RecircTemp > OAInletTemp)) HeatRecOn = true;
             if ((OperatingMode == OpMode::Cool) && (RecircTemp < OAInletTemp)) HeatRecOn = true;
         }
-        if (PurchAir(PurchAirNum).HtRecType == HeatRecovery::Enthalpy) {
+        if (PurchAir.HtRecType == HeatRecovery::Enthalpy) {
             if ((OperatingMode == OpMode::Heat) && (RecircEnthalpy > OAInletEnthalpy)) HeatRecOn = true;
             if ((OperatingMode == OpMode::Cool) && (RecircEnthalpy < OAInletEnthalpy)) HeatRecOn = true;
         }
         // Calculate heat recovery if active
         if (HeatRecOn) {
-            PurchAir(PurchAirNum).TimeHtRecActive = state.dataHVACGlobal->TimeStepSys;
-            OAAfterHtRecTemp = OAInletTemp + PurchAir(PurchAirNum).HtRecSenEff * (RecircTemp - OAInletTemp);
-            if (PurchAir(PurchAirNum).HtRecType == HeatRecovery::Enthalpy)
-                OAAfterHtRecHumRat = OAInletHumRat + PurchAir(PurchAirNum).HtRecLatEff * (RecircHumRat - OAInletHumRat);
+            PurchAir.TimeHtRecActive = state.dataHVACGlobal->TimeStepSys;
+            OAAfterHtRecTemp = OAInletTemp + PurchAir.HtRecSenEff * (RecircTemp - OAInletTemp);
+            if (PurchAir.HtRecType == HeatRecovery::Enthalpy)
+                OAAfterHtRecHumRat = OAInletHumRat + PurchAir.HtRecLatEff * (RecircHumRat - OAInletHumRat);
             OAAfterHtRecEnthalpy = PsyHFnTdbW(OAAfterHtRecTemp, OAAfterHtRecHumRat);
             //   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
             if (PsyTsatFnHPb(state, OAAfterHtRecEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName) > OAAfterHtRecTemp) {
@@ -3027,16 +3027,16 @@ void CalcPurchAirMixedAir(EnergyPlusData &state,
 
         // Calculate OA and heat recovery sensible and latent rates
         CpAir = PsyCpAirFnW(OAInletHumRat);
-        PurchAir(PurchAirNum).HtRecSenOutput = OAMassFlowRate * CpAir * (OAAfterHtRecTemp - OAInletTemp);
-        PurchAir(PurchAirNum).HtRecLatOutput = OAMassFlowRate * (OAAfterHtRecEnthalpy - OAInletEnthalpy) - PurchAir(PurchAirNum).HtRecSenOutput;
+        PurchAir.HtRecSenOutput = OAMassFlowRate * CpAir * (OAAfterHtRecTemp - OAInletTemp);
+        PurchAir.HtRecLatOutput = OAMassFlowRate * (OAAfterHtRecEnthalpy - OAInletEnthalpy) - PurchAir.HtRecSenOutput;
 
     } else { // No outdoor air
         RecircMassFlowRate = SupplyMassFlowRate;
         MixedAirTemp = RecircTemp;
         MixedAirHumRat = RecircHumRat;
         MixedAirEnthalpy = RecircEnthalpy;
-        PurchAir(PurchAirNum).HtRecSenOutput = 0.0;
-        PurchAir(PurchAirNum).HtRecLatOutput = 0.0;
+        PurchAir.HtRecSenOutput = 0.0;
+        PurchAir.HtRecLatOutput = 0.0;
     }
 }
 
