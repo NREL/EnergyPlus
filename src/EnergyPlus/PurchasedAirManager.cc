@@ -2134,7 +2134,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             MinOASensOutput = 0.0;
             MinOALatOutput = 0.0;
         }
-        SupplyMassFlowRate = OAMassFlowRate;
+        // SupplyMassFlowRate = OAMassFlowRate;
 
         // Check if cooling of the supply air stream is required
 
@@ -2477,7 +2477,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 OAMassFlowRate = PurchAir.MaxHeatMassFlowRate;
             }
 
-            SupplyMassFlowRate = OAMassFlowRate;
+            // SupplyMassFlowRate = OAMassFlowRate;
 
             // Determine supply mass flow rate
             // Mass flow rate to meet sensible load, at Minimum Cooling Supply Air Temperature
@@ -2619,7 +2619,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                     PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;
                 } break;
                 }
-                SupplyEnthalpy = PsyHFnTdbW(PurchAir.SupplyTemp, PurchAir.SupplyHumRat);
+                // SupplyEnthalpy = PsyHFnTdbW(PurchAir.SupplyTemp, PurchAir.SupplyHumRat);
 
                 // Check supply humidity ratio for dehumidification (SupplyHumRatForHumid should always be < SupplyHumRatForDehum)
                 // This section is the heating/deadband section, so dehumidification should activate
