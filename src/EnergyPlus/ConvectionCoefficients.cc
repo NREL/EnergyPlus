@@ -3628,7 +3628,7 @@ Real64 EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, HcExt const
     }
 
     Material::SurfaceRoughness Roughness =
-        state.dataMaterial->Material(state.dataConstruction->Construct(surface.Construction).LayerPoint(1))->Roughness;
+        state.dataMaterial->materials(state.dataConstruction->Construct(surface.Construction).LayerPoint(1))->Roughness;
 
     switch (ForcedConvModelEqNum) {
     case HcExt::None: {
@@ -4054,7 +4054,9 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                     }
                 } break;
                 case DataZoneEquipment::ZoneEquipType::VentilatedSlab:
-                case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiant: {
+                case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiantConstFlow:
+                case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiantVarFlow:
+                case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiantElectric: {
                     if (zoneEquipConfig.InFloorActiveElement) {
                         for (int spaceNumLoop : zone.spaceIndexes) {
                             auto const &thisSpace = state.dataHeatBal->space(spaceNumLoop);
@@ -6299,7 +6301,7 @@ Real64 CalcClearRoof(EnergyPlusData &state,
 
     Real64 Rf = RoughnessMultiplier[(int)RoughnessIndex];
     if (Rex > 0.1) { // avoid zero and crazy small denominators
-        Real64 tmp = std::log(1.0 + GrLn / pow_2(Rex));
+        Real64 tmp = std::log1p(GrLn / pow_2(Rex));
         eta = tmp / (1.0 + tmp);
     } else {
         eta = 1.0; // forced convection gone because no wind
@@ -6318,7 +6320,7 @@ Real64 CalcClearRoof(EnergyPlusData &state,
                      Real64 const RoofPerimeter)
 {
     Material::SurfaceRoughness const RoughnessIndex =
-        state.dataMaterial->Material(state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1))->Roughness;
+        state.dataMaterial->materials(state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1))->Roughness;
     // find x, don't know x. avoid time consuming geometry algorithm
     Real64 x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
 

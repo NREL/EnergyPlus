@@ -266,7 +266,7 @@ void SimulateVRF(EnergyPlusData &state,
 
         if (state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
-            state.dataHVACVarRefFlow->VRF(VRFCondenser).CalcVRFCondenser_FluidTCtrl(state);
+            state.dataHVACVarRefFlow->VRF(VRFCondenser).CalcVRFCondenser_FluidTCtrl(state, FirstHVACIteration);
         } else {
             // Algorithm Type: VRF model based on system curve
             CalcVRFCondenser(state, VRFCondenser);
@@ -11010,7 +11010,7 @@ void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(EnergyPlusData &state,
     }
 }
 
-void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
+void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, const bool FirstHVACIteration)
 {
 
     // SUBROUTINE INFORMATION:
@@ -11141,7 +11141,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     Real64 Pipe_DeltP_h;             // Piping Loss Algorithm Parameter: Pipe pressure drop (h) [Pa]
     Real64 Pipe_Q_c;                 // Piping Loss Algorithm Parameter: Heat loss (c) [W]
     Real64 Pipe_Q_h;                 // Piping Loss Algorithm Parameter: Heat loss (h) [W]
-    Real64 Q_c_TU_PL;                // Cooling load to be met at heating mode, including the piping loss(W)
+    Real64 Q_c_TU_PL;                // Cooling load to be met at cooling mode, including the piping loss(W)
     Real64 Q_h_TU_PL;                // Heating load to be met at heating mode, including the piping loss (W)
     Real64 Q_h_OU;                   // outdoor unit condenser heat release (cooling mode) [W]
     Real64 Q_c_OU;                   // outdoor unit evaporator heat extract (heating mode) [W]
@@ -11419,56 +11419,40 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         C_cap_operation = this->VRFOU_CapModFactor(
             state, h_comp_in, h_IU_evap_in, max(min(Psuction, RefPHigh), RefPLow), Tsuction + SH_Comp, Tsuction + 8, CapMinTc - 5);
 
-        if (Q_c_TU_PL * C_cap_operation < CompEvaporatingCAPSpdMin) {
-            // Required cooling load is less than the min cooling capacity, on-off strategy
+        // Iteration_Ncomp: Perform iterations to calculate Ncomp (Label10)
+        Counter = 1;
+        Ncomp = TU_CoolingLoad / this->CoolingCOP;
+        Ncomp_new = Ncomp;
+    Label10:;
+        Q_h_OU = Q_c_TU_PL + Ncomp_new; // Ncomp_new may be updated during Iteration_Ncomp Label10
 
-            this->VRFOperationSimPath = 11;
+        // *VRF OU TeTc calculations
+        m_air = this->OUAirFlowRate * RhoAir;
+        SC_OU = this->SC;
+        this->VRFOU_TeTc(state, HXOpMode::CondMode, Q_h_OU, SC_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->CondensingTemp);
+        this->CondensingTemp = min(CapMaxTc, this->CondensingTemp);
+        this->SC = SC_OU;
 
-            CyclingRatio = Q_c_TU_PL * C_cap_operation / CompEvaporatingCAPSpdMin;
-            double CyclingRatioFrac = 0.85 + 0.15 * CyclingRatio;
-            double HPRTF = CyclingRatio / CyclingRatioFrac;
-            Ncomp = CompEvaporatingPWRSpdMin * HPRTF; //
-            CompSpdActual = this->CompressorSpeed(1); //
-            this->CondensingTemp = CapMinTc;          //
+        // *VEF OU Compressor Simulation at cooling mode: Specify the compressor speed and power consumption
+        this->VRFOU_CalcCompC(state,
+                              TU_CoolingLoad,
+                              Tsuction,
+                              this->CondensingTemp,
+                              Psuction,
+                              T_comp_in,
+                              h_comp_in,
+                              h_IU_evap_in,
+                              Pipe_Q_c,
+                              CapMaxTc,
+                              Q_h_OU,
+                              CompSpdActual,
+                              Ncomp,
+                              CyclingRatio);
 
-        } else {
-            // Required cooling load is greater than or equal to the min cooling capacity
-
-            // Iteration_Ncomp: Perform iterations to calculate Ncomp (Label10)
-            Counter = 1;
-            Ncomp = TU_CoolingLoad / this->CoolingCOP;
+        if ((std::abs(Ncomp - Ncomp_new) > (Tolerance * Ncomp_new)) && (Counter < 30)) {
             Ncomp_new = Ncomp;
-        Label10:;
-            Q_h_OU = Q_c_TU_PL + Ncomp_new; // Ncomp_new may be updated during Iteration_Ncomp Label10
-
-            // *VRF OU TeTc calculations
-            m_air = this->OUAirFlowRate * RhoAir;
-            SC_OU = this->SC;
-            this->VRFOU_TeTc(
-                state, HXOpMode::CondMode, Q_h_OU, SC_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->CondensingTemp);
-            this->CondensingTemp = min(CapMaxTc, this->CondensingTemp);
-            this->SC = SC_OU;
-
-            // *VEF OU Compressor Simulation at cooling mode: Specify the compressor speed and power consumption
-            this->VRFOU_CalcCompC(state,
-                                  TU_CoolingLoad,
-                                  Tsuction,
-                                  this->CondensingTemp,
-                                  Psuction,
-                                  T_comp_in,
-                                  h_comp_in,
-                                  h_IU_evap_in,
-                                  Pipe_Q_c,
-                                  CapMaxTc,
-                                  Q_h_OU,
-                                  CompSpdActual,
-                                  Ncomp);
-
-            if ((std::abs(Ncomp - Ncomp_new) > (Tolerance * Ncomp_new)) && (Counter < 30)) {
-                Ncomp_new = Ncomp;
-                Counter = Counter + 1;
-                goto Label10;
-            }
+            Counter = Counter + 1;
+            goto Label10;
         }
 
         // Update h_IU_evap_in in iterations Label12
@@ -11490,6 +11474,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         }
 
         // Key outputs of this subroutine
+        Ncomp *= CyclingRatio;
+        Q_h_OU *= CyclingRatio;
         this->CompActSpeed = max(CompSpdActual, 0.0);
         this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter; // 0.95 is the efficiency of the compressor inverter, can come from IDF //@minor
         this->OUFanPower = this->RatedOUFanPower;              //@ * pow_3( CondFlowRatio )
@@ -11961,7 +11947,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
         this->HeatingCapacity = 0.0;                                    // Include the piping loss
         this->PipingCorrectionHeating = 1.0;                            // 1 means no piping loss
-        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = MaxCap; // yujie: default value is MaxCap = 1e+20, not 0
+        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = MaxCap; // default value is MaxCap = 1e+20, not 0
 
         this->CoolingCapacity = 0.0; // Include the piping loss
         this->PipingCorrectionCooling = 1.0;
@@ -12334,6 +12320,25 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
     // Calculate the IU Te/Tc for the next time step
     this->CalcVRFIUTeTc_FluidTCtrl(state);
+    // update coil and IU evaporating temperature, also keep coil RTF updated with the condenser side cycling ratio, for the FluidTCtrl model
+    for (int VRFTUNum = 1; VRFTUNum <= state.dataHVACVarRefFlow->NumVRFTU; ++VRFTUNum) {
+        auto const &thisTU = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
+        auto &coolingCoil = state.dataDXCoils->DXCoil(thisTU.CoolCoilIndex);
+        if (this->adjustedTe && (!FirstHVACIteration)) {
+            coolingCoil.EvaporatingTemp = this->EvaporatingTemp;
+            this->IUEvaporatingTemp = this->EvaporatingTemp;
+        }
+
+        int PLF;
+        if (coolingCoil.PLFFPLR(1) > 0 && this->VRFCondCyclingRatio < 1.0) {
+            PLF = Curve::CurveValue(state, coolingCoil.PLFFPLR(1), this->VRFCondCyclingRatio); // Calculate part-load factor
+        } else {
+            PLF = 1.0;
+        }
+        if (coolingCoil.TotalCoolingEnergyRate > 0.0) {
+            coolingCoil.CoolingCoilRuntimeFraction = this->VRFCondCyclingRatio / PLF;
+        }
+    }
 }
 
 void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
@@ -13833,7 +13838,8 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                                             Real64 MaxOutdoorUnitTc,   // The maximum temperature that Tc can be at heating mode [C]
                                             Real64 &OUCondHeatRelease, // Condenser heat release (cooling mode) [W]
                                             Real64 &CompSpdActual,     // Actual compressor running speed [rps]
-                                            Real64 &Ncomp              // Compressor power [W]
+                                            Real64 &Ncomp,             // Compressor power [W]
+                                            Real64 &CyclingRatio       // Cycling Ratio [W]
 )
 {
 
@@ -13841,6 +13847,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
     //       AUTHOR         Xiufeng Pang
     //       DATE WRITTEN   Feb 2014
     //       MODIFIED       Rongpeng Zhang, Jan 2016
+    //       MODIFIED       Yujie Xu, Sep 2023
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -13896,7 +13903,8 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
     Real64 RefPHigh;                       // High Pressure Value for Ps (max in tables) [Pa]
     Real64 T_discharge_new;                // Condensing temperature, for temporary use in iterations [C]
     Real64 Tfs;                            // Temperature of the air at the coil surface [C]]
-    Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C}
+    Real64 constexpr Tolerance(0.05);      // Tolerance for condensing temperature calculation [C]
+    Real64 constexpr TeTol(0.5);           // Tolerance for the difference between Te and SmallLoadTe
     Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
     Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
@@ -13925,6 +13933,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
     C_cap_operation = this->VRFOU_CapModFactor(
         state, Pipe_h_comp_in, Pipe_h_IU_in, max(min(P_suction, RefPHigh), RefPLow), T_suction + Modifi_SH, T_suction + 8, T_discharge - 5);
 
+    this->adjustedTe = false;
     for (CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++) {
         // Iteration to find the VRF speed that can meet the required load, Iteration DoName1
 
@@ -13973,14 +13982,26 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                 MinRefriPe = this->refrig->getSatPressure(state, -15, RoutineName);
                 MinOutdoorUnitPe = max(P_discharge - this->CompMaxDeltaP, MinRefriPe);
                 MinOutdoorUnitTe = this->refrig->getSatTemperature(state, max(min(MinOutdoorUnitPe, RefPHigh), RefPLow), RoutineName);
+                // Te can't be smaller than user input lower bound
+                MinOutdoorUnitTe = max(this->IUEvapTempLow, MinOutdoorUnitTe);
 
                 auto f = [&state, T_discharge_new, CondHeat, CAPFT](Real64 const T_suc) {
                     return CompResidual_FluidTCtrl(state, T_discharge_new, CondHeat, CAPFT, T_suc);
                 };
 
                 General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe,
-                                   T_suction);   // SmallLoadTe is the updated Te'
-                if (SolFla < 0) SmallLoadTe = 6; // MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
+                                   T_suction); // SmallLoadTe is the updated Te'
+                if (SolFla == -1) {
+                    // show error not converging
+                    ShowWarningMessage(state, format("{}: low load Te adjustment failed for {}", RoutineName, this->Name));
+                    ShowContinueErrorTimeStamp(state, "");
+                    ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating OU evaporating temperature", MaxIter));
+                } else if (SolFla == -2) {
+                    // demand < capacity at both endpoints of the Te range, assuming f(x) is roughly monotonic than this is the low load case
+                    assert(f(T_suction) < 0);
+                    // TeTol is added to prevent the final updated Te to go out of bounds
+                    SmallLoadTe = 6 + TeTol; // MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
+                }
 
                 // Get an updated Te corresponding to the updated Te'
                 // VRFOU_TeModification( VRFCond, this->EvaporatingTemp, SmallLoadTe, Pipe_h_IU_in, OutdoorDryBulb, Pipe_Te_assumed,
@@ -13992,6 +14013,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                     NumIteTe = 1;
                     MaxNumIteTe = (this->EvaporatingTemp - SmallLoadTe) / 0.1 + 1; // upper bound and lower bound of Te iterations
                     Pipe_Te_assumed = this->EvaporatingTemp - 0.1;
+                    this->adjustedTe = true;
 
                 Label11:;
                     Pipe_m_ref = 0; // Total Ref Flow Rate( kg/s )
@@ -14058,14 +14080,14 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
 
                     T_suction = this->refrig->getSatTemperature(state, max(min(Pipe_Pe_assumed - Pipe_DeltP, RefPHigh), RefPLow), RoutineName);
 
-                    if ((std::abs(T_suction - SmallLoadTe) > 0.5) && (Pipe_Te_assumed < this->EvaporatingTemp) && (Pipe_Te_assumed > SmallLoadTe) &&
+                    if ((std::abs(T_suction - SmallLoadTe) > TeTol) && (Pipe_Te_assumed < this->EvaporatingTemp) && (Pipe_Te_assumed > SmallLoadTe) &&
                         (NumIteTe < MaxNumIteTe)) {
                         Pipe_Te_assumed = Pipe_Te_assumed - 0.1;
                         NumIteTe = NumIteTe + 1;
                         goto Label11;
                     }
 
-                    if (std::abs(T_suction - SmallLoadTe) > 0.5) {
+                    if (std::abs(T_suction - SmallLoadTe) > TeTol) {
                         NumIteTe = 999;
                         T_suction = SmallLoadTe;
                         Pipe_SH_merged = 3.0;
@@ -14117,12 +14139,21 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                     goto Label13;
                 }
 
-                if (CapDiff > (Tolerance * Cap_Eva0)) NumIteCcap = 999;
+                // when it gets here, either NumIteCcap = 30 or CapDiff > (Tolerance * Cap_Eva0)
+                if (CapDiff > (Tolerance * Cap_Eva0) && (Cap_Eva1 - Cap_Eva0) >= 0.0) {
+                    NumIteCcap = 999;
+                    CyclingRatio = Cap_Eva0 / Cap_Eva1;
+                } else {
+                    CyclingRatio = 1.0;
+                }
 
                 Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
+                OUCondHeatRelease = Ncomp + Cap_Eva1;
 
                 this->CondensingTemp = T_discharge; // OU Tc' is updated due to OUCondHeatRelease updates, which is caused by IU Te' updates
                                                     // during low load conditions
+                this->EvaporatingTemp = T_suction;
+                this->IUEvaporatingTemp = T_suction;
 
                 break; // EXIT DoName1
 
@@ -14199,7 +14230,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     Real64 RefTSat;                        // Saturated temperature of the refrigerant [C]
     Real64 RefPLow;                        // Low Pressure Value for Ps (>0.0) [Pa]
     Real64 RefPHigh;                       // High Pressure Value for Ps (max in tables) [Pa]
-    Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C]
+    Real64 constexpr Tolerance(0.05);      // Tolerance for condensing temperature calculation [C}
     Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
     Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 

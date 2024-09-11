@@ -252,7 +252,7 @@ struct ChillerElectricEIRData : BaseGlobalStruct
     bool getInputFlag = true;
     Array1D<ChillerElectricEIR::ElectricEIRChillerSpecs> ElectricEIRChiller;
 
-    void init_state([[maybe_unused]] EnergyPlusData &state)
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
 

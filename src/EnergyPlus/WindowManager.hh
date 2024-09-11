@@ -139,7 +139,9 @@ namespace Window {
                                                Real64 &SurfOutsideTemp // Outside surface temperature (C)
     );
 
+#ifdef GET_OUT
     void WindowHeatBalanceEquations(EnergyPlusData &state, int SurfNum); // Surface number
+#endif                                                                   // GET_OUT
 
     void GetHeatBalanceEqCoefMatrixSimple(EnergyPlusData &state,
                                           int nglasslayer,           // Number of glass layers
@@ -323,7 +325,7 @@ namespace Window {
                                Array1D<Real64> hgap,        // Conductive gap conductance [W/m2-K]
                                Real64 &NominalConductance,  // Nominal center-of-glass conductance, including air films
                                Real64 &SHGC,                // Nominal center-of-glass solar heat gain coefficient for
-                               Real64 &TSolNorm             // Overall beam solar transmittance at normal incidence
+                               Real64 TSolNorm              // Overall beam solar transmittance at normal incidence
     );
 
     void WindowTempsForNominalCond(EnergyPlusData &state,
@@ -355,40 +357,6 @@ namespace Window {
                          Real64 s_el,       // Solar profile angle (radians)
                          Array1A<Real64> p  // Blind properties (equivalent to ST_LAY)
     );
-
-    Real64 InterpProfAng(Real64 ProfAng,           // Profile angle (rad)
-                         Array1S<Real64> PropArray // Array of blind properties
-    );
-
-    Real64 InterpSlatAng(Real64 SlatAng,           // Slat angle (rad)
-                         bool VarSlats,            // True if slat angle is variable
-                         Array1S<Real64> PropArray // Array of blind properties as function of slat angle
-    );
-
-    Real64 InterpProfSlatAng(Real64 ProfAng,           // Profile angle (rad)
-                             Real64 SlatAng,           // Slat angle (rad)
-                             bool VarSlats,            // True if variable-angle slats
-                             Array2A<Real64> PropArray // Array of blind properties
-    );
-
-    Real64 BlindBeamBeamTrans(Real64 ProfAng,        // Solar profile angle (rad)
-                              Real64 SlatAng,        // Slat angle (rad)
-                              Real64 SlatWidth,      // Slat width (m)
-                              Real64 SlatSeparation, // Slat separation (distance between surfaces of adjacent slats) (m)
-                              Real64 SlatThickness   // Slat thickness (m)
-    );
-
-    constexpr Real64 InterpProfSlat(Real64 const SlatLower,
-                                    Real64 const SlatUpper,
-                                    Real64 const ProfLower,
-                                    Real64 const ProfUpper,
-                                    Real64 const SlatInterpFac,
-                                    Real64 const ProfInterpFac)
-    {
-        Real64 ValA = SlatLower + SlatInterpFac * (SlatUpper - SlatLower);
-        Real64 ValB = ProfLower + SlatInterpFac * (ProfUpper - ProfLower);
-        return ValA + ProfInterpFac * (ValB - ValA);
-    }
 
     inline Real64 InterpSw(Real64 const SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
                            Real64 const A,         // Glazing property in unswitched state
@@ -512,7 +480,9 @@ struct WindowManagerData : BaseGlobalStruct
         0.0};                                                         // Solar radiation and IR radiation from internal gains absorbed by glass face
     std::array<Real64, 2 *Window::maxGlassLayers> thetas = {0.0};     // Glass surface temperatures (K)
     std::array<Real64, 2 *Window::maxGlassLayers> thetasPrev = {0.0}; // Previous-iteration glass surface temperatures (K)
-    std::array<Real64, 2 *Window::maxGlassLayers> fvec = {0.0};       // Glass face heat balance function
+#ifdef GET_OUT
+    std::array<Real64, 2 *Window::maxGlassLayers> fvec = {0.0}; // Glass face heat balance function
+#endif                                                          // GET_OUT
 
     std::array<Real64, Window::maxGlassLayers> hrgap = {0.0}; // Radiative gap conductance
 
@@ -583,7 +553,9 @@ struct WindowManagerData : BaseGlobalStruct
         this->AbsRadGlassFace = {0.0};
         this->thetas = {0.0};
         this->thetasPrev = {0.0};
+#ifdef GET_OUT
         this->fvec = {0.0};
+#endif // GET_OUT
         this->hrgap = {0.0};
         this->A23P = 0.0;
         this->A32P = 0.0;

@@ -677,21 +677,21 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     zoneGroupData1->ZoneList = 2;
     zoneGroupData1->Multiplier = 99;
 
-    auto const materialData0 = std::make_unique<Material::MaterialChild>();
+    auto const materialData0 = std::make_unique<Material::MaterialBase>();
     materialData0->Name = "test material 1";
-    materialData0->group = Material::Group::Air;
-    auto const materialData1 = std::make_unique<Material::MaterialChild>();
+    materialData0->group = Material::Group::AirGap;
+    auto const materialData1 = std::make_unique<Material::MaterialShade>();
     materialData1->Name = "test material 2";
     materialData1->group = Material::Group::Shade;
     materialData1->Roughness = Material::SurfaceRoughness::Rough; // 1
     materialData1->Conductivity = 2;
     materialData1->Density = 2;
-    materialData1->IsoMoistCap = 2;
+    // materialData1->IsoMoistCap = 2;
     materialData1->Porosity = 2;
     materialData1->Resistance = 2;
     materialData1->ROnly = true;
     materialData1->SpecHeat = 2;
-    materialData1->ThermGradCoef = 2;
+    // materialData1->ThermGradCoef = 2;
     materialData1->Thickness = 2;
     materialData1->VaporDiffus = 2;
 
@@ -983,7 +983,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
 
     ASSERT_EQ(2ul, materials.size());
     std::vector<std::string> material0{"1", "test material 1", "1", "-1", "0.0", "0.0", "0.0", "0.0", "0.0", "0", "0.0", "0.0", "0.0", "0.0"};
-    std::vector<std::string> material1{"2", "test material 2", "2", "1", "2.0", "2.0", "2.0", "2.0", "2.0", "1", "2.0", "2.0", "2.0", "2.0"};
+    std::vector<std::string> material1{"2", "test material 2", "2", "1", "2.0", "2.0", "0.0", "2.0", "2.0", "1", "2.0", "0.0", "2.0", "2.0"};
     EXPECT_EQ(material0, materials[0]);
     EXPECT_EQ(material1, materials[1]);
 

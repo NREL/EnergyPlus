@@ -209,6 +209,8 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     using OutAirNodeManager::CheckOutAirNodeNumber;
     using ScheduleManager::GetScheduleIndex;
 
+    static constexpr std::string_view routineName = "GetPipeHeatTransfer";
+
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr NumPipeSections(20);
     int constexpr NumberOfDepthNodes(8); // Number of nodes in the cartesian grid-Should be an even # for now
@@ -224,14 +226,17 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     int NumOfPipeHTInt; // Number of Pipe Heat Transfer objects
     int NumOfPipeHTExt; // Number of Pipe Heat Transfer objects
     int NumOfPipeHTUG;  // Number of Pipe Heat Transfer objects
-    auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+    int NumSections;    // total number of sections in pipe
+
+    auto &s_ipsc = state.dataIPShortCut;
+    auto &s_mat = state.dataMaterial;
     // Initializations and allocations
-    cCurrentModuleObject = "Pipe:Indoor";
-    NumOfPipeHTInt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    cCurrentModuleObject = "Pipe:Outdoor";
-    NumOfPipeHTExt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    cCurrentModuleObject = "Pipe:Underground";
-    NumOfPipeHTUG = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    s_ipsc->cCurrentModuleObject = "Pipe:Indoor";
+    NumOfPipeHTInt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
+    s_ipsc->cCurrentModuleObject = "Pipe:Outdoor";
+    NumOfPipeHTExt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
+    s_ipsc->cCurrentModuleObject = "Pipe:Underground";
+    NumOfPipeHTUG = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, s_ipsc->cCurrentModuleObject);
 
     state.dataPipeHT->nsvNumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
     // allocate data structures
@@ -241,425 +246,398 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     state.dataPipeHT->PipeHTUniqueNames.reserve(static_cast<unsigned>(state.dataPipeHT->nsvNumOfPipeHT));
     int Item = 0;
 
-    cCurrentModuleObject = "Pipe:Indoor";
+    s_ipsc->cCurrentModuleObject = "Pipe:Indoor";
     for (int PipeItem = 1; PipeItem <= NumOfPipeHTInt; ++PipeItem) {
         ++Item;
         // get the object name
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 cCurrentModuleObject,
+                                                                 s_ipsc->cCurrentModuleObject,
                                                                  PipeItem,
-                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 s_ipsc->cAlphaArgs,
                                                                  NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 s_ipsc->rNumericArgs,
                                                                  NumNumbers,
                                                                  IOStatus,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                 s_ipsc->lNumericFieldBlanks,
+                                                                 s_ipsc->lAlphaFieldBlanks,
+                                                                 s_ipsc->cAlphaFieldNames,
+                                                                 s_ipsc->cNumericFieldNames);
 
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPipeHT->PipeHTUniqueNames,
-                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                 cCurrentModuleObject,
-                                                 state.dataIPShortCut->cAlphaFieldNames(1),
+                                                 s_ipsc->cAlphaArgs(1),
+                                                 s_ipsc->cCurrentModuleObject,
+                                                 s_ipsc->cAlphaFieldNames(1),
                                                  ErrorsFound);
-        state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
+        state.dataPipeHT->PipeHT(Item).Name = s_ipsc->cAlphaArgs(1);
         state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeInterior;
 
         // General user input data
-        state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).Construction = s_ipsc->cAlphaArgs(2);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(s_ipsc->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
         // get inlet node data
-        state.dataPipeHT->PipeHT(Item).InletNode = state.dataIPShortCut->cAlphaArgs(3);
+        state.dataPipeHT->PipeHT(Item).InletNode = s_ipsc->cAlphaArgs(3);
         state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
-                                                                        state.dataIPShortCut->cAlphaArgs(3),
+                                                                        s_ipsc->cAlphaArgs(3),
                                                                         ErrorsFound,
                                                                         DataLoopNode::ConnectionObjectType::PipeIndoor,
-                                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                                        s_ipsc->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
                                                                         DataLoopNode::ConnectionType::Inlet,
                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(3), s_ipsc->cAlphaArgs(3)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
         // get outlet node data
-        state.dataPipeHT->PipeHT(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(4);
+        state.dataPipeHT->PipeHT(Item).OutletNode = s_ipsc->cAlphaArgs(4);
         state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
-                                                                         state.dataIPShortCut->cAlphaArgs(4),
+                                                                         s_ipsc->cAlphaArgs(4),
                                                                          ErrorsFound,
                                                                          DataLoopNode::ConnectionObjectType::PipeIndoor,
-                                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                                         s_ipsc->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
                                                                          DataLoopNode::ConnectionType::Outlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(4), s_ipsc->cAlphaArgs(4)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
-        TestCompSet(state,
-                    cCurrentModuleObject,
-                    state.dataIPShortCut->cAlphaArgs(1),
-                    state.dataIPShortCut->cAlphaArgs(3),
-                    state.dataIPShortCut->cAlphaArgs(4),
-                    "Pipe Nodes");
+        TestCompSet(state, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1), s_ipsc->cAlphaArgs(3), s_ipsc->cAlphaArgs(4), "Pipe Nodes");
 
         // get environmental boundary condition type
 
-        if (state.dataIPShortCut->lAlphaFieldBlanks(5)) state.dataIPShortCut->cAlphaArgs(5) = "ZONE";
+        if (s_ipsc->lAlphaFieldBlanks(5)) s_ipsc->cAlphaArgs(5) = "ZONE";
 
-        PipeIndoorBoundaryType indoorType =
-            static_cast<PipeIndoorBoundaryType>(getEnumValue(pipeIndoorBoundaryTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
+        PipeIndoorBoundaryType indoorType = static_cast<PipeIndoorBoundaryType>(getEnumValue(pipeIndoorBoundaryTypeNamesUC, s_ipsc->cAlphaArgs(5)));
         switch (indoorType) {
         case PipeIndoorBoundaryType::Zone:
             state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ZoneEnv;
-            state.dataPipeHT->PipeHT(Item).EnvrZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
+            state.dataPipeHT->PipeHT(Item).EnvrZonePtr = Util::FindItemInList(s_ipsc->cAlphaArgs(6), state.dataHeatBal->Zone);
             if (state.dataPipeHT->PipeHT(Item).EnvrZonePtr == 0) {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
-                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(6), s_ipsc->cAlphaArgs(6)));
+                ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             break;
 
         case PipeIndoorBoundaryType::Schedule:
             state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ScheduleEnv;
-            state.dataPipeHT->PipeHT(Item).EnvrSchedule = state.dataIPShortCut->cAlphaArgs(7);
+            state.dataPipeHT->PipeHT(Item).EnvrSchedule = s_ipsc->cAlphaArgs(7);
             state.dataPipeHT->PipeHT(Item).EnvrSchedPtr = GetScheduleIndex(state, state.dataPipeHT->PipeHT(Item).EnvrSchedule);
-            state.dataPipeHT->PipeHT(Item).EnvrVelSchedule = state.dataIPShortCut->cAlphaArgs(8);
+            state.dataPipeHT->PipeHT(Item).EnvrVelSchedule = s_ipsc->cAlphaArgs(8);
             state.dataPipeHT->PipeHT(Item).EnvrVelSchedPtr = GetScheduleIndex(state, state.dataPipeHT->PipeHT(Item).EnvrVelSchedule);
             if (state.dataPipeHT->PipeHT(Item).EnvrSchedPtr == 0) {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
-                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(7), s_ipsc->cAlphaArgs(7)));
+                ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             if (state.dataPipeHT->PipeHT(Item).EnvrVelSchedPtr == 0) {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8)));
-                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(8), s_ipsc->cAlphaArgs(8)));
+                ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             break;
 
         default:
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ShowContinueError(state, R"(Should be "ZONE" or "SCHEDULE")"); // TODO rename point
             ErrorsFound = true;
         }
 
         // dimensions
-        state.dataPipeHT->PipeHT(Item).PipeID = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("GetPipesHeatTransfer: invalid {} of {:.4R}",
-                                   state.dataIPShortCut->cNumericFieldNames(1),
-                                   state.dataIPShortCut->rNumericArgs(1)));
-            ShowContinueError(state, format("{} must be > 0.0", state.dataIPShortCut->cNumericFieldNames(1)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+        state.dataPipeHT->PipeHT(Item).PipeID = s_ipsc->rNumericArgs(1);
+        if (s_ipsc->rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
+            ShowSevereError(state, format("GetPipesHeatTransfer: invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
+            ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(1)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
 
             ErrorsFound = true;
         }
 
-        state.dataPipeHT->PipeHT(Item).Length = state.dataIPShortCut->rNumericArgs(2);
-        if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("GetPipesHeatTransfer: invalid {} of {:.4R}",
-                                   state.dataIPShortCut->cNumericFieldNames(2),
-                                   state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} must be > 0.0", state.dataIPShortCut->cNumericFieldNames(2)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+        state.dataPipeHT->PipeHT(Item).Length = s_ipsc->rNumericArgs(2);
+        if (s_ipsc->rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
+            ShowSevereError(state, format("GetPipesHeatTransfer: invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
+            ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(2)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum != 0) {
             state.dataPipeHT->PipeHT(Item).ValidatePipeConstruction(state,
-                                                                    cCurrentModuleObject,
-                                                                    state.dataIPShortCut->cAlphaArgs(2),
-                                                                    state.dataIPShortCut->cAlphaFieldNames(2),
+                                                                    s_ipsc->cCurrentModuleObject,
+                                                                    s_ipsc->cAlphaArgs(2),
+                                                                    s_ipsc->cAlphaFieldNames(2),
                                                                     state.dataPipeHT->PipeHT(Item).ConstructionNum,
                                                                     ErrorsFound);
         }
 
     } // end of input loop
 
-    cCurrentModuleObject = "Pipe:Outdoor";
+    s_ipsc->cCurrentModuleObject = "Pipe:Outdoor";
     for (int PipeItem = 1; PipeItem <= NumOfPipeHTExt; ++PipeItem) {
         ++Item;
         // get the object name
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 cCurrentModuleObject,
+                                                                 s_ipsc->cCurrentModuleObject,
                                                                  PipeItem,
-                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 s_ipsc->cAlphaArgs,
                                                                  NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 s_ipsc->rNumericArgs,
                                                                  NumNumbers,
                                                                  IOStatus,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                 s_ipsc->lNumericFieldBlanks,
+                                                                 s_ipsc->lAlphaFieldBlanks,
+                                                                 s_ipsc->cAlphaFieldNames,
+                                                                 s_ipsc->cNumericFieldNames);
 
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPipeHT->PipeHTUniqueNames,
-                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                 cCurrentModuleObject,
-                                                 state.dataIPShortCut->cAlphaFieldNames(1),
+                                                 s_ipsc->cAlphaArgs(1),
+                                                 s_ipsc->cCurrentModuleObject,
+                                                 s_ipsc->cAlphaFieldNames(1),
                                                  ErrorsFound);
-        state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
+        state.dataPipeHT->PipeHT(Item).Name = s_ipsc->cAlphaArgs(1);
         state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeExterior;
 
         // General user input data
-        state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).Construction = s_ipsc->cAlphaArgs(2);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(s_ipsc->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
         // get inlet node data
-        state.dataPipeHT->PipeHT(Item).InletNode = state.dataIPShortCut->cAlphaArgs(3);
+        state.dataPipeHT->PipeHT(Item).InletNode = s_ipsc->cAlphaArgs(3);
         state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
-                                                                        state.dataIPShortCut->cAlphaArgs(3),
+                                                                        s_ipsc->cAlphaArgs(3),
                                                                         ErrorsFound,
                                                                         DataLoopNode::ConnectionObjectType::PipeOutdoor,
-                                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                                        s_ipsc->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
                                                                         DataLoopNode::ConnectionType::Inlet,
                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(3), s_ipsc->cAlphaArgs(3)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
         // get outlet node data
-        state.dataPipeHT->PipeHT(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(4);
+        state.dataPipeHT->PipeHT(Item).OutletNode = s_ipsc->cAlphaArgs(4);
         state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
-                                                                         state.dataIPShortCut->cAlphaArgs(4),
+                                                                         s_ipsc->cAlphaArgs(4),
                                                                          ErrorsFound,
                                                                          DataLoopNode::ConnectionObjectType::PipeOutdoor,
-                                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                                         s_ipsc->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
                                                                          DataLoopNode::ConnectionType::Outlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(4), s_ipsc->cAlphaArgs(4)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
-        TestCompSet(state,
-                    cCurrentModuleObject,
-                    state.dataIPShortCut->cAlphaArgs(1),
-                    state.dataIPShortCut->cAlphaArgs(3),
-                    state.dataIPShortCut->cAlphaArgs(4),
-                    "Pipe Nodes");
+        TestCompSet(state, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1), s_ipsc->cAlphaArgs(3), s_ipsc->cAlphaArgs(4), "Pipe Nodes");
 
         // get environmental boundary condition type
         //    PipeHT(Item)%Environment = 'OutdoorAir'
         state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::OutsideAirEnv;
 
-        state.dataPipeHT->PipeHT(Item).EnvrAirNode = state.dataIPShortCut->cAlphaArgs(5);
+        state.dataPipeHT->PipeHT(Item).EnvrAirNode = s_ipsc->cAlphaArgs(5);
         state.dataPipeHT->PipeHT(Item).EnvrAirNodeNum = GetOnlySingleNode(state,
-                                                                          state.dataIPShortCut->cAlphaArgs(5),
+                                                                          s_ipsc->cAlphaArgs(5),
                                                                           ErrorsFound,
                                                                           DataLoopNode::ConnectionObjectType::PipeOutdoor,
-                                                                          state.dataIPShortCut->cAlphaArgs(1),
+                                                                          s_ipsc->cAlphaArgs(1),
                                                                           DataLoopNode::NodeFluidType::Air,
                                                                           DataLoopNode::ConnectionType::OutsideAirReference,
                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                           ObjectIsNotParent);
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+        if (!s_ipsc->lAlphaFieldBlanks(5)) {
             if (!CheckOutAirNodeNumber(state, state.dataPipeHT->PipeHT(Item).EnvrAirNodeNum)) {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
-                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+                ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
                 ErrorsFound = true;
             }
         } else {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, format("An {} must be used ", state.dataIPShortCut->cAlphaFieldNames(5)));
+            ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(5), s_ipsc->cAlphaArgs(5)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
+            ShowContinueError(state, format("An {} must be used ", s_ipsc->cAlphaFieldNames(5)));
             ErrorsFound = true;
         }
 
         // dimensions
-        state.dataPipeHT->PipeHT(Item).PipeID = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("Invalid {} of {:.4R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-            ShowContinueError(state, format("{} must be > 0.0", state.dataIPShortCut->cNumericFieldNames(1)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+        state.dataPipeHT->PipeHT(Item).PipeID = s_ipsc->rNumericArgs(1);
+        if (s_ipsc->rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
+            ShowSevereError(state, format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
+            ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(1)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
-        state.dataPipeHT->PipeHT(Item).Length = state.dataIPShortCut->rNumericArgs(2);
-        if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("Invalid {} of {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} must be > 0.0", state.dataIPShortCut->cNumericFieldNames(2)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+        state.dataPipeHT->PipeHT(Item).Length = s_ipsc->rNumericArgs(2);
+        if (s_ipsc->rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
+            ShowSevereError(state, format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
+            ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(2)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum != 0) {
             state.dataPipeHT->PipeHT(Item).ValidatePipeConstruction(state,
-                                                                    cCurrentModuleObject,
-                                                                    state.dataIPShortCut->cAlphaArgs(2),
-                                                                    state.dataIPShortCut->cAlphaFieldNames(2),
+                                                                    s_ipsc->cCurrentModuleObject,
+                                                                    s_ipsc->cAlphaArgs(2),
+                                                                    s_ipsc->cAlphaFieldNames(2),
                                                                     state.dataPipeHT->PipeHT(Item).ConstructionNum,
                                                                     ErrorsFound);
         }
 
     } // end of input loop
 
-    cCurrentModuleObject = "Pipe:Underground";
+    s_ipsc->cCurrentModuleObject = "Pipe:Underground";
     for (int PipeItem = 1; PipeItem <= NumOfPipeHTUG; ++PipeItem) {
-
         ++Item;
         // get the object name
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 cCurrentModuleObject,
+                                                                 s_ipsc->cCurrentModuleObject,
                                                                  PipeItem,
-                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 s_ipsc->cAlphaArgs,
                                                                  NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 s_ipsc->rNumericArgs,
                                                                  NumNumbers,
                                                                  IOStatus,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                 s_ipsc->lNumericFieldBlanks,
+                                                                 s_ipsc->lAlphaFieldBlanks,
+                                                                 s_ipsc->cAlphaFieldNames,
+                                                                 s_ipsc->cNumericFieldNames);
+
+        ErrorObjectHeader eoh{routineName, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)};
 
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPipeHT->PipeHTUniqueNames,
-                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                 cCurrentModuleObject,
-                                                 state.dataIPShortCut->cAlphaFieldNames(1),
+                                                 s_ipsc->cAlphaArgs(1),
+                                                 s_ipsc->cCurrentModuleObject,
+                                                 s_ipsc->cAlphaFieldNames(1),
                                                  ErrorsFound);
-        state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
+        state.dataPipeHT->PipeHT(Item).Name = s_ipsc->cAlphaArgs(1);
         state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeUnderground;
 
         // General user input data
-        state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).Construction = s_ipsc->cAlphaArgs(2);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(s_ipsc->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(2), s_ipsc->cAlphaArgs(2)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
         // get inlet node data
-        state.dataPipeHT->PipeHT(Item).InletNode = state.dataIPShortCut->cAlphaArgs(3);
+        state.dataPipeHT->PipeHT(Item).InletNode = s_ipsc->cAlphaArgs(3);
         state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
-                                                                        state.dataIPShortCut->cAlphaArgs(3),
+                                                                        s_ipsc->cAlphaArgs(3),
                                                                         ErrorsFound,
                                                                         DataLoopNode::ConnectionObjectType::PipeUnderground,
-                                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                                        s_ipsc->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
                                                                         DataLoopNode::ConnectionType::Inlet,
                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(3), s_ipsc->cAlphaArgs(3)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
         // get outlet node data
-        state.dataPipeHT->PipeHT(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(4);
+        state.dataPipeHT->PipeHT(Item).OutletNode = s_ipsc->cAlphaArgs(4);
         state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
-                                                                         state.dataIPShortCut->cAlphaArgs(4),
+                                                                         s_ipsc->cAlphaArgs(4),
                                                                          ErrorsFound,
                                                                          DataLoopNode::ConnectionObjectType::PipeUnderground,
-                                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                                         s_ipsc->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
                                                                          DataLoopNode::ConnectionType::Outlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowSevereError(state, format("Invalid {}={}", s_ipsc->cAlphaFieldNames(4), s_ipsc->cAlphaArgs(4)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
-        TestCompSet(state,
-                    cCurrentModuleObject,
-                    state.dataIPShortCut->cAlphaArgs(1),
-                    state.dataIPShortCut->cAlphaArgs(3),
-                    state.dataIPShortCut->cAlphaArgs(4),
-                    "Pipe Nodes");
+        TestCompSet(state, s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1), s_ipsc->cAlphaArgs(3), s_ipsc->cAlphaArgs(4), "Pipe Nodes");
 
         state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::GroundEnv;
 
         // Solar inclusion flag
         // A6,  \field Sun Exposure
-        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "SUNEXPOSED")) {
+        if (Util::SameString(s_ipsc->cAlphaArgs(5), "SUNEXPOSED")) {
             state.dataPipeHT->PipeHT(Item).SolarExposed = true;
-        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "NOSUN")) {
+        } else if (Util::SameString(s_ipsc->cAlphaArgs(5), "NOSUN")) {
             state.dataPipeHT->PipeHT(Item).SolarExposed = false;
         } else {
-            ShowSevereError(state, format("GetPipesHeatTransfer: invalid key for sun exposure flag for {}", state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, format("Key should be either SunExposed or NoSun.  Entered Key: {}", state.dataIPShortCut->cAlphaArgs(5)));
+            ShowSevereError(state, format("GetPipesHeatTransfer: invalid key for sun exposure flag for {}", s_ipsc->cAlphaArgs(1)));
+            ShowContinueError(state, format("Key should be either SunExposed or NoSun.  Entered Key: {}", s_ipsc->cAlphaArgs(5)));
             ErrorsFound = true;
         }
 
         // dimensions
-        state.dataPipeHT->PipeHT(Item).PipeID = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("Invalid {} of {:.4R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-            ShowContinueError(state, format("{} must be > 0.0", state.dataIPShortCut->cNumericFieldNames(1)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+        state.dataPipeHT->PipeHT(Item).PipeID = s_ipsc->rNumericArgs(1);
+        if (s_ipsc->rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
+            ShowSevereError(state, format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(1), s_ipsc->rNumericArgs(1)));
+            ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(1)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
-        state.dataPipeHT->PipeHT(Item).Length = state.dataIPShortCut->rNumericArgs(2);
-        if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-            ShowSevereError(state,
-                            format("Invalid {} of {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} must be > 0.0", state.dataIPShortCut->cNumericFieldNames(2)));
-            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+        state.dataPipeHT->PipeHT(Item).Length = s_ipsc->rNumericArgs(2);
+        if (s_ipsc->rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
+            ShowSevereError(state, format("Invalid {} of {:.4R}", s_ipsc->cNumericFieldNames(2), s_ipsc->rNumericArgs(2)));
+            ShowContinueError(state, format("{} must be > 0.0", s_ipsc->cNumericFieldNames(2)));
+            ShowContinueError(state, format("Entered in {}={}", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
         // Also get the soil material name
         // A7,  \field Soil Material
-        state.dataPipeHT->PipeHT(Item).SoilMaterial = state.dataIPShortCut->cAlphaArgs(6);
-        state.dataPipeHT->PipeHT(Item).SoilMaterialNum = Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material);
+        state.dataPipeHT->PipeHT(Item).SoilMaterial = s_ipsc->cAlphaArgs(6);
+        state.dataPipeHT->PipeHT(Item).SoilMaterialNum = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(6));
         if (state.dataPipeHT->PipeHT(Item).SoilMaterialNum == 0) {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataPipeHT->PipeHT(Item).SoilMaterial));
-            ShowContinueError(state, format("Found in {}={}", cCurrentModuleObject, state.dataPipeHT->PipeHT(Item).Name));
+            ShowSevereItemNotFound(state, eoh, s_ipsc->cAlphaFieldNames(6), s_ipsc->cAlphaArgs(6));
             ErrorsFound = true;
         } else {
-            auto const *thisMaterialSoil =
-                dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum));
-            assert(thisMaterialSoil != nullptr);
-            state.dataPipeHT->PipeHT(Item).SoilDensity = thisMaterialSoil->Density;
-            state.dataPipeHT->PipeHT(Item).SoilDepth = thisMaterialSoil->Thickness;
-            state.dataPipeHT->PipeHT(Item).SoilCp = thisMaterialSoil->SpecHeat;
-            state.dataPipeHT->PipeHT(Item).SoilConductivity = thisMaterialSoil->Conductivity;
-            state.dataPipeHT->PipeHT(Item).SoilThermAbs = thisMaterialSoil->AbsorpThermal;
-            state.dataPipeHT->PipeHT(Item).SoilSolarAbs = thisMaterialSoil->AbsorpSolar;
-            state.dataPipeHT->PipeHT(Item).SoilRoughness = thisMaterialSoil->Roughness;
+            auto const *matSoil = s_mat->materials(state.dataPipeHT->PipeHT(Item).SoilMaterialNum);
+
+            state.dataPipeHT->PipeHT(Item).SoilDensity = matSoil->Density;
+            state.dataPipeHT->PipeHT(Item).SoilDepth = matSoil->Thickness;
+            state.dataPipeHT->PipeHT(Item).SoilCp = matSoil->SpecHeat;
+            state.dataPipeHT->PipeHT(Item).SoilConductivity = matSoil->Conductivity;
+            state.dataPipeHT->PipeHT(Item).SoilThermAbs = matSoil->AbsorpThermal;
+            state.dataPipeHT->PipeHT(Item).SoilSolarAbs = matSoil->AbsorpSolar;
+            state.dataPipeHT->PipeHT(Item).SoilRoughness = matSoil->Roughness;
             state.dataPipeHT->PipeHT(Item).PipeDepth = state.dataPipeHT->PipeHT(Item).SoilDepth + state.dataPipeHT->PipeHT(Item).PipeID / 2.0;
             state.dataPipeHT->PipeHT(Item).DomainDepth = state.dataPipeHT->PipeHT(Item).PipeDepth * 2.0;
             state.dataPipeHT->PipeHT(Item).SoilDiffusivity = state.dataPipeHT->PipeHT(Item).SoilConductivity /
@@ -678,16 +656,15 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum != 0) {
             state.dataPipeHT->PipeHT(Item).ValidatePipeConstruction(state,
-                                                                    cCurrentModuleObject,
-                                                                    state.dataIPShortCut->cAlphaArgs(2),
-                                                                    state.dataIPShortCut->cAlphaFieldNames(2),
+                                                                    s_ipsc->cCurrentModuleObject,
+                                                                    s_ipsc->cAlphaArgs(2),
+                                                                    s_ipsc->cAlphaFieldNames(2),
                                                                     state.dataPipeHT->PipeHT(Item).ConstructionNum,
                                                                     ErrorsFound);
         }
 
         // Get ground temperature model
-        state.dataPipeHT->PipeHT(Item).groundTempModel =
-            GetGroundTempModelAndInit(state, state.dataIPShortCut->cAlphaArgs(7), state.dataIPShortCut->cAlphaArgs(8));
+        state.dataPipeHT->PipeHT(Item).groundTempModel = GetGroundTempModelAndInit(state, s_ipsc->cAlphaArgs(7), s_ipsc->cAlphaArgs(8));
 
         // Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
         state.dataPipeHT->PipeHT(Item).NumSections = NumPipeSections;
@@ -858,33 +835,31 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
     Real64 Resistance = 0.0;
     Real64 TotThickness = 0.0;
 
+    auto &s_mat = state.dataMaterial;
+
     // CTF stuff
     int TotalLayers = state.dataConstruction->Construct(ConstructionNum).TotLayers;
     // get pipe properties
     if (TotalLayers == 1) { // no insulation layer
+        auto const *mat = s_mat->materials(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1));
 
-        this->PipeConductivity = state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1))->Conductivity;
-        this->PipeDensity = state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1))->Density;
-        this->PipeCp = state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1))->SpecHeat;
-        this->PipeOD = this->PipeID + 2.0 * state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1))->Thickness;
+        this->PipeConductivity = mat->Conductivity;
+        this->PipeDensity = mat->Density;
+        this->PipeCp = mat->SpecHeat;
+        this->PipeOD = this->PipeID + 2.0 * mat->Thickness;
         this->InsulationOD = this->PipeOD;
-        this->SumTK = state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1))->Thickness /
-                      state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1))->Conductivity;
+        this->SumTK = mat->Thickness / mat->Conductivity;
 
     } else if (TotalLayers >= 2) { // first layers are insulation, last layer is pipe
 
         for (int LayerNum = 1; LayerNum <= TotalLayers - 1; ++LayerNum) {
-            Resistance += state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum))->Thickness /
-                          state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum))->Conductivity;
-            Density = state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum))->Density *
-                      state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum))->Thickness;
-            TotThickness += state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum))->Thickness;
-            SpHeat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum))->SpecHeat *
-                     state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum))->Thickness;
-            this->InsulationThickness =
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum))->Thickness;
-            this->SumTK += state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum))->Thickness /
-                           state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum))->Conductivity;
+            auto const *mat = state.dataMaterial->materials(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum));
+            Resistance += mat->Thickness / mat->Conductivity;
+            Density = mat->Density * mat->Thickness;
+            TotThickness += mat->Thickness;
+            SpHeat = mat->SpecHeat * mat->Thickness;
+            this->InsulationThickness = mat->Thickness;
+            this->SumTK += mat->Thickness / mat->Conductivity;
         }
 
         this->InsulationResistance = Resistance;
@@ -893,13 +868,12 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
         this->InsulationCp = SpHeat / TotThickness;
         this->InsulationThickness = TotThickness;
 
-        this->PipeConductivity =
-            state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(TotalLayers))->Conductivity;
-        this->PipeDensity = state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(TotalLayers))->Density;
-        this->PipeCp = state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(TotalLayers))->SpecHeat;
+        auto const *mat = state.dataMaterial->materials(state.dataConstruction->Construct(ConstructionNum).LayerPoint(TotalLayers));
+        this->PipeConductivity = mat->Conductivity;
+        this->PipeDensity = mat->Density;
+        this->PipeCp = mat->SpecHeat;
 
-        this->PipeOD =
-            this->PipeID + 2.0 * state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(TotalLayers))->Thickness;
+        this->PipeOD = this->PipeID + 2.0 * mat->Thickness;
         this->InsulationOD = this->PipeOD + 2.0 * this->InsulationThickness;
 
     } else {
