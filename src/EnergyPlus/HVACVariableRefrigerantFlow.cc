@@ -7931,7 +7931,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                           state.dataSize->DataScalableCapSizingON,
                           state.dataSize->DataFracOfAutosizedCoolingCapacity);
 
-      // initialize capacity sizing variables: heating
+        // initialize capacity sizing variables: heating
         initCapSizingVars(state,
                           HeatingCapacitySizing,
                           state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod,
