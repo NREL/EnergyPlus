@@ -470,12 +470,8 @@ namespace AirflowNetwork {
 
                 Real64 flowRate = fan->maxAirFlowRate;
                 flowRate *= m_state.dataEnvrn->StdRhoAir;
-                bool nodeErrorsFound{false};
                 int inletNode = fan->inletNodeNum;
                 int outletNode = fan->outletNodeNum;
-                if (nodeErrorsFound) {
-                    success = false;
-                }
                 HVAC::FanType fanType = fan->type;
                 if (fanType != HVAC::FanType::Exhaust) {
                     ShowSevereError(m_state,
@@ -4607,7 +4603,7 @@ namespace AirflowNetwork {
                 int compnum = compnum_iter->second;
                 AirflowNetworkLinkageData(count).CompNum = compnum;
 
-                auto &surf = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum);
+                auto const &surf = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum);
 
                 switch (AirflowNetworkLinkageData(count).element->type()) {
                 case ComponentType::DOP: {
@@ -13402,8 +13398,8 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        auto &NetworkNumOfLinks = ActualNumOfLinks;
         auto &NetworkNumOfNodes = ActualNumOfNodes;
+        auto &NetworkNumOfLinks = ActualNumOfLinks;
 
         // Argument array dimensioning (these used to be arguments, need to also test newAU and newIK)
         EP_SIZE_CHECK(IK, NetworkNumOfNodes + 1);

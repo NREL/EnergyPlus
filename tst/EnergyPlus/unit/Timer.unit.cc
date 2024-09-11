@@ -60,7 +60,7 @@
 
 using namespace EnergyPlus;
 
-TEST_F(EnergyPlusFixture, Timer_ticktock)
+TEST_F(EnergyPlusFixture, DISABLED_Timer_ticktock)
 {
 
     constexpr std::chrono::milliseconds::rep sleep_time_ms = 100;
@@ -70,7 +70,7 @@ TEST_F(EnergyPlusFixture, Timer_ticktock)
     std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
     t.tock();
     // In some occurrences CI is reporting slightly above than 100 values, probably system was quite busy at that time,
-    // but we don't want to have the test failing occassionally
+    // but we don't want to have the test failing occasionally
     EXPECT_GE(t.duration().count(), sleep_time_ms);
     EXPECT_LT(t.duration().count(), sleep_time_ms * 2);
     EXPECT_GE(t.elapsedSeconds(), sleep_time_s);

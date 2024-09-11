@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
 
@@ -64,6 +65,38 @@ namespace HeatBalanceHAMTManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
+    struct MaterialHAMT : public Material::MaterialBase
+    {
+        // HAMT
+        int niso = -1;                                       // Number of data points
+        Array1D<Real64> isodata = Array1D<Real64>(27, 0.0);  // isotherm values
+        Array1D<Real64> isorh = Array1D<Real64>(27, 0.0);    // isotherm RH values
+        int nsuc = -1;                                       // Number of data points
+        Array1D<Real64> sucdata = Array1D<Real64>(27, 0.0);  // suction values
+        Array1D<Real64> sucwater = Array1D<Real64>(27, 0.0); // suction water values
+        int nred = -1;                                       // Number of data points
+        Array1D<Real64> reddata = Array1D<Real64>(27, 0.0);  // redistribution values
+        Array1D<Real64> redwater = Array1D<Real64>(27, 0.0); // redistribution water values
+        int nmu = -1;                                        // Number of data points
+        Array1D<Real64> mudata = Array1D<Real64>(27, 0.0);   // mu values
+        Array1D<Real64> murh = Array1D<Real64>(27, 0.0);     // mu rh values
+        int ntc = -1;                                        // Number of data points
+        Array1D<Real64> tcdata = Array1D<Real64>(27, 0.0);   // thermal conductivity values
+        Array1D<Real64> tcwater = Array1D<Real64>(27, 0.0);  // thermal conductivity water values
+        Real64 itemp = 10.0;                                 // initial Temperature
+        Real64 irh = 0.5;                                    // Initial RH
+        Real64 iwater = 0.2;                                 // Initial water content kg/kg
+        int divs = 3;                                        // Number of divisions
+        Real64 divsize = 0.005;                              // Average Cell Size
+        int divmin = 3;                                      // Minimum number of cells
+        int divmax = 10;                                     // Maximum number of cells
+
+        MaterialHAMT() : Material::MaterialBase()
+        {
+            group = Material::Group::Regular;
+        }
+        ~MaterialHAMT() = default;
+    };
 
     constexpr int ittermax(150); // Maximum Number of itterations
     constexpr int adjmax(6);     // Maximum Number of Adjacent Cells

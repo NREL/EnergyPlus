@@ -109,7 +109,6 @@ namespace NonZoneEquipmentManager {
         using WaterUse::SimulateWaterUse;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int WaterHeaterNum; // Water heater object number
         auto &CountNonZoneEquip = state.dataGlobal->CountNonZoneEquip;
 
         if (CountNonZoneEquip) {
@@ -121,7 +120,7 @@ namespace NonZoneEquipmentManager {
         SimulateWaterUse(state, FirstHVACIteration); // simulate non-plant loop water use.
 
         if (!state.dataGlobal->ZoneSizingCalc) {
-            for (WaterHeaterNum = 1; WaterHeaterNum <= state.dataGlobal->NumOfWaterHeater; ++WaterHeaterNum) {
+            for (int WaterHeaterNum = 1; WaterHeaterNum <= state.dataGlobal->NumOfWaterHeater; ++WaterHeaterNum) {
                 SimulateWaterHeaterStandAlone(state, WaterHeaterNum, FirstHVACIteration);
             }
         }

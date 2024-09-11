@@ -1078,6 +1078,7 @@ namespace TranspiredCollector {
         Real64 SensHeatingRate;               // Rate at which the system is heating outdoor air
         Real64 AlessHoles;                    // Area for Kutscher's relation
 
+        auto &s_mat = state.dataMaterial;
         // Active UTSC calculation
         // first do common things for both correlations
         Real64 sum_area = 0.0;
@@ -1187,9 +1188,7 @@ namespace TranspiredCollector {
                                       HAirARR(ThisSurf),
                                       HSrdSurfARR(ThisSurf));
             ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
-            AbsThermSurf =
-                dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
-                    ->AbsorpThermal;
+            AbsThermSurf = s_mat->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->AbsorpThermal;
             TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::Kelvin;
             TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + Constant::Kelvin;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
@@ -1752,6 +1751,9 @@ namespace TranspiredCollector {
         Real64 sum_area = 0.0;
         Real64 sum_produc_area_drybulb = 0.0;
         Real64 sum_produc_area_wetbulb = 0.0;
+
+        auto &s_mat = state.dataMaterial;
+
         for (int SurfNum : SurfPtrARR) {
             sum_area += state.dataSurface->Surface(SurfNum).Area;
             sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
@@ -1801,9 +1803,7 @@ namespace TranspiredCollector {
                                       HAirARR(ThisSurf),
                                       HSrdSurfARR(ThisSurf));
             int ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
-            Real64 AbsThermSurf =
-                dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
-                    ->AbsorpThermal;
+            Real64 AbsThermSurf = s_mat->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->AbsorpThermal;
             Real64 TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::Kelvin;
             Real64 TsBaffK = TmpTsBaf + Constant::Kelvin;
             if (TsBaffK == TsoK) {        // avoid divide by zero

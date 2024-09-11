@@ -192,8 +192,7 @@ namespace EcoRoofManager {
         }
 
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(1)));
-        assert(thisMaterial != nullptr);
+        auto const *thisMaterial = state.dataMaterial->materials(thisConstruct.LayerPoint(1));
         RoughSurf = thisMaterial->Roughness;
         Real64 AbsThermSurf = thisMaterial->AbsorpThermal; // Thermal absoptance of the exterior surface
         Real64 HMovInsul = 0.0;                            // "Convection" coefficient of movable insulation
@@ -507,9 +506,11 @@ namespace EcoRoofManager {
 
     void initEcoRoofFirstTime(EnergyPlusData &state, int const SurfNum, int const ConstrNum)
     {
-        auto const *thisMat =
-            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
-        assert(thisMat != nullptr);
+        auto const *mat = state.dataMaterial->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
+        assert(mat->group == Material::Group::EcoRoof);
+
+        auto const *matER = dynamic_cast<Material::MaterialEcoRoof const *>(mat);
+        assert(matER != nullptr);
         auto &thisEcoRoof = state.dataEcoRoofMgr;
 
         thisEcoRoof->EcoRoofbeginFlag = false;
@@ -520,19 +521,19 @@ namespace EcoRoofManager {
                             "currently works only with CTF heat balance solution algorithm.");
 
         // ONLY READ ECOROOF PROPERTIES IN THE FIRST TIME
-        thisEcoRoof->Zf = thisMat->HeightOfPlants;              // Plant height (m)
-        thisEcoRoof->LAI = thisMat->LAI;                        // Leaf Area Index
-        thisEcoRoof->Alphag = 1.0 - thisMat->AbsorpSolar;       // albedo rather than absorptivity
-        thisEcoRoof->Alphaf = thisMat->Lreflectivity;           // Leaf Reflectivity
-        thisEcoRoof->epsilonf = thisMat->LEmissitivity;         // Leaf Emisivity
-        thisEcoRoof->StomatalResistanceMin = thisMat->RStomata; // Leaf min stomatal resistance
-        thisEcoRoof->epsilong = thisMat->AbsorpThermal;         // Soil Emisivity
-        thisEcoRoof->MoistureMax = thisMat->Porosity;           // Max moisture content in soil
-        thisEcoRoof->MoistureResidual = thisMat->MinMoisture;   // Min moisture content in soil
-        thisEcoRoof->Moisture = thisMat->InitMoisture;          // Initial moisture content in soil
-        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture;  // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
+        thisEcoRoof->Zf = matER->HeightOfPlants;               // Plant height (m)
+        thisEcoRoof->LAI = matER->LAI;                         // Leaf Area Index
+        thisEcoRoof->Alphag = 1.0 - matER->AbsorpSolar;        // albedo rather than absorptivity
+        thisEcoRoof->Alphaf = matER->Lreflectivity;            // Leaf Reflectivity
+        thisEcoRoof->epsilonf = matER->LEmissitivity;          // Leaf Emisivity
+        thisEcoRoof->StomatalResistanceMin = matER->RStomata;  // Leaf min stomatal resistance
+        thisEcoRoof->epsilong = matER->AbsorpThermal;          // Soil Emisivity
+        thisEcoRoof->MoistureMax = matER->Porosity;            // Max moisture content in soil
+        thisEcoRoof->MoistureResidual = matER->MinMoisture;    // Min moisture content in soil
+        thisEcoRoof->Moisture = matER->InitMoisture;           // Initial moisture content in soil
+        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture; // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
 
-        thisEcoRoof->SoilThickness = thisMat->Thickness; // Total thickness of soil layer (m)
+        thisEcoRoof->SoilThickness = matER->Thickness; // Total thickness of soil layer (m)
 
         thisEcoRoof->FirstEcoSurf = SurfNum; // this determines WHEN to updatesoilProps
 
@@ -668,18 +669,19 @@ namespace EcoRoofManager {
 
     void initEcoRoof(EnergyPlusData &state, int const SurfNum, int const ConstrNum)
     {
-        auto const *thisMat =
-            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
-        assert(thisMat != nullptr);
+        auto const *mat = state.dataMaterial->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
+        assert(mat->group == Material::Group::EcoRoof);
+        auto const *matER = dynamic_cast<Material::MaterialEcoRoof const *>(mat);
+        assert(matER != nullptr);
         auto &thisSurf = state.dataSurface->Surface(SurfNum);
 
         // DJS July 2007
         // Make sure the ecoroof module resets its conditions at start of EVERY warmup day and every new design day
         // for Reverse DD testing
         if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
-            state.dataEcoRoofMgr->Moisture = thisMat->InitMoisture;                  // Initial moisture content in soil
+            state.dataEcoRoofMgr->Moisture = matER->InitMoisture;                    // Initial moisture content in soil
             state.dataEcoRoofMgr->MeanRootMoisture = state.dataEcoRoofMgr->Moisture; // Start the root zone moisture at the same value as the surface.
-            state.dataEcoRoofMgr->Alphag = 1.0 - thisMat->AbsorpSolar;               // albedo rather than absorptivity
+            state.dataEcoRoofMgr->Alphag = 1.0 - matER->AbsorpSolar;                 // albedo rather than absorptivity
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataEcoRoofMgr->CalcEcoRoofMyEnvrnFlag) {
@@ -775,16 +777,16 @@ namespace EcoRoofManager {
         RatioMax = 1.0 + 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
         RatioMin = 1.0 - 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
 
-        auto *thisMaterial =
-            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
-        assert(thisMaterial != nullptr);
+        auto *mat = state.dataMaterial->materials(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
+        assert(mat->group == Material::Group::EcoRoof);
+        auto *matER = dynamic_cast<Material::MaterialEcoRoof *>(mat);
         if (state.dataEcoRoofMgr->UpdatebeginFlag) {
 
             // SET dry values that NEVER CHANGE
-            state.dataEcoRoofMgr->DryCond = thisMaterial->Conductivity;
-            state.dataEcoRoofMgr->DryDens = thisMaterial->Density;
-            state.dataEcoRoofMgr->DryAbsorp = thisMaterial->AbsorpSolar;
-            state.dataEcoRoofMgr->DrySpecHeat = thisMaterial->SpecHeat;
+            state.dataEcoRoofMgr->DryCond = matER->Conductivity;
+            state.dataEcoRoofMgr->DryDens = matER->Density;
+            state.dataEcoRoofMgr->DryAbsorp = matER->AbsorpSolar;
+            state.dataEcoRoofMgr->DrySpecHeat = matER->SpecHeat;
 
             // DETERMINE RELATIVE THICKNESS OF TWO LAYERS OF SOIL (also unchanging)
             if (SoilThickness > 0.12) {
@@ -794,7 +796,7 @@ namespace EcoRoofManager {
             }
             // This loop outputs the minimum number of time steps needed to keep the solution stable
             // The equation is minimum timestep in seconds=161240*((number of layers)**(-2.3))*(Total thickness of the soil)**2.07
-            if (thisMaterial->EcoRoofCalculationMethod == 2) {
+            if (matER->calcMethod == Material::EcoRoofCalcMethod::SchaapGenuchten) {
                 int index1;
                 Real64 const depth_limit(depth_fac * std::pow(state.dataEcoRoofMgr->TopDepth + state.dataEcoRoofMgr->RootDepth, 2.07));
                 for (index1 = 1; index1 <= 20; ++index1) {
@@ -908,7 +910,7 @@ namespace EcoRoofManager {
             Moisture = MoistureMax;
         }
 
-        if (thisMaterial->EcoRoofCalculationMethod == 1) {
+        if (matER->calcMethod == Material::EcoRoofCalcMethod::Simple) {
 
             // THE SECTION BELOW WAS THE INITIAL MOISTURE DISTRIBUTION MODEL.
             // Any line with "!-" was code.  A line with "!" was just a comment.  This is done in case this code needs to be resurected in the future.
@@ -1110,23 +1112,23 @@ namespace EcoRoofManager {
         // TestRatio variable is available just in case there are stability issues. If so, we can limit the amount
         // by which soil properties are allowed to vary in one time step (10% in example below).
 
-        TestRatio = SoilConductivity / thisMaterial->Conductivity;
+        TestRatio = SoilConductivity / matER->Conductivity;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        thisMaterial->Conductivity *= TestRatio;
-        SoilConductivity = thisMaterial->Conductivity;
+        matER->Conductivity *= TestRatio;
+        SoilConductivity = matER->Conductivity;
 
-        TestRatio = SoilDensity / thisMaterial->Density;
+        TestRatio = SoilDensity / matER->Density;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        thisMaterial->Density *= TestRatio;
-        SoilDensity = thisMaterial->Density;
+        matER->Density *= TestRatio;
+        SoilDensity = matER->Density;
 
-        TestRatio = SoilSpecHeat / thisMaterial->SpecHeat;
+        TestRatio = SoilSpecHeat / matER->SpecHeat;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        thisMaterial->SpecHeat *= TestRatio;
-        SoilSpecHeat = thisMaterial->SpecHeat;
+        matER->SpecHeat *= TestRatio;
+        SoilSpecHeat = matER->SpecHeat;
 
         // Now call InitConductionTransferFunction with the ConstrNum as the argument. As long as the argument is
         // non-zero InitConductionTransferFunction will ONLY update this construction. If the argument is 0 it will

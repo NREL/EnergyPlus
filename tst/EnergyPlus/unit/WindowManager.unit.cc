@@ -2502,7 +2502,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
 
-    HeatBalanceManager::GetWindowGlassSpectralData(*state, FoundError);
+    Material::GetWindowGlassSpectralData(*state, FoundError);
     EXPECT_FALSE(FoundError);
     Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
@@ -3020,7 +3020,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     Real64 NominalConductanceSummer;
 
     MaterNum = state->dataConstruction->Construct(ConstrNum).LayerPoint(1);
-    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(MaterNum));
+    auto *thisMaterial = dynamic_cast<Material::MaterialGlass *>(state->dataMaterial->materials(MaterNum));
     // summer, adj ratio should stay the same, only change for winter
     state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.5;
     CalcNominalWindowCond(*state, ConstrNum, 2, NominalConductanceSummer, SHGC, TransSolNorm, TransVisNorm, errFlag);
@@ -3031,7 +3031,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     std::array<Real64, 3> legalInputUs = {3.0, 5.0, 7.0};
     for (auto varyInputU : legalInputUs) {
         thisMaterial->SimpleWindowUfactor = varyInputU;
-        HeatBalanceManager::SetupSimpleWindowGlazingSystem(*state, MaterNum);
+        thisMaterial->SetupSimpleWindowGlazingSystem(*state);
         state->dataWindowManager->scon[0] = thisMaterial->Conductivity / thisMaterial->Thickness;
         CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
         EXPECT_NEAR(NominalConductanceWinter, varyInputU, 0.01);
@@ -3076,24 +3076,29 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     bool errors_found = false;
     Material::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);
-    EXPECT_EQ(state->dataMaterial->ComplexShade(1).Name, "SHADE_14_LAYER");
-    EXPECT_ENUM_EQ(state->dataMaterial->ComplexShade(1).LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).Thickness, 1.016000e-003, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).Conductivity, 1.592276e+002, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).IRTransmittance, 0, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).FrontEmissivity, 0.9, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).BackEmissivity, 0.9, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).TopOpeningMultiplier, 0, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).BottomOpeningMultiplier, 0, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).LeftOpeningMultiplier, 0, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).RightOpeningMultiplier, 0, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).FrontOpeningMultiplier, 5.000000e-002, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatWidth, 0.0254, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatSpacing, 0.0201, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatThickness, 0.0010, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatAngle, 45.0, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatConductivity, 159.2276, 1e-5);
-    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatCurve, 0, 1e-5);
+
+    auto &s_mat = state->dataMaterial;
+    auto const *matComplexShade = dynamic_cast<Material::MaterialComplexShade const *>(s_mat->materials(1));
+    assert(matComplexShade != nullptr);
+
+    EXPECT_EQ(matComplexShade->Name, "SHADE_14_LAYER");
+    EXPECT_ENUM_EQ(matComplexShade->LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ);
+    EXPECT_NEAR(matComplexShade->Thickness, 1.016000e-003, 1e-5);
+    EXPECT_NEAR(matComplexShade->Conductivity, 1.592276e+002, 1e-5);
+    EXPECT_NEAR(matComplexShade->TransThermal, 0, 1e-5);
+    EXPECT_NEAR(matComplexShade->FrontEmissivity, 0.9, 1e-5);
+    EXPECT_NEAR(matComplexShade->BackEmissivity, 0.9, 1e-5);
+    EXPECT_NEAR(matComplexShade->topOpeningMult, 0, 1e-5);
+    EXPECT_NEAR(matComplexShade->bottomOpeningMult, 0, 1e-5);
+    EXPECT_NEAR(matComplexShade->leftOpeningMult, 0, 1e-5);
+    EXPECT_NEAR(matComplexShade->rightOpeningMult, 0, 1e-5);
+    EXPECT_NEAR(matComplexShade->frontOpeningMult, 5.000000e-002, 1e-5);
+    EXPECT_NEAR(matComplexShade->SlatWidth, 0.0254, 1e-5);
+    EXPECT_NEAR(matComplexShade->SlatSpacing, 0.0201, 1e-5);
+    EXPECT_NEAR(matComplexShade->SlatThickness, 0.0010, 1e-5);
+    EXPECT_NEAR(matComplexShade->SlatAngle, 45.0, 1e-5);
+    EXPECT_NEAR(matComplexShade->SlatConductivity, 159.2276, 1e-5);
+    EXPECT_NEAR(matComplexShade->SlatCurve, 0, 1e-5);
 }
 
 TEST_F(EnergyPlusFixture, SetupComplexWindowStateGeometry_Test)

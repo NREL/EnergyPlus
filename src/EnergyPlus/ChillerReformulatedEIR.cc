@@ -2545,16 +2545,16 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
             }
         } break;
         case DataPlant::CondenserFlowControl::ModulatedDeltaTemperature: {
-            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               this->CondInletTemp,
-                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
-                                                               RoutineName);
+            Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
+                                                                   this->CondInletTemp,
+                                                                   state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
+                                                                   RoutineName);
             Real64 condDT = 0.0;
             if (this->CondDTScheduleNum > 0) {
                 condDT = ScheduleManager::GetCurrentScheduleValue(state, this->CondDTScheduleNum);
             }
-            this->CondMassFlowRate = this->QCondenser / (Cp * condDT);
+            this->CondMassFlowRate = this->QCondenser / (CpCond * condDT);
         } break;
         default: {
             this->CondMassFlowRate = this->CondMassFlowRateMax;
@@ -2573,12 +2573,12 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
         // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
         if (this->HeatRecActive) this->calcHeatRecovery(state, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovery);
-        Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                    state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                    condInletTemp,
-                                                    state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
-                                                    RoutineName);
-        this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / Cp + condInletTemp;
+        Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(state,
+                                                               state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
+                                                               condInletTemp,
+                                                               state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
+                                                               RoutineName);
+        this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + condInletTemp;
     } else {
         ShowSevereError(state, format("ControlReformEIRChillerModel: Condenser flow = 0, for ElecReformEIRChiller={}", this->Name));
         ShowContinueErrorTimeStamp(state, "");
