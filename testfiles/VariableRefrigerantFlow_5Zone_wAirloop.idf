@@ -1,7 +1,7 @@
 ! VariableRefrigerantFlow_5Zone.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              Varible Refrigerant Flow AC system
+! Highlights:              Variable Refrigerant Flow AC system
 !
 ! Simulation Location/Run: Miami Intl Ap FL USA TMY3 722020, 2 design days, 2 run periods,
 !
