@@ -213,15 +213,8 @@ void GetPurchasedAir(EnergyPlusData &state)
     using ZonePlenum::GetReturnPlenumIndex;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int PurchAirNum;
-    int NumAlphas;
-    int NumNums;
-    int IOStat;
-    int CtrlZone;                                                       // zone index
-    int NodeNum;                                                        // node index
     static constexpr std::string_view RoutineName("GetPurchasedAir: "); // include trailing blank space
     bool ErrorsFound(false);                                            // If errors detected in input
-    bool IsOANodeListed;                                                // Flag for OA node name listed in OutdoorAir:Node or Nodelist
     bool UniqueNodeError;                                               // Flag for non-unique node error(s)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "ZoneHVAC:IdealLoadsAirSystem";
@@ -236,8 +229,11 @@ void GetPurchasedAir(EnergyPlusData &state)
     state.dataPurchasedAirMgr->CheckEquipName = true;
 
     if (state.dataPurchasedAirMgr->NumPurchAir > 0) {
+        int NumAlphas;
+        int NumNums;
+        int IOStat;
         InitUniqueNodeCheck(state, cCurrentModuleObject);
-        for (PurchAirNum = 1; PurchAirNum <= state.dataPurchasedAirMgr->NumPurchAir; ++PurchAirNum) {
+        for (int PurchAirNum = 1; PurchAirNum <= state.dataPurchasedAirMgr->NumPurchAir; ++PurchAirNum) {
             PurchAir(PurchAirNum).cObjectName = cCurrentModuleObject;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -509,6 +505,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             ObjectIsNotParent);
                 // Check if OA node is initialized in OutdoorAir:Node or OutdoorAir:Nodelist
+                bool IsOANodeListed; // Flag for OA node name listed in OutdoorAir:Node or Nodelist
                 CheckAndAddAirNodeNumber(state, PurchAir(PurchAirNum).OutdoorAirNodeNum, IsOANodeListed);
                 if ((!IsOANodeListed) && state.dataGlobal->DisplayExtraWarnings) {
                     ShowWarningError(state, format("{}{}=\"{} missing data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -590,9 +587,9 @@ void GetPurchasedAir(EnergyPlusData &state)
             PurchAir(PurchAirNum).HtRecSenEff = state.dataIPShortCut->rNumericArgs(10);
             PurchAir(PurchAirNum).HtRecLatEff = state.dataIPShortCut->rNumericArgs(11);
 
-            for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+            for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                     if (PurchAir(PurchAirNum).ZoneSupplyAirNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                         PurchAir(PurchAirNum).ZonePtr = CtrlZone;
                     }
@@ -670,7 +667,7 @@ void GetPurchasedAir(EnergyPlusData &state)
         EndUniqueNodeCheck(state, cCurrentModuleObject);
     }
 
-    for (PurchAirNum = 1; PurchAirNum <= state.dataPurchasedAirMgr->NumPurchAir; ++PurchAirNum) {
+    for (int PurchAirNum = 1; PurchAirNum <= state.dataPurchasedAirMgr->NumPurchAir; ++PurchAirNum) {
 
         // Setup Output variables
         //    energy variables
