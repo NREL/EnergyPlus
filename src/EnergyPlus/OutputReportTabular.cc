@@ -14446,6 +14446,12 @@ void AddTOCLoadComponentTableSummaries(EnergyPlusData &state)
 
     if (state.dataGlobal->CompLoadReportIsReq) {
         if (ort->displayZoneComponentLoadSummary) {
+            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                for (int iSpace = 1; iSpace <= state.dataGlobal->NumOfZones; ++iSpace) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->space(iSpace).zoneNum).IsControlled) continue;
+                    AddTOCEntry(state, "Space Component Load Summary", state.dataHeatBal->space(iSpace).Name);
+                }
+            }
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                 AddTOCEntry(state, "Zone Component Load Summary", state.dataHeatBal->Zone(iZone).Name);
@@ -15028,8 +15034,6 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                     e.cellUsed = false;
                 }
             }
-        }
-        if (ort->displayZoneComponentLoadSummary) {
             ZoneHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : ZoneHeatCompLoadTables) {
                 e.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
@@ -15117,6 +15121,28 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
 
         // ZoneComponentLoadSummary
         if (ort->displayZoneComponentLoadSummary) {
+            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                for (int iSpace = 1; iSpace <= state.dataGlobal->NumOfZones; ++iSpace) {
+                    // Yes, check if the zone is controlled, not the space for this
+                    if (!state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->space(iSpace).zoneNum).IsControlled) continue;
+                    if (allocated(state.dataSize->CalcFinalSpaceSizing)) {
+                        computeSpaceZoneCompLoads(state,
+                                                  state.dataSize->CalcFinalSpaceSizing(iSpace),
+                                                  SpaceCoolCompLoadTables(iSpace),
+                                                  SpaceHeatCompLoadTables(iSpace),
+                                                  peopleDelaySeqCool,
+                                                  equipDelaySeqCool,
+                                                  hvacLossDelaySeqCool,
+                                                  powerGenDelaySeqCool,
+                                                  lightDelaySeqCool,
+                                                  feneSolarDelaySeqCool,
+                                                  ort->feneCondInstantSeq,
+                                                  surfDelaySeqCool,
+                                                  spaceComponentAreas(iSpace),
+                                                  iSpace);
+                    }
+                }
+            }
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                 if (allocated(state.dataSize->CalcFinalZoneSizing)) {
@@ -15134,13 +15160,12 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                               surfDelaySeqCool,
                                               ZoneComponentAreas(iZone),
                                               iZone);
-
-                    // We delay the potential application of SI to IP conversion and actual output until after both the
-                    // AirLoopComponentLoadSummary and FacilityComponentLoadSummary have been processed because below we try
-                    // to retrieve the info directly when the timestamp would match (cf #7356), and if we converted right
-                    // now, we would apply the conversion twice
                 }
             }
+            // We delay the potential application of SI to IP conversion and actual output until after both the
+            // AirLoopComponentLoadSummary and FacilityComponentLoadSummary have been processed because below we try
+            // to retrieve the info directly when the timestamp would match (cf #7356), and if we converted right
+            // now, we would apply the conversion twice
         }
 
         // AirLoopComponentLoadSummary
@@ -15492,7 +15517,8 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
         // SpaceComponentLoadSummary: Now we convert and Display
         if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
             if (ort->displayZoneComponentLoadSummary) {
-                for (int iSpace = 1; iSpace <= state.dataGlobal->NumOfZones; ++iSpace) {
+                for (int iSpace = 1; iSpace <= state.dataGlobal->numSpaces; ++iSpace) {
+                    // Test if *zone* is controlled, not space, for sizing
                     if (!state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->space(iSpace).zoneNum).IsControlled) continue;
                     if (allocated(state.dataSize->CalcFinalSpaceSizing)) {
                         LoadSummaryUnitConversion(state, SpaceCoolCompLoadTables(iSpace), unitsStyle_cur);
