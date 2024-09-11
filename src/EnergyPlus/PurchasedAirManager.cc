@@ -3063,25 +3063,25 @@ void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const
     FirstCall = true;            // just used to avoid redundant calulations
     SupPathInletChanged = false; // don't care if something changes
 
-    auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
+    auto &PurchAir = state.dataPurchasedAirMgr->PurchAir(PurchAirNum);
 
-    if (PurchAir(PurchAirNum).ReturnPlenumIndex > 0) {
+    if (PurchAir.ReturnPlenumIndex > 0) {
 
         // if connected to a return plenum, set the flag that this ideal loads air system was simulated
-        state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex)
-            .IsSimulated(PurchAir(PurchAirNum).PurchAirArrayIndex) = true;
+        state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir.ReturnPlenumIndex)
+            .IsSimulated(PurchAir.PurchAirArrayIndex) = true;
 
         // if all ideal loads air systems connected to the same plenum have been simulated, simulate the zone air plenum
-        if (all(state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated)) {
+        if (all(state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir.ReturnPlenumIndex).IsSimulated)) {
             SimAirZonePlenum(state,
-                             PurchAir(PurchAirNum).ReturnPlenumName,
+                             PurchAir.ReturnPlenumName,
                              DataZoneEquipment::AirLoopHVACZone::ReturnPlenum,
-                             PurchAir(PurchAirNum).ReturnPlenumIndex,
+                             PurchAir.ReturnPlenumIndex,
                              FirstHVACIteration,
                              FirstCall,
                              SupPathInletChanged);
             // reset this plenums flags for next iteration
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated = false;
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir.ReturnPlenumIndex).IsSimulated = false;
         }
     }
 }
