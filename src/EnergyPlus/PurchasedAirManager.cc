@@ -1158,8 +1158,6 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool UnitOn; // simple checks for error
 
-    auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
-
     // Do the Begin Simulation initializations
     if (state.dataPurchasedAirMgr->InitPurchasedAirMyOneTimeFlag) {
         state.dataPurchasedAirMgr->InitPurchasedAirMyEnvrnFlag.allocate(state.dataPurchasedAirMgr->NumPurchAir);
@@ -1175,42 +1173,44 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
     if (!state.dataPurchasedAirMgr->InitPurchasedAirZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataPurchasedAirMgr->InitPurchasedAirZoneEquipmentListChecked = true;
         for (int Loop = 1; Loop <= state.dataPurchasedAirMgr->NumPurchAir; ++Loop) {
+            auto &PurchAirLoop = state.dataPurchasedAirMgr->PurchAir(Loop);
 
             // link with return plenum if used (i.e., PlenumExhaustAirNodeNum will be non-zero)
-            if (PurchAir(Loop).PlenumExhaustAirNodeNum > 0) {
-                PurchAir(Loop).ReturnPlenumIndex = GetReturnPlenumIndex(state, PurchAir(Loop).PlenumExhaustAirNodeNum);
-                if (PurchAir(Loop).ReturnPlenumIndex > 0) {
-                    GetReturnPlenumName(state, PurchAir(Loop).ReturnPlenumIndex, PurchAir(Loop).ReturnPlenumName);
+            if (PurchAirLoop.PlenumExhaustAirNodeNum > 0) {
+                PurchAirLoop.ReturnPlenumIndex = GetReturnPlenumIndex(state, PurchAirLoop.PlenumExhaustAirNodeNum);
+                if (PurchAirLoop.ReturnPlenumIndex > 0) {
+                    GetReturnPlenumName(state, PurchAirLoop.ReturnPlenumIndex, PurchAirLoop.ReturnPlenumName);
                     InitializePlenumArrays(state, Loop);
                 } else {
                     ShowSevereError(state,
                                     format("InitPurchasedAir: {} = {} cannot find ZoneHVAC:ReturnPlenum.  It will not be simulated.",
-                                           PurchAir(Loop).cObjectName,
-                                           PurchAir(Loop).Name));
+                                           PurchAirLoop.cObjectName,
+                                           PurchAirLoop.Name));
                 }
             }
 
-            if (CheckZoneEquipmentList(state, PurchAir(Loop).cObjectName, PurchAir(Loop).Name)) continue;
+            if (CheckZoneEquipmentList(state, PurchAirLoop.cObjectName, PurchAirLoop.Name)) continue;
             ShowSevereError(state,
                             format("InitPurchasedAir: {} = {} is not on any ZoneHVAC:EquipmentList.  It will not be simulated.",
-                                   PurchAir(Loop).cObjectName,
-                                   PurchAir(Loop).Name));
+                                   PurchAirLoop.cObjectName,
+                                   PurchAirLoop.Name));
         }
     }
 
+    auto &PurchAir = state.dataPurchasedAirMgr->PurchAir(PurchAirNum);
     // one time inits for each unit - links PurchAirNum with static input data from ControlledZoneNum and ActualZoneNum
     if (!state.dataPurchasedAirMgr->InitPurchasedAirOneTimeUnitInitsDone(PurchAirNum)) {
         state.dataPurchasedAirMgr->InitPurchasedAirOneTimeUnitInitsDone(PurchAirNum) = true;
 
         // Is the supply node really a zone inlet node?
         // this check has to be done here because of SimPurchasedAir passing in ControlledZoneNum
-        int SupplyNodeNum = PurchAir(PurchAirNum).ZoneSupplyAirNodeNum;
+        int SupplyNodeNum = PurchAir.ZoneSupplyAirNodeNum;
         if (SupplyNodeNum > 0) {
             int NodeIndex = FindNumberInList(SupplyNodeNum,
                                              state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode,
                                              state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes);
             if (NodeIndex == 0) {
-                ShowSevereError(state, format("InitPurchasedAir: In {} = {}", PurchAir(PurchAirNum).cObjectName, PurchAir(PurchAirNum).Name));
+                ShowSevereError(state, format("InitPurchasedAir: In {} = {}", PurchAir.cObjectName, PurchAir.Name));
                 ShowContinueError(state,
                                   format("Zone Supply Air Node Name={} is not a zone inlet node.", state.dataLoopNodes->NodeID(SupplyNodeNum)));
                 ShowContinueError(
@@ -1224,13 +1224,13 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
         // If exhaust node is specified, then recirculation is exhaust node, otherwise use zone return node
         // this check has to be done here because of SimPurchasedAir passing in ControlledZoneNum
         bool UseReturnNode = false;
-        if (PurchAir(PurchAirNum).ZoneExhaustAirNodeNum > 0) {
-            int ExhaustNodeNum = PurchAir(PurchAirNum).ZoneExhaustAirNodeNum;
+        if (PurchAir.ZoneExhaustAirNodeNum > 0) {
+            int ExhaustNodeNum = PurchAir.ZoneExhaustAirNodeNum;
             int NodeIndex = FindNumberInList(ExhaustNodeNum,
                                              state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode,
                                              state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes);
             if (NodeIndex == 0) {
-                ShowSevereError(state, format("InitPurchasedAir: In {} = {}", PurchAir(PurchAirNum).cObjectName, PurchAir(PurchAirNum).Name));
+                ShowSevereError(state, format("InitPurchasedAir: In {} = {}", PurchAir.cObjectName, PurchAir.Name));
                 ShowContinueError(state,
                                   format("Zone Exhaust Air Node Name={} is not a zone exhaust node.", state.dataLoopNodes->NodeID(ExhaustNodeNum)));
                 ShowContinueError(
@@ -1239,23 +1239,23 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
                 ShowContinueError(state, "Zone return air node will be used for ideal loads recirculation air.");
                 UseReturnNode = true;
             } else {
-                PurchAir(PurchAirNum).ZoneRecircAirNodeNum = PurchAir(PurchAirNum).ZoneExhaustAirNodeNum;
+                PurchAir.ZoneRecircAirNodeNum = PurchAir.ZoneExhaustAirNodeNum;
             }
         } else {
             UseReturnNode = true;
         }
         if (UseReturnNode) {
             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumReturnNodes == 1) {
-                PurchAir(PurchAirNum).ZoneRecircAirNodeNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(1);
+                PurchAir.ZoneRecircAirNodeNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(1);
             } else if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumReturnNodes > 1) {
-                ShowWarningError(state, format("InitPurchasedAir: In {} = {}", PurchAir(PurchAirNum).cObjectName, PurchAir(PurchAirNum).Name));
+                ShowWarningError(state, format("InitPurchasedAir: In {} = {}", PurchAir.cObjectName, PurchAir.Name));
                 ShowContinueError(state,
                                   "No Zone Exhaust Air Node Name has been specified for this system and the zone has more than one Return Air Node.");
                 ShowContinueError(state,
                                   format("Using the first return air node ={}",
                                          state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(1))));
             } else {
-                ShowFatalError(state, format("InitPurchasedAir: In {} = {}", PurchAir(PurchAirNum).cObjectName, PurchAir(PurchAirNum).Name));
+                ShowFatalError(state, format("InitPurchasedAir: In {} = {}", PurchAir.cObjectName, PurchAir.Name));
                 ShowContinueError(
                     state,
                     " Invalid recirculation node. No exhaust or return node has been specified for this zone in ZoneHVAC:EquipmentConnections.");
@@ -1263,9 +1263,9 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
             }
         }
         // If there is OA and economizer is active, then there must be a limit on cooling flow rate
-        if (PurchAir(PurchAirNum).OutdoorAir && (PurchAir(PurchAirNum).EconomizerType != Econ::NoEconomizer)) {
-            if ((PurchAir(PurchAirNum).CoolingLimit == LimitType::NoLimit) || (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitCapacity)) {
-                ShowSevereError(state, format("InitPurchasedAir: In {} = {}", PurchAir(PurchAirNum).cObjectName, PurchAir(PurchAirNum).Name));
+        if (PurchAir.OutdoorAir && (PurchAir.EconomizerType != Econ::NoEconomizer)) {
+            if ((PurchAir.CoolingLimit == LimitType::NoLimit) || (PurchAir.CoolingLimit == LimitType::LimitCapacity)) {
+                ShowSevereError(state, format("InitPurchasedAir: In {} = {}", PurchAir.cObjectName, PurchAir.Name));
                 ShowContinueError(state, "There is outdoor air with economizer active but there is no limit on cooling air flow rate.");
                 ShowContinueError(state,
                                   "Cooling Limit must be set to LimitFlowRate or LimitFlowRateAndCapacity, and Maximum Cooling Air Flow Rate "
@@ -1285,17 +1285,15 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
     // Do the Begin Environment initializations
     if (state.dataGlobal->BeginEnvrnFlag && state.dataPurchasedAirMgr->InitPurchasedAirMyEnvrnFlag(PurchAirNum)) {
 
-        if ((PurchAir(PurchAirNum).HeatingLimit == LimitType::LimitFlowRate) ||
-            (PurchAir(PurchAirNum).HeatingLimit == LimitType::LimitFlowRateAndCapacity)) {
-            PurchAir(PurchAirNum).MaxHeatMassFlowRate = state.dataEnvrn->StdRhoAir * PurchAir(PurchAirNum).MaxHeatVolFlowRate;
+        if ((PurchAir.HeatingLimit == LimitType::LimitFlowRate) || (PurchAir.HeatingLimit == LimitType::LimitFlowRateAndCapacity)) {
+            PurchAir.MaxHeatMassFlowRate = state.dataEnvrn->StdRhoAir * PurchAir.MaxHeatVolFlowRate;
         } else {
-            PurchAir(PurchAirNum).MaxHeatMassFlowRate = 0.0;
+            PurchAir.MaxHeatMassFlowRate = 0.0;
         }
-        if ((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRate) ||
-            (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity)) {
-            PurchAir(PurchAirNum).MaxCoolMassFlowRate = state.dataEnvrn->StdRhoAir * PurchAir(PurchAirNum).MaxCoolVolFlowRate;
+        if ((PurchAir.CoolingLimit == LimitType::LimitFlowRate) || (PurchAir.CoolingLimit == LimitType::LimitFlowRateAndCapacity)) {
+            PurchAir.MaxCoolMassFlowRate = state.dataEnvrn->StdRhoAir * PurchAir.MaxCoolVolFlowRate;
         } else {
-            PurchAir(PurchAirNum).MaxCoolMassFlowRate = 0.0;
+            PurchAir.MaxCoolMassFlowRate = 0.0;
         }
         state.dataPurchasedAirMgr->InitPurchasedAirMyEnvrnFlag(PurchAirNum) = false;
     }
@@ -1306,95 +1304,95 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
 
     // These initializations are done every iteration
     // check that supply air temps can meet the zone thermostat setpoints
-    if (PurchAir(PurchAirNum).MinCoolSuppAirTemp > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum) &&
-        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum) != 0 && PurchAir(PurchAirNum).CoolingLimit == LimitType::NoLimit) {
+    if (PurchAir.MinCoolSuppAirTemp > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum) &&
+        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum) != 0 && PurchAir.CoolingLimit == LimitType::NoLimit) {
         // Check if the unit is scheduled off
         UnitOn = true;
-        //        IF (PurchAir(PurchAirNum)%AvailSchedPtr > 0) THEN
-        if (GetCurrentScheduleValue(state, PurchAir(PurchAirNum).AvailSchedPtr) <= 0) {
+        //        IF (PurchAir%AvailSchedPtr > 0) THEN
+        if (GetCurrentScheduleValue(state, PurchAir.AvailSchedPtr) <= 0) {
             UnitOn = false;
         }
         //        END IF
         // Check if cooling available
         bool CoolOn = true;
-        //        IF (PurchAir(PurchAirNum)%CoolSchedPtr > 0) THEN
-        if (GetCurrentScheduleValue(state, PurchAir(PurchAirNum).CoolSchedPtr) <= 0) {
+        //        IF (PurchAir%CoolSchedPtr > 0) THEN
+        if (GetCurrentScheduleValue(state, PurchAir.CoolSchedPtr) <= 0) {
             CoolOn = false;
         }
         //        END IF
         if (UnitOn && CoolOn) {
-            if (PurchAir(PurchAirNum).CoolErrIndex == 0) {
+            if (PurchAir.CoolErrIndex == 0) {
                 ShowSevereError(state,
                                 format("InitPurchasedAir: For {} = {} serving Zone {}",
-                                       PurchAir(PurchAirNum).cObjectName,
-                                       PurchAir(PurchAirNum).Name,
+                                       PurchAir.cObjectName,
+                                       PurchAir.Name,
                                        state.dataHeatBal->Zone(ControlledZoneNum).Name));
                 ShowContinueError(state,
                                   format("..the minimum supply air temperature for cooling [{:.2R}] is greater than the zone cooling mean air "
                                          "temperature (MAT) setpoint [{:.2R}].",
-                                         PurchAir(PurchAirNum).MinCoolSuppAirTemp,
+                                         PurchAir.MinCoolSuppAirTemp,
                                          state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum)));
                 ShowContinueError(state, "..For operative and comfort thermostat controls, the MAT setpoint is computed.");
                 ShowContinueError(state, "..This error may indicate that the mean radiant temperature or another comfort factor is too warm.");
                 ShowContinueError(state, "Unit availability is nominally ON and Cooling availability is nominally ON.");
-                ShowContinueError(state, format("Limit Cooling Capacity Type={}", cLimitType(PurchAir(PurchAirNum).CoolingLimit)));
+                ShowContinueError(state, format("Limit Cooling Capacity Type={}", cLimitType(PurchAir.CoolingLimit)));
                 // could check for optemp control or comfort control here
                 ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringSevereErrorAtEnd(state,
-                                          "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
-                                              " serving Zone " + state.dataHeatBal->Zone(ControlledZoneNum).Name +
+                                          "InitPurchasedAir: For " + PurchAir.cObjectName + " = " + PurchAir.Name + " serving Zone " +
+                                              state.dataHeatBal->Zone(ControlledZoneNum).Name +
                                               ", the minimum supply air temperature for cooling error continues",
-                                          PurchAir(PurchAirNum).CoolErrIndex,
-                                          PurchAir(PurchAirNum).MinCoolSuppAirTemp,
-                                          PurchAir(PurchAirNum).MinCoolSuppAirTemp,
+                                          PurchAir.CoolErrIndex,
+                                          PurchAir.MinCoolSuppAirTemp,
+                                          PurchAir.MinCoolSuppAirTemp,
                                           _,
                                           "C",
                                           "C");
         }
     }
-    if (PurchAir(PurchAirNum).MaxHeatSuppAirTemp < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum) &&
-        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum) != 0 && PurchAir(PurchAirNum).HeatingLimit == LimitType::NoLimit) {
+    if (PurchAir.MaxHeatSuppAirTemp < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum) &&
+        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum) != 0 && PurchAir.HeatingLimit == LimitType::NoLimit) {
         // Check if the unit is scheduled off
         UnitOn = true;
-        //        IF (PurchAir(PurchAirNum)%AvailSchedPtr > 0) THEN
-        if (GetCurrentScheduleValue(state, PurchAir(PurchAirNum).AvailSchedPtr) <= 0) {
+        //        IF (PurchAir%AvailSchedPtr > 0) THEN
+        if (GetCurrentScheduleValue(state, PurchAir.AvailSchedPtr) <= 0) {
             UnitOn = false;
         }
         //        END IF
         // Check if heating and cooling available
         bool HeatOn = true;
-        //        IF (PurchAir(PurchAirNum)%HeatSchedPtr > 0) THEN
-        if (GetCurrentScheduleValue(state, PurchAir(PurchAirNum).HeatSchedPtr) <= 0) {
+        //        IF (PurchAir%HeatSchedPtr > 0) THEN
+        if (GetCurrentScheduleValue(state, PurchAir.HeatSchedPtr) <= 0) {
             HeatOn = false;
         }
         //        END IF
         if (UnitOn && HeatOn) {
-            if (PurchAir(PurchAirNum).HeatErrIndex == 0) {
+            if (PurchAir.HeatErrIndex == 0) {
                 ShowSevereMessage(state,
                                   format("InitPurchasedAir: For {} = {} serving Zone {}",
-                                         PurchAir(PurchAirNum).cObjectName,
-                                         PurchAir(PurchAirNum).Name,
+                                         PurchAir.cObjectName,
+                                         PurchAir.Name,
                                          state.dataHeatBal->Zone(ControlledZoneNum).Name));
                 ShowContinueError(state,
                                   format("..the maximum supply air temperature for heating [{:.2R}] is less than the zone mean air temperature "
                                          "heating setpoint [{:.2R}].",
-                                         PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
+                                         PurchAir.MaxHeatSuppAirTemp,
                                          state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum)));
                 ShowContinueError(state, "..For operative and comfort thermostat controls, the MAT setpoint is computed.");
                 ShowContinueError(state, "..This error may indicate that the mean radiant temperature or another comfort factor is too cold.");
                 ShowContinueError(state, "Unit availability is nominally ON and Heating availability is nominally ON.");
-                ShowContinueError(state, format("Limit Heating Capacity Type={}", cLimitType(PurchAir(PurchAirNum).HeatingLimit)));
+                ShowContinueError(state, format("Limit Heating Capacity Type={}", cLimitType(PurchAir.HeatingLimit)));
                 // could check for optemp control or comfort control here
                 ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringSevereErrorAtEnd(state,
-                                          "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
-                                              " serving Zone " + state.dataHeatBal->Zone(ControlledZoneNum).Name +
+                                          "InitPurchasedAir: For " + PurchAir.cObjectName + " = " + PurchAir.Name + " serving Zone " +
+                                              state.dataHeatBal->Zone(ControlledZoneNum).Name +
                                               ", maximum supply air temperature for heating error continues",
-                                          PurchAir(PurchAirNum).HeatErrIndex,
-                                          PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
-                                          PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
+                                          PurchAir.HeatErrIndex,
+                                          PurchAir.MaxHeatSuppAirTemp,
+                                          PurchAir.MaxHeatSuppAirTemp,
                                           _,
                                           "C",
                                           "C");
