@@ -2941,8 +2941,6 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         M. Witte (GARD)
     //       DATE WRITTEN   Jun 2011 (taken from HVACSingleDuctSystem.cc and adapted for Ideal Loads System)
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the amount of outside air required based on optional user input.
@@ -2952,27 +2950,24 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
     // User input defines method used to calculate OA.
 
     // FUNCTION PARAMETER DEFINITIONS:
-    bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+    bool constexpr UseMinOASchFlag = true; // Always use min OA schedule in calculations.
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    bool UseOccSchFlag;      // TRUE = use actual occupancy, FALSE = use total zone people
-    Real64 OAVolumeFlowRate; // outside air flow rate (m3/s)
+    auto &PurchAir = state.dataPurchasedAirMgr->PurchAir(PurchAirNum);
 
-    auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
+    if (PurchAir.OutdoorAir) {
+        bool UseOccSchFlag; // TRUE = use actual occupancy, FALSE = use total zone people
 
-    if (PurchAir(PurchAirNum).OutdoorAir) {
-
-        if (PurchAir(PurchAirNum).DCVType == DCV::OccupancySchedule) {
+        if (PurchAir.DCVType == DCV::OccupancySchedule) {
             UseOccSchFlag = true;
         } else {
             UseOccSchFlag = false;
         }
-        OAVolumeFlowRate =
-            DataSizing::calcDesignSpecificationOutdoorAir(state, PurchAir(PurchAirNum).OARequirementsPtr, ZoneNum, UseOccSchFlag, UseMinOASchFlag);
+        Real64 OAVolumeFlowRate =
+            DataSizing::calcDesignSpecificationOutdoorAir(state, PurchAir.OARequirementsPtr, ZoneNum, UseOccSchFlag, UseMinOASchFlag);
         OAMassFlowRate = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
         // If DCV with CO2SetPoint then check required OA flow to meet CO2 setpoint
-        if (PurchAir(PurchAirNum).DCVType == DCV::CO2SetPoint) {
+        if (PurchAir.DCVType == DCV::CO2SetPoint) {
             OAMassFlowRate = max(OAMassFlowRate, state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP);
         }
 
@@ -2981,7 +2976,7 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
     } else { // No outdoor air
         OAMassFlowRate = 0.0;
     }
-    PurchAir(PurchAirNum).MinOAMassFlowRate = OAMassFlowRate;
+    PurchAir.MinOAMassFlowRate = OAMassFlowRate;
 }
 
 void CalcPurchAirMixedAir(EnergyPlusData &state,
@@ -3482,10 +3477,7 @@ void InitializePlenumArrays(EnergyPlusData &state, int const PurchAirNum)
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int ReturnPlenumIndex;        // index to ZoneHVAC:ReturnPlenum object
-    int ReturnPlenumNum;          // loop counter
     bool PlenumNotFound;          // logical to determine if same plenum is used by other ideal loads air systems
-    int Loop;                     // loop counters
-    int Loop2;                    // loop counters
     Array1D_int TempPurchArray;   // temporary array used for dynamic allocation
     Array1D_bool TempIsSimulated; // temporary array used for dynamic allocation
 
@@ -3520,7 +3512,7 @@ void InitializePlenumArrays(EnergyPlusData &state, int const PurchAirNum)
     } else {
 
         // find the correct index to PurchAirPlenumArrays
-        for (ReturnPlenumNum = 1; ReturnPlenumNum <= state.dataPurchasedAirMgr->NumPlenumArrays; ++ReturnPlenumNum) {
+        for (int ReturnPlenumNum = 1; ReturnPlenumNum <= state.dataPurchasedAirMgr->NumPlenumArrays; ++ReturnPlenumNum) {
             if (ReturnPlenumIndex != state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).ReturnPlenumIndex) continue;
 
             // allocate temporary arrays and save existing data
@@ -3543,7 +3535,7 @@ void InitializePlenumArrays(EnergyPlusData &state, int const PurchAirNum)
                 .IsSimulated.allocate(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir);
 
             // re-initialize previous data
-            for (Loop = 1; Loop < state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir; ++Loop) {
+            for (int Loop = 1; Loop < state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir; ++Loop) {
                 state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).PurchAirArray(Loop) = TempPurchArray(Loop);
                 state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).IsSimulated(Loop) = TempIsSimulated(Loop);
             }
@@ -3569,7 +3561,7 @@ void InitializePlenumArrays(EnergyPlusData &state, int const PurchAirNum)
 
             // allocate temporary array and save existing data
             state.dataPurchasedAirMgr->TempPurchAirPlenumArrays.allocate(state.dataPurchasedAirMgr->NumPlenumArrays);
-            for (Loop = 1; Loop < state.dataPurchasedAirMgr->NumPlenumArrays; ++Loop) {
+            for (int Loop = 1; Loop < state.dataPurchasedAirMgr->NumPlenumArrays; ++Loop) {
                 state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).NumPurchAir =
                     state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir;
                 state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).ReturnPlenumIndex =
@@ -3578,7 +3570,7 @@ void InitializePlenumArrays(EnergyPlusData &state, int const PurchAirNum)
                     state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir);
                 state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).IsSimulated.allocate(
                     state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir);
-                for (Loop2 = 1; Loop2 <= state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir; ++Loop2) {
+                for (int Loop2 = 1; Loop2 <= state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir; ++Loop2) {
                     state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).PurchAirArray(Loop2) =
                         state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).PurchAirArray(Loop2);
                     state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).IsSimulated(Loop2) =
@@ -3592,7 +3584,7 @@ void InitializePlenumArrays(EnergyPlusData &state, int const PurchAirNum)
             state.dataPurchasedAirMgr->PurchAirPlenumArrays.allocate(state.dataPurchasedAirMgr->NumPlenumArrays);
 
             // allocate member arrays to same size as before
-            for (Loop = 1; Loop < state.dataPurchasedAirMgr->NumPlenumArrays; ++Loop) {
+            for (int Loop = 1; Loop < state.dataPurchasedAirMgr->NumPlenumArrays; ++Loop) {
                 state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).PurchAirArray.allocate(
                     state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).NumPurchAir);
                 state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).IsSimulated.allocate(
