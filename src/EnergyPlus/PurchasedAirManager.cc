@@ -1467,20 +1467,21 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     state.dataSize->ZoneCoolingOnlyFan = false;
     CompType = PurchAir.cObjectName;
     CompName = PurchAir.Name;
-    bool ErrorsFound = false;
 
     if (state.dataSize->CurZoneEqNum > 0) {
         auto &ZoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
         std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-        int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
-        int FieldNum;     // IDD numeric field number where input field description is found
-        bool PrintFlag;   // TRUE when sizing information is reported in the eio file
+        int FieldNum;             // IDD numeric field number where input field description is found
+        bool PrintFlag;           // TRUE when sizing information is reported in the eio file
+        bool ErrorsFound = false;
         if (PurchAir.HVACSizingIndex > 0) {
             state.dataSize->DataZoneNumber = PurchAir.ZonePtr;
             int zoneHVACIndex = PurchAir.HVACSizingIndex;
             int SAFMethod;       // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
                                  // FractionOfAutosizedHeatingAirflow, HeatingCapacitySizing, etc.)
             int CapSizingMethod; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
+            int SizingMethod;    // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing,
+                                 // CoolingCapacitySizing)
 
             FieldNum = 5; // N5 , \field Maximum Heating Air Flow Rate
             PrintFlag = true;
@@ -1743,7 +1744,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                         TempSize = AutoSize;
                     }
                 }
-                SizingMethod = CoolingCapacitySizing;
+                // SizingMethod = CoolingCapacitySizing;
                 SizingString = "";
                 state.dataSize->ZoneCoolingOnlyFan = true;
                 PrintFlag = false;
@@ -1797,7 +1798,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
 
         } else {
             // SizingString = "Maximum Heating Air Flow Rate [m3/s]";
-            SizingMethod = HeatingAirflowSizing;
+            // SizingMethod = HeatingAirflowSizing;
             FieldNum = 5;
             SizingString = state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(FieldNum) + " [m3/s]";
             IsAutoSize = false;
@@ -1828,7 +1829,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
             }
 
             IsAutoSize = false;
-            SizingMethod = HeatingCapacitySizing;
+            // SizingMethod = HeatingCapacitySizing;
             FieldNum = 6; // N6, \field Maximum Sensible Heating Capacity
             SizingString = state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(FieldNum) + " [m3/s]";
             if ((PurchAir.MaxHeatSensCap == AutoSize) &&
@@ -1926,7 +1927,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
             }
 
             IsAutoSize = false;
-            SizingMethod = CoolingCapacitySizing;
+            //  SizingMethod = CoolingCapacitySizing;
             FieldNum = 8; // N8, \field Maximum Total Cooling Capacity
             SizingString = state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(FieldNum) + " [m3/s]";
             if ((PurchAir.MaxCoolTotCap == AutoSize) &&
