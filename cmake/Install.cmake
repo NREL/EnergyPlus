@@ -418,20 +418,6 @@ if(WIN32)
   install(FILES "${PROJECT_SOURCE_DIR}/bin/WeatherConverter/TimeZoneCodes.txt" DESTINATION "PreProcess/WeatherConverter/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/WeatherConverter/WBANLocations.csv" DESTINATION "PreProcess/WeatherConverter/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/WeatherConverter/Weather.exe" DESTINATION "PreProcess/WeatherConverter/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Win/EP-Compare Libs/Appearance Pak.dll"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Win/EP-Compare Libs/EHInterfaces5001.dll"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Win/EP-Compare Libs/EHObjectArray5001.dll"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Win/EP-Compare Libs/EHObjectCollection5001.dll"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Win/EP-Compare Libs/EHTreeView4301.DLL"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Win/EP-Compare Libs/MBSChartDirector5Plugin16042.dll"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Win/EP-Compare.exe" DESTINATION "PostProcess/EP-Compare/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/GraphHints.csv" DESTINATION "PostProcess/EP-Compare/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/EPDraw/Run-Win/EPDrawGUI Libs/Appearance Pak.dll" DESTINATION "PreProcess/EPDraw/EPDrawGUI Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/EPDraw/Run-Win/EPDrawGUI Libs/Shell.dll" DESTINATION "PreProcess/EPDraw/EPDrawGUI Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/EPDraw/Run-Win/EPDrawGUI.exe" DESTINATION "PreProcess/EPDraw/")
@@ -512,8 +498,6 @@ if(APPLE)
 
   install(DIRECTORY "${PROJECT_SOURCE_DIR}/bin/EP-Launch-Lite/EP-Launch-Lite.app" DESTINATION "PreProcess")
   install(DIRECTORY "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Mac/IDFVersionUpdater.app" DESTINATION "PreProcess/IDFVersionUpdater")
-  install(DIRECTORY "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Mac/EP-Compare.app" DESTINATION "PostProcess/EP-Compare")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/GraphHints.csv" DESTINATION "PostProcess/EP-Compare/")
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/EPMacro/Mac/EPMacro" DESTINATION "./")
 
   configure_file(scripts/runenergyplus.in "${PROJECT_BINARY_DIR}/scripts/runenergyplus" @ONLY)
@@ -548,21 +532,6 @@ elseif(UNIX)
   set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
   set(CPACK_IFW_TARGET_DIRECTORY
       "/usr/local/${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
-
-  install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare" DESTINATION "PostProcess/EP-Compare/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/GraphHints.csv" DESTINATION "PostProcess/EP-Compare/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHInterfaces5001.so"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHObjectArray5001.so"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHObjectCollection5001.so"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHTreeView4301.so"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/libMBSChartDirector5Plugin16042.so"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/libRBAppearancePak.so"
-          DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
 
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBAppearancePak64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
@@ -710,7 +679,6 @@ if(APPLE)
       # "EPMacro"
       # "PreProcess/EP-Launch-Lite.app"
       # "PreProcess/IDFVersionUpdater/IDFVersionUpdater.app"
-      # "PostProcess/EP-Compare/EP-Compare.app"
     )
 
     # Codesign inner binaries and libraries, in the CPack staging area for the EnergyPlus project, component Unspecified
