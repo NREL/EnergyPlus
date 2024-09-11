@@ -217,28 +217,25 @@ namespace ZoneAirLoopEquipmentManager {
         static std::string const CurrentModuleObject("ZoneHVAC:AirDistributionUnit"); // Object type for getting and error messages
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int AirDistUnitNum;
-        int AirDistCompUnitNum;
-        int NumAlphas;
-        int NumNums;
-        int IOStat;
         bool ErrorsFound(false); // If errors detected in input
-        bool IsNotOK;            // Flag to verify name
         Array1D_string AlphArray(5);
         Array1D<Real64> NumArray(2);
         Array1D_string cAlphaFields(5);   // Alpha field names
         Array1D_string cNumericFields(2); // Numeric field names
         Array1D_bool lAlphaBlanks(5);     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks(2);   // Logical array, numeric field input BLANK = .TRUE.
-        bool DualDuctRecircIsUsed;        // local temporary for deciding if recirc side used by dual duct terminal
 
         int NumAirDistUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataDefineEquipment->AirDistUnit.allocate(NumAirDistUnits);
 
         if (NumAirDistUnits > 0) {
+            int NumAlphas;
+            int NumNums;
+            int IOStat;
+            bool IsNotOK; // Flag to verify name
 
-            for (AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum) {
+            for (int AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum) {
                 auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum);
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
@@ -267,7 +264,7 @@ namespace ZoneAirLoopEquipmentManager {
                                                               ObjectIsParent);
                 airDistUnit.InletNodeNum = 0;
                 airDistUnit.NumComponents = 1;
-                AirDistCompUnitNum = 1;
+                int AirDistCompUnitNum = 1;
                 // Load the air Distribution Unit Equip and Name
                 airDistUnit.EquipType(AirDistCompUnitNum) = AlphArray(3);
                 airDistUnit.EquipName(AirDistCompUnitNum) = AlphArray(4);
@@ -387,6 +384,7 @@ namespace ZoneAirLoopEquipmentManager {
                                   airDistUnit.EquipName(AirDistCompUnitNum),
                                   "UNDEFINED",
                                   AlphArray(2));
+                    bool DualDuctRecircIsUsed; // local temporary for deciding if recirc side used by dual duct terminal
                     GetDualDuctOutdoorAirRecircUse(
                         state, airDistUnit.EquipType(AirDistCompUnitNum), airDistUnit.EquipName(AirDistCompUnitNum), DualDuctRecircIsUsed);
                     if (DualDuctRecircIsUsed) {
@@ -409,7 +407,7 @@ namespace ZoneAirLoopEquipmentManager {
                 }
 
             } // End of Air Dist Do Loop
-            for (AirDistUnitNum = 1; AirDistUnitNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++AirDistUnitNum) {
+            for (int AirDistUnitNum = 1; AirDistUnitNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++AirDistUnitNum) {
                 auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Heating Energy",
@@ -557,8 +555,6 @@ namespace ZoneAirLoopEquipmentManager {
 
         bool ProvideSysOutput;
         int AirDistCompNum;
-        int InNodeNum;                      // air distribution unit inlet node
-        int OutNodeNum;                     // air distribution unit outlet node
         int AirLoopNum(0);                  // index of air loop
         Real64 MassFlowRateMaxAvail;        // max avail mass flow rate excluding leaks [kg/s]
         Real64 MassFlowRateMinAvail;        // min avail mass flow rate excluding leaks [kg/s]
@@ -574,8 +570,8 @@ namespace ZoneAirLoopEquipmentManager {
             NonAirSysOutput = 0.0;
 
             auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum);
-            InNodeNum = airDistUnit.InletNodeNum;
-            OutNodeNum = airDistUnit.OutletNodeNum;
+            int InNodeNum = airDistUnit.InletNodeNum;
+            int OutNodeNum = airDistUnit.OutletNodeNum;
             MassFlowRateMaxAvail = 0.0;
             MassFlowRateMinAvail = 0.0;
             // check for no plenum

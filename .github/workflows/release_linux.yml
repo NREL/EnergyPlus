@@ -1,4 +1,4 @@
-name: Linux Releases
+name: Releases
 
 on:
   push:
@@ -12,14 +12,18 @@ env:
 
 jobs:
   build_installer_artifact:
-    name: Build Installer and Upload  # keeping upload in this job so we could potentially download problematic builds
+    name: Build Packages for ${{ matrix.pretty }}
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     strategy:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04]
+        include:
+          - os: ubuntu-22.04
+            pretty: "Ubuntu 22.04"
+          - os: ubuntu-24.04
+            pretty: "Ubuntu 24.04"
 
     permissions:
       # Needed permission to upload the release asset

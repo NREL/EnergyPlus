@@ -16203,7 +16203,7 @@ Dimensionless;	!- Output Unit Type
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
+    Material::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -23956,4 +23956,262 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
     EXPECT_NEAR(thisSys1.m_CycRatio, 1.0, 0.0001);
     EXPECT_EQ(thisSys1.m_SpeedNum, 2);
     EXPECT_NEAR(sensOut, 500.0, 2);
+}
+
+TEST_F(ZoneUnitarySysTest, ZeroCoolingSpeedTest)
+{
+    std::string_view constexpr idf_objects = R"IDF(
+
+  AirLoopHVAC:UnitarySystem,
+    Sys 1 Furnace DX Cool Unitary System,  !- Name
+    Load,                    !- Control Type
+    SPACE1-1,                !- Controlling Zone or Thermostat Location
+    None,                    !- Dehumidification Control Type
+    ,                        !- Availability Schedule Name
+    Sys 1 Furnace DX Cool Mixed Air Outlet,  !- Air Inlet Node Name
+    Sys 1 Furnace DX Cool Heating Coil Outlet,  !- Air Outlet Node Name
+    ,      !- Supply Fan Object Type
+    ,  !- Supply Fan Name
+    ,             !- Fan Placement
+    ,           !- Supply Air Fan Operating Mode Schedule Name
+    ,                        !- Heating Coil Object Type
+    ,                        !- Heating Coil Name
+    ,                        !- DX Heating Coil Sizing Ratio
+    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Sys 1 Furnace DX Cool Cooling Coil,  !- Cooling Coil Name
+    ,                        !- Use DOAS DX Cooling Coil
+    ,                        !- Minimum Supply Air Temperature {C}
+    ,                        !- Latent Load Control
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- No Load Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
+    ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
+    Autosize,                !- Maximum Supply Air Temperature {C}
+    21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
+    ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
+    ,                        !- Ancillary On-Cycle Electric Power {W}
+    ,                        !- Ancillary Off-Cycle Electric Power {W}
+    ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
+    ,                        !- Maximum Temperature for Heat Recovery {C}
+    ,                        !- Heat Recovery Water Inlet Node Name
+    ,                        !- Heat Recovery Water Outlet Node Name
+    UnitarySystemPerformance:Multispeed,  !- Design Specification Multispeed Object Type
+    Sys 1 Furnace DX Cool Unitary System MultiSpeed Performance;  !- Design Specification Multispeed Object Name
+  Coil:Cooling:DX,
+    Sys 1 Furnace DX Cool Cooling Coil,  !- Name
+    Sys 1 Furnace DX Cool Supply Fan Outlet,  !- Evaporator Inlet Node Name
+    Sys 1 Furnace DX Cool Cooling Coil Outlet,  !- Evaporator Outlet Node Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Condenser Zone Name
+    Sys 1 Furnace DX Cool Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
+    Sys 1 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
+    Sys 1 Furnace DX Cool Cooling Coil Performance;  !- Performance Object Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Name
+    0.0,                     !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    Discrete,                !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Sys 1 Furnace DX Cool Cooling Coil Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Sys 1 Furnace DX Cool Cooling Coil Operating Mode,  !- Name
+    autosize,                !- Rated Gross Total Cooling Capacity {W}
+    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Latent Capacity Time Constant {s}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    No,                      !- Apply Latent Degradation to Speeds Greater than 1
+    AirCooled,               !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name
+    Sys 1 Furnace DX Cool Cooling Coil Speed 2 Performance;  !- Speed 2 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Name
+    0.5000,                  !- Gross Total Cooling Capacity Fraction
+    0.5000,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    autosize,                !- Gross Sensible Heat Ratio
+    3,                       !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 1 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 1 Furnace DX Cool Cool Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 1 Furnace DX Cool Cool Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 1 Furnace DX Cool Cool Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 1 Furnace DX Cool Cool Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    0.2,                     !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    Sys 1 Furnace DX Cool Cool Coil WH-FT;  !- Waste Heat Modifier Function of Temperature Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Sys 1 Furnace DX Cool Cooling Coil Speed 2 Performance,  !- Name
+    1.0000,                  !- Gross Total Cooling Capacity Fraction
+    1.0000,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    autosize,                !- Gross Sensible Heat Ratio
+    3,                       !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 1 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 1 Furnace DX Cool Cool Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 1 Furnace DX Cool Cool Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 1 Furnace DX Cool Cool Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 1 Furnace DX Cool Cool Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    0.2,                     !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    Sys 1 Furnace DX Cool Cool Coil WH-FT;  !- Waste Heat Modifier Function of Temperature Curve Name
+
+! Curves from example file MultiSpeedHeatPump.idf, Sep 2013, same curves for all speeds.
+
+  Curve:Biquadratic,
+    Sys 1 Furnace DX Cool Cool Coil Cap-FT,  !- Name
+    0.476428E+00,            !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Cubic,
+    Sys 1 Furnace DX Cool Cool Coil Cap-FF,  !- Name
+    0.47278589,              !- Coefficient1 Constant
+    1.2433415,               !- Coefficient2 x
+    -1.0387055,              !- Coefficient3 x**2
+    0.32257813,              !- Coefficient4 x**3
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x
+
+  Curve:Biquadratic,
+    Sys 1 Furnace DX Cool Cool Coil EIR-FT,  !- Name
+    0.632475E+00,            !- Coefficient1 Constant
+    -0.121321E-01,           !- Coefficient2 x
+    0.507773E-03,            !- Coefficient3 x**2
+    0.155377E-01,            !- Coefficient4 y
+    0.272840E-03,            !- Coefficient5 y**2
+    -0.679201E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Cubic,
+    Sys 1 Furnace DX Cool Cool Coil EIR-FF,  !- Name
+    0.47278589,              !- Coefficient1 Constant
+    1.2433415,               !- Coefficient2 x
+    -1.0387055,              !- Coefficient3 x**2
+    0.32257813,              !- Coefficient4 x**3
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x
+
+! PLF = l.- Cd(1.-PLR) where Cd = 0.15
+
+  Curve:Quadratic,
+    Sys 1 Furnace DX Cool Cool Coil PLF,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1;                       !- Maximum Value of x
+
+  Curve:Biquadratic,
+    Sys 1 Furnace DX Cool Cool Coil WH-FT,  !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+)IDF";
+
+    EXPECT_TRUE(process_idf(idf_objects, false));
+
+    bool zoneEquipment = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    bool ErrorsFound(false);
+    std::string compName = "SYS 1 FURNACE DX COOL UNITARY SYSTEM";
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
+    auto thisSys = &state->dataUnitarySystems->unitarySys[0];
+    thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound);
+
+    OutputReportPredefined::SetPredefinedTables(*state);
+
+    state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).MassFlowRate = 0.05;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataUnitarySystems->CoolingLoad = true;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = 0.15;
+
+    int AirLoopNum(0);
+    bool FirstHVACIteration = false;
+    thisSys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
+
+    Real64 OnOffAirFlowRatio(1.0);
+    Real64 CoilCoolHeatRat(1.0);
+    HVAC::CompressorOp CompressorOn(HVAC::CompressorOp::On);
+    thisSys->m_CoolingSpeedNum = 0;
+    thisSys->m_SingleMode = 0;
+    thisSys->m_CoolingPartLoadFrac = 0.5;
+    thisSys->calcUnitaryCoolingSystem(
+        *state, AirLoopNum, FirstHVACIteration, thisSys->m_CoolingPartLoadFrac, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
+    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).HumRat, state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).HumRat);
+    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Enthalpy,
+              state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Enthalpy);
 }
