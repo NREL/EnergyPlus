@@ -415,12 +415,15 @@ namespace PlantCentralGSHP {
 
         void CalcChillerHeaterModel(EnergyPlusData &state);
 
-        void adjustChillerHeaterFlowTemp(EnergyPlusData &state,
-                                         Real64 &QCondenser,
-                                         Real64 &CondMassFlowRate,
-                                         Real64 &CondOutletTemp,
-                                         Real64 const CondInletTemp,
-                                         Real64 const CondDeltaTemp);
+        void adjustChillerHeaterCondFlowTemp(EnergyPlusData &state,
+                                             Real64 &QCondenser,
+                                             Real64 &CondMassFlowRate,
+                                             Real64 &CondOutletTemp,
+                                             Real64 const CondInletTemp,
+                                             Real64 const CondDeltaTemp);
+
+        void adjustChillerHeaterEvapFlowTemp(
+            EnergyPlusData &state, Real64 const qEvaporator, Real64 &evapMassFlowRate, Real64 &evapOutletTemp, Real64 const evapInletTemp);
 
         Real64
         setChillerHeaterCondTemp(EnergyPlusData &state, int const numChillerHeater, Real64 const condEnteringTemp, Real64 const condLeavingTemp);
@@ -433,7 +436,7 @@ namespace PlantCentralGSHP {
                                  Real64 const lowTempLimitEout,
                                  Real64 evapInletTemp,
                                  Real64 &qEvaporator,
-                                 Real64 &evapMassFlowRate,
+                                 Real64 const evapMassFlowRate,
                                  Real64 const Cp);
 
         void calcPLRAndCyclingRatio(EnergyPlusData &state,
