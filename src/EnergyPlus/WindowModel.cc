@@ -80,13 +80,13 @@ namespace Window {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Reads input and creates instance of WindowModel object
-        int NumNums;
-        int NumAlphas;
-        int IOStat;
 
         auto aModel = std::make_unique<CWindowModel>(); // (AUTO_OK)
         int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, objectName);
         if (numCurrModels > 0) {
+            int NumNums;
+            int NumAlphas;
+            int IOStat;
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, objectName, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
             // Please consider using getEnumValue pattern here.
