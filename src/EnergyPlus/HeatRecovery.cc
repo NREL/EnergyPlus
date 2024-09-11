@@ -517,7 +517,7 @@ namespace HeatRecovery {
                 thisExchanger.EconoLockOut = static_cast<bool>(toggle);
             }
 
-            // yujie: read new curves here
+            // read new curves here
             thisExchanger.HeatEffectSensibleCurveIndex =
                 Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11)); // convert curve name to number
             thisExchanger.HeatEffectLatentCurveIndex =
