@@ -2403,16 +2403,16 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
             }
         } break;
         case DataPlant::CondenserFlowControl::ModulatedDeltaTemperature: {
-            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               this->CondInletTemp,
-                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
-                                                               RoutineName);
+            Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
+                                                                   this->CondInletTemp,
+                                                                   state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
+                                                                   RoutineName);
             Real64 condDT = 0.0;
             if (this->CondDTScheduleNum > 0) {
                 condDT = ScheduleManager::GetCurrentScheduleValue(state, this->CondDTScheduleNum);
             }
-            this->CondMassFlowRate = this->QCondenser / (Cp * condDT);
+            this->CondMassFlowRate = this->QCondenser / (CpCond * condDT);
         } break;
         default: {
             this->CondMassFlowRate = this->CondMassFlowRateMax;
@@ -2431,13 +2431,13 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
         if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
             // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
             if (this->HeatRecActive) this->calcHeatRecovery(state, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
-            Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                        state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                        condInletTemp,
-                                                        state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
-                                                        RoutineName);
+            Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
+                                                                   condInletTemp,
+                                                                   state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
+                                                                   RoutineName);
 
-            this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / Cp + condInletTemp;
+            this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + condInletTemp;
         } else {
             ShowSevereError(state, format("CalcElectricEIRChillerModel: Condenser flow = 0, for ElectricEIRChiller={}", this->Name));
             ShowContinueErrorTimeStamp(state, "");
@@ -2457,8 +2457,8 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
         if (this->HeatRecActive) this->calcHeatRecovery(state, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
 
         if (CondMassFlowRate > 0.0) {
-            Cp = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(this->CondInletNodeNum).HumRat);
-            CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / Cp;
+            Real64 CpCond = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(this->CondInletNodeNum).HumRat);
+            CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / CpCond;
         } else {
             this->CondOutletTemp = condInletTemp;
         }

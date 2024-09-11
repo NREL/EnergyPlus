@@ -1026,7 +1026,6 @@ namespace BranchInputManager {
                 int NumNumbers; // Used to retrieve numbers from IDF
                 int NumAlphas;  // Used to retrieve names from IDF
                 int NumParams;
-                bool ErrFound = false;
                 state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
                 NodeNums.dimension(NumParams, 0);
                 state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
@@ -1063,12 +1062,6 @@ namespace BranchInputManager {
                 cNumericFields.deallocate();
                 lAlphaBlanks.deallocate();
                 lNumericBlanks.deallocate();
-                if (ErrFound) {
-                    ShowSevereError(
-                        state,
-                        format("{} Invalid {} Input, preceding condition(s) will likely cause termination.", RoutineName, CurrentModuleObject));
-                    state.dataBranchInputManager->InvalidBranchDefinitions = true;
-                }
                 TestInletOutletNodes(state);
                 state.dataBranchInputManager->GetBranchInputOneTimeFlag = false;
             }

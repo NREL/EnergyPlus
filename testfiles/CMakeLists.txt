@@ -51,6 +51,7 @@ add_simulation_test(IDF_FILE 5ZoneAirCooledConvCoef.idf EPW_FILE USA_CO_Golden-N
 add_simulation_test(IDF_FILE 5ZoneAirCooledConvCoef_VSFan.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooledKeepSiteLocation.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooledWithSpaces.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE 5ZoneAirCooledWithSpacesDaylightingIntMass.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooledWithSpaceHeatBalance.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooledWithSpacesHVAC.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooledDemandLimiting.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

@@ -81,20 +81,20 @@ void createCoilSelectionReportObj(EnergyPlusData &state)
 CoilSelectionData::CoilSelectionData( // constructor
     std::string const &coilName)
     : isCooling(false), isHeating(false), coilNum(-999), airloopNum(-999), oaControllerNum(-999), zoneEqNum(-999), oASysNum(-999), zoneHVACTypeNum(0),
-      zoneHVACIndex(0), typeof_Coil(-999), coilSizingMethodConcurrence(-999), coilSizingMethodCapacity(-999), coilSizingMethodAirFlow(-999),
-      isCoilSizingForTotalLoad(false), capIsAutosized(false), volFlowIsAutosized(false), coilWaterFlowUser(-999.0), oaPretreated(false),
-      isSupplementalHeater(false), coilTotCapFinal(-999.0), coilSensCapFinal(-999.0), coilRefAirVolFlowFinal(-999.0),
-      coilRefWaterVolFlowFinal(-999.0), coilTotCapAtPeak(-999.0), coilSensCapAtPeak(-999.0), coilDesMassFlow(-999.0), coilDesVolFlow(-999.0),
-      coilDesEntTemp(-999.0), coilDesEntWetBulb(-999.0), coilDesEntHumRat(-999.0), coilDesEntEnth(-999.0), coilDesLvgTemp(-999.0),
-      coilDesLvgWetBulb(-999.0), coilDesLvgHumRat(-999.0), coilDesLvgEnth(-999.0), coilDesWaterMassFlow(-999.0), coilDesWaterEntTemp(-999.0),
-      coilDesWaterLvgTemp(-999.0), coilDesWaterTempDiff(-999.0), pltSizNum(-999), waterLoopNum(-999), oaPeakTemp(-999.00), oaPeakHumRat(-999.0),
-      oaPeakWetBulb(-999.0), oaPeakVolFlow(-999.0), oaPeakVolFrac(-999.0), oaDoaTemp(-999.0), oaDoaHumRat(-999.0), raPeakTemp(-999.0),
-      raPeakHumRat(-999.0), rmPeakTemp(-999.0), rmPeakHumRat(-999.0), rmPeakRelHum(-999.0), rmSensibleAtPeak(-999.0), rmLatentAtPeak(0.0),
-      coilIdealSizCapOverSimPeakCap(-999.0), coilIdealSizCapUnderSimPeakCap(-999.0), reheatLoadMult(-999.0), minRatio(-999.0), maxRatio(-999.0),
-      cpMoistAir(-999.0), cpDryAir(-999.0), rhoStandAir(-999.0), rhoFluid(-999.0), cpFluid(-999.0), coilCapFTIdealPeak(1.0), coilRatedTotCap(-999.0),
-      coilRatedSensCap(-999.0), ratedAirMassFlow(-999.0), ratedCoilInDb(-999.0), ratedCoilInWb(-999.0), ratedCoilInHumRat(-999.0),
-      ratedCoilInEnth(-999.0), ratedCoilOutDb(-999.0), ratedCoilOutWb(-999.0), ratedCoilOutHumRat(-999.0), ratedCoilOutEnth(-999.0),
-      ratedCoilEff(-999.0), ratedCoilBpFactor(-999.0), ratedCoilAppDewPt(-999.0), ratedCoilOadbRef(-999.0), ratedCoilOawbRef(-999.0),
+      zoneHVACIndex(0), typeof_Coil(-999), coilSizingMethodCapacity(-999), coilSizingMethodAirFlow(-999), isCoilSizingForTotalLoad(false),
+      capIsAutosized(false), volFlowIsAutosized(false), coilWaterFlowUser(-999.0), oaPretreated(false), isSupplementalHeater(false),
+      coilTotCapFinal(-999.0), coilSensCapFinal(-999.0), coilRefAirVolFlowFinal(-999.0), coilRefWaterVolFlowFinal(-999.0), coilTotCapAtPeak(-999.0),
+      coilSensCapAtPeak(-999.0), coilDesMassFlow(-999.0), coilDesVolFlow(-999.0), coilDesEntTemp(-999.0), coilDesEntWetBulb(-999.0),
+      coilDesEntHumRat(-999.0), coilDesEntEnth(-999.0), coilDesLvgTemp(-999.0), coilDesLvgWetBulb(-999.0), coilDesLvgHumRat(-999.0),
+      coilDesLvgEnth(-999.0), coilDesWaterMassFlow(-999.0), coilDesWaterEntTemp(-999.0), coilDesWaterLvgTemp(-999.0), coilDesWaterTempDiff(-999.0),
+      pltSizNum(-999), waterLoopNum(-999), oaPeakTemp(-999.00), oaPeakHumRat(-999.0), oaPeakWetBulb(-999.0), oaPeakVolFlow(-999.0),
+      oaPeakVolFrac(-999.0), oaDoaTemp(-999.0), oaDoaHumRat(-999.0), raPeakTemp(-999.0), raPeakHumRat(-999.0), rmPeakTemp(-999.0),
+      rmPeakHumRat(-999.0), rmPeakRelHum(-999.0), rmSensibleAtPeak(-999.0), rmLatentAtPeak(0.0), coilIdealSizCapOverSimPeakCap(-999.0),
+      coilIdealSizCapUnderSimPeakCap(-999.0), reheatLoadMult(-999.0), minRatio(-999.0), maxRatio(-999.0), cpMoistAir(-999.0), cpDryAir(-999.0),
+      rhoStandAir(-999.0), rhoFluid(-999.0), cpFluid(-999.0), coilCapFTIdealPeak(1.0), coilRatedTotCap(-999.0), coilRatedSensCap(-999.0),
+      ratedAirMassFlow(-999.0), ratedCoilInDb(-999.0), ratedCoilInWb(-999.0), ratedCoilInHumRat(-999.0), ratedCoilInEnth(-999.0),
+      ratedCoilOutDb(-999.0), ratedCoilOutWb(-999.0), ratedCoilOutHumRat(-999.0), ratedCoilOutEnth(-999.0), ratedCoilEff(-999.0),
+      ratedCoilBpFactor(-999.0), ratedCoilAppDewPt(-999.0), ratedCoilOadbRef(-999.0), ratedCoilOawbRef(-999.0),
 
       supFanType(HVAC::FanType::Invalid), supFanNum(0), fanSizeMaxAirVolumeFlow(-999.0), fanSizeMaxAirMassFlow(-999.0), fanHeatGainIdealPeak(-999.0),
       coilAndFanNetTotalCapacityIdealPeak(-999.0), plantDesMaxMassFlowRate(-999.0), plantDesRetTemp(-999.0), plantDesSupTemp(-999.0),
@@ -660,15 +660,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             c->oaPeakVolFrac = -999.0;
         }
 
-        if (c->coilSizingMethodConcurrence == DataSizing::NonCoincident) {
-            c->coilSizingMethodConcurrenceName = "Non-Coincident";
-        } else if (c->coilSizingMethodConcurrence == DataSizing::Coincident) {
-            c->coilSizingMethodConcurrenceName = "Coincident";
-        } else if (c->coilSizingMethodConcurrence == DataSizing::Combination) {
-            c->coilSizingMethodConcurrenceName = "Combination";
-        } else {
-            c->coilSizingMethodConcurrenceName = "N/A";
-        }
+        c->coilSizingMethodConcurrenceName = DataSizing::CoilSizingConcurrenceNames[(int)c->coilSizingMethodConcurrence];
 
         if (c->coilSizingMethodCapacity == DataSizing::CoolingDesignCapacity) {
             c->coilSizingMethodCapacityName = "CoolingDesignCapacity";
@@ -765,7 +757,6 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         }
         // fill out some fan information
         HVAC::FanType locFanType = HVAC::FanType::Invalid;
-        bool errorsFound(false);
         if (c->supFanNum == 0) {
             c->supFanNum = Fans::GetFanIndex(state, c->fanAssociatedWithCoilName);
         }
@@ -927,7 +918,6 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
         auto &thisSubEq = zoneEquipList.EquipData(equipLoop).SubEquipData;
 
         // search for coil and fan SubEquipData and return parent type/name and fan type/name for coil reports.
-        auto const &coilIterator = std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubCoilLambda);
         if (std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubCoilLambda) != thisSubEq.end()) {
             c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
             c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
@@ -1286,7 +1276,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         c->oaPeakHumRat = finalSysSizing.OutHumRatAtCoolPeak;
         c->raPeakTemp = finalSysSizing.RetTempAtCoolPeak;
         c->raPeakHumRat = finalSysSizing.RetHumRatAtCoolPeak;
-        c->coilSizingMethodConcurrence = finalSysSizing.SizingOption;
+        c->coilSizingMethodConcurrence = static_cast<DataSizing::CoilSizingConcurrence>(finalSysSizing.SizingOption);
         c->coilSizingMethodCapacity = finalSysSizing.CoolingCapMethod;
         c->coilSizingMethodAirFlow = finalSysSizing.ScaleCoolSAFMethod;
         // DesOutAirVolFlow
@@ -1345,9 +1335,9 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             c->rmPeakRelHum = -999.0;
         }
 
-        if (c->coilSizingMethodConcurrence == DataSizing::Coincident) {
+        if (c->coilSizingMethodConcurrence == DataSizing::CoilSizingConcurrence::Coincident) {
             c->rmSensibleAtPeak = finalSysSizing.SysCoolCoinSpaceSens;
-        } else if (c->coilSizingMethodConcurrence == DataSizing::NonCoincident) {
+        } else if (c->coilSizingMethodConcurrence == DataSizing::CoilSizingConcurrence::NonCoincident) {
             c->rmSensibleAtPeak = sumSensLoad;
         } else { // DataSizing::Combination or other
             c->rmSensibleAtPeak = sumSensLoad;
@@ -1492,7 +1482,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                     state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
                 c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
             }
-            int sizMethod = 0;
+            DataSizing::SizingConcurrence sizMethod = DataSizing::SizingConcurrence::Invalid;
             bool sizMethodsAreTheSame = true;
             for (int airLoopNum = 0; airLoopNum < state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].NumOfAirLoops; ++airLoopNum) {
                 int actualAirLoopNum = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum[airLoopNum];
@@ -1505,9 +1495,9 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                 }
             }
             if (sizMethodsAreTheSame) {
-                c->coilSizingMethodConcurrence = sizMethod;
+                c->coilSizingMethodConcurrence = static_cast<DataSizing::CoilSizingConcurrence>(sizMethod);
             } else {
-                c->coilSizingMethodConcurrence = DataSizing::Combination;
+                c->coilSizingMethodConcurrence = DataSizing::CoilSizingConcurrence::Combination;
             }
         }
     } else {
@@ -1555,7 +1545,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         c->oaPeakVolFlow = finalSysSizing.DesOutAirVolFlow;
         c->raPeakTemp = finalSysSizing.HeatRetTemp;
         c->raPeakHumRat = finalSysSizing.HeatRetHumRat;
-        c->coilSizingMethodConcurrence = finalSysSizing.SizingOption;
+        c->coilSizingMethodConcurrence = static_cast<DataSizing::CoilSizingConcurrence>(finalSysSizing.SizingOption);
         c->coilSizingMethodCapacity = finalSysSizing.HeatingCapMethod;
         c->coilSizingMethodAirFlow = finalSysSizing.ScaleHeatSAFMethod;
 
@@ -1610,9 +1600,9 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             c->rmPeakRelHum = -999.0;
         }
 
-        if (c->coilSizingMethodConcurrence == DataSizing::Coincident) {
+        if (c->coilSizingMethodConcurrence == DataSizing::CoilSizingConcurrence::Coincident) {
             c->rmSensibleAtPeak = finalSysSizing.SysHeatCoinSpaceSens;
-        } else if (c->coilSizingMethodConcurrence == DataSizing::NonCoincident) {
+        } else if (c->coilSizingMethodConcurrence == DataSizing::CoilSizingConcurrence::NonCoincident) {
             c->rmSensibleAtPeak = sumLoad;
         }
 
@@ -1789,7 +1779,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                     state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
                 c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
             }
-            int sizMethod = 0;
+            DataSizing::SizingConcurrence sizMethod = DataSizing::SizingConcurrence::Invalid;
             bool sizMethodsAreTheSame = true;
             for (int airLoopNum = 0; airLoopNum < state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].NumOfAirLoops; ++airLoopNum) {
                 int actualAirLoopNum = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum[airLoopNum];
@@ -1802,9 +1792,9 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                 }
             }
             if (sizMethodsAreTheSame) {
-                c->coilSizingMethodConcurrence = sizMethod;
+                c->coilSizingMethodConcurrence = static_cast<DataSizing::CoilSizingConcurrence>(sizMethod);
             } else {
-                c->coilSizingMethodConcurrence = DataSizing::Combination;
+                c->coilSizingMethodConcurrence = DataSizing::CoilSizingConcurrence::Combination;
             }
         }
     } else {

@@ -90,6 +90,7 @@ void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
     state.files.mtd.open_as_stringstream();
     state.files.edd.open_as_stringstream();
     state.files.zsz.open_as_stringstream();
+    state.files.spsz.open_as_stringstream();
     state.files.ssz.open_as_stringstream();
 }
 
@@ -119,6 +120,7 @@ void EnergyPlusFixture::SetUp()
 
     Psychrometrics::InitializePsychRoutines(*state);
     createCoilSelectionReportObj(*state);
+    state->dataEnvrn->StdRhoAir = 1.2;
 }
 
 void EnergyPlusFixture::TearDown()
@@ -129,6 +131,7 @@ void EnergyPlusFixture::TearDown()
     state->files.eio.del();
     state->files.debug.del();
     state->files.zsz.del();
+    state->files.spsz.del();
     state->files.ssz.del();
     state->files.mtr.del();
     state->files.bnd.del();

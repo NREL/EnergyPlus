@@ -104,29 +104,16 @@ namespace EnergyPlus::HeatBalanceAirManager {
 enum class AirflowSpec
 {
     Invalid = -1,
-    Flow,
-    FlowPerZone,
-    FlowPerArea,
-    FlowPerPerson,
-    AirChanges,
-    Num
-};
-constexpr std::array<std::string_view, static_cast<int>(AirflowSpec::Num)> airflowNamesUC = {
-    "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/PERSON", "AIRCHANGES/HOUR"};
-
-enum class AirflowSpecAlt
-{
-    Invalid = -1,
-    Flow,
     FlowPerZone,
     FlowPerArea,
     FlowPerExteriorArea,
     FlowPerExteriorWallArea,
+    FlowPerPerson,
     AirChanges,
     Num
 };
-constexpr std::array<std::string_view, static_cast<int>(AirflowSpecAlt::Num)> airflowAltNamesUC = {
-    "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/EXTERIORAREA", "FLOW/EXTERIORWALLAREA", "AIRCHANGES/HOUR"};
+constexpr std::array<std::string_view, static_cast<int>(AirflowSpec::Num)> airflowSpecNamesUC = {
+    "FLOW/ZONE", "FLOW/AREA", "FLOW/EXTERIORAREA", "FLOW/EXTERIORWALLAREA", "FLOW/PERSON", "AIRCHANGES/HOUR"};
 
 constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::VentilationType::Num)> ventilationTypeNamesUC = {
     "NATURAL", "INTAKE", "EXHAUST", "BALANCED"};
@@ -536,7 +523,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             ErrorsFound = true;
         }
 
-        // Check whether this zone is also controleld by hybrid ventilation object with ventilation control option or not
+        // Check whether this zone is also controlled by hybrid ventilation object with ventilation control option or not
         bool ControlFlag = Avail::GetHybridVentilationControlStatus(state, thisZoneAirBalance.ZonePtr);
         if (ControlFlag && thisZoneAirBalance.BalanceMethod == DataHeatBalance::AirBalance::Quadrature) {
             thisZoneAirBalance.BalanceMethod = DataHeatBalance::AirBalance::None;
@@ -746,10 +733,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                 // Set space flow fractions
                 // Infiltration equipment design level calculation method.
-                AirflowSpecAlt flow = static_cast<AirflowSpecAlt>(getEnumValue(airflowAltNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowSpecNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
-                case AirflowSpecAlt::Flow:
-                case AirflowSpecAlt::FlowPerZone:
+                case AirflowSpec::FlowPerZone:
                     if (lNumericFieldBlanks(1)) {
                         ShowWarningError(state,
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
@@ -777,7 +763,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpecAlt::FlowPerArea:
+                case AirflowSpec::FlowPerArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(2) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(2) * thisSpace.FloorArea;
@@ -813,7 +799,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpecAlt::FlowPerExteriorArea:
+                case AirflowSpec::FlowPerExteriorArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(3) * thisSpace.ExteriorTotalSurfArea;
@@ -847,7 +833,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpecAlt::FlowPerExteriorWallArea:
+                case AirflowSpec::FlowPerExteriorWallArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(3) * thisSpace.ExtGrossWallArea;
@@ -881,7 +867,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpecAlt::AirChanges:
+                case AirflowSpec::AirChanges:
                     if (thisInfiltration.spaceIndex != 0) {
                         if (rNumericArgs(4) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(4) * thisSpace.Volume / Constant::SecInHour;
@@ -1398,9 +1384,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Ventilation equipment design level calculation method
-                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowSpecNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
-                case AirflowSpec::Flow:
                 case AirflowSpec::FlowPerZone:
                     thisVentilation.DesignLevel = rNumericArgs(1);
                     if (lNumericFieldBlanks(1)) {
@@ -2575,9 +2560,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Mixing equipment design level calculation method
-                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowSpecNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
-                case AirflowSpec::Flow:
                 case AirflowSpec::FlowPerZone:
                     thisMixing.DesignLevel = rNumericArgs(1);
                     if (lNumericFieldBlanks(1)) {
@@ -3195,9 +3179,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Mixing equipment design level calculation method.
-                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowSpecNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
-                case AirflowSpec::Flow:
                 case AirflowSpec::FlowPerZone:
                     thisMixing.DesignLevel = rNumericArgs(1);
                     if (lNumericFieldBlanks(1)) {
@@ -3802,7 +3785,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
             int AlphaNum = 2;
             int Zone1Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
-            if (Zone1Num == 0) {
+            int space1Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->space);
+            if ((Zone1Num == 0) && (space1Num == 0)) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", invalid (not found) {}=\"{}\".",
                                        RoutineName,
@@ -3811,11 +3795,14 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                        cAlphaFieldNames(AlphaNum),
                                        cAlphaArgs(AlphaNum)));
                 ErrorsFound = true;
+            } else if (Zone1Num == 0) {
+                Zone1Num = state.dataHeatBal->space(space1Num).zoneNum;
             }
 
             ++AlphaNum; // 3
             int Zone2Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
-            if (Zone2Num == 0) {
+            int space2Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->space);
+            if ((Zone2Num == 0) && (space2Num == 0)) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", invalid (not found) {}=\"{}\".",
                                        RoutineName,
@@ -3824,7 +3811,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                        cAlphaFieldNames(AlphaNum),
                                        cAlphaArgs(AlphaNum)));
                 ErrorsFound = true;
+            } else if (Zone2Num == 0) {
+                Zone2Num = state.dataHeatBal->space(space2Num).zoneNum;
             }
+
+            int spaceNumA = 0;
+            int spaceNumB = 0;
             if (Zone1Num == Zone2Num) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", The same zone name has been entered for both sides of a refrigerated door {}=\"{}\".",
@@ -3837,9 +3829,13 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             } else if (Zone1Num < Zone2Num) { // zone 1 will come first in soln loop, id zone 2 as mate zone
                 ZoneNumA = Zone1Num;
                 ZoneNumB = Zone2Num;
+                spaceNumA = space1Num;
+                spaceNumB = space2Num;
             } else { // zone 2 will come first in soln loop, id zone 1 as mate zone
                 ZoneNumA = Zone2Num;
                 ZoneNumB = Zone1Num;
+                spaceNumA = space2Num;
+                spaceNumB = space1Num;
             }
 
             if (!allocated(state.dataHeatBal->RefDoorMixing(ZoneNumA).OpenSchedPtr)) {
@@ -3891,6 +3887,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             ConnectionNumber = state.dataHeatBal->RefDoorMixing(ZoneNumA).NumRefDoorConnections + 1;
             state.dataHeatBal->RefDoorMixing(ZoneNumA).NumRefDoorConnections = ConnectionNumber;
             state.dataHeatBal->RefDoorMixing(ZoneNumA).ZonePtr = ZoneNumA;
+            state.dataHeatBal->RefDoorMixing(ZoneNumA).spaceIndex = spaceNumA;
+            state.dataHeatBal->RefDoorMixing(ZoneNumA).fromSpaceIndex = spaceNumB;
             state.dataHeatBal->RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber) = ZoneNumB;
             state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectionNumber) = NameThisObject;
             // need to make sure same pair of zones is only entered once.

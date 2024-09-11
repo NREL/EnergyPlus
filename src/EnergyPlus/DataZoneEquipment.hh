@@ -135,10 +135,13 @@ namespace DataZoneEquipment {
         BaseboardWater,
         BaseboardElectric,
         HighTemperatureRadiant,
-        LowTemperatureRadiant,
+        LowTemperatureRadiantConstFlow,
+        LowTemperatureRadiantVarFlow,
+        LowTemperatureRadiantElectric,
         ExhaustFan,
         HeatExchanger,
-        HeatPumpWaterHeater,
+        HeatPumpWaterHeaterPumpedCondenser,
+        HeatPumpWaterHeaterWrappedCondenser,
         DehumidifierDX,
         RefrigerationChillerSet,
         UserDefinedHVACForcedAir,
@@ -282,8 +285,9 @@ namespace DataZoneEquipment {
         int InNode;  // Air distribution unit inlet node
         int OutNode; // Air distribution unit Outlet node
         bool SupplyAirPathExists;
-        int MainBranchIndex;
-        int SupplyBranchIndex;
+        int AirLoopNum = 0;            // airloop number serving this ADU
+        int MainBranchIndex;           // airloop branch index (not the actual branch index)
+        int SupplyBranchIndex;         // airloop branch index (not the actual branch index)
         int AirDistUnitIndex;          // equipment number in EquipList
         int TermUnitSizingIndex;       // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
         int SupplyAirPathIndex;        // Pointer to SupplyAirPath serving this terminal unit
@@ -326,10 +330,9 @@ namespace DataZoneEquipment {
         Array1D_int ReturnNodePlenumNum;      // number of the return plenum attached to this return node (zero if none)
         Array1D_int ReturnFlowBasisNode;      // return air flow basis nodes
         Array1D_int ReturnNodeExhaustNodeNum; // Exhaust node number flow to a corrsponding return node due to light heat gain
-        // Array1D_int SharedExhaustNode;        // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the
-        // exhaust node value
         Array1D<LightReturnExhaustConfig>
             SharedExhaustNode; // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the exhaust node value
+        Array1D_int returnNodeSpaceMixerIndex; // index to SpaceHVAC:ZoneReturnMixer that feeds this return node (-1 if there is none)
 
         bool ZonalSystemOnly;     // TRUE if served by a zonal system (only)
         bool IsControlled;        // True when this is a controlled zone.
@@ -372,6 +375,11 @@ namespace DataZoneEquipment {
         void beginEnvirnInit(EnergyPlusData &state);
 
         void hvacTimeStepInit(EnergyPlusData &state, bool FirstHVACIteration);
+
+        void calcReturnFlows(EnergyPlusData &state,
+                             Real64 &ExpTotalReturnMassFlow,  // Expected total return air mass flow rate
+                             Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
+        );
     };
 
     struct EquipmentData // data for an individual component
@@ -477,15 +485,24 @@ namespace DataZoneEquipment {
         void adjustLoads(EnergyPlusData &state, int zoneNum, int equipTypeNum);
     };
 
-    struct ZoneEquipmentMixer : ZoneEquipmentSplitterMixer
+    struct ZoneMixer : ZoneEquipmentSplitterMixer
     {
-        int zoneEquipInletNodeNum = 0;
+        int outletNodeNum = 0;
 
         void setOutletConditions(EnergyPlusData &state);
+    };
 
+    struct ZoneEquipmentMixer : ZoneMixer
+    {
         void setInletFlows(EnergyPlusData &state);
     };
 
+    struct ZoneReturnMixer : ZoneMixer
+    {
+        void setInletConditions(EnergyPlusData &state);
+
+        void setInletFlows(EnergyPlusData &state);
+    };
     struct ControlList
     {
         // Members
@@ -567,6 +584,13 @@ namespace DataZoneEquipment {
                                     InputProcessor::json const objectFields,
                                     DataZoneEquipment::ZoneEquipmentMixer &thisZeqMixer);
 
+    void processZoneReturnMixerInput(EnergyPlusData &state,
+                                     std::string_view zeqMixerModuleObject,
+                                     int const zoneNum,
+                                     InputProcessor::json const objectSchemaProps,
+                                     InputProcessor::json const objectFields,
+                                     int mixerIndex);
+
     bool CheckZoneEquipmentList(EnergyPlusData &state,
                                 std::string_view ComponentType, // Type of component
                                 std::string_view ComponentName, // Name of component
@@ -614,7 +638,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     int NumOfZoneEquipLists = 0;
     Array1D<Avail::Status> ZoneEquipAvail;
     Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
-    EPVector<DataZoneEquipment::EquipConfiguration> spaceEquipConfig;
+    Array1D<DataZoneEquipment::EquipConfiguration> spaceEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;
     Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
     Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;
@@ -623,6 +647,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     Array1D<ExhaustAirSystemManager::ZoneExhaustControl> ZoneExhaustControlSystem; // 2022-01: maybe a better name?
     std::vector<DataZoneEquipment::ZoneEquipmentSplitter> zoneEquipSplitter;
     std::vector<DataZoneEquipment::ZoneEquipmentMixer> zoneEquipMixer;
+    std::vector<DataZoneEquipment::ZoneReturnMixer> zoneReturnMixer;
 
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {

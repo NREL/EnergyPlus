@@ -388,7 +388,7 @@ Examples of this statement in an IDF are:
 \subsection{SpaceHVAC:EquipmentConnections}\label{spacehvacequipmentconnections}
 
 If HVAC equipment is modeled at the Space level for one or more zones, the SpaceHVAC:EquipmentConnections statement defines the node connections to a space. Any space modeled with SpaceHVAC:EquipmentConnections will have its own air temperature and humidity ratio, and surfaces and internal gains in the zone will interact with the space conditions.
-Note that all nodes mentioned in the SpaceHVAC:EquipmentConnections input must be unique. That is, all nodes in all the SpaceHVAC:EquipmentConnections statements referenced by the ``Space Air Inlet Nodes'', ``Space Air Exhaust Nodes'', ``Space Air Node Name'' and ``Space Return Air Node Name'' cannot have any node name appearing more than once. Unlike ZoneHVAC:EquipmentConnections, there is no equipment list. Equipment is connected to spaces using \hyperref[spacehvaczoneequipmentsplitter]{SpaceHVAC:ZoneEquipmentSplitter} and \hyperref[spacehvaczoneequipmentmixer]{SpaceHVAC:ZoneEquipmentMixer} as shown in Figure \ref{fig:space-hvac-equipment-connections}. If any space in a zone has a SpaceHVAC:EquipmentConnections object, then all spaces in that zone must have one, even if they are not served by any HVAC equipment. SpaceHVAC is only used when \hyperref[zoneairheatbalancealgorithm]{ZoneAirHeatBalanceAlgorithm} ``Do Space Heat Balance for Simulation'' is Yes.
+Note that all nodes mentioned in the SpaceHVAC:EquipmentConnections input must be unique. That is, all nodes in all the SpaceHVAC:EquipmentConnections statements referenced by the ``Space Air Inlet Nodes'', ``Space Air Exhaust Nodes'', ``Space Air Node Name'' and ``Space Return Air Node Name'' cannot have any node name appearing more than once. Unlike ZoneHVAC:EquipmentConnections, there is no equipment list. Equipment is connected to spaces using \hyperref[spacehvaczoneequipmentsplitter]{SpaceHVAC:ZoneEquipmentSplitter}, \hyperref[spacehvaczoneequipmentmixer]{SpaceHVAC:ZoneEquipmentMixer} and \hyperref[spacehvaczonereturnmixer]{SpaceHVAC:ZoneReturnMixer} as shown in Figure \ref{fig:space-hvac-equipment-connections}. If any space in a zone has a SpaceHVAC:EquipmentConnections object, then all spaces in that zone must have one, even if they are not served by any HVAC equipment. SpaceHVAC is only used when \hyperref[zoneairheatbalancealgorithm]{ZoneAirHeatBalanceAlgorithm} ``Do Space Heat Balance for Simulation'' is Yes.
 
 \begin{figure}[hbtp]
 \centering
@@ -487,7 +487,7 @@ Name of the space which controls this piece of zone equipment (i.e. the space wh
 \paragraph{Field: Space Fraction Method}\label{field-seqsplitter-space-sizing-basis}
 
 The method used to autosize the space fractions. The choices are: DesignCoolingLoad, DesignHeatingLoad, FloorArea, Volume, and PerimeterLength. The default is DesignCoolingLoad.
-For example, if there are 3 Spaces listed below, the Space Output Fractions will be sized to Space1DesignCoolingLoad / Sum(Space1thru3DesignCoolingLoad).
+For example, if there are 3 Spaces listed below, the Space 1 Output Fraction will be sized to Space1DesignCoolingLoad / Sum(Space1thru3DesignCoolingLoad). PerimeterLength sums the width of exterior walls in each space.
 
 \paragraph{Field: Space \textless{}x\textgreater{} Name}\label{field-seqsplitter-space-name}
 
@@ -547,7 +547,7 @@ Name of the zone equipment inlet node that is supplied by the Space Nodes.
 \paragraph{Field: Space Fraction Method}\label{field-seqmixer-space-sizing-basis}
 
 The method used to autosize the space fractions. The choices are: DesignCoolingLoad, DesignHeatingLoad, FloorArea, Volume, and PerimeterLength. The default is DesignCoolingLoad.
-For example, if there are 3 Spaces listed below, the Space Output Fractions will be sized to Space1DesignCoolingLoad / Sum(Space1thru3DesignCoolingLoad).
+For example, if there are 3 Spaces listed below, the Space 1 Output Fraction will be sized to Space1DesignCoolingLoad / Sum(Space1thru3DesignCoolingLoad). PerimeterLength sums the width of exterior walls in each space.
 
 \paragraph{Field: Space \textless{}x\textgreater{} Name}\label{field-seqmixer-space-name}
 
@@ -579,5 +579,47 @@ SpaceHVAC:ZoneEquipmentMixer,
     Zone 5-Remainder,        !- Space 3 Name
     0.2,                     !- Space 3 Fraction {dimensionless}
     Zone 5-Remainder In Node;  !- Space 3 Node Name
+\end{lstlisting}
+
+\subsection{SpaceHVAC:ZoneReturnMixer}\label{spacehvaczonereturnmixer}
+
+The SpaceHVAC:ZoneReturnMixer object mixes the airflow from one or more space return air nodes to a zone return air node.
+
+\subsubsection{Inputs}\label{inputs-1-052-sretmixer}
+
+\paragraph{Field: Name}\label{field-sretmixer-name-015}
+
+Name of the mixer object.
+
+\paragraph{Field: Zone Name}\label{field-sretmixer-zone-name}
+
+Name of the zone which contains the return air node.
+
+\paragraph{Field: Zone Return Air Node Name}\label{field-sretmixer-zone-return-air-node-name}
+
+Name of the zone return air node that is supplied by the Space Return Air Nodes.
+
+\paragraph{Field: Space \textless{}x\textgreater{} Name}\label{field-sretmixer-space-name}
+
+Name of a space to supply air to this zone return air node.
+
+\paragraph{Field: Space \textless{}x\textgreater{} Return Air Node Name}\label{field-sretmixer-space-node-name}
+
+The name of a \hyperref[spacehvacequipmentconnections]{SpaceHVAC:EquipmentConnections} Return Air Node Name that sends airflow to the Zone Return Air Node.
+
+An example of this statement in an IDF is:
+
+\begin{lstlisting}
+
+  SpaceHVAC:ZoneReturnMixer,
+    Zone 5 Return Mixer,     !- Name
+    Zone 5,                  !- Zone Name
+    Zone 5 Out Node,         !- Zone Return Air Node Name
+    Space 5 Office,          !- Space 1 Name
+    Space 5 Office Return Node,  !- Space 1 Return Air Node Name
+    Space 5 Conference,      !- Space 2 Name
+    Space 5 Conference Return Node,  !- Space 2 Return Air Node Name
+    Zone 5-Remainder,        !- Space 3 Name
+    Zone 5-Remainder Return Node;  !- Space 3 Return Air Node Name
 \end{lstlisting}
 

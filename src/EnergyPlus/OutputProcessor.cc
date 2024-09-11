@@ -1572,7 +1572,7 @@ namespace OutputProcessor {
         //  write(outputfiledebug,*) 'resourcetype=',TRIM(resourcetype)
         //  write(outputfiledebug,*) 'ipunits type=',CodeForIPUnits
         if (units != Constant::Units::kg && units != Constant::Units::J && units != Constant::Units::m3 && units != Constant::Units::L) {
-            ShowWarningError(
+            ShowWarningMessage(
                 state, format("DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[{}].", Constant::unitNames[(int)units]));
             ErrorsFound = true;
         }
@@ -3058,7 +3058,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::TimeStepType timeStepType, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::StoreType storeType,       // State, Average=1, NonState, Sum=2
                          std::string const &key,                     // Associated Key for this variable
-                         int const indexGroupKey,                    // Group identifier for SQL output
+                         [[maybe_unused]] int const indexGroupKey,   // Group identifier for SQL output
                          OutputProcessor::ReportFreq freq            // Internal use -- causes reporting at this freqency
 )
 {
@@ -3647,13 +3647,13 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
         if (reqVar->key.empty()) reqVar->key = "*";
         if (has(reqVar->name, "OPAQUE SURFACE INSIDE FACE CONDUCTION") && !state.dataGlobal->DisplayAdvancedReportVariables &&
             !state.dataOutputProcessor->OpaqSurfWarned) {
-            ShowWarningError(state, R"(Variables containing "Opaque Surface Inside Face Conduction" are now "advanced" variables.)");
+            ShowWarningMessage(state, R"(Variables containing "Opaque Surface Inside Face Conduction" are now "advanced" variables.)");
             ShowContinueError(state, "You must enter the \"Output:Diagnostics,DisplayAdvancedReportVariables;\" statement to view.");
             ShowContinueError(state, "First, though, read cautionary statements in the \"InputOutputReference\" document.");
             state.dataOutputProcessor->OpaqSurfWarned = true;
         }
         if (!state.dataOutputProcessor->Rept) {
-            ShowWarningError(state, "The following Report Variables were requested but not generated -- check.rdd file");
+            ShowWarningMessage(state, "The following Report Variables were requested but not generated -- check.rdd file");
             ShowContinueError(state, "Either the IDF did not contain these elements, the variable name is misspelled,");
             ShowContinueError(state,
                               "or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;");
