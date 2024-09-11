@@ -215,7 +215,6 @@ void GetPurchasedAir(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static constexpr std::string_view RoutineName("GetPurchasedAir: "); // include trailing blank space
     bool ErrorsFound(false);                                            // If errors detected in input
-    bool UniqueNodeError;                                               // Flag for non-unique node error(s)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "ZoneHVAC:IdealLoadsAirSystem";
 
@@ -279,7 +278,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            ObjectIsNotParent);
-            UniqueNodeError = false;
+            bool UniqueNodeError = false;
             CheckUniqueNodeNames(state,
                                  state.dataIPShortCut->cAlphaFieldNames(3),
                                  UniqueNodeError,
@@ -1157,14 +1156,7 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
     using ZonePlenum::GetReturnPlenumName;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-    bool UnitOn;        // simple checks for error
-    bool CoolOn;        // simple checks for error
-    bool HeatOn;        // simple checks for error
-    int SupplyNodeNum;  // Node number for ideal loads supply node
-    int ExhaustNodeNum; // Node number for ideal loads exhaust node
-    int NodeIndex;      // Array index of zone inlet or zone exhaust node that matches ideal loads node
-    bool UseReturnNode; // simple checks for error
+    bool UnitOn; // simple checks for error
 
     auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
 
@@ -1182,7 +1174,7 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
     // need to check all units to see if they are on Zone Equipment List or issue warning
     if (!state.dataPurchasedAirMgr->InitPurchasedAirZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataPurchasedAirMgr->InitPurchasedAirZoneEquipmentListChecked = true;
-        for (Loop = 1; Loop <= state.dataPurchasedAirMgr->NumPurchAir; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataPurchasedAirMgr->NumPurchAir; ++Loop) {
 
             // link with return plenum if used (i.e., PlenumExhaustAirNodeNum will be non-zero)
             if (PurchAir(Loop).PlenumExhaustAirNodeNum > 0) {
@@ -1212,11 +1204,11 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
 
         // Is the supply node really a zone inlet node?
         // this check has to be done here because of SimPurchasedAir passing in ControlledZoneNum
-        SupplyNodeNum = PurchAir(PurchAirNum).ZoneSupplyAirNodeNum;
+        int SupplyNodeNum = PurchAir(PurchAirNum).ZoneSupplyAirNodeNum;
         if (SupplyNodeNum > 0) {
-            NodeIndex = FindNumberInList(SupplyNodeNum,
-                                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode,
-                                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes);
+            int NodeIndex = FindNumberInList(SupplyNodeNum,
+                                             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode,
+                                             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes);
             if (NodeIndex == 0) {
                 ShowSevereError(state, format("InitPurchasedAir: In {} = {}", PurchAir(PurchAirNum).cObjectName, PurchAir(PurchAirNum).Name));
                 ShowContinueError(state,
@@ -1231,12 +1223,12 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
         // Set recirculation node number
         // If exhaust node is specified, then recirculation is exhaust node, otherwise use zone return node
         // this check has to be done here because of SimPurchasedAir passing in ControlledZoneNum
-        UseReturnNode = false;
+        bool UseReturnNode = false;
         if (PurchAir(PurchAirNum).ZoneExhaustAirNodeNum > 0) {
-            ExhaustNodeNum = PurchAir(PurchAirNum).ZoneExhaustAirNodeNum;
-            NodeIndex = FindNumberInList(ExhaustNodeNum,
-                                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode,
-                                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes);
+            int ExhaustNodeNum = PurchAir(PurchAirNum).ZoneExhaustAirNodeNum;
+            int NodeIndex = FindNumberInList(ExhaustNodeNum,
+                                             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode,
+                                             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes);
             if (NodeIndex == 0) {
                 ShowSevereError(state, format("InitPurchasedAir: In {} = {}", PurchAir(PurchAirNum).cObjectName, PurchAir(PurchAirNum).Name));
                 ShowContinueError(state,
@@ -1324,7 +1316,7 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
         }
         //        END IF
         // Check if cooling available
-        CoolOn = true;
+        bool CoolOn = true;
         //        IF (PurchAir(PurchAirNum)%CoolSchedPtr > 0) THEN
         if (GetCurrentScheduleValue(state, PurchAir(PurchAirNum).CoolSchedPtr) <= 0) {
             CoolOn = false;
@@ -1371,7 +1363,7 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
         }
         //        END IF
         // Check if heating and cooling available
-        HeatOn = true;
+        bool HeatOn = true;
         //        IF (PurchAir(PurchAirNum)%HeatSchedPtr > 0) THEN
         if (GetCurrentScheduleValue(state, PurchAir(PurchAirNum).HeatSchedPtr) <= 0) {
             HeatOn = false;
