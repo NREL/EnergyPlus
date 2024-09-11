@@ -4393,7 +4393,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
+    Material::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

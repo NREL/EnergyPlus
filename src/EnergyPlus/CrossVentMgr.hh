@@ -81,7 +81,7 @@ struct CrossVentMgrData : BaseGlobalStruct
     bool InitUCSDCV_MyOneTimeFlag = true;
     Array1D_bool InitUCSDCV_MyEnvrnFlag;
 
-    void init_state([[maybe_unused]] EnergyPlusData &state)
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
 

@@ -45,13 +45,12 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ZoneContaminantPredictorCorrector_hh_INCLUDED
-#define ZoneContaminantPredictorCorrector_hh_INCLUDED
+#ifndef extendedHI_hh_INCLUDED
+#define extendedHI_hh_INCLUDED
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -59,65 +58,34 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace ZoneContaminantPredictorCorrector {
+namespace ExtendedHI {
 
-    void ManageZoneContaminanUpdates(EnergyPlusData &state,
-                                     DataHeatBalFanSys::PredictorCorrectorCtrl UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
-                                     bool ShortenTimeStepSys,
-                                     bool UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
-                                     Real64 PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
-    );
-
-    void GetZoneContaminanInputs(EnergyPlusData &state);
-
-    void GetZoneContaminanSetPoints(EnergyPlusData &state);
-
-    void InitZoneContSetPoints(EnergyPlusData &state);
-
-    void PredictZoneContaminants(EnergyPlusData &state,
-                                 bool ShortenTimeStepSys,
-                                 bool UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
-                                 Real64 PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
-    );
-
-    void PushZoneTimestepHistories(EnergyPlusData &state);
-
-    void PushSystemTimestepHistories(EnergyPlusData &state);
-
-    void RevertZoneTimestepHistories(EnergyPlusData &state);
-
-    void InverseModelCO2(EnergyPlusData &state,
-                         int ZoneNum,                // Zone number
-                         Real64 CO2Gain,             // Zone total CO2 gain
-                         Real64 CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
-                         Real64 ZoneMassFlowRate,    // Zone air mass flow rate
-                         Real64 CO2MassFlowRate,     // Zone air CO2 mass flow rate
-                         Real64 RhoAir               // Air density
-    );
-
-    void CorrectZoneContaminants(EnergyPlusData &state,
-                                 bool UseZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
-    );
-
-} // namespace ZoneContaminantPredictorCorrector
-
-struct ZoneContaminantPredictorCorrectorData : BaseGlobalStruct
-{
-    bool GetZoneAirContamInputFlag = true; // True when need to get input
-    bool MyOneTimeFlag = true;
-    bool MyEnvrnFlag = true;
-    bool MyConfigOneTimeFlag = true;
-
-    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    enum class EqvarName
     {
-    }
+        Invalid = -1,
+        Phi = 1,
+        Rf = 2,
+        Rs = 3,
+        DTcdt = 4,
+        Num
+    };
 
-    void clear_state() override
-    {
-        new (this) ZoneContaminantPredictorCorrectorData();
-    }
-};
+    Real64 pvstar(Real64 T);
+    Real64 Le(Real64 T);
+    Real64 Qv(Real64 Ta, Real64 Pa);
+    Real64 Zs(Real64 Rs);
+    Real64 Ra(Real64 Ts, Real64 Ta);
+    Real64 Ra_bar(Real64 Tf, Real64 Ta);
+    Real64 Ra_un(Real64 Ts, Real64 Ta);
+    int find_eqvar_name(EnergyPlusData &state, Real64 Ta, Real64 RH);
+    Real64 find_eqvar_value(EnergyPlusData &state, Real64 Ta, Real64 RH);
+    Real64 find_eqvar_phi(EnergyPlusData &state, Real64 Ta, Real64 RH);
+    Real64 find_eqvar_Rf(EnergyPlusData &state, Real64 Ta, Real64 RH);
+    Real64 find_eqvar_rs(EnergyPlusData &state, Real64 Ta, Real64 RH);
+    Real64 find_T(EnergyPlusData &state, int eqvar_name, Real64 eqvar);
+    Real64 heatindex(EnergyPlusData &state, Real64 Ta, Real64 RH);
 
+} // namespace ExtendedHI
 } // namespace EnergyPlus
 
 #endif

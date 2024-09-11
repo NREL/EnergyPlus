@@ -1086,8 +1086,6 @@ namespace StandardRatings {
         Real64 EER2(0.0);           // Energy Efficiency Ratio using AHRI 210/140 - 2023
         Real64 EER_2022(0.0);       // Energy Efficiency Ratio in SI [W/W]
         Real64 IEER_2022(0.0);      // Integerated Energy Efficiency Ratio in SI [W/W]
-        Real64 NetCoolingCapRated2022(0.0);
-        Real64 NetCoolingCapRatedMaxSpeed2023(0.0);
 
         Real64 HSPF(0.0);                       // Heating Seasonal Performance Factor in SI [W/W]
         Real64 NetHeatingCapRatedHighTemp(0.0); // Net Rated heating capacity at high temp [W]
@@ -2440,8 +2438,9 @@ namespace StandardRatings {
         return EER;
     }
 
-    std::tuple<Real64, Real64, Real64, Real64>
-    SEER2CalulcationCurveFit(EnergyPlusData &state, std::string const &CoilType, EnergyPlus::CoilCoolingDXCurveFitOperatingMode operatingMode)
+    std::tuple<Real64, Real64, Real64, Real64> SEER2CalulcationCurveFit(EnergyPlusData &state,
+                                                                        [[maybe_unused]] std::string const &CoilType,
+                                                                        EnergyPlus::CoilCoolingDXCurveFitOperatingMode operatingMode)
     {
         Real64 EEER2(0.0);
         Real64 SEER2_User(0.0);
@@ -4106,7 +4105,7 @@ namespace StandardRatings {
     std::pair<Real64, int> GetMatchingSpeedFromBuildingLoad(Real64 buildingLoad, const Array1A<Real64> &speedList)
     {
         std::pair<int, Real64> result = {-1, -1}; // Initialize result to indicate no suitable number found
-        for (int i = 0; i < speedList.size(); ++i) {
+        for (int i = 0; i < speedList.isize(); ++i) {
             Real64 scaledSpeed = speedList[i];
             if (scaledSpeed >= buildingLoad) {
                 result = {speedList[i], i};
@@ -6307,17 +6306,17 @@ namespace StandardRatings {
                 Real64 q_H0_low = Q_H0_Low(spnum);
                 Real64 q_H1_low = Q_H1_Low(spnum);
                 Real64 q_H2_int = Q_H2_Int(spnum);
-                Real64 q_H1_full = Q_H1_Full(spnum);
-                Real64 q_H2_full = Q_H2_Full(spnum);
-                Real64 q_H3_full = Q_H3_Full(spnum);
-                Real64 q_H4_full = Q_H4_Full(spnum);
+                Real64 q_H1_full = Q_H1_Full(spnum + 1);
+                Real64 q_H2_full = Q_H2_Full(spnum + 1);
+                Real64 q_H3_full = Q_H3_Full(spnum + 1);
+                Real64 q_H4_full = Q_H4_Full(spnum + 1);
                 // Equation 11.177 AHRI-2023
                 //?? (replaced 62 with 35) in Ratio expression // (t=>35-47/62-47)
                 Real64 q_35_low = // q_H1_low + (q_H0_low - q_H1_low) * ((t - (8.33)) / (1.66 - (8.33)));
                     q_H1_low + (q_H0_low - q_H1_low) * ((1.67 - (8.33)) / (16.67 - (8.33)));
 
                 // Equation 11.191 AHRI-2023
-                Real64 N_Hq = min(1.0, (q_H2_int - q_35_low) / (q_H2_full - q_35_low));
+                Real64 N_Hq = (q_H2_full != q_35_low) ? min(1.0, (q_H2_int - q_35_low) / (q_H2_full - q_35_low)) : 0.0;
                 N_Hq = max(0.0, N_Hq);
                 // Equation 11.190 AHRI-2023
                 Real64 M_Hq = (q_H0_low - q_H1_low) / (16.66 - 8.33) * (1.0 - N_Hq) + (q_H2_full - q_H3_full) / (1.66 - (-8.33)) * N_Hq;
@@ -6326,17 +6325,17 @@ namespace StandardRatings {
                 Real64 p_H0_low = P_H0_Low(spnum);
                 Real64 p_H1_low = P_H1_Low(spnum);
                 Real64 p_H2_int = P_H2_Int(spnum);
-                Real64 p_H1_full = P_H1_Full(spnum);
-                Real64 p_H2_full = P_H2_Full(spnum);
-                Real64 p_H3_full = P_H3_Full(spnum);
-                Real64 p_H4_full = P_H4_Full(spnum);
+                Real64 p_H1_full = P_H1_Full(spnum + 1);
+                Real64 p_H2_full = P_H2_Full(spnum + 1);
+                Real64 p_H3_full = P_H3_Full(spnum + 1);
+                Real64 p_H4_full = P_H4_Full(spnum + 1);
                 // Equation 11.178 AHRI - 2023
                 //?? (replaced 62 with 35) in Ratio expression (t=>35 F-47/35-47)
                 Real64 p_35_low = // p_H1_low + (p_H0_low - p_H1_low) * ((t - (8.33)) / (1.66 - (8.33)));
                     p_H1_low + (p_H0_low - p_H1_low) * ((1.67 - (8.33)) / (16.67 - (8.33)));
 
                 // Equation 11.194 AHRI-2023
-                Real64 N_HE = min(1.0, (p_H2_int - p_35_low) / (p_H2_full - p_35_low));
+                Real64 N_HE = (p_H2_full != p_35_low) ? min(1.0, (p_H2_int - p_35_low) / (p_H2_full - p_35_low)) : 0.0;
                 N_HE = max(0.0, N_HE);
 
                 // Equation 11.193 AHRI-2023
@@ -6350,35 +6349,63 @@ namespace StandardRatings {
                 Real64 q_hs(0.0);
                 Real64 p_hs(0.0);
                 // Low Speed
-                if (t < -8.33) {
-                    q_low = Q_H3_Full(spnum) + ((Q_H1_Low(spnum) - Q_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
-
-                    p_low = P_H3_Full(spnum) + ((P_H1_Low(spnum) - P_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
-                } else if (t >= 4.44) {
-                    q_low = Q_H1_Low(spnum) + ((Q_H0_Low(spnum) - Q_H1_Low(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempRated) /
-                                               (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated));
-                    p_low = P_H1_Low(spnum) + ((P_H0_Low(spnum) - P_H1_Low(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempRated) /
-                                               (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated));
-                } else {
-                    q_low = Q_H3_Full(spnum) + ((Q_H2_Full(spnum) - Q_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
-                    p_low = P_H3_Full(spnum) + ((P_H2_Full(spnum) - P_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
+                if (t >= 8.33) {
+                    Real64 ratio = // (t - 8.33) / (16.67 - 8.33)
+                        (t - HeatingOutdoorCoilInletAirDBTempRated) /
+                        (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated);
+                    // equation 11.179
+                    q_low = Q_H1_Low(spnum) + ((Q_H1_Low(spnum) - Q_H3_Full(spnum)) * ratio);
+                    // equation 11.182
+                    p_low = P_H1_Low(spnum) + ((P_H1_Low(spnum) - P_H3_Full(spnum)) * ratio);
+                } else if (t >= 1.67 && t < 8.33) {
+                    Real64 ratio = // (t - 1.67) / (8.33 - 1.67)
+                        (t - HeatingOutdoorCoilInletAirDBTempH2Test) /
+                        (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH2Test);
+                    // equation 11.180
+                    q_low = Q_H2_Int(spnum) + ((Q_H0_Low(spnum) - Q_H1_Low(spnum)) * ratio);
+                    // equation 11.183
+                    p_low = P_H2_Int(spnum) + ((P_H0_Low(spnum) - P_H1_Low(spnum)) * ratio);
+                } else if (t < 1.67) {
+                    // for now Q_H2_Int is replaced with Q_H_Int, no equation for the later
+                    // equation 11.181
+                    q_low = Q_H2_Int(spnum);
+                    // equation 11.184
+                    p_low = P_H2_Int(spnum);
                 }
 
                 // High Speed
-                if ((t <= -8.33) || (t >= 7.20)) {
-                    q_hs = Q_H3_Full(spnum + 1) + ((Q_H1_Full(spnum + 1) - Q_H3_Full(spnum + 1)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                   (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
-                    p_hs = P_H3_Full(spnum + 1) + ((P_H1_Full(spnum + 1) - P_H3_Full(spnum + 1)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                   (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
-                } else {
-                    q_hs = Q_H3_Full(spnum + 1) + ((Q_H2_Full(spnum + 1) - Q_H3_Full(spnum + 1)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                   (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
-                    p_hs = P_H3_Full(spnum + 1) + ((P_H2_Full(spnum + 1) - P_H3_Full(spnum + 1)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
-                                                   (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
+                if (t <= -15.0) {
+                    Real64 ratio = // ((t - (-15.0)) / (8.33 - (-8.33)));
+                        (t - HeatingOutdoorCoilInletAirDBTemp_H4FullTest) /
+                        (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test);
+                    // equation 11.205
+                    q_hs = Q_H4_Full(spnum + 1) + ((Q_H1_Full(spnum + 1) - Q_H3_Full(spnum + 1)) * ratio);
+                    // equation 11.206
+                    p_hs = P_H4_Full(spnum + 1) + ((P_H1_Full(spnum + 1) - P_H3_Full(spnum + 1)) * ratio);
+                } else if ((t > -15.0) && (t < -8.33)) {
+                    Real64 ratio = // ((t - (-15.0)) / (-8.33 - (-15.0)));
+                        (t - HeatingOutdoorCoilInletAirDBTemp_H4FullTest) /
+                        (HeatingOutdoorCoilInletAirDBTempH3Test - HeatingOutdoorCoilInletAirDBTemp_H4FullTest);
+                    // equation 11.203
+                    q_hs = Q_H4_Full(spnum + 1) + ((Q_H3_Full(spnum + 1) - Q_H4_Full(spnum + 1)) * ratio);
+                    // equation 11.204
+                    p_hs = P_H4_Full(spnum + 1) + ((P_H3_Full(spnum + 1) - P_H4_Full(spnum + 1)) * ratio);
+                } else if ((t > -8.33) && (t < t_ob)) {
+                    Real64 ratio = //((t - (-8.33)) / (1.67 - (-8.33)));
+                        (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                        (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test);
+                    // equation 11.201
+                    q_hs = Q_H3_Full(spnum + 1) + ((Q_H2_Full(spnum + 1) - Q_H3_Full(spnum + 1)) * ratio);
+                    // equation 11.202
+                    p_hs = P_H3_Full(spnum + 1) + ((P_H2_Full(spnum + 1) - P_H3_Full(spnum + 1)) * ratio);
+                } else if ((t >= t_ob) && (t <= -8.33)) {
+                    Real64 ratio = // ((t - (-8.33)) / (8.33 - (-8.33)));
+                        (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                        (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test);
+                    // equation 11.199
+                    q_hs = Q_H3_Full(spnum + 1) + ((Q_H1_Full(spnum + 1) - Q_H3_Full(spnum + 1)) * ratio);
+                    // equation 11.200
+                    p_hs = P_H3_Full(spnum + 1) + ((P_H1_Full(spnum + 1) - P_H3_Full(spnum + 1)) * ratio);
                 }
 
                 Real64 cop_low = q_low / p_low;
@@ -6444,18 +6471,30 @@ namespace StandardRatings {
                 } else if (bl >= q_full) {
                     // CASE 3 : 11.2.2.3.3 AHRI-2023
                     // Building Load is greater than the capacity of the unit at the Full Compressor Speed, q_full <= bl or (bl >= q_full:)
-                    if (t > (-15) || t <= (-8.33)) { // Logical disjunction always evaluates to true: t > -15 || t <= -8.33
-                        Real64 t_ratio = (t - (-15)) / ((-8.33) - (-15));
-                        // Equation 11.203 AHRI-2023
-                        q_full = q_H4_full + (q_H3_full - q_H4_full) * t_ratio;
-                        // Equation 11.204 AHRI-2023
-                        p_full = p_H4_full + (p_H3_full - p_H4_full) * t_ratio;
-                    } else if (t < (-15)) {
-                        Real64 t_ratio = (t - (-15)) / (8.33 - (-8.33));
+                    if (t <= -15.0) {
+                        Real64 t_ratio = (t - (-15.0)) / ((8.33) - (-8.33));
                         // Equation 11.205 AHRI-2023
                         q_full = q_H4_full + (q_H1_full - q_H3_full) * t_ratio;
                         // Equation 11.206 AHRI-2023
                         p_full = p_H4_full + (p_H1_full - p_H3_full) * t_ratio;
+                    } else if (t > (-15.0) && t < (-8.33)) {
+                        Real64 t_ratio = (t - (-15.0)) / (-8.33 - (-15.0));
+                        // Equation 11.203 AHRI-2023
+                        q_full = q_H4_full + (q_H3_full - q_H4_full) * t_ratio;
+                        // Equation 11.204 AHRI-2023
+                        p_full = p_H4_full + (p_H3_full - p_H4_full) * t_ratio;
+                    } else if (t > (-8.33) && t < t_ob) {
+                        Real64 t_ratio = (t - (-8.33)) / (1.67 - (-8.33));
+                        // Equation 11.201 AHRI-2023
+                        q_full = q_H3_full + (q_H2_full - q_H3_full) * t_ratio;
+                        // Equation 11.202 AHRI-2023
+                        p_full = p_H3_full + (p_H2_full - p_H3_full) * t_ratio;
+                    } else if (t >= t_ob || t == (-8.33)) {
+                        Real64 t_ratio = (t - (-8.33)) / (8.33 - (-8.33));
+                        // Equation 11.199 AHRI-2023
+                        q_full = q_H3_full + (q_H1_full - q_H3_full) * t_ratio;
+                        // Equation 11.200 AHRI-2023
+                        p_full = p_H3_full + (p_H1_full - p_H3_full) * t_ratio;
                     }
 
                     // if not conducting H4 Test then use this block

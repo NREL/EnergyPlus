@@ -757,7 +757,6 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         }
         // fill out some fan information
         HVAC::FanType locFanType = HVAC::FanType::Invalid;
-        bool errorsFound(false);
         if (c->supFanNum == 0) {
             c->supFanNum = Fans::GetFanIndex(state, c->fanAssociatedWithCoilName);
         }
@@ -919,7 +918,6 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
         auto &thisSubEq = zoneEquipList.EquipData(equipLoop).SubEquipData;
 
         // search for coil and fan SubEquipData and return parent type/name and fan type/name for coil reports.
-        auto const &coilIterator = std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubCoilLambda);
         if (std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubCoilLambda) != thisSubEq.end()) {
             c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
             c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
