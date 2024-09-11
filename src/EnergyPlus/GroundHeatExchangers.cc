@@ -1369,7 +1369,7 @@ void GLHEVert::combineShortAndLongTimestepGFunctions()
     // Add the rest of the long time-step g-functions to the combined curve
     for (int index_longTS = this->myRespFactors->GFNC.l(); index_longTS <= this->myRespFactors->GFNC.u(); ++index_longTS) {
         GFNC_combined.push_back(this->myRespFactors->GFNC(index_longTS));
-        LNTTS_combined.push_back(this->myRespFactors->LNTTS[index_longTS]);
+        LNTTS_combined.push_back(this->myRespFactors->LNTTS[index_longTS - 1]);
     }
 
     // Reset vectors for final usage
