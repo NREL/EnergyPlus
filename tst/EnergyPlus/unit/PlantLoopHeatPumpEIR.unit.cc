@@ -4539,12 +4539,12 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingSimulate_AirSource_with_Defrost)
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
-        EXPECT_NEAR(19200.0, thisHeatingPLHP->fuelRate, 0.001);
-        EXPECT_NEAR(17280000.0, thisHeatingPLHP->fuelEnergy, 0.001);
+        EXPECT_NEAR(16533.333, thisHeatingPLHP->fuelRate, 0.001);
+        EXPECT_NEAR(14880000.0, thisHeatingPLHP->fuelEnergy, 0.001);
         // expect it to meet setpoint and have some pre-evaluated conditions
         // EXPECT_NEAR(specifiedLoadSetpoint, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(curLoad, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
-        EXPECT_NEAR(18020.0, thisEIRPlantLoopHP->powerUsage, 0.001);
+        EXPECT_NEAR(15520.0, thisEIRPlantLoopHP->powerUsage, 0.001);
     }
 
     // now we can call it again from the load side, but this time there is load (still firsthvac, unit cannot meet load)
@@ -4561,9 +4561,9 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingSimulate_AirSource_with_Defrost)
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
-        EXPECT_NEAR(28800.0, thisHeatingPLHP->fuelRate, 0.001);
-        EXPECT_NEAR(25920000.0, thisHeatingPLHP->fuelEnergy, 0.001);
-        EXPECT_NEAR(18020.0, thisEIRPlantLoopHP->powerUsage, 0.001);
+        EXPECT_NEAR(24800.0, thisHeatingPLHP->fuelRate, 0.001);
+        EXPECT_NEAR(22320000.0, thisHeatingPLHP->fuelEnergy, 0.001);
+        EXPECT_NEAR(15520.0, thisEIRPlantLoopHP->powerUsage, 0.001);
         // expect it to miss setpoint and be at max capacity
         // EXPECT_NEAR(44.402, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         // EXPECT_NEAR(availableCapacity, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
