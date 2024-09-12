@@ -2670,14 +2670,12 @@ namespace LowTempRadiantSystem {
         std::string SizingString;            // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;                     // autosized value of coil input field
         int FieldNum = 1;                    // IDD numeric field number where input field description is found
-        int SizingMethod;                    // Integer representation of sizing method name (e.g. CoolingCapacitySizing, HeatingCapacitySizing)
         bool PrintFlag;                      // TRUE when sizing information is reported in the eio file
-        int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
-                                // FractionOfAutosizedHeatingCapacity )
-        Real64 DesCoilLoad;     // design autosized or user specified capacity
-        OperatingMode OpMode(OperatingMode::ClgHtg); // System operating mode
-        Real64 WaterVolFlowMaxDes;                   // Design water volume flow rate for reproting
-        Real64 WaterVolFlowMaxUser;                  // User hard-sized water volume flow rate for reproting
+        int CapSizingMethod;        // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
+                                    // FractionOfAutosizedHeatingCapacity )
+        Real64 DesCoilLoad;         // design autosized or user specified capacity
+        Real64 WaterVolFlowMaxDes;  // Design water volume flow rate for reproting
+        Real64 WaterVolFlowMaxUser; // User hard-sized water volume flow rate for reproting
 
         auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
 
@@ -2697,7 +2695,7 @@ namespace LowTempRadiantSystem {
 
                 CompType = "ZoneHVAC:LowTemperatureRadiant:Electric";
                 CompName = state.dataLowTempRadSys->ElecRadSys(RadSysNum).Name;
-                SizingMethod = HeatingCapacitySizing;
+                int SizingMethod = HeatingCapacitySizing;
                 FieldNum = 1;
                 PrintFlag = true;
                 SizingString = state.dataLowTempRadSys->ElecRadSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
@@ -2740,7 +2738,6 @@ namespace LowTempRadiantSystem {
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
-                                SizingMethod = AutoCalculateSizing;
                                 state.dataSize->DataConstantUsedForSizing =
                                     state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                                 state.dataSize->DataFractionUsedForSizing = 1.0;
@@ -2796,7 +2793,7 @@ namespace LowTempRadiantSystem {
 
             if (state.dataSize->CurZoneEqNum > 0) {
 
-                SizingMethod = HeatingCapacitySizing;
+                int SizingMethod = HeatingCapacitySizing;
                 FieldNum = 2;
                 PrintFlag = true;
                 SizingString = state.dataLowTempRadSys->HydronicRadiantSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
@@ -2839,7 +2836,6 @@ namespace LowTempRadiantSystem {
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
-                                SizingMethod = AutoCalculateSizing;
                                 state.dataSize->DataConstantUsedForSizing =
                                     state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                                 state.dataSize->DataFractionUsedForSizing = 1.0;
@@ -2979,7 +2975,7 @@ namespace LowTempRadiantSystem {
 
             if (state.dataSize->CurZoneEqNum > 0) {
 
-                SizingMethod = CoolingCapacitySizing;
+                int SizingMethod = CoolingCapacitySizing;
                 FieldNum = 4;
                 PrintFlag = true;
                 SizingString = state.dataLowTempRadSys->HydronicRadiantSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
@@ -3021,7 +3017,6 @@ namespace LowTempRadiantSystem {
                         if (CapSizingMethod == CoolingDesignCapacity) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
-                                SizingMethod = AutoCalculateSizing;
                                 state.dataSize->DataConstantUsedForSizing =
                                     state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
                                 state.dataSize->DataFractionUsedForSizing = 1.0;
@@ -3229,6 +3224,7 @@ namespace LowTempRadiantSystem {
 
             CompType = "ZoneHVAC:LowTemperatureRadiant:ConstantFlow";
             CompName = state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name;
+            OperatingMode OpMode; // System operating mode
 
             // Check which operating system it is
             int HeatNode = state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode;
@@ -3531,23 +3527,19 @@ namespace LowTempRadiantSystem {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ActWaterFlow; // actual water flow for heating or cooling [kg/sec]
-        int ControlNode;     // the hot water or cold water inlet node
         Real64 ControlTemp;  // temperature of whatever is controlling the radiant system
         Real64 MassFlowFrac; // fraction of the maximum water flow rate as determined by the control algorithm
         Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/sec]
         Real64 OffTempCool;  // temperature at which the flow rate throttles back to zero for cooling
         Real64 OffTempHeat;  // temperature at which the flow rate throttles back to zero for heating
-        int ZoneNum;         // number of zone being served
         Real64 mdot;         // local temporary for fluid mass flow rate
         bool SysRunning;     // True when system is running
 
         VarFlowRadDesignData variableFlowDesignDataObject =                           // Is this intended to be a copy?
             state.dataLowTempRadSys->HydronicRadiantSysDesign(this->DesignObjectPtr); // Contains the data for variable flow hydronic systems
 
-        ControlNode = 0;
         MaxWaterFlow = 0.0;
         ActWaterFlow = 0.0;
-        ZoneNum = this->ZonePtr;
         this->OperatingMode = NotOperating;
         SysRunning = true;
 
@@ -3614,11 +3606,9 @@ namespace LowTempRadiantSystem {
                 this->setOperatingModeBasedOnChangeoverDelay(state);
 
                 if (this->OperatingMode == HeatingMode) {
-                    ControlNode = this->HotWaterInNode;
                     MaxWaterFlow = this->WaterFlowMaxHeat;
                     MassFlowFrac = this->calculateOperationalFraction(OffTempHeat, ControlTemp, variableFlowDesignDataObject.HotThrottlRange);
                 } else if (this->OperatingMode == CoolingMode) {
-                    ControlNode = this->ColdWaterInNode;
                     MaxWaterFlow = this->WaterFlowMaxCool;
                     MassFlowFrac = this->calculateOperationalFraction(OffTempCool, ControlTemp, variableFlowDesignDataObject.ColdThrottlRange);
                 } else {
