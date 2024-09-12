@@ -140,6 +140,7 @@ if [ ! "$link_directory" = "n" ]; then
 		rm -f "${link_directory}/energyplus"
 		rm -f "${link_directory}/Energy+.idd"
 		rm -f "${link_directory}/Energy+.schema.epJSON"
+		rm -f "${link_directory}/EPMacro"
 		rm -f "${link_directory}/ExpandObjects"
 		rm -f "${link_directory}/HVAC-Diagram"
 		rm -f "${link_directory}/IDFVersionUpdater"
