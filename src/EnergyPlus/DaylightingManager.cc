@@ -4780,7 +4780,7 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
     }
 }
 
-bool doesDayLightingUseDElight(EnergyPlusData &state)
+bool doesDayLightingUseDElight(EnergyPlusData const &state)
 {
     auto const &dl = state.dataDayltg;
     for (auto const &znDayl : dl->daylightControl) {
