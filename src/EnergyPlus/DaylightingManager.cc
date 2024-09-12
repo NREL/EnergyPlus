@@ -641,7 +641,7 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
     // This subroutine does the daylighting coefficient calculation for the
     // daylighting and illuminance map reference points.
     auto &dl = state.dataDayltg;
-    auto &s_surf = state.dataSurface;
+    auto const &s_surf = state.dataSurface;
 
     if (dl->VeryFirstTime) {
         // make sure all necessary surfaces match to pipes
@@ -707,7 +707,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     // PURPOSE OF THIS SUBROUTINE:
     // Provides calculations for Daylighting Coefficients for daylighting reference points
     auto &dl = state.dataDayltg;
-    auto &s_surf = state.dataSurface;
+    auto const &s_surf = state.dataSurface;
 
     //  glare calculation (radians)
     int IConst;            // Construction counter
@@ -1063,7 +1063,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
     // Was previously part of CalcDayltgCoeffsRefMapPoints -- broken out to all multiple
     // maps per zone
     auto &dl = state.dataDayltg;
-    auto &s_surf = state.dataSurface;
+    auto const &s_surf = state.dataSurface;
 
     //  In the following four variables, I=1 for clear sky, 2 for overcast.
     int numRefPts; // Number of daylighting reference points in a zone
@@ -1919,7 +1919,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
     TVISIntWin = 0.0;
 
     Vector3<Real64> HitPtIntWin = {0.0, 0.0, 0.0};
-    auto &surf = s_surf->Surface(IWin);
+    auto const &surf = s_surf->Surface(IWin);
     if (surf.OriginalClass == SurfaceClass::TDD_Diffuser) {
         // Look up the TDD:DOME object
         int PipeNum = s_surf->SurfWinTDDPipeNum(IWin);
@@ -2294,7 +2294,7 @@ void InitializeCFSStateData(EnergyPlusData &state,
 
     CFSRefPointPosFactor(state, RefPoint, StateRefPoint, iWin, CurFenState, NTrnBasis, AZVIEW);
 
-    auto &surf = s_surf->Surface(iWin);
+    auto const &surf = s_surf->Surface(iWin);
 
     curWinEl = 0;
     // loop through window elements. This will calculate sky, ground and reflection bins for each window element
@@ -2665,7 +2665,7 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
 
     // Locals
     auto const &dl = state.dataDayltg;
-    auto &s_surf = state.dataSurface;
+    auto const &s_surf = state.dataSurface;
 
     bool hitObs; // True iff obstruction is hit
 
@@ -3945,7 +3945,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
     // Perform the GetInput function for the Output:IlluminanceMap
     // Glazer - June 2016 (moved from GetDaylightingControls)
     auto &dl = state.dataDayltg;
-    auto &s_surf = state.dataSurface;
+    auto const &s_surf = state.dataSurface;
 
     Array1D_bool ZoneMsgDone;
 
@@ -4609,7 +4609,7 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
     //       MODIFIED       Glazer - July 2016 - separated this from GetInput function
     // For splitflux daylighting, transform the geometry
     auto &dl = state.dataDayltg;
-    auto &s_surf = state.dataSurface;
+    auto const &s_surf = state.dataSurface;
 
     // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
     Real64 CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
@@ -9295,7 +9295,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
                     // Get exterior windows in EnclNumAdj -- there must be at least one, otherwise
                     // it would not be an "AdjIntWinEncl"
                     for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
-                        auto &surfAdj = s_surf->Surface(SurfNumAdj);
+                        auto const &surfAdj = s_surf->Surface(SurfNumAdj);
                         if ((surfAdj.Class == SurfaceClass::Window && surfAdj.ExtBoundCond == ExternalEnvironment) ||
                             surfAdj.OriginalClass == SurfaceClass::TDD_Diffuser) {
                             ++enclExtWinCtr;
