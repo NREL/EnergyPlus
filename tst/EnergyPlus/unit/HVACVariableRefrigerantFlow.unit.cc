@@ -2572,6 +2572,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 OUEvapHeatExtract = 5110.40; // Evaporator heat extract [W]
     Real64 Ncomp = 1058;                // Compressor power [W]
     Real64 CompSpdActual;               // Actual compressor running speed [rps]
+    Real64 CyclingRatio = 1.0;
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CalcCompH(*state,
@@ -2585,12 +2586,53 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
                                                             Pipe_Q,
                                                             OUEvapHeatExtract,
                                                             CompSpdActual,
-                                                            Ncomp);
+                                                            Ncomp,
+                                                            CyclingRatio);
 
     // Test
-    EXPECT_NEAR(5110, OUEvapHeatExtract, 1);
+    EXPECT_NEAR(1.0, CyclingRatio, 0.01);
+    EXPECT_NEAR(4654, OUEvapHeatExtract, 1); // low load calculation, min speed capacity should use the curve corresponding to the lowest speed
     EXPECT_NEAR(1500, CompSpdActual, 1);
     EXPECT_NEAR(2080, Ncomp, 1);
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(1).VRFTUInletNodeNum).MassFlowRate, 0.0);
+
+    // Inputs_condition for an even lower load, and a more strict Te lower bound
+    TU_load = 3006;              // Indoor unit cooling load [W]
+    T_suction = 8.86;            // Compressor suction temperature Te' [C]
+    T_discharge = 40.26;         // Compressor discharge temperature Tc' [C]
+    Pipe_h_out_ave = 233428;     // Average Enthalpy of the refrigerant leaving IUs [kJ/kg]
+    IUMaxCondTemp = 36;          // VRV IU condensing temperature, max among all indoor units [C]
+    MinOutdoorUnitTe = -5;       // The minimum temperature that OU Te can be at cooling mode (only used for calculating Min capacity)
+    Tfs = 10.90;                 // Temperature of the air at the OU evaporator coil surface [C]]
+    Pipe_Q = 162.67;             // Piping Loss Algorithm Parameter: Heat loss [W]
+    OUEvapHeatExtract = 5110.40; // Evaporator heat extract [W]
+    Ncomp = 1058;                // Compressor power [W]
+    CompSpdActual;               // Actual compressor running speed [rps]
+    CyclingRatio = 1.0;
+
+    // Run
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CalcCompH(*state,
+                                                            TU_load,
+                                                            T_suction,
+                                                            T_discharge,
+                                                            Pipe_h_out_ave,
+                                                            IUMaxCondTemp,
+                                                            MinOutdoorUnitTe,
+                                                            Tfs,
+                                                            Pipe_Q,
+                                                            OUEvapHeatExtract,
+                                                            CompSpdActual,
+                                                            Ncomp,
+                                                            CyclingRatio);
+
+    EXPECT_NEAR(0.20, CyclingRatio, 0.01);
+    Real64 x = T_discharge;
+    Real64 y = -5; // in low load modification
+    Real64 CurveValueEvap = 3.19E-01 - 1.26E-03 * x - 2.15E-05 * x * x + 1.20E-02 * y + 1.05E-04 * y * y - 8.66E-05 * x * y;
+    Real64 CurveValuePower = 8.79E-02 - 1.72E-04 * x + 6.93E-05 * x * x - 3.38E-05 * y - 8.10E-06 * y * y - 1.04E-05 * x * y;
+    EXPECT_NEAR(CurveValueEvap * state->dataHVACVarRefFlow->VRF(1).RatedEvapCapacity, OUEvapHeatExtract, 1);
+    EXPECT_NEAR(1500, CompSpdActual, 1);
+    EXPECT_NEAR(CurveValuePower * state->dataHVACVarRefFlow->VRF(1).RatedCompPower, Ncomp, 1);
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(1).VRFTUInletNodeNum).MassFlowRate, 0.0);
 }
 
@@ -2634,7 +2676,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         thisVRF.RatedEvapCapacity * CurveValue(*state, thisVRF.OUCoolingCAPFT(1), thisVRF.CondensingTemp, thisVRF.EvaporatingTemp);
     Real64 CompEvaporatingPWRSpdMin =
         thisVRF.RatedCompPower * CurveValue(*state, thisVRF.OUCoolingPWRFT(1), thisVRF.CondensingTemp, thisVRF.EvaporatingTemp);
-    EXPECT_NEAR(0.34, CyclingRatio, 0.01);
+    EXPECT_NEAR(0.35, CyclingRatio, 0.01);
     EXPECT_NEAR(OUEvapHeatExtract, CompEvaporatingCAPSpdMin + Ncomp, 1e-4);
     EXPECT_NEAR(1500, CompSpdActual, 1);
     EXPECT_NEAR(Ncomp, CompEvaporatingPWRSpdMin, 1e-4);
@@ -13324,7 +13366,9 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     EXPECT_NEAR(84.8359, thisFan->totalPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan->totalPower), 0.0001);
     EXPECT_NEAR(0.4124, state->dataHVACVarRefFlow->VRF(1).VRFCondCyclingRatio, 0.0001);
-    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(1).OUFanPower, state->dataHVACVarRefFlow->VRF(1).RatedOUFanPower, 0.0001);
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(1).OUFanPower,
+                state->dataHVACVarRefFlow->VRF(1).RatedOUFanPower * state->dataHVACVarRefFlow->VRF(1).VRFCondCyclingRatio,
+                0.0001);
 }
 
 // Test for #7648: HREIRFTHeat wrongly used HRCAPFTHeatConst. Occurs only if you have Heat Recovery

@@ -11485,9 +11485,9 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         Ncomp *= CyclingRatio;
         Q_h_OU *= CyclingRatio;
         this->CompActSpeed = max(CompSpdActual, 0.0);
-        this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter; // 0.95 is the efficiency of the compressor inverter, can come from IDF //@minor
-        this->OUFanPower = this->RatedOUFanPower;              //@ * pow_3( CondFlowRatio )
-        this->VRFCondCyclingRatio = CyclingRatio;              // report variable for cycling rate
+        this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter;   // 0.95 is the efficiency of the compressor inverter, can come from IDF //@minor
+        this->OUFanPower = this->RatedOUFanPower * CyclingRatio; //@ * pow_3( CondFlowRatio )
+        this->VRFCondCyclingRatio = CyclingRatio;                // report variable for cycling rate
 
         Tdischarge = this->CondensingTemp; // outdoor unit condensing temperature
         this->CoolingCapacity =
@@ -11640,24 +11640,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
             SH_OU = this->SH;
             this->VRFOU_TeTc(
                 state, HXOpMode::EvapMode, Q_c_OU, SH_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->EvaporatingTemp);
-        } else if ((Q_c_OU * C_cap_operation) <= CompEvaporatingCAPSpdMin) {
-            // Required heating load is smaller than the min heating capacity
-
-            if (Q_c_OU == 0) {
-                // Q_h_TU_PL is less than or equal to CompEvaporatingPWRSpdMin
-                CyclingRatio = Q_h_TU_PL / CompEvaporatingPWRSpdMin;
-                this->EvaporatingTemp = OutdoorDryBulb;
-            } else {
-                // Q_h_TU_PL is greater than CompEvaporatingPWRSpdMin
-                CyclingRatio = Q_c_OU * C_cap_operation / CompEvaporatingCAPSpdMin;
-                this->EvaporatingTemp = max(CapMinTe, RefTLow);
-            }
-
-            double CyclingRatioFrac = 0.85 + 0.15 * CyclingRatio;
-            double HPRTF = CyclingRatio / CyclingRatioFrac;
-            Ncomp = CompEvaporatingPWRSpdMin * HPRTF;
-            CompSpdActual = this->CompressorSpeed(1);
-
         } else {
             // CompEvaporatingCAPSpdMin < (Q_c_OU * C_cap_operation) <= CompEvaporatingCAPSpdMaxCurrentTsuc + CompEvaporatingPWRSpdMaxCurrentTsuc
             // Required heating load is greater than or equal to the min heating capacity
@@ -11682,12 +11664,14 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
                                   Tdischarge,
                                   h_IU_cond_out_ave,
                                   this->IUCondensingTemp,
-                                  CapMinTe,
+                                  // Te can't be smaller than user input lower bound
+                                  max(this->IUEvapTempLow, CapMinTe),
                                   Tfs,
                                   Pipe_Q_h,
                                   Q_c_OU,
                                   CompSpdActual,
-                                  Ncomp_new);
+                                  Ncomp_new,
+                                  CyclingRatio);
 
             if ((std::abs(Ncomp_new - Ncomp) > (Tolerance * Ncomp)) && (Counter < 30)) {
                 Ncomp = Ncomp_new;
@@ -11713,9 +11697,11 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         }
 
         // Key outputs of this subroutine
+        Ncomp *= CyclingRatio;
+        Q_c_OU *= CyclingRatio;
         this->CompActSpeed = max(CompSpdActual, 0.0);
         this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter;
-        this->OUFanPower = this->RatedOUFanPower;
+        this->OUFanPower = this->RatedOUFanPower * CyclingRatio;
         this->VRFCondCyclingRatio = CyclingRatio;
 
         Tsuction = this->EvaporatingTemp; // Outdoor unit evaporating temperature
@@ -14209,7 +14195,8 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     Real64 Pipe_Q,             // Piping Loss Algorithm Parameter: Heat loss [W]
     Real64 &OUEvapHeatExtract, // Condenser heat release (cooling mode) [W]
     Real64 &CompSpdActual,     // Actual compressor running speed [rps]
-    Real64 &Ncomp              // Compressor power [W]
+    Real64 &Ncomp,             // Compressor power [W]
+    Real64 &CyclingRatio       // Compressor cycling ratio
 )
 {
 
@@ -14320,7 +14307,6 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                 auto f = [&state, T_discharge, CondHeat, CAPFT](Real64 const T_suc) {
                     return CompResidual_FluidTCtrl(state, T_discharge, CondHeat, CAPFT, T_suc);
                 };
-
                 General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe, T_suction);
                 if (SolFla < 0) SmallLoadTe = MinOutdoorUnitTe;
 
@@ -14329,9 +14315,13 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                 // Update SH and Pe to calculate Modification Factor, which is used to update rps to for N_comp calculations
                 if (this->C3Te == 0)
                     Modifi_SH = -(this->C1Te - Tfs + T_suction) / this->C2Te;
-                else
-                    Modifi_SH =
-                        (-this->C2Te + std::pow((pow_2(this->C2Te) - 4 * (this->C1Te - Tfs + T_suction) * this->C3Te), 0.5)) / (2 * this->C3Te);
+                else {
+                    if ((pow_2(this->C2Te) - 4 * (this->C1Te - Tfs + T_suction) * this->C3Te) < 0.0)
+                        Modifi_SH = this->C2Te / (-2 * (this->C1Te - Tfs + T_suction));
+                    else
+                        Modifi_SH =
+                            (-this->C2Te + std::pow((pow_2(this->C2Te) - 4 * (this->C1Te - Tfs + T_suction) * this->C3Te), 0.5)) / (2 * this->C3Te);
+                }
 
                 Modifi_Pe = this->refrig->getSatPressure(state, T_suction, RoutineName);
 
@@ -14356,10 +14346,19 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                     NumIteCcap = NumIteCcap + 1;
                     goto Label19;
                 }
-                if (CapDiff > (Tolerance * Cap_Eva0)) NumIteCcap = 999;
+                if (CapDiff > (Tolerance * Cap_Eva0) && (Cap_Eva1 - Cap_Eva0) >= 0.0) {
+                    NumIteCcap = 999;
+                    CyclingRatio = Cap_Eva0 / Cap_Eva1;
+                } else {
+                    CyclingRatio = 1.0;
+                }
 
                 Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
-
+                // Cap_Eva1 is the updated compressor min speed capacity
+                OUEvapHeatExtract = Cap_Eva1;
+                this->EvaporatingTemp = T_suction;
+                this->CondensingTemp = T_discharge;
+                this->IUCondensingTemp = T_discharge;
                 break; // EXIT DoName2
 
             } // End: if( CounterCompSpdTemp <= 1 ) Low load modification
