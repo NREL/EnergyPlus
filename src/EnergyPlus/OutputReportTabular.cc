@@ -16186,21 +16186,21 @@ void CollectPeakZoneConditions(EnergyPlusData &state,
         }
 
         // Number of people
-        Real64 const totNumPeople = 0;
+        Real64 totNumPeople = 0;
         if (spaceIndex == 0) {
-            std::accumulate(state.dataHeatBal->People.cbegin(),
-                            state.dataHeatBal->People.cend(),
-                            0.0,
-                            [&zoneIndex](const Real64 &sum, const DataHeatBalance::PeopleData &people) {
-                                return zoneIndex == people.ZonePtr ? (sum + people.NumberOfPeople) : sum;
-                            });
+            totNumPeople = std::accumulate(state.dataHeatBal->People.cbegin(),
+                                           state.dataHeatBal->People.cend(),
+                                           0.0,
+                                           [&zoneIndex](const Real64 &sum, const DataHeatBalance::PeopleData &people) {
+                                               return zoneIndex == people.ZonePtr ? (sum + people.NumberOfPeople) : sum;
+                                           });
         } else {
-            std::accumulate(state.dataHeatBal->People.cbegin(),
-                            state.dataHeatBal->People.cend(),
-                            0.0,
-                            [&spaceIndex](const Real64 &sum, const DataHeatBalance::PeopleData &people) {
-                                return spaceIndex == people.spaceIndex ? (sum + people.NumberOfPeople) : sum;
-                            });
+            totNumPeople = std::accumulate(state.dataHeatBal->People.cbegin(),
+                                           state.dataHeatBal->People.cend(),
+                                           0.0,
+                                           [&spaceIndex](const Real64 &sum, const DataHeatBalance::PeopleData &people) {
+                                               return spaceIndex == people.spaceIndex ? (sum + people.NumberOfPeople) : sum;
+                                           });
         }
         compLoad.numPeople = totNumPeople;
     }
