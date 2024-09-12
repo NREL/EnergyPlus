@@ -15101,9 +15101,10 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
         // ZoneComponentLoadSummary
         if (ort->displayZoneComponentLoadSummary) {
             if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
-                for (int iSpace = 1; iSpace <= state.dataGlobal->NumOfZones; ++iSpace) {
+                for (int iSpace = 1; iSpace <= state.dataGlobal->numSpaces; ++iSpace) {
                     // Yes, check if the zone is controlled, not the space for this
-                    if (!state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->space(iSpace).zoneNum).IsControlled) continue;
+                    int zoneNum = state.dataHeatBal->space(iSpace).zoneNum;
+                    if (!state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) continue;
                     if (allocated(state.dataSize->CalcFinalSpaceSizing)) {
                         computeSpaceZoneCompLoads(state,
                                                   state.dataSize->CalcFinalSpaceSizing(iSpace),
@@ -15118,6 +15119,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                                   ort->feneCondInstantSeq,
                                                   surfDelaySeq,
                                                   spaceComponentAreas(iSpace),
+                                                  zoneNum,
                                                   iSpace);
                     }
                 }
@@ -15564,7 +15566,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
 }
 
 void computeSpaceZoneCompLoads(EnergyPlusData &state,
-                               DataSizing::ZoneSizingData &calcFinalSizing,
+                               DataSizing::ZoneSizingData const &calcFinalSizing,
                                CompLoadTablesType &coolCompLoadTables,
                                CompLoadTablesType &heatCompLoadTables,
                                Array1D<Real64> &peopleDelaySeq,
@@ -15576,7 +15578,8 @@ void computeSpaceZoneCompLoads(EnergyPlusData &state,
                                Array3D<Real64> &feneCondInstantSeqLoc,
                                Array2D<Real64> &surfDelaySeq,
                                ZompComponentAreasType &componentAreas,
-                               int iZone)
+                               int const iZone,
+                               int const iSpace)
 {
     int coolDesSelected = calcFinalSizing.CoolDDNum;
     coolCompLoadTables.desDayNum = coolDesSelected;
@@ -15609,7 +15612,7 @@ void computeSpaceZoneCompLoads(EnergyPlusData &state,
                                    feneSolarDelaySeq,
                                    feneCondInstantSeqLoc,
                                    surfDelaySeq);
-    CollectPeakZoneConditions(state, coolCompLoadTables, coolDesSelected, timeCoolMax, iZone, true);
+    CollectPeakZoneConditions(state, coolCompLoadTables, coolDesSelected, timeCoolMax, iZone, true, iSpace);
     // send latent load info to coil summary report
     state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(
         iZone, coolCompLoadTables.cells(LoadCompCol::Latent, LoadCompRow::GrdTot));
@@ -15645,7 +15648,7 @@ void computeSpaceZoneCompLoads(EnergyPlusData &state,
                                    feneSolarDelaySeq,
                                    feneCondInstantSeqLoc,
                                    surfDelaySeq);
-    CollectPeakZoneConditions(state, heatCompLoadTables, heatDesSelected, timeHeatMax, iZone, false);
+    CollectPeakZoneConditions(state, heatCompLoadTables, heatDesSelected, timeHeatMax, iZone, false, iSpace);
 
     // send latent load info to coil summary report
     state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(
@@ -16033,14 +16036,21 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 }
 
 // for the load summary report add values the peak conditions subtable
-void CollectPeakZoneConditions(
-    EnergyPlusData &state, CompLoadTablesType &compLoad, int const desDaySelected, int const timeOfMax, int const zoneIndex, bool const isCooling)
+void CollectPeakZoneConditions(EnergyPlusData &state,
+                               CompLoadTablesType &compLoad,
+                               int const desDaySelected,
+                               int const timeOfMax,
+                               int const zoneIndex,
+                               bool const isCooling,
+                               int const spaceIndex)
 {
 
     if (timeOfMax != 0) {
 
         auto const &thisZone = state.dataHeatBal->Zone(zoneIndex);
-        auto const &thisCalcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(zoneIndex);
+        auto const &szCalcFinalSizing =
+            (spaceIndex == 0) ? state.dataSize->CalcFinalZoneSizing(zoneIndex) : state.dataSize->CalcFinalSpaceSizing(spaceIndex);
+        auto const &szFinalSizing = (spaceIndex == 0) ? state.dataSize->FinalZoneSizing(zoneIndex) : state.dataSize->FinalSpaceSizing(spaceIndex);
 
         Real64 mult = thisZone.Multiplier * thisZone.ListMultiplier;
         if (mult == 0.0) mult = 1.0;
@@ -16053,53 +16063,49 @@ void CollectPeakZoneConditions(
                                                 state.dataWeather->DesDayInput(desDaySelected).DayOfMonth,
                                                 state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
             } else {
-                compLoad.peakDateHrMin = thisCalcFinalZoneSizing.CoolPeakDateHrMin;
+                compLoad.peakDateHrMin = szCalcFinalSizing.CoolPeakDateHrMin;
             }
 
             // Outside Dry Bulb Temperature
-            compLoad.outsideDryBulb = thisCalcFinalZoneSizing.CoolOutTempSeq(timeOfMax);
+            compLoad.outsideDryBulb = szCalcFinalSizing.CoolOutTempSeq(timeOfMax);
 
             // Outside Wet Bulb Temperature
             // use standard air pressure because air pressure is not tracked with sizing data
-            if (thisCalcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax) < 1.0 && thisCalcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax) > 0.0) {
-                compLoad.outsideWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                                                                         thisCalcFinalZoneSizing.CoolOutTempSeq(timeOfMax),
-                                                                         thisCalcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax),
-                                                                         state.dataEnvrn->StdBaroPress);
+            if (szCalcFinalSizing.CoolOutHumRatSeq(timeOfMax) < 1.0 && szCalcFinalSizing.CoolOutHumRatSeq(timeOfMax) > 0.0) {
+                compLoad.outsideWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
+                    state, szCalcFinalSizing.CoolOutTempSeq(timeOfMax), szCalcFinalSizing.CoolOutHumRatSeq(timeOfMax), state.dataEnvrn->StdBaroPress);
             }
 
             // Outside Humidity Ratio at Peak
-            compLoad.outsideHumRatio = thisCalcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax);
+            compLoad.outsideHumRatio = szCalcFinalSizing.CoolOutHumRatSeq(timeOfMax);
 
             // Zone Dry Bulb Temperature
-            compLoad.zoneDryBulb = thisCalcFinalZoneSizing.CoolZoneTempSeq(timeOfMax);
+            compLoad.zoneDryBulb = szCalcFinalSizing.CoolZoneTempSeq(timeOfMax);
 
             // Zone Relative Humdity
             // use standard air pressure because air pressure is not tracked with sizing data
-            compLoad.zoneRelHum = Psychrometrics::PsyRhFnTdbWPb(state,
-                                                                thisCalcFinalZoneSizing.CoolZoneTempSeq(timeOfMax),
-                                                                thisCalcFinalZoneSizing.CoolZoneHumRatSeq(timeOfMax),
-                                                                state.dataEnvrn->StdBaroPress);
+            compLoad.zoneRelHum = Psychrometrics::PsyRhFnTdbWPb(
+                state, szCalcFinalSizing.CoolZoneTempSeq(timeOfMax), szCalcFinalSizing.CoolZoneHumRatSeq(timeOfMax), state.dataEnvrn->StdBaroPress);
 
             // Zone Humidity Ratio at Peak
-            compLoad.zoneHumRatio = thisCalcFinalZoneSizing.CoolZoneHumRatSeq(timeOfMax);
+            compLoad.zoneHumRatio = szCalcFinalSizing.CoolZoneHumRatSeq(timeOfMax);
 
             // Peak Design Sensible Load
-            compLoad.peakDesSensLoad = thisCalcFinalZoneSizing.DesCoolLoad / mult; // change sign
+            compLoad.peakDesSensLoad = szCalcFinalSizing.DesCoolLoad / mult; // change sign
 
             // Design Peak Load
-            compLoad.designPeakLoad = state.dataSize->FinalZoneSizing(zoneIndex).DesCoolLoad / mult;
+            compLoad.designPeakLoad = szFinalSizing.DesCoolLoad / mult;
 
             // Supply air temperature
-            if (thisCalcFinalZoneSizing.ZnCoolDgnSAMethod == DataSizing::SupplyAirTemperature) {
-                compLoad.supAirTemp = thisCalcFinalZoneSizing.CoolDesTemp;
+            if (szCalcFinalSizing.ZnCoolDgnSAMethod == DataSizing::SupplyAirTemperature) {
+                compLoad.supAirTemp = szCalcFinalSizing.CoolDesTemp;
             } else {
-                Real64 DeltaTemp = -std::abs(thisCalcFinalZoneSizing.CoolDesTempDiff);
-                compLoad.supAirTemp = DeltaTemp + thisCalcFinalZoneSizing.ZoneTempAtCoolPeak;
+                Real64 DeltaTemp = -std::abs(szCalcFinalSizing.CoolDesTempDiff);
+                compLoad.supAirTemp = DeltaTemp + szCalcFinalSizing.ZoneTempAtCoolPeak;
             }
 
             // Main fan air flow
-            compLoad.mainFanAirFlow = thisCalcFinalZoneSizing.DesCoolVolFlow;
+            compLoad.mainFanAirFlow = szCalcFinalSizing.DesCoolVolFlow;
 
         } else {
             // Time of Peak Load
@@ -16109,57 +16115,53 @@ void CollectPeakZoneConditions(
                                                 state.dataWeather->DesDayInput(desDaySelected).DayOfMonth,
                                                 state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
             } else {
-                compLoad.peakDateHrMin = thisCalcFinalZoneSizing.HeatPeakDateHrMin;
+                compLoad.peakDateHrMin = szCalcFinalSizing.HeatPeakDateHrMin;
             }
 
             // Outside Dry Bulb Temperature
-            compLoad.outsideDryBulb = thisCalcFinalZoneSizing.HeatOutTempSeq(timeOfMax);
+            compLoad.outsideDryBulb = szCalcFinalSizing.HeatOutTempSeq(timeOfMax);
 
             // Outside Wet Bulb Temperature
             // use standard air pressure because air pressure is not tracked with sizing data
-            if (thisCalcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax) < 1.0 && thisCalcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax) > 0.0) {
-                compLoad.outsideWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                                                                         thisCalcFinalZoneSizing.HeatOutTempSeq(timeOfMax),
-                                                                         thisCalcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax),
-                                                                         state.dataEnvrn->StdBaroPress);
+            if (szCalcFinalSizing.HeatOutHumRatSeq(timeOfMax) < 1.0 && szCalcFinalSizing.HeatOutHumRatSeq(timeOfMax) > 0.0) {
+                compLoad.outsideWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
+                    state, szCalcFinalSizing.HeatOutTempSeq(timeOfMax), szCalcFinalSizing.HeatOutHumRatSeq(timeOfMax), state.dataEnvrn->StdBaroPress);
             }
 
             // Outside Humidity Ratio at Peak
-            compLoad.outsideHumRatio = thisCalcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax);
+            compLoad.outsideHumRatio = szCalcFinalSizing.HeatOutHumRatSeq(timeOfMax);
 
             // Zone Dry Bulb Temperature
-            compLoad.zoneDryBulb = thisCalcFinalZoneSizing.HeatZoneTempSeq(timeOfMax);
+            compLoad.zoneDryBulb = szCalcFinalSizing.HeatZoneTempSeq(timeOfMax);
 
             // Zone Relative Humdity
             // use standard air pressure because air pressure is not tracked with sizing data
-            compLoad.zoneRelHum = Psychrometrics::PsyRhFnTdbWPb(state,
-                                                                thisCalcFinalZoneSizing.HeatZoneTempSeq(timeOfMax),
-                                                                thisCalcFinalZoneSizing.HeatZoneHumRatSeq(timeOfMax),
-                                                                state.dataEnvrn->StdBaroPress);
+            compLoad.zoneRelHum = Psychrometrics::PsyRhFnTdbWPb(
+                state, szCalcFinalSizing.HeatZoneTempSeq(timeOfMax), szCalcFinalSizing.HeatZoneHumRatSeq(timeOfMax), state.dataEnvrn->StdBaroPress);
 
             // Zone Humidity Ratio at Peak
-            compLoad.zoneHumRatio = thisCalcFinalZoneSizing.HeatZoneHumRatSeq(timeOfMax);
+            compLoad.zoneHumRatio = szCalcFinalSizing.HeatZoneHumRatSeq(timeOfMax);
 
             // Peak Design Sensible Load
-            compLoad.peakDesSensLoad = -thisCalcFinalZoneSizing.DesHeatLoad / mult; // change sign
+            compLoad.peakDesSensLoad = -szCalcFinalSizing.DesHeatLoad / mult; // change sign
 
             // Design Peak Load
-            compLoad.designPeakLoad = -state.dataSize->FinalZoneSizing(zoneIndex).DesHeatLoad / mult;
+            compLoad.designPeakLoad = -szFinalSizing.DesHeatLoad / mult;
 
             // Supply air temperature
-            if (thisCalcFinalZoneSizing.ZnHeatDgnSAMethod == DataSizing::SupplyAirTemperature) {
-                compLoad.supAirTemp = thisCalcFinalZoneSizing.HeatDesTemp;
+            if (szCalcFinalSizing.ZnHeatDgnSAMethod == DataSizing::SupplyAirTemperature) {
+                compLoad.supAirTemp = szCalcFinalSizing.HeatDesTemp;
             } else {
-                Real64 DeltaTemp = -std::abs(thisCalcFinalZoneSizing.HeatDesTempDiff);
-                compLoad.supAirTemp = DeltaTemp + thisCalcFinalZoneSizing.ZoneTempAtHeatPeak;
+                Real64 DeltaTemp = -std::abs(szCalcFinalSizing.HeatDesTempDiff);
+                compLoad.supAirTemp = DeltaTemp + szCalcFinalSizing.ZoneTempAtHeatPeak;
             }
 
             // Main fan air flow
-            compLoad.mainFanAirFlow = thisCalcFinalZoneSizing.DesHeatVolFlow;
+            compLoad.mainFanAirFlow = szCalcFinalSizing.DesHeatVolFlow;
         }
 
         // Outside air flow
-        compLoad.outsideAirFlow = thisCalcFinalZoneSizing.MinOA;
+        compLoad.outsideAirFlow = szCalcFinalSizing.MinOA;
 
         // outside air %
         if (compLoad.mainFanAirFlow != 0.) {
@@ -16184,12 +16186,22 @@ void CollectPeakZoneConditions(
         }
 
         // Number of people
-        Real64 const totNumPeople = std::accumulate(state.dataHeatBal->People.cbegin(),
-                                                    state.dataHeatBal->People.cend(),
-                                                    0.0,
-                                                    [&zoneIndex](const Real64 &sum, const DataHeatBalance::PeopleData &people) {
-                                                        return zoneIndex == people.ZonePtr ? (sum + people.NumberOfPeople) : sum;
-                                                    });
+        Real64 const totNumPeople = 0;
+        if (spaceIndex == 0) {
+            std::accumulate(state.dataHeatBal->People.cbegin(),
+                            state.dataHeatBal->People.cend(),
+                            0.0,
+                            [&zoneIndex](const Real64 &sum, const DataHeatBalance::PeopleData &people) {
+                                return zoneIndex == people.ZonePtr ? (sum + people.NumberOfPeople) : sum;
+                            });
+        } else {
+            std::accumulate(state.dataHeatBal->People.cbegin(),
+                            state.dataHeatBal->People.cend(),
+                            0.0,
+                            [&spaceIndex](const Real64 &sum, const DataHeatBalance::PeopleData &people) {
+                                return spaceIndex == people.spaceIndex ? (sum + people.NumberOfPeople) : sum;
+                            });
+        }
         compLoad.numPeople = totNumPeople;
     }
 }

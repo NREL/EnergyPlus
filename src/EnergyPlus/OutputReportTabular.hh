@@ -780,7 +780,7 @@ namespace OutputReportTabular {
     void WriteLoadComponentSummaryTables(EnergyPlusData &state);
 
     void computeSpaceZoneCompLoads(EnergyPlusData &state,
-                                   DataSizing::ZoneSizingData &calcFinalSizing,
+                                   DataSizing::ZoneSizingData const &calcFinalSizing,
                                    CompLoadTablesType &coolCompLoadTables,
                                    CompLoadTablesType &heatCompLoadTables,
                                    Array1D<Real64> &peopleDelaySeq,
@@ -792,7 +792,7 @@ namespace OutputReportTabular {
                                    Array3D<Real64> &feneCondInstantSeqLoc,
                                    Array2D<Real64> &surfDelaySeq,
                                    ZompComponentAreasType &componentAreas,
-                                   int iZone);
+                                   int const iZone, int const iSpace = 0);
 
     void GetDelaySequences(EnergyPlusData &state,
                            int desDaySelected,
@@ -822,8 +822,8 @@ namespace OutputReportTabular {
                                         Array3D<Real64> const &feneCondInstantSeqLoc,
                                         Array2D<Real64> const &surfDelaySeq);
 
-    void
-    CollectPeakZoneConditions(EnergyPlusData &state, CompLoadTablesType &compLoad, int desDaySelected, int timeOfMax, int zoneIndex, bool isCooling);
+    void CollectPeakZoneConditions(
+        EnergyPlusData &state, CompLoadTablesType &compLoad, int desDaySelected, int timeOfMax, int zoneIndex, bool isCooling, int spaceIndex = 0);
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);
 
