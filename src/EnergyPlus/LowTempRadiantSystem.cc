@@ -522,7 +522,6 @@ namespace LowTempRadiantSystem {
                 thisRadSysDesign.DesignCoolingCapMethod = CapacityPerFloorArea;
                 if (!lNumericBlanks(7)) {
                     thisRadSysDesign.DesignScaledCoolingCapacity = Numbers(7);
-                    std::string a = cNumericFields(4);
                     if (thisRadSysDesign.DesignScaledCoolingCapacity <= 0.0) {
                         ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
                         ShowContinueError(state, format("Input for {} = {}", cAlphaFields(7), thisRadSysDesign.DesignCoolingCapMethodInput));
@@ -4383,7 +4382,7 @@ namespace LowTempRadiantSystem {
                     SetComponentFlowRate(state, mdot, this->ColdWaterInNode, this->ColdWaterOutNode, this->CWPlantLoc);
                 }
                 LoopInNode = this->HotWaterInNode;
-                auto &hotNode = state.dataLoopNodes->Node(LoopInNode);
+                auto const &hotNode = state.dataLoopNodes->Node(LoopInNode);
                 SysWaterInTemp = hotNode.Temp;
                 Iteration = false;
 
@@ -4486,7 +4485,7 @@ namespace LowTempRadiantSystem {
                     SetComponentFlowRate(state, mdot, this->HotWaterInNode, this->HotWaterOutNode, this->HWPlantLoc);
                 }
                 LoopInNode = this->ColdWaterInNode;
-                auto &coldNode = state.dataLoopNodes->Node(LoopInNode);
+                auto const &coldNode = state.dataLoopNodes->Node(LoopInNode);
                 SysWaterInTemp = coldNode.Temp;
                 state.dataLowTempRadSys->CFloCondIterNum = 1;
                 while ((state.dataLowTempRadSys->CFloCondIterNum <= 1) ||
