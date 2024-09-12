@@ -171,7 +171,8 @@ namespace ExtendedHI {
         Real64 phi = 0.84;
         Real64 Pa = RH * pvstar(Ta);
         Real64 Rs = 0.0387;
-        Real64 m = (Pc - Pa) / (Zs(Rs) + Za);
+        Real64 ZsRs = Zs(Rs);
+        Real64 m = (Pc - Pa) / (ZsRs + Za);
         Real64 Ts;
         int SolFla;
         General::SolveRoot(
@@ -180,7 +181,7 @@ namespace ExtendedHI {
             maxIter,
             SolFla,
             Ts,
-            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (Zs(Rs) + Za) - (Tc - Ts) / Rs; },
+            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (ZsRs + Za) - (Tc - Ts) / Rs; },
             std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m)),
             std::max(Tc, Ta) + Rs * std::abs(m));
         Real64 flux1 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs;
@@ -195,8 +196,9 @@ namespace ExtendedHI {
         Real64 Pa = RH * pvstar(Ta);
         Real64 Rs = 0.0387;
         Real64 phi = 0.84;
-        Real64 m_bar = (Pc - Pa) / (Zs(Rs) + Za_bar);
-        Real64 m = (Pc - Pa) / (Zs(Rs) + Za);
+        Real64 ZsRs = Zs(Rs);
+        Real64 m_bar = (Pc - Pa) / (ZsRs + Za_bar);
+        Real64 m = (Pc - Pa) / (ZsRs + Za);
         Real64 Ts;
         int SolFla;
         General::SolveRoot(
@@ -205,7 +207,7 @@ namespace ExtendedHI {
             maxIter,
             SolFla,
             Ts,
-            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (Zs(Rs) + Za) - (Tc - Ts) / Rs; },
+            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (ZsRs + Za) - (Tc - Ts) / Rs; },
             std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m)),
             std::max(Tc, Ta) + Rs * std::abs(m));
         Real64 Tf;
@@ -215,7 +217,7 @@ namespace ExtendedHI {
             maxIter,
             SolFla,
             Tf,
-            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (Zs(Rs) + Za_bar) - (Tc - Tf) / Rs; },
+            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (ZsRs + Za_bar) - (Tc - Tf) / Rs; },
             std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m_bar)),
             std::max(Tc, Ta) + Rs * std::abs(m_bar));
         Real64 flux1 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs;
@@ -232,7 +234,7 @@ namespace ExtendedHI {
                 SolFla,
                 Tf,
                 [&](Real64 Tf) {
-                    return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) * (Tf - Ta) / ((Zs(Rs) + Za_bar) * (Tf - Ta) + r * Ra_bar(Tf, Ta) * (Ts_bar - Tf)) -
+                    return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) * (Tf - Ta) / ((ZsRs + Za_bar) * (Tf - Ta) + r * Ra_bar(Tf, Ta) * (Ts_bar - Tf)) -
                            (Tc - Ts_bar) / Rs;
                 },
                 Ta,
@@ -250,8 +252,9 @@ namespace ExtendedHI {
         Real64 Pa = RH * pvstar(Ta);
         Real64 phi = 0.84;
         Real64 Rs = 0.0387;
-        Real64 m = (Pc - Pa) / (Zs(Rs) + Za);
-        Real64 m_bar = (Pc - Pa) / (Zs(Rs) + Za_bar);
+        Real64 ZsRs = Zs(Rs);
+        Real64 m = (Pc - Pa) / (ZsRs + Za);
+        Real64 m_bar = (Pc - Pa) / (ZsRs + Za_bar);
         Real64 Ts;
         int SolFla;
         General::SolveRoot(
@@ -260,7 +263,7 @@ namespace ExtendedHI {
             maxIter,
             SolFla,
             Ts,
-            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (Zs(Rs) + Za) - (Tc - Ts) / Rs; },
+            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (ZsRs + Za) - (Tc - Ts) / Rs; },
             std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m)),
             std::max(Tc, Ta) + Rs * std::abs(m));
         Real64 Tf;
@@ -270,7 +273,7 @@ namespace ExtendedHI {
             maxIter,
             SolFla,
             Tf,
-            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (Zs(Rs) + Za_bar) - (Tc - Tf) / Rs; },
+            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (ZsRs + Za_bar) - (Tc - Tf) / Rs; },
             std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m_bar)),
             std::max(Tc, Ta) + Rs * std::abs(m_bar));
         Real64 flux1 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs;
@@ -288,7 +291,8 @@ namespace ExtendedHI {
                     0.0,
                     Tc);
                 Rs = (Tc - Ts) / (Q - Qv(Ta, Pa));
-                Real64 Ps = Pc - (Pc - Pa) * Zs(Rs) / (Zs(Rs) + Za_un);
+                ZsRs = Zs(Rs);
+                Real64 Ps = Pc - (Pc - Pa) * ZsRs / (ZsRs + Za_un);
                 if (Ps > phi_salt * pvstar(Ts)) {
                     General::SolveRoot(
                         state,
@@ -313,9 +317,10 @@ namespace ExtendedHI {
         Real64 dTcdt = 0.0;
         Real64 Pa = RH * pvstar(Ta);
         Real64 Rs = 0.0387;
+        Real64 ZsRs = Zs(Rs);
         Real64 phi = 0.84;
-        Real64 m = (Pc - Pa) / (Zs(Rs) + Za);
-        Real64 m_bar = (Pc - Pa) / (Zs(Rs) + Za_bar);
+        Real64 m = (Pc - Pa) / (ZsRs + Za);
+        Real64 m_bar = (Pc - Pa) / (ZsRs + Za_bar);
         Real64 Ts;
         int SolFla;
         General::SolveRoot(
@@ -324,7 +329,7 @@ namespace ExtendedHI {
             maxIter,
             SolFla,
             Ts,
-            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (Zs(Rs) + Za) - (Tc - Ts) / Rs; },
+            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (ZsRs + Za) - (Tc - Ts) / Rs; },
             std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m)),
             std::max(Tc, Ta) + Rs * std::abs(m));
         Real64 Tf;
@@ -334,7 +339,7 @@ namespace ExtendedHI {
             maxIter,
             SolFla,
             Tf,
-            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (Zs(Rs) + Za_bar) - (Tc - Tf) / Rs; },
+            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (ZsRs + Za_bar) - (Tc - Tf) / Rs; },
             std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m_bar)),
             std::max(Tc, Ta) + Rs * std::abs(m_bar));
         Real64 flux1 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs;
@@ -351,9 +356,10 @@ namespace ExtendedHI {
 
         Real64 Pa = RH * pvstar(Ta);
         Real64 Rs = 0.0387;
+        Real64 ZsRs = Zs(Rs);
         Real64 phi = 0.84;
-        Real64 m = (Pc - Pa) / (Zs(Rs) + Za);
-        Real64 m_bar = (Pc - Pa) / (Zs(Rs) + Za_bar);
+        Real64 m = (Pc - Pa) / (ZsRs + Za);
+        Real64 m_bar = (Pc - Pa) / (ZsRs + Za_bar);
 
         int SolFla;
         Real64 Ts;
@@ -363,7 +369,7 @@ namespace ExtendedHI {
             maxIter,
             SolFla,
             Ts,
-            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (Zs(Rs) + Za) - (Tc - Ts) / Rs; },
+            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (ZsRs + Za) - (Tc - Ts) / Rs; },
             std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m)),
             std::max(Tc, Ta) + Rs * std::abs(m));
 
@@ -374,7 +380,7 @@ namespace ExtendedHI {
             maxIter,
             SolFla,
             Tf,
-            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (Zs(Rs) + Za_bar) - (Tc - Tf) / Rs; },
+            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (ZsRs + Za_bar) - (Tc - Tf) / Rs; },
             std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m_bar)),
             std::max(Tc, Ta) + Rs * std::abs(m_bar));
         Real64 flux1 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs;
@@ -401,8 +407,9 @@ namespace ExtendedHI {
         Real64 Rs = 0.0387;
         Real64 phi = 0.84;
         Real64 dTcdt = 0.0;
-        Real64 m = (Pc - Pa) / (Zs(Rs) + Za);
-        Real64 m_bar = (Pc - Pa) / (Zs(Rs) + Za_bar);
+        Real64 ZsRs = Zs(Rs);
+        Real64 m = (Pc - Pa) / (ZsRs + Za);
+        Real64 m_bar = (Pc - Pa) / (ZsRs + Za_bar);
 
         int SolFla;
         Real64 Ts;
@@ -412,7 +419,7 @@ namespace ExtendedHI {
             maxIter,
             SolFla,
             Ts,
-            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (Zs(Rs) + Za) - (Tc - Ts) / Rs; },
+            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (ZsRs + Za) - (Tc - Ts) / Rs; },
             std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m)),
             std::max(Tc, Ta) + Rs * std::abs(m));
 
@@ -423,7 +430,7 @@ namespace ExtendedHI {
             maxIter,
             SolFla,
             Tf,
-            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (Zs(Rs) + Za_bar) - (Tc - Tf) / Rs; },
+            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (ZsRs + Za_bar) - (Tc - Tf) / Rs; },
             std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m_bar)),
             std::max(Tc, Ta) + Rs * std::abs(m_bar));
         Real64 flux1 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs;
@@ -442,7 +449,7 @@ namespace ExtendedHI {
                 SolFla,
                 Tf,
                 [&](Real64 Tf) {
-                    return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) * (Tf - Ta) / ((Zs(Rs) + Za_bar) * (Tf - Ta) + r * Ra_bar(Tf, Ta) * (Ts_bar - Tf)) -
+                    return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) * (Tf - Ta) / ((ZsRs + Za_bar) * (Tf - Ta) + r * Ra_bar(Tf, Ta) * (Ts_bar - Tf)) -
                            (Tc - Ts_bar) / Rs;
                 },
                 Ta,
@@ -462,7 +469,8 @@ namespace ExtendedHI {
                     0.0,
                     Tc);
                 Rs = (Tc - Ts) / (Q - Qv(Ta, Pa));
-                Real64 Ps = Pc - (Pc - Pa) * Zs(Rs) / (Zs(Rs) + Za_un);
+                ZsRs = Zs(Rs);
+                Real64 Ps = Pc - (Pc - Pa) * ZsRs / (ZsRs + Za_un);
                 if (Ps > phi_salt * pvstar(Ts)) {
                     General::SolveRoot(
                         state,
