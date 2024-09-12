@@ -4178,8 +4178,6 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpFluid;         // Specific heat of the fluid in the radiant system
         Real64 InjectFlowRate;  // Calculated injection flow rate that will meet the inlet temperature requirement
-        bool Iteration;         // FALSE when a normal solution, TRUE when it is a solution where we must also find the inlet temp
-        int LoopInNode;         // Node on the loop that is the inlet to the constant flow radiant system
         Real64 OffTempCool;     // temperature at which the cooling shuts down
         Real64 OffTempHeat;     // temperature at which the heating shuts down
         Real64 PumpPartLoadRat; // Pump part load ratio (based on user schedule, or 1.0 for no schedule)
@@ -4189,8 +4187,6 @@ namespace LowTempRadiantSystem {
         Real64 SetPointTempHi;  // Current high point in setpoint temperature range
         Real64 SetPointTempLo;  // Current low point in setpoint temperature range
         Real64 ShaftPower;      // Amount of power expended at the pump shaft
-        int SurfNum;            // Surface number in the Surface derived type for a radiant system surface
-        int SurfNum2;           // Surface number in the Surface derived type for a radiant system surface
         bool SysRunning;        // TRUE when the system is running
         Real64 SysWaterInTemp;  // Fluid temperature supplied from the loop
         Real64 WaterTempHi;     // Current high point in water temperature range
@@ -4199,8 +4195,6 @@ namespace LowTempRadiantSystem {
 
         ConstantFlowRadDesignData ConstantFlowDesignDataObject =                   // Once again, is this supposed to be a deep copy?
             state.dataLowTempRadSys->CflowRadiantSysDesign(this->DesignObjectPtr); // Contains the data for variable flow hydronic systems
-        auto &Surface = state.dataSurface->Surface;
-        auto &Node = state.dataLoopNodes->Node;
 
         // initialize local variables
         SysRunning = true; // default to running and turn off only if not running
@@ -4339,11 +4333,12 @@ namespace LowTempRadiantSystem {
             this->PumpMassFlowRate = 0.0;
             this->PumpHeattoFluid = 0.0;
 
-            for (SurfNum = 1; SurfNum <= this->NumOfSurfaces; ++SurfNum) {
-                SurfNum2 = this->SurfacePtr(SurfNum);
+            for (int SurfNum = 1; SurfNum <= this->NumOfSurfaces; ++SurfNum) {
+                int SurfNum2 = this->SurfacePtr(SurfNum);
+                auto &surface = state.dataSurface->Surface(SurfNum2);
                 state.dataHeatBalFanSys->QRadSysSource(SurfNum2) = 0.0;
-                if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
-                    state.dataHeatBalFanSys->QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                if (surface.ExtBoundCond > 0 && surface.ExtBoundCond != SurfNum2)
+                    state.dataHeatBalFanSys->QRadSysSource(surface.ExtBoundCond) = 0.0; // Also zero the other side of an interzone
             }
 
             // turn off flow requests made during init because it is not actually running
@@ -4355,7 +4350,9 @@ namespace LowTempRadiantSystem {
                 mdot = 0.0;
                 SetComponentFlowRate(state, mdot, this->HotWaterInNode, this->HotWaterOutNode, this->HWPlantLoc);
             }
-        } else { // (SysRunning) so simulate the system...
+        } else {            // (SysRunning) so simulate the system...
+            bool Iteration; // FALSE when a normal solution, TRUE when it is a solution where we must also find the inlet temp
+            int LoopInNode; // Node on the loop that is the inlet to the constant flow radiant system
 
             // Determine pump flow rate and pump heat addition
             this->PumpMassFlowRate = this->WaterMassFlowRate; // Set in InitLowTempRadiantSystem
@@ -4386,10 +4383,11 @@ namespace LowTempRadiantSystem {
                     SetComponentFlowRate(state, mdot, this->ColdWaterInNode, this->ColdWaterOutNode, this->CWPlantLoc);
                 }
                 LoopInNode = this->HotWaterInNode;
-                SysWaterInTemp = Node(LoopInNode).Temp;
+                auto &hotNode = state.dataLoopNodes->Node(LoopInNode);
+                SysWaterInTemp = hotNode.Temp;
                 Iteration = false;
 
-                if ((SysWaterInTemp >= state.dataLowTempRadSys->LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
+                if ((SysWaterInTemp >= state.dataLowTempRadSys->LoopReqTemp) && (hotNode.MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
                     // Case 1: Adequate temperature and flow
                     // Best condition--loop inlet temperature greater than requested and we have enough flow.
                     // So, proceed assuming the RadInTemp requested by the controls and then figure out the
@@ -4407,8 +4405,7 @@ namespace LowTempRadiantSystem {
                     }
                     this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
 
-                } else if ((SysWaterInTemp < state.dataLowTempRadSys->LoopReqTemp) &&
-                           (Node(LoopInNode).MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
+                } else if ((SysWaterInTemp < state.dataLowTempRadSys->LoopReqTemp) && (hotNode.MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
                     // Case 2: Adequate flow but temperature too low
                     // Only thing to do is to reset the inlet temperature and assume that the loop will supply
                     // the entire flow to the component (no recirculation but potentially some bypass for the
@@ -4427,8 +4424,7 @@ namespace LowTempRadiantSystem {
                     if (this->WaterInjectionRate > this->WaterMassFlowRate) this->WaterInjectionRate = this->WaterMassFlowRate;
                     this->WaterRecircRate = 0.0; // by definition
 
-                } else if ((SysWaterInTemp >= state.dataLowTempRadSys->LoopReqTemp) &&
-                           (Node(LoopInNode).MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
+                } else if ((SysWaterInTemp >= state.dataLowTempRadSys->LoopReqTemp) && (hotNode.MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
                     // Case 3: Adequate temperature but loop flow is less than component flow
                     // This case might work out, but there is no guarantee that there is enough loop flow to
                     // mix with the recirculation flow and still provide a high enough temperature.  First
@@ -4455,12 +4451,12 @@ namespace LowTempRadiantSystem {
                     } else {
                         InjectFlowRate = this->WaterMassFlowRate;
                     }
-                    if (InjectFlowRate > Node(LoopInNode).MassFlowRateMaxAvail) {
+                    if (InjectFlowRate > hotNode.MassFlowRateMaxAvail) {
                         // We didn't have enough flow from the loop to meet our inlet temperature request.
                         // So, set the injection rate to the loop flow and calculate the recirculation flow.
                         // Then, resimulate the radiant system using these values (it will obtain the actual
                         // inlet temperature that results from this).
-                        this->WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
+                        this->WaterInjectionRate = hotNode.MassFlowRateMaxAvail;
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                         this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                         Iteration = true;
@@ -4470,13 +4466,12 @@ namespace LowTempRadiantSystem {
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                     }
 
-                } else if ((SysWaterInTemp < state.dataLowTempRadSys->LoopReqTemp) &&
-                           (Node(LoopInNode).MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
+                } else if ((SysWaterInTemp < state.dataLowTempRadSys->LoopReqTemp) && (hotNode.MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
                     // Case 4: Temperature too low and loop flow is less than component flow
                     // Worst condition--can't meet the temperature request at all.  Only thing to do is to
                     // set the loop flow and recirculation rate (known) and solve for the inlet temperature
                     // using the "iteration" solution scheme from "Case 3B" above
-                    this->WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
+                    this->WaterInjectionRate = hotNode.MassFlowRateMaxAvail;
                     this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                     this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                     Iteration = true;
@@ -4491,15 +4486,15 @@ namespace LowTempRadiantSystem {
                     SetComponentFlowRate(state, mdot, this->HotWaterInNode, this->HotWaterOutNode, this->HWPlantLoc);
                 }
                 LoopInNode = this->ColdWaterInNode;
-                SysWaterInTemp = Node(LoopInNode).Temp;
+                auto &coldNode = state.dataLoopNodes->Node(LoopInNode);
+                SysWaterInTemp = coldNode.Temp;
                 state.dataLowTempRadSys->CFloCondIterNum = 1;
                 while ((state.dataLowTempRadSys->CFloCondIterNum <= 1) ||
                        ((state.dataLowTempRadSys->CFloCondIterNum <= 2) &&
                         (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlVariedOff) && (state.dataLowTempRadSys->VarOffCond))) {
                     Iteration = false;
 
-                    if ((SysWaterInTemp <= state.dataLowTempRadSys->LoopReqTemp) &&
-                        (Node(LoopInNode).MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
+                    if ((SysWaterInTemp <= state.dataLowTempRadSys->LoopReqTemp) && (coldNode.MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
                         // Case 1: Adequate temperature and flow
                         // Best condition--loop inlet temperature lower than requested and we have enough flow.
                         // So, proceed assuming the RadInTemp requested by the controls and then figure out the
@@ -4525,7 +4520,7 @@ namespace LowTempRadiantSystem {
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
 
                     } else if ((SysWaterInTemp > state.dataLowTempRadSys->LoopReqTemp) &&
-                               (Node(LoopInNode).MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
+                               (coldNode.MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
                         // Case 2: Adequate flow but temperature too high
                         // Only thing to do is to reset the inlet temperature and assume that the loop will supply
                         // the entire flow to the component (no recirculation but potentially some bypass for the
@@ -4545,7 +4540,7 @@ namespace LowTempRadiantSystem {
                         this->WaterRecircRate = 0.0; // by definition
 
                     } else if ((SysWaterInTemp <= state.dataLowTempRadSys->LoopReqTemp) &&
-                               (Node(LoopInNode).MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
+                               (coldNode.MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
                         // Case 3: Adequate temperature but loop flow is less than component flow
                         // This case might work out, but there is no guarantee that there is enough loop flow to
                         // mix with the recirculation flow and still provide a high enough temperature.  First
@@ -4577,12 +4572,12 @@ namespace LowTempRadiantSystem {
                         } else {
                             InjectFlowRate = this->WaterMassFlowRate;
                         }
-                        if (InjectFlowRate > Node(LoopInNode).MassFlowRateMaxAvail) {
+                        if (InjectFlowRate > coldNode.MassFlowRateMaxAvail) {
                             // We didn't have enough flow from the loop to meet our inlet temperature request.
                             // So, set the injection rate to the loop flow and calculate the recirculation flow.
                             // Then, resimulate the radiant system using these values (it will obtain the actual
                             // inlet temperature that results from this).
-                            this->WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
+                            this->WaterInjectionRate = coldNode.MassFlowRateMaxAvail;
                             this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                             this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                             Iteration = true;
@@ -4593,13 +4588,12 @@ namespace LowTempRadiantSystem {
                             this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                         }
 
-                    } else if ((SysWaterInTemp > state.dataLowTempRadSys->LoopReqTemp) &&
-                               (Node(LoopInNode).MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
+                    } else if ((SysWaterInTemp > state.dataLowTempRadSys->LoopReqTemp) && (coldNode.MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
                         // Case 4: Temperature too low and loop flow is less than component flow
                         // Worst condition--can't meet the temperature request at all.  Only thing to do is to
                         // set the loop flow and recirculation rate (known) and solve for the inlet temperature
                         // using the "iteration" solution scheme from "Case 3B" above
-                        this->WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
+                        this->WaterInjectionRate = coldNode.MassFlowRateMaxAvail;
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                         this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                         Iteration = true;
