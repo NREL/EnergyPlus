@@ -325,7 +325,7 @@ namespace Window {
                                Array1D<Real64> hgap,        // Conductive gap conductance [W/m2-K]
                                Real64 &NominalConductance,  // Nominal center-of-glass conductance, including air films
                                Real64 &SHGC,                // Nominal center-of-glass solar heat gain coefficient for
-                               Real64 &TSolNorm             // Overall beam solar transmittance at normal incidence
+                               Real64 TSolNorm              // Overall beam solar transmittance at normal incidence
     );
 
     void WindowTempsForNominalCond(EnergyPlusData &state,
