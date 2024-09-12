@@ -4923,12 +4923,12 @@ namespace LowTempRadiantSystem {
                                 WaterTempIn * (1.0 - state.dataLowTempRadSys->Cmj(RadSurfNum2)) +
                                 (state.dataLowTempRadSys->Ckj(RadSurfNum2) * state.dataLowTempRadSys->Cmj(RadSurfNum2));
                             Mdot = WaterMassFlow * this->SurfaceFrac(RadSurfNum2);
-                            int SurfNum = this->SurfacePtr(RadSurfNum2);
-                            state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
+                            int SurfNum2 = this->SurfacePtr(RadSurfNum2);
+                            state.dataHeatBalFanSys->QRadSysSource(SurfNum2) =
                                 Mdot * Cp * (WaterTempIn - state.dataLowTempRadSys->WaterTempOut(RadSurfNum2));
-                            if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
-                                state.dataHeatBalFanSys->QRadSysSource(Surface(SurfNum).ExtBoundCond) =
-                                    state.dataHeatBalFanSys->QRadSysSource(SurfNum); // Also set the other side of an interzone
+                            if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                                state.dataHeatBalFanSys->QRadSysSource(Surface(SurfNum2).ExtBoundCond) =
+                                    state.dataHeatBalFanSys->QRadSysSource(SurfNum2); // Also set the other side of an interzone
                         }
                     }
                 }
