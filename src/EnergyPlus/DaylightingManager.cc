@@ -9671,7 +9671,7 @@ void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64
 
     auto &ip = state.dataInputProcessing->inputProcessor;
     auto const &ipsc = state.dataIPShortCut;
-    auto &s_surf = state.dataSurface;
+    auto const &s_surf = state.dataSurface;
 
     if (ip->getNumObjectsFound(state, CurrentModuleObject) == 1) {
         int NAlphas;
