@@ -285,8 +285,9 @@ namespace DataZoneEquipment {
         int InNode;  // Air distribution unit inlet node
         int OutNode; // Air distribution unit Outlet node
         bool SupplyAirPathExists;
-        int MainBranchIndex;
-        int SupplyBranchIndex;
+        int AirLoopNum = 0;            // airloop number serving this ADU
+        int MainBranchIndex;           // airloop branch index (not the actual branch index)
+        int SupplyBranchIndex;         // airloop branch index (not the actual branch index)
         int AirDistUnitIndex;          // equipment number in EquipList
         int TermUnitSizingIndex;       // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
         int SupplyAirPathIndex;        // Pointer to SupplyAirPath serving this terminal unit

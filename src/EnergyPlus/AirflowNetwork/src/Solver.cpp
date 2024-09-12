@@ -11228,13 +11228,15 @@ namespace AirflowNetwork {
                                     found = true;
                                 }
                             }
-                            if (!found) {
-                                ShowSevereError(m_state, format("{}Fan:ZoneExhaust is not defined in {}", RoutineName, CurrentModuleObject));
-                                ShowContinueError(m_state,
-                                                  "Zone Air Exhaust Node in ZoneHVAC:EquipmentConnections =" +
-                                                      m_state.dataLoopNodes->NodeID(m_state.dataZoneEquip->ZoneEquipConfig(j).ExhaustNode(k)));
-                                ErrorsFound = true;
-                            }
+                        }
+                        if (!found) {
+                            ShowSevereError(m_state, format("{}Fan:ZoneExhaust is not defined in {}", RoutineName, CurrentModuleObject));
+                            ShowContinueError(
+                                m_state,
+                                format("The inlet node of the {} Fan:ZoneExhaust is not defined in the {}'s ZoneHVAC:EquipmentConnections",
+                                       m_state.dataZoneEquip->ZoneEquipList(j).EquipName,
+                                       m_state.dataZoneEquip->ZoneEquipConfig(j).ZoneName));
+                            ErrorsFound = true;
                         }
                     }
                 }

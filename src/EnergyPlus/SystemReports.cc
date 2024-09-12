@@ -160,6 +160,7 @@ void InitEnergyReports(EnergyPlusData &state)
                                                  ++OutNum) {
                                                 if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) ==
                                                     state.dataZoneEquip->SupplyAirPath(SAPNum).InletNodeNum) {
+                                                    thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).AirLoopNum = AirLoopNum;
                                                     thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex =
                                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OutletBranchNum[OutNum - 1];
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
@@ -192,6 +193,7 @@ void InitEnergyReports(EnergyPlusData &state)
                                                  ++BranchNum) {
                                                 if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNumOut ==
                                                     state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
+                                                    thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).AirLoopNum = AirLoopNum;
                                                     thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
                                                         for (int MainBranchNum = 1;
@@ -229,6 +231,7 @@ void InitEnergyReports(EnergyPlusData &state)
                                                  ++OutNum) {
                                                 if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) ==
                                                     state.dataZoneEquip->SupplyAirPath(SAPNum).InletNodeNum) {
+                                                    thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).AirLoopNum = AirLoopNum;
                                                     thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex =
                                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OutletBranchNum[OutNum - 1];
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
@@ -261,6 +264,7 @@ void InitEnergyReports(EnergyPlusData &state)
                                                  ++BranchNum) {
                                                 if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNumOut ==
                                                     state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
+                                                    thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).AirLoopNum = AirLoopNum;
                                                     thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
                                                         for (int MainBranchNum = 1;
@@ -4871,6 +4875,7 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                         auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
                         auto &zel = state.dataZoneEquip->ZoneEquipList(zoneNum);
                         for (auto &thisCoolADU : thisZoneEquipConfig.AirDistUnitCool) {
+                            if (thisCoolADU.AirLoopNum != airLoopNum) continue;
                             if (thisCoolADU.SupplyBranchIndex != thisAtoZInfo.SupplyDuctBranchNum(ductNum)) continue;
                             if (thisCoolADU.SupplyAirPathExists) {
                                 int spCompNum = thisSupplyPath.OutletNodeSupplyPathCompNum(thisCoolADU.SupplyAirPathOutNodeIndex);
@@ -4923,6 +4928,7 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                         auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
                         auto &zel = state.dataZoneEquip->ZoneEquipList(zoneNum);
                         for (auto &thisHeatADU : thisZoneEquipConfig.AirDistUnitHeat) {
+                            if (thisHeatADU.AirLoopNum != airLoopNum) continue;
                             if (thisHeatADU.SupplyBranchIndex != thisAtoZInfo.SupplyDuctBranchNum(ductNum)) continue;
                             if (thisHeatADU.SupplyAirPathExists) {
                                 int spCompNum = thisSupplyPath.OutletNodeSupplyPathCompNum(thisHeatADU.SupplyAirPathOutNodeIndex);
