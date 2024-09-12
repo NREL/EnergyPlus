@@ -2677,8 +2677,6 @@ namespace LowTempRadiantSystem {
                                 // FractionOfAutosizedHeatingCapacity )
         Real64 DesCoilLoad;     // design autosized or user specified capacity
         OperatingMode OpMode(OperatingMode::ClgHtg); // System operating mode
-        int HeatNode;                                // Hot water inlet node to determine system operating mode
-        int CoolNode;                                // Chilled water inlet node to determine system operating mode
         Real64 WaterVolFlowMaxDes;                   // Design water volume flow rate for reproting
         Real64 WaterVolFlowMaxUser;                  // User hard-sized water volume flow rate for reproting
 
@@ -3234,8 +3232,8 @@ namespace LowTempRadiantSystem {
             CompName = state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name;
 
             // Check which operating system it is
-            HeatNode = state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode;
-            CoolNode = state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode;
+            int HeatNode = state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode;
+            int CoolNode = state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode;
             if (HeatNode > 0 && CoolNode > 0) {
                 OpMode = OperatingMode::ClgHtg;
             } else if (HeatNode > 0 && CoolNode <= 0) {
@@ -3540,16 +3538,12 @@ namespace LowTempRadiantSystem {
         Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/sec]
         Real64 OffTempCool;  // temperature at which the flow rate throttles back to zero for cooling
         Real64 OffTempHeat;  // temperature at which the flow rate throttles back to zero for heating
-        int SurfNum;         // Surface number in the Surface derived type for a radiant system surface
-        int SurfNum2;        // Surface number in the Surface derived type for a radiant system surface
         int ZoneNum;         // number of zone being served
         Real64 mdot;         // local temporary for fluid mass flow rate
         bool SysRunning;     // True when system is running
 
         VarFlowRadDesignData variableFlowDesignDataObject =                           // Is this intended to be a copy?
             state.dataLowTempRadSys->HydronicRadiantSysDesign(this->DesignObjectPtr); // Contains the data for variable flow hydronic systems
-
-        auto &Surface = state.dataSurface->Surface;
 
         ControlNode = 0;
         MaxWaterFlow = 0.0;
@@ -3562,11 +3556,12 @@ namespace LowTempRadiantSystem {
 
             // Unit is off or has no load upon it; set the flow rates to zero and then
             // simulate the components with the no flow conditions
-            for (SurfNum = 1; SurfNum <= this->NumOfSurfaces; ++SurfNum) {
-                SurfNum2 = this->SurfacePtr(SurfNum);
+            for (int SurfNum = 1; SurfNum <= this->NumOfSurfaces; ++SurfNum) {
+                int SurfNum2 = this->SurfacePtr(SurfNum);
+                auto &surface = state.dataSurface->Surface(SurfNum2);
                 state.dataHeatBalFanSys->QRadSysSource(SurfNum2) = 0.0;
-                if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
-                    state.dataHeatBalFanSys->QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                if (surface.ExtBoundCond > 0 && surface.ExtBoundCond != SurfNum2)
+                    state.dataHeatBalFanSys->QRadSysSource(surface.ExtBoundCond) = 0.0; // Also zero the other side of an interzone
             }
             if (this->HeatingSystem) {
                 mdot = 0.0;
@@ -3693,19 +3688,12 @@ namespace LowTempRadiantSystem {
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int CondSurfNum;          // Surface number (in radiant array) of
-        int ConstrNum;            // Index for construction number in Construct derived type
         Real64 DewPointTemp;      // Dew-point temperature based on the zone air conditions
         Real64 EpsMdotCp;         // Epsilon (heat exchanger terminology) times water mass flow rate times water specific heat
         Real64 FullWaterMassFlow; // Original water mass flow rate before reducing the flow for condensation concerns
         Real64 LowestRadSurfTemp; // Lowest surface temperature of a radiant system (when condensation is a concern)
         Real64 PredictedCondTemp; // Temperature at which condensation is predicted (includes user parameter)
-        int RadSurfNum;           // DO loop counter for the surfaces that comprise a particular radiant system
-        int RadSurfNum2;          // DO loop counter for the surfaces that comprise a particular radiant system
-        int RadSurfNum3;          // DO loop counter for the surfaces that comprise a particular radiant system
         Real64 ReductionFrac;     // Fraction that the flow should be reduced to avoid condensation
-        int SurfNum;              // Index for radiant surface in Surface derived type
-        int SurfNum2;             // Index for radiant surface in Surface derived type
         Real64 SysWaterMassFlow;  // System level water mass flow rate (includes effect of zone multiplier)
         Real64 WaterMassFlow;     // Water mass flow rate in the radiant system, kg/s
         int WaterNodeIn;          // Node number of the water entering the radiant system
@@ -3761,8 +3749,8 @@ namespace LowTempRadiantSystem {
             // This is possible with a mismatch between system and plant operation
             // or a slight mismatch between zone and system controls.  This is not
             // necessarily a "problem" so this exception is necessary in the code.
-            for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
-                SurfNum = this->SurfacePtr(RadSurfNum);
+            for (int RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
+                int SurfNum = this->SurfacePtr(RadSurfNum);
                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) = 0.0;
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
                     state.dataHeatBalFanSys->QRadSysSource(Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
@@ -3770,9 +3758,9 @@ namespace LowTempRadiantSystem {
 
         } else {
 
-            for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
+            for (int RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
 
-                SurfNum = this->SurfacePtr(RadSurfNum);
+                int SurfNum = this->SurfacePtr(RadSurfNum);
                 // Determine the heat exchanger "effectiveness" term
 
                 EpsMdotCp = calculateHXEffectivenessTerm(state,
@@ -3842,7 +3830,7 @@ namespace LowTempRadiantSystem {
                 // which is the desired result, that is the heat source or sink to the radiant
                 // system as a function of the water inlet temperature (flow rate is also in there
                 // as well as all of the heat balance terms "hidden" in Ck and Cl).
-                ConstrNum = Surface(SurfNum).Construction;
+                int ConstrNum = Surface(SurfNum).Construction;
                 auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
 
                 if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF) {
@@ -3877,14 +3865,14 @@ namespace LowTempRadiantSystem {
             }
 
             // "Temperature Comparison" Cut-off:
-            for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
+            for (int RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
                 // Check to see whether or not the system should really be running.  If
                 // QRadSysSource is negative when we are in heating mode or QRadSysSource
                 // is positive when we are in cooling mode, then the radiant system will
                 // be doing the opposite of its intention.  In this case, the flow rate
                 // is set to zero to avoid heating in cooling mode or cooling in heating
                 // mode.
-                SurfNum = this->SurfacePtr(RadSurfNum);
+                int SurfNum = this->SurfacePtr(RadSurfNum);
 
                 if (((this->OperatingMode == HeatingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) <= 0.0)) ||
                     ((this->OperatingMode == CoolingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) >= 0.0))) {
@@ -3898,8 +3886,8 @@ namespace LowTempRadiantSystem {
                     this->WaterMassFlowRate = WaterMassFlow;
                     this->OperatingMode = NotOperating;
 
-                    for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                        SurfNum2 = this->SurfacePtr(RadSurfNum2);
+                    for (int RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                        int SurfNum2 = this->SurfacePtr(RadSurfNum2);
                         state.dataHeatBalFanSys->QRadSysSource(SurfNum2) = 0.0;
                         if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                             state.dataHeatBalFanSys->QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
@@ -3919,7 +3907,7 @@ namespace LowTempRadiantSystem {
 
             if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 
-                for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                for (int RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) <
                         (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT)) {
                         // Condensation warning--must shut off radiant system
@@ -3928,8 +3916,8 @@ namespace LowTempRadiantSystem {
                         this->OperatingMode = NotOperating;
                         SetComponentFlowRate(state, WaterMassFlow, this->ColdWaterInNode, this->ColdWaterOutNode, this->CWPlantLoc);
                         this->WaterMassFlowRate = WaterMassFlow;
-                        for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
-                            SurfNum2 = this->SurfacePtr(RadSurfNum3);
+                        for (int RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
+                            int SurfNum2 = this->SurfacePtr(RadSurfNum3);
                             state.dataHeatBalFanSys->QRadSysSource(SurfNum2) = 0.0;
                             if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                                 state.dataHeatBalFanSys->QRadSysSource(Surface(SurfNum2).ExtBoundCond) =
@@ -3970,7 +3958,7 @@ namespace LowTempRadiantSystem {
 
             } else if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlNone)) {
 
-                for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                for (int RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
                         // Condensation occurring but user does not want to shut radiant system off ever
                         this->CondCausedShutDown = true;
@@ -3980,8 +3968,8 @@ namespace LowTempRadiantSystem {
             } else if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlVariedOff)) {
 
                 LowestRadSurfTemp = 999.9;
-                CondSurfNum = 0;
-                for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                int CondSurfNum = 0;
+                for (int RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) <
                         (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT)) {
                         if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) < LowestRadSurfTemp) {
@@ -4002,8 +3990,8 @@ namespace LowTempRadiantSystem {
                     WaterMassFlow = 0.0;
                     SetComponentFlowRate(state, WaterMassFlow, this->ColdWaterInNode, this->ColdWaterOutNode, this->CWPlantLoc);
                     this->WaterMassFlowRate = WaterMassFlow;
-                    for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
-                        SurfNum2 = this->SurfacePtr(RadSurfNum3);
+                    for (int RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
+                        int SurfNum2 = this->SurfacePtr(RadSurfNum3);
                         state.dataHeatBalFanSys->QRadSysSource(SurfNum2) = 0.0;
                         if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                             state.dataHeatBalFanSys->QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
@@ -4012,7 +4000,7 @@ namespace LowTempRadiantSystem {
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Now check all of the surface temperatures.  If any potentially have condensation, leave the system off.
-                    for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                    for (int RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                         if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) <
                             (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT)) {
                             this->CondCausedShutDown = true;
@@ -4034,8 +4022,8 @@ namespace LowTempRadiantSystem {
                         this->WaterMassFlowRate = SysWaterMassFlow;
 
                         // Go through all of the surfaces again with the new flow rate...
-                        for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
-                            SurfNum = this->SurfacePtr(RadSurfNum3);
+                        for (int RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
+                            int SurfNum = this->SurfacePtr(RadSurfNum3);
                             // Determine the heat exchanger "effectiveness" term
 
                             EpsMdotCp = calculateHXEffectivenessTerm(state,
@@ -4047,7 +4035,7 @@ namespace LowTempRadiantSystem {
                                                                      this->DesignObjectPtr,
                                                                      typeOfRadiantSystem);
 
-                            ConstrNum = Surface(SurfNum).Construction;
+                            int ConstrNum = Surface(SurfNum).Construction;
                             auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
                             if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF) {
                                 // For documentation on coefficients, see code earlier in this subroutine
@@ -4080,7 +4068,7 @@ namespace LowTempRadiantSystem {
 
                         // Check for condensation one more time.  If no condensation, we are done.  If there is
                         // condensation, shut things down and be done.
-                        for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                        for (int RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                             if (this->CondCausedShutDown) break;
                             if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) < (PredictedCondTemp)) {
                                 // Condensation still present--must shut off radiant system
@@ -4089,8 +4077,8 @@ namespace LowTempRadiantSystem {
                                 this->OperatingMode = NotOperating;
                                 SetComponentFlowRate(state, WaterMassFlow, this->ColdWaterInNode, this->ColdWaterOutNode, this->CWPlantLoc);
                                 this->WaterMassFlowRate = WaterMassFlow;
-                                for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
-                                    SurfNum2 = this->SurfacePtr(RadSurfNum3);
+                                for (int RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
+                                    int SurfNum2 = this->SurfacePtr(RadSurfNum3);
                                     state.dataHeatBalFanSys->QRadSysSource(SurfNum2) = 0.0;
                                     if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                                         state.dataHeatBalFanSys->QRadSysSource(Surface(SurfNum2).ExtBoundCond) =
