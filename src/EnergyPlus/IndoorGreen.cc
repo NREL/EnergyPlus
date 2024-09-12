@@ -378,14 +378,13 @@ namespace IndoorGreen {
                                 OutputProcessor::TimeStepType::Zone,
                                 OutputProcessor::StoreType::Average,
                                 ig.Name);
-            SetupOutputVariable(
-                state,
-                "Indoor Living Wall Sensible Heat Gain Rate",
-                Constant::Units::W,
-                ig.SensibleRate,
-                OutputProcessor::TimeStepType::Zone,
-                OutputProcessor::StoreType::Average,
-                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall Sensible Heat Gain Rate",
+                                Constant::Units::W,
+                                ig.SensibleRate,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
+                                ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall Latent Heat Gain Rate",
                                 Constant::Units::W,
@@ -583,10 +582,11 @@ namespace IndoorGreen {
                 ZoneNewHum = ZoneSatHum;
             }
             HMid = Psychrometrics::PsyHFnTdbW(ZoneNewTemp, ZonePreHum);
-            ig.SensibleRateLED = (1 - ig.LEDRadFraction) * ig.LEDActualEleP; // convective heat gain from LED lights when LED is on; heat convection from
-                                                                          // plants was considered and counted from plant surface heat balance.
+            ig.SensibleRateLED =
+                (1 - ig.LEDRadFraction) * ig.LEDActualEleP; // convective heat gain from LED lights when LED is on; heat convection from
+                                                            // plants was considered and counted from plant surface heat balance.
             ig.SensibleRate = state.dataHeatBalSurf->SurfQConvInRep(ig.SurfPtr) / Timestep;
-            ig.LatentRate = ZoneAirVol *rhoair *(HCons - HMid) / Timestep; // unit W
+            ig.LatentRate = ZoneAirVol * rhoair * (HCons - HMid) / Timestep; // unit W
             state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(ig.SurfPtr) =
                 -1.0 * ig.LambdaET +
                 ig.LEDRadFraction * 0.9 * ig.LEDActualEleP /
