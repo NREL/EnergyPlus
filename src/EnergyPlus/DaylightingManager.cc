@@ -7656,16 +7656,16 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     int idxLo = surfShade.blind.profAngIdxLo;
                     int idxHi = surfShade.blind.profAngIdxHi;
                     int interpFac = surfShade.blind.profAngInterpFac;
-                    Real64 TransBlBmDiffFront = Interp(btar.Vis.Ft.Bm[idxLo].DfTra, btar.Vis.Ft.Bm[idxHi].DfTra, interpFac);
+                    TransBlBmDiffFront = Interp(btar.Vis.Ft.Bm[idxLo].DfTra, btar.Vis.Ft.Bm[idxHi].DfTra, interpFac);
 
                     if (ShType == WinShadingType::IntBlind) { // Interior blind
                         // TH CR 8121, 7/7/2010
                         // ReflBlBmDiffFront = WindowManager::InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
-                        Real64 ReflBlBmDiffFront = Interp(btar.Vis.Ft.Bm[idxLo].DfRef, btar.Vis.Ft.Bm[idxHi].DfRef, interpFac);
+                        ReflBlBmDiffFront = Interp(btar.Vis.Ft.Bm[idxLo].DfRef, btar.Vis.Ft.Bm[idxHi].DfRef, interpFac);
 
                         // TH added 7/12/2010 for CR 8121
-                        Real64 ReflBlDiffDiffFront = btar.Vis.Ft.Df.Ref;
-                        Real64 TransBlDiffDiffFront = btar.Vis.Ft.Df.Tra;
+                        ReflBlDiffDiffFront = btar.Vis.Ft.Df.Ref;
+                        TransBlDiffDiffFront = btar.Vis.Ft.Df.Tra;
 
                         transMult = TVISBSun * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                          (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
