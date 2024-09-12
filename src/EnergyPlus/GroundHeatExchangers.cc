@@ -488,11 +488,10 @@ GLHEResponseFactors::GLHEResponseFactors(EnergyPlusData &state, std::string cons
     }
 
     this->numGFuncPairs = static_cast<int>(tmpLntts.size());
-    this->GFNC.dimension(this->numGFuncPairs, 0.0);
 
     for (int i = 1; i <= (int)tmpLntts.size(); ++i) {
         this->LNTTS.push_back(tmpLntts[i - 1]);
-        this->GFNC(i) = tmpGvals[i - 1];
+        this->GFNC.push_back(tmpGvals[i - 1]);
     }
 }
 
@@ -1019,15 +1018,11 @@ void GLHEVert::setupTimeVectors()
         }
     }
 
-    // Setup the arrays
-    this->myRespFactors->GFNC.dimension(tempLNTTS.size(), 0.0);
+    this->myRespFactors->LNTTS = tempLNTTS;
+    this->myRespFactors->time = tempLNTTS;
+    std::transform(this->myRespFactors->time.begin(), this->myRespFactors->time.end(), this->myRespFactors->time.begin(), [&t_s](auto &c){return exp(c) * t_s;});
+    this->myRespFactors->GFNC = std::vector<Real64>(tempLNTTS.size(), 0.0);
 
-    int index = 1;
-    for (auto const &thisLNTTS : tempLNTTS) {
-        this->myRespFactors->time.push_back(exp(thisLNTTS) * t_s);
-        this->myRespFactors->LNTTS.push_back(thisLNTTS);
-        ++index;
-    }
 }
 
 //******************************************************************************
@@ -1367,23 +1362,17 @@ void GLHEVert::combineShortAndLongTimestepGFunctions()
     }
 
     // Add the rest of the long time-step g-functions to the combined curve
-    for (int index_longTS = this->myRespFactors->GFNC.l(); index_longTS <= this->myRespFactors->GFNC.u(); ++index_longTS) {
-        GFNC_combined.push_back(this->myRespFactors->GFNC(index_longTS));
-        LNTTS_combined.push_back(this->myRespFactors->LNTTS[index_longTS - 1]);
+    for (int index_longTS = 0; index_longTS < this->myRespFactors->GFNC.size(); ++index_longTS) {
+        GFNC_combined.push_back(this->myRespFactors->GFNC[index_longTS]);
+        LNTTS_combined.push_back(this->myRespFactors->LNTTS[index_longTS]);
     }
 
-    // Reset vectors for final usage
-    this->myRespFactors->time = std::vector<Real64>();
-    this->myRespFactors->LNTTS = std::vector<Real64>();
-    this->myRespFactors->GFNC.deallocate();
+    this->myRespFactors->time = LNTTS_combined;
+    std::transform(this->myRespFactors->time.begin(), this->myRespFactors->time.end(), this->myRespFactors->time.begin(), [&t_s](auto &c){return exp(c) * t_s;});
 
-    this->myRespFactors->GFNC.dimension(GFNC_combined.size(), 0.0);
+    this->myRespFactors->LNTTS = LNTTS_combined;
+    this->myRespFactors->GFNC = GFNC_combined;
 
-    for (unsigned int index = 0; index < GFNC_combined.size(); ++index) {
-        this->myRespFactors->time.push_back(exp(LNTTS_combined[index]) * t_s);
-        this->myRespFactors->LNTTS.push_back(LNTTS_combined[index]);
-        this->myRespFactors->GFNC[index] = GFNC_combined[index];
-    }
 }
 
 void GLHEBase::makeThisGLHECacheAndCompareWithFileCache(EnergyPlusData &state)
@@ -1456,7 +1445,7 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
         this->myRespFactors->LNTTS = std::vector<Real64>(myCacheData["Response Factors"]["LNTTS"].get<std::vector<Real64>>());
 
         // Populate the g-function array
-        this->myRespFactors->GFNC = Array1D<Real64>(myCacheData["Response Factors"]["GFNC"].get<std::vector<Real64>>());
+        this->myRespFactors->GFNC = std::vector<Real64>(myCacheData["Response Factors"]["GFNC"].get<std::vector<Real64>>());
     }
 }
 
@@ -1512,16 +1501,12 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
     int NPairs = static_cast<int>((tLg_max - tLg_min) / (tLg_grid) + 1);
 
     // Allocate and setup g-function arrays
-    this->myRespFactors->GFNC.allocate(NPairs);
+    this->myRespFactors->GFNC = std::vector<Real64>(NPairs, 0.0);
     this->myRespFactors->LNTTS = std::vector<Real64>(NPairs, 0.0);
     this->QnMonthlyAgg.allocate(static_cast<int>(this->maxSimYears * 12));
     this->QnHr.allocate(730 + this->AGG + this->SubAGG);
     this->QnSubHr.allocate(static_cast<int>((this->SubAGG + 1) * maxTSinHr + 1));
     this->LastHourN.allocate(this->SubAGG + 1);
-
-    for (int i = 1; i <= NPairs; ++i) {
-        this->myRespFactors->GFNC(i) = 0.0;
-    }
 
     // Calculate the number of loops (per trench) and number of trenches to be involved
     // Due to the symmetry of a slinky GHX field, we need only calculate about
@@ -1641,7 +1626,7 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
             }         // n1
         }             // m1
 
-        this->myRespFactors->GFNC(NT) = (gFunc * (this->coilDiameter / 2.0)) / (4 * Constant::Pi * fraction * this->numTrenches * this->numCoils);
+        this->myRespFactors->GFNC[NT - 1] = (gFunc * (this->coilDiameter / 2.0)) / (4 * Constant::Pi * fraction * this->numTrenches * this->numCoils);
         this->myRespFactors->LNTTS[NT - 1] = tLg;
 
     } // NT time
