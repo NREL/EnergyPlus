@@ -110,7 +110,6 @@ set(test_src
     EvaporativeCoolers.unit.cc
     EvaporativeFluidCoolers.unit.cc
     ExhaustSystem.unit.cc
-    ExtendedHI.unit.cc
     ExteriorEnergyUse.unit.cc
     FanCoilUnits.unit.cc
     Fans.unit.cc
