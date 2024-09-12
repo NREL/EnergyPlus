@@ -387,6 +387,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
         loopsidebranch.Comp.allocate(1);
     }
 
+    state->dataSize->ZoneSizingRunDone = true;
     DataZoneEquipment::GetZoneEquipmentData(*state);
     // get electric baseboard inputs
     BaseboardRadiator::GetBaseboardInput(*state);
@@ -477,6 +478,60 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     state->dataBaseboardRadiator->baseboards(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
     state->dataBaseboardRadiator->baseboards(BaseboardNum).SizeBaseboard(*state, BaseboardNum);
     EXPECT_EQ(state->dataBaseboardRadiator->baseboards(BaseboardNum).UA, 3000.0);
+}
+
+TEST_F(EnergyPlusFixture, BaseboardConvWater_resetSizingFlagBasedOnInputTest)
+{
+    state->dataBaseboardRadiator->baseboards.allocate(1);
+    auto &thisBB = state->dataBaseboardRadiator->baseboards(1);
+    state->dataSize->ZoneSizingRunDone = true;
+
+    // Test 1A: UA autosized so MySizeFlag should stay true
+    thisBB.MySizeFlag = true; // reset to default/initialized value
+    thisBB.UA = DataSizing::AutoSize;
+    thisBB.WaterVolFlowRateMax = 0.001;
+    thisBB.HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
+    thisBB.ScaledHeatingCapacity = 1.0;
+    thisBB.resetSizingFlagBasedOnInput(*state);
+    EXPECT_TRUE(thisBB.MySizeFlag);
+
+    // Test 1B: WaterVolFlowRateMax autosized so MySizeFlag should stay true
+    thisBB.MySizeFlag = true; // reset to default/initialized value
+    thisBB.UA = 0.5;
+    thisBB.WaterVolFlowRateMax = DataSizing::AutoSize;
+    thisBB.HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
+    thisBB.ScaledHeatingCapacity = 1.0;
+    thisBB.resetSizingFlagBasedOnInput(*state);
+    EXPECT_TRUE(thisBB.MySizeFlag);
+
+    // Test 1C: Heating Capacity autosized for method HeatingDesignCapacity so MySizeFlag should stay true
+    thisBB.MySizeFlag = true; // reset to default/initialized value
+    thisBB.UA = 0.5;
+    thisBB.WaterVolFlowRateMax = 0.001;
+    thisBB.HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+    thisBB.ScaledHeatingCapacity = DataSizing::AutoSize;
+    thisBB.resetSizingFlagBasedOnInput(*state);
+    EXPECT_TRUE(thisBB.MySizeFlag);
+
+    // Test 2A: Heating Capacity not autosized for method HeatingDesignCapacity and UA and WaterVolFlowRateMax not autosized
+    //          so MySizeFlag should be changed to false
+    thisBB.MySizeFlag = true; // reset to default/initialized value
+    thisBB.UA = 0.5;
+    thisBB.WaterVolFlowRateMax = 0.001;
+    thisBB.HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+    thisBB.ScaledHeatingCapacity = 1000.0;
+    thisBB.resetSizingFlagBasedOnInput(*state);
+    EXPECT_FALSE(thisBB.MySizeFlag);
+
+    // Test 2B: CapacityPerFloorArea method and UA and WaterVolFlowRateMax not autosized
+    //          so MySizeFlag should be changed to false
+    thisBB.MySizeFlag = true; // reset to default/initialized value
+    thisBB.UA = 0.5;
+    thisBB.WaterVolFlowRateMax = 0.001;
+    thisBB.HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+    thisBB.ScaledHeatingCapacity = DataSizing::AutoSize; // this value does not mater since it is not really valid for this method
+    thisBB.resetSizingFlagBasedOnInput(*state);
+    EXPECT_FALSE(thisBB.MySizeFlag);
 }
 
 } // namespace EnergyPlus

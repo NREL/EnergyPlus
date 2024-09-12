@@ -107,8 +107,6 @@ namespace HVACVariableRefrigerantFlow {
         Num
     };
 
-    constexpr Real64 MaxCap(1.0e+20); // limit of zone terminal unit capacity
-
     // VRF Algorithm Type
     enum class AlgorithmType
     {
@@ -543,7 +541,8 @@ namespace HVACVariableRefrigerantFlow {
                         Real64 Pipe_Q,             // Piping Loss Algorithm Parameter: Heat loss [W]
                         Real64 &OUEvapHeatExtract, // Condenser heat release (cooling mode) [W]
                         Real64 &CompSpdActual,     // Actual compressor running speed [rps]
-                        Real64 &Ncomp              // Compressor power [W]
+                        Real64 &Ncomp,             // Compressor power [W]
+                        Real64 &CyclingRatio       // Compressor cycling ratio
         );
 
         void VRFHR_OU_HR_Mode(EnergyPlusData &state,
