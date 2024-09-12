@@ -77,8 +77,7 @@ namespace ExtendedHI {
     Real64 Ra(Real64 Ts, Real64 Ta);
     Real64 Ra_bar(Real64 Tf, Real64 Ta);
     Real64 Ra_un(Real64 Ts, Real64 Ta);
-    int find_eqvar_name(EnergyPlusData &state, Real64 Ta, Real64 RH);
-    Real64 find_eqvar_value(EnergyPlusData &state, Real64 Ta, Real64 RH);
+    Real64 find_eqvar_name_and_value(EnergyPlusData &state, Real64 Ta, Real64 RH, int &varname);
     Real64 find_eqvar_phi(EnergyPlusData &state, Real64 Ta, Real64 RH);
     Real64 find_eqvar_Rf(EnergyPlusData &state, Real64 Ta, Real64 RH);
     Real64 find_eqvar_rs(EnergyPlusData &state, Real64 Ta, Real64 RH);
