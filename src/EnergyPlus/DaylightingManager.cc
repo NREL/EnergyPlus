@@ -6929,8 +6929,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Vector3<Real64> groundHitPt;  // Coordinates of point that ray from window center hits the ground (m)
     std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> FLCW = {Illums()}; // Sky-related upgoing luminous flux
     std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> FLFW = {Illums()}; // Sky-related downgoing luminous flux
-    Real64 transMult;
-    Real64 transBmBmMult;
 
     //  3=intermediate, 4=overcast
     Real64 DPH; // Sky/ground element altitude and azimuth increments (radians)
@@ -7736,8 +7734,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             // -- Window with shade, blind or diffusing glass
 
             if (ShadeOn || BlindOn || ScreenOn || s_surf->SurfWinSolarDiffusing(IWin)) {
-                transBmBmMult = 0.0;
-                transMult = 0.0;
+                Real64 transMult = 0.0;
 
                 if (ShadeOn || s_surf->SurfWinSolarDiffusing(IWin)) { // Shade on or diffusing glass
                     int IConstShaded = s_surf->SurfWinActiveShadedConstruction(IWin);
