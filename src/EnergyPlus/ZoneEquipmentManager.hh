@@ -108,6 +108,14 @@ namespace ZoneEquipmentManager {
 
     void SetUpZoneSizingArrays(EnergyPlusData &state);
 
+    void calcSizingOA(EnergyPlusData &state,
+                      DataSizing::ZoneSizingData &zsFinalSizing,
+                      DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                      bool &dsoaError,
+                      bool &ErrorsFound,
+                      int const zoneNum,
+                      int const spaceNum = 0);
+
     void fillZoneSizingFromInput(EnergyPlusData &state,
                                  DataSizing::ZoneSizingInputData const &zoneSizingInput,
                                  Array2D<DataSizing::ZoneSizingData> &zsSizing,

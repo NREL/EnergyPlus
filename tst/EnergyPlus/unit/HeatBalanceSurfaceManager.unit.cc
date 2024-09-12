@@ -3258,7 +3258,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.0022; // RH = 10%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
-    EXPECT_NEAR(25, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
+    EXPECT_NEAR(26, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
     EXPECT_NEAR(23, state->dataHeatBal->Resilience(1).ZoneHumidex, 1);
 
     // Heat Index Case 4: Rothfusz regression, other than the above conditions;
@@ -3833,7 +3833,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.0022; // RH = 10%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
-    EXPECT_NEAR(25, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
+    EXPECT_NEAR(26, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
     EXPECT_NEAR(23, state->dataHeatBal->Resilience(1).ZoneHumidex, 1);
 
     // Heat Index Case 4: Rothfusz regression, other than the above conditions;

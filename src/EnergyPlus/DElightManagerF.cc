@@ -333,7 +333,7 @@ namespace DElightManagerF {
 
                     // Write each opaque bounding Surface to the DElight input file
                     for (int spaceNum : zn.spaceIndexes) {
-                        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                        auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                         int const iSurfaceFirst = thisSpace.HTSurfaceFirst;
                         int const iSurfaceLast = thisSpace.HTSurfaceLast;
                         for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
