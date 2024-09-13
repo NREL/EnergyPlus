@@ -3746,7 +3746,7 @@ Output:Variable,
 
 Output:Variable,
     *,                       !- Key Value
-    Indoor Living Wall Energy Rate Required For Evapotranspiration Per Unit Are,  !- Variable Name
+    Indoor Living Wall Energy Rate Required For Evapotranspiration Per Unit Area,  !- Variable Name
     Timestep;                !- Reporting Frequency
 
 Output:Variable,
