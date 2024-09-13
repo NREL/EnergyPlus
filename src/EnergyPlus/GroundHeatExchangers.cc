@@ -1822,32 +1822,28 @@ Real64 GLHESlinky::integral(int const m, int const n, int const m1, int const n1
     // Simpson's 1/3 rule of integration
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 sumIntF = 0.0;
     Real64 theta = 0.0;
     constexpr Real64 theta1 = 0.0;
     constexpr Real64 theta2 = 2 * Constant::Pi;
-    Array1D<Real64> f(J0, 0.0);
+    std::vector<Real64> f;
 
     Real64 h = (theta2 - theta1) / (J0 - 1);
 
     // Calculate the function at various equally spaced x values
-    for (int j = 1; j <= J0; ++j) {
-
-        theta = theta1 + (j - 1) * h;
-
-        f(j) = nearFieldResponseFunction(m, n, m1, n1, eta, theta, t);
-
-        if (j == 1 || j == J0) {
-        } else if (isEven(j)) {
-            f(j) = 4 * f(j);
-        } else {
-            f(j) = 2 * f(j);
-        }
-
-        sumIntF += f(j);
+    for (int j = 0; j < J0; ++j) {
+        theta = theta1 + j * h;
+        f.push_back(nearFieldResponseFunction(m, n, m1, n1, eta, theta, t));
     }
 
-    return (h / 3) * sumIntF;
+    for (int j = 1; j < J0 - 1; ++j) {
+        if (!isEven(j)) {
+            f[j] = 4 * f[j];
+        } else {
+            f[j] = 2 * f[j];
+        }
+    }
+
+    return (h / 3) * std::reduce(f.begin(), f.end());
 }
 
 //******************************************************************************
