@@ -204,13 +204,12 @@ namespace InternalHeatGains {
         int IOStat;
 
         //   Variables for reporting nominal internal gains
-        Real64 LightTot;       // Total Lights for calculating lights per square meter
-        Real64 ElecTot;        // Total Electric Load for calculating electric per square meter
-        Real64 GasTot;         // Total Gas load for calculating gas per square meter
-        Real64 OthTot;         // Total Other load for calculating other load per square meter
-        Real64 HWETot;         // Total Hot Water Equipment for calculating HWE per square meter
-        Real64 StmTot;         // Total Steam for calculating Steam per square meter
-        std::string BBHeatInd; // Yes if BBHeat in zone, no if not.
+        Real64 LightTot; // Total Lights for calculating lights per square meter
+        Real64 ElecTot;  // Total Electric Load for calculating electric per square meter
+        Real64 GasTot;   // Total Gas load for calculating gas per square meter
+        Real64 OthTot;   // Total Other load for calculating other load per square meter
+        Real64 HWETot;   // Total Hot Water Equipment for calculating HWE per square meter
+        Real64 StmTot;   // Total Steam for calculating Steam per square meter
         Real64 SchMin;
         Real64 SchMax;
         std::string liteName;
@@ -3651,7 +3650,7 @@ namespace InternalHeatGains {
             OthTot = 0.0;
             HWETot = 0.0;
             StmTot = 0.0;
-            BBHeatInd = "No";
+            std::string BBHeatInd = "No"; // Yes if BBHeat in zone, no if not.
             for (int Loop1 = 1; Loop1 <= state.dataHeatBal->TotLights; ++Loop1) {
                 if (state.dataHeatBal->Lights(Loop1).ZonePtr != Loop) continue;
                 LightTot += state.dataHeatBal->Lights(Loop1).DesignLevel;
