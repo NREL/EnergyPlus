@@ -367,8 +367,6 @@ namespace InternalHeatGains {
                                                       format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", IHGAlphas(3), SchMin));
                                     ErrorsFound = true;
                                 }
-                            }
-                            if (Item1 == 1) {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", {}, maximum is < 0.0",
@@ -595,8 +593,6 @@ namespace InternalHeatGains {
                                                       format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", IHGAlphas(5), SchMin));
                                     ErrorsFound = true;
                                 }
-                            }
-                            if (Item1 == 1) {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", {} maximum is < 0.0",
@@ -1264,8 +1260,6 @@ namespace InternalHeatGains {
                                                       format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", IHGAlphas(3), SchMin));
                                     ErrorsFound = true;
                                 }
-                            }
-                            if (Item1 == 1) {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", {}, maximum is < 0.0",
@@ -1947,8 +1941,6 @@ namespace InternalHeatGains {
                                                       format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", IHGAlphas(3), SchMin));
                                     ErrorsFound = true;
                                 }
-                            }
-                            if (Item1 == 1) {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", {}, maximum is < 0.0",
