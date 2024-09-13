@@ -996,113 +996,17 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     // from the specified OA method
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-        auto const &thisZone = state.dataHeatBal->Zone(CtrlZoneNum);
         auto &finalZoneSizing = state.dataSize->FinalZoneSizing(CtrlZoneNum);
         auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
-        // Use the max occupancy PEOPLE structure to calculate design min OA for each zone from the outside air flow per person input
-        Real64 TotPeopleInZone = 0.0;
-        Real64 ZoneMinOccupancy = 0.;
-        int DSOAPtr = finalZoneSizing.ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
-        if ((DSOAPtr > 0) && !dsoaError) {
-            auto &thisOAReq = state.dataSize->OARequirements(DSOAPtr);
-            // If this is a DesignSpecification:OutdoorAir:SpaceList check to make sure spaces are valid and belong to this zone
-            if (thisOAReq.numDSOA > 0) {
-                for (int spaceCounter = 1; spaceCounter <= thisOAReq.numDSOA; ++spaceCounter) {
-                    int thisSpaceNum = thisOAReq.dsoaSpaceIndexes(spaceCounter);
-                    if (thisSpaceNum > 0) {
-                        if (state.dataHeatBal->space(thisSpaceNum).zoneNum != CtrlZoneNum) {
-                            ShowSevereError(state, format("SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList={}", thisOAReq.Name));
-                            ShowContinueError(state, format("is invalid for Sizing:Zone={}", finalZoneSizing.ZoneName));
-                            ShowContinueError(state, "All spaces in the list must be part of this zone.");
-                            ErrorsFound = true;
-                        }
-                    }
-                }
-            }
-
-            finalZoneSizing.DesOAFlowPPer = thisOAReq.desFlowPerZonePerson(state, CtrlZoneNum);
-            finalZoneSizing.DesOAFlowPerArea = thisOAReq.desFlowPerZoneArea(state, CtrlZoneNum);
-        }
-
-        for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-            if (state.dataHeatBal->People(PeopleNum).ZonePtr == CtrlZoneNum) {
-                auto &people = state.dataHeatBal->People(PeopleNum);
-                TotPeopleInZone += (people.NumberOfPeople * thisZone.Multiplier * thisZone.ListMultiplier);
-                Real64 SchMax = ScheduleManager::GetScheduleMaxValue(state, people.NumberOfPeoplePtr);
-                if (SchMax > 0) {
-                    finalZoneSizing.ZonePeakOccupancy = TotPeopleInZone * SchMax;
-                } else {
-                    finalZoneSizing.ZonePeakOccupancy = TotPeopleInZone;
-                }
-                ZoneMinOccupancy += TotPeopleInZone * ScheduleManager::GetScheduleMinValue(state, people.NumberOfPeoplePtr);
-            }
-        }
-        finalZoneSizing.TotalZoneFloorArea = (thisZone.FloorArea * thisZone.Multiplier * thisZone.ListMultiplier);
-        Real64 OAFromPeople = finalZoneSizing.DesOAFlowPPer * TotPeopleInZone;
-        Real64 OAFromArea = finalZoneSizing.DesOAFlowPerArea * finalZoneSizing.TotalZoneFloorArea;
-        finalZoneSizing.TotPeopleInZone = TotPeopleInZone;
-        finalZoneSizing.TotalOAFromPeople = OAFromPeople;
-        finalZoneSizing.TotalOAFromArea = OAFromArea;
-
-        // save Voz for predefined outdoor air summary report
-        Real64 MinEz = std::min(finalZoneSizing.ZoneADEffCooling, finalZoneSizing.ZoneADEffHeating);
-        if (MinEz == 0) {
-            MinEz = 1.0; // if not calculated assume 1.0 ventilation effectiveness
-        }
-        state.dataHeatBal->ZonePreDefRep(CtrlZoneNum).VozMin = (ZoneMinOccupancy * finalZoneSizing.DesOAFlowPPer + OAFromArea) / MinEz;
-
-        // Calculate the design min OA flow rate for this zone
-        // flag to use occupancy schedule when calculating OA
-        // flag to use min OA schedule when calculating OA
-        state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex = DSOAPtr;                                     // store for later use
-        state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex = finalZoneSizing.ZoneAirDistributionIndex; // store for later use
-        Real64 OAVolumeFlowRate = 0.0;
-        if (!dsoaError) {
-            bool UseOccSchFlag = false;
-            bool UseMinOASchFlag = false;
-            OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, DSOAPtr, CtrlZoneNum, UseOccSchFlag, UseMinOASchFlag);
-        }
-
-        // Zone(ZoneIndex)%Multiplier and Zone(ZoneIndex)%ListMultiplier applied in CalcDesignSpecificationOutdoorAir
-        finalZoneSizing.MinOA = OAVolumeFlowRate;
-        calcFinalZoneSizing.MinOA = OAVolumeFlowRate;
-        if (finalZoneSizing.ZoneADEffCooling > 0.0 || finalZoneSizing.ZoneADEffHeating > 0.0) {
-            finalZoneSizing.MinOA /= min(finalZoneSizing.ZoneADEffCooling, finalZoneSizing.ZoneADEffHeating);
-            calcFinalZoneSizing.MinOA = finalZoneSizing.MinOA;
-        }
-        // calculated zone design flow rates automatically take into account zone multipliers, since the zone
-        // loads are multiplied (in ZoneTempPredictorCorrector.cc). Flow rates derived directly from
-        // user inputs need to be explicitly multiplied by the zone multipliers.
-        finalZoneSizing.DesCoolMinAirFlow2 =
-            finalZoneSizing.DesCoolMinAirFlowPerArea * thisZone.FloorArea * thisZone.Multiplier * thisZone.ListMultiplier;
-        calcFinalZoneSizing.DesCoolMinAirFlow2 =
-            calcFinalZoneSizing.DesCoolMinAirFlowPerArea * thisZone.FloorArea * thisZone.Multiplier * thisZone.ListMultiplier;
-        finalZoneSizing.DesHeatMaxAirFlow2 =
-            finalZoneSizing.DesHeatMaxAirFlowPerArea * thisZone.FloorArea * thisZone.Multiplier * thisZone.ListMultiplier;
-        calcFinalZoneSizing.DesHeatMaxAirFlow2 =
-            calcFinalZoneSizing.DesHeatMaxAirFlowPerArea * thisZone.FloorArea * thisZone.Multiplier * thisZone.ListMultiplier;
-        int zoneMultiplier = thisZone.Multiplier * thisZone.ListMultiplier;
-        finalZoneSizing.DesCoolMinAirFlow *= zoneMultiplier;
-        calcFinalZoneSizing.DesCoolMinAirFlow *= zoneMultiplier;
-        finalZoneSizing.DesHeatMaxAirFlow *= zoneMultiplier;
-        calcFinalZoneSizing.DesHeatMaxAirFlow *= zoneMultiplier;
-        finalZoneSizing.InpDesCoolAirFlow *= zoneMultiplier;
-        calcFinalZoneSizing.InpDesCoolAirFlow *= zoneMultiplier;
-        finalZoneSizing.InpDesHeatAirFlow *= zoneMultiplier;
-        calcFinalZoneSizing.InpDesHeatAirFlow *= zoneMultiplier;
-
-        for (int DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
-            auto &zoneSizing = state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum);
-            zoneSizing.MinOA = finalZoneSizing.MinOA;
-            state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).MinOA = calcFinalZoneSizing.MinOA;
-            zoneSizing.DesCoolMinAirFlow2 = finalZoneSizing.DesCoolMinAirFlow2;
-            state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesCoolMinAirFlow2 = calcFinalZoneSizing.DesCoolMinAirFlow2;
-            zoneSizing.DesCoolMinAirFlow = finalZoneSizing.DesCoolMinAirFlow;
-            state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesCoolMinAirFlow = calcFinalZoneSizing.DesCoolMinAirFlow;
-            zoneSizing.DesHeatMaxAirFlow2 = finalZoneSizing.DesHeatMaxAirFlow2;
-            state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesHeatMaxAirFlow2 = calcFinalZoneSizing.DesHeatMaxAirFlow2;
-            zoneSizing.DesHeatMaxAirFlow = finalZoneSizing.DesHeatMaxAirFlow;
-            state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesHeatMaxAirFlow = calcFinalZoneSizing.DesHeatMaxAirFlow;
+        calcSizingOA(state, finalZoneSizing, calcFinalZoneSizing, dsoaError, ErrorsFound, CtrlZoneNum);
+    }
+    if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            int zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+            if (!state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) continue;
+            auto &finalSpaceSizing = state.dataSize->FinalSpaceSizing(spaceNum);
+            auto &calcFinalSpaceSizing = state.dataSize->CalcFinalSpaceSizing(spaceNum);
+            calcSizingOA(state, finalSpaceSizing, calcFinalSpaceSizing, dsoaError, ErrorsFound, zoneNum, spaceNum);
         }
     }
     // Formats
@@ -1137,6 +1041,129 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     }
     if (ErrorsFound) {
         ShowFatalError(state, "SetUpZoneSizingArrays: Errors found in Sizing:Zone input");
+    }
+}
+
+void calcSizingOA(EnergyPlusData &state,
+                  DataSizing::ZoneSizingData &zsFinalSizing,
+                  DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                  bool &dsoaError,
+                  bool &ErrorsFound,
+                  int const zoneNum,
+                  int const spaceNum)
+{
+    // Use the max occupancy PEOPLE structure to calculate design min OA for each zone from the outside air flow per person input
+    Real64 TotPeopleInZone = 0.0;
+    Real64 ZoneMinOccupancy = 0.;
+    int DSOAPtr = zsFinalSizing.ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
+    auto const &thisZone = state.dataHeatBal->Zone(zoneNum);
+    int zoneMult = thisZone.Multiplier * thisZone.ListMultiplier;
+    Real64 floorArea = (spaceNum == 0) ? thisZone.FloorArea : state.dataHeatBal->space(spaceNum).FloorArea;
+    if ((DSOAPtr > 0) && !dsoaError) {
+        auto &thisOAReq = state.dataSize->OARequirements(DSOAPtr);
+        // If this is a DesignSpecification:OutdoorAir:SpaceList check to make sure spaces are valid and belong to this zone
+        if (thisOAReq.numDSOA > 0) {
+            for (int spaceCounter = 1; spaceCounter <= thisOAReq.numDSOA; ++spaceCounter) {
+                int thisSpaceNum = thisOAReq.dsoaSpaceIndexes(spaceCounter);
+                if (thisSpaceNum > 0) {
+                    if (state.dataHeatBal->space(thisSpaceNum).zoneNum != zoneNum) {
+                        ShowSevereError(state, format("SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList={}", thisOAReq.Name));
+                        ShowContinueError(state, format("is invalid for Sizing:Zone={}", zsFinalSizing.ZoneName));
+                        ShowContinueError(state, "All spaces in the list must be part of this zone.");
+                        ErrorsFound = true;
+                    }
+                }
+            }
+        }
+
+        zsFinalSizing.DesOAFlowPPer = thisOAReq.desFlowPerZonePerson(state, zoneNum, spaceNum);
+        zsFinalSizing.DesOAFlowPerArea = thisOAReq.desFlowPerZoneArea(state, zoneNum, spaceNum);
+    }
+
+    for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+        auto &people = state.dataHeatBal->People(PeopleNum);
+        if (((spaceNum == 0) && (people.ZonePtr == zoneNum)) || ((spaceNum > 0) && (people.spaceIndex == spaceNum))) {
+            Real64 numPeople = people.NumberOfPeople * zoneMult;
+            TotPeopleInZone += numPeople;
+            Real64 SchMax = ScheduleManager::GetScheduleMaxValue(state, people.NumberOfPeoplePtr);
+            if (SchMax > 0) {
+                zsFinalSizing.ZonePeakOccupancy += numPeople * SchMax;
+            } else {
+                zsFinalSizing.ZonePeakOccupancy += numPeople;
+            }
+            ZoneMinOccupancy += numPeople * ScheduleManager::GetScheduleMinValue(state, people.NumberOfPeoplePtr);
+        }
+    }
+    zsFinalSizing.TotalZoneFloorArea = (floorArea * zoneMult);
+    Real64 OAFromPeople = zsFinalSizing.DesOAFlowPPer * TotPeopleInZone;
+    Real64 OAFromArea = zsFinalSizing.DesOAFlowPerArea * zsFinalSizing.TotalZoneFloorArea;
+    zsFinalSizing.TotPeopleInZone = TotPeopleInZone;
+    zsFinalSizing.TotalOAFromPeople = OAFromPeople;
+    zsFinalSizing.TotalOAFromArea = OAFromArea;
+
+    // save Voz for predefined outdoor air summary report
+    Real64 MinEz = std::min(zsFinalSizing.ZoneADEffCooling, zsFinalSizing.ZoneADEffHeating);
+    if (MinEz == 0) {
+        MinEz = 1.0; // if not calculated assume 1.0 ventilation effectiveness
+    }
+    Real64 vozMin = (ZoneMinOccupancy * zsFinalSizing.DesOAFlowPPer + OAFromArea) / MinEz;
+    if (spaceNum == 0) {
+        // Space TODO: There is no equivalent for spaces
+        state.dataHeatBal->ZonePreDefRep(zoneNum).VozMin = vozMin;
+    }
+
+    // Calculate the design min OA flow rate for this zone
+    // flag to use occupancy schedule when calculating OA
+    // flag to use min OA schedule when calculating OA
+    auto &equipConfig = (spaceNum == 0) ? state.dataZoneEquip->ZoneEquipConfig(zoneNum) : state.dataZoneEquip->spaceEquipConfig(spaceNum);
+    equipConfig.ZoneDesignSpecOAIndex = DSOAPtr;                                   // store for later use
+    equipConfig.ZoneAirDistributionIndex = zsFinalSizing.ZoneAirDistributionIndex; // store for later use
+    Real64 OAVolumeFlowRate = 0.0;
+    if (!dsoaError) {
+        bool UseOccSchFlag = false;
+        bool UseMinOASchFlag = false;
+        bool PerPersonNotSet = false;
+        bool MaxOAVolFlowFlag = false;
+        OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
+            state, DSOAPtr, zoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet, MaxOAVolFlowFlag, spaceNum);
+    }
+
+    // Zone(ZoneIndex)%Multiplier and Zone(ZoneIndex)%ListMultiplier applied in CalcDesignSpecificationOutdoorAir
+    zsFinalSizing.MinOA = OAVolumeFlowRate;
+    zsCalcFinalSizing.MinOA = OAVolumeFlowRate;
+    if (zsFinalSizing.ZoneADEffCooling > 0.0 || zsFinalSizing.ZoneADEffHeating > 0.0) {
+        zsFinalSizing.MinOA /= min(zsFinalSizing.ZoneADEffCooling, zsFinalSizing.ZoneADEffHeating);
+        zsCalcFinalSizing.MinOA = zsFinalSizing.MinOA;
+    }
+    // calculated zone design flow rates automatically take into account zone multipliers, since the zone
+    // loads are multiplied (in ZoneTempPredictorCorrector.cc). Flow rates derived directly from
+    // user inputs need to be explicitly multiplied by the zone multipliers.
+    zsFinalSizing.DesCoolMinAirFlow2 = zsFinalSizing.DesCoolMinAirFlowPerArea * floorArea * zoneMult;
+    zsCalcFinalSizing.DesCoolMinAirFlow2 = zsCalcFinalSizing.DesCoolMinAirFlowPerArea * floorArea * zoneMult;
+    zsFinalSizing.DesHeatMaxAirFlow2 = zsFinalSizing.DesHeatMaxAirFlowPerArea * floorArea * zoneMult;
+    zsCalcFinalSizing.DesHeatMaxAirFlow2 = zsCalcFinalSizing.DesHeatMaxAirFlowPerArea * floorArea * zoneMult;
+    int zoneMultiplier = zoneMult;
+    zsFinalSizing.DesCoolMinAirFlow *= zoneMultiplier;
+    zsCalcFinalSizing.DesCoolMinAirFlow *= zoneMultiplier;
+    zsFinalSizing.DesHeatMaxAirFlow *= zoneMultiplier;
+    zsCalcFinalSizing.DesHeatMaxAirFlow *= zoneMultiplier;
+    zsFinalSizing.InpDesCoolAirFlow *= zoneMultiplier;
+    zsCalcFinalSizing.InpDesCoolAirFlow *= zoneMultiplier;
+    zsFinalSizing.InpDesHeatAirFlow *= zoneMultiplier;
+    zsCalcFinalSizing.InpDesHeatAirFlow *= zoneMultiplier;
+
+    for (int DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
+        auto &zoneSizing = state.dataSize->ZoneSizing(DesDayNum, zoneNum);
+        zoneSizing.MinOA = zsFinalSizing.MinOA;
+        state.dataSize->CalcZoneSizing(DesDayNum, zoneNum).MinOA = zsCalcFinalSizing.MinOA;
+        zoneSizing.DesCoolMinAirFlow2 = zsFinalSizing.DesCoolMinAirFlow2;
+        state.dataSize->CalcZoneSizing(DesDayNum, zoneNum).DesCoolMinAirFlow2 = zsCalcFinalSizing.DesCoolMinAirFlow2;
+        zoneSizing.DesCoolMinAirFlow = zsFinalSizing.DesCoolMinAirFlow;
+        state.dataSize->CalcZoneSizing(DesDayNum, zoneNum).DesCoolMinAirFlow = zsCalcFinalSizing.DesCoolMinAirFlow;
+        zoneSizing.DesHeatMaxAirFlow2 = zsFinalSizing.DesHeatMaxAirFlow2;
+        state.dataSize->CalcZoneSizing(DesDayNum, zoneNum).DesHeatMaxAirFlow2 = zsCalcFinalSizing.DesHeatMaxAirFlow2;
+        zoneSizing.DesHeatMaxAirFlow = zsFinalSizing.DesHeatMaxAirFlow;
+        state.dataSize->CalcZoneSizing(DesDayNum, zoneNum).DesHeatMaxAirFlow = zsCalcFinalSizing.DesHeatMaxAirFlow;
     }
 }
 

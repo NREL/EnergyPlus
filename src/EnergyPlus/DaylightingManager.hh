@@ -317,7 +317,7 @@ namespace Dayltg {
 
     void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound);
 
-    bool doesDayLightingUseDElight(EnergyPlusData &state);
+    bool doesDayLightingUseDElight(EnergyPlusData const &state);
 
     void CheckTDDsAndLightShelvesInDaylitZones(EnergyPlusData &state);
 
