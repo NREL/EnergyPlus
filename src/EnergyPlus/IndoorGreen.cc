@@ -378,14 +378,6 @@ namespace IndoorGreen {
                                 OutputProcessor::TimeStepType::Zone,
                                 OutputProcessor::StoreType::Average,
                                 ig.Name);
-            SetupOutputVariable(
-                state,
-                "Indoor Living Wall Sensible Heat Gain Rate",
-                Constant::Units::W,
-                ig.SensibleRate,
-                OutputProcessor::TimeStepType::Zone,
-                OutputProcessor::StoreType::Average,
-                ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall Latent Heat Gain Rate",
                                 Constant::Units::W,
