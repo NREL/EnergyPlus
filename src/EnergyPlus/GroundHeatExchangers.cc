@@ -1808,7 +1808,7 @@ inline bool GLHEBase::isEven(int const val)
 
 //******************************************************************************
 
-Real64 GLHESlinky::integral(int const m, int const n, int const m1, int const n1, Real64 const t, Real64 const eta, Real64 const J0)
+Real64 GLHESlinky::integral(int const m, int const n, int const m1, int const n1, Real64 const t, Real64 const eta, int const J0)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
@@ -1838,7 +1838,6 @@ Real64 GLHESlinky::integral(int const m, int const n, int const m1, int const n1
         f(j) = nearFieldResponseFunction(m, n, m1, n1, eta, theta, t);
 
         if (j == 1 || j == J0) {
-            f(j) = f(j);
         } else if (isEven(j)) {
             f(j) = 4 * f(j);
         } else {
@@ -1870,29 +1869,25 @@ Real64 GLHESlinky::doubleIntegral(int const m, int const n, int const m1, int co
     constexpr Real64 eta1 = 0.0;
     constexpr Real64 eta2 = 2 * Constant::Pi;
 
-    Real64 sumIntF = 0.0;
-    Array1D<Real64> g(I0, 0.0);
+    std::vector<Real64> g;
 
     Real64 h = (eta2 - eta1) / (I0 - 1);
 
     // Calculates the value of the function at various equally spaced values
-    for (int i = 1; i <= I0; ++i) {
-
-        Real64 eta = eta1 + (i - 1) * h;
-        g(i) = integral(m, n, m1, n1, t, eta, J0);
-
-        if (i == 1 || i == I0) {
-            g(i) = g(i);
-        } else if (isEven(i)) {
-            g(i) = 4 * g(i);
-        } else {
-            g(i) = 2 * g(i);
-        }
-
-        sumIntF += g(i);
+    for (int i = 0; i < I0; ++i) {
+        Real64 eta = eta1 + i * h;
+        g.push_back(integral(m, n, m1, n1, t, eta, J0));
     }
 
-    return (h / 3) * sumIntF;
+    for (int i = 1; i < g.size() - 1; ++i) {
+        if (!isEven(i)) {
+            g[i] = 4 * g[i];
+        } else {
+            g[i] = 2 * g[i];
+        }
+    }
+
+    return (h / 3) * std::reduce(g.begin(), g.end());
 }
 
 //******************************************************************************

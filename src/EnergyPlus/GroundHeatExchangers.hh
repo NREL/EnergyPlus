@@ -454,7 +454,7 @@ namespace GroundHeatExchangers {
 
         Real64 doubleIntegral(int m, int n, int m1, int n1, Real64 t, int I0, int J0);
 
-        Real64 integral(int m, int n, int m1, int n1, Real64 t, Real64 eta, Real64 J0);
+        Real64 integral(int m, int n, int m1, int n1, Real64 t, Real64 eta, int J0);
 
         Real64 distance(int m, int n, int m1, int n1, Real64 eta, Real64 theta);
 
