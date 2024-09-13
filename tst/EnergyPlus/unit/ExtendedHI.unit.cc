@@ -271,10 +271,13 @@ TEST_F(EnergyPlusFixture, extendedHI_find_eqvar)
                                                  {0.02073, 0.00466, 0.01213, 0.0196, 0.02707, 0.03453},
                                                  {0.00147, 0.01691, 0.03395, 0.051, 0.06804, 0.08509}};
 
+    int eqvar_name = 0;
+    Real64 eqvar_value = 0.0;
     for (size_t i = 0; i < Ta_values.size(); ++i) {
         for (size_t j = 0; j < RH_values.size(); ++j) {
-            EXPECT_EQ(find_eqvar_name(*state, Ta_values[i], RH_values[j]), result_0[i][j]);
-            EXPECT_NEAR(find_eqvar_value(*state, Ta_values[i], RH_values[j]), result_1[i][j], tol);
+            eqvar_value = find_eqvar_name_and_value(*state, Ta_values[i], RH_values[j], eqvar_name);
+            EXPECT_EQ(eqvar_name, result_0[i][j]);
+            EXPECT_NEAR(eqvar_value, result_1[i][j], tol);
         }
     }
 }
