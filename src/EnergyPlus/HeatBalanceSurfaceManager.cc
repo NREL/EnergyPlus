@@ -5520,10 +5520,38 @@ void CalcThermalResilience(EnergyPlusData &state)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 const ZoneT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTAV;
             Real64 const ZoneW = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRatAvg;
-            Real64 const ZoneRH = Psychrometrics::PsyRhFnTdbWPb(state, ZoneT, ZoneW, state.dataEnvrn->OutBaroPress);
+            Real64 const ZoneRH = Psychrometrics::PsyRhFnTdbWPb(state, ZoneT, ZoneW, state.dataEnvrn->OutBaroPress) * 100.0;
             Real64 const ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
-            // calculate extended heat index
-            state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex = ExtendedHI::heatindex(state, ZoneT + Constant::Kelvin, ZoneRH) - Constant::Kelvin;
+            if (ZoneTF * 2.7 + 109.1 - ZoneRH * 100.0 > 0.0) {
+                Real64 constexpr c1 = -42.379;
+                Real64 constexpr c2 = 2.04901523;
+                Real64 constexpr c3 = 10.14333127;
+                Real64 constexpr c4 = -.22475541;
+                Real64 constexpr c5 = -.00683783;
+                Real64 constexpr c6 = -.05481717;
+                Real64 constexpr c7 = .00122874;
+                Real64 constexpr c8 = .00085282;
+                Real64 constexpr c9 = -.00000199;
+                Real64 HI;
+
+                if (ZoneTF < 80) {
+                    HI = 0.5 * (ZoneTF + 61.0 + (ZoneTF - 68.0) * 1.2 + (ZoneRH * 0.094));
+                } else {
+                    HI = c1 + c2 * ZoneTF + c3 * ZoneRH + c4 * ZoneTF * ZoneRH + c5 * ZoneTF * ZoneTF + c6 * ZoneRH * ZoneRH +
+                         c7 * ZoneTF * ZoneTF * ZoneRH + c8 * ZoneTF * ZoneRH * ZoneRH + c9 * ZoneTF * ZoneTF * ZoneRH * ZoneRH;
+                    if (ZoneRH < 13 && ZoneTF < 112) {
+                        HI -= (13 - ZoneRH) / 4 * std::sqrt((17 - abs(ZoneTF - 95)) / 17);
+                    } else if (ZoneRH > 85 && ZoneTF < 87) {
+                        HI += (ZoneRH - 85) / 10 * (87 - ZoneTF) / 5;
+                    }
+                }
+                HI = (HI - 32.0) * (5.0 / 9.0);
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex = HI;
+            } else {
+                // calculate extended heat index
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex =
+                    ExtendedHI::heatindex(state, ZoneT + Constant::Kelvin, ZoneRH / 100.0) - Constant::Kelvin;
+            }
         }
     }
     if (state.dataHeatBalSurfMgr->reportVarHumidex || state.dataOutRptTab->displayThermalResilienceSummary) {
