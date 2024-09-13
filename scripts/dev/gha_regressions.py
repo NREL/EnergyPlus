@@ -503,6 +503,7 @@ class RegressionManager:
                 if entry_num % 40 == 0:
                     print(f"On file #{entry_num}/{len(entries)} ({baseline.name}), Diff status so far: {so_far}")
             except Exception as e:
+                any_diffs = True
                 print(f"Regression run *failed* trying to process file: {baseline.name}; reason: {e}")
                 self.root_index_files_failed.append(baseline.name)
         meta_data = [
