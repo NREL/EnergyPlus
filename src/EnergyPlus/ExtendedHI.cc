@@ -234,8 +234,7 @@ namespace ExtendedHI {
                 SolFla,
                 Tf,
                 [&](Real64 Tf) {
-                    Real64 Ra_barTfTa = Ra_bar(Tf, Ta);
-                    return (Tf - Ta) / Ra_barTfTa + (Pc - Pa) * (Tf - Ta) / ((ZsRs + Za_bar) * (Tf - Ta) + r * Ra_barTfTa * (Ts_bar - Tf)) -
+                    return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) * (Tf - Ta) / ((ZsRs + Za_bar) * (Tf - Ta) + r * Ra_bar(Tf, Ta) * (Ts_bar - Tf)) -
                            (Tc - Ts_bar) / Rs;
                 },
                 Ta,
@@ -403,8 +402,7 @@ namespace ExtendedHI {
                 SolFla,
                 Tf,
                 [&](Real64 Tf) {
-                    Real64 Ra_barTfTa = Ra_bar(Tf, Ta);
-                    return (Tf - Ta) / Ra_barTfTa + (Pc - Pa) * (Tf - Ta) / ((ZsRs + Za_bar) * (Tf - Ta) + r * Ra_barTfTa * (Ts_bar - Tf)) -
+                    return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) * (Tf - Ta) / ((ZsRs + Za_bar) * (Tf - Ta) + r * Ra_bar(Tf, Ta) * (Ts_bar - Tf)) -
                            (Tc - Ts_bar) / Rs;
                 },
                 Ta,
