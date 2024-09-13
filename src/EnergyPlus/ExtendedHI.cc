@@ -487,7 +487,7 @@ namespace ExtendedHI {
         // The function computes the extended heat index, in Kelvinn
 
         auto const HVACSystemRootSolverBackup = state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver;
-        state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::ShortBisectionThenRegulaFalsi;
+        state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
         int eqvar_name = 0;
         Real64 eqvar_value = find_eqvar_name_and_value(state, Ta, RH, eqvar_name);
 
