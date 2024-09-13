@@ -116,8 +116,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataConstruction->Construct.allocate(ConstrNum);
     state->dataConstruction->Construct(ConstrNum).LayerPoint.allocate(MatNum);
     state->dataConstruction->Construct(ConstrNum).LayerPoint(MatNum) = 1;
-    Material::MaterialChild *p = new Material::MaterialChild;
-    state->dataMaterial->Material.push_back(p);
+    auto *p = new Material::MaterialBase;
+    state->dataMaterial->materials.push_back(p);
     p->AbsorpThermal = 0.8;
     // allocate exterior vented cavity variable data
     state->dataHeatBal->ExtVentedCavity.allocate(1);
@@ -199,7 +199,11 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataSurface->Surface.deallocate();
     state->dataConstruction->Construct(ConstrNum).LayerPoint.deallocate();
     state->dataConstruction->Construct.deallocate();
-    state->dataMaterial->Material.deallocate();
+
+    for (int i = 1; i <= state->dataMaterial->materials.isize(); ++i)
+        delete state->dataMaterial->materials(i);
+
+    state->dataMaterial->materials.deallocate();
     state->dataHeatBal->ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     state->dataHeatBal->ExtVentedCavity.deallocate();
     state->dataHeatBal->Zone.deallocate();

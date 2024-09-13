@@ -190,7 +190,7 @@ namespace DataAirSystems {
         AirLoopMixerData Mixer;            // Data for mixer (if any)
         Array1D_bool ControlConverged;     // Convergence Parameter for controllers
         int NumOutletBranches = 0;
-        std::array<int, 3> OutletBranchNum = {0}; // branch numbers of system outlets
+        std::array<int, 3> OutletBranchNum = {0}; // airloop branch numbers of system outlets (not the actual branch index)
         int NumInletBranches = 0;
         std::array<int, 3> InletBranchNum = {0}; // branch number of system inlets
         bool CentralHeatCoilExists = true;       // true if there are central heating coils

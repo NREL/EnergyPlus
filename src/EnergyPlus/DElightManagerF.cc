@@ -333,7 +333,7 @@ namespace DElightManagerF {
 
                     // Write each opaque bounding Surface to the DElight input file
                     for (int spaceNum : zn.spaceIndexes) {
-                        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                        auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                         int const iSurfaceFirst = thisSpace.HTSurfaceFirst;
                         int const iSurfaceLast = thisSpace.HTSurfaceLast;
                         for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
@@ -352,10 +352,7 @@ namespace DElightManagerF {
                                     iMatlLayer = state.dataConstruction->Construct(iconstruct).LayerPoint(1);
                                     // Get the outside visible reflectance of this material layer
                                     // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
-                                    auto const *thisMaterial =
-                                        dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(iMatlLayer));
-                                    assert(thisMaterial != nullptr);
-                                    rExtVisRefl = 1.0 - thisMaterial->AbsorpVisible;
+                                    rExtVisRefl = 1.0 - state.dataMaterial->materials(iMatlLayer)->AbsorpVisible;
                                 } else {
                                     rExtVisRefl = 0.0;
                                 }

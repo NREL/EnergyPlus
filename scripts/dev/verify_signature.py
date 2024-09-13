@@ -73,7 +73,6 @@ class Generator(Enum):
 BUNDLED_APPS = [
     "PreProcess/EP-Launch-Lite.app",
     "PreProcess/IDFVersionUpdater/IDFVersionUpdater.app",
-    "PostProcess/EP-Compare/EP-Compare.app",
 ]
 
 

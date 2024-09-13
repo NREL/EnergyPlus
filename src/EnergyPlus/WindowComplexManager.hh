@@ -379,7 +379,7 @@ struct WindowComplexManagerData : BaseGlobalStruct
     {
     }
 
-    void clear_state() // override
+    void clear_state() override
     {
         this->NumComplexWind = 0;
         this->BasisList.deallocate();

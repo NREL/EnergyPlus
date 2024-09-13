@@ -3718,6 +3718,7 @@ TEST_F(ConvectionCoefficientsFixture, testTARPNaturalConvectionAlgorithm)
 
 TEST_F(ConvectionCoefficientsFixture, RoofExtConvectionCoefficient)
 {
+    auto &s_mat = state->dataMaterial;
 
     state->dataSurface->Surface.allocate(1);
 
@@ -3755,14 +3756,12 @@ TEST_F(ConvectionCoefficientsFixture, RoofExtConvectionCoefficient)
     state->dataConstruction->Construct(1).LayerPoint(1) = 1;
 
     // define material
-    state->dataMaterial->TotMaterials = 1;
-    Material::MaterialChild *mat = new Material::MaterialChild;
-    state->dataMaterial->Material.push_back(mat);
-    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
-    thisMaterial_1->AbsorpThermalFront = 0.1;
-    thisMaterial_1->Roughness = Material::SurfaceRoughness::Rough;
-    thisMaterial_1->Name = "Roof_Material";
-    thisMaterial_1->group = Material::Group::Regular;
+    auto *mat1 = new Material::MaterialBase;
+    s_mat->materials.push_back(mat1);
+    mat1->AbsorpThermalFront = 0.1;
+    mat1->Roughness = Material::SurfaceRoughness::Rough;
+    mat1->Name = "Roof_Material";
+    mat1->group = Material::Group::Regular;
 
     // set environment air conditions
     state->dataEnvrn->OutBaroPress = 101325.0; // Pa
@@ -4051,7 +4050,7 @@ TEST_F(ConvectionCoefficientsFixture, SurroundingSurfacesHRadCoefTest)
     // calculate surrounding surface radiation coeffient
     Real64 surf_tempExtK = state->dataHeatBalSurf->SurfOutsideTempHist(1)(surfNum) + Constant::Kelvin;
     auto &north_wall_const = state->dataConstruction->Construct(surface_north_wall.Construction);
-    auto *north_wall_mat = dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->Material(north_wall_const.LayerPoint(1)));
+    auto const *north_wall_mat = state->dataMaterial->materials(north_wall_const.LayerPoint(1));
     Real64 surf_absExt_north_wall = north_wall_mat->AbsorpThermal; // LW emitance of the exterior surface
     // calculate surrounding surfaces radiation exchange coefficient
     Real64 north_wall_srdSurfsTK = surface_north_wall.SrdSurfTemp + Constant::Kelvin;
@@ -4090,7 +4089,7 @@ TEST_F(ConvectionCoefficientsFixture, SurroundingSurfacesHRadCoefTest)
     // calculate surrounding surface radiation coeffient
     surf_tempExtK = state->dataHeatBalSurf->SurfOutsideTempHist(1)(surfNum) + Constant::Kelvin;
     auto &east_wall_const = state->dataConstruction->Construct(surface_east_wall.Construction);
-    auto *east_wall_mat = dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->Material(east_wall_const.LayerPoint(1)));
+    auto const *east_wall_mat = state->dataMaterial->materials(east_wall_const.LayerPoint(1));
     Real64 surf_absExt_east_wall = east_wall_mat->AbsorpThermal; // LW emitance of the exterior surface
     // calculate surrounding surfaces radiation exchange coefficient
     Real64 east_wall_srdSurfsTK = surface_east_wall.SrdSurfTemp + Constant::Kelvin;
