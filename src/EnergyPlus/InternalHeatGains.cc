@@ -212,7 +212,6 @@ namespace InternalHeatGains {
         Real64 StmTot;   // Total Steam for calculating Steam per square meter
         Real64 SchMin;
         Real64 SchMax;
-        std::string liteName;
 
         // Formats
         static constexpr std::string_view Format_720(" Zone Internal Gains Nominal, {},{:.2R},{:.1R},");
@@ -1566,7 +1565,7 @@ namespace InternalHeatGains {
                 if (state.dataHeatBal->Lights(lightsNum).FractionReturnAir > 0)
                     state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).HasLtsRetAirGain = true;
                 // send values to predefined lighting summary report
-                liteName = state.dataHeatBal->Lights(lightsNum).Name;
+                std::string liteName = state.dataHeatBal->Lights(lightsNum).Name;
                 Real64 mult = state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
                 Real64 spaceArea = state.dataHeatBal->space(spaceNum).FloorArea;
                 state.dataInternalHeatGains->sumArea += spaceArea * mult;
@@ -4358,11 +4357,11 @@ namespace InternalHeatGains {
         // inputObjects is allocated here and filled with data for further input processing.
 
         constexpr std::string_view routineName = "setupIHGZonesAndSpaces: ";
-        bool localErrFlag = false;
 
         auto &ip = state.dataInputProcessing->inputProcessor;
         auto const instances = ip->epJSON.find(objectType);
         if (instances != ip->epJSON.end()) {
+            bool localErrFlag = false;
             auto const &objectSchemaProps = ip->getObjectSchemaProps(state, objectType);
             auto &instancesValue = instances.value();
             numInputObjects = int(instancesValue.size());
@@ -7931,9 +7930,6 @@ namespace InternalHeatGains {
             99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0, 80.0}; // Maximum relative humidity [%]
 
         static constexpr std::string_view RoutineName("CalcZoneITEq");
-        int Loop;
-        int NZ;
-        int SupplyNodeNum;                // Supply air node number (if zero, then not specified)
         Real64 OperSchedFrac;             // Operating schedule fraction
         Real64 CPULoadSchedFrac;          // CPU loading schedule fraction
         ITEInletConnection AirConnection; // Air connection type
@@ -7963,7 +7959,7 @@ namespace InternalHeatGains {
 
         //  Zero out time step variables
         // Object report variables
-        for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
 
             for (int i = 0; i < (int)PERptVars::Num; ++i) {
                 state.dataHeatBal->ZoneITEq(Loop).PowerRpt[i] = 0.0;
@@ -7994,7 +7990,7 @@ namespace InternalHeatGains {
         } // ZoneITEq init loop
 
         // Zone total report variables
-        for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
 
             for (int i = 0; i < (int)PERptVars::Num; ++i) {
                 state.dataHeatBal->ZoneRpt(Loop).PowerRpt[i] = 0.0;
@@ -8043,9 +8039,9 @@ namespace InternalHeatGains {
             state.dataHeatBal->spaceRpt(spaceNum).SumToutMinusTSup = 0.0;
         } // Space init spaceNum
 
-        for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
             // Get schedules
-            NZ = state.dataHeatBal->ZoneITEq(Loop).ZonePtr;
+            int NZ = state.dataHeatBal->ZoneITEq(Loop).ZonePtr;
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
             int spaceNum = state.dataHeatBal->ZoneITEq(Loop).spaceIndex;
             OperSchedFrac = GetCurrentScheduleValue(state, state.dataHeatBal->ZoneITEq(Loop).OperSchedPtr);
@@ -8054,7 +8050,7 @@ namespace InternalHeatGains {
             // Determine inlet air temperature and humidity
             AirConnection = state.dataHeatBal->ZoneITEq(Loop).AirConnectionType;
             RecircFrac = 0.0;
-            SupplyNodeNum = state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum;
+            int SupplyNodeNum = state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum;
             if (state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps) {
                 TSupply = state.dataLoopNodes->Node(SupplyNodeNum).Temp;
                 WSupply = state.dataLoopNodes->Node(SupplyNodeNum).HumRat;
@@ -8290,7 +8286,7 @@ namespace InternalHeatGains {
         } // ZoneITEq calc loop
 
         // Zone and space-level sensible heat index
-        for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
             int ZN = state.dataHeatBal->ZoneITEq(Loop).ZonePtr;
             int spaceNum = state.dataHeatBal->ZoneITEq(Loop).spaceIndex;
             if (state.dataHeatBal->ZoneRpt(ZN).SumToutMinusTSup != 0.0) {
