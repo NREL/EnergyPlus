@@ -7529,7 +7529,7 @@ namespace InternalHeatGains {
             auto &thisPeople = state.dataHeatBal->People(Loop);
             int NZ = state.dataHeatBal->People(Loop).ZonePtr;
             int spaceNum = thisPeople.spaceIndex;
-            auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
+            auto const &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
             NumberOccupants = thisPeople.NumberOfPeople * GetCurrentScheduleValue(state, thisPeople.NumberOfPeoplePtr);
             if (thisPeople.EMSPeopleOn) NumberOccupants = thisPeople.EMSNumberOfPeople;
 
@@ -7838,12 +7838,12 @@ namespace InternalHeatGains {
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) { // Loop through all surfaces...
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 int const firstSurf = thisSpace.HTSurfaceFirst;
                 int const lastSurf = thisSpace.HTSurfaceLast;
                 if (firstSurf <= 0) continue;
                 for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-                    auto &thisEnclosure = state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(SurfNum).RadEnclIndex);
+                    auto const &thisEnclosure = state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(SurfNum).RadEnclIndex);
 
                     if (!state.dataGlobal->doLoadComponentPulseNow) {
                         state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) =
