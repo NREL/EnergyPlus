@@ -17781,7 +17781,7 @@ void ResetBEPSGathering(EnergyPlusData &state)
     // Jason Glazer - October 2015
     // Reset all ABUPS gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    auto &ort = state.dataOutRptTab;
+    auto const &ort = state.dataOutRptTab;
     ort->gatherTotalsBEPS = 0.0;
     ort->gatherEndUseBEPS = 0.0;
     ort->gatherEndUseSubBEPS = 0.0;
