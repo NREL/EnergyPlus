@@ -1369,9 +1369,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     int OutletNode; // pump outlet node number
     Real64 TotalEffic;
     Real64 SteamDensity; // Density of working fluid
-    int DummyWaterIndex(1);
     Real64 TempWaterDensity;
-    bool errFlag;
     Real64 mdotMax; // local fluid mass flow rate maximum
     Real64 mdotMin; // local fluid mass flow rate minimum
     int plloopnum;
@@ -1387,7 +1385,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     // One time inits
     if (thisPump.PumpOneTimeFlag) {
 
-        errFlag = false;
+        bool errFlag = false;
         ScanPlantLoopsForObject(state, thisPump.Name, thisPump.TypeOf_Num, thisPump.plantLoc, errFlag, _, _, _, _, _);
         plloopnum = thisPump.plantLoc.loopNum;
         lsnum = thisPump.plantLoc.loopSideNum;
@@ -1498,6 +1496,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     // Begin environment inits
     if (thisPump.PumpInitFlag && state.dataGlobal->BeginEnvrnFlag) {
         if (thisPump.pumpType == PumpType::Cond) {
+            int DummyWaterIndex = 1;
 
             TempWaterDensity = GetDensityGlycol(state, fluidNameWater, Constant::InitConvTemp, DummyWaterIndex, RoutineName);
             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, thisPump.FluidIndex, RoutineName);
