@@ -1470,7 +1470,7 @@ namespace Photovoltaics {
                Real64 const AA,   // passed in from CalcPV
                Real64 const EPS,  // passed in from CalcPV
                Real64 &II,        // current [A]
-               Real64 &VV,        // voltage [V]
+               Real64 const VV,   // voltage [V]
                Real64 &PP         // power [W]
     )
     {
