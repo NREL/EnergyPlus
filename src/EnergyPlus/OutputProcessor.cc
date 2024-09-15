@@ -2424,7 +2424,6 @@ namespace OutputProcessor {
         // and the SQL database
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op = state.dataOutputProcessor;
         auto &rf = state.dataResultsFramework->resultsFramework;
         auto &sql = state.dataSQLiteProcedures->sqlite;
 
@@ -2449,7 +2448,7 @@ namespace OutputProcessor {
 
         if (freq == ReportFreq::Hour || freq == ReportFreq::Day || freq == ReportFreq::Month || freq == ReportFreq::Year ||
             freq == ReportFreq::Simulation)
-            op->freqTrackingVariables[(int)freq] = true;
+            state.dataOutputProcessor->freqTrackingVariables[(int)freq] = true;
 
         if (sql) {
             sql->createSQLiteReportDictionaryRecord(ReportID, storeType, indexGroup, key, name, timeStepType, unitsString, freq, false, schedString);
@@ -4611,9 +4610,9 @@ void ProduceRDDMDD(EnergyPlusData &state)
                     ddVar = op->ddOutVars[ddVar->Next];
 
                     std::string_view timeStepName = timeStepTypeNames[(int)ddVar->timeStepType];
-                    std::string_view storeTypeName = storeTypeNames[(int)ddVar->storeType];
-                    std::string_view varName = ddVar->name;
-                    std::string_view unitName =
+                    storeTypeName = storeTypeNames[(int)ddVar->storeType];
+                    varName = ddVar->name;
+                    std::string_view unFitName =
                         (ddVar->units == Constant::Units::customEMS) ? ddVar->unitNameCustomEMS : Constant::unitNames[(int)ddVar->units];
 
                     if (op->ProduceReportVDD == ReportVDD::Yes) {
