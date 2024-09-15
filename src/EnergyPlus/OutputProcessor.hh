@@ -824,7 +824,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                                             bool CumulativeIndicator          // true if this is a Cumulative meter reporting
 );
 
-int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName);
+int GetMeterIndex(EnergyPlusData const &state, std::string const &MeterName);
 
 Constant::eResource GetMeterResourceType(EnergyPlusData &state, int MeterNumber); // Which Meter Number (from GetMeterIndex)
 

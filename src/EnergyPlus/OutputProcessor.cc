@@ -3947,7 +3947,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
     } // if (CumulativeIndicator)
 } // SetInitialMeterReportingAndOutputNames()
 
-int GetMeterIndex(EnergyPlusData &state, std::string const &name)
+int GetMeterIndex(EnergyPlusData const &state, std::string const &name)
 {
 
     // FUNCTION INFORMATION:
