@@ -1699,7 +1699,7 @@ namespace RoomAir {
                 for (int iGain = 1; iGain <= roomAFNNode.NumIntGains; ++iGain) {
                     auto &intGain = roomAFNNode.IntGain(iGain);
                     if (intGain.FractionCheck) continue;
-                    Real64 SumFraction = roomAFNNode.IntGainsFractions(iGain);
+                    SumFraction = roomAFNNode.IntGainsFractions(iGain);
                     intGain.FractionCheck = true;
 
                     for (int iRoomAFNNode2 = 1; iRoomAFNNode2 <= roomAFNZoneInfo.NumOfAirNodes; ++iRoomAFNNode2) {
@@ -1781,11 +1781,8 @@ namespace RoomAir {
         Real64 constexpr BaseDischargeCoef(0.62);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool SetZoneAux;
         Array1D_int AuxSurf;
-        int MaxSurf;
         Array2D_int AuxAirflowNetworkSurf;
-        int ZoneEquipConfigNum; // counter
 
         // Do the one time initializations
         if (state.dataRoomAir->MyOneTimeFlag) {
@@ -1849,7 +1846,6 @@ namespace RoomAir {
                 int contWindowBeg = contWindow + 1;
                 int contInternalBeg = contInternal + 1;
                 int contDoorBeg = contDoor + 1;
-                SetZoneAux = true;
 
                 Real64 Z1ofZone = std::numeric_limits<Real64>::max();
                 Real64 Z2ofZone = std::numeric_limits<Real64>::lowest();
@@ -1944,7 +1940,7 @@ namespace RoomAir {
                 }
             }
             // calculate maximum number of airflow network surfaces in a single zone
-            MaxSurf = AuxSurf(1);
+            int MaxSurf = AuxSurf(1);
             for (int iZone = 2; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 if (AuxSurf(iZone) > MaxSurf) MaxSurf = AuxSurf(iZone);
             }
@@ -2452,7 +2448,7 @@ namespace RoomAir {
                     if (state.dataRoomAir->AirModel(iZone).AirModel != RoomAirModel::CrossVent)
                         continue; // don't set these up if they don't make sense
 
-                    ZoneEquipConfigNum = ZoneNum; // Where does this ZoneNum come from?
+                    int ZoneEquipConfigNum = ZoneNum; // Where does this ZoneNum come from?
 
                     auto const &zone = state.dataHeatBal->Zone(iZone);
                     // check whether this zone is a controlled zone or not
