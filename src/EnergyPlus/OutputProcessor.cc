@@ -1080,7 +1080,7 @@ namespace OutputProcessor {
                 }
 
                 std::string meterOrVarNameUC = Util::makeUPPER(ipsc->cAlphaArgs(fldIndex + 1));
-                std::string::size_type lbrackPos = index(meterOrVarNameUC, '[');
+                lbrackPos = index(meterOrVarNameUC, '[');
                 if (lbrackPos != std::string::npos) meterOrVarNameUC.erase(lbrackPos);
 
                 // A custom meter cannot reference another custom meter
@@ -1251,7 +1251,7 @@ namespace OutputProcessor {
             for (int fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2) {
                 // No need to check for empty fields
                 std::string meterOrVarNameUC = Util::makeUPPER(ipsc->cAlphaArgs(fldIndex + 1));
-                std::string::size_type lbrackPos = index(meterOrVarNameUC, '[');
+                lbrackPos = index(meterOrVarNameUC, '[');
                 if (lbrackPos != std::string::npos) meterOrVarNameUC.erase(lbrackPos);
 
                 // No need to check for custom source meters
@@ -4305,11 +4305,11 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
         units = ddOutVar->units;
         numKeys = ddOutVar->keyOutVarNums.size();
 
-    } else if (auto found = op->meterMap.find(nameUC); found != op->meterMap.end()) {
+    } else if (auto found2 = op->meterMap.find(nameUC); found2 != op->meterMap.end()) {
         // Search Meters if not found in integers or reals
         // Use the GetMeterIndex function
         // Meters do not have keys, so only one will be found
-        int meterNum = found->second;
+        int meterNum = found2->second;
         numKeys = 1;
         varType = VariableType::Meter;
         units = op->meters[meterNum]->units;
