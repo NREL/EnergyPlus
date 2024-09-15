@@ -2704,16 +2704,9 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     constexpr std::string_view RoutineName = "GetRuntimeLanguageUserInput: ";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int VariableNum(0); // temporary
-    int RuntimeReportVarNum;
-    bool Found;
     OutputProcessor::TimeStepType sovTimeStepType; // temporary
     OutputProcessor::StoreType sovStoreType;       // temporary
-    std::string EndUseSubCatString;
 
-    int TrendNum;
-    int NumTrendSteps;
-    int loop;
     int ErlVarLoop;
     int CurveIndexNum;
     int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
@@ -2741,6 +2734,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound = false;
+        int VariableNum = 0; // temporary
+        int RuntimeReportVarNum;
 
         cCurrentModuleObject = "EnergyManagementSystem:Sensor";
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
@@ -2939,7 +2934,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         state.dataRuntimeLang->NumEMSCurveIndices = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRuntimeLang->NumEMSCurveIndices > 0) {
             state.dataRuntimeLangProcessor->CurveIndexVariableNums.dimension(state.dataRuntimeLang->NumEMSCurveIndices, 0);
-            for (loop = 1; loop <= state.dataRuntimeLang->NumEMSCurveIndices; ++loop) {
+            for (int loop = 1; loop <= state.dataRuntimeLang->NumEMSCurveIndices; ++loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          loop,
@@ -2999,7 +2994,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         state.dataRuntimeLang->NumEMSConstructionIndices = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRuntimeLang->NumEMSConstructionIndices > 0) {
             state.dataRuntimeLangProcessor->ConstructionIndexVariableNums.dimension(state.dataRuntimeLang->NumEMSConstructionIndices, 0);
-            for (loop = 1; loop <= state.dataRuntimeLang->NumEMSConstructionIndices; ++loop) {
+            for (int loop = 1; loop <= state.dataRuntimeLang->NumEMSConstructionIndices; ++loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          loop,
@@ -3137,7 +3132,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         state.dataRuntimeLang->NumErlTrendVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRuntimeLang->NumErlTrendVariables > 0) {
             state.dataRuntimeLang->TrendVariable.allocate(state.dataRuntimeLang->NumErlTrendVariables);
-            for (TrendNum = 1; TrendNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendNum) {
+            for (int TrendNum = 1; TrendNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          TrendNum,
@@ -3172,7 +3167,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     state.dataRuntimeLang->ErlVariable(VariableNum).Value.initialized = true; // Cannot figure out how to get around needing this,
                 }
 
-                NumTrendSteps = std::floor(rNumericArgs(1));
+                int NumTrendSteps = std::floor(rNumericArgs(1));
                 if (NumTrendSteps > 0) {
                     state.dataRuntimeLang->TrendVariable(TrendNum).LogDepth = NumTrendSteps;
                     // setup data arrays using NumTrendSteps
@@ -3185,7 +3180,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     // current time is zero, each value in trend log array is one zone timestep further back in time
                     // units are hours.  all terms negative, getting increasingly negative the further back in time
                     //  further back in time is higher index in array
-                    for (loop = 1; loop <= NumTrendSteps; ++loop) {
+                    for (int loop = 1; loop <= NumTrendSteps; ++loop) {
                         if (loop == 1) {
                             state.dataRuntimeLang->TrendVariable(TrendNum).TimeARR(loop) = -state.dataGlobal->TimeStepZone;
                             continue;
@@ -3309,7 +3304,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 if (!lAlphaFieldBlanks(5)) {
                     // Lookup the Runtime Language Context, i.e., PROGRAM, FUNCTION, or global
-                    Found = false;
+                    bool Found = false;
                     for (StackNum = 1; StackNum <= state.dataRuntimeLang->NumErlStacks; ++StackNum) {
                         if (state.dataRuntimeLang->ErlStack(StackNum).Name == cAlphaArgs(5)) {
                             Found = true;
@@ -3405,7 +3400,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
         if (state.dataRuntimeLang->NumEMSMeteredOutputVariables > 0) {
             cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
-            for (loop = 1; loop <= state.dataRuntimeLang->NumEMSMeteredOutputVariables; ++loop) {
+            for (int loop = 1; loop <= state.dataRuntimeLang->NumEMSMeteredOutputVariables; ++loop) {
                 RuntimeReportVarNum = state.dataRuntimeLang->NumEMSOutputVariables + loop;
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
@@ -3482,7 +3477,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 if (!lAlphaFieldBlanks(4)) {
                     // Lookup the Runtime Language Context, i.e., PROGRAM, FUNCTION, or global
-                    Found = false;
+                    bool Found = false;
                     for (StackNum = 1; StackNum <= state.dataRuntimeLang->NumErlStacks; ++StackNum) {
                         if (state.dataRuntimeLang->ErlStack(StackNum).Name == cAlphaArgs(4)) {
                             Found = true;
@@ -3626,7 +3621,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 if (!lAlphaFieldBlanks(8)) {
-                    EndUseSubCatString = cAlphaArgs(8);
+                    std::string EndUseSubCatString = cAlphaArgs(8);
 
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
