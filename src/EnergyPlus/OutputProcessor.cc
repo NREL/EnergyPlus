@@ -4609,7 +4609,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
                 while (ddVar->Next != -1) {
                     ddVar = op->ddOutVars[ddVar->Next];
 
-                    std::string_view timeStepName = timeStepTypeNames[(int)ddVar->timeStepType];
+                    timeStepName = timeStepTypeNames[(int)ddVar->timeStepType];
                     storeTypeName = storeTypeNames[(int)ddVar->storeType];
                     varName = ddVar->name;
                     std::string_view unFitName =
