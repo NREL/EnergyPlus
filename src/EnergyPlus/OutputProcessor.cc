@@ -671,11 +671,9 @@ namespace OutputProcessor {
         Array1D_string NamesOfKeys;   // Specific key name
         Array1D_int IndexesForKeyVar; // Array index
 
-        std::vector<int> onCustomMeterVarNums;
         Array1D_int VarsOnSourceMeter;
-        bool BigErrorsFound;
 
-        BigErrorsFound = false;
+        bool BigErrorsFound = false;
 
         int numCustomMeters = 0, numCustomDecMeters = 0;
         std::vector<std::string> customMeterNames;
@@ -2736,8 +2734,6 @@ namespace OutputProcessor {
         // easier maintenance and writing of data to the SQL database.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string MaxOut; // Character for Max out string
-        std::string MinOut; // Character for Min out string
         auto &rf = state.dataResultsFramework->resultsFramework;
         auto &sql = state.dataSQLiteProcedures->sqlite;
 
