@@ -767,7 +767,7 @@ namespace OutputReportTabular {
 
     void AllocateLoadComponentArrays(EnergyPlusData &state);
 
-    void DeallocateLoadComponentArrays(EnergyPlusData &state);
+    void DeallocateLoadComponentArrays(EnergyPlusData const &state);
 
     void ComputeLoadComponentDecayCurve(EnergyPlusData &state);
 
@@ -891,9 +891,9 @@ namespace OutputReportTabular {
 
     void ResetMonthlyGathering(EnergyPlusData &state);
 
-    void ResetBinGathering(EnergyPlusData &state);
+    void ResetBinGathering(EnergyPlusData const &state);
 
-    void ResetBEPSGathering(EnergyPlusData &state);
+    void ResetBEPSGathering(EnergyPlusData const &state);
 
     void ResetSourceEnergyEndUseGathering(EnergyPlusData &state);
 

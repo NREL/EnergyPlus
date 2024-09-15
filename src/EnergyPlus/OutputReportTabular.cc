@@ -14590,7 +14590,7 @@ void AllocateLoadComponentArrays(EnergyPlusData &state)
     ort->AllocateLoadComponentArraysDoAllocate = false;
 }
 
-void DeallocateLoadComponentArrays(EnergyPlusData &state)
+void DeallocateLoadComponentArrays(EnergyPlusData const &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer
@@ -17744,7 +17744,7 @@ void ResetMonthlyGathering(EnergyPlusData &state)
     }
 }
 
-void ResetBinGathering(EnergyPlusData &state)
+void ResetBinGathering(EnergyPlusData const &state)
 {
     // Jason Glazer - October 2015
     // Reset all timebins gathering arrays to zero for multi-year simulations
@@ -17776,7 +17776,7 @@ void ResetBinGathering(EnergyPlusData &state)
     }
 }
 
-void ResetBEPSGathering(EnergyPlusData &state)
+void ResetBEPSGathering(EnergyPlusData const &state)
 {
     // Jason Glazer - October 2015
     // Reset all ABUPS gathering arrays to zero for multi-year simulations
