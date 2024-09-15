@@ -149,10 +149,10 @@ namespace Photovoltaics {
                 Real64 &B,
                 Real64 &P,
                 int &K,
-                Real64 &IO,
-                Real64 &IL,
-                Real64 &RSER,
-                Real64 &AA,
+                Real64 const IO,
+                Real64 const IL,
+                Real64 const RSER,
+                Real64 const AA,
                 Real64 const EPS,
                 int const KMAX);
 
