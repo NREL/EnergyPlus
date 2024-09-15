@@ -1638,16 +1638,16 @@ namespace PhotovoltaicThermalCollectors {
         // Solve a system of linear equations using Gaussian elimination and back substitution method.
 
         Real64 sum, dummy1, dummy2, mm, small(1.0e-10);
-        int i, j, ii, p, k, m(3);
-        bool coeff_not_zero;
+        int p;
+        int constexpr m = 3;
 
-        for (i = 0; i < m; i++) {
+        for (int i = 0; i < m; i++) {
             y[i] = 0.0;
         }
 
-        for (i = 0; i <= (m - 2); i++) {
-            coeff_not_zero = false;
-            for (j = i; j <= (m - 1); j++) {
+        for (int i = 0; i <= (m - 2); i++) {
+            bool coeff_not_zero = false;
+            for (int j = i; j <= (m - 1); j++) {
                 if (std::abs(jj[j * m + i]) > small) {
                     coeff_not_zero = true;
                     p = j;
@@ -1660,17 +1660,17 @@ namespace PhotovoltaicThermalCollectors {
                     dummy2 = f[i];
                     f[i] = f[p];
                     f[p] = dummy2;
-                    for (j = 0; j <= (m - 1); j++) {
+                    for (int j = 0; j <= (m - 1); j++) {
                         dummy1 = jj[i * m + j];
                         jj[i * m + j] = jj[p * m + j];
                         jj[p * m + j] = dummy1;
                     }
                 }
-                for (j = (i + 1); j <= (m - 1); j++) {
+                for (int j = (i + 1); j <= (m - 1); j++) {
                     if (std::abs(jj[i * m + i]) < small) jj[i * m + i] = small;
                     mm = jj[j * m + i] / jj[i * m + i];
                     f[j] = f[j] - mm * f[i];
-                    for (k = 0; k <= (m - 1); k++) {
+                    for (int k = 0; k <= (m - 1); k++) {
                         jj[j * m + k] = jj[j * m + k] - mm * jj[i * m + k];
                     }
                 }
@@ -1679,9 +1679,9 @@ namespace PhotovoltaicThermalCollectors {
         if (std::abs(jj[(m - 1) * m + m - 1]) < small) jj[(m - 1) * m + m - 1] = small;
         y[m - 1] = f[m - 1] / jj[(m - 1) * m + m - 1];
         sum = 0.0;
-        for (i = 0; i <= (m - 2); i++) {
-            ii = m - 2 - i;
-            for (j = ii; j <= (m - 1); j++) {
+        for (int i = 0; i <= (m - 2); i++) {
+            int ii = m - 2 - i;
+            for (int j = ii; j <= (m - 1); j++) {
                 sum = sum + jj[ii * m + j] * y[j];
             }
             if (std::abs(jj[ii * m + ii]) < small) jj[ii * m + ii] = small;
@@ -1739,25 +1739,19 @@ namespace PhotovoltaicThermalCollectors {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        int InletNode;
-        int OutletNode;
-        int thisOSCM;
 
         {
             switch (this->WorkingFluidType) {
             case WorkingFluidEnum::LIQUID: {
-                InletNode = this->PlantInletNodeNum;
-                OutletNode = this->PlantOutletNodeNum;
+                int InletNode = this->PlantInletNodeNum;
+                int OutletNode = this->PlantOutletNodeNum;
 
                 PlantUtilities::SafeCopyPlantNode(state, InletNode, OutletNode);
                 state.dataLoopNodes->Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
             } break;
             case WorkingFluidEnum::AIR: {
-                InletNode = this->HVACInletNodeNum;
-                OutletNode = this->HVACOutletNodeNum;
+                int InletNode = this->HVACInletNodeNum;
+                int OutletNode = this->HVACOutletNodeNum;
 
                 // Set the outlet nodes for properties that just pass through & not used
                 state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
@@ -1776,7 +1770,7 @@ namespace PhotovoltaicThermalCollectors {
 
                 // update the OtherSideConditionsModel coefficients for BIPVT
                 if (this->ModelType == PVTModelType::BIPVT) {
-                    thisOSCM = this->BIPVT.OSCMPtr;
+                    int thisOSCM = this->BIPVT.OSCMPtr;
                     state.dataSurface->OSCM(thisOSCM).TConv = this->BIPVT.Tplen;
                     state.dataSurface->OSCM(thisOSCM).HConv = this->BIPVT.HcPlen;
                     state.dataSurface->OSCM(thisOSCM).TRad = this->BIPVT.Tcoll;
