@@ -118,9 +118,9 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
     // value(7)   Seconds (0-59)
     // value(8)   Milliseconds (0-999)
 
-    std::string datestring; // supposedly returns blank when no date available.
-
     if (state.dataRuntimeLangProcessor->InitializeOnce) {
+
+        std::string datestring; // supposedly returns blank when no date available.
 
         state.dataRuntimeLang->emsVarBuiltInStart = state.dataRuntimeLang->NumErlVariables + 1;
 
@@ -278,11 +278,9 @@ void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ActuatorUsedLoop;
-    int EMSActuatorVariableNum;
     int ErlVariableNum;
     int TrendVarNum;
     int SensorNum;
-    int TrendDepth;
     int loop;
     bool CycleThisVariable;
 
@@ -319,7 +317,7 @@ void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state)
     // reinitialize state of actuators
     for (ActuatorUsedLoop = 1; ActuatorUsedLoop <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed;
          ++ActuatorUsedLoop) {
-        EMSActuatorVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
+        int EMSActuatorVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
         ErlVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
         state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Type = Value::Null;
         *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
@@ -340,7 +338,7 @@ void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state)
 
     // reinitialize trend variables so old data are purged
     for (TrendVarNum = 1; TrendVarNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendVarNum) {
-        TrendDepth = state.dataRuntimeLang->TrendVariable(TrendVarNum).LogDepth;
+        int TrendDepth = state.dataRuntimeLang->TrendVariable(TrendVarNum).LogDepth;
         state.dataRuntimeLang->TrendVariable(TrendVarNum).TrendValARR({1, TrendDepth}) = 0.0;
     }
 
@@ -1035,32 +1033,19 @@ void ParseExpression(EnergyPlusData &state,
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   June 2006
     //       MODIFIED       Brent Griffith, May 2009
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Parsing string into a series of tokens
 
-    // METHODOLOGY EMPLOYED:
-
-    // Using/Aliasing
-
-    // Locals
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxDoLoopCounts(500);
-
-    // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     //  CHARACTER(len=120), DIMENSION(MaxErrors) :: Error  ! Errors should be stored with the stack
     int NumErrors;
     std::string::size_type Pos;
     std::string StringToken;
-    char NextChar;
     bool PeriodFound;
-    bool MinusFound;
-    bool PlusFound;
-    bool MultFound;
-    bool DivFound;
     bool ErrorFlag;
     bool OperatorProcessing;
     int CountDoLooping;
@@ -1088,9 +1073,9 @@ void ParseExpression(EnergyPlusData &state,
     std::string::size_type LastPos(String.length());
     Pos = 0;
     OperatorProcessing = false; // true when an operator is found until terminated by non-operator
-    MinusFound = false;
-    MultFound = false;
-    DivFound = false;
+    bool MinusFound = false;
+    bool MultFound = false;
+    bool DivFound = false;
     while (Pos < LastPos) {
         ++CountDoLooping;
         if (CountDoLooping > MaxDoLoopCounts) {
@@ -1099,7 +1084,7 @@ void ParseExpression(EnergyPlusData &state,
             ShowContinueError(state, format("...Failed to process String=\"{}\".", String));
             ShowFatalError(state, "...program terminates due to preceding condition.");
         }
-        NextChar = String[Pos];
+        char NextChar = String[Pos];
         if (NextChar == ' ') {
             ++Pos;
             continue;
@@ -1111,7 +1096,7 @@ void ParseExpression(EnergyPlusData &state,
         // Get the next token
         StringToken = "";
         PeriodFound = false;
-        PlusFound = false;
+        bool PlusFound = false;
         ErrorFlag = false;
         LastED = false;
         if (is_any_of(NextChar, "0123456789.")) {
@@ -1243,7 +1228,7 @@ void ParseExpression(EnergyPlusData &state,
                     ShowContinueError(state, "...Use parenthesis to wrap appropriate variables. For example, X / ( -Y ).");
                     ++NumErrors;
                     DivFound = false;
-                } else if (OperatorProcessing && (NextChar == '-')) {
+                } else if (OperatorProcessing) {
                     // if operator was deterined last pass and this character is a -, then insert a 0 before the minus and treat as subtraction
                     // example: change "Var == -1" to "Var == 0-1"
                     OperatorProcessing = false;
@@ -1591,7 +1576,7 @@ int ProcessTokens(
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Number = Token(Pos + 5).Number;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Expression = Token(Pos + 5).Expression;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Variable = Token(Pos + 5).Variable;
-                        if ((NumOperands == 5) && (NumTokens - 6 > 0)) { // too many tokens for this non-binary operator
+                        if ((NumTokens - 6) > 0) { // too many tokens for this non-binary operator
                             ShowFatalError(state, "EMS error parsing tokens, too many for  built-in function");
                         }
                     }
@@ -2865,8 +2850,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                                                              lAlphaFieldBlanks,
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
-                } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables &&
-                           GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables) {
+                } else if (GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables) {
                     cCurrentModuleObject = "ExternalInterface:Variable";
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                              cCurrentModuleObject,
