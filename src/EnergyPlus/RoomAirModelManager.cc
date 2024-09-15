@@ -346,7 +346,7 @@ namespace RoomAir {
             //   figure number of surfaces for this zone
             airPatternZoneInfo.totNumSurfs = 0;
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 airPatternZoneInfo.totNumSurfs += thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1;
             }
             //   allocate nested derived type for surface info
@@ -355,7 +355,7 @@ namespace RoomAir {
             //   Fill in what we know for nested structure for surfaces
             int thisSurfinZone = 0;
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 for (int thisHBsurfID = thisSpace.HTSurfaceFirst; thisHBsurfID <= thisSpace.HTSurfaceLast; ++thisHBsurfID) {
                     ++thisSurfinZone;
                     if (state.dataSurface->Surface(thisHBsurfID).Class == DataSurfaces::SurfaceClass::IntMass) {
@@ -696,7 +696,7 @@ namespace RoomAir {
             } else {
                 int NumOfSurfs = 0;
                 for (int spaceNum : state.dataHeatBal->Zone(airNode.ZonePtr).spaceIndexes) {
-                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                     NumOfSurfs += thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1;
                 }
                 airNode.SurfMask.allocate(NumOfSurfs);
@@ -744,7 +744,7 @@ namespace RoomAir {
             auto const &zone = state.dataHeatBal->Zone(airNode.ZonePtr);
             int NumOfSurfs = 0;
             for (int spaceNum : zone.spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 NumOfSurfs += thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1;
             }
 
@@ -763,7 +763,7 @@ namespace RoomAir {
             for (int ListSurfNum = 4; ListSurfNum <= NumAlphas; ++ListSurfNum) {
                 int thisSurfinZone = 0;
                 for (int spaceNum : zone.spaceIndexes) {
-                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                     for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
                         ++thisSurfinZone;
                         if (ipsc->cAlphaArgs(ListSurfNum) == state.dataSurface->Surface(SurfNum).Name) {
@@ -1339,7 +1339,7 @@ namespace RoomAir {
 
             roomAFNZoneInfo.totNumSurfs = 0;
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 roomAFNZoneInfo.totNumSurfs += thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1;
             }
         } // for (Loop)
@@ -1429,7 +1429,7 @@ namespace RoomAir {
                 int NumSurfsThisNode = NumAlphas - 1;
                 int NumOfSurfs = 0; // What is this used for?
                 for (int spaceNum : state.dataHeatBal->Zone(iZone).spaceIndexes) {
-                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                     NumOfSurfs += thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1;
                 }
 
@@ -1451,7 +1451,7 @@ namespace RoomAir {
                 int thisSurfinZone = 0;
                 for (int ListSurfNum = 2; ListSurfNum <= NumAlphas; ++ListSurfNum) {
                     for (int spaceNum : state.dataHeatBal->Zone(iZone).spaceIndexes) {
-                        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                        auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                         for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
                             ++thisSurfinZone;
                             if (ipsc->cAlphaArgs(ListSurfNum) == state.dataSurface->Surface(SurfNum).Name) {
@@ -1648,13 +1648,11 @@ namespace RoomAir {
                     roomAFNNodeHVAC.SupplyFraction = ipsc->rNumericArgs(iEquipArg);
                     roomAFNNodeHVAC.ReturnFraction = ipsc->rNumericArgs(iEquipArg);
 
-                    // get equipment index
-                    int EquipIndex = 0;
+                    // get equipment type
                     for (int thisZoneEquipNum = 1; thisZoneEquipNum <= state.dataZoneEquip->ZoneEquipList(iZone).NumOfEquipTypes;
                          ++thisZoneEquipNum) {
                         if (Util::SameString(state.dataZoneEquip->ZoneEquipList(iZone).EquipName(thisZoneEquipNum), roomAFNNodeHVAC.Name) &&
                             roomAFNNodeHVAC.zoneEquipType == state.dataZoneEquip->ZoneEquipList(iZone).EquipType(thisZoneEquipNum)) {
-                            EquipIndex = state.dataZoneEquip->ZoneEquipList(iZone).EquipIndex(thisZoneEquipNum);
                             break;
                         }
                     }
@@ -1841,18 +1839,16 @@ namespace RoomAir {
             state.dataRoomAir->HDoor = 0.0;
 
             int contWall = 0, contFloor = 0, contCeiling = 0, contWindow = 0, contInternal = 0, contDoor = 0;
-            int contWallBeg = 0, contFloorBeg = 0, contCeilingBeg = 0, contWindowBeg = 0, contInternalBeg = 0, contDoorBeg = 0;
-            int contWallLast = 0, contFloorLast = 0, contCeilingLast = 0, contWindowLast = 0, contInternalLast = 0, contDoorLast = 0;
 
             // Put the surface and zone information in Apos and PosZ arrays
             for (int ZNum = 1; ZNum <= state.dataGlobal->NumOfZones; ++ZNum) {
                 // advance ONE position in the arrays PosZ because this is a new zone
-                contWallBeg = contWall + 1;
-                contFloorBeg = contFloor + 1;
-                contCeilingBeg = contCeiling + 1;
-                contWindowBeg = contWindow + 1;
-                contInternalBeg = contInternal + 1;
-                contDoorBeg = contDoor + 1;
+                int contWallBeg = contWall + 1;
+                int contFloorBeg = contFloor + 1;
+                int contCeilingBeg = contCeiling + 1;
+                int contWindowBeg = contWindow + 1;
+                int contInternalBeg = contInternal + 1;
+                int contDoorBeg = contDoor + 1;
                 SetZoneAux = true;
 
                 Real64 Z1ofZone = std::numeric_limits<Real64>::max();
@@ -1860,7 +1856,7 @@ namespace RoomAir {
 
                 // cycle in this zone for all the surfaces
                 for (int spaceNum : state.dataHeatBal->Zone(ZNum).spaceIndexes) {
-                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    auto const &thisSpace = state.dataHeatBal->space(spaceNum);
 
                     for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
                         auto const &surf = state.dataSurface->Surface(SurfNum);
@@ -1900,12 +1896,12 @@ namespace RoomAir {
                     }
                 } // for (SurfNum)
 
-                contWallLast = contWall;
-                contFloorLast = contFloor;
-                contCeilingLast = contCeiling;
-                contWindowLast = contWindow;
-                contDoorLast = contDoor;
-                contInternalLast = contInternal;
+                int contWallLast = contWall;
+                int contFloorLast = contFloor;
+                int contCeilingLast = contCeiling;
+                int contWindowLast = contWindow;
+                int contDoorLast = contDoor;
+                int contInternalLast = contInternal;
                 // PosZ_Wall (... + 1) has the Begin Wall reference in Apos_Wall for the ZNum
                 // PosZ_Wall (... + 2) has the End Wall reference in Apos_Wall for the ZNum
                 state.dataRoomAir->PosZ_Wall(ZNum).beg = contWallBeg;
