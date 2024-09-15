@@ -133,11 +133,10 @@ PlantComponent *PipeHTData::factory(EnergyPlusData &state, DataPlant::PlantEquip
         state.dataPipeHT->GetPipeInputFlag = false;
     }
     // Now look for this particular pipe in the list
-    for (auto &pipe : state.dataPipeHT->PipeHT) {
-        if (pipe.Type == objectType && pipe.Name == objectName) {
-            return &pipe;
-        }
-    }
+    auto thisObj = std::find_if(state.dataPipeHT->PipeHT.begin(),
+                                state.dataPipeHT->PipeHT.end(),
+                                [&objectType, &objectName](const PipeHTData &myObj) { return myObj.Type == objectType && myObj.Name == objectName; });
+    if (thisObj != state.dataPipeHT->PipeHT.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("PipeHTFactory: Error getting inputs for pipe named: {}", objectName));
     // Shut up the compiler
@@ -226,7 +225,6 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     int NumOfPipeHTInt; // Number of Pipe Heat Transfer objects
     int NumOfPipeHTExt; // Number of Pipe Heat Transfer objects
     int NumOfPipeHTUG;  // Number of Pipe Heat Transfer objects
-    int NumSections;    // total number of sections in pipe
 
     auto &s_ipsc = state.dataIPShortCut;
     auto &s_mat = state.dataMaterial;
@@ -835,7 +833,7 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
     Real64 Resistance = 0.0;
     Real64 TotThickness = 0.0;
 
-    auto &s_mat = state.dataMaterial;
+    auto const &s_mat = state.dataMaterial;
 
     // CTF stuff
     int TotalLayers = state.dataConstruction->Construct(ConstructionNum).TotLayers;
