@@ -17814,7 +17814,7 @@ void ResetSourceEnergyEndUseGathering(EnergyPlusData &state)
     // Jason Glazer - October 2015
     // Reset all source energy end use table gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    auto &ort = state.dataOutRptTab;
+    auto const &ort = state.dataOutRptTab;
     ort->gatherTotalsBySourceBEPS = 0.0;
     ort->gatherEndUseBySourceBEPS = 0.0;
 }
@@ -17824,7 +17824,7 @@ void ResetPeakDemandGathering(EnergyPlusData &state)
     // Jason Glazer - October 2015
     // Reset all demand end use components table gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    auto &ort = state.dataOutRptTab;
+    auto const &ort = state.dataOutRptTab;
     ort->gatherDemandTotal = 0.0;
     ort->gatherDemandTimeStamp = 0;
     ort->gatherDemandEndUse = 0.0;
