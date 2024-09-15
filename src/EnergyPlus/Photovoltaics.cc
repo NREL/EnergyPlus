@@ -1263,7 +1263,6 @@ namespace Photovoltaics {
         Real64 VA;
         Real64 VOCA;
         Real64 PA;
-        int CC;
         int K;
         Real64 CellTemp(0.0); // cell temperature in Kelvin
         Real64 CellTempC;     // cell temperature in degrees C
@@ -1287,7 +1286,6 @@ namespace Photovoltaics {
 
             // set initial values for eta iteration loop
             DummyErr = 2.0 * ERR;
-            CC = 1;
             EtaOld = EtaIni;
 
             // Begin DO WHILE loop - until the error tolerance is reached.
@@ -1394,7 +1392,6 @@ namespace Photovoltaics {
                     PM / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Area;
                 DummyErr = std::abs((ETA - EtaOld) / EtaOld);
                 EtaOld = ETA;
-                ++CC;
 
             } // while
 
