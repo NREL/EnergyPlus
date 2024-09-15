@@ -186,11 +186,10 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Get input for PVT Simple objects
 
-        int Item;                // Item to be "gotten"
-        int NumAlphas;           // Number of Alphas for each GetObjectItem call
-        int NumNumbers;          // Number of Numbers for each GetObjectItem call
-        int IOStatus;            // Used in GetObjectItem
-        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        int Item;       // Item to be "gotten"
+        int NumAlphas;  // Number of Alphas for each GetObjectItem call
+        int NumNumbers; // Number of Numbers for each GetObjectItem call
+        int IOStatus;   // Used in GetObjectItem
 
         tmpSimplePVTperf.allocate(NumSimplePVTPerform);
         for (Item = 1; Item <= NumSimplePVTPerform; ++Item) {
@@ -219,7 +218,6 @@ namespace PhotovoltaicThermalCollectors {
                                        state.dataIPShortCut->cAlphaArgs(3),
                                        state.dataIPShortCut->cCurrentModuleObject,
                                        thisTmpSimplePVTperf.Name));
-                ErrorsFound = true;
             }
             thisTmpSimplePVTperf.SurfEmissivity = state.dataIPShortCut->rNumericArgs(3);
         }
@@ -234,8 +232,6 @@ namespace PhotovoltaicThermalCollectors {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
-        int Found;
-        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         using DataSurfaces::OSCMData;
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::ScheduleAlwaysOn;
@@ -257,14 +253,13 @@ namespace PhotovoltaicThermalCollectors {
             auto &thisTmpBIPVTperf = tmpBIPVTperf(Item);
             thisTmpBIPVTperf.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisTmpBIPVTperf.OSCMName = state.dataIPShortCut->cAlphaArgs(2);
-            Found = Util::FindItemInList(thisTmpBIPVTperf.OSCMName, state.dataSurface->OSCM);
+            int Found = Util::FindItemInList(thisTmpBIPVTperf.OSCMName, state.dataSurface->OSCM);
             if (Found == 0) {
                 ShowSevereError(state,
                                 format("GetBIPVTCollectorsInput: Invalid outside model name={}, object type={}, object name={}",
                                        thisTmpBIPVTperf.OSCMName,
                                        state.dataIPShortCut->cCurrentModuleObject,
                                        thisTmpBIPVTperf.Name));
-                ErrorsFound = true;
             }
             thisTmpBIPVTperf.OSCMPtr = Found;
             thisTmpBIPVTperf.PVEffGapWidth = state.dataIPShortCut->rNumericArgs(1);
@@ -290,7 +285,6 @@ namespace PhotovoltaicThermalCollectors {
                                            state.dataIPShortCut->cAlphaArgs(3),
                                            state.dataIPShortCut->cCurrentModuleObject,
                                            thisTmpBIPVTperf.Name));
-                    ErrorsFound = true;
                     continue;
                 }
             }
