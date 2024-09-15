@@ -2707,23 +2707,13 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     OutputProcessor::TimeStepType sovTimeStepType; // temporary
     OutputProcessor::StoreType sovStoreType;       // temporary
 
-    int ErlVarLoop;
-    int CurveIndexNum;
-    int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
-    int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
-    int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
     Array1D_string cAlphaFieldNames;
     Array1D_string cNumericFieldNames;
     Array1D_bool lNumericFieldBlanks;
     Array1D_bool lAlphaFieldBlanks;
     Array1D_string cAlphaArgs;
     Array1D<Real64> rNumericArgs;
-    std::string cCurrentModuleObject;
-    int ConstructNum;
-    bool errFlag;
     std::string::size_type lbracket;
-    std::string UnitsA;
-    std::string UnitsB;
     Constant::Units curUnit(Constant::Units::None);
     std::string::size_type ptr;
 
@@ -2734,13 +2724,17 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound = false;
+        int TotalArgs = 0;   // argument for call to GetObjectDefMaxArgs
         int VariableNum = 0; // temporary
         int RuntimeReportVarNum;
+        bool errFlag;
+        std::string UnitsA;
+        std::string UnitsB;
 
-        cCurrentModuleObject = "EnergyManagementSystem:Sensor";
+        std::string cCurrentModuleObject = "EnergyManagementSystem:Sensor";
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
-        MaxNumNumbers = NumNums;
-        MaxNumAlphas = NumAlphas;
+        int MaxNumNumbers = NumNums;
+        int MaxNumAlphas = NumAlphas;
         cCurrentModuleObject = "EnergyManagementSystem:Actuator";
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
@@ -2892,7 +2886,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 // loop over each alpha and register variable named as global Erl variable
-                for (ErlVarLoop = 1; ErlVarLoop <= NumAlphas; ++ErlVarLoop) {
+                for (int ErlVarLoop = 1; ErlVarLoop <= NumAlphas; ++ErlVarLoop) {
                     if ((cCurrentModuleObject.compare("ExternalInterface:FunctionalMockupUnitImport:To:Variable") == 0)) {
                         if (ErlVarLoop == 1) {
                             // Only validate first field of object ExternalInterface:FunctionalMockupUnitImport:To:Variable.
@@ -2970,7 +2964,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     }
                 }
 
-                CurveIndexNum = GetCurveIndex(state, cAlphaArgs(2)); // curve name
+                int CurveIndexNum = GetCurveIndex(state, cAlphaArgs(2)); // curve name
                 if (CurveIndexNum == 0) {
                     if (lAlphaFieldBlanks(2)) {
                         ShowSevereError(state, format("{}{}=\"{} blank field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -3032,7 +3026,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     continue;
                 }
 
-                ConstructNum = Util::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
+                int ConstructNum = Util::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
 
                 if (ConstructNum == 0) {
                     if (lAlphaFieldBlanks(2)) {
@@ -3251,12 +3245,6 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 lbracket = index(cAlphaArgs(1), '[');
                 if (lbracket == std::string::npos) {
-                    UnitsA = "";
-                    //          if (lAlphaFieldBlanks(6)) then
-                    //            CALL ShowWarningError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units
-                    //            indicated.') CALL ShowContinueError(state, '...no units indicated for this variable. [] is assumed.')
-                    //            cAlphaArgs(1)=TRIM(cAlphaArgs(1))//' []'
-                    //          endif
                     UnitsB = cAlphaArgs(6);
                     lbracket = index(UnitsB, '[');
                     ptr = index(UnitsB, ']');
@@ -3424,12 +3412,6 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 lbracket = index(cAlphaArgs(1), '[');
                 if (lbracket == std::string::npos) {
-                    UnitsA = "";
-                    //          if (lAlphaFieldBlanks(9)) then
-                    //            CALL ShowWarningError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units
-                    //            indicated.') CALL ShowContinueError(state, '...no units indicated for this variable. [] is assumed.')
-                    //            cAlphaArgs(1)=TRIM(cAlphaArgs(1))//' []'
-                    //          endif
                     UnitsB = cAlphaArgs(9);
                     lbracket = index(UnitsB, '[');
                     ptr = index(UnitsB, ']');
@@ -3669,24 +3651,11 @@ void ReportRuntimeLanguage(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   June 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS SUBROUTINE:
-
-    // METHODOLOGY EMPLOYED:
-
-    // USE STATEMENTS:
-
-    // Locals
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int RuntimeReportVarNum;
-    int VariableNum;
-
-    for (RuntimeReportVarNum = 1;
+    for (int RuntimeReportVarNum = 1;
          RuntimeReportVarNum <= state.dataRuntimeLang->NumEMSOutputVariables + state.dataRuntimeLang->NumEMSMeteredOutputVariables;
          ++RuntimeReportVarNum) {
-        VariableNum = state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).VariableNum;
+        int VariableNum = state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).VariableNum;
         if (state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type == Value::Number) {
             state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Value =
                 state.dataRuntimeLang->ErlVariable(VariableNum).Value.Number;
