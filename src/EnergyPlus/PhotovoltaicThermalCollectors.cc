@@ -766,13 +766,13 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         Real64 DesignVolFlowRateDes = 0.0; // Autosize design volume flow for reporting
-        int PltSizNum = 0;                 // Plant Sizing index corresponding to CurLoopNum
         bool ErrorsFound = false;
 
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
 
             if (!allocated(state.dataSize->PlantSizData)) return;
             if (!allocated(state.dataPlnt->PlantLoop)) return;
+            int PltSizNum = 0; // Plant Sizing index corresponding to CurLoopNum
 
             if (this->WPlantLoc.loopNum > 0) {
                 PltSizNum = state.dataPlnt->PlantLoop(this->WPlantLoc.loopNum).PlantSizNum;
@@ -861,7 +861,7 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 } else {
                     CheckSysSizing(state, "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name);
-                    auto &thisFinalSysSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
+                    auto const &thisFinalSysSizing = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum);
                     if (state.dataSize->CurOASysNum > 0) {
                         DesignVolFlowRateDes = thisFinalSysSizing.DesOutAirVolFlow;
                     } else {
@@ -1444,11 +1444,10 @@ namespace PhotovoltaicThermalCollectors {
                   110.4)); // Sutherland's formula https://www.grc.nasa.gov/www/k-12/airplane/viscosity.html Sutherland's constant = 198.72 R
                            // converted to K =>110.4. At 273.15, Viscosity is 1.71E-5 as per Incropera, et al 6th ed. Temp range approx 273K - 373K
             k_air = 0.000000000015207 * std::pow(t_film + 273.15, 3.0) - 0.000000048574 * std::pow(t_film + 273.15, 2.0) +
-                    0.00010184 * (t_film + 273.15) - 0.00039333;                        // Dumas, A., and Trancossi, M., SAE Technical Papers, 2009
-            prandtl_air = 0.680 + 0.000000469 * std::pow(t_film + 273.15 - 540.0, 2.0); // The Schock Absorber Handbook, 2nd Ed. John C. Dixon 2007
-            density_air = 101.3 / (0.287 * (t_film + 273.15));                          // Ideal gas law
-            diffusivity_air = k_air / (cp_amb * density_air);                           // definition
-            kin_viscosity_air = mu_air / density_air;                                   // definition
+                    0.00010184 * (t_film + 273.15) - 0.00039333; // Dumas, A., and Trancossi, M., SAE Technical Papers, 2009
+            density_air = 101.3 / (0.287 * (t_film + 273.15));   // Ideal gas law
+            diffusivity_air = k_air / (cp_amb * density_air);    // definition
+            kin_viscosity_air = mu_air / density_air;            // definition
 
             // duffie and beckman correlation for nat convection - This is for exterior
             raleigh = (gravity * (1.0 / (0.5 * (tamb + tpvg) + 273.15)) * (std::max((Real64)(0.000001), std::abs(tpvg - tamb))) * std::pow(dhyd, 3)) /
