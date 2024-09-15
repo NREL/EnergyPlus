@@ -1637,9 +1637,9 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Solve a system of linear equations using Gaussian elimination and back substitution method.
 
-        Real64 sum, dummy1, dummy2, mm, small(1.0e-10);
         int p;
         int constexpr m = 3;
+        Real64 constexpr small = 1.0e-10;
 
         for (int i = 0; i < m; i++) {
             y[i] = 0.0;
@@ -1657,18 +1657,18 @@ namespace PhotovoltaicThermalCollectors {
 
             if (coeff_not_zero) {
                 if (p != i) {
-                    dummy2 = f[i];
+                    Real64 dummy2 = f[i];
                     f[i] = f[p];
                     f[p] = dummy2;
                     for (int j = 0; j <= (m - 1); j++) {
-                        dummy1 = jj[i * m + j];
+                        Real64 dummy1 = jj[i * m + j];
                         jj[i * m + j] = jj[p * m + j];
                         jj[p * m + j] = dummy1;
                     }
                 }
                 for (int j = (i + 1); j <= (m - 1); j++) {
                     if (std::abs(jj[i * m + i]) < small) jj[i * m + i] = small;
-                    mm = jj[j * m + i] / jj[i * m + i];
+                    Real64 mm = jj[j * m + i] / jj[i * m + i];
                     f[j] = f[j] - mm * f[i];
                     for (int k = 0; k <= (m - 1); k++) {
                         jj[j * m + k] = jj[j * m + k] - mm * jj[i * m + k];
@@ -1678,7 +1678,7 @@ namespace PhotovoltaicThermalCollectors {
         }
         if (std::abs(jj[(m - 1) * m + m - 1]) < small) jj[(m - 1) * m + m - 1] = small;
         y[m - 1] = f[m - 1] / jj[(m - 1) * m + m - 1];
-        sum = 0.0;
+        Real64 sum = 0.0;
         for (int i = 0; i <= (m - 2); i++) {
             int ii = m - 2 - i;
             for (int j = ii; j <= (m - 1); j++) {
