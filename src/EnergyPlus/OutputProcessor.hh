@@ -622,7 +622,7 @@ namespace OutputProcessor {
         Array1D_string spaceTypeName; // Array of space type names
     };
 
-    int DetermineMinuteForReporting(EnergyPlusData &state);
+    int DetermineMinuteForReporting(EnergyPlusData const &state);
 
     void InitializeOutput(EnergyPlusData &state);
 

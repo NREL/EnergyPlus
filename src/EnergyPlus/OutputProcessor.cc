@@ -120,7 +120,7 @@ namespace OutputProcessor {
 
     // Functions
 
-    int DetermineMinuteForReporting(EnergyPlusData &state)
+    int DetermineMinuteForReporting(EnergyPlusData const &state)
     {
 
         // FUNCTION INFORMATION:
