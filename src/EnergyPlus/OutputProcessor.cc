@@ -4363,10 +4363,10 @@ void GetVariableKeys(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string nameUC = Util::makeUPPER(varName);
-    auto &op = state.dataOutputProcessor;
 
     // Select based on variable type:  integer, real, or meter
     if (varType == VariableType::Integer || varType == VariableType::Real) {
+        auto &op = state.dataOutputProcessor;
         auto found = op->ddOutVarMap.find(nameUC);
         if (found == op->ddOutVarMap.end()) return;
 
