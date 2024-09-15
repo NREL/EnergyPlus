@@ -96,11 +96,10 @@ PlantComponent *PlantProfileData::factory(EnergyPlusData &state, std::string con
         state.dataPlantLoadProfile->GetPlantLoadProfileInputFlag = false;
     }
     // Now look for this particular pipe in the list
-    for (auto &plp : state.dataPlantLoadProfile->PlantProfile) {
-        if (plp.Name == objectName) {
-            return &plp;
-        }
-    }
+    auto thisObj = std::find_if(state.dataPlantLoadProfile->PlantProfile.begin(),
+                                state.dataPlantLoadProfile->PlantProfile.end(),
+                                [&objectName](const PlantProfileData &plp) { return plp.Name == objectName; });
+    if (thisObj != state.dataPlantLoadProfile->PlantProfile.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("PlantLoadProfile::factory: Error getting inputs for pipe named: {}", objectName));
     // Shut up the compiler
@@ -342,10 +341,8 @@ void PlantProfileData::ReportPlantProfile(EnergyPlusData &state)
 }
 void PlantProfileData::oneTimeInit_new(EnergyPlusData &state)
 {
-    bool errFlag;
-
     if (allocated(state.dataPlnt->PlantLoop)) {
-        errFlag = false;
+        bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->Type, this->plantLoc, errFlag, _, _, _, _, _);
         if (errFlag) {
             ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
@@ -379,11 +376,6 @@ void GetPlantProfileInput(EnergyPlusData &state)
     using namespace DataLoopNode;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-    int IOStatus;            // Used in GetObjectItem
-    int NumAlphas;           // Number of Alphas for each GetObjectItem call
-    int NumNumbers;          // Number of Numbers for each GetObjectItem call
-    int ProfileNum;          // PLANT LOAD PROFILE (PlantProfile) object number
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     cCurrentModuleObject = "LoadProfile:Plant";
@@ -391,8 +383,12 @@ void GetPlantProfileInput(EnergyPlusData &state)
 
     if (state.dataPlantLoadProfile->NumOfPlantProfile > 0) {
         state.dataPlantLoadProfile->PlantProfile.allocate(state.dataPlantLoadProfile->NumOfPlantProfile);
+        bool ErrorsFound = false; // Set to true if errors in input, fatal at end of routine
+        int IOStatus;             // Used in GetObjectItem
+        int NumAlphas;            // Number of Alphas for each GetObjectItem call
+        int NumNumbers;           // Number of Numbers for each GetObjectItem call
 
-        for (ProfileNum = 1; ProfileNum <= state.dataPlantLoadProfile->NumOfPlantProfile; ++ProfileNum) {
+        for (int ProfileNum = 1; ProfileNum <= state.dataPlantLoadProfile->NumOfPlantProfile; ++ProfileNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      ProfileNum,
