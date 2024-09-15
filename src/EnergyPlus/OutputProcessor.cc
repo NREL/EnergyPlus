@@ -1967,7 +1967,7 @@ namespace OutputProcessor {
         // in the data structure.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op = state.dataOutputProcessor;
+        auto const &op = state.dataOutputProcessor;
 
         for (auto *meter : op->meters) {
             auto &period = meter->periodFinYrSM;
@@ -3959,7 +3959,7 @@ int GetMeterIndex(EnergyPlusData &state, std::string const &name)
     // for the meter name.  If none active for this run, a zero is returned.  This is used later to
     // obtain a meter "value".
 
-    auto &op = state.dataOutputProcessor;
+    auto const &op = state.dataOutputProcessor;
 
     auto found = op->meterMap.find(name);
     return (found != op->meterMap.end()) ? found->second : -1;
@@ -4167,7 +4167,7 @@ int GetNumMeteredVariables(EnergyPlusData &state,
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int NumVariables = 0;
-    auto &op = state.dataOutputProcessor;
+    auto const &op = state.dataOutputProcessor;
 
     for (auto *var : op->outVars) {
         //    Pos=INDEX(RVariableTypes(Loop)%VarName,':')
@@ -4366,7 +4366,7 @@ void GetVariableKeys(EnergyPlusData &state,
 
     // Select based on variable type:  integer, real, or meter
     if (varType == VariableType::Integer || varType == VariableType::Real) {
-        auto &op = state.dataOutputProcessor;
+        auto const &op = state.dataOutputProcessor;
         auto found = op->ddOutVarMap.find(nameUC);
         if (found == op->ddOutVarMap.end()) return;
 
@@ -4669,7 +4669,7 @@ int AddDDOutVar(EnergyPlusData &state,
     using namespace OutputProcessor;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &op = state.dataOutputProcessor;
+    auto const &op = state.dataOutputProcessor;
 
     std::string nameUC = Util::makeUPPER(name);
 
