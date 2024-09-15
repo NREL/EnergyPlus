@@ -1497,14 +1497,14 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
     // 3) For SET POINT MANAGER:RETURN AIR BYPASS FLOW
     //    check for duplicate air loop names.
 
-    for (int iSPM = 1; iSPM <= (int)state.dataSetPointManager->spms.size(); ++iSPM) {
+    for (int iSPM = 1; iSPM <= state.dataSetPointManager->spms.isize(); ++iSPM) {
         auto const *spm = state.dataSetPointManager->spms(iSPM);
 
         // check for duplicate nodes in each setpoint managers control node list (node lists of size 1 do not need verification)
         // issue warning only since duplicate node names within a setpoint manager does not cause a conflict (i.e., same
         // value written to node) but may indicate an error in the node name.
         for (int iNode = 0; iNode < (int)spm->ctrlNodeNums.size() - 1; ++iNode) {
-            for (int jNode = iNode + 1; (int)jNode < spm->ctrlNodeNums.size(); ++jNode) {
+            for (int jNode = iNode + 1; jNode < (int)spm->ctrlNodeNums.size(); ++jNode) {
                 if (spm->ctrlNodeNums[iNode] != spm->ctrlNodeNums[jNode]) continue;
                 ShowWarningError(state, format("{} =\"{}\"", spmTypeNames[(int)spm->type], spm->Name));
                 ShowContinueError(state, format("...duplicate node specified = {}", state.dataLoopNodes->NodeID(spm->ctrlNodeNums[iNode])));
@@ -4539,7 +4539,7 @@ int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int const MixedAi
         state.dataSetPointManager->GetInputFlag = false;
     }
 
-    for (int iSPM = 1; iSPM <= state.dataSetPointManager->spms.size(); ++iSPM) {
+    for (int iSPM = 1; iSPM <= state.dataSetPointManager->spms.isize(); ++iSPM) {
         auto *const spm = state.dataSetPointManager->spms(iSPM);
         if (spm->type != SPMType::MixedAir) continue;
 

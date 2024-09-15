@@ -183,8 +183,6 @@ set(INCLUDED_IMAGES
     ${PROJECT_SOURCE_DIR}/auxiliary-programs/media/image118.png
     ${PROJECT_SOURCE_DIR}/auxiliary-programs/media/image119.png
     ${PROJECT_SOURCE_DIR}/auxiliary-programs/media/image120.png
-    ${PROJECT_SOURCE_DIR}/auxiliary-programs/media/image121.png
-    ${PROJECT_SOURCE_DIR}/auxiliary-programs/media/image122.png
-    ${PROJECT_SOURCE_DIR}/auxiliary-programs/media/image123.png)
+    ${PROJECT_SOURCE_DIR}/auxiliary-programs/media/image121.png)
 
 create_doc_target("auxiliary-programs" "AuxiliaryPrograms")

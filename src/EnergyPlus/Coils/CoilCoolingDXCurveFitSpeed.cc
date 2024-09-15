@@ -839,7 +839,7 @@ Real64 CoilCoolingDXCurveFitSpeed::calcEffectiveSHR(const DataLoopNode::NodeData
     To1 = aa + Tcl;
     Error = 1.0;
     while (Error > 0.001) {
-        To2 = aa - Tcl * (std::exp(-To1 / Tcl) - 1.0);
+        To2 = aa - Tcl * std::expm1(-To1 / Tcl);
         Error = std::abs((To2 - To1) / To1);
         To1 = To2;
     }

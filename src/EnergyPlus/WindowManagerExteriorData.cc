@@ -161,9 +161,12 @@ namespace Window {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Reads spectral data value
+
+        auto &s_mat = state.dataMaterial;
+
         assert(t_SampleDataPtr != 0); // It must not be called for zero value
         std::shared_ptr<CSpectralSampleData> aSampleData = std::make_shared<CSpectralSampleData>();
-        auto spectralData = state.dataHeatBal->SpectralData(t_SampleDataPtr); // (AUTO_OK_OBJ)
+        auto spectralData = s_mat->SpectralData(t_SampleDataPtr); // (AUTO_OK_OBJ)
         int numOfWl = spectralData.NumOfWavelengths;
         for (int i = 1; i <= numOfWl; ++i) {
             Real64 wl = spectralData.WaveLength(i);
@@ -177,7 +180,7 @@ namespace Window {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(Material::MaterialChild const &t_MaterialProperties)
+    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(Material::MaterialGlass const &t_MaterialProperties)
     {
         Real64 Tsol = t_MaterialProperties.Trans;
         Real64 Rfsol = t_MaterialProperties.ReflectSolBeamFront;
