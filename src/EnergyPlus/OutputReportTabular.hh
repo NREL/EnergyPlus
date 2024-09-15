@@ -824,7 +824,7 @@ namespace OutputReportTabular {
 
     void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, UnitsStyle unitsStyle_para);
 
-    void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int curAirLoop);
+    void CreateListOfZonesForAirLoop(EnergyPlusData const &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int curAirLoop);
 
     void OutputCompLoadSummary(EnergyPlusData &state,
                                EnergyPlus::OutputReportTabular::OutputType kind,
