@@ -826,9 +826,9 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
 
 int GetMeterIndex(EnergyPlusData const &state, std::string const &MeterName);
 
-Constant::eResource GetMeterResourceType(EnergyPlusData &state, int MeterNumber); // Which Meter Number (from GetMeterIndex)
+Constant::eResource GetMeterResourceType(EnergyPlusData const &state, int MeterNumber); // Which Meter Number (from GetMeterIndex)
 
-Real64 GetCurrentMeterValue(EnergyPlusData &state, int MeterNumber); // Which Meter Number (from GetMeterIndex)
+Real64 GetCurrentMeterValue(EnergyPlusData const &state, int MeterNumber); // Which Meter Number (from GetMeterIndex)
 
 Real64 GetInstantMeterValue(EnergyPlusData &state,
                             int MeterNumber,                           // Which Meter Number (from GetMeterIndex)
@@ -845,7 +845,7 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
                                                  int keyVarIndex                        // Array index
 );
 
-int GetNumMeteredVariables(EnergyPlusData &state,
+int GetNumMeteredVariables(EnergyPlusData const &state,
                            std::string const &ComponentType, // Given Component Type
                            std::string const &ComponentName  // Given Component Name (user defined)
 );
@@ -877,7 +877,7 @@ void InitPollutionMeterReporting(EnergyPlusData &state, OutputProcessor::ReportF
 
 void ProduceRDDMDD(EnergyPlusData &state);
 
-int AddDDOutVar(EnergyPlusData &state,
+int AddDDOutVar(EnergyPlusData const &state,
                 std::string_view const nameUC, // Variable Name
                 OutputProcessor::TimeStepType TimeStepType,
                 OutputProcessor::StoreType StateType,

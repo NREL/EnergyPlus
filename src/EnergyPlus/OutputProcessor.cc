@@ -3965,7 +3965,7 @@ int GetMeterIndex(EnergyPlusData const &state, std::string const &name)
     return (found != op->meterMap.end()) ? found->second : -1;
 } // GetMeterIndex()
 
-Constant::eResource GetMeterResourceType(EnergyPlusData &state, int const MeterNumber) // Which Meter Number (from GetMeterIndex)
+Constant::eResource GetMeterResourceType(EnergyPlusData const &state, int const MeterNumber) // Which Meter Number (from GetMeterIndex)
 {
 
     // FUNCTION INFORMATION:
@@ -3978,7 +3978,7 @@ Constant::eResource GetMeterResourceType(EnergyPlusData &state, int const MeterN
     return (MeterNumber != -1) ? state.dataOutputProcessor->meters[MeterNumber]->resource : Constant::eResource::Invalid;
 } // GetMeterResourceType()
 
-Real64 GetCurrentMeterValue(EnergyPlusData &state, int const MeterNumber) // Which Meter Number (from GetMeterIndex)
+Real64 GetCurrentMeterValue(EnergyPlusData const &state, int const MeterNumber) // Which Meter Number (from GetMeterIndex)
 {
 
     // FUNCTION INFORMATION:
@@ -4150,7 +4150,7 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
     return resultVal;
 } // GetInternalVariableValueExternalInterface()
 
-int GetNumMeteredVariables(EnergyPlusData &state,
+int GetNumMeteredVariables(EnergyPlusData const &state,
                            [[maybe_unused]] std::string const &ComponentType, // Given Component Type
                            std::string const &ComponentName                   // Given Component Name (user defined)
 )
@@ -4647,7 +4647,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
     state.files.mdd.close();
 } // ProduceRDDMDD()
 
-int AddDDOutVar(EnergyPlusData &state,
+int AddDDOutVar(EnergyPlusData const &state,
                 std::string_view const name, // Variable Name
                 OutputProcessor::TimeStepType const timeStepType,
                 OutputProcessor::StoreType const storeType,
