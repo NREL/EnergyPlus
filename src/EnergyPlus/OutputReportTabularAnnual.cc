@@ -96,10 +96,7 @@ void GetInputTabularAnnual(EnergyPlusData &state)
     int IOStat;               // IO Status when calling get input subroutine
     // static bool ErrorsFound( false );
     int objCount(0);
-    int indexNums(0);
-    std::string curVarMtr("");
-    std::string curAggTyp("");
-    int curNumDgts(2);
+    int curNumDgts;
     AnnualFieldSet::AggregationKind curAgg(AnnualFieldSet::AggregationKind::sumOrAvg);
 
     auto &annualTables = state.dataOutputReportTabularAnnual->annualTables;
@@ -128,7 +125,7 @@ void GetInputTabularAnnual(EnergyPlusData &state)
             annualTables.push_back(AnnualTable(state, alphArray(1), alphArray(2), alphArray(3)));
             // the remaining fields are repeating in groups of three and need to be added to the data structure
             for (jAlpha = 4; jAlpha <= numAlphas; jAlpha += 2) {
-                curVarMtr = alphArray(jAlpha);
+                std::string curVarMtr = alphArray(jAlpha);
                 if (curVarMtr.empty()) {
                     ShowWarningError(state,
                                      format("{}: Blank column specified in '{}', need to provide a variable or meter or EMS variable name ",
@@ -141,7 +138,7 @@ void GetInputTabularAnnual(EnergyPlusData &state)
                 } else {
                     curAgg = AnnualFieldSet::AggregationKind::sumOrAvg; // if missing aggregation type use SumOrAverage
                 }
-                indexNums = 1 + (jAlpha - 3) / 2; // compute the corresponding field index in the numArray
+                int indexNums = 1 + (jAlpha - 3) / 2; // compute the corresponding field index in the numArray
                 if (indexNums <= numNums) {
                     curNumDgts = numArray(indexNums);
                 } else {
@@ -180,7 +177,6 @@ void AnnualTable::setupGathering(EnergyPlusData &state)
 // This method is used after GetInput for REPORT:TABLE:ANNUAL to set up how output variables, meters,
 // input fields, and ems variables are gathered.
 {
-    int keyCount = 0;
     OutputProcessor::VariableType typeVar = OutputProcessor::VariableType::Invalid;
     OutputProcessor::StoreType avgSumVar;
     OutputProcessor::TimeStepType stepTypeVar;
@@ -195,7 +191,7 @@ void AnnualTable::setupGathering(EnergyPlusData &state)
 
     std::vector<AnnualFieldSet>::iterator fldStIt;
     for (fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt) {
-        keyCount = fldStIt->getVariableKeyCountandTypeFromFldSt(state, typeVar, avgSumVar, stepTypeVar, unitsVar);
+        int keyCount = fldStIt->getVariableKeyCountandTypeFromFldSt(state, typeVar, avgSumVar, stepTypeVar, unitsVar);
         fldStIt->getVariableKeysFromFldSt(state, typeVar, keyCount, fldStIt->m_namesOfKeys, fldStIt->m_indexesForKeyVar);
         for (std::string nm : fldStIt->m_namesOfKeys) {
             std::string nmUpper = nm;
@@ -1294,8 +1290,6 @@ void AnnualTable::convertUnitForDeferredResults(EnergyPlusData &state,
 {
     Real64 curConversionFactor;
     Real64 curConversionOffset;
-    std::string varNameWithUnits;
-    int indexUnitConv;
     std::string curUnits;
     std::string energyUnitsString;
     Real64 curSI;
@@ -1303,7 +1297,8 @@ void AnnualTable::convertUnitForDeferredResults(EnergyPlusData &state,
     Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor(unitsStyle, energyUnitsString);
     // do the unit conversions
     if (unitsStyle == OutputReportTabular::UnitsStyle::InchPound || unitsStyle == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
-        varNameWithUnits = format("{} [{}]", fldStIt->m_variMeter, Constant::unitNames[(int)fldStIt->m_varUnits]);
+        int indexUnitConv;
+        std::string varNameWithUnits = format("{} [{}]", fldStIt->m_variMeter, Constant::unitNames[(int)fldStIt->m_varUnits]);
         OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
         OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     } else { // just do the Joule conversion
@@ -1342,7 +1337,6 @@ std::vector<Real64> AnnualTable::calculateBins(int const numberOfBins,
                                                Real64 &timeBelowBottomBin)
 {
     std::vector<Real64> returnBins(0.0);
-    int binNum = 0;
     returnBins.resize(numberOfBins);
     Real64 intervalSize = (topOfBins - bottomOfBins) / float(numberOfBins);
     timeAboveTopBin = 0.0;
@@ -1357,7 +1351,7 @@ std::vector<Real64> AnnualTable::calculateBins(int const numberOfBins,
             timeAboveTopBin += *elapsedTimeIt;
         } else {
             // determine which bin the results are in
-            binNum = int((*valueIt - bottomOfBins) / intervalSize);
+            int binNum = int((*valueIt - bottomOfBins) / intervalSize);
             if (binNum < numberOfBins && binNum >= 0) {
                 returnBins[binNum] += *elapsedTimeIt;
             }

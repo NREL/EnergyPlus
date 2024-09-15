@@ -95,7 +95,7 @@ namespace OutputReportPredefined {
 
         // Climate Summary Report
 
-        auto &s(state.dataOutRptPredefined);
+        auto const &s = state.dataOutRptPredefined;
 
         s->pdrClim = newPreDefReport(state, "ClimaticDataSummary", "Clim", "Climatic Data Summary");
 
