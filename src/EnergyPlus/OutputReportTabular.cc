@@ -17809,7 +17809,7 @@ void ResetBEPSGathering(EnergyPlusData const &state)
     ort->gatherWaterEndUseTotal = 0.0;
 }
 
-void ResetSourceEnergyEndUseGathering(EnergyPlusData &state)
+void ResetSourceEnergyEndUseGathering(EnergyPlusData const &state)
 {
     // Jason Glazer - October 2015
     // Reset all source energy end use table gathering arrays to zero for multi-year simulations
@@ -17819,7 +17819,7 @@ void ResetSourceEnergyEndUseGathering(EnergyPlusData &state)
     ort->gatherEndUseBySourceBEPS = 0.0;
 }
 
-void ResetPeakDemandGathering(EnergyPlusData &state)
+void ResetPeakDemandGathering(EnergyPlusData const &state)
 {
     // Jason Glazer - October 2015
     // Reset all demand end use components table gathering arrays to zero for multi-year simulations

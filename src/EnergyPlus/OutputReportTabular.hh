@@ -895,9 +895,9 @@ namespace OutputReportTabular {
 
     void ResetBEPSGathering(EnergyPlusData const &state);
 
-    void ResetSourceEnergyEndUseGathering(EnergyPlusData &state);
+    void ResetSourceEnergyEndUseGathering(EnergyPlusData const &state);
 
-    void ResetPeakDemandGathering(EnergyPlusData &state);
+    void ResetPeakDemandGathering(EnergyPlusData const &state);
 
     void ResetHeatGainGathering(EnergyPlusData &state);
 
