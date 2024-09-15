@@ -747,7 +747,7 @@ namespace OutputProcessor {
                 }
 
                 std::string meterOrVarNameUC = Util::makeUPPER(ipsc->cAlphaArgs(fldIndex + 1));
-                std::string::size_type lbrackPos = index(meterOrVarNameUC, '[');
+                lbrackPos = index(meterOrVarNameUC, '[');
                 if (lbrackPos != std::string::npos) meterOrVarNameUC.erase(lbrackPos);
 
                 // A custom meter cannot reference another custom meter
@@ -916,7 +916,7 @@ namespace OutputProcessor {
             for (int fldIndex = 3; fldIndex <= NumAlpha; fldIndex += 2) {
                 // No need to check for empty fields
                 std::string meterOrVarNameUC = Util::makeUPPER(ipsc->cAlphaArgs(fldIndex + 1));
-                std::string::size_type lbrackPos = index(meterOrVarNameUC, '[');
+                lbrackPos = index(meterOrVarNameUC, '[');
                 if (lbrackPos != std::string::npos) meterOrVarNameUC.erase(lbrackPos);
 
                 // No need to check for custom source meters
