@@ -1427,7 +1427,6 @@ int ProcessTokens(
     int LastPos;
     int TokenNum;
     int NumTokens;
-    int Depth;
     int NumSubTokens;
     int NewNumTokens;
     int OperatorNum;
@@ -1454,7 +1453,7 @@ int ProcessTokens(
 
     while ((Pos > 0) && (ParenthWhileCounter < 50)) {
         ++ParenthWhileCounter;
-        Depth = 0;
+        int Depth = 0;
         for (TokenNum = 1; TokenNum <= NumTokens; ++TokenNum) {
             if (Token(TokenNum).Type == Token::Parenthesis) {
                 if (Token(TokenNum).Parenthesis == Token::ParenthesisLeft) {
@@ -1718,15 +1717,10 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
     // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int thisTrend;      // local temporary
-    int thisIndex;      // local temporary
-    Real64 thisAverage; // local temporary
-    int loop;           // local temporary
-    Real64 thisSlope;   // local temporary
-    Real64 thisMax;     // local temporary
-    Real64 thisMin;     // local temporary
-    int OperandNum;
-    int SeedN;              // number of digits in the number used to seed the generator
+    Real64 thisAverage;     // local temporary
+    Real64 thisSlope;       // local temporary
+    Real64 thisMax;         // local temporary
+    Real64 thisMin;         // local temporary
     Array1D_int SeedIntARR; // local temporary for random seed
     Real64 tmpRANDU1;       // local temporary for uniform random number
     Real64 tmpRANDU2;       // local temporary for uniform random number
@@ -1747,7 +1741,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
         // is there a way to keep these and not allocate and deallocate all the time?
         Operand.allocate(thisErlExpression.NumOperands);
         // Reduce operands down to literals
-        for (OperandNum = 1; OperandNum <= thisErlExpression.NumOperands; ++OperandNum) {
+        for (int OperandNum = 1; OperandNum <= thisErlExpression.NumOperands; ++OperandNum) {
             auto &thisOperand = Operand(OperandNum);
             thisOperand = thisErlExpression.Operand(OperandNum);
             if (thisOperand.Type == Value::Expression) {
@@ -1778,6 +1772,8 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
         }
 
         if (ReturnValue.Type != Value::Error) {
+            int thisTrend; // local temporary
+            int thisIndex; // local temporary
 
             // Perform the operation
 
@@ -2025,10 +2021,11 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                 break;
 
             case ErlFunc::RandSeed:
+                int SeedN; // number of digits in the number used to seed the generator
                 // convert arg to an integer array for the seed.
                 RANDOM_SEED(SeedN); // obtains processor's use size as output
                 SeedIntARR.allocate(SeedN);
-                for (loop = 1; loop <= SeedN; ++loop) {
+                for (int loop = 1; loop <= SeedN; ++loop) {
                     if (loop == 1) {
                         SeedIntARR(loop) = std::floor(Operand(1).Number);
                     } else {
@@ -2319,7 +2316,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                             if (thisIndex == 1) {
                                 thisMax = state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(1);
                             } else {
-                                for (loop = 2; loop <= thisIndex; ++loop) {
+                                for (int loop = 2; loop <= thisIndex; ++loop) {
                                     if (loop == 2) {
                                         thisMax = max(state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(1),
                                                       state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(2));
@@ -2353,7 +2350,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                             if (thisIndex == 1) {
                                 thisMin = state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(1);
                             } else {
-                                for (loop = 2; loop <= thisIndex; ++loop) {
+                                for (int loop = 2; loop <= thisIndex; ++loop) {
                                     if (loop == 2) {
                                         thisMin = min(state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(1),
                                                       state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(2));
@@ -2707,13 +2704,6 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     constexpr std::string_view RoutineName = "GetRuntimeLanguageUserInput: ";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int GlobalNum;
-    int StackNum;
-    int ErrorNum;
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
-    bool ErrorsFound(false);
     int VariableNum(0); // temporary
     int RuntimeReportVarNum;
     bool Found;
@@ -2746,6 +2736,11 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
     if (state.dataRuntimeLangProcessor->GetInput) { // GetInput check is redundant with the InitializeRuntimeLanguage routine
         state.dataRuntimeLangProcessor->GetInput = false;
+        int StackNum;
+        int NumAlphas; // Number of elements in the alpha array
+        int NumNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
+        bool ErrorsFound = false;
 
         cCurrentModuleObject = "EnergyManagementSystem:Sensor";
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
@@ -2829,7 +2824,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
                 state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables >
             0) {
-            for (GlobalNum = 1;
+            for (int GlobalNum = 1;
                  GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
                                   state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
                                   state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables;
@@ -2864,8 +2859,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                                                              lAlphaFieldBlanks,
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
-                } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables &&
-                           GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
+                } else if (GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
                                             state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2882,9 +2876,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
 
-                } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
-                                           state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables &&
-                           GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
+                } else if (GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
                                             state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
                                             state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
@@ -3224,7 +3216,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 ShowSevereError(
                     state,
                     format("Errors found parsing EMS Runtime Language program or subroutine = {}", state.dataRuntimeLang->ErlStack(StackNum).Name));
-                for (ErrorNum = 1; ErrorNum <= state.dataRuntimeLang->ErlStack(StackNum).NumErrors; ++ErrorNum) {
+                for (int ErrorNum = 1; ErrorNum <= state.dataRuntimeLang->ErlStack(StackNum).NumErrors; ++ErrorNum) {
                     ShowContinueError(state, state.dataRuntimeLang->ErlStack(StackNum).Error(ErrorNum));
                 }
                 ErrorsFound = true;
