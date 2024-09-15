@@ -4608,8 +4608,6 @@ void ProduceRDDMDD(EnergyPlusData &state)
                     timeStepName = timeStepTypeNames[(int)ddVar->timeStepType];
                     storeTypeName = storeTypeNames[(int)ddVar->storeType];
                     varName = ddVar->name;
-                    std::string_view unFitName =
-                        (ddVar->units == Constant::Units::customEMS) ? ddVar->unitNameCustomEMS : Constant::unitNames[(int)ddVar->units];
 
                     if (op->ProduceReportVDD == ReportVDD::Yes) {
                         print(state.files.rdd, "{},{},{} [{}]\n", timeStepName, storeTypeName, varName, unitName);
