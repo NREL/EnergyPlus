@@ -100,7 +100,7 @@ namespace Material {
                 if (prevPhaseChangeState == Phase::Freezing || prevPhaseChangeState == Phase::Transition) {
                     phaseChangeState = Phase::Transition;
                 }
-            } else if (updatedTempTDT > TempHighPCM) {
+            } else {
                 phaseChangeState = Phase::Liquid;
             }
         } else { // phaseChangeDeltaT > 0
@@ -114,7 +114,7 @@ namespace Material {
                 if (prevPhaseChangeState == Phase::Melting || prevPhaseChangeState == Phase::Transition) {
                     phaseChangeState = Phase::Transition;
                 }
-            } else if (updatedTempTDT > TempHighPCF) {
+            } else {
                 phaseChangeState = Phase::Liquid;
             }
         }
