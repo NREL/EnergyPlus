@@ -52,13 +52,15 @@
 
 namespace EnergyPlus {
 
-template <> EnumParser<Window::WindowsModel>::EnumParser() // LOL
-{
-    m_Map["BUILTINWINDOWSMODEL"] = Window::WindowsModel::BuiltIn;
-    m_Map["EXTERNALWINDOWSMODEL"] = Window::WindowsModel::External;
-}
-
 namespace Window {
+
+    constexpr std::array<std::string_view, (int)OpticalDataModel::Num> opticalDataModelNames = {
+        "SpectralAverage", "Spectral", "BSDF", "SpectralAndAngle"};
+
+    constexpr std::array<std::string_view, (int)OpticalDataModel::Num> opticalDataModelNamesUC = {
+        "SPECTRALAVERAGE", "SPECTRAL", "BSDF", "SPECTRALANDANGLE"};
+
+    constexpr std::array<std::string_view, (int)WindowsModel::Num> windowsModelNamesUC = {"BUILTINWINDOWSMODEL", "EXTERNALWINDOWSMODEL"};
 
     /////////////////////////////////////////////////////////////////////////////////////////
     //  CWindowModel
@@ -78,20 +80,20 @@ namespace Window {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Reads input and creates instance of WindowModel object
-        int NumNums;
-        int NumAlphas;
-        int IOStat;
 
         auto aModel = std::make_unique<CWindowModel>(); // (AUTO_OK)
         int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, objectName);
         if (numCurrModels > 0) {
+            int NumNums;
+            int NumAlphas;
+            int IOStat;
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, objectName, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
             // Please consider using getEnumValue pattern here.
             // Consider that you are creating an entire map for the
             // sole purpose of looking up a single element
-            EnumParser<WindowsModel> aParser;
-            aModel->m_Model = aParser.StringToEnum(state, state.dataIPShortCut->cAlphaArgs(1));
+
+            aModel->m_Model = static_cast<WindowsModel>(getEnumValue(windowsModelNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
         }
 
         return aModel;

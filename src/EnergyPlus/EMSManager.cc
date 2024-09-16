@@ -1699,10 +1699,11 @@ namespace EMSManager {
         // Loop thru SurfaceWindow and register any shading controls
 
         for (int loopSurfNum = 1; loopSurfNum <= state.dataSurface->TotSurfaces; ++loopSurfNum) {
+            auto &surf = state.dataSurface->Surface(loopSurfNum);
 
-            if (state.dataSurface->Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(loopSurfNum).ExtBoundCond != DataSurfaces::ExternalEnvironment) continue;
-            if (!state.dataSurface->Surface(loopSurfNum).HasShadeControl) continue;
+            if (surf.Class != DataSurfaces::SurfaceClass::Window) continue;
+            if (surf.ExtBoundCond != DataSurfaces::ExternalEnvironment) continue;
+            if (!surf.HasShadeControl) continue;
 
             if (state.dataSurface->SurfWinHasShadeOrBlindLayer(loopSurfNum)) {
                 SetupEMSActuator(state,
@@ -1712,16 +1713,18 @@ namespace EMSManager {
                                  "[ShadeStatus]",
                                  state.dataSurface->SurfWinShadingFlagEMSOn(loopSurfNum),
                                  state.dataSurface->SurfWinShadingFlagEMSValue(loopSurfNum));
-                if (state.dataSurface->SurfWinMovableSlats(loopSurfNum)) {
+
+                auto &surfShade = state.dataSurface->surfShades(loopSurfNum);
+                if (surfShade.blind.movableSlats) {
                     SetupEMSActuator(state,
                                      "Window Shading Control",
-                                     state.dataSurface->Surface(loopSurfNum).Name,
+                                     surf.Name,
                                      "Slat Angle",
                                      "[degrees]",
-                                     state.dataSurface->SurfWinSlatAngThisTSDegEMSon(loopSurfNum),
-                                     state.dataSurface->SurfWinSlatAngThisTSDegEMSValue(loopSurfNum));
+                                     surfShade.blind.slatAngDegEMSon,
+                                     surfShade.blind.slatAngDegEMSValue);
                 }
-            } else if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(loopSurfNum).activeWindowShadingControl).ShadingType ==
+            } else if (state.dataSurface->WindowShadingControl(surf.activeWindowShadingControl).ShadingType ==
                        DataSurfaces::WinShadingType::ExtScreen) {
                 SetupEMSActuator(state,
                                  "Window Shading Control",

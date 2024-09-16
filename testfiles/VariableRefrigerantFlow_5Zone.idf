@@ -1,7 +1,7 @@
 ! VariableRefrigerantFlow_5Zone.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              Varible Refrigerant Flow AC system
+! Highlights:              Variable Refrigerant Flow AC system
 !
 ! Simulation Location/Run: Miami Intl Ap FL USA TMY3 722020, 2 design days, 2 run periods,
 !
@@ -519,10 +519,36 @@
     20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
     ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
     TU1-NightCycleManagerList,  !- Availability Manager List Name
-    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    VRFSizingRules1,         !- Design Specification ZoneHVAC Sizing Object Name
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
     ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
+
+  DesignSpecification:ZoneHVAC:Sizing,
+    VRFSizingRules1,         !- Name
+    SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
+    0.0,                     !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- No Load Fraction of Cooling Supply Air Flow Rate
+    ,                        !- No Load Fraction of Heating Supply Air Flow Rate
+    SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Heating Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    CapacityPerFloorArea,    !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W}
+    156.89549,               !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- Fraction of Autosized Heating Design Capacity
 
   AvailabilityManagerAssignmentList,
     TU1-NightCycleManagerList,  !- Name
