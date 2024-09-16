@@ -2668,45 +2668,12 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         if ((mat->LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ) ||
-            (mat->LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ)) {
-            if (s_ipsc->rNumericArgs(11) <= 0.0) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(
-                    state, eoh, format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(11), s_ipsc->rNumericArgs(11)));
-            }
-
-            if (s_ipsc->rNumericArgs(12) <= 0.0) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(
-                    state, eoh, format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(12), s_ipsc->rNumericArgs(12)));
-            }
-
-            if (s_ipsc->rNumericArgs(13) <= 0.0) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(
-                    state, eoh, format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(13), s_ipsc->rNumericArgs(13)));
-            }
-
-            if ((s_ipsc->rNumericArgs(14) < -90.0) || (s_ipsc->rNumericArgs(14) > 90.0)) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(
-                    state,
-                    eoh,
-                    format("{} must be >=-90 and <=90, entered value = {:.2R}", s_ipsc->cNumericFieldNames(14), s_ipsc->rNumericArgs(14)));
-            }
-
-            if (s_ipsc->rNumericArgs(15) <= 0.0) {
-                ErrorsFound = true;
-                ShowSevereCustomMessage(
-                    state, eoh, format("{} must be >0, entered value = {:.2R}", s_ipsc->cNumericFieldNames(15), s_ipsc->rNumericArgs(15)));
-            }
-
-            if ((s_ipsc->rNumericArgs(16) < 0.0) ||
-                ((s_ipsc->rNumericArgs(16) > 0.0) && (s_ipsc->rNumericArgs(16) < (s_ipsc->rNumericArgs(11) / 2)))) {
+            (mat->LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_VERT)) {
+            if ((s_ipsc->rNumericArgs(16) > 0.0) && (s_ipsc->rNumericArgs(16) < (s_ipsc->rNumericArgs(11) / 2))) {
                 ErrorsFound = true;
                 ShowSevereCustomMessage(state,
                                         eoh,
-                                        format("{} must be =0 or greater than SlatWidth/2, entered value = {:.2R}",
+                                        format("{} must be = 0 or greater than SlatWidth/2, entered value = {:.2R}",
                                                s_ipsc->cNumericFieldNames(16),
                                                s_ipsc->rNumericArgs(16)));
             }
