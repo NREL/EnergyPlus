@@ -54,7 +54,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from sys import argv
+from os import path
+from sys import argv, exit
 
 summary_input_md_file = argv[1]
 summary_output_js_file = argv[2]
@@ -62,6 +63,12 @@ matrix_os = argv[3]
 github_sha = argv[4]
 github_run_id = argv[5]
 artifact_url = argv[6]
+
+if not path.exists(summary_input_md_file):
+    print("Regression script shows failure exit code, but could not find summary file.")
+    print("This generally indicates that the regression script had an unhandled failure.")
+    print("Check the 'Run Regressions' GitHub Action step above for more helpful information")
+    exit(1)
 
 with open(summary_input_md_file) as md:
     md_contents = md.read()
