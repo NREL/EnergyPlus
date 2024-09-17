@@ -61,9 +61,9 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-// #if LINK_WITH_PYTHON
-// #include <EnergyPlus/PythonEngine.hh>
-// #endif
+#if LINK_WITH_PYTHON
+#include <EnergyPlus/PythonEngine.hh>
+#endif
 
 namespace EnergyPlus {
 
@@ -234,29 +234,36 @@ Built on Platform: {}
         // bool debugCLI = false;
         app.add_flag("--debug-cli", debugCLI, "Print the result of the CLI assignments to the console and exit")->group(""); // Empty group to hide it
 
-        // #if LINK_WITH_PYTHON
-        //         // static constexpr std::array<std::string_view, 6> logLevelStrs = {"Trace", "Debug", "Info", "Warn", "Error", "Fatal"};
-        //
-        //         auto *auxiliaryToolsSubcommand = app.add_subcommand("auxiliary", "Run Auxiliary Python Tools");
-        //         auxiliaryToolsSubcommand->require_subcommand(); // should default to requiring 1 or more additional args?
-        //         std::vector<std::string> python_fwd_args;
-        //
-        //         auto *epLaunchSubcommand = auxiliaryToolsSubcommand->add_subcommand("eplaunch", "EP-Launch");
-        //         epLaunchSubcommand->callback([&state, &python_fwd_args] {
-        //             fs::path programDir = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
-        //             fs::path const pathToPythonPackages = programDir / "python_lib";
-        //             fs::path const tclLibraryDir = pathToPythonPackages / "tcl8.6"; // TODO: Find this dynamically
-        //             std::string tclLib = "TCL_LIBRARY=" + tclLibraryDir.string();
-        //
-        //             putenv(tclLib.c_str());
-        //             fs::path const pathToEPLaunchExe = pathToPythonPackages / "bin" / "energyplus_launch.exe";
-        //             system(pathToEPLaunchExe.string().c_str());
-        //
-        //
-        //             exit(0);
-        //         });
-        //
-        // #endif
+        #if LINK_WITH_PYTHON
+        auto *auxiliaryToolsSubcommand = app.add_subcommand("auxiliary", "Run Auxiliary Python Tools");
+        auxiliaryToolsSubcommand->require_subcommand(); // should default to requiring 1 or more additional args?
+
+        std::vector<std::string> python_fwd_args;
+        auto *epLaunchSubCommand = auxiliaryToolsSubcommand->add_subcommand("eplaunch", "EnergyPlus Launch");
+        epLaunchSubCommand->add_option("args", python_fwd_args, "Extra Arguments forwarded to EnergyPlus Launch")->option_text("ARG ...");
+        epLaunchSubCommand->positionals_at_end(true);
+        epLaunchSubCommand->footer("You can pass extra arguments after the eplaunch keyword, they will be forwarded to EnergyPlus Launch.");
+
+        epLaunchSubCommand->callback([&state, &python_fwd_args] {
+            EnergyPlus::Python::PythonEngine engine(state);
+            // There's probably better to be done, like instantiating the pythonEngine with the argc/argv then calling PyRun_SimpleFile but whatever
+            std::string cmd = R"python(import sys
+sys.argv.clear()
+sys.argv.append("energyplus")
+)python";
+            for (const auto &arg : python_fwd_args) {
+                cmd += fmt::format("sys.argv.append(\"{}\")\n", arg);
+            }
+
+            cmd += R"python(
+from eplaunch.tk_runner import main_gui
+main_gui()
+)python";
+
+            engine.exec(cmd);
+            exit(0);
+        });
+        #endif
 
         app.footer("Example: energyplus -w weather.epw -r input.idf");
 

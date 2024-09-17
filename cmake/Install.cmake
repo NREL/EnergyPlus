@@ -384,7 +384,6 @@ if(WIN32)
   install(FILES "${PROJECT_SOURCE_DIR}/scripts/Epl-run.bat" DESTINATION "./")
   install(FILES "${PROJECT_SOURCE_DIR}/scripts/RunDirMulti.bat" DESTINATION "./")
   install(FILES "${PROJECT_SOURCE_DIR}/release/RunEP.ico" DESTINATION "./")
-  install(FILES "${PROJECT_SOURCE_DIR}/release/RunEPLaunch.bat" DESTINATION "./")
   install(FILES "${PROJECT_SOURCE_DIR}/scripts/RunEPlus.bat" DESTINATION "./")
   install(FILES "${PROJECT_SOURCE_DIR}/scripts/RunReadESO.bat" DESTINATION "./")
   install(FILES "${PROJECT_SOURCE_DIR}/release/Runep.pif" DESTINATION "./")
@@ -482,7 +481,6 @@ if(WIN32)
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/MSINET.OCX" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Msvcrtd.dll" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Vsflex7L.ocx" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
-
 endif()
 
 # The group, which will be used to configure the root package
