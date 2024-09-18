@@ -16048,11 +16048,11 @@ void CollectPeakZoneConditions(EnergyPlusData &state,
     if (timeOfMax != 0) {
 
         auto const &thisZone = state.dataHeatBal->Zone(zoneIndex);
+        Real64 mult = thisZone.Multiplier * thisZone.ListMultiplier;
         auto const &szCalcFinalSizing =
             (spaceIndex == 0) ? state.dataSize->CalcFinalZoneSizing(zoneIndex) : state.dataSize->CalcFinalSpaceSizing(spaceIndex);
         auto const &szFinalSizing = (spaceIndex == 0) ? state.dataSize->FinalZoneSizing(zoneIndex) : state.dataSize->FinalSpaceSizing(spaceIndex);
 
-        Real64 mult = thisZone.Multiplier * thisZone.ListMultiplier;
         if (mult == 0.0) mult = 1.0;
 
         if (isCooling) {

@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -105,6 +106,19 @@ namespace HVACManager {
 
     void ReportAirHeatBalance(EnergyPlusData &state);
 
+    void reportAirHeatBal1(EnergyPlusData &state,
+                           DataHeatBalance::AirReportVars &szAirRpt,
+                           DataZoneEquipment::EquipConfiguration const &szEquipConfig,
+                           int const zoneNum,
+                           int const spaceNum = 0);
+
+    void reportAirHeatBal2(EnergyPlusData &state,
+                           DataHeatBalance::AirReportVars &szAirRpt,
+                           DataZoneEquipment::EquipConfiguration const &szEquipConfig,
+                           ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData const &szHeatBal,
+                           int const zoneNum,
+                           int const spaceNum = 0);
+
     void SetHeatToReturnAirFlag(EnergyPlusData &state);
 
     void UpdateZoneInletConvergenceLog(EnergyPlusData &state);
@@ -128,7 +142,6 @@ struct HVACManagerData : BaseGlobalStruct
     int RepIterAir = 0;
     bool SimHVACIterSetup = false;
     bool TriggerGetAFN = true;
-    bool ReportAirHeatBalanceFirstTimeFlag = true;
     bool MyOneTimeFlag = true;
     bool PrintedWarmup = false;
     bool MyEnvrnFlag = true;
@@ -140,8 +153,6 @@ struct HVACManagerData : BaseGlobalStruct
     int ErrCount = 0; // Number of times that the maximum iterations was exceeded
     int MaxErrCount = 0;
     std::string ErrEnvironmentName;
-    Array1D<Real64> MixSenLoad; // Mixing sensible loss or gain
-    Array1D<Real64> MixLatLoad; // Mixing latent loss or gain
 
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {

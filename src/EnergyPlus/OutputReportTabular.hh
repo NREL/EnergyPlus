@@ -792,7 +792,8 @@ namespace OutputReportTabular {
                                    Array3D<Real64> &feneCondInstantSeqLoc,
                                    Array2D<Real64> &surfDelaySeq,
                                    ZompComponentAreasType &componentAreas,
-                                   int const iZone, int const iSpace = 0);
+                                   int const iZone,
+                                   int const iSpace = 0);
 
     void GetDelaySequences(EnergyPlusData &state,
                            int desDaySelected,
