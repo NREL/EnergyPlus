@@ -14763,19 +14763,16 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
     auto const &ort = state.dataOutRptTab;
 
     if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
-        state.dataOutRptTab->TimeStepInDayGCLS =
-            (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-        ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, _) = 0.0;
-        for (state.dataOutRptTab->iSurfGCLS = 1; state.dataOutRptTab->iSurfGCLS <= state.dataSurface->TotSurfaces; ++state.dataOutRptTab->iSurfGCLS) {
-            state.dataOutRptTab->ZoneNumGCLS = state.dataSurface->Surface(state.dataOutRptTab->iSurfGCLS).Zone;
-            if (state.dataOutRptTab->ZoneNumGCLS == 0) continue;
-            if (state.dataSurface->Surface(state.dataOutRptTab->iSurfGCLS).Class != DataSurfaces::SurfaceClass::Window) continue;
+        int timeStepInDayGCLS = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+        ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLS, _) = 0.0;
+        for (int iSurfGCLS = 1; iSurfGCLS <= state.dataSurface->TotSurfaces; ++iSurfGCLS) {
+            int zoneNumGCLS = state.dataSurface->Surface(iSurfGCLS).Zone;
+            if (zoneNumGCLS == 0) continue;
+            if (state.dataSurface->Surface(iSurfGCLS).Class != DataSurfaces::SurfaceClass::Window) continue;
             // IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
-            ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, state.dataOutRptTab->ZoneNumGCLS) +=
-                state.dataSurface->SurfWinGainConvGlazToZoneRep(state.dataOutRptTab->iSurfGCLS) +
-                state.dataSurface->SurfWinConvHeatFlowNatural(state.dataOutRptTab->iSurfGCLS) +
-                state.dataSurface->SurfWinGainConvShadeToZoneRep(state.dataOutRptTab->iSurfGCLS) +
-                state.dataSurface->SurfWinGainFrameDividerToZoneRep(state.dataOutRptTab->iSurfGCLS);
+            ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLS, zoneNumGCLS) +=
+                state.dataSurface->SurfWinGainConvGlazToZoneRep(iSurfGCLS) + state.dataSurface->SurfWinConvHeatFlowNatural(iSurfGCLS) +
+                state.dataSurface->SurfWinGainConvShadeToZoneRep(iSurfGCLS) + state.dataSurface->SurfWinGainFrameDividerToZoneRep(iSurfGCLS);
             // for now assume zero instant solar - may change related
             // to how blinds and shades absorb solar radiation and
             // convect that heat that timestep.
@@ -14784,7 +14781,7 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
         for (int izone = 1; izone <= state.dataGlobal->NumOfZones; ++izone) {
             Real64 tubularGain = 0.0;
             tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, OutputReportTabular::IntGainTypesTubularGCLS);
-            ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, izone) += tubularGain;
+            ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLS, izone) += tubularGain;
         }
     }
 }
@@ -14794,8 +14791,6 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer
     //       DATE WRITTEN   September 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //   Gather values during sizing used for loads component report.
@@ -14803,72 +14798,62 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     //   Save sequence of values for report during sizing.
 
-    // Using/Aliasing
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
     if (!(state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing)) {
         return;
     }
     auto &ort = state.dataOutRptTab;
     Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    state.dataOutRptTab->TimeStepInDayGCLH = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-    for (state.dataOutRptTab->iZoneGCLH = 1; state.dataOutRptTab->iZoneGCLH <= state.dataGlobal->NumOfZones; ++state.dataOutRptTab->iZoneGCLH) {
-        ort->infilInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
-            ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatGain -
-              state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatLoss) /
+    int timeStepInDayGCLH = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+    for (int iZoneGCLH = 1; iZoneGCLH <= state.dataGlobal->NumOfZones; ++iZoneGCLH) {
+        ort->infilInstantSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) =
+            ((state.dataHeatBal->ZnAirRpt(iZoneGCLH).InfilHeatGain - state.dataHeatBal->ZnAirRpt(iZoneGCLH).InfilHeatLoss) /
              TimeStepSysSec); // zone infiltration
         if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
-            ort->infilInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenGainW -
-                 state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenLossW); // air flow network
+            ort->infilInstantSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) +=
+                (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiSenGainW -
+                 state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiSenLossW); // air flow network
         }
-        ort->infilLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
-            ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentGain -
-              state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentLoss) /
+        ort->infilLatentSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) =
+            ((state.dataHeatBal->ZnAirRpt(iZoneGCLH).InfilLatentGain - state.dataHeatBal->ZnAirRpt(iZoneGCLH).InfilLatentLoss) /
              TimeStepSysSec); // zone infiltration
         if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
-            ort->infilLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatGainW -
-                 state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatLossW); // air flow network
+            ort->infilLatentSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) +=
+                (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiLatGainW -
+                 state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiLatLossW); // air flow network
         }
 
-        ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
-            ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatGain -
-              state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatLoss) /
+        ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) =
+            ((state.dataHeatBal->ZnAirRpt(iZoneGCLH).VentilHeatGain - state.dataHeatBal->ZnAirRpt(iZoneGCLH).VentilHeatLoss) /
              TimeStepSysSec); // zone ventilation
         if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
-            ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenGainW -
-                 state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenLossW); // air flow network
+            ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) +=
+                (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentSenGainW -
+                 state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentSenLossW); // air flow network
         }
-        ort->zoneVentLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
-            ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentGain -
-              state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentLoss) /
+        ort->zoneVentLatentSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) =
+            ((state.dataHeatBal->ZnAirRpt(iZoneGCLH).VentilLatentGain - state.dataHeatBal->ZnAirRpt(iZoneGCLH).VentilLatentLoss) /
              TimeStepSysSec); // zone ventilation
         if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
-            ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatGainW -
-                 state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatLossW); // air flow network
+            ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) +=
+                (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentLatGainW -
+                 state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentLatLossW); // air flow network
         }
 
-        ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
-            ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatGain -
-              state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatLoss) /
+        ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) =
+            ((state.dataHeatBal->ZnAirRpt(iZoneGCLH).MixHeatGain - state.dataHeatBal->ZnAirRpt(iZoneGCLH).MixHeatLoss) /
              TimeStepSysSec); // zone mixing
         if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
-            ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenGainW -
-                 state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenLossW); // air flow network
+            ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) +=
+                (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixSenGainW -
+                 state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixSenLossW); // air flow network
         }
-        ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
-            ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentGain -
-              state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentLoss) /
+        ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) =
+            ((state.dataHeatBal->ZnAirRpt(iZoneGCLH).MixLatentGain - state.dataHeatBal->ZnAirRpt(iZoneGCLH).MixLatentLoss) /
              TimeStepSysSec); // zone mixing
         if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
-            ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatGainW -
-                 state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatLossW); // air flow network
+            ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, timeStepInDayGCLH, iZoneGCLH) +=
+                (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixLatGainW -
+                 state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixLatLossW); // air flow network
         }
     }
 }

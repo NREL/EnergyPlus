@@ -1332,11 +1332,6 @@ struct OutputReportTabularData : BaseGlobalStruct
     int TimeOfPulseCLCDC = 0;
     int CoolDesSelectedCLCDC = 0; // design day selected for cooling
     int HeatDesSelectedCLCDC = 0; // design day selected for heating
-    int iSurfGCLS = 0;
-    int ZoneNumGCLS = 0;
-    int TimeStepInDayGCLS = 0;
-    int iZoneGCLH = 0;
-    int TimeStepInDayGCLH = 0;
     Array3D_bool adjFenDone;
     Real64 BigNumRMG = 0.0;
     int foundGsui = 0;
@@ -1638,11 +1633,6 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->TimeOfPulseCLCDC = 0;
         this->CoolDesSelectedCLCDC = 0; // design day selected for cooling
         this->HeatDesSelectedCLCDC = 0; // design day selected for heating
-        this->iSurfGCLS = 0;
-        this->ZoneNumGCLS = 0;
-        this->TimeStepInDayGCLS = 0;
-        this->iZoneGCLH = 0;
-        this->TimeStepInDayGCLH = 0;
         this->adjFenDone.clear();
         this->BigNumRMG = 0.0;
         this->foundGsui = 0;
