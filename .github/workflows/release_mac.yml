@@ -1,4 +1,4 @@
-name: Releases
+name: Mac Releases
 
 on:
   push:
