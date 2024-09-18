@@ -2549,6 +2549,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // will not shut down the branch
     auto &thisInletNode = state.dataLoopNodes->Node(this->loadSideNodes.inlet);
     auto &thisOutletNode = state.dataLoopNodes->Node(this->loadSideNodes.outlet);
+    auto &thisSourceSideInletNode = state.dataLoopNodes->Node(this->sourceSideNodes.inlet); // OA Intake node
     auto &sim_component = DataPlant::CompData::getPlantComponent(state, this->loadSidePlantLoc);
     if ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad <= 0.0)) {
         if (sim_component.FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) this->loadSideMassFlowRate = thisInletNode.MassFlowRate;
@@ -2720,10 +2721,10 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // Determine which air variable to use for GAHP:
     // Source (air) side variable to use
     // auto &thisloadsideinletnode = state.dataLoopNodes->Node(this->loadSideNodes.inlet);
-    Real64 oaTempforCurve = thisInletNode.Temp; // state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+    Real64 oaTempforCurve = this->sourceSideInletTemp; // state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
     if (this->oaTempCurveInputVar == OATempCurveVar::WetBulb) {
-        oaTempforCurve =
-            Psychrometrics::PsyTwbFnTdbWPb(state, thisInletNode.Temp, thisInletNode.HumRat, thisInletNode.Press, "PLFFHPEIR::doPhysics()");
+        oaTempforCurve = Psychrometrics::PsyTwbFnTdbWPb(
+            state, thisSourceSideInletNode.Temp, thisSourceSideInletNode.HumRat, thisSourceSideInletNode.Press, "PLFFHPEIR::doPhysics()");
     }
 
     // Load (water) side temperature variable
@@ -2733,10 +2734,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
 
     // evaluate capacity modifier curve and determine load side heat transfer
-    Real64 capacityModifierFuncTemp =
-        // CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
-        // CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, oaTempforCurve);
-        Curve::CurveValue(state, this->capFuncTempCurveIndex, waterTempforCurve, oaTempforCurve);
+    Real64 capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, waterTempforCurve, oaTempforCurve);
 
     if (capacityModifierFuncTemp < 0.0) {
         if (this->capModFTErrorIndex == 0) {

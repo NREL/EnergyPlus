@@ -541,7 +541,7 @@ namespace DXCoils {
                    ObjexxFCL::Optional<Real64 const> PartLoadRatio = _,              // part load ratio (for single speed cycling unit)
                    ObjexxFCL::Optional<Real64 const> OnOffAFR = _,                   // ratio of compressor on airflow to compressor off airflow
                    ObjexxFCL::Optional<Real64 const> CoilCoolingHeatingPLRRatio = _, // used for cycling fan RH control
-                   ObjexxFCL::Optional<Real64 const> MaxCap = _,                     // maximum cooling capacity of VRF terminal units
+                   ObjexxFCL::Optional<Real64 const> MaxCap = Constant::MaxCap,      // maximum cooling capacity of VRF terminal units
                    ObjexxFCL::Optional<Real64 const> CompCyclingRatio = _            // cycling ratio of VRF condenser connected to this TU
     );
 
@@ -878,7 +878,8 @@ namespace DXCoils {
                                   HVAC::FanOp const fanOp,                // Allows parent object to control fan operation
                                   Real64 const CompCycRatio,              // cycling ratio of VRF condenser
                                   ObjexxFCL::Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
-                                  ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio // ratio of compressor on airflow to compressor off airflow
+                                  ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
+                                  Real64 MaxCoolCap = Constant::MaxCap                 // maximum allowed cooling capacity
     );
 
     void

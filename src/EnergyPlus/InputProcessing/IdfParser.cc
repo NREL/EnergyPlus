@@ -659,14 +659,13 @@ std::string IdfParser::parse_string(std::string_view idf, size_t &index)
     eat_whitespace(idf, index);
 
     std::string str;
-    char c;
 
     while (true) {
         if (index == idf_size) {
             break;
         }
 
-        c = idf[index];
+        char c = idf[index];
         increment_both_index(index, index_into_cur_line);
         if (c == ',' || c == ';' || c == '!') {
             decrement_both_index(index, index_into_cur_line);

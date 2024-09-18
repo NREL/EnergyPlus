@@ -619,6 +619,8 @@ namespace Constant {
     Real64 constexpr UniversalGasConst = 8314.462175;       // Universal Gas Constant (J/mol*K)
     Real64 constexpr convertJtoGJ = 1.0E-9;                 // Conversion factor for J to GJ
 
+    Real64 constexpr MaxCap(1.0e+20); // limit of zone terminal unit capacity
+
 } // namespace Constant
 
 } // namespace EnergyPlus
