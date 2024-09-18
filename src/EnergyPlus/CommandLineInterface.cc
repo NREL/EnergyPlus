@@ -275,7 +275,7 @@ sys.argv.append("energyplus")
                     }
                 }
             }
-            cmd += fmt::format("from os import environ\n");
+            cmd += "from os import environ\n";
             cmd += fmt::format("environ[\'TCL_LIBRARY\'] = \"{}/{}\"\n", sPathToPythonPackages, tclConfigDir);
 
             cmd += R"python(
