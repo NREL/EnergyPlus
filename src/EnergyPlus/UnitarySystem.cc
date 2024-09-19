@@ -3153,7 +3153,7 @@ namespace UnitarySystems {
                 state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = HVAC::AutoCalculateSizing;
                 this->m_DesignHeatingCapacity = DataSizing::AutoSize;
-                if (this->m_CoolingCoilType_Num == HVAC::Coil_CoolingWaterToAirHPSimple)
+                if (this->m_CoolingCoilType_Num == HVAC::Coil_CoolingWaterToAirHPSimple) {
                     // adjusted cooling coil capacity
                     WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
                                                                     blankString,
@@ -3164,7 +3164,6 @@ namespace UnitarySystems {
                                                                     HVAC::CompressorOp::Off,
                                                                     0.0,
                                                                     FirstHVACIteration);
-                if (this->m_CoolCoilExists) {
                     state.dataSize->DataConstantUsedForSizing = WaterToAirHeatPumpSimple::GetCoilCapacity(
                         state, HVAC::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
                     EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
