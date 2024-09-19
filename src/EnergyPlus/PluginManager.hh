@@ -60,16 +60,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 #if LINK_WITH_PYTHON
-#ifdef _DEBUG
-// We don't want to try to import a debug build of Python here
-// so if we are building a Debug build of the C++ code, we need
-// to undefine _DEBUG during the #include command for Python.h.
-// Otherwise it will fail
-#undef _DEBUG
-#include <Python.h>
-#define _DEBUG
-#else
-#include <Python.h>
+#ifndef PyObject_HEAD
+struct _object;
+using PyObject = _object;
 #endif
 #endif
 
@@ -175,6 +168,7 @@ namespace PluginManagement {
 #endif
     };
 
+    // TODO: Make this use PythonEngine so we don't duplicate code
     class PluginManager
     {
     public:
