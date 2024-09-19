@@ -12198,8 +12198,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         }
     }
 
-    this->TotalCoolingCapacity = TotalCondCoolingCapacity * CoolingPLR;
-    this->TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR;
+    this->TotalCoolingCapacity = TotalCondCoolingCapacity * CoolingPLR * CyclingRatio;
+    this->TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR * CyclingRatio;
 
     if (this->MinPLR > 0.0) {
         bool const plrTooLow = this->VRFCondPLR < this->MinPLR;
