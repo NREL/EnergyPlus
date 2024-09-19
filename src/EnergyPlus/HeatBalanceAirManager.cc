@@ -286,7 +286,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     // Following used for reporting
     state.dataHeatBal->ZnAirRpt.allocate(state.dataGlobal->NumOfZones);
-    if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+    if (state.dataHeatBal->doSpaceHeatBalance) {
         state.dataHeatBal->spaceAirRpt.allocate(state.dataGlobal->numSpaces);
     }
 

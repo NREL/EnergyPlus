@@ -2238,7 +2238,12 @@ void ReportInfiltrations(EnergyPlusData &state)
         AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisSpaceHB.MAT, thisSpaceHB.airHumRatAvg, RoutineName);
         thisInfiltration.InfilVdotCurDensity = thisInfiltration.InfilMdot / AirDensity;
         thisInfiltration.InfilVolumeCurDensity = thisInfiltration.InfilVdotCurDensity * TimeStepSysSec;
-        thisInfiltration.InfilAirChangeRate = thisInfiltration.InfilVolumeCurDensity / (TimeStepSys * thisZone.Volume);
+        Real64 vol = state.dataHeatBal->space(spaceNum).Volume;
+        if (vol > 0.0) {
+            thisInfiltration.InfilAirChangeRate = thisInfiltration.InfilVolumeCurDensity / (TimeStepSys * vol);
+        } else {
+            thisInfiltration.InfilAirChangeRate = 0.0;
+        }
 
         // CR7751 third, calculate using standard dry air at nominal elevation
         AirDensity = state.dataEnvrn->StdRhoAir;
@@ -2445,7 +2450,7 @@ void reportAirHeatBal2(EnergyPlusData &state,
 
     for (int VentNum = 1; VentNum <= state.dataHeatBal->TotVentilation; ++VentNum) {
         auto const &ventilation = state.dataHeatBal->Ventilation(VentNum);
-        if (((spaceNum == 0) && (ventilation.ZonePtr == zoneNum)) || (spaceNum == ventilation.spaceIndex)) {
+        if (((spaceNum == 0) && (ventilation.ZonePtr == zoneNum)) || ((spaceNum > 0) && (spaceNum == ventilation.spaceIndex))) {
             if (ADSCorrectionFactor > 0) {
                 szAirRpt.VentilAirTemp += ventilation.AirTemp * ventilation.MCP;
                 VentZoneMassflow += ventilation.MCP;
@@ -2508,7 +2513,7 @@ void reportAirHeatBal2(EnergyPlusData &state,
 
     for (int MixNum = 1; MixNum <= state.dataHeatBal->TotMixing; ++MixNum) {
         auto &mixing = state.dataHeatBal->Mixing(MixNum);
-        if ((((spaceNum == 0) && (mixing.ZonePtr == zoneNum)) || (spaceNum == mixing.spaceIndex)) && mixing.ReportFlag) {
+        if (mixing.ReportFlag && (((spaceNum == 0) && (mixing.ZonePtr == zoneNum)) || ((spaceNum > 0) && (spaceNum == mixing.spaceIndex)))) {
             Real64 const fromMAT = (mixing.fromSpaceIndex == 0) ? state.dataZoneTempPredictorCorrector->zoneHeatBalance(mixing.FromZone).MAT
                                                                 : state.dataZoneTempPredictorCorrector->spaceHeatBalance(mixing.fromSpaceIndex).MAT;
             Real64 const fromHumRat = (mixing.fromSpaceIndex == 0)
@@ -2536,7 +2541,8 @@ void reportAirHeatBal2(EnergyPlusData &state,
 
     for (int MixNum = 1; MixNum <= state.dataHeatBal->TotCrossMixing; ++MixNum) {
         auto &crossMixing = state.dataHeatBal->CrossMixing(MixNum);
-        if ((((spaceNum == 0) && (crossMixing.ZonePtr == zoneNum)) || (spaceNum == crossMixing.spaceIndex)) && crossMixing.ReportFlag) {
+        if (crossMixing.ReportFlag &&
+            ((((spaceNum == 0) && (crossMixing.ZonePtr == zoneNum)) || (spaceNum > 0) && (spaceNum == crossMixing.spaceIndex)))) {
             Real64 const fromMAT = (crossMixing.fromSpaceIndex == 0)
                                        ? state.dataZoneTempPredictorCorrector->zoneHeatBalance(crossMixing.FromZone).MAT
                                        : state.dataZoneTempPredictorCorrector->spaceHeatBalance(crossMixing.fromSpaceIndex).MAT;
@@ -2560,7 +2566,8 @@ void reportAirHeatBal2(EnergyPlusData &state,
             //                     ZoneAirHumRat(crossMixing%FromZone))*H2OHtOfVap
             szAirRpt.MixLatLoad += crossMixing.DesiredAirFlowRate * AirDensity * (szHeatBal.airHumRat - fromHumRat) * H2OHtOfVap;
         }
-        if ((((spaceNum == 0) && (crossMixing.FromZone == zoneNum)) || (spaceNum == crossMixing.fromSpaceIndex)) && crossMixing.ReportFlag) {
+        if (crossMixing.ReportFlag &&
+            (((spaceNum == 0) && (crossMixing.FromZone == zoneNum)) || ((spaceNum > 0) && (spaceNum == crossMixing.fromSpaceIndex)))) {
             Real64 const mixingMAT = (crossMixing.spaceIndex == 0)
                                          ? state.dataZoneTempPredictorCorrector->zoneHeatBalance(crossMixing.ZonePtr).MAT
                                          : state.dataZoneTempPredictorCorrector->spaceHeatBalance(crossMixing.spaceIndex).MAT;
@@ -2588,7 +2595,7 @@ void reportAirHeatBal2(EnergyPlusData &state,
         //       in input with lowest zone # first no matter how input in idf
         auto &refDoorMixing = state.dataHeatBal->RefDoorMixing(zoneNum);
         if (refDoorMixing.RefDoorMixFlag) { // .TRUE. for both zoneA and zoneB
-            if ((spaceNum == 0) && (refDoorMixing.ZonePtr == zoneNum) || (spaceNum == refDoorMixing.spaceIndex)) {
+            if (((spaceNum == 0) && (refDoorMixing.ZonePtr == zoneNum)) || ((spaceNum > 0) && (spaceNum == refDoorMixing.spaceIndex))) {
                 for (int j = 1; j <= refDoorMixing.NumRefDoorConnections; ++j) {
                     //    Capture impact when zoneNum is the 'primary zone'
                     //    that is, the zone of a pair with the lower zone number
@@ -2627,7 +2634,8 @@ void reportAirHeatBal2(EnergyPlusData &state,
                 //    that is, the zone of a pair with the higher zone number(matezoneptr = zoneNum)
                 if (refDoorMixingA.RefDoorMixFlag) {
                     for (int j = 1; j <= refDoorMixingA.NumRefDoorConnections; ++j) {
-                        if (refDoorMixingA.MateZonePtr(j) == zoneNum) {
+                        if (((spaceNum == 0) && (refDoorMixingA.MateZonePtr(j) == zoneNum)) ||
+                            ((spaceNum == 0) && (refDoorMixingA.fromSpaceIndex == spaceNum))) {
                             if (refDoorMixingA.VolRefDoorFlowRate(j) > 0.0) {
                                 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                                                state.dataEnvrn->OutBaroPress,
