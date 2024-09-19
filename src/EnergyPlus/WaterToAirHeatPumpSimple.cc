@@ -2740,7 +2740,7 @@ namespace WaterToAirHeatPumpSimple {
 
                 // user provided inputs are assumed to be at rated conditions
                 simpleWatertoAirHP.RatedPowerHeat = simpleWatertoAirHP.RatedCapHeat / simpleWatertoAirHP.RatedCOPHeatAtRatedCdts;
-                simpleWatertoAirHP.RatedCapHeatAtRatedCdts = 0;
+                simpleWatertoAirHP.RatedCapHeatAtRatedCdts = simpleWatertoAirHP.RatedCapHeat;
                 simpleWatertoAirHP.RatedPowerHeatAtRatedCdts = 0;
             }
             // Check that heat pump heating capacity is within 20% of cooling capacity. Check only for heating coil and report both.
