@@ -17,6 +17,8 @@ LINKED_RE = re.compile(
     r"current version (?P<current_version>\d+\.\d+\.\d+)(?:, \w+)?\)"
 )
 
+LINKED_RE_ARM64 = re.compile(f"(?P<libname>.*) \(architecture arm64\)")
+
 
 def get_linked_libraries(p: Path):
     linked_libs = []
@@ -28,6 +30,8 @@ def get_linked_libraries(p: Path):
     for line in lines:
         if m := LINKED_RE.match(line):
             linked_libs.append(m.groupdict())
+        elif m := LINKED_RE_ARM64.match(line):
+            linked_libs.append(m.groupdict())  # it will only have a libname key, I think that's fine
         else:
             raise ValueError(f"For {p}, cannot parse line: '{line}'")
     return linked_libs
@@ -38,7 +42,7 @@ if __name__ == "__main__":
     if platform.system() != "Darwin":
         sys.exit(0)
 
-    print("PYTHON: Copying standard library files")
+    print("PYTHON: Copying and fixing up Tcl/Tk")
 
     if len(sys.argv) == 2:
         python_dir = Path(sys.argv[1])
