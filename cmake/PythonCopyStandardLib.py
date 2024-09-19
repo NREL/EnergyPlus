@@ -122,7 +122,6 @@ if platform.system() == 'Windows':
     python_root_dir = os.path.dirname(standard_lib_dir)
     tcl_dir = os.path.join(python_root_dir, 'tcl')
     shutil.copytree(tcl_dir, target_dir, dirs_exist_ok=True)
-# TODO: Need to do this on Mac as well, see the bottom of cmake/PythonFixUpOnMac.cmake for more info
 
 # then I'm going to try to clean up any __pycache__ folders in the target dir to reduce installer size
 for root, dirs, _ in os.walk(target_dir):
