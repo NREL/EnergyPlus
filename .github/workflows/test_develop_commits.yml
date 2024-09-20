@@ -2,7 +2,7 @@ name: Develop Branch Testing
 
 on:
   push:
-    branches: [ develop ]  # run this on all commits to the develop branch
+    branches: [ develop, fixPythonEngineBuild ]  # run this on all commits to the develop branch
 
 defaults:
   run:
@@ -58,13 +58,13 @@ jobs:
 #          nproc: 4
 #          pretty: "Standard Build on Windows VS 2022"
 #          alternate: false
-#        - os: ubuntu-24.04
-#          arch: x86_64
-#          python-arch: x64
-#          generator: "Unix Makefiles"
-#          nproc: 4
-#          pretty: "Alternate Build on Ubuntu 24.04"
-#          alternate: true
+        - os: ubuntu-24.04
+          arch: x86_64
+          python-arch: x64
+          generator: "Unix Makefiles"
+          nproc: 4
+          pretty: "Alternate Build on Ubuntu 24.04"
+          alternate: true
 
     steps:
 
