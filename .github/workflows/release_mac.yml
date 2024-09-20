@@ -159,6 +159,9 @@ jobs:
               -DCPACK_CODESIGNING_NOTARY_PROFILE_NAME:STRING=EnergyPlus \
               ../
 
+    - name: Setup upterm session
+      uses: lhotari/action-upterm@v1
+
     - name: Build Package
       working-directory: ./build
       shell: bash
