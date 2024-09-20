@@ -363,7 +363,7 @@ namespace IndoorGreen {
                                   ig.ZonePtr,
                                   ig.Name,
                                   DataHeatBalance::IntGainType::IndoorGreen,
-                                  &ig.SensibleRateLED,
+                                  &ig.SensibleRate,
                                   nullptr,
                                   nullptr,
                                   &ig.LatentRate,
@@ -582,15 +582,12 @@ namespace IndoorGreen {
                 ZoneNewHum = ZoneSatHum;
             }
             HMid = Psychrometrics::PsyHFnTdbW(ZoneNewTemp, ZonePreHum);
-            ig.SensibleRateLED =
-                (1 - ig.LEDRadFraction) * ig.LEDActualEleP; // convective heat gain from LED lights when LED is on; heat convection from
-                                                            // plants was considered and counted from plant surface heat balance.
-            ig.SensibleRate = state.dataHeatBalSurf->SurfQConvInRep(ig.SurfPtr) / Timestep;
             ig.LatentRate = ZoneAirVol * rhoair * (HCons - HMid) / Timestep; // unit W
+            ig.SensibleRateLED = (1 - ig.LEDRadFraction) * ig.LEDActualEleP; // convective heat gain from LED lights when LED is on;
+            ig.SensibleRate = -1.0 * ig.LatentRate + ig.SensibleRateLED;
             state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(ig.SurfPtr) =
-                -1.0 * ig.LambdaET +
                 ig.LEDRadFraction * 0.9 * ig.LEDActualEleP /
-                    state.dataSurface->Surface(ig.SurfPtr).Area; // assume the energy from radiation for photosynthesis is only 10%.
+                state.dataSurface->Surface(ig.SurfPtr).Area; // assume the energy from radiation for photosynthesis is only 10%.
         }
     }
 

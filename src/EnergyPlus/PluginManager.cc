@@ -58,6 +58,19 @@
 #include <nlohmann/json.hpp>
 
 #if LINK_WITH_PYTHON
+
+#ifdef _DEBUG
+// We don't want to try to import a debug build of Python here
+// so if we are building a Debug build of the C++ code, we need
+// to undefine _DEBUG during the #include command for Python.h.
+// Otherwise it will fail
+#undef _DEBUG
+#include <Python.h>
+#define _DEBUG
+#else
+#include <Python.h>
+#endif
+
 #include <fmt/format.h>
 template <> struct fmt::formatter<PyStatus>
 {
@@ -467,7 +480,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
     } else {
         programDir = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
     }
-    fs::path const pathToPythonPackages = programDir / "python_standard_lib";
+    fs::path const pathToPythonPackages = programDir / "python_lib";
 
     initPython(state, pathToPythonPackages);
 
@@ -478,7 +491,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
     PyRun_SimpleString("import sys"); // allows us to report sys.path later
 
     // we also need to set an extra import path to find some dynamic library loading stuff, again make it relative to the binary
-    addToPythonPath(state, programDir / "python_standard_lib/lib-dynload", false);
+    addToPythonPath(state, programDir / "python_lib/lib-dynload", false);
 
     // now for additional paths:
     // we'll always want to add the program executable directory to PATH so that Python can find the installed pyenergyplus package
