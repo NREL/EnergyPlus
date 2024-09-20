@@ -113,7 +113,7 @@ foreach(path ${_all_root_dylibs})
   endif()
 endforeach()
 
-file(GLOB PYTHON_SOS "${CMAKE_INSTALL_PREFIX}/python_lib/lib-dynload/*.so")
+file(GLOB PYTHON_SOS "${CMAKE_INSTALL_PREFIX}/python_lib/lib-dynload/*.so" "${CMAKE_INSTALL_PREFIX}/python_lib/lib-dynload/*.dylib")
 
 print_relative_paths(PREFIX "FULL_PATHS=" ABSOLUTE_PATHS ${FULL_PATHS})
 print_relative_paths(PREFIX "ROOT_DYLIBS=" ABSOLUTE_PATHS ${ROOT_DYLIBS})
