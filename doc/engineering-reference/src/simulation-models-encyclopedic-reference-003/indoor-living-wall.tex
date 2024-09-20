@@ -9,7 +9,7 @@ The IndoorLivingWall object directly connects with the inside surface heat balan
 Plant energy balance equation:
 
 \begin{equation}
-Q_{lw-net}+Q_{sw}+h_{ip} \cdot A_ip \cdot (T_z - T_p )-\lambda \cdot A_ip \cdot ET+Q_{cond}=0
+Q_{lw-net}+Q_{sw}+h_{ip} \cdot A_ip \cdot (T_z - T_p )+Q_{cond}=0
 \end{equation}
 
 where:
@@ -27,11 +27,7 @@ where:
 \item
   \(T_p\) is the plant surface temperature (\si{\celsius})
 \item
-  \(A_ip\) is the plant surface area (\si{\area})
-\item
-  \(\lambda\) is the latent heat of vaporization (\si{\specificEnthalpy})
-\item
-  \(ET\) is the evapotranspiration rate (\si{\evapotranspirationRate}).
+  \(A_ip\) is the plant surface area (\si{\area}).
 \end{itemize}
 
 Indoor air heat balance connects with indoor living walls through convective heat transfer, which has the opposite sign of the term in surface heat balance. Convective portion of heat gain from LED lights also contributes to zone air heat balance equation.
@@ -53,7 +49,7 @@ where:
 \item
   $V_z$ is zone air volume (\si{\volume})
 \item
-  \(\dot Q_i\) is the convective heat from internal loads (\si{\watt})
+  \(\dot Q_i\) is the convective heat from internal loads including sensible heat gain from living walls (\si{\watt})
 \item
   \({{h_i}} {A_i}\left( {{T_{si}} - {T_z}} \right)\) is the convective heat transfer from surfaces to zone air (\si{\watt})
 \item

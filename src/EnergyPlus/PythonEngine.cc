@@ -362,7 +362,7 @@ namespace Python {
     }
 
 #else // NOT LINK_WITH_PYTHON
-    PythonEngine::PythonEngine()
+    PythonEngine::PythonEngine(EnergyPlus::EnergyPlusData &state)
     {
         ShowFatalError(state, "EnergyPlus is not linked with python");
     }
