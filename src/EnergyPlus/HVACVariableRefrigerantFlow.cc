@@ -1192,10 +1192,9 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
 
         vrf.ElecHeatingPower =
             (vrf.RatedHeatingPower * TotHeatCapTempModFac) * TotHeatEIRTempModFac * EIRFPLRModFac * HREIRAdjustment * VRFRTF * InputPowerMultiplier;
-
-        // adjust defrost power based on heating RTF
-        vrf.DefrostPower *= VRFRTF;
     }
+    // adjust defrost power based on RTF
+    vrf.DefrostPower *= VRFRTF;
     vrf.VRFCondRTF = VRFRTF;
 
     // calculate crankcase heater power
