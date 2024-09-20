@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 #include <GSL/span.h>
 
 namespace EnergyPlus {
@@ -166,9 +167,9 @@ namespace InternalHeatGains {
 
     Real64 SumReturnAirConvectionGainsByTypes(
         EnergyPlusData &state,
-        int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
-        gsl::span<const DataHeatBalance::IntGainType> GainTypeARR // variable length 1-d array of enum valued gain types
-    );
+        int const ZoneNum,                                         // zone index pointer for which zone to sum gains for
+        gsl::span<const DataHeatBalance::IntGainType> GainTypeARR, // variable length 1-d array of enum valued gain types
+        int const spaceIndex = 0);                                 // space index pointer, sum gains only for this space
 
     Real64 SumAllSpaceInternalRadiationGains(EnergyPlusData &state,
                                              int const SpaceNum // space index pointer for which space to sum gains for
@@ -220,6 +221,9 @@ namespace InternalHeatGains {
     );
 
     void GatherComponentLoadsIntGain(EnergyPlusData &state);
+
+    void
+    gatherCompLoadIntGain2(EnergyPlusData &state, OutputReportTabular::compLoadsTimeStep &szCompLoadDayTS, int const zoneNum, int const spaceNum = 0);
 
 } // namespace InternalHeatGains
 

@@ -491,6 +491,53 @@ namespace OutputReportTabular {
         }
     };
 
+    struct compLoadsTimeStep
+    {
+        Real64 peopleInstantSeq = 0.0;
+        Real64 peopleLatentSeq = 0.0;
+        Real64 peopleRadSeq = 0.0;
+
+        Real64 lightInstantSeq = 0.0;
+        Real64 lightRetAirSeq = 0.0;
+        Real64 lightLWRadSeq = 0.0; // long wave thermal radiation
+
+        Real64 equipInstantSeq = 0.0;
+        Real64 equipLatentSeq = 0.0;
+        Real64 equipRadSeq = 0.0;
+
+        Real64 refrigInstantSeq = 0.0;
+        Real64 refrigRetAirSeq = 0.0;
+        Real64 refrigLatentSeq = 0.0;
+
+        Real64 waterUseInstantSeq = 0.0;
+        Real64 waterUseLatentSeq = 0.0;
+
+        Real64 hvacLossInstantSeq = 0.0;
+        Real64 hvacLossRadSeq = 0.0;
+
+        Real64 powerGenInstantSeq = 0.0;
+        Real64 powerGenRadSeq = 0.0;
+        Real64 infilInstantSeq = 0.0;
+        Real64 infilLatentSeq = 0.0;
+
+        Real64 zoneVentInstantSeq = 0.0;
+        Real64 zoneVentLatentSeq = 0.0;
+
+        Real64 interZoneMixInstantSeq = 0.0;
+        Real64 interZoneMixLatentSeq = 0.0;
+
+        Real64 feneCondInstantSeq = 0.0;
+    };
+    struct compLoadsDay
+    {
+
+        std::vector<OutputReportTabular::compLoadsTimeStep> ts;
+    };
+    struct componentLoads
+    {
+        std::vector<compLoadsDay> day;
+    };
+
     // Functions
 
     std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path const &filePath, bool output_to_file = true);
@@ -789,7 +836,7 @@ namespace OutputReportTabular {
                                    Array1D<Real64> &powerGenDelaySeq,
                                    Array1D<Real64> &lightDelaySeq,
                                    Array1D<Real64> &feneSolarDelaySeq,
-                                   Array3D<Real64> &feneCondInstantSeqLoc,
+                                   OutputReportTabular::componentLoads &zsCompLoadLoc,
                                    Array2D<Real64> &surfDelaySeq,
                                    ZompComponentAreasType &componentAreas,
                                    int const iZone,
@@ -805,7 +852,7 @@ namespace OutputReportTabular {
                            Array1D<Real64> &powerGenDelaySeq,
                            Array1D<Real64> &lightDelaySeq,
                            Array1D<Real64> &feneSolarDelaySeq,
-                           Array3D<Real64> &feneCondInstantSeq,
+                           OutputReportTabular::componentLoads &zsCompLoadLoc,
                            Array2D<Real64> &surfDelaySeq);
 
     void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
@@ -820,7 +867,7 @@ namespace OutputReportTabular {
                                         Array1D<Real64> const &powerGenDelaySeq,
                                         Array1D<Real64> const &lightDelaySeq,
                                         Array1D<Real64> const &feneSolarDelaySeq,
-                                        Array3D<Real64> const &feneCondInstantSeqLoc,
+                                        OutputReportTabular::componentLoads &zsCompLoadLoc,
                                         Array2D<Real64> const &surfDelaySeq);
 
     void CollectPeakZoneConditions(
@@ -1183,42 +1230,11 @@ struct OutputReportTabularData : BaseGlobalStruct
     Array3D<Real64> ITABSFseq; // used for determining the radiant fraction on each surface
     Array3D<Real64> TMULTseq;  // used for determining the radiant fraction on each surface
 
-    Array3D<Real64> peopleInstantSeq;
-    Array3D<Real64> peopleLatentSeq;
-    Array3D<Real64> peopleRadSeq;
-
-    Array3D<Real64> lightInstantSeq;
-    Array3D<Real64> lightRetAirSeq;
-    Array3D<Real64> lightLWRadSeq; // long wave thermal radiation
     Array3D<Real64> lightSWRadSeq; // short wave visible radiation
-
-    Array3D<Real64> equipInstantSeq;
-    Array3D<Real64> equipLatentSeq;
-    Array3D<Real64> equipRadSeq;
-
-    Array3D<Real64> refrigInstantSeq;
-    Array3D<Real64> refrigRetAirSeq;
-    Array3D<Real64> refrigLatentSeq;
-
-    Array3D<Real64> waterUseInstantSeq;
-    Array3D<Real64> waterUseLatentSeq;
-
-    Array3D<Real64> hvacLossInstantSeq;
-    Array3D<Real64> hvacLossRadSeq;
-
-    Array3D<Real64> powerGenInstantSeq;
-    Array3D<Real64> powerGenRadSeq;
-    Array3D<Real64> infilInstantSeq;
-    Array3D<Real64> infilLatentSeq;
-
-    Array3D<Real64> zoneVentInstantSeq;
-    Array3D<Real64> zoneVentLatentSeq;
-
-    Array3D<Real64> interZoneMixInstantSeq;
-    Array3D<Real64> interZoneMixLatentSeq;
-
-    Array3D<Real64> feneCondInstantSeq;
     Array3D<Real64> feneSolarRadSeq;
+
+    std::vector<OutputReportTabular::componentLoads> znCompLoads; // Zone component loads
+    std::vector<OutputReportTabular::componentLoads> spCompLoads; // Space component loads
 
     int maxUniqueKeyCount = 0;
 
@@ -1497,32 +1513,6 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->decayCurveHeat.deallocate();
         this->ITABSFseq.deallocate();
         this->TMULTseq.deallocate();
-        this->peopleInstantSeq.deallocate();
-        this->peopleLatentSeq.deallocate();
-        this->peopleRadSeq.deallocate();
-        this->lightInstantSeq.deallocate();
-        this->lightRetAirSeq.deallocate();
-        this->lightLWRadSeq.deallocate();
-        this->lightSWRadSeq.deallocate();
-        this->equipInstantSeq.deallocate();
-        this->equipLatentSeq.deallocate();
-        this->equipRadSeq.deallocate();
-        this->refrigInstantSeq.deallocate();
-        this->refrigRetAirSeq.deallocate();
-        this->refrigLatentSeq.deallocate();
-        this->waterUseInstantSeq.deallocate();
-        this->waterUseLatentSeq.deallocate();
-        this->hvacLossInstantSeq.deallocate();
-        this->hvacLossRadSeq.deallocate();
-        this->powerGenInstantSeq.deallocate();
-        this->powerGenRadSeq.deallocate();
-        this->infilInstantSeq.deallocate();
-        this->infilLatentSeq.deallocate();
-        this->zoneVentInstantSeq.deallocate();
-        this->zoneVentLatentSeq.deallocate();
-        this->interZoneMixInstantSeq.deallocate();
-        this->interZoneMixLatentSeq.deallocate();
-        this->feneCondInstantSeq.deallocate();
         this->feneSolarRadSeq.deallocate();
         this->maxUniqueKeyCount = 0;
         this->activeSubTableName.clear();

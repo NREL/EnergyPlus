@@ -9121,8 +9121,9 @@ namespace InternalHeatGains {
 
     Real64 SumReturnAirConvectionGainsByTypes(
         EnergyPlusData &state,
-        int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
-        gsl::span<const DataHeatBalance::IntGainType> GainTypeARR // variable length 1-d array of integer valued gain types
+        int const ZoneNum,                                         // zone index pointer for which zone to sum gains for
+        gsl::span<const DataHeatBalance::IntGainType> GainTypeARR, // variable length 1-d array of integer valued gain types
+        int const spaceIndex                                       // space index pointer, sum gains only for this space
     )
     {
 
@@ -9138,16 +9139,27 @@ namespace InternalHeatGains {
 
         int NumberOfTypes = GainTypeARR.size();
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
-                continue;
-            }
-
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+        // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
+        if (spaceIndex > 0) {
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
+                        SumReturnAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).ReturnAirConvGainRate;
+                    }
+                }
+            }
+        } else {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
+                    continue;
+                }
 
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
-                        SumReturnAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
+                for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                    for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
+
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
+                            SumReturnAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
+                        }
                     }
                 }
             }
@@ -9494,7 +9506,23 @@ namespace InternalHeatGains {
         // Using/Aliasing
         using namespace DataHeatBalance;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
+            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                auto &znCLDayTS = state.dataOutRptTab->znCompLoads[iZone - 1].day[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1];
+                gatherCompLoadIntGain2(state, znCLDayTS, iZone);
+            }
+            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                for (int iSpace = 1; iSpace <= state.dataGlobal->NumOfZones; ++iSpace) {
+                    auto &spCLDayTS = state.dataOutRptTab->spCompLoads[iSpace - 1].day[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1];
+                    gatherCompLoadIntGain2(state, spCLDayTS, state.dataHeatBal->space(iSpace).zoneNum, iSpace);
+                }
+            }
+        }
+    }
+
+    void gatherCompLoadIntGain2(EnergyPlusData &state, OutputReportTabular::compLoadsTimeStep &szCompLoadDayTS, int const zoneNum, int const spaceNum)
+    {
         static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesPeople = {DataHeatBalance::IntGainType::People};
         static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesLight = {DataHeatBalance::IntGainType::Lights};
         static constexpr std::array<DataHeatBalance::IntGainType, 7> IntGainTypesEquip = {DataHeatBalance::IntGainType::ElectricEquipment,
@@ -9560,54 +9588,30 @@ namespace InternalHeatGains {
         assert((int)(size(IntGainTypesPeople) + size(IntGainTypesLight) + size(IntGainTypesEquip) + size(IntGainTypesRefrig) +
                      size(IntGainTypesWaterUse) + size(IntGainTypesHvacLoss) + size(IntGainTypesPowerGen) + size(ExcludedIntGainTypes)) ==
                (int)DataHeatBalance::IntGainType::Num);
+        szCompLoadDayTS.peopleInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesPeople, spaceNum);
+        szCompLoadDayTS.peopleLatentSeq = SumInternalLatentGainsByTypes(state, zoneNum, IntGainTypesPeople, spaceNum);
+        szCompLoadDayTS.peopleRadSeq = SumInternalRadiationGainsByTypes(state, zoneNum, IntGainTypesPeople, spaceNum);
 
-        if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
-            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                state.dataOutRptTab->peopleInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesPeople);
-                state.dataOutRptTab->peopleLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalLatentGainsByTypes(state, iZone, IntGainTypesPeople);
-                state.dataOutRptTab->peopleRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesPeople);
+        szCompLoadDayTS.lightInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesLight, spaceNum);
+        szCompLoadDayTS.lightRetAirSeq = SumReturnAirConvectionGainsByTypes(state, zoneNum, IntGainTypesLight, spaceNum);
+        szCompLoadDayTS.lightLWRadSeq = SumInternalRadiationGainsByTypes(state, zoneNum, IntGainTypesLight, spaceNum);
 
-                state.dataOutRptTab->lightInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesLight);
-                state.dataOutRptTab->lightRetAirSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumReturnAirConvectionGainsByTypes(state, iZone, IntGainTypesLight);
-                state.dataOutRptTab->lightLWRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesLight);
+        szCompLoadDayTS.equipInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesEquip, spaceNum);
+        szCompLoadDayTS.equipLatentSeq = SumInternalLatentGainsByTypes(state, zoneNum, IntGainTypesEquip, spaceNum);
+        szCompLoadDayTS.equipRadSeq = SumInternalRadiationGainsByTypes(state, zoneNum, IntGainTypesEquip, spaceNum);
 
-                state.dataOutRptTab->equipInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesEquip);
-                state.dataOutRptTab->equipLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalLatentGainsByTypes(state, iZone, IntGainTypesEquip);
-                state.dataOutRptTab->equipRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesEquip);
+        szCompLoadDayTS.refrigInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesRefrig, spaceNum);
+        szCompLoadDayTS.refrigRetAirSeq = SumReturnAirConvectionGainsByTypes(state, zoneNum, IntGainTypesRefrig, spaceNum);
+        szCompLoadDayTS.refrigLatentSeq = SumInternalLatentGainsByTypes(state, zoneNum, IntGainTypesRefrig, spaceNum);
 
-                state.dataOutRptTab->refrigInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesRefrig);
-                state.dataOutRptTab->refrigRetAirSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumReturnAirConvectionGainsByTypes(state, iZone, IntGainTypesRefrig);
-                state.dataOutRptTab->refrigLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalLatentGainsByTypes(state, iZone, IntGainTypesRefrig);
+        szCompLoadDayTS.waterUseInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesWaterUse, spaceNum);
+        szCompLoadDayTS.waterUseLatentSeq = SumInternalLatentGainsByTypes(state, zoneNum, IntGainTypesWaterUse, spaceNum);
 
-                state.dataOutRptTab->waterUseInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesWaterUse);
-                state.dataOutRptTab->waterUseLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalLatentGainsByTypes(state, iZone, IntGainTypesWaterUse);
+        szCompLoadDayTS.hvacLossInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesHvacLoss, spaceNum);
+        szCompLoadDayTS.hvacLossRadSeq = SumInternalRadiationGainsByTypes(state, zoneNum, IntGainTypesHvacLoss, spaceNum);
 
-                state.dataOutRptTab->hvacLossInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesHvacLoss);
-                state.dataOutRptTab->hvacLossRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesHvacLoss);
-
-                state.dataOutRptTab->powerGenInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesPowerGen);
-                state.dataOutRptTab->powerGenRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesPowerGen);
-            }
-        }
+        szCompLoadDayTS.powerGenInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesPowerGen, spaceNum);
+        szCompLoadDayTS.powerGenRadSeq = SumInternalRadiationGainsByTypes(state, zoneNum, IntGainTypesPowerGen, spaceNum);
     }
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,
