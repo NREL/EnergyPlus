@@ -2740,8 +2740,8 @@ namespace WaterToAirHeatPumpSimple {
 
                 // user provided inputs are assumed to be at rated conditions
                 simpleWatertoAirHP.RatedPowerHeat = simpleWatertoAirHP.RatedCapHeat / simpleWatertoAirHP.RatedCOPHeatAtRatedCdts;
-                simpleWatertoAirHP.RatedCapHeatAtRatedCdts = simpleWatertoAirHP.RatedCapHeat;
-                simpleWatertoAirHP.RatedPowerHeatAtRatedCdts = 0;
+                simpleWatertoAirHP.RatedCapHeatAtRatedCdts = 0;   // not sure why these are set = 0, should be RatedCapHeat?
+                simpleWatertoAirHP.RatedPowerHeatAtRatedCdts = 0; // should be RatedPowerHeat?
             }
             // Check that heat pump heating capacity is within 20% of cooling capacity. Check only for heating coil and report both.
             if (simpleWatertoAirHP.WAHPType == WatertoAirHP::Heating && simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
@@ -2883,20 +2883,19 @@ namespace WaterToAirHeatPumpSimple {
                                                             RoutineNameAlt);
 
                 if (simpleWatertoAirHP.WAHPType == WatertoAirHP::Heating) {
-                    RatedWaterVolFlowRateDes =
-                        simpleWatertoAirHP.RatedCapHeatAtRatedCdts / (state.dataSize->PlantSizData(PltSizNum).DeltaT * Cp * rho);
+                    RatedWaterVolFlowRateDes = simpleWatertoAirHP.RatedCapHeat / (state.dataSize->PlantSizData(PltSizNum).DeltaT * Cp * rho);
                 } else if (simpleWatertoAirHP.WAHPType == WatertoAirHP::Cooling) {
                     //       use companion heating coil capacity to calculate volumetric flow rate
                     if (simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
                         auto &companionHeatingCoil(
                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum));
                         if (companionHeatingCoil.RatedCapHeat == DataSizing::AutoSize) {
-                            SystemCapacity = simpleWatertoAirHP.RatedCapCoolTotal;
+                            SystemCapacity = simpleWatertoAirHP.RatedCapCoolTotal; // but you should use condenser capacity?
                         } else {
                             SystemCapacity = companionHeatingCoil.RatedCapHeat;
                         }
                     } else {
-                        SystemCapacity = simpleWatertoAirHP.RatedCapCoolAtRatedCdts;
+                        SystemCapacity = simpleWatertoAirHP.RatedCapCoolAtRatedCdts; // RatedCapCoolTotal ? * (1 + 1/COP) ?
                     }
 
                     RatedWaterVolFlowRateDes = SystemCapacity / (state.dataSize->PlantSizData(PltSizNum).DeltaT * Cp * rho);
