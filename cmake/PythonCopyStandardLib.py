@@ -85,6 +85,8 @@ ctypes_import_file = os.path.abspath(ctypes.__file__)
 ctypes_package_dir = os.path.dirname(ctypes_import_file)
 standard_lib_dir = os.path.dirname(ctypes_package_dir)
 
+print(f"PYTHON: Analyzing standard library directory at {standard_lib_dir}") 
+
 if os.path.exists(target_dir):
     # Let's check the library files to see if the ABI matches
     # Otherwise if you build with say python 3.8 initially, and then switch to

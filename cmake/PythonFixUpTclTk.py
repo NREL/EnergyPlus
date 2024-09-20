@@ -59,9 +59,12 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+import os
+import stat
 
 
 def locate_tk_so(python_dir: Path) -> Path:
+    print(f"Searching for _tkinter so in {python_dir}")
     sos = list(python_dir.glob("lib-dynload/_tkinter*.so"))
     assert len(sos) == 1, "Unable to locate _tkinter so"
     return sos[0]
@@ -72,7 +75,7 @@ LINKED_RE = re.compile(
     r"current version (?P<current_version>\d+\.\d+\.\d+)(?:, \w+)?\)"
 )
 
-LINKED_RE_ARM64 = re.compile(f"(?P<libname>.*) \(architecture arm64\)")
+LINKED_RE_ARM64 = re.compile(f"(?P<libname>.*) (architecture arm64)")
 
 
 def get_linked_libraries(p: Path):
@@ -113,7 +116,17 @@ if __name__ == "__main__":
 
     for tcl_tk_so in tcl_tk_sos:
         new_tcl_tk_so = lib_dynload_dir / tcl_tk_so.name
+        if str(tcl_tk_so).startswith('@loader_path'):
+            assert new_tcl_tk_so.is_file(), f"{new_tcl_tk_so} missing when the tkinter so is already adjusted. Wipe the dir"
+            print("Already fixed up the libtcl and libtk, nothing to do here")
+            continue
         shutil.copy(tcl_tk_so, new_tcl_tk_so)
+        # during testing, the brew installed tcl and tk libraries were installed without write permission
+        # the workaround was to manually chmod u+w those files in the brew install folder
+        # instead let's just fix them up once we copy them here
+        current_perms = os.stat(str(new_tcl_tk_so)).st_mode
+        os.chmod(str(new_tcl_tk_so), current_perms | stat.S_IWUSR)
+        # now that it can definitely be written, we can run install_name_tool on it
         lines = subprocess.check_output(
             ["install_name_tool", "-change", str(tcl_tk_so), f"@loader_path/{new_tcl_tk_so.name}", str(tk_so)]
         )
