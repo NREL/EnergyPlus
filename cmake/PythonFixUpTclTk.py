@@ -75,7 +75,7 @@ LINKED_RE = re.compile(
     r"current version (?P<current_version>\d+\.\d+\.\d+)(?:, \w+)?\)"
 )
 
-LINKED_RE_ARM64 = re.compile(f"(?P<libname>.*) (architecture arm64)")
+LINKED_RE_ARM64 = re.compile(r"(?P<libname>.*) \(architecture arm64\)")
 
 
 def get_linked_libraries(p: Path):
@@ -86,9 +86,9 @@ def get_linked_libraries(p: Path):
     lines = [x.strip() for x in lines[1:]]
 
     for line in lines:
-        if m := LINKED_RE.match(line):
+        if 'compatibility version' in line and (m := LINKED_RE.match(line)):
             linked_libs.append(m.groupdict())
-        elif m := LINKED_RE_ARM64.match(line):
+        elif 'architecture arm64' in line and (m := LINKED_RE_ARM64.match(line)):
             linked_libs.append(m.groupdict())  # it will only have a libname key, I think that's fine
         else:
             raise ValueError(f"For {p}, cannot parse line: '{line}'")
