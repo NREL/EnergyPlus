@@ -908,7 +908,6 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 }
             }
         }
-        vrf.DefrostPower *= VRFRTF;
 
         TotalCondHeatingCapacity =
             vrf.HeatingCapacity * state.dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) * TotHeatCapTempModFac * HeatingCapacityMultiplier;
