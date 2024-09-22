@@ -2800,63 +2800,38 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PltSizHeatNum; // index of plant sizing object for 1st heating loop
-    Real64 DesMassFlow;
     Real64 TempSteamIn;
     Real64 EnthSteamOutWet;
     Real64 EnthSteamInDry;
     Real64 LatentHeatSteam;
     Real64 SteamDensity;
 
-    bool ErrorsFound;
     bool PlantSizingErrorsFound;
     Real64 rho; // local fluid density
     Real64 Cp;  // local fluid specific heat
-    bool IsAutoSize;
-    bool IsMaxFlowAutoSize;                   // Indicate if the maximum terminal flow is autosize
-    int AirLoopNum;                           // Air loop number
-    int SysSizNum;                            // System sizing number
-    Real64 MinMinFlowRatio(0.0);              // the minimum minimum flow ratio
-    Real64 MaxAirVolFlowRateDes;              // Autosized maximum air flow rate for reporting
-    Real64 MaxAirVolFlowRateUser;             // Hardsized maximum air flow rate for reporting
-    Real64 MaxHeatAirVolFlowRateDes;          // Autosized maximum heating air flow rate for reporting
-    Real64 MaxHeatAirVolFlowRateUser;         // Hardsized maximum heating air flow rate for reporting
-    Real64 MinAirFlowFracDes;                 // Autosized minimum cooling air flow fraction for reporting
-    Real64 MinAirFlowFracUser;                // User input minimum cooling air flow fraction for reporting
-    Real64 FixedMinAirDes;                    // Autosized minimum cooling air flow rate for reporting [m3/s]
-    Real64 FixedMinAirUser;                   // User input minimum cooling air flow rate for reporting [m3/s]
-    Real64 MaxAirVolFlowRateDuringReheatDes;  // Autosized maximum air flow durign reheat for reporting
-    Real64 MaxAirVolFlowRateDuringReheatUser; // Hardsized maximum air flow durign reheat for reporting
-    Real64 MaxAirVolFractionDuringReheatDes;  // Autosized maximum air fraction durign reheat for reporting
-    Real64 MaxAirVolFractionDuringReheatUser; // Hardsized maximum air flow durign reheat for reporting
-    Real64 MaxReheatWaterVolFlowDes;          // Autosized reheat water flow or reporting
-    Real64 MaxReheatWaterVolFlowUser;         // Hardsized reheat water flow for reporting
-    Real64 MaxReheatSteamVolFlowDes;          // Autosized reheat steam flow for reporting
-    Real64 MaxReheatSteamVolFlowUser;         // Hardsized reheat steam flow for reporting
 
-    PltSizHeatNum = 0;
-    DesMassFlow = 0.0;
-    ErrorsFound = false;
-    IsAutoSize = false;
-    IsMaxFlowAutoSize = false;
-    MaxAirVolFlowRateDes = 0.0;
-    MaxAirVolFlowRateUser = 0.0;
-    MaxHeatAirVolFlowRateDes = 0.0;
-    MaxHeatAirVolFlowRateUser = 0.0;
-    MinAirFlowFracDes = 0.0;
-    MinAirFlowFracUser = 0.0;
-    FixedMinAirDes = 0.0;
-    FixedMinAirUser = 0.0;
-    MaxAirVolFlowRateDuringReheatDes = 0.0;
-    MaxAirVolFlowRateDuringReheatUser = 0.0;
-    MaxAirVolFractionDuringReheatDes = 0.0;
-    MaxAirVolFractionDuringReheatUser = 0.0;
-    MaxReheatWaterVolFlowDes = 0.0;
-    MaxReheatWaterVolFlowUser = 0.0;
-    MaxReheatSteamVolFlowDes = 0.0;
-    MaxReheatSteamVolFlowUser = 0.0;
-    MinMinFlowRatio = 0.0;
-    AirLoopNum = 0;
-    SysSizNum = 0;
+    Real64 DesMassFlow = 0.0;
+    bool ErrorsFound = false;
+    bool IsAutoSize = false;
+    bool IsMaxFlowAutoSize = false;
+    Real64 MaxAirVolFlowRateDes = 0.0;              // Autosized maximum air flow rate for reporting
+    Real64 MaxAirVolFlowRateUser = 0.0;             // Hardsized maximum air flow rate for reporting
+    Real64 MaxHeatAirVolFlowRateDes = 0.0;          // Autosized maximum heating air flow rate for reporting
+    Real64 MaxHeatAirVolFlowRateUser = 0.0;         // Hardsized maximum heating air flow rate for reporting
+    Real64 MinAirFlowFracDes = 0.0;                 // Autosized minimum cooling air flow fraction for reporting
+    Real64 MinAirFlowFracUser = 0.0;                // User input minimum cooling air flow fraction for reporting
+    Real64 FixedMinAirDes = 0.0;                    // Autosized minimum cooling air flow rate for reporting [m3/s]
+    Real64 FixedMinAirUser = 0.0;                   // User input minimum cooling air flow rate for reporting [m3/s]
+    Real64 MaxAirVolFlowRateDuringReheatDes = 0.0;  // Autosized maximum air flow durign reheat for reporting
+    Real64 MaxAirVolFlowRateDuringReheatUser = 0.0; // Hardsized maximum air flow durign reheat for reporting
+    Real64 MaxAirVolFractionDuringReheatDes = 0.0;  // Autosized maximum air fraction durign reheat for reporting
+    Real64 MaxAirVolFractionDuringReheatUser = 0.0; // Hardsized maximum air flow durign reheat for reporting
+    Real64 MaxReheatWaterVolFlowDes = 0.0;          // Autosized reheat water flow or reporting
+    Real64 MaxReheatWaterVolFlowUser = 0.0;         // Hardsized reheat water flow for reporting
+    Real64 MaxReheatSteamVolFlowDes = 0.0;          // Autosized reheat steam flow for reporting
+    Real64 MaxReheatSteamVolFlowUser = 0.0;         // Hardsized reheat steam flow for reporting
+    Real64 MinMinFlowRatio = 0.0;                   // the minimum minimum flow ratio
+    int SysSizNum = 0;                              // System sizing number
 
     int ZoneNum = this->CtrlZoneNum;
 
@@ -2975,7 +2950,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     // if a sizing run has been done, check if system sizing has been done for this system
     bool SizingDesRunThisAirSys = false;
     if (state.dataSize->SysSizingRunDone) {
-        AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
+        int AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
         if (AirLoopNum > 0) {
             CheckThisAirSystemForSizing(state, AirLoopNum, SizingDesRunThisAirSys);
         }
@@ -4706,7 +4681,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     Real64 QNoHeatFanOff;   // min heating - fan off, hot water at min flow [W]
     HeatingCoilType HCType; // heating coil type
     HVAC::FanType fanType;  // fan type (as a number)
-    Real64 HCLoad;          // load passed to a gas or electric heating coil [W]
     int FanOp;              // 1 if fan is on; 0 if off.
     Real64 MaxCoolMassFlow; // air flow at max cooling [kg/s]
     Real64 MaxHeatMassFlow; // air flow at max heating [kg/s]
@@ -4740,7 +4714,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
 
     if (HCType == HeatingCoilType::SimpleHeating) {
         WaterControlNode = this->ReheatControlNode;
-        HCLoad = 0.0;
         if (FirstHVACIteration) {
             MaxFlowWater = this->MaxReheatWaterFlow;
             MinFlowWater = this->MinReheatWaterFlow;
@@ -4751,14 +4724,12 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         }
     } else {
         WaterControlNode = 0;
-        HCLoad = BigLoad;
         MaxFlowWater = 0.0;
         MinFlowWater = 0.0;
     }
 
     if (HCType == HeatingCoilType::SteamAirHeating) {
         SteamControlNode = this->ReheatControlNode;
-        HCLoad = 0.0;
         if (FirstHVACIteration) {
             MaxFlowSteam = this->MaxReheatSteamFlow;
             MinFlowSteam = this->MinReheatSteamFlow;
@@ -4768,7 +4739,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         }
     } else {
         SteamControlNode = 0;
-        HCLoad = BigLoad;
         MaxFlowSteam = 0.0;
         MinFlowSteam = 0.0;
     }
