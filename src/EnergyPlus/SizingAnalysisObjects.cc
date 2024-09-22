@@ -175,17 +175,14 @@ int SizingLog::GetSysStepZtStepIndex(ZoneTimestepObject tmpztStepStamp)
 void SizingLog::FillSysStep(ZoneTimestepObject tmpztStepStamp, SystemTimestepObject tmpSysStepStamp)
 {
 
-    int ztIndex(0);
-    int oldNumSubSteps(0);
-    int newNumSubSteps(0);
+    int newNumSubSteps;
     Real64 constexpr MinutesPerHour(60.0);
-    Real64 ZoneStepStartMinutes(0.0);
 
-    ztIndex = GetSysStepZtStepIndex(tmpztStepStamp);
+    int ztIndex = GetSysStepZtStepIndex(tmpztStepStamp);
 
     if (ztStepObj[ztIndex].hasSystemSubSteps) {
 
-        oldNumSubSteps = ztStepObj[ztIndex].numSubSteps;
+        int oldNumSubSteps = ztStepObj[ztIndex].numSubSteps;
         newNumSubSteps = round(tmpztStepStamp.timeStepDuration / tmpSysStepStamp.TimeStepDuration);
         if (newNumSubSteps != oldNumSubSteps) {
             ztStepObj[ztIndex].subSteps.resize(newNumSubSteps);
@@ -199,7 +196,7 @@ void SizingLog::FillSysStep(ZoneTimestepObject tmpztStepStamp, SystemTimestepObj
     }
 
     // figure out which index this substep needs to go into
-    ZoneStepStartMinutes = tmpztStepStamp.stepStartMinute;
+    Real64 ZoneStepStartMinutes = tmpztStepStamp.stepStartMinute;
 
     tmpSysStepStamp.stStepsIntoZoneStep =
         round((((tmpSysStepStamp.CurMinuteStart - ZoneStepStartMinutes) / MinutesPerHour) / tmpSysStepStamp.TimeStepDuration));
@@ -220,7 +217,7 @@ void SizingLog::AverageSysTimeSteps()
     for (auto &zt : ztStepObj) {
         if (zt.numSubSteps > 0) {
             RunningSum = 0.0;
-            for (auto &SysT : zt.subSteps) {
+            for (auto const &SysT : zt.subSteps) {
                 RunningSum += SysT.LogDataValue;
             }
             zt.logDataValue = RunningSum / double(zt.numSubSteps);
@@ -254,15 +251,14 @@ void SizingLog::ProcessRunningAverage()
 
 ZoneTimestepObject SizingLog::GetLogVariableDataMax(EnergyPlusData &state)
 {
-    Real64 MaxVal;
     ZoneTimestepObject tmpztStepStamp;
-    MaxVal = 0.0;
+    Real64 MaxVal = 0.0;
 
     if (!ztStepObj.empty()) {
         tmpztStepStamp = ztStepObj[0];
     }
 
-    for (auto &zt : ztStepObj) {
+    for (auto const &zt : ztStepObj) {
         if (zt.envrnNum > 0 && zt.kindOfSim != Constant::KindOfSim::Invalid && zt.runningAvgDataValue > MaxVal) {
             MaxVal = zt.runningAvgDataValue;
             tmpztStepStamp = zt;
@@ -276,10 +272,7 @@ ZoneTimestepObject SizingLog::GetLogVariableDataMax(EnergyPlusData &state)
 Real64 SizingLog::GetLogVariableDataAtTimestamp(ZoneTimestepObject tmpztStepStamp)
 {
     int const index = GetZtStepIndex(tmpztStepStamp);
-
-    Real64 const val = ztStepObj[index].runningAvgDataValue;
-
-    return val;
+    return ztStepObj[index].runningAvgDataValue;
 }
 
 void SizingLog::ReInitLogForIteration()
@@ -364,7 +357,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
     // prepare current timing data once and then pass into fill routines
     // function used by both zone and system frequency log updates
 
-    int locDayOfSim(1);
+    int locDayOfSim;
 
     if (state.dataGlobal->WarmupFlag) { // DayOfSim not okay during warmup, keeps incrementing up during warmup days
         locDayOfSim = 1;
@@ -386,9 +379,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
 
 void SizingLoggerFramework::UpdateSizingLogValuesZoneStep(EnergyPlusData &state)
 {
-    ZoneTimestepObject tmpztStepStamp;
-
-    tmpztStepStamp = PrepareZoneTimestepStamp(state);
+    ZoneTimestepObject tmpztStepStamp = PrepareZoneTimestepStamp(state);
 
     for (auto &l : logObjs) {
         l.FillZoneStep(tmpztStepStamp);
@@ -397,11 +388,9 @@ void SizingLoggerFramework::UpdateSizingLogValuesZoneStep(EnergyPlusData &state)
 
 void SizingLoggerFramework::UpdateSizingLogValuesSystemStep(EnergyPlusData &state)
 {
-    Real64 constexpr MinutesPerHour(60.0);
-    ZoneTimestepObject tmpztStepStamp;
+    Real64 constexpr MinutesPerHour = 60.0;
+    ZoneTimestepObject tmpztStepStamp = PrepareZoneTimestepStamp(state);
     SystemTimestepObject tmpSysStepStamp;
-
-    tmpztStepStamp = PrepareZoneTimestepStamp(state);
 
     // prepare system timestep stamp
     tmpSysStepStamp.CurMinuteEnd = state.dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].CurMinute;
