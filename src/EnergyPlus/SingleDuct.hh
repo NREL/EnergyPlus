@@ -343,11 +343,6 @@ namespace SingleDuct {
                     int ZoneEquipOutletNode           // zone equipment outlet node (used with inlet side mixers)
     );
 
-    void SetATMixerPriFlow(EnergyPlusData &state,
-                           int ATMixerNum,                                          // Air terminal mixer index
-                           ObjexxFCL::Optional<Real64 const> PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
-    );
-
     void setATMixerSizingProperties(EnergyPlusData &state,
                                     int inletATMixerIndex, // index to ATMixer at inlet of zone equipment
                                     int controlledZoneNum, // controlled zone number

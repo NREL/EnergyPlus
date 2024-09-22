@@ -278,10 +278,7 @@ Real64 SizingLog::GetLogVariableDataAtTimestamp(ZoneTimestepObject tmpztStepStam
 void SizingLog::ReInitLogForIteration()
 {
     ZoneTimestepObject tmpNullztStepObj;
-
-    for (auto &zt : ztStepObj) {
-        zt = tmpNullztStepObj;
-    }
+    std::fill(ztStepObj.begin(), ztStepObj.end(), tmpNullztStepObj);
 }
 
 void SizingLog::SetupNewEnvironment(int const seedEnvrnNum, int const newEnvrnNum)
@@ -291,8 +288,7 @@ void SizingLog::SetupNewEnvironment(int const seedEnvrnNum, int const newEnvrnNu
 
 int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData &state, Real64 &rVariable, int stepsInAverage)
 {
-    int VectorLength(0);
-    int constexpr HoursPerDay(24);
+    int constexpr HoursPerDay = 24;
 
     SizingLog tmpLog(rVariable);
     tmpLog.NumOfEnvironmentsInLogSet = 0;
@@ -333,7 +329,7 @@ int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData &state, Real64 
 
     tmpLog.timeStepsInAverage = stepsInAverage;
 
-    VectorLength = stepSum;
+    int VectorLength = stepSum;
 
     tmpLog.NumOfStepsInLogSet = VectorLength;
     tmpLog.ztStepObj.resize(VectorLength);

@@ -5998,34 +5998,6 @@ void GetATMixer(EnergyPlusData &state,
     }
 }
 
-void SetATMixerPriFlow(EnergyPlusData &state,
-                       int const ATMixerNum,                                // Air terminal mixer index
-                       ObjexxFCL::Optional<Real64 const> PriAirMassFlowRate // Air terminal mixer primary air mass flow rate [kg/s]
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   April 2012
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This Subroutine sets the primary air mass flow rate on the primary air inlet
-    // node of a terminal unit mixer component.
-
-    // METHODOLOGY EMPLOYED:
-    // The flow is set to either the input PriAirMassFlowRate if this optional input
-    // parameter is present, or to the maximum available mass flow rate of the primary
-    // air inlet node.
-
-    if (ATMixerNum <= 0) return;
-    int const PriAirNode = state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode; // air terminal mixer primary air inlet node number
-    if (present(PriAirMassFlowRate)) {
-        state.dataLoopNodes->Node(PriAirNode).MassFlowRate = PriAirMassFlowRate;
-    } else {
-        state.dataLoopNodes->Node(PriAirNode).MassFlowRate = state.dataLoopNodes->Node(PriAirNode).MassFlowRateMaxAvail;
-    }
-}
-
 void setATMixerSizingProperties(EnergyPlusData &state,
                                 int const inletATMixerIndex, // index to ATMixer at inlet of zone equipment
                                 int const controlledZoneNum, // controlled zone number
