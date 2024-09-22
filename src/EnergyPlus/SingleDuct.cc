@@ -98,8 +98,6 @@ namespace EnergyPlus::SingleDuct {
 // MODULE INFORMATION:
 //       AUTHOR         Richard J. Liesen
 //       DATE WRITTEN   January 2000
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // To encapsulate the data and algorithms required to
@@ -128,15 +126,11 @@ void SimulateSingleDuct(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   January 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine manages Sys system simulation.
     // It is called from the ManageZoneEquip
     // at the system time step.
-
-    // Using/Aliasing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SysNum; // The Sys that you are currently loading input into
@@ -222,8 +216,6 @@ void GetSysInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   April 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is the main routine to call other input routines and Get routines
@@ -2434,8 +2426,6 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   January 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for  initializations of the Sys Components.
@@ -2457,9 +2447,6 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InletNode;
     int OutletNode;
-    // static Array1D_bool MyEnvrnFlag;
-    // static Array1D_bool MySizeFlag;
-    // static Array1D_bool GetGasElecHeatCoilCap; // Gets autosized value of coil capacity
     Real64 SteamTemp;
     Real64 SteamDensity;
     Real64 rho;
@@ -2468,19 +2455,6 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     // static Array1D_bool PlantLoopScanFlag;
 
     // Do the Begin Simulation initializations
-    if (state.dataSingleDuct->InitSysFlag) {
-
-        // MyEnvrnFlag.allocate(NumSDAirTerminal);
-        // MySizeFlag.allocate(NumSDAirTerminal);
-        // PlantLoopScanFlag.allocate(NumSDAirTerminal);
-        // GetGasElecHeatCoilCap.allocate(NumSDAirTerminal);
-        // MyEnvrnFlag = true;
-        // MySizeFlag = true;
-        // PlantLoopScanFlag = true;
-        // GetGasElecHeatCoilCap = true;
-        state.dataSingleDuct->InitSysFlag = false;
-    }
-
     if (this->PlantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
         if ((this->ReheatComp_PlantType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
             (this->ReheatComp_PlantType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
@@ -3731,16 +3705,12 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     //                      TH 3/2012: added supply air flow adjustment based on zone maximum outdoor
     //                                 air fraction - a TRACE feature
     //                      Brent Griffith, 5/2012, general cleanup, fix negatives CR 8767, fix phantom coil flows CR 8854
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the simple single duct volume VAV.
 
     // METHODOLOGY EMPLOYED:
     // There is method to this madness.
-
-    // REFERENCES:
-    // na
 
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
@@ -3750,17 +3720,6 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     using PlantUtilities::SetActuatedBranchFlowRate;
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MassFlow;     // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets
@@ -4214,7 +4173,6 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
     //       AUTHOR         R. Raustad (FSEC)
     //       DATE WRITTEN   Jan 2010
     //       MODIFIED       Mangesh Basarkar, 06/2011: Modifying outside air based on airloop DCV flag
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Calculates the amount of outside air required based on optional user input.
@@ -4223,25 +4181,11 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // User input defines method used to calculate OA.
 
-    // REFERENCES:
-
     // Using/Aliasing
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
     // FUNCTION PARAMETER DEFINITIONS:
     bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
@@ -4276,17 +4220,10 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   August 2006
     //       MODIFIED       KHL/TH 10/2010: added maximum supply air temperature leaving reheat coil
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the VAV box with varying airflow in heating and cooling.
     // Modified version of SimVAV.
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
 
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
@@ -4297,17 +4234,6 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     using WaterCoils::SimulateWaterCoilComponents;
     // unused   USE DataHeatBalFanSys,    ONLY: ZoneThermostatSetPointHi, ZoneThermostatSetPointLo
     using PlantUtilities::SetActuatedBranchFlowRate;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MassFlow;     // Total Mass Flow Rate from Hot & Cold Inlets [kg/sec]
@@ -4637,8 +4563,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   July 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates a single duct VAV terminal unit with a variable-speed fan upstream
@@ -5043,16 +4967,9 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   February 2000
     //       MODIFIED       FB/KHL/TH 2/2011: added maximum supply air temperature leaving reheat coil
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the simple single duct constant volume systems.
-
-    // METHODOLOGY EMPLOYED:
-    // There is method to this madness.
-
-    // REFERENCES:
-    // na
 
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
@@ -5238,8 +5155,6 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   July 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Simulate the components making up the VAV terminal unit with variable speed fan.
@@ -5247,26 +5162,11 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Simulates the unit components sequentially in the air flow direction.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using HeatingCoils::SimulateHeatingCoilComponents;
     using PlantUtilities::SetComponentFlowRate;
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int FanInNode;       // unit air inlet node (fan inlet)
@@ -5339,18 +5239,12 @@ void SingleDuctAirTerminal::UpdateSys(EnergyPlusData &state) const
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   january 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the Syss.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int OutletNode;
-    int InletNode;
-
-    OutletNode = this->OutletNodeNum;
-    InletNode = this->InletNodeNum;
+    int OutletNode = this->OutletNodeNum;
+    int InletNode = this->InletNodeNum;
 
     if (this->SysType_Num == SysType::SingleDuctVAVReheat || this->SysType_Num == SysType::SingleDuctCBVAVReheat ||
         this->SysType_Num == SysType::SingleDuctCBVAVNoReheat || this->SysType_Num == SysType::SingleDuctVAVNoReheat ||
@@ -5390,40 +5284,6 @@ void SingleDuctAirTerminal::UpdateSys(EnergyPlusData &state) const
 void SingleDuctAirTerminal::ReportSys(EnergyPlusData &state) // unused1208
 {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Unknown
-    //       DATE WRITTEN   Unknown
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine updates the Sys report variables.
-
-    // METHODOLOGY EMPLOYED:
-    // There is method to this madness.
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    // Still needs to report the Sys power from this component
-
     // set zone OA volume flow rate
     this->CalcOutdoorAirVolumeFlowRate(state);
 }
@@ -5441,8 +5301,6 @@ void GetHVACSingleDuctSysIndex(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Lixing Gu
     //       DATE WRITTEN   February 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine sets an index for a given single duct system -- issues error message if that system
@@ -5483,15 +5341,10 @@ void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool const Fi
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR
     //       DATE WRITTEN   March 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
     // Simulate an Air Terminal Mixer component
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     if (state.dataSingleDuct->GetATMixerFlag) {
         state.dataSingleDuct->GetATMixerFlag = false;
@@ -5518,10 +5371,7 @@ void GetATMixers(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR
     //       DATE WRITTEN   March 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
     // Get input for inlet side air terminal mixers and store it in the inlet side air terminal mixer array
@@ -5975,33 +5825,13 @@ void CalcATMixer(EnergyPlusData &state, int const SysNum)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR
     //       DATE WRITTEN   March 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
     // Calculate the mixed air flow and conditions in the air terminal mixer
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
     // Using/Aliasing
     using Psychrometrics::PsyTdbFnHW;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     state.dataSingleDuct->PriEnthalpyCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).Enthalpy;
     state.dataSingleDuct->PriHumRatCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).HumRat;
@@ -6057,17 +5887,10 @@ void UpdateATMixer(EnergyPlusData &state, int const SysNum)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR
     //       DATE WRITTEN   March 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
     // Move the results of CalcATMixer to the affected nodes
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
 
     // Using/Aliasing
     using namespace DataLoopNode;
@@ -6128,8 +5951,6 @@ void GetATMixer(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   April 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets: 1) the index of the named AT Mixer in the SysATMixer data array
