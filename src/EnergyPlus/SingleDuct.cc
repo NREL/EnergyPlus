@@ -2457,7 +2457,6 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InletNode;
     int OutletNode;
-    int SysIndex;
     // static Array1D_bool MyEnvrnFlag;
     // static Array1D_bool MySizeFlag;
     // static Array1D_bool GetGasElecHeatCoilCap; // Gets autosized value of coil capacity
@@ -2507,7 +2506,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     if (!state.dataSingleDuct->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataSingleDuct->ZoneEquipmentListChecked = true;
         // Check to see if there is a Air Distribution Unit on the Zone Equipment List
-        for (SysIndex = 1; SysIndex <= state.dataSingleDuct->NumSDAirTerminal; ++SysIndex) {
+        for (int SysIndex = 1; SysIndex <= state.dataSingleDuct->NumSDAirTerminal; ++SysIndex) {
             if (state.dataSingleDuct->sd_airterminal(SysIndex).ADUNum == 0) continue;
             if (CheckZoneEquipmentList(state,
                                        "ZoneHVAC:AirDistributionUnit",
@@ -3541,8 +3540,6 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                         ShowContinueError(state, format("Occurs in AirTerminal Object={}", this->SysName));
                         ErrorsFound = true;
                     }
-                }
-                if (IsAutoSize) {
                     this->MaxReheatWaterVolFlow = MaxReheatWaterVolFlowDes;
                     BaseSizer::reportSizerOutput(
                         state, this->sysType, this->SysName, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxReheatWaterVolFlowDes);
@@ -3661,8 +3658,6 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                         ShowContinueError(state, format("Occurs in AirTerminal:SingleDuct:ConstantVolume:Reheat Object={}", this->SysName));
                         ErrorsFound = true;
                     }
-                }
-                if (IsAutoSize) {
                     this->MaxReheatSteamVolFlow = MaxReheatSteamVolFlowDes;
                     BaseSizer::reportSizerOutput(
                         state, this->sysType, this->SysName, "Design Size Maximum Reheat Steam Flow Rate [m3/s]", MaxReheatSteamVolFlowDes);
@@ -3801,7 +3796,6 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     Real64 DeltaTemp;
     int SysOutletNode;        // The node number of the terminal unit outlet node
     int SysInletNode;         // the node number of the terminal unit inlet node
-    int WaterControlNode;     // This is the Actuated Reheat Control Node
     Real64 MaxFlowWater;      // This is the value passed to the Controller depending if FirstHVACIteration or not
     Real64 MinFlowWater;      // This is the value passed to the Controller depending if FirstHVACIteration or not
     Real64 QActualHeating;    // the heating load seen by the reheat coil
@@ -4045,7 +4039,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                 MaxFlowWater = this->MaxReheatWaterFlow;
                 MinFlowWater = this->MinReheatWaterFlow;
             } else {
-                WaterControlNode = this->ReheatControlNode;
+                int WaterControlNode = this->ReheatControlNode;
                 MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
                 MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
             }
@@ -4341,20 +4335,19 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 MassFlow;      // Total Mass Flow Rate from Hot & Cold Inlets [kg/sec]
-    Real64 QTotLoad;      // Total load based on thermostat setpoint temperature [Watts]
-    Real64 QZnReq;        // Total load to be met by terminal heater [Watts]
-    Real64 QToHeatSetPt;  // Remaining load to heating setpoint [W]
-    Real64 QSupplyAir;    // Zone load met by VAVHeatandCool system
-    Real64 CpAirZn;       // Specific heat of zone air [J/kg-C]
-    Real64 CpAirSysIn;    // Specific heat of VAVHeatandCool box entering air [J/kg-C]
-    Real64 DeltaTemp;     // Temperature difference multiplied by specific heat [J/kg]
-    Real64 MaxFlowWater;  // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 MinFlowWater;  // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 LeakLoadMult;  // Load multiplier to adjust for downstream leaks
-    int SysOutletNode;    // The node number of the terminal unit outlet node
-    int SysInletNode;     // The node number of the terminal unit inlet node
-    int WaterControlNode; // This is the Actuated Reheat Control Node
+    Real64 MassFlow;     // Total Mass Flow Rate from Hot & Cold Inlets [kg/sec]
+    Real64 QTotLoad;     // Total load based on thermostat setpoint temperature [Watts]
+    Real64 QZnReq;       // Total load to be met by terminal heater [Watts]
+    Real64 QToHeatSetPt; // Remaining load to heating setpoint [W]
+    Real64 QSupplyAir;   // Zone load met by VAVHeatandCool system
+    Real64 CpAirZn;      // Specific heat of zone air [J/kg-C]
+    Real64 CpAirSysIn;   // Specific heat of VAVHeatandCool box entering air [J/kg-C]
+    Real64 DeltaTemp;    // Temperature difference multiplied by specific heat [J/kg]
+    Real64 MaxFlowWater; // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 MinFlowWater; // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 LeakLoadMult; // Load multiplier to adjust for downstream leaks
+    int SysOutletNode;   // The node number of the terminal unit outlet node
+    int SysInletNode;    // The node number of the terminal unit inlet node
     Real64 DummyMdot;
     Real64 QActualHeating;
     Real64 MinFlowFrac; // minimum flow fraction (and minimum damper position)
@@ -4500,7 +4493,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
                 MaxFlowWater = this->MaxReheatWaterFlow;
                 MinFlowWater = this->MinReheatWaterFlow;
             } else {
-                WaterControlNode = this->ReheatControlNode;
+                int WaterControlNode = this->ReheatControlNode;
                 MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
                 MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
             }
@@ -4724,7 +4717,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     int SolFlag;
     Real64 ErrTolerance;
     Real64 MaxSteamCap; // steam coil capacity at full load
-    bool ErrorsFound;   // returned from mining function call
 
     // The calculated load from the Heat Balance
     QTotLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
@@ -4785,6 +4777,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     // region 1: active cooling with fan on
     FanOp = 1;
     if (HCType == HeatingCoilType::SteamAirHeating) {
+        bool ErrorsFound; // returned from mining function call
         this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, fanType, MaxCoolMassFlow, FanOp, QCoolFanOnMax);
         this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, fanType, MinMassFlow, FanOp, QCoolFanOnMin);
         // region 2: active heating with fan on
