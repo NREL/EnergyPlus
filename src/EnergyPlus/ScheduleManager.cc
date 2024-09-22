@@ -199,8 +199,6 @@ namespace ScheduleManager {
         bool ErrorsFound(false);
         bool NumErrorFlag;
         int SchedTypePtr;
-        std::string CFld; // Character field for error message
-        //  CHARACTER(len=20) CFld1        ! Character field for error message
         int NumHrDaySchedules;                                       // Number of "hourly" dayschedules
         int NumIntDaySchedules;                                      // Number of "interval" dayschedules
         int NumExternalInterfaceSchedules;                           // Number of "PtolemyServer ExternalInterface" "compact" Schedules
@@ -229,8 +227,6 @@ namespace ScheduleManager {
         int CurMinute;
         int MinutesPerItem;
         int NumExpectedItems;
-        int MaxNums;
-        int MaxAlps;
         int AddWeekSch;
         int AddDaySch;
         Array1D_bool AllDays(maxDayTypes);
@@ -252,14 +248,12 @@ namespace ScheduleManager {
         int kdy;
         // for SCHEDULE:FILE
         int rowCnt;
-        std::string subString;
         int iDay;
         int hDay;
         int jHour;
         int kDayType;
         Real64 curHrVal;
         std::string::size_type sPos;
-        std::string CurrentModuleObject; // for ease in getting objects
         int MaxNums1;
         char ColumnSep;
         bool FileIntervalInterpolated;
@@ -276,10 +270,10 @@ namespace ScheduleManager {
         }
         state.dataScheduleMgr->ScheduleInputProcessed = true;
 
-        MaxNums = 1; // Need at least 1 number because it's used as a local variable in the Schedule Types loop
-        MaxAlps = 0;
+        int MaxNums = 1; // Need at least 1 number because it's used as a local variable in the Schedule Types loop
+        int MaxAlps = 0;
 
-        CurrentModuleObject = "ScheduleTypeLimits";
+        std::string CurrentModuleObject = "ScheduleTypeLimits";
         state.dataScheduleMgr->NumScheduleTypes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataScheduleMgr->NumScheduleTypes > 0) {
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
@@ -531,7 +525,7 @@ namespace ScheduleManager {
             if (rowCnt != rowLimitCount) {
                 if (rowCnt < rowLimitCount) {
                     ShowSevereError(state, format("{}{}=\"{}\" {} data values read.", RoutineName, CurrentModuleObject, Alphas(1), rowCnt));
-                } else if (rowCnt > rowLimitCount) {
+                } else {
                     ShowSevereError(state, format("{}{}=\"{}\" too many data values read.", RoutineName, CurrentModuleObject, Alphas(1)));
                 }
                 ShowContinueError(
@@ -1846,14 +1840,6 @@ namespace ScheduleManager {
                         format(
                             "{}{}=\"{}\" less than {} hourly values read from file.", RoutineName, CurrentModuleObject, Alphas(1), numHourlyValues));
                     ShowContinueError(state, format("..Number read={}.", (rowCnt * 60) / MinutesPerItem));
-                }
-                if (rowCnt < rowLimitCount) {
-                    ShowWarningError(
-                        state, format("{}{}=\"{}\" less than specified hourly values read from file.", RoutineName, CurrentModuleObject, Alphas(1)));
-                    ShowContinueError(state,
-                                      format("..Specified Number of Hourly Values={} Actual number of hourly values included={}",
-                                             numHourlyValues,
-                                             (rowCnt * 60) / MinutesPerItem));
                 }
 
                 // process the data into the normal schedule data structures
@@ -3786,7 +3772,6 @@ namespace ScheduleManager {
                 SetScheduleMinMax(state, ScheduleIndex);
             }
             MinValue = state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue;
-            MinValue = state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue;
         }
 
         //  Min/max for schedule has been set.  Test.
@@ -4133,8 +4118,6 @@ namespace ScheduleManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0); // For total minimum
         Real64 MaxValue(0.0); // For total maximum
-        bool MinValueOk;
-        bool MaxValueOk;
 
         if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             MinValue = 1.0;
@@ -4152,8 +4135,8 @@ namespace ScheduleManager {
         }
 
         //  Min/max for schedule has been set.  Test.
-        MinValueOk = true;
-        MaxValueOk = true;
+        bool MinValueOk;
+        bool MaxValueOk;
 
         if (exclusiveMin) {
             MinValueOk = (MinValue > Minimum);
@@ -4181,8 +4164,6 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function checks the indicated schedule values for validity.  Uses the ScheduleIndex
@@ -4193,29 +4174,8 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckDayScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 MinValue(0.0); // For total minimum
+        Real64 MinValue = 0.0; // For total minimum
         bool MinValueOk;
 
         if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
@@ -4231,17 +4191,13 @@ namespace ScheduleManager {
         }
 
         //  Min/max for schedule has been set.  Test.
-        MinValueOk = true;
-
         if (exclusiveMin) {
             MinValueOk = (MinValue > Minimum);
         } else {
             MinValueOk = (FLT_EPSILON >= Minimum - MinValue);
         }
 
-        CheckDayScheduleValueMinMax = MinValueOk;
-
-        return CheckDayScheduleValueMinMax;
+        return MinValueOk;
     }
 
     bool HasFractionalScheduleValue(EnergyPlusData &state, int const ScheduleIndex) // Which Schedule being tested
