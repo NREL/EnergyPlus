@@ -380,7 +380,7 @@ namespace ScheduleManager {
                                 bool const isItLeapYear   // true if it is a leap year containing February 29
     );
 
-    int GetNumberOfSchedules(EnergyPlusData const &state);
+    int GetNumberOfSchedules(EnergyPlusData &state);
 
 } // namespace ScheduleManager
 

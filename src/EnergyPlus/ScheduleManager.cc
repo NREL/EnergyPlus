@@ -151,7 +151,6 @@ namespace ScheduleManager {
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
         //       MODIFIED       Rui Zhang February 2010
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine processes the schedules input for EnergyPlus.
@@ -2663,7 +2662,6 @@ namespace ScheduleManager {
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
         //       MODIFIED       August 2011; adapt Autodesk changes (time reduction)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function returns the hourly schedule value for the current day.
@@ -2672,29 +2670,6 @@ namespace ScheduleManager {
         // Use internal Schedule data structure to return value.  Note that missing values in
         // input will equate to 0 indices in arrays -- which has been set up to return legally with
         // 0.0 values.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         // Checking if valid index is passed is necessary
         if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
@@ -2714,8 +2689,6 @@ namespace ScheduleManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2011; adapted from Autodesk (time reduction)
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This routine calculates all the scheduled values as a time reduction measure and
@@ -2723,28 +2696,7 @@ namespace ScheduleManager {
 
         // METHODOLOGY EMPLOYED:
         // Use internal Schedule data structure to calculate current value.  Note that missing values in
-        // input will equate to 0 indices in arrays -- which has been set up to return legally with
-        // 0.0 values.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        // input will equate to 0 indices in arrays -- which has been set up to return legally with 0.0 values.
 
         if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
@@ -2912,8 +2864,6 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function returns the internal pointer to Day Schedule "ScheduleName".
@@ -2947,8 +2897,6 @@ namespace ScheduleManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine returns an entire day's worth of schedule values.
@@ -3005,37 +2953,9 @@ namespace ScheduleManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine returns an entire day's worth of schedule values for a specified Day Schedule Index item.
-
-        // METHODOLOGY EMPLOYED:
-        // Use internal data to fill DayValues array.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
@@ -3087,37 +3007,13 @@ namespace ScheduleManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine processes the "interval" fields with/without optional "until" in front of
-        // time (hh:mm).
-
-        // METHODOLOGY EMPLOYED:
-        // na.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
+        // This subroutine processes the "interval" fields with/without optional "until" in front of time (hh:mm).
 
         // Argument array dimensioning
         MinuteValue.dim(60, 24);
         SetMinuteValue.dim(60, 24);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;
@@ -3126,22 +3022,17 @@ namespace ScheduleManager {
         int MMField;
         int Hr;
         int Min;
-        int SHr;  // starting hour
-        int SMin; // starting minute
-        int EHr;  // ending hour
-        int EMin; // ending minute
-        std::string::size_type sFld;
         int totalMinutes;
         Real64 incrementPerMinute;
         Real64 curValue;
 
         MinuteValue = 0.0;
         SetMinuteValue = false;
-        SHr = 1;
-        SMin = 1;
-        EHr = 0;
-        EMin = 0;
-        sFld = 0;
+        int SHr = 1;
+        int SMin = 1;
+        int EHr = 0;
+        int EMin = 0;
+        std::string::size_type sFld = 0;
 
         Real64 StartValue = 0;
         Real64 EndValue = 0;
@@ -3628,8 +3519,6 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function checks the indicated schedule values for validity.  Uses the ScheduleIndex
@@ -3822,8 +3711,6 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function checks the indicated schedule value for validity.  Uses the ScheduleIndex
@@ -3833,26 +3720,8 @@ namespace ScheduleManager {
         // This routine is best used with "discrete" schedules.  The routine must traverse all values
         // in the schedule and compares by equality.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckScheduleValue;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;  // Loop Control variable
@@ -3895,8 +3764,6 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function checks the indicated schedule value for validity.  Uses the ScheduleIndex
@@ -3906,26 +3773,8 @@ namespace ScheduleManager {
         // This routine is best used with "discrete" schedules.  The routine must traverse all values
         // in the schedule and compares by equality.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckScheduleValue;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;  // Loop Control variable
@@ -3969,8 +3818,6 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function checks the indicated schedule values for validity.  Uses the ScheduleIndex
@@ -3981,26 +3828,8 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckDayScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0); // For total minimum
@@ -4092,36 +3921,12 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   March 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // This function returns true if the schedule contains fractional
-        // values [>0, <1].
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
+        // This function returns true if the schedule contains fractional values [>0, <1].
 
         // Return value
         bool HasFractions; // True if the schedule has fractional values
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WkSch;
@@ -4394,38 +4199,12 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function returns the schedule name from the Schedule Index.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         std::string ScheduleName;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
@@ -4450,8 +4229,6 @@ namespace ScheduleManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine puts the proper current schedule values into the "reporting"
@@ -4486,8 +4263,6 @@ namespace ScheduleManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // In response to CR7498, report orphan (unused) schedule items.
@@ -4623,13 +4398,9 @@ namespace ScheduleManager {
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2006
         //       MODIFIED       September 2012; Glazer - CR8849
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // This function returns the "average" hours per week for a schedule over
-        // the entire year.
-
-        // Return value
+        // This function returns the "average" hours per week for a schedule over the entire year.
 
         Real64 WeeksInYear;
 
@@ -4695,13 +4466,6 @@ namespace ScheduleManager {
 
     int GetNumberOfSchedules(EnergyPlusData &state)
     {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Greg Stark
-        //       DATE WRITTEN   September 2008
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function returns the number of schedules.
-
         return state.dataScheduleMgr->NumSchedules;
     }
 
