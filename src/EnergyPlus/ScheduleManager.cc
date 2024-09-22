@@ -223,7 +223,6 @@ namespace ScheduleManager {
         int NumFields;
         int SCount;
         //  LOGICAL RptSchedule
-        int RptLevel;
         int CurMinute;
         int MinutesPerItem;
         int NumExpectedItems;
@@ -2316,7 +2315,6 @@ namespace ScheduleManager {
             NumFields = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
             //    RptSchedule=.FALSE.
-            RptLevel = 1;
             for (Count = 1; Count <= NumFields; ++Count) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, Status);
@@ -3720,7 +3718,7 @@ namespace ScheduleManager {
             MinValueOk = (Minimum == 0.0);
             MaxValueOk = (Maximum == 0.0);
         } else if (schedNum > 0 && schedNum <= state.dataScheduleMgr->NumSchedules) {
-            auto &sched = state.dataScheduleMgr->Schedule(schedNum);
+            auto const &sched = state.dataScheduleMgr->Schedule(schedNum);
             if (!sched.MaxMinSet) {
                 SetScheduleMinMax(state, schedNum);
             }
@@ -4359,7 +4357,7 @@ namespace ScheduleManager {
                         auto &weekSch = state.dataScheduleMgr->WeekSchedule(WkSch);
                         for (int jType = 1; jType <= maxDayTypes; ++jType) {
                             if (dayTypeFilter[jType - 1]) {
-                                auto &daySch = state.dataScheduleMgr->DaySchedule(weekSch.DaySchedulePointer(jType));
+                                auto const &daySch = state.dataScheduleMgr->DaySchedule(weekSch.DaySchedulePointer(jType));
                                 // use precalcuated min and max from SetScheduleMinMax
                                 MinValue = min(MinValue, daySch.TSValMin);
                                 MaxValue = max(MaxValue, daySch.TSValMax);
@@ -4700,42 +4698,11 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   September 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function returns the number of schedules.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        int NumberOfSchedules;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        NumberOfSchedules = state.dataScheduleMgr->NumSchedules;
-
-        return NumberOfSchedules;
+        return state.dataScheduleMgr->NumSchedules;
     }
 
 } // namespace ScheduleManager
