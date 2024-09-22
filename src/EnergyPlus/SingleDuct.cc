@@ -6260,7 +6260,6 @@ void setATMixerSizingProperties(EnergyPlusData &state,
                                 int const curZoneEqNum       // current zone equipment being simulated
 )
 {
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
     auto &FinalZoneSizing(state.dataSize->FinalZoneSizing);
 
     if (inletATMixerIndex == 0) return; // protect this function from bad inputs
@@ -6309,21 +6308,22 @@ void setATMixerSizingProperties(EnergyPlusData &state,
 
     if (SizingDesRunThisAirSys) {
         auto &finalSysSizing = state.dataSize->FinalSysSizing(airLoopIndex);
+        auto &zoneEqSizing = state.dataSize->ZoneEqSizing(curZoneEqNum);
 
         // set ATMixer outlet air flow rate in ZoneEqSizing array for ATMixer. If this value > 0, then the Sizer will know an ATMixer exists
-        ZoneEqSizing(curZoneEqNum).ATMixerVolFlow = state.dataSingleDuct->SysATMixer(inletATMixerIndex).DesignPrimaryAirVolRate;
+        zoneEqSizing.ATMixerVolFlow = state.dataSingleDuct->SysATMixer(inletATMixerIndex).DesignPrimaryAirVolRate;
 
         // If air loop has heating coil use SA conditions, else if OA sys has coils then use precool conditions, else use OA conditions
         if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).CentralHeatCoilExists) {
             // if central heating coil exists, ATMixer outlet is assumed to be at supply air conditions described in sizing input
-            ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = finalSysSizing.HeatSupTemp;
-            ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = finalSysSizing.HeatSupHumRat;
+            zoneEqSizing.ATMixerHeatPriDryBulb = finalSysSizing.HeatSupTemp;
+            zoneEqSizing.ATMixerHeatPriHumRat = finalSysSizing.HeatSupHumRat;
         } else if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).NumOAHeatCoils > 0) {
             // if no central heating coil exists and an outdoor air coil does exist, then ATMixer outlet is mixture of preheat and return
             if (finalSysSizing.DesMainVolFlow == 0.0) { // protect divide by 0
                 // doesn't matter, just pick a condition
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = finalSysSizing.PreheatTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = finalSysSizing.PreheatHumRat;
+                zoneEqSizing.ATMixerHeatPriDryBulb = finalSysSizing.PreheatTemp;
+                zoneEqSizing.ATMixerHeatPriHumRat = finalSysSizing.PreheatHumRat;
             } else {
                 // mix preheat condition with return air condition based on OA frac. OA frac should nearly always be 1.
                 // OA frac is based on air loop fraction, not ATMixer flow fraction since air loop can serve multiple ATMixers
@@ -6341,15 +6341,15 @@ void setATMixerSizingProperties(EnergyPlusData &state,
                 // back calculate temperature based on humrat and enthalpy state points
                 Real64 CoilInTempForSizing = Psychrometrics::PsyTdbFnHW(CoilInEnthalpyForSizing, CoilInHumRatForSizing);
 
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = CoilInTempForSizing;
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = CoilInHumRatForSizing;
+                zoneEqSizing.ATMixerHeatPriDryBulb = CoilInTempForSizing;
+                zoneEqSizing.ATMixerHeatPriHumRat = CoilInHumRatForSizing;
             }
         } else {
             // else no coils exist in air loop so mix OA condition with return air condition
             if (finalSysSizing.DesMainVolFlow == 0.0) { // protect divide by 0
                 // doesn't matter, just pick a condition
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = finalSysSizing.HeatOutTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = finalSysSizing.HeatOutHumRat;
+                zoneEqSizing.ATMixerHeatPriDryBulb = finalSysSizing.HeatOutTemp;
+                zoneEqSizing.ATMixerHeatPriHumRat = finalSysSizing.HeatOutHumRat;
             } else {
                 // OA frac is based on air loop fraction, not ATMixer flow fraction since air loop can serve multiple ATMixers
                 Real64 OutAirFrac = finalSysSizing.DesOutAirVolFlow / finalSysSizing.DesMainVolFlow;
@@ -6366,22 +6366,22 @@ void setATMixerSizingProperties(EnergyPlusData &state,
                 // back calculate temperature based on humrat and enthalpy state points
                 Real64 CoilInTempForSizing = Psychrometrics::PsyTdbFnHW(CoilInEnthalpyForSizing, CoilInHumRatForSizing);
 
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = CoilInTempForSizing;
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = CoilInHumRatForSizing;
+                zoneEqSizing.ATMixerHeatPriDryBulb = CoilInTempForSizing;
+                zoneEqSizing.ATMixerHeatPriHumRat = CoilInHumRatForSizing;
             }
         }
 
         // If air loop has cooling coil use SA conditions, else if OA sys has coils then use precool conditions, else use OA conditions
         if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).CentralCoolCoilExists) {
             // if central cooling coil exists, ATMixer outlet is assumed to be at supply air conditions described in sizing input
-            ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = finalSysSizing.CoolSupTemp;
-            ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = finalSysSizing.CoolSupHumRat;
+            zoneEqSizing.ATMixerCoolPriDryBulb = finalSysSizing.CoolSupTemp;
+            zoneEqSizing.ATMixerCoolPriHumRat = finalSysSizing.CoolSupHumRat;
         } else if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).NumOACoolCoils > 0) {
             // if no central cooling coil exists and an outdoor air coil does exist, then ATMixer outlet is mixture of precool and return
             if (finalSysSizing.DesMainVolFlow == 0.0) { // protect divide by 0
                 // doesn't matter, just pick a condition
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = finalSysSizing.PrecoolTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = finalSysSizing.PrecoolHumRat;
+                zoneEqSizing.ATMixerCoolPriDryBulb = finalSysSizing.PrecoolTemp;
+                zoneEqSizing.ATMixerCoolPriHumRat = finalSysSizing.PrecoolHumRat;
             } else {
                 // mix precool condition with return air condition based on OA frac. OA frac should nearly always be 1.
                 // OA frac is based on air loop fraction, not ATMixer flow fraction since air loop can serve multiple ATMixers
@@ -6399,15 +6399,15 @@ void setATMixerSizingProperties(EnergyPlusData &state,
                 // back calculate temperature based on humrat and enthalpy state points
                 Real64 CoilInTempForSizing = Psychrometrics::PsyTdbFnHW(CoilInEnthalpyForSizing, CoilInHumRatForSizing);
 
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = CoilInTempForSizing;
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = CoilInHumRatForSizing;
+                zoneEqSizing.ATMixerCoolPriDryBulb = CoilInTempForSizing;
+                zoneEqSizing.ATMixerCoolPriHumRat = CoilInHumRatForSizing;
             }
         } else {
             // else no coils exist in air loop so mix OA condition with return air condition
             if (finalSysSizing.DesMainVolFlow == 0.0) { // protect divide by 0
                 // doesn't matter, just pick a condition
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = finalSysSizing.OutTempAtCoolPeak;
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = finalSysSizing.OutHumRatAtCoolPeak;
+                zoneEqSizing.ATMixerCoolPriDryBulb = finalSysSizing.OutTempAtCoolPeak;
+                zoneEqSizing.ATMixerCoolPriHumRat = finalSysSizing.OutHumRatAtCoolPeak;
             } else {
                 // OA frac is based on air loop fraction, not ATMixer flow fraction since air loop can serve multiple ATMixers
                 Real64 OutAirFrac = finalSysSizing.DesOutAirVolFlow / finalSysSizing.DesMainVolFlow;
@@ -6425,8 +6425,8 @@ void setATMixerSizingProperties(EnergyPlusData &state,
                 // back calculate temperature based on humrat and enthalpy state points
                 Real64 CoilInTempForSizing = Psychrometrics::PsyTdbFnHW(CoilInEnthalpyForSizing, CoilInHumRatForSizing);
 
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = CoilInTempForSizing;
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = CoilInHumRatForSizing;
+                zoneEqSizing.ATMixerCoolPriDryBulb = CoilInTempForSizing;
+                zoneEqSizing.ATMixerCoolPriHumRat = CoilInHumRatForSizing;
             }
         }
 
