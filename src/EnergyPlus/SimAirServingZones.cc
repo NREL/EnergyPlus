@@ -172,7 +172,7 @@ void ManageAirLoops(EnergyPlusData &state,
     // Call the AirLoop Simulation
     if (state.dataGlobal->SysSizingCalc) {
         SizeAirLoops(state);
-    } else if (!state.dataGlobal->SysSizingCalc) {
+    } else {
         SimAirLoops(state, FirstHVACIteration, SimZoneEquipment);
     }
 
@@ -285,16 +285,15 @@ void GetAirPathData(EnergyPlusData &state)
     int NumParams;
     int MaxNumbers;
     int MaxAlphas;
-    Array1D_string Alphas;           // alpha strings returned by GetObjectItem
-    Array1D_string cAlphaFields;     // Alpha field names
-    Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-    std::string CurrentModuleObject; // Object type for getting and error messages
-    int NumNodes;                    // number of nodes returned by GetNodeNums
-    Array1D_int NodeNums;            // node numbers returned by GetNodeNums
-    int NodeNum;                     // a node number
-    int AirSysNum;                   // an air system (air loop) number
-    int OANum;                       // outside air system index
-    int NumInList;
+    Array1D_string Alphas;            // alpha strings returned by GetObjectItem
+    Array1D_string cAlphaFields;      // Alpha field names
+    Array1D_bool lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
+    std::string CurrentModuleObject;  // Object type for getting and error messages
+    int NumNodes;                     // number of nodes returned by GetNodeNums
+    Array1D_int NodeNums;             // node numbers returned by GetNodeNums
+    int NodeNum;                      // a node number
+    int AirSysNum;                    // an air system (air loop) number
+    int OANum;                        // outside air system index
     int OAMixNum;                     // outside air mixer index
     int IOStat;                       // status number returned by GetObjectItem
     int NumControllers;               // number of controllers
@@ -1348,7 +1347,7 @@ void GetAirPathData(EnergyPlusData &state)
 
     OANum = GetNumOASystems(state);
     for (int OASysNum = 1; OASysNum <= OANum; ++OASysNum) {
-        NumInList = GetOACompListNumber(state, OASysNum);
+        int NumInList = GetOACompListNumber(state, OASysNum);
         for (int OACompNum = 1; OACompNum <= NumInList; ++OACompNum) {
             CompType_Num = GetOACompTypeNum(state, OASysNum, OACompNum);
             if (CompType_Num == CompType::WaterCoil_DetailedCool || CompType_Num == CompType::WaterCoil_SimpleHeat ||
