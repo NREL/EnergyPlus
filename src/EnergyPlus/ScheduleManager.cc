@@ -3050,14 +3050,12 @@ namespace ScheduleManager {
 
     void ExternalInterfaceSetSchedule(EnergyPlusData &state,
                                       int &ScheduleIndex,
-                                      Real64 &Value // The new value for the schedule
+                                      Real64 const Value // The new value for the schedule
     )
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   February 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine sets all values of the schedule referenced by 'ScheduleIndex'
@@ -3067,32 +3065,9 @@ namespace ScheduleManager {
         // for supervisory controls or internal gains obtained from real-time occupancy
         // measurements.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int TS; // Counter for Num Of Time Steps in Hour
-        int Hr; // Hour Counter
-
         // Assign the value of the variable
-        for (Hr = 1; Hr <= 24; ++Hr) {
-            for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+        for (int Hr = 1; Hr <= 24; ++Hr) {
+            for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                 state.dataScheduleMgr->DaySchedule(ScheduleIndex).TSValue(TS, Hr) = Value;
             }
         }
