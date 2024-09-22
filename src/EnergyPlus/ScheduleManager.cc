@@ -3463,7 +3463,6 @@ namespace ScheduleManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int DayT;
         bool OneValid;
         bool DupAssignment;
 
@@ -3612,7 +3611,7 @@ namespace ScheduleManager {
             OneValid = true;
         }
         if (has(ForDayField, "ALLOTHERDAY")) {
-            for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
+            for (int DayT = 1; DayT <= maxDayTypes; ++DayT) {
                 if (AlReady(DayT)) continue;
                 TheseDays(DayT) = true;
                 AlReady(DayT) = true;
@@ -4237,43 +4236,13 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // This function returns the minimum value used by a schedule over
-        // the entire year.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 MinimumValue; // Minimum value for schedule
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
+        // This function returns the minimum value used by a schedule over the entire year.
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 MinValue(0.0);
-        Real64 MaxValue(0.0);
-        int WkSch;
-        int DayT;
-        int Loop;
+        Real64 MinValue = 0.0;
+        Real64 MaxValue = 0.0;
 
         if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             MinValue = 1.0;
@@ -4287,10 +4256,10 @@ namespace ScheduleManager {
 
         if (ScheduleIndex > 0) {
             if (!state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                int WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= maxDayTypes; ++DayT) {
+                for (int DayT = 2; DayT <= maxDayTypes; ++DayT) {
                     MinValue =
                         min(MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4299,10 +4268,10 @@ namespace ScheduleManager {
                             maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
                 int prevWkSch = -999; // set to a value that would never occur
-                for (Loop = 2; Loop <= 366; ++Loop) {
+                for (int Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
                     if (WkSch != prevWkSch) { // skip if same as previous week (very common)
-                        for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
+                        for (int DayT = 1; DayT <= maxDayTypes; ++DayT) {
                             MinValue = min(
                                 MinValue,
                                 minval(
@@ -4321,12 +4290,10 @@ namespace ScheduleManager {
             }
 
             //  Min/max for schedule has been set.
-            MinimumValue = state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue;
+            return state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue;
         } else {
-            MinimumValue = MinValue;
+            return MinValue;
         }
-
-        return MinimumValue;
     }
 
     Real64 GetScheduleMaxValue(EnergyPlusData &state, int const ScheduleIndex) // Which Schedule being tested
