@@ -3430,44 +3430,18 @@ namespace ScheduleManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine processes a field "For: day types" and returns
         // those day types (can be multiple) from field.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(TheseDays, maxDayTypes);
         EP_SIZE_CHECK(AlReady, maxDayTypes);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool OneValid;
-        bool DupAssignment;
-
-        OneValid = false;
-        DupAssignment = false;
+        bool OneValid = false;
+        bool DupAssignment = false;
         // Just test for specific days
         if (has(ForDayField, "WEEKDAY")) {
             TheseDays({2, 6}) = true;
@@ -3650,19 +3624,19 @@ namespace ScheduleManager {
         Real64 MinValue = daySched.TSValMin;
         Real64 MaxValue = daySched.TSValMax;
         for (int DayT = 2; DayT <= maxDayTypes; ++DayT) {
-            auto const &daySched = state.dataScheduleMgr->DaySchedule(wkSched.DaySchedulePointer(DayT));
-            MinValue = min(MinValue, daySched.TSValMin);
-            MaxValue = max(MaxValue, daySched.TSValMax);
+            auto const &daySched2 = state.dataScheduleMgr->DaySchedule(wkSched.DaySchedulePointer(DayT));
+            MinValue = min(MinValue, daySched2.TSValMin);
+            MaxValue = max(MaxValue, daySched2.TSValMax);
         }
         int prevWkSch = -999; // set to a value that would never occur
         for (int Loop = 2; Loop <= 366; ++Loop) {
             int WkSch = sched.WeekSchedulePointer(Loop);
             if (WkSch != prevWkSch) { // skip if same as previous week (very common)
-                auto const &wkSched = state.dataScheduleMgr->WeekSchedule(WkSch);
+                auto const &wkSched2 = state.dataScheduleMgr->WeekSchedule(WkSch);
                 for (int DayT = 1; DayT <= maxDayTypes; ++DayT) {
-                    auto const &daySched = state.dataScheduleMgr->DaySchedule(wkSched.DaySchedulePointer(DayT));
-                    MinValue = min(MinValue, daySched.TSValMin);
-                    MaxValue = max(MaxValue, daySched.TSValMax);
+                    auto const &daySched3 = state.dataScheduleMgr->DaySchedule(wkSched2.DaySchedulePointer(DayT));
+                    MinValue = min(MinValue, daySched3.TSValMin);
+                    MaxValue = max(MaxValue, daySched3.TSValMax);
                 }
                 prevWkSch = WkSch;
             }
