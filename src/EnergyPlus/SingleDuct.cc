@@ -5092,33 +5092,17 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 MassFlow;     // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets
-    Real64 QZnReq;       // [Watts]
-    Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
-    Real64 CpAir;
-    int WaterControlNode;  // This is the Actuated Reheat Control Node
-    Real64 MaxFlowWater;   // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 MinFlowWater;   // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 QActualHeating; // the heating load seen by the reheat coil
-    Real64 DummyMdot;      // local fluid mass flow rate
+    Real64 MaxFlowWater; // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 MinFlowWater; // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 DummyMdot;    // local fluid mass flow rate
 
-    QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // The calculated load from the Heat Balance
-    MassFlow = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;                                       // System massflow is set to the Available
+    Real64 QToHeatSetPt =
+        state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // The calculated load from the Heat Balance
+    Real64 MassFlow = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;                     // System massflow is set to the Available
     state.dataSingleDuct->QMax2SCV = QToHeatSetPt;
     state.dataSingleDuct->ZoneTempSCV = state.dataLoopNodes->Node(ZoneNodeNum).Temp;
-    CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat); // zone air specific heat
+    Real64 CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat); // zone air specific heat
     if (this->MaxReheatTempSetByUser) {
         state.dataSingleDuct->TAirMaxSCV = this->MaxReheatTemp;
         state.dataSingleDuct->QMaxSCV = CpAir * MassFlow * (state.dataSingleDuct->TAirMaxSCV - state.dataSingleDuct->ZoneTempSCV);
@@ -5144,11 +5128,13 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     this->sd_airterminalOutlet.AirMassFlowRateMinAvail = this->sd_airterminalInlet.AirMassFlowRateMinAvail;
     this->UpdateSys(state);
 
-    QActualHeating = QToHeatSetPt - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCV); // reheat needed
+    Real64 QActualHeating =
+        QToHeatSetPt - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCV); // reheat needed
     // Now the massflow for reheating has been determined. If it is zero, or in SetBack, or the
     // system scheduled OFF then not operational and shut the system down.
     if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) &&
         (state.dataHeatBalFanSys->TempControlType(ZoneNum) != HVAC::ThermostatType::SingleCooling)) {
+        Real64 QZnReq; // [Watts]
 
         switch (this->ReheatComp_Num) {
         case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
@@ -5168,7 +5154,7 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
                 MaxFlowWater = this->MaxReheatWaterFlow;
                 MinFlowWater = this->MinReheatWaterFlow;
             } else {
-                WaterControlNode = this->ReheatControlNode;
+                int WaterControlNode = this->ReheatControlNode;
                 MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
                 MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
             }
@@ -6230,8 +6216,6 @@ void SetATMixerPriFlow(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   April 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This Subroutine sets the primary air mass flow rate on the primary air inlet
@@ -6242,11 +6226,8 @@ void SetATMixerPriFlow(EnergyPlusData &state,
     // parameter is present, or to the maximum available mass flow rate of the primary
     // air inlet node.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int PriAirNode; // air terminal mixer primary air inlet node number
-
     if (ATMixerNum <= 0) return;
-    PriAirNode = state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode;
+    int const PriAirNode = state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode; // air terminal mixer primary air inlet node number
     if (present(PriAirMassFlowRate)) {
         state.dataLoopNodes->Node(PriAirNode).MassFlowRate = PriAirMassFlowRate;
     } else {
