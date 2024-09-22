@@ -2840,18 +2840,12 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function returns the internal pointer to Schedule "ScheduleName".
 
         // Return value
         int GetScheduleIndex;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int DayCtr;
-        int WeekCtr;
 
         if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
@@ -2863,11 +2857,11 @@ namespace ScheduleManager {
             if (GetScheduleIndex > 0) {
                 if (!state.dataScheduleMgr->Schedule(GetScheduleIndex).Used) {
                     state.dataScheduleMgr->Schedule(GetScheduleIndex).Used = true;
-                    for (WeekCtr = 1; WeekCtr <= 366; ++WeekCtr) {
+                    for (int WeekCtr = 1; WeekCtr <= 366; ++WeekCtr) {
                         if (state.dataScheduleMgr->Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr) > 0) {
                             state.dataScheduleMgr->WeekSchedule(state.dataScheduleMgr->Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr)).Used =
                                 true;
-                            for (DayCtr = 1; DayCtr <= maxDayTypes; ++DayCtr) {
+                            for (int DayCtr = 1; DayCtr <= maxDayTypes; ++DayCtr) {
                                 state.dataScheduleMgr
                                     ->DaySchedule(state.dataScheduleMgr
                                                       ->WeekSchedule(state.dataScheduleMgr->Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr))
@@ -2890,37 +2884,12 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function returns the internal pointer to Schedule "ScheduleName" (actually, it doesn't do that)
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Return value
         std::string TypeOfSchedule;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int curSchType;
 
         if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
@@ -2928,7 +2897,7 @@ namespace ScheduleManager {
         }
 
         if ((ScheduleIndex > 0) && (ScheduleIndex <= state.dataScheduleMgr->NumSchedules)) {
-            curSchType = state.dataScheduleMgr->Schedule(ScheduleIndex).ScheduleTypePtr;
+            int curSchType = state.dataScheduleMgr->Schedule(ScheduleIndex).ScheduleTypePtr;
             if ((curSchType > 0) && (curSchType <= state.dataScheduleMgr->NumScheduleTypes)) {
                 TypeOfSchedule = state.dataScheduleMgr->ScheduleType(curSchType).Name;
             } else {
@@ -3364,43 +3333,13 @@ namespace ScheduleManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K Lawrie
         //       DATE WRITTEN   January 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine decodes a hhmm date field input as part of the "until" time in a schedule
-        // representation.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 rRetHH; // real Returned "hour"
-        Real64 rRetMM; // real Returned "minute"
-        bool nonIntegral;
-        std::string hHour;
-        std::string mMinute;
+        // This subroutine decodes a hhmm date field input as part of the "until" time in a schedule representation.
 
         std::string String = stripped(FieldValue);
         std::string::size_type const Pos = index(String, ':');
-        nonIntegral = false;
+        bool nonIntegral = false;
         if (Pos == std::string::npos) {
             ShowSevereError(state,
                             format("ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (no : separator in hh:mm)={}",
@@ -3412,7 +3351,7 @@ namespace ScheduleManager {
             RetHH = 0;
         } else {
             bool error = false;
-            rRetHH = Util::ProcessNumber(String.substr(0, Pos), error);
+            Real64 rRetHH = Util::ProcessNumber(String.substr(0, Pos), error);
             RetHH = int(rRetHH);
             if (double(RetHH) != rRetHH || error || rRetHH < 0.0) {
                 if (double(RetHH) != rRetHH && rRetHH >= 0.0) {
@@ -3435,7 +3374,7 @@ namespace ScheduleManager {
 
         String.erase(0, Pos + 1);
         bool error = false;
-        rRetMM = Util::ProcessNumber(String, error);
+        Real64 rRetMM = Util::ProcessNumber(String, error);
         RetMM = int(rRetMM);
         if (double(RetMM) != rRetMM || error || rRetMM < 0.0) {
             if (double(RetMM) != rRetMM && rRetMM >= 0.0) {
@@ -3456,6 +3395,8 @@ namespace ScheduleManager {
         }
 
         if (nonIntegral) {
+            std::string hHour; // these haven't been initialized?
+            std::string mMinute;
             ShowContinueError(state, format("Until value to be used will be: {:2.2F}:{:2.2F}", hHour, mMinute));
         }
         if (interpolationKind == ScheduleInterpolation::No) {
