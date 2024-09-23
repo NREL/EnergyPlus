@@ -6937,12 +6937,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     feneSolarDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24);
     feneSolarDelaySeqCool = 0.;
 
-    //Array3D<Real64> feneCondInstantSeq;
-    //feneCondInstantSeq.allocate(state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays,
-    //                            state->dataGlobal->NumOfTimeStepInHour * 24,
-    //                            state->dataViewFactor->NumOfRadiantEnclosures);
-    //feneCondInstantSeq = 0.0;
-
     Array2D<Real64> surfDelaySeqCool;
     surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, state->dataSurface->TotSurfaces);
     surfDelaySeqCool = 0.0;
@@ -8313,12 +8307,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     Array1D<Real64> feneSolarDelaySeqCool;
     feneSolarDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24);
     feneSolarDelaySeqCool = 0.;
-
-    Array3D<Real64> feneCondInstantSeq;
-    feneCondInstantSeq.allocate(state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays,
-                                state->dataGlobal->NumOfTimeStepInHour * 24,
-                                state->dataViewFactor->NumOfRadiantEnclosures);
-    feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
     surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, state->dataSurface->TotSurfaces);
