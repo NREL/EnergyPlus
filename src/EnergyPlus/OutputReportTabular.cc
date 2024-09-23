@@ -14741,7 +14741,6 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
         for (int izone = 1; izone <= state.dataGlobal->NumOfZones; ++izone) {
             Real64 tubularGain = 0.0;
             tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, OutputReportTabular::IntGainTypesTubularGCLS);
-            Real64 fenCISeq = ort->znCompLoads[izone - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq;
             ort->znCompLoads[izone - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq += tubularGain;
         }
         if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
@@ -14749,7 +14748,6 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
                 Real64 tubularGain = 0.0;
                 int zone = state.dataHeatBal->space(ispace).zoneNum;
                 tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, zone, OutputReportTabular::IntGainTypesTubularGCLS, ispace);
-                Real64 fenCISeq = ort->znCompLoads[ispace - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq;
                 ort->znCompLoads[ispace - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq += tubularGain;
             }
         }
@@ -15713,7 +15711,6 @@ void GetDelaySequences(EnergyPlusData &state,
             // also remove the net radiant component on the instanteous conduction for fenestration
             auto &szCompLoadDayTS = szCompLoadLoc.day[desDaySelected - 1].ts[kTimeStep - 1];
             if (!szCompLoadDayTS.adjFenDone) {
-                Real64 fenCISeq = szCompLoadDayTS.feneCondInstantSeq;
                 szCompLoadDayTS.feneCondInstantSeq -= adjFeneSurfNetRadSeq;
                 szCompLoadDayTS.adjFenDone = true;
             }
