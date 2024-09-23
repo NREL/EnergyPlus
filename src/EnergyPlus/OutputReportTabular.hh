@@ -527,6 +527,7 @@ namespace OutputReportTabular {
         Real64 interZoneMixLatentSeq = 0.0;
 
         Real64 feneCondInstantSeq = 0.0;
+        bool adjFenDone = false;
     };
     struct compLoadsDay
     {
@@ -1348,7 +1349,6 @@ struct OutputReportTabularData : BaseGlobalStruct
     int TimeOfPulseCLCDC = 0;
     int CoolDesSelectedCLCDC = 0; // design day selected for cooling
     int HeatDesSelectedCLCDC = 0; // design day selected for heating
-    Array3D_bool adjFenDone;
     Real64 BigNumRMG = 0.0;
     int foundGsui = 0;
     int iUnitGsui = 0;
@@ -1623,7 +1623,6 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->TimeOfPulseCLCDC = 0;
         this->CoolDesSelectedCLCDC = 0; // design day selected for cooling
         this->HeatDesSelectedCLCDC = 0; // design day selected for heating
-        this->adjFenDone.clear();
         this->BigNumRMG = 0.0;
         this->foundGsui = 0;
         this->iUnitGsui = 0;

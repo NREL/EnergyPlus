@@ -14711,14 +14711,27 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
             auto &day = zoneCL.day[state.dataSize->CurOverallSimDay - 1];
             day.ts[timeStepInDayGCLS - 1].feneCondInstantSeq = 0.0;
         }
+        if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+            for (auto &spaceCL : ort->spCompLoads) {
+                auto &day = spaceCL.day[state.dataSize->CurOverallSimDay - 1];
+                day.ts[timeStepInDayGCLS - 1].feneCondInstantSeq = 0.0;
+            }
+        }
         for (int iSurfGCLS = 1; iSurfGCLS <= state.dataSurface->TotSurfaces; ++iSurfGCLS) {
             int zoneNumGCLS = state.dataSurface->Surface(iSurfGCLS).Zone;
             if (zoneNumGCLS == 0) continue;
             if (state.dataSurface->Surface(iSurfGCLS).Class != DataSurfaces::SurfaceClass::Window) continue;
             // IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
-            ort->znCompLoads[zoneNumGCLS - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq +=
-                state.dataSurface->SurfWinGainConvGlazToZoneRep(iSurfGCLS) + state.dataSurface->SurfWinConvHeatFlowNatural(iSurfGCLS) +
-                state.dataSurface->SurfWinGainConvShadeToZoneRep(iSurfGCLS) + state.dataSurface->SurfWinGainFrameDividerToZoneRep(iSurfGCLS);
+            Real64 surfCond = state.dataSurface->SurfWinGainConvGlazToZoneRep(iSurfGCLS) + state.dataSurface->SurfWinConvHeatFlowNatural(iSurfGCLS) +
+                              state.dataSurface->SurfWinGainConvShadeToZoneRep(iSurfGCLS) +
+                              state.dataSurface->SurfWinGainFrameDividerToZoneRep(iSurfGCLS);
+            ort->znCompLoads[zoneNumGCLS - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq += surfCond;
+
+            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                int spaceNum = state.dataSurface->Surface(iSurfGCLS).spaceNum;
+                ort->spCompLoads[spaceNum - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq += surfCond;
+            }
+
             // for now assume zero instant solar - may change related
             // to how blinds and shades absorb solar radiation and
             // convect that heat that timestep.
@@ -14728,7 +14741,17 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
         for (int izone = 1; izone <= state.dataGlobal->NumOfZones; ++izone) {
             Real64 tubularGain = 0.0;
             tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, OutputReportTabular::IntGainTypesTubularGCLS);
+            Real64 fenCISeq = ort->znCompLoads[izone - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq;
             ort->znCompLoads[izone - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq += tubularGain;
+        }
+        if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+            for (int ispace = 1; ispace <= state.dataGlobal->NumOfZones; ++ispace) {
+                Real64 tubularGain = 0.0;
+                int zone = state.dataHeatBal->space(ispace).zoneNum;
+                tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, zone, OutputReportTabular::IntGainTypesTubularGCLS, ispace);
+                Real64 fenCISeq = ort->znCompLoads[ispace - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq;
+                ort->znCompLoads[ispace - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq += tubularGain;
+            }
         }
     }
 }
@@ -15608,14 +15631,6 @@ void GetDelaySequences(EnergyPlusData &state,
     // static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
     auto &ort = state.dataOutRptTab;
 
-    if (!ort->initAdjFenDone) {
-        state.dataOutRptTab->adjFenDone.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays,
-                                                 state.dataGlobal->NumOfTimeStepInHour * 24,
-                                                 state.dataGlobal->NumOfZones);
-        state.dataOutRptTab->adjFenDone = false;
-        ort->initAdjFenDone = true;
-    }
-
     if (desDaySelected != 0) {
 
         Array2D<Real64> decayCurve;
@@ -15696,9 +15711,11 @@ void GetDelaySequences(EnergyPlusData &state,
             lightDelaySeq(kTimeStep) = lightLWConvIntoZone + lightSWConvIntoZone;
             feneSolarDelaySeq(kTimeStep) = feneSolarConvIntoZone;
             // also remove the net radiant component on the instanteous conduction for fenestration
-            if (!state.dataOutRptTab->adjFenDone(desDaySelected, kTimeStep, zoneIndex)) {
-                szCompLoadLoc.day[desDaySelected - 1].ts[kTimeStep - 1].feneCondInstantSeq -= adjFeneSurfNetRadSeq;
-                state.dataOutRptTab->adjFenDone(desDaySelected, kTimeStep, zoneIndex) = true;
+            auto &szCompLoadDayTS = szCompLoadLoc.day[desDaySelected - 1].ts[kTimeStep - 1];
+            if (!szCompLoadDayTS.adjFenDone) {
+                Real64 fenCISeq = szCompLoadDayTS.feneCondInstantSeq;
+                szCompLoadDayTS.feneCondInstantSeq -= adjFeneSurfNetRadSeq;
+                szCompLoadDayTS.adjFenDone = true;
             }
         } // for kTimeStep
 
