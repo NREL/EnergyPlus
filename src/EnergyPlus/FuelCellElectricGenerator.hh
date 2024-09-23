@@ -124,22 +124,22 @@ namespace FuelCellElectricGenerator {
         bool HasBeenOn;
         bool DuringShutDown;
         bool DuringStartUp;
-        Real64 NdotFuel;           // molar fuel use rate.  (kmol/sec)
-        Real64 TotFuelInEnthalpy;  // Enthalpy of fuel coming into FCPM (watts)
-        Real64 NdotProdGas;        // (kmol/sec)
+        Real64 NdotFuel;          // molar fuel use rate.  (kmol/sec)
+        Real64 TotFuelInEnthalpy; // Enthalpy of fuel coming into FCPM (watts)
+        Real64 NdotProdGas;       // (kmol/sec)
         Array1D<Real64> ConstitMolalFract;
         Array1D<GasID> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 TprodGasLeavingFCPM;
-        Real64 NdotAir;           // molar air use rate    (kmol/sec)
-        Real64 TotAirInEnthalpy;  // Enthalpy of air coming nto FCPM energy balance (watts)
-        Real64 NdotLiqwater;      // molar water use rate (kmol/sec)
+        Real64 NdotAir;          // molar air use rate    (kmol/sec)
+        Real64 TotAirInEnthalpy; // Enthalpy of air coming nto FCPM energy balance (watts)
+        Real64 NdotLiqwater;     // molar water use rate (kmol/sec)
         Real64 TwaterInlet;
         Real64 WaterInEnthalpy;       // Enthalpy of liquid water used for reforming (watts)
         Real64 DilutionAirInEnthalpy; // Enthalpy of Dilution air coming into FCPM (watts)
         Real64 DilutionAirOutEnthalpy;
-        Real64 PelancillariesAC;    // ancillary power (watts)
-        Real64 TotProdGasEnthalpy;  // Enthalpy of product gases leaving FCPM   (watts)
-        Real64 WaterOutEnthalpy;    // enthalpy of vapor from water used for reforming
+        Real64 PelancillariesAC;   // ancillary power (watts)
+        Real64 TotProdGasEnthalpy; // Enthalpy of product gases leaving FCPM   (watts)
+        Real64 WaterOutEnthalpy;   // enthalpy of vapor from water used for reforming
         int SeqSubstitIter;
         int RegulaFalsiIter;
 
@@ -398,13 +398,13 @@ namespace FuelCellElectricGenerator {
         Real64 HeatRecOutletTemp;    // reporting: Heat Recovery Loop Outlet Temperature (C)
         Real64 HeatRecMdot;          // reporting: Heat Recovery Loop Mass flow rate (kg/s)
         // air supply and blower
-        Real64 TairInlet;         // State point 1
-        Real64 TairIntoFCPM;      // Temperature at State point 4
-        Real64 NdotAir;           // air flow in kmol/sec
-        Real64 TotAirInEnthalpy;  // Enthalpy at State point 4
-        Real64 BlowerPower;       // electrical power used by air supply blower
-        Real64 BlowerEnergy;      // electrical energy used by air supply blower
-        Real64 BlowerSkinLoss;    // heat rate of losses by blower
+        Real64 TairInlet;        // State point 1
+        Real64 TairIntoFCPM;     // Temperature at State point 4
+        Real64 NdotAir;          // air flow in kmol/sec
+        Real64 TotAirInEnthalpy; // Enthalpy at State point 4
+        Real64 BlowerPower;      // electrical power used by air supply blower
+        Real64 BlowerEnergy;     // electrical energy used by air supply blower
+        Real64 BlowerSkinLoss;   // heat rate of losses by blower
         // fuel supply and compressor
         Real64 TfuelInlet;           // State point 2 [C]
         Real64 TfuelIntoFCPM;        // state point 5 [C]
