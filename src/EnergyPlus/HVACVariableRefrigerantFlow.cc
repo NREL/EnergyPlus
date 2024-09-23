@@ -12060,7 +12060,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
                 this->DefrostPower = 0.0;
             }
         }
-        this->DefrostPower *= VRFRTF;
 
         // From the VRF_FluidTCtrl model
         TotalCondHeatingCapacity = this->HeatingCapacity;
@@ -12237,6 +12236,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         this->ElecHeatingPower = 0;
     }
     this->VRFCondRTF = VRFRTF;
+    this->DefrostPower *= VRFRTF;
 
     // Calculate CrankCaseHeaterPower: VRF Heat Pump Crankcase Heater Electric Power [W]
     if (this->MaxOATCCHeater > OutdoorDryBulb) {
