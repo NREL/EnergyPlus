@@ -485,7 +485,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         }
         // type of demand window
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "QuarterHour")) {
-            // check to make sure that the demand window and the TIMESTEP IN HOUR are consistant.
+            // check to make sure that the demand window and the TIMESTEP IN HOUR are consistent.
             {
                 switch (state.dataGlobal->NumOfTimeStepInHour) {
                 case 1:
@@ -1275,7 +1275,7 @@ void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfSca
 
     //   Returns the last substring of the line of text to the
     //   left of the endOfSubStrg pointer. A substring is
-    //   delimitted by spaces.  Quotes are not significant
+    //   delimited by spaces.  Quotes are not significant
     //   (they are treated just like any other non-space character)
 
     //   Scan the string from the end.
@@ -2210,7 +2210,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
     //    into categories.
     //      category SUM chg1Name chg2Name chg3Name
     //    Since the dependency array has one target and multiple
-    //    parameters, remainingPt is shown as a seperate equation that
+    //    parameters, remainingPt is shown as a separate equation that
     //    depends on namePt for Charge:Block. The equation will not be
     //    displayed or processed except in the sort.
     //      remainingPt NOOP namePt
@@ -2219,21 +2219,21 @@ void CreateDefaultComputation(EnergyPlusData &state)
     //    charge, ratchet or qualify.
     //      chg1Name
     //    It is also possible that two variables referenced within one
-    //    object could include a dependancy relationship also. For
+    //    object could include a dependency relationship also. For
     //    example, the blkSzPt could be calculated using the same sourePt
     //    in Charge:Block.
 
     // METHODOLOGY EMPLOYED:
     //    Since some ECONOMCIS:* objects depend on other variables
     //    first must create the order of when to perform the
-    //    computations. First a dependancy table is created that
-    //    indicates what variables are dependant on other variables.
+    //    computations. First a dependency table is created that
+    //    indicates what variables are dependent on other variables.
     //    A directed acyclic graph (DAG) describes the general
     //    problem which is usually solved using a topological
     //    sorting algorithm.
     //    Each line/step is generated and put into the depend
     //    array. Also in the array are counts of how many items it
-    //    depends on and a list of entries that are dependant on that
+    //    depends on and a list of entries that are dependent on that
     //    line.
 
     // for each tariff that does not have a UtilityCost:Computation object go through the variables
@@ -2251,7 +2251,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
             }
             //"clear" the dependOn array
             state.dataEconTariff->numOperand = 0;
-            // Define the preset equations (category sumation)
+            // Define the preset equations (category summation)
             int curTotal = tariff.ptTotal;
             int curSubtotal = tariff.ptSubtotal;
             int curBasis = tariff.ptBasis;
@@ -2284,7 +2284,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 addOperand(state, tariff.ptEnergyCharges, tariff.nativeRealTimePriceCosts);
             }
             // now add equations with NOOP to represent each object with its
-            // dependancies
+            // dependencies
             // Qualify
             for (int kObj = 1; kObj <= state.dataEconTariff->numQualify; ++kObj) {
                 auto const &qualify = state.dataEconTariff->qualify(kObj);
@@ -2351,7 +2351,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
                     }
                 }
             }
-            // make sure no compuation is already user defined
+            // make sure no computation is already user defined
             if (computation.firstStep != 0) {
                 ShowWarningError(state, format("In UtilityCost:Tariff: Overwriting user defined tariff {}", tariff.tariffName));
             }
@@ -2361,13 +2361,13 @@ void CreateDefaultComputation(EnergyPlusData &state)
             computation.lastStep = -1; // this will be incremented by addStep
             computation.isUserDef = false;
             // now all "equations" are defined, treat the variables with the list
-            // of dependancies as a directed acyclic graph and use "count down" algorithm
+            // of dependencies as a directed acyclic graph and use "count down" algorithm
             // to do a topological sort of the variables into the order for computation
             // First, clear the counters
             for (int jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
                 state.dataEconTariff->econVar(jVar).cntMeDependOn = 0;
             }
-            // Second, add up the number of dependancies on each variable
+            // Second, add up the number of dependencies on each variable
             for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                 if (state.dataEconTariff->econVar(iVar).activeNow) {
                     if (state.dataEconTariff->econVar(iVar).lastOperand >= state.dataEconTariff->econVar(iVar).firstOperand) {
@@ -2384,7 +2384,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 numNoDepend = 0;
                 for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                     if (state.dataEconTariff->econVar(iVar).activeNow) {
-                        // find a variable that has no more dangling dependancies
+                        // find a variable that has no more dangling dependencies
                         if (state.dataEconTariff->econVar(iVar).cntMeDependOn == 0) {
                             // If the variable is a native variable then
                             // IF (econVar(iVar)%kindOfObj .NE. iEconVarObjType::Native) THEN
@@ -2437,7 +2437,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
             }
             if (loopCount > 100000) {
                 ShowWarningError(state,
-                                 format("UtilityCost:Tariff: Loop count exceeded when counting dependancies in tariff: {}", tariff.tariffName));
+                                 format("UtilityCost:Tariff: Loop count exceeded when counting dependencies in tariff: {}", tariff.tariffName));
             }
             // make sure that all variables associated with the tariff are included
             bool remainingVarFlag = false;
@@ -2450,7 +2450,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 ShowWarningError(state,
                                  format("CreateDefaultComputation: In UtilityCost:Computation: Circular or invalid dependencies found in tariff: {}",
                                         tariff.tariffName));
-                ShowContinueError(state, "  UtilityCost variables that may have invalid dependencies and the variables they are dependant on.");
+                ShowContinueError(state, "  UtilityCost variables that may have invalid dependencies and the variables they are dependent on.");
                 for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                     if (state.dataEconTariff->econVar(iVar).tariffIndx == iTariff) {
                         if (state.dataEconTariff->econVar(iVar).activeNow) {
@@ -2484,7 +2484,7 @@ void addOperand(EnergyPlusData &state, int const varMe, int const varOperand)
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
     //    DATE WRITTEN   July 2004
 
-    //   Used by CreateDefaultComputation to create the dependancy
+    //   Used by CreateDefaultComputation to create the dependency
     //   relationship in the EconVar array
 
     int constexpr sizeIncrement(100);
@@ -3148,7 +3148,7 @@ void pushStack(EnergyPlusData &state, Array1A<Real64> const monthlyArray, int co
             }
             // if the serviceCharges are being evaluated add in the monthly charges
             if (econVar(variablePointer).specific == catServiceCharges) addMonthlyCharge(state, variablePointer);
-            // get the results of performing the evaulation - should have been
+            // get the results of performing the evaluation - should have been
             // put into the econVar values
             curMonthlyArray = econVar(variablePointer).values;
         }
@@ -3298,7 +3298,7 @@ void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable)
     } else {
         blkSzMult = chargeBlock.blkSzMultVal;
     }
-    // initially set the remaing energy or demand to the source
+    // initially set the remaining energy or demand to the source
     remainVals = sourceVals;
     // initially set the result (cost) to zero
     resultChg = 0.0;
@@ -3607,7 +3607,7 @@ void evaluateQualify(EnergyPlusData &state, int const usingVariable)
         }
     }
     // now update the tariff level qualifier - only update if the tariff is still qualified
-    // and the current qualifer fails.
+    // and the current qualifier fails.
     if (tariff.isQualified) {
         if (!isQualified) {
             tariff.isQualified = false;
@@ -4743,7 +4743,7 @@ void selectTariff(EnergyPlusData &state)
     //    DATE WRITTEN   July 2004
 
     //    To select tariffs for each combination of meter and
-    //    group.  If multipler tariffs have the same meter and
+    //    group.  If multiple tariffs have the same meter and
     //    group, then select the one with the lowest cost.
     //    For electric tariffs, since they may have buy, sell, or
     //    netmetering, they need to be combined more carefully.

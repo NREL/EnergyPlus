@@ -789,7 +789,7 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.m_CompPointerAirLoopSplitter =
                     thisAirLoopSplitter.factory(state, thisDOAS.m_AirLoopSplitterIndex, thisDOAS.AirLoopSplitterName);
 
-                // get pretreated desing conditions
+                // get pretreated design conditions
                 thisDOAS.PreheatTemp = fields.at("preheat_design_temperature").get<Real64>();
                 thisDOAS.PreheatHumRat = fields.at("preheat_design_humidity_ratio").get<Real64>();
                 thisDOAS.PrecoolTemp = fields.at("precool_design_temperature").get<Real64>();

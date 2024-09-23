@@ -2050,11 +2050,11 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                         OutputProcessor::StoreType::Average,
                                         state.dataHeatBal->Zone(TempControlledZone.ActualZoneNum).Name);
                 } // TStat Objects Loop
-            }     // found thermostat referene
+            }     // found thermostat reference
         }         // loop over NumOpTempControlledZones
     }             // NumOpTempControlledZones > 0
 
-    // Overcool dehumidificaton GetInput starts here
+    // Overcool dehumidification GetInput starts here
     cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TandHStat));
     state.dataZoneCtrls->NumTempAndHumidityControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -2477,7 +2477,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                            cAlphaArgs(1),
                                            cNumericFieldNames(8),
                                            rNumericArgs(8)));
-                    ShowContinueError(state, ".. The minumum value is 0.");
+                    ShowContinueError(state, ".. The minimum value is 0.");
                     ErrorsFound = true;
                 }
 
@@ -3436,7 +3436,7 @@ void PredictSystemLoads(EnergyPlusData &state,
                         thisZoneThermostatSetPointLo = thisTempControlledZone.ZoneThermostatSetPointLo;
                         thisTempControlledZone.HeatOffFlag = true;
                     }
-                    // check setpoint for both and provde an error message
+                    // check setpoint for both and provide an error message
                     if (thisZoneThermostatSetPointLo >= thisZoneThermostatSetPointHi) {
                         ShowSevereError(state,
                                         "DualSetPointWithDeadBand: When Temperature Difference Between Cutout And Setpoint is applied, the heating "
@@ -3770,7 +3770,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
             break;
         }
 
-        // Apply offset for faulty therostats
+        // Apply offset for faulty thermostats
         if ((state.dataFaultsMgr->NumFaultyThermostat > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
             (!state.dataGlobal->KickOffSimulation)) {
             //  loop through the FaultsThermostatOffset objects to find the one for the zone
@@ -4167,7 +4167,7 @@ Real64 correctZoneAirTemps(EnergyPlusData &state,
                 Real64 spaceTempChange = thisSpaceHB.correctAirTemp(state, useZoneTimeStepHistory, zoneNum, spaceNum);
                 maxTempChange = max(maxTempChange, spaceTempChange);
             } else {
-                // If doing sizing and zone is controled, then set space node to match zone node
+                // If doing sizing and zone is controlled, then set space node to match zone node
                 if (state.dataHeatBal->doSpaceHeatBalanceSizing && thisZone.IsControlled) {
                     auto const &thisZoneNode = state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber);
                     auto &thisSpaceNode = state.dataLoopNodes->Node(state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber);
@@ -5170,7 +5170,7 @@ void InverseModelTemperature(EnergyPlusData &state,
                                     (TempIndCoef - TempDepCoef * thisZoneHB.ZT);
                 }
 
-                if ((AirCapHM_temp > 0) && (AirCapHM_temp != 1)) {    // Avoide IND
+                if ((AirCapHM_temp > 0) && (AirCapHM_temp != 1)) {    // Avoid IND
                     AirCapHM = TempDepCoef / std::log(AirCapHM_temp); // Inverse equation
                 } else {
                     AirCapHM = TempIndCoef / (thisZoneHB.ZT - state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum));
@@ -5195,7 +5195,7 @@ void InverseModelTemperature(EnergyPlusData &state,
                 state, MultpHM, zone.ZoneVolCapMultpSensHMSum, zone.ZoneVolCapMultpSensHMCountSum, zone.ZoneVolCapMultpSensHMAverage, ZoneNum);
             zone.ZoneVolCapMultpSensHM = MultpHM;
 
-        } // Hybrid model internal thermal mass calcualtion end
+        } // Hybrid model internal thermal mass calculation end
 
         // Hybrid model people count calculation
         if (hybridModelZone.PeopleCountCalc_T && state.dataHVACGlobal->UseZoneTimeStepHistory) {
@@ -5272,7 +5272,7 @@ void processInverseModelMultpHM(EnergyPlusData &state,
                                 Real64 &multiplierHM, // Hybrid model thermal mass multiplier
                                 Real64 &multSumHM,    // Sum of Hybrid model thermal mass multipliers
                                 Real64 &countSumHM,   // Count of number of points in sum
-                                Real64 &multAvgHM,    // Average of hybrid model mass multipier
+                                Real64 &multAvgHM,    // Average of hybrid model mass multiplier
                                 int zoneNum           // Zone number for the hybrid model
 )
 {
@@ -6252,7 +6252,7 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
     //       DATE WRITTEN   May 2006
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This routine sets the thermal comfort setpoints for each controlled zone based on air tempeature obtained from thermal comfort models.
+    // This routine sets the thermal comfort setpoints for each controlled zone based on air temperature obtained from thermal comfort models.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 SetPointLo = 0.0;
@@ -6950,7 +6950,7 @@ temperatureAndCountInSch(EnergyPlusData &state, int const scheduleIndex, bool co
 {
     // J.Glazer - Aug 2017
 
-    // determine month to use based on hemiphere and season
+    // determine month to use based on hemisphere and season
     int monthToUse;
     if (isSummer) {
         if (state.dataEnvrn->Latitude > 0.) {

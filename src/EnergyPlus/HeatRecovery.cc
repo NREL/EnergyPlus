@@ -1666,7 +1666,7 @@ namespace HeatRecovery {
                                                  this->Name,
                                                  this->type == HVAC::HXType::AirToAir_FlatPlate
                                                      ? "Flat Plate"
-                                                     : (this->type == HVAC::HXType::Desiccant_Balanced ? "Dessicant Balanced" : "Generic"));
+                                                     : (this->type == HVAC::HXType::Desiccant_Balanced ? "Desiccant Balanced" : "Generic"));
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirHRPlateOrRotary,
                                                  this->Name,
@@ -1689,7 +1689,7 @@ namespace HeatRecovery {
 
     void
     HeatExchCond::CalcAirToAirPlateHeatExch(EnergyPlusData &state,
-                                            bool const HXUnitOn,                           // flag to simulate heat exchager heat recovery
+                                            bool const HXUnitOn,                           // flag to simulate heat exchanger heat recovery
                                             ObjexxFCL::Optional_bool_const EconomizerFlag, // economizer flag pass by air loop or OA sys
                                             ObjexxFCL::Optional_bool_const HighHumCtrlFlag // high humidity control flag passed by airloop or OA sys
     )
@@ -1904,7 +1904,7 @@ namespace HeatRecovery {
         //   School Advanced Ventilation Engineering Software http://www.epa.gov/iaq/schooldesign/saves.html
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 constexpr ErrorTol(0.001); // error tolerence
+        Real64 constexpr ErrorTol(0.001); // error tolerance
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SupOutNode;
@@ -2172,7 +2172,7 @@ namespace HeatRecovery {
                     ControlFraction = 0.0;
                 }
                 if (this->ExchConfig == HXConfigurationType::Rotary) {
-                    //       Rotory HX's never get bypassed, rotational speed is modulated
+                    //       Rotary HX's never get bypassed, rotational speed is modulated
                     this->SensEffectiveness *= ControlFraction;
                     this->LatEffectiveness *= ControlFraction;
                 } else { // HX is a plate heat exchanger, bypass air to control SA temperature
@@ -2397,7 +2397,7 @@ namespace HeatRecovery {
 
     void HeatExchCond::CalcDesiccantBalancedHeatExch(
         EnergyPlusData &state,
-        bool const HXUnitOn,                           // flag to simulate heat exchager heat recovery
+        bool const HXUnitOn,                           // flag to simulate heat exchanger heat recovery
         bool const FirstHVACIteration,                 // First HVAC iteration flag
         HVAC::FanOp const fanOp,                       // Supply air fan operating mode (1=cycling, 2=constant)
         Real64 const PartLoadRatio,                    // Part load ratio requested of DX compressor
@@ -2422,7 +2422,7 @@ namespace HeatRecovery {
 
         // METHODOLOGY EMPLOYED:
         //  This is an empirical heat exchanger model. The model uses heat exchanger performance data to
-        //  calculate the air temperature and humidity ratio of the leaving upply and secondary air streams.
+        //  calculate the air temperature and humidity ratio of the leaving supply and secondary air streams.
         //  Humidity control can enable/disable heat recovery through the use of the HXUnitOn Subroutine argument.
 
         // Using/Aliasing
@@ -2859,13 +2859,13 @@ namespace HeatRecovery {
                             this->LatEffectiveness *= Curve::CurveValue(state, this->CoolEffectLatentCurveIndex, HXAirVolFlowRatio);
                         }
                     }
-                    //         calculation of local variable Csup can be 0, gaurd against divide by 0.
+                    //         calculation of local variable Csup can be 0, guard against divide by 0.
                     TempSupOut = TempSupIn + this->SensEffectiveness * SafeDiv(CMin, CSup) * (TempSecIn - TempSupIn);
                     QSensTrans = CSup * (TempSupIn - TempSupOut);
                     //         Csec cannot be 0 in this subroutine
                     TempSecOut = TempSecIn + QSensTrans / CSec;
                     Error = (TempSecOut - TempThreshold);
-                    //         recalculate DFFraction until convergence, gaurd against divide by 0 (unlikely).
+                    //         recalculate DFFraction until convergence, guard against divide by 0 (unlikely).
                     DFFraction = max(0.0, min(1.0, DFFraction * SafeDiv((TempSecIn - TempSecOut), (TempSecIn - TempThreshold))));
                     ++Iter;
                 }
@@ -3303,7 +3303,7 @@ namespace HeatRecovery {
 
         // PURPOSE OF THIS SUBROUTINE:
         // To verify that the empirical model's independent variables are within the limits used during the
-        // developement of the empirical model.
+        // development of the empirical model.
 
         // METHODOLOGY EMPLOYED:
         // The empirical models used for simulating a desiccant enhanced cooling coil are based on a limited data set.
@@ -3404,7 +3404,7 @@ namespace HeatRecovery {
                     ShowContinueError(state, state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.buffer2);
                     ShowContinueError(state, state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.buffer3);
                     ShowContinueError(state,
-                                      "...Using process inlet air humidity ratios that are outside the regeneratoin outlet air temperature equation "
+                                      "...Using process inlet air humidity ratios that are outside the regeneration outlet air temperature equation "
                                       "model boundaries may adversely affect desiccant model performance.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
@@ -3444,7 +3444,7 @@ namespace HeatRecovery {
         thisError.TimeStepSysLast = TimeStepSys;
         thisError.CurrentEndTimeLast = thisError.CurrentEndTime;
 
-        //   If regen and procees inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
+        //   If regen and process inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
         if (std::abs(T_RegenInTemp - T_ProcInTemp) < SMALL) {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.print = false;
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.print = false;
@@ -3667,7 +3667,7 @@ namespace HeatRecovery {
 
         // PURPOSE OF THIS SUBROUTINE:
         // To verify that the empirical model's independent variables are within the limits used during the
-        // developement of the empirical model.
+        // development of the empirical model.
 
         // METHODOLOGY EMPLOYED:
         // The empirical models used for simulating a desiccant enhanced cooling coil are based on a limited data set.
@@ -3807,7 +3807,7 @@ namespace HeatRecovery {
         thisError.TimeStepSysLast = TimeStepSys;
         thisError.CurrentEndTimeLast = thisError.CurrentEndTime;
 
-        //   If regen and procees inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
+        //   If regen and process inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
         if (std::abs(H_RegenInTemp - H_ProcInTemp) < SMALL) {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.print = false;
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.print = false;
@@ -4031,7 +4031,7 @@ namespace HeatRecovery {
 
         // PURPOSE OF THIS SUBROUTINE:
         // To verify that the empirical model's independent variables are within the limits used during the
-        // developement of the empirical model.
+        // development of the empirical model.
 
         // METHODOLOGY EMPLOYED:
         // The empirical models used for simulating a desiccant enhanced cooling coil are based on a limited data set.
@@ -4192,7 +4192,7 @@ namespace HeatRecovery {
 
         // PURPOSE OF THIS SUBROUTINE:
         // To verify that the empirical model's independent variables are within the limits used during the
-        // developement of the empirical model.
+        // development of the empirical model.
 
         // METHODOLOGY EMPLOYED:
         // The empirical models used for simulating a desiccant enhanced cooling coil are based on a limited data set.
@@ -4462,7 +4462,7 @@ namespace HeatRecovery {
             return;
         }
 
-        //     If regen and procees inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
+        //     If regen and process inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
         if (std::abs(T_RegenInTemp - T_ProcInTemp) < SMALL) {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumTempErr.print = false;
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumTempErr.print = false;
@@ -4638,7 +4638,7 @@ namespace HeatRecovery {
             return;
         }
 
-        //     If regen and procees inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
+        //     If regen and process inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
         if (std::abs(H_RegenInTemp - H_ProcInTemp) < SMALL) {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumHumRatErr.print = false;
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumHumRatErr.print = false;
@@ -4927,7 +4927,7 @@ namespace HeatRecovery {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // This function looks up the given Generic HX and the voluetric air flow rate.
+        // This function looks up the given Generic HX and the volumetric air flow rate.
         // If incorrect HX name is given, ErrorsFound is returned as true and air flow rate as zero.
 
         // Obtains and Allocates heat exchanger related parameters from input file
@@ -4960,7 +4960,7 @@ namespace HeatRecovery {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // This function looks up the given Generic HX and the voluetric air flow rate.
+        // This function looks up the given Generic HX and the volumetric air flow rate.
         // If incorrect HX name is given, ErrorsFound is returned as true and air flow rate as zero.
 
         // Obtains and Allocates heat exchanger related parameters from input file

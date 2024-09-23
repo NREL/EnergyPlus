@@ -169,7 +169,7 @@ namespace ThermalComfort {
             CurrentGroupName = state.dataHeatBal->People(Loop).Name;
 
             // CurrentModuleObject='People'
-            // MJW MRT ToDo: Rename most Zone Therml Comfort output varibles to People Thermal Comfort ('cause they're keyed by People name)
+            // MJW MRT ToDo: Rename most Zone Thermal Comfort output variables to People Thermal Comfort ('cause they're keyed by People name)
             if (state.dataHeatBal->People(Loop).Fanger) {
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Fanger Model PMV",
@@ -719,7 +719,7 @@ namespace ThermalComfort {
         P1 = state.dataThermalComforts->CloInsul * state.dataThermalComforts->AbsAirTemp;                                        // p4
         P4 = 308.7 - 0.028 * state.dataThermalComforts->IntHeatProd + P2 * pow_4(state.dataThermalComforts->AbsRadTemp / 100.0); // p5
 
-        // First guess for clothed surface tempeature
+        // First guess for clothed surface temperature
         state.dataThermalComforts->AbsCloSurfTemp = state.dataThermalComforts->AbsAirTemp + (35.5 - AirTemp) / (3.5 * (CloUnit + 0.1));
         XN = state.dataThermalComforts->AbsCloSurfTemp / 100.0;
         state.dataThermalComforts->HcFor = 12.1 * std::sqrt(AirVel); // Heat transfer coefficient by forced convection
@@ -1011,7 +1011,7 @@ namespace ThermalComfort {
             state.dataThermalComforts->AvgBodyTemp =
                 SkinMassRat * state.dataThermalComforts->SkinTemp + (1.0 - SkinMassRat) * state.dataThermalComforts->CoreTemp;
 
-            Real64 SkinThermSigWarm;                                               // vasodialtion signal (WARMS)
+            Real64 SkinThermSigWarm;                                               // vasodilation signal (WARMS)
             Real64 SkinThermSigCold;                                               // vasoconstriction signal
             Real64 SkinSignal = state.dataThermalComforts->SkinTemp - SkinTempSet; // thermoregulatory control signal from the skin
             if (SkinSignal > 0) {
@@ -1693,7 +1693,7 @@ namespace ThermalComfort {
         Real64 SkinWetSignal;           // Skin wettedness signal
         Real64 SweatCtrlFac;            // Sweat control factor
         Real64 SweatSuppFac;            // Sweat suppression factor due to skin wettedness
-        Real64 WeighFac;                // Weighting factor of core siganl
+        Real64 WeighFac;                // Weighting factor of core signal
 
         // THE CONTROLLING SYSTEM.
         // THE CONTROLLING SIGNALS :

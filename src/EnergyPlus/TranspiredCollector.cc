@@ -92,7 +92,7 @@ namespace TranspiredCollector {
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
-    // Ecapsulates data and routines for simulating unglazed transpired solar collectors (UTSC)
+    // Encapsulates data and routines for simulating unglazed transpired solar collectors (UTSC)
     //   as a component on the HVAC air system.
 
     // METHODOLOGY EMPLOYED:
@@ -249,9 +249,9 @@ namespace TranspiredCollector {
         Array1D<Real64> Numbers(11); // Numeric items for object
         int NumAlphas;               // Number of Alphas for each GetObjectItem call
         int NumNumbers;              // Number of Numbers for each GetObjectItem call
-        int MaxNumAlphas;            // argumenet for call to GetObjectDefMaxArgs
-        int MaxNumNumbers;           // argumenet for call to GetObjectDefMaxArgs
-        int Dummy;                   // argumenet for call to GetObjectDefMaxArgs
+        int MaxNumAlphas;            // argument for call to GetObjectDefMaxArgs
+        int MaxNumNumbers;           // argument for call to GetObjectDefMaxArgs
+        int Dummy;                   // argument for call to GetObjectDefMaxArgs
         int IOStatus;                // Used in GetObjectItem
         bool ErrorsFound(false);     // Set to true if errors in input, fatal at end of routine
         int Found;
@@ -270,8 +270,8 @@ namespace TranspiredCollector {
         Array1D<Real64> NumbersSplit(1);      // Numeric items for object
         int NumAlphasSplit;                   // Number of Alphas for each GetObjectItem call
         int NumNumbersSplit;                  // Number of Numbers for each GetObjectItem call
-        int MaxNumAlphasSplit;                // argumenet for call to GetObjectDefMaxArgs
-        int MaxNumNumbersSplit;               // argumenet for call to GetObjectDefMaxArgs
+        int MaxNumAlphasSplit;                // argument for call to GetObjectDefMaxArgs
+        int MaxNumNumbersSplit;               // argument for call to GetObjectDefMaxArgs
         int IOStatusSplit;                    // Used in GetObjectItem
         int NumOASys;                         // do loop counter
         int ACountBase;                       // counter for alhpasSplit
@@ -634,7 +634,7 @@ namespace TranspiredCollector {
 
             if (ErrorsFound) continue; // previous inner do loop may have detected problems that need to be cycle'd again to avoid crash
 
-            // now that we should have all the surfaces, do some preperations and checks.
+            // now that we should have all the surfaces, do some preparations and checks.
 
             // are they all similar tilt and azimuth? Issue warnings so people can do it if they really want
             Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs));
@@ -982,7 +982,7 @@ namespace TranspiredCollector {
             sum_sub(state.dataLoopNodes->Node,
                     &DataLoopNode::NodeData::MassFlowRate,
                     state.dataTranspiredCollector->UTSC(UTSCNum).InletNode); // Autodesk:F2C++ Functions handle array subscript usage
-        state.dataTranspiredCollector->UTSC(UTSCNum).IsOn = false;           // intialize then turn on if appropriate
+        state.dataTranspiredCollector->UTSC(UTSCNum).IsOn = false;           // initialize then turn on if appropriate
         state.dataTranspiredCollector->UTSC(UTSCNum).Tplen = state.dataTranspiredCollector->UTSC(UTSCNum).TplenLast;
         state.dataTranspiredCollector->UTSC(UTSCNum).Tcoll = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast;
         state.dataTranspiredCollector->UTSC(UTSCNum).TairHX = Tamb;
@@ -1038,7 +1038,7 @@ namespace TranspiredCollector {
         Real64 HcPlen;                        // surface convection heat transfer coefficient for plenum surfaces
         Real64 D;                             // hole diameter
         Real64 ReD;                           // Reynolds number for holes
-        Real64 P;                             // pitch, distance betweeen holes
+        Real64 P;                             // pitch, distance between holes
         Real64 Por;                           // porosity, area fraction of collector that is open because of holes
         Real64 Mdot;                          // mass flow rate of suction air
         Real64 QdotSource;                    // energy flux for source/sink inside collector surface (for hybrid PV UTSC)
@@ -1046,13 +1046,13 @@ namespace TranspiredCollector {
         int NumSurfs;                         // number of underlying HT surfaces associated with UTSC
         Material::SurfaceRoughness Roughness; // parameters for surface roughness, defined in DataHeatBalance
         Real64 SolAbs;                        // solar absorptivity of collector
-        Real64 AbsExt;                        // thermal emmittance of collector
+        Real64 AbsExt;                        // thermal emittance of collector
         Real64 TempExt;                       // collector temperature
         int SurfPtr;                          // index of surface in main surface structure
         Real64 HMovInsul;                     // dummy for call to InitExteriorConvectionCoeff
         Real64 HExt;                          // dummy for call to InitExteriorConvectionCoeff
         int ConstrNum;                        // index of construction in main construction structure
-        Real64 AbsThermSurf;                  // thermal emmittance of underlying wall.
+        Real64 AbsThermSurf;                  // thermal emittance of underlying wall.
         Real64 TsoK;                          // underlying surface temperature in Kelvin
         Real64 TscollK;                       // collector temperature in Kelvin  (lagged)
         Real64 AreaSum;                       // sum of contributing surfaces for area-weighted averages.

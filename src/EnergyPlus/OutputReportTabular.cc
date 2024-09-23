@@ -553,7 +553,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
     // NOTE:
     //   The bulk of this routine used to be part of the the
     //   GetInputTabularMonthly routine but when predefined
-    //   monthly reports were added this routine was seperated
+    //   monthly reports were added this routine was separated
     //   from input.
 
     // REFERENCES:
@@ -1779,7 +1779,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->endUseNames(static_cast<int>(Constant::EndUse::Cogeneration) + 1) = "Cogeneration";
 
         auto &op = state.dataOutputProcessor;
-        // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
+        // End use subs must be dynamically allocated to accommodate the end use with the most subcategories
         ort->meterNumEndUseSubBEPS.allocate(op->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->meterNumEndUseSpTypeBEPS.allocate(op->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         for (int endUse = 1; endUse <= static_cast<int>(Constant::EndUse::Num); ++endUse) {
@@ -3433,7 +3433,7 @@ void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    //   Gathers the data each timesetp and adds the length of the
+    //   Gathers the data each timestep and adds the length of the
     //   timestep to the appropriate bin.
 
     // Using/Aliasing
@@ -3498,7 +3498,7 @@ void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
                     if (ort->OutputTableBinned(iInObj).avgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                         curValue /= (elapsedTime * Constant::SecInHour);
                     }
-                    // round the value to the number of signficant digits used in the final output report
+                    // round the value to the number of significant digits used in the final output report
                     if (curIntervalSize < 1) {
                         curValue = round(curValue * 10000.0) / 10000.0; // four significant digits
                     } else if (curIntervalSize >= 10) {
@@ -4536,7 +4536,7 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
     // The following two columns are derived based on the values of the other columns and need to be computed on every HVAC timestep.
     //   Opaque Surface Conduction and Other Heat Addition
     //   Opaque Surface Conduction and Other Heat Removal
-    // For variables that are updated on a zone timestep basis, the values are used on the HVAC timestep but are ratioed by the
+    // For variables that are updated on a zone timestep basis, the values are used on the HVAC timestep but are ratio-ed by the
     // timestep lengths.
     // The peak reports follow a similar example.
 
@@ -4721,7 +4721,7 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
     // Opaque Surface Conduction and Other Heat Addition
     // Opaque Surface Conduction and Other Heat Removal
     for (state.dataOutRptTab->iZoneGHGR = 1; state.dataOutRptTab->iZoneGHGR <= state.dataGlobal->NumOfZones; ++state.dataOutRptTab->iZoneGHGR) {
-        // ZonePreDefRep variables above already inlude zone list and group multipliers
+        // ZonePreDefRep variables above already include zone list and group multipliers
         state.dataOutRptTab->totalGHGR =
             ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnPeoplAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnLiteAdd +
             ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnZoneEqHt + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnZoneEqCl +
@@ -7720,7 +7720,7 @@ void WriteBEPSTable(EnergyPlusData &state)
         collapsedTotal(10) = ort->gatherTotalsBEPS(14); // other fuel 2
         collapsedTotal(11) = ort->gatherTotalsBEPS(3);  // district cooling <- purchased cooling
         collapsedTotal(12) = ort->gatherTotalsBEPS(4);  // district heating water <- purchased heating
-        collapsedTotal(13) = ort->gatherTotalsBEPS(5);  // distrcit heating steam  <- purchased heating
+        collapsedTotal(13) = ort->gatherTotalsBEPS(5);  // district heating steam  <- purchased heating
         collapsedTotal(14) = ort->gatherTotalsBEPS(7);  // water
 
         if (produceTabular) {
@@ -7892,7 +7892,7 @@ void WriteBEPSTable(EnergyPlusData &state)
         } else {
             ort->OverallNetEnergyFromStorage = 0.0;
         }
-        // determine which resource is the primary heating resourse
+        // determine which resource is the primary heating resource
         int resourcePrimaryHeating = 0;
         Real64 heatingMaximum = 0.0;
         for (int iResource = 1; iResource <= 13; ++iResource) { // don't do water
@@ -9719,7 +9719,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         }
         Array1D_string rowHeadTemp(rowHead);
-        // Before outputing to SQL, we forward fill the End use column (rowHead)
+        // Before outputting to SQL, we forward fill the End use column (rowHead)
         // for better sql queries
         FillRowHead(rowHeadTemp);
 
@@ -10192,7 +10192,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
     // show the headers of the report
     WriteReportHeaders(state, "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Average);
 
-    Real64 ipElectricityConversion = 1.0; // declare here so that last one used is correct for LEEED section
+    Real64 ipElectricityConversion = 1.0; // declare here so that last one used is correct for LEED section
     for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
         UnitsStyle unitsStyle_cur = ort->unitsStyle;
         bool produceTabular = true;
@@ -10554,7 +10554,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         }
 
         Array1D_string rowHeadTemp(rowHead);
-        // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+        // Before outputting to SQL, we forward fill the End use column (rowHead) (cf #7481)
         // for better sql queries
         FillRowHead(rowHeadTemp);
 
@@ -10966,7 +10966,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
 
     auto const &ort = state.dataOutRptTab;
 
-    // all arrays are in the format: (row, columnm)
+    // all arrays are in the format: (row, column)
     if (!ort->displayTabularVeriSum) {
         return;
     }
@@ -14394,7 +14394,7 @@ int unitsFromHeading(EnergyPlusData &state, std::string &heading)
     return (unitConv);
 }
 
-// Jan 2021: Overloaded this function to accomondate dual units output needs
+// Jan 2021: Overloaded this function to accommodate dual units output needs
 // changes the heading that contains and SI to IP as well as providing the unit conversion index
 // Glazer Nov 2016
 int unitsFromHeading(EnergyPlusData &state, std::string &heading, UnitsStyle unitsStyle_para)
@@ -14414,7 +14414,7 @@ int unitsFromHeading(EnergyPlusData &state, std::string &heading, UnitsStyle uni
     return (unitConv);
 }
 
-// function that returns a vector of strings when given a string with comma delimitters
+// function that returns a vector of strings when given a string with comma delimiters
 // Glazer Nov 2016
 std::vector<std::string> splitCommaString(std::string const &inputString)
 {
@@ -14968,7 +14968,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
     Array1D<CompLoadTablesType> FacilityZonesHeatCompLoadTables; // zone results used for facility report - never directly output
     Array1D<CompLoadTablesType> FacilityZonesCoolCompLoadTables;
 
-    // Jan 2021: The following variable is redudant in the original code, deleting the line
+    // Jan 2021: The following variable is redundant in the original code, deleting the line
     // CompLoadTablesType curCompLoadTable; // active component load table
 
     for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
@@ -14977,7 +14977,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
         bool produceSQLite = false;
         if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-        // adjusted initilization location to after variable declaration for loops 2021-01-11
+        // adjusted initialization location to after variable declaration for loops 2021-01-11
         peopleDelaySeqHeat.dimension(state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
         peopleDelaySeqHeat = 0.0;
         peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
@@ -15674,7 +15674,7 @@ void GetDelaySequences(EnergyPlusData &state,
                         (peopleConvFromSurf + equipConvFromSurf + hvacLossConvFromSurf + powerGenConvFromSurf + lightLWConvFromSurf +
                          lightSWConvFromSurf +
                          feneSolarConvFromSurf); // remove net radiant for the surface
-                                                 // also remove the net radiant component on the instanteous conduction for fenestration
+                                                 // also remove the net radiant component on the instantaneous conduction for fenestration
                     if (state.dataSurface->Surface(jSurf).Class == DataSurfaces::SurfaceClass::Window) {
                         adjFeneSurfNetRadSeq += ort->netSurfRadSeq(desDaySelected, kTimeStep, jSurf);
                     }
@@ -15687,7 +15687,7 @@ void GetDelaySequences(EnergyPlusData &state,
             // combine short wave (visible) and long wave (thermal) impacts
             lightDelaySeq(kTimeStep) = lightLWConvIntoZone + lightSWConvIntoZone;
             feneSolarDelaySeq(kTimeStep) = feneSolarConvIntoZone;
-            // also remove the net radiant component on the instanteous conduction for fenestration
+            // also remove the net radiant component on the instantaneous conduction for fenestration
             if (!state.dataOutRptTab->adjFenDone(desDaySelected, kTimeStep, zoneIndex)) {
                 feneCondInstantSeq(desDaySelected, kTimeStep, zoneIndex) -= adjFeneSurfNetRadSeq;
                 state.dataOutRptTab->adjFenDone(desDaySelected, kTimeStep, zoneIndex) = true;
@@ -15997,7 +15997,7 @@ void CollectPeakZoneConditions(
             // Zone Dry Bulb Temperature
             compLoad.zoneDryBulb = thisCalcFinalZoneSizing.CoolZoneTempSeq(timeOfMax);
 
-            // Zone Relative Humdity
+            // Zone Relative Humidity
             // use standard air pressure because air pressure is not tracked with sizing data
             compLoad.zoneRelHum = Psychrometrics::PsyRhFnTdbWPb(state,
                                                                 thisCalcFinalZoneSizing.CoolZoneTempSeq(timeOfMax),
@@ -16053,7 +16053,7 @@ void CollectPeakZoneConditions(
             // Zone Dry Bulb Temperature
             compLoad.zoneDryBulb = thisCalcFinalZoneSizing.HeatZoneTempSeq(timeOfMax);
 
-            // Zone Relative Humdity
+            // Zone Relative Humidity
             // use standard air pressure because air pressure is not tracked with sizing data
             compLoad.zoneRelHum = Psychrometrics::PsyRhFnTdbWPb(state,
                                                                 thisCalcFinalZoneSizing.HeatZoneTempSeq(timeOfMax),
@@ -16252,7 +16252,7 @@ void AddAreaColumnForZone(int const zoneNum, Array1D<ZompComponentAreasType> con
     compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::OpqDoor) = true;
 }
 
-// Used for the AirLoop and Facility level load component tables to sum the results from invidual zones
+// Used for the AirLoop and Facility level load component tables to sum the results from individual zones
 void CombineLoadCompResults(CompLoadTablesType &compLoadTotal, CompLoadTablesType const &compLoadPartial, Real64 const multiplier)
 {
     // sum the main results
@@ -16408,7 +16408,7 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
     compLoadTotal.cndPumpPerFlow *= powerPerFlowLiquidConversion;
 }
 
-// Jan 2021: Overloaded the function with addtional parameters for dual units;
+// Jan 2021: Overloaded the function with additional parameters for dual units;
 //           used overloading since the original function was checked in an existing test unit.
 // apply unit conversions to the load components summary tables
 void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, UnitsStyle unitsStyle_para)
@@ -16684,7 +16684,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
             tableBody(1, 3) = RealToStr(curCompLoad.outsideWetBulb, 2);   // Outside Wet Bulb Temperature
             tableBody(1, 4) = RealToStr(curCompLoad.outsideHumRatio, 5);  // Outside Humidity Ratio at Peak
             tableBody(1, 5) = RealToStr(curCompLoad.zoneDryBulb, 2);      // Zone Dry Bulb Temperature
-            tableBody(1, 6) = RealToStr(100 * curCompLoad.zoneRelHum, 2); // Zone Relative Humdity
+            tableBody(1, 6) = RealToStr(100 * curCompLoad.zoneRelHum, 2); // Zone Relative Humidity
             tableBody(1, 7) = RealToStr(curCompLoad.zoneHumRatio, 5);     // Zone Humidity Ratio at Peak
         }
         tableBody(1, 8) = RealToStr(curCompLoad.supAirTemp, 2); // supply air temperature
@@ -16735,7 +16735,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
             rowHead(4) = "Floor Area per Total Capacity [m2/W]";
             rowHead(5) = "Total Capacity per Floor Area [W/m2]";
             // rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]"; // facility only
-            // rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]"; // facility only
+            // rowHead( 7 ) = "Condenser Pump Power per Flow [W-s/m3]"; // facility only
             rowHead(6) = "Number of People";
         } else {
             rowHead(1) = "Outside Air Fraction [fraction]";
@@ -17025,10 +17025,10 @@ void WriteTable(EnergyPlusData &state,
     int rowsRowLabels = isize(rowLabels);
     int colsColumnLabels = isize(columnLabels);
     int const colsWidthColumn = isize(widthColumn);
-    // check size of arrays for consistancy and if inconsistent use smaller value
+    // check size of arrays for consistency and if inconsistent use smaller value
     // and display warning
     if (rowsBody != rowsRowLabels) {
-        ShowWarningError(state, "REPORT:TABLE Inconsistant number of rows.");
+        ShowWarningError(state, "REPORT:TABLE Inconsistent number of rows.");
         rowsBody = min(rowsBody, rowsRowLabels);
         rowsRowLabels = rowsBody;
     }
@@ -17043,7 +17043,7 @@ void WriteTable(EnergyPlusData &state,
     rowUnitStrings.allocate(rowsBody);
     columnUnitStrings.allocate(colsBody);
     bodyEsc.allocate(colsBody, rowsBody);
-    // create new array to hold multiple line column lables
+    // create new array to hold multiple line column labels
     colLabelMulti.allocate(colsColumnLabels, 50);
     colLabelMulti = blank; // set array to blank
     int maxNumColLabelRows = 0;
@@ -18973,7 +18973,7 @@ Real64 ConvertIPdelta(EnergyPlusData &state, int const unitConvIndex, Real64 con
     // PURPOSE OF THIS SUBROUTINE:
     //   Apply the selected unit conversion to the input value
     //   expressed in SI units to result in IP units. This routine
-    //   only uses the mulitplier and NOT the offset and is appropriate
+    //   only uses the multiplier and NOT the offset and is appropriate
     //   when the number being converted is a difference or delta
     //   between values (such as a temperature difference).
 
@@ -19025,7 +19025,7 @@ void GetUnitConversion(EnergyPlusData &state, int const unitConvIndex, Real64 &m
     // PURPOSE OF THIS SUBROUTINE:
     //   Return of the multiplier and adder for the given
     //   SI to IP unit conversion.
-    //     SI = (IP * multipier) + offset
+    //     SI = (IP * multiplier) + offset
     //  This function could be replaced by referencing the
     //  array directly but does include some checking of the
     //  bounds of the array.
@@ -19078,7 +19078,7 @@ Real64 getSpecificUnitMultiplier(EnergyPlusData &state, std::string const &SIuni
     //   SI to IP unit conversion. No offset is provided so
     //   it cannot be used to convert units such as temperatures
     //   that include an offset.
-    //     SI = (IP * multipier) + offset
+    //     SI = (IP * multiplier) + offset
     //   Unlike LookupSItoIP, this function does not expect more
     //   the units in the two input parameters. No hints or
     //   defaults are used since both the SI and IP units are
@@ -19140,7 +19140,7 @@ Real64 getSpecificUnitDivider(EnergyPlusData &state, std::string const &SIunit, 
     //   SI to IP unit conversion. No offset is provided so
     //   it cannot be used to convert units such as temperatures
     //   that include an offset.
-    //     SI = (IP * multipier) + offset
+    //     SI = (IP * multiplier) + offset
     //   Unlike LookupSItoIP, this function does not expect more
     //   the units in the two input parameters. No hints or
     //   defaults are used since both the SI and IP units are

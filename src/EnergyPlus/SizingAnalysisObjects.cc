@@ -128,7 +128,7 @@ int SizingLog::GetZtStepIndex(const ZoneTimestepObject tmpztStepStamp)
         vecIndex = envrnStartZtStepIndexMap[newEnvrnToSeedEnvrnMap[tmpztStepStamp.envrnNum]];
     }
 
-    // next for safety sake, constrain index to lie inside correct envronment
+    // next for safety sake, constrain index to lie inside correct environment
     if (vecIndex < envrnStartZtStepIndexMap[newEnvrnToSeedEnvrnMap[tmpztStepStamp.envrnNum]]) {
         vecIndex = envrnStartZtStepIndexMap[newEnvrnToSeedEnvrnMap[tmpztStepStamp.envrnNum]]; // first step in environment
     }
@@ -538,7 +538,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData &state, int 
         }
     }
 
-    // add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
+    // add a separate eio summary report about what happened, did demand trap get used, what were the key values.
     if (!state.dataGlobal->sizingAnalysisEioHeaderDoneOnce) {
         print(state.files.eio,
               "{}",

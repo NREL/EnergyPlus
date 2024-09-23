@@ -173,7 +173,7 @@ namespace Photovoltaics {
             CalcSimplePV(state, PVnum);
         } break;
         case PVModel::TRNSYS: {
-            // 'PhotovoltaicPeformance:EquivalentOne-Diode' (aka. 5-parameter TRNSYS type 180 model)
+            // 'PhotovoltaicPerformance:EquivalentOne-Diode' (aka. 5-parameter TRNSYS type 180 model)
             InitTRNSYSPV(state, PVnum);
 
             CalcTRNSYSPV(state, PVnum, RunFlag);
@@ -206,7 +206,7 @@ namespace Photovoltaics {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // provide a "get" method to collect results for individual electic load centers.
+        // provide a "get" method to collect results for individual electric load centers.
 
         // Using/Aliasing
         using PhotovoltaicThermalCollectors::GetPVTThermalPowerProduction;
@@ -324,7 +324,7 @@ namespace Photovoltaics {
                     ShowWarningError(state,
                                      format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
                     ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                    ShowContinueError(state, "Surface is not exposed to solar, check surface bounday condition");
+                    ShowContinueError(state, "Surface is not exposed to solar, check surface boundary condition");
                 }
                 state.dataPhotovoltaic->PVarray(PVnum).Zone = GetPVZone(state, state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr);
 
@@ -836,7 +836,7 @@ namespace Photovoltaics {
                 state.dataHeatBal->SurfQRadSWOutIncident(
                     ThisSurf); // active solar cellsurface net area | solar conversion efficiency | solar incident
 
-            // store sink term in appropriate place for surface heat transfer itegration
+            // store sink term in appropriate place for surface heat transfer integration
             state.dataPhotovoltaic->PVarray(thisPV).SurfaceSink = state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower;
 
             // array energy, power * timestep
@@ -919,7 +919,7 @@ namespace Photovoltaics {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Calculate various PV system peformance indicies at the current timestep
+        // Calculate various PV system performance indices at the current timestep
 
         // METHODOLOGY EMPLOYED:
         //  adapted code from a set of F77 routines by G. Barker that implement the model
@@ -1071,7 +1071,7 @@ namespace Photovoltaics {
                                                   thisPVarray.SNLPVModule.BVoc0,
                                                   thisPVarray.SNLPVModule.mBVoc);
 
-            // Calculate Vmp: voltagea at maximum powerpoint
+            // Calculate Vmp: voltage at maximum powerpoint
             thisPVarray.SNLPVCalc.Vmp = SandiaVmp(thisPVarray.SNLPVCalc.Tcell,
                                                   Ee,
                                                   thisPVarray.SNLPVModule.Vmp0,
@@ -1357,7 +1357,7 @@ namespace Photovoltaics {
                      state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Vmp + state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefVoc) /
                     state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Imp;
 
-                //  temperature depencence
+                //  temperature dependence
                 IL = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation /
                      state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefInsolation *
                      (ILRef + state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TempCoefIsc *
@@ -1369,7 +1369,7 @@ namespace Photovoltaics {
                               state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.CellsInSeries / AARef *
                               (1.0 - state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefTemperature / CellTemp));
 
-                //  compute short curcuit current and open circuit voltage
+                //  compute short circuit current and open circuit voltage
 
                 //   NEWTON --> ISC  (STARTVALUE: ISCG1 - BASED ON IL=ISC)
                 ISCG1 = IL;
@@ -1753,7 +1753,7 @@ namespace Photovoltaics {
 
         // METHODOLOGY EMPLOYED:
         // apply sandia temperature model, This is module temp or back of
-        // of the panel.  A seperate correction handles delta T for actual cell
+        // of the panel.  A separate correction handles delta T for actual cell
 
         // REFERENCES:
         // from G. Barker's TRNSYS implementation
@@ -1930,7 +1930,7 @@ namespace Photovoltaics {
         //       AUTHOR         G. Barker
         //       DATE WRITTEN   <unknown>
         //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffit F77-> f90
+        //       RE-ENGINEERED  B. Griffith F77-> f90
 
         // PURPOSE OF THIS FUNCTION:
         // Returns the result of Sandia Air Mass function
@@ -2229,7 +2229,7 @@ namespace Photovoltaics {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   Janauray 2004
+        //       DATE WRITTEN   January 2004
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 

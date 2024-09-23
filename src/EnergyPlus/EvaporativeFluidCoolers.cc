@@ -905,7 +905,7 @@ namespace EvaporativeFluidCoolers {
                     ShowSevereError(
                         state,
                         format(
-                            "{} = \"{}\". Low-Speed User Specified Design Capacity must be less than the High-Speed User Specified Design Dapacity.",
+                            "{} = \"{}\". Low-Speed User Specified Design Capacity must be less than the High-Speed User Specified Design Capacity.",
                             state.dataIPShortCut->cCurrentModuleObject,
                             thisEFC.Name));
                     ErrorsFound = true;
@@ -964,7 +964,7 @@ namespace EvaporativeFluidCoolers {
                                        "\"UFactorTimesAreaAndDesignWaterFlowRate\" or \"StandardDesignCapacity\" or \"UserSpecifiedDesignCapacity\".",
                                        state.dataIPShortCut->cCurrentModuleObject,
                                        thisEFC.Name));
-                ShowContinueError(state, format("Evaporative fluid cooler Performanace Input Method currently specified as: {}", AlphArray(4)));
+                ShowContinueError(state, format("Evaporative fluid cooler Performance Input Method currently specified as: {}", AlphArray(4)));
                 ErrorsFound = true;
             }
 
@@ -2225,7 +2225,7 @@ namespace EvaporativeFluidCoolers {
         }
 
         // Calculate bypass fraction since OWTLowerLimit < OutletWaterTemp < TempSetPoint.
-        // The iteration ends when the numer of iteration exceeds the limit or the difference
+        // The iteration ends when the number of iteration exceeds the limit or the difference
         //  between the new and old bypass fractions is less than the threshold.
         if (BypassFlag == 1) {
             Real64 bypassFraction = (TempSetPoint - this->OutletWaterTemp) / (inletWaterTemp - this->OutletWaterTemp);
@@ -2254,7 +2254,7 @@ namespace EvaporativeFluidCoolers {
                         this->SimSimpleEvapFluidCooler(
                             state, this->WaterMassFlowRate * (1.0 - BypassFraction2), AirFlowRate, UAdesign, this->OutletWaterTemp);
                         if (this->OutletWaterTemp < OWTLowerLimit) {
-                            // Use previous iteraction values
+                            // Use previous iteration values
                             BypassFraction2 = BypassFractionPrev;
                             this->OutletWaterTemp = OutletWaterTempPrev;
                         }
@@ -2520,7 +2520,7 @@ namespace EvaporativeFluidCoolers {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Collect evaporative fluid cooler water useage calculations for
+        // Collect evaporative fluid cooler water usage calculations for
         // reuse by all the evaporative fluid cooler models.
 
         // REFERENCES:
@@ -2657,7 +2657,7 @@ namespace EvaporativeFluidCoolers {
             return;
 
         // Check flow rate through evaporative fluid cooler and compare to design flow rate,
-        // show warning if greater than Design * Mulitplier
+        // show warning if greater than Design * Multiplier
         if (state.dataLoopNodes->Node(this->WaterOutletNode).MassFlowRate >
             this->DesWaterMassFlowRate * this->EvapFluidCoolerMassFlowRateMultiplier) {
             ++this->HighMassFlowErrorCount;
