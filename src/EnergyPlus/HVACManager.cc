@@ -2602,12 +2602,12 @@ void reportAirHeatBal2(EnergyPlusData &state,
                     if (refDoorMixing.VolRefDoorFlowRate(j) > 0.0) {
                         // int ZoneB = refDoorMixing.MateZonePtr(j);
                         // auto const &zoneBHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneB);
-                        Real64 const szBMAT = (refDoorMixing.spaceIndex == 0)
-                                                  ? state.dataZoneTempPredictorCorrector->zoneHeatBalance(refDoorMixing.ZonePtr).MAT
-                                                  : state.dataZoneTempPredictorCorrector->spaceHeatBalance(refDoorMixing.spaceIndex).MAT;
+                        Real64 const szBMAT = (refDoorMixing.fromSpaceIndex == 0)
+                                                  ? state.dataZoneTempPredictorCorrector->zoneHeatBalance(refDoorMixing.MateZonePtr(j)).MAT
+                                                  : state.dataZoneTempPredictorCorrector->spaceHeatBalance(refDoorMixing.fromSpaceIndex).MAT;
                         Real64 const szBHumRat = (refDoorMixing.fromSpaceIndex == 0)
-                                                     ? state.dataZoneTempPredictorCorrector->zoneHeatBalance(refDoorMixing.ZonePtr).airHumRat
-                                                     : state.dataZoneTempPredictorCorrector->spaceHeatBalance(refDoorMixing.spaceIndex).airHumRat;
+                                                     ? state.dataZoneTempPredictorCorrector->zoneHeatBalance(refDoorMixing.MateZonePtr(j)).airHumRat
+                                                     : state.dataZoneTempPredictorCorrector->spaceHeatBalance(refDoorMixing.fromSpaceIndex).airHumRat;
                         AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                                        state.dataEnvrn->OutBaroPress,
                                                                        (szHeatBal.MAT + szBMAT) / 2.0,
@@ -2629,7 +2629,6 @@ void reportAirHeatBal2(EnergyPlusData &state,
             }         // zone A (zoneptr = zoneNum)
             for (int ZoneA = 1; ZoneA <= (zoneNum - 1); ++ZoneA) {
                 auto &refDoorMixingA = state.dataHeatBal->RefDoorMixing(ZoneA);
-                auto const &zoneAHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneA);
                 //    Capture impact when zoneNum is the 'mating zone'
                 //    that is, the zone of a pair with the higher zone number(matezoneptr = zoneNum)
                 if (refDoorMixingA.RefDoorMixFlag) {
@@ -2637,14 +2636,21 @@ void reportAirHeatBal2(EnergyPlusData &state,
                         if (((spaceNum == 0) && (refDoorMixingA.MateZonePtr(j) == zoneNum)) ||
                             ((spaceNum == 0) && (refDoorMixingA.fromSpaceIndex == spaceNum))) {
                             if (refDoorMixingA.VolRefDoorFlowRate(j) > 0.0) {
+                                // auto const &zoneAHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneA);
+                                Real64 const szAMAT = (refDoorMixingA.spaceIndex == 0)
+                                                          ? state.dataZoneTempPredictorCorrector->zoneHeatBalance(refDoorMixingA.ZonePtr).MAT
+                                                          : state.dataZoneTempPredictorCorrector->spaceHeatBalance(refDoorMixingA.spaceIndex).MAT;
+                                Real64 const szAHumRat =
+                                    (refDoorMixingA.spaceIndex == 0)
+                                        ? state.dataZoneTempPredictorCorrector->zoneHeatBalance(refDoorMixingA.ZonePtr).airHumRat
+                                        : state.dataZoneTempPredictorCorrector->spaceHeatBalance(refDoorMixingA.spaceIndex).airHumRat;
                                 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                                                state.dataEnvrn->OutBaroPress,
-                                                                               (szHeatBal.MAT + zoneAHB.MAT) / 2.0,
-                                                                               (szHeatBal.airHumRat + zoneAHB.airHumRat) / 2.0,
+                                                                               (szHeatBal.MAT + szAMAT) / 2.0,
+                                                                               (szHeatBal.airHumRat + szAHumRat) / 2.0,
                                                                                std::string());
-                                CpAir = Psychrometrics::PsyCpAirFnW((szHeatBal.airHumRat + zoneAHB.airHumRat) / 2.0);
-                                H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb((szHeatBal.airHumRat + zoneAHB.airHumRat) / 2.0,
-                                                                            (szHeatBal.MAT + zoneAHB.MAT) / 2.0);
+                                CpAir = Psychrometrics::PsyCpAirFnW((szHeatBal.airHumRat + szAHumRat) / 2.0);
+                                H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb((szHeatBal.airHumRat + szAHumRat) / 2.0, (szHeatBal.MAT + szAMAT) / 2.0);
                                 szAirRpt.MixVolume +=
                                     refDoorMixingA.VolRefDoorFlowRate(j) * state.dataHVACGlobal->TimeStepSysSec * ADSCorrectionFactor;
                                 szAirRpt.MixVdotCurDensity += refDoorMixingA.VolRefDoorFlowRate(j) * ADSCorrectionFactor;
@@ -2653,9 +2659,9 @@ void reportAirHeatBal2(EnergyPlusData &state,
                                 szAirRpt.MixMdot += refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * ADSCorrectionFactor;
                                 szAirRpt.MixVdotStdDensity +=
                                     refDoorMixingA.VolRefDoorFlowRate(j) * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
-                                szAirRpt.MixSenLoad += refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * CpAir * (szHeatBal.MAT - zoneAHB.MAT);
+                                szAirRpt.MixSenLoad += refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * CpAir * (szHeatBal.MAT - szAMAT);
                                 szAirRpt.MixLatLoad +=
-                                    refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * (szHeatBal.airHumRat - zoneAHB.airHumRat) * H2OHtOfVap;
+                                    refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * (szHeatBal.airHumRat - szAHumRat) * H2OHtOfVap;
                             } // volflowrate > 0
                         }     // matezoneptr (zoneB) = Zonelooop
                     }         // NumRefDoorConnections
