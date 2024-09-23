@@ -1973,7 +1973,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     // get venetian blind material index
     int VBMatNum = Material::GetMaterialNum(*state, "WMTEUQL_BLND_KINDV_RF80_T02_A18_Rb45");
     auto const *matVenetBlind = dynamic_cast<Material::MaterialBlindEQL const *>(state->dataMaterial->materials(VBMatNum));
-    // get equivalent layer window contruction index
+    // get equivalent layer window construction index
     for (int ConstrPtr = 1; ConstrPtr <= state->dataHeatBal->TotConstructs; ++ConstrPtr) {
         if (state->dataConstruction->Construct(ConstrPtr).WindowTypeEQL) {
             ConstrNum = ConstrPtr;

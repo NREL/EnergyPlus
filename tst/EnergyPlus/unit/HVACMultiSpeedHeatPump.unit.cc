@@ -1325,7 +1325,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     state->dataHVACMultiSpdHP->MSHeatPump(2).TotCoolEnergyRate = 1000.0;
     state->dataHVACMultiSpdHP->MSHeatPump(1).FlowFraction = 1.0;
     state->dataHVACMultiSpdHP->MSHeatPump(2).FlowFraction = 1.0;
-    // because sizing isn't occuring, we must set these
+    // because sizing isn't occurring, we must set these
     for (auto &dxCoil : state->dataDXCoils->DXCoil) {
         for (int i = 1; i <= dxCoil.NumOfSpeeds; ++i) {
             dxCoil.MSRatedAirMassFlowRate(i) = dxCoil.MSRatedAirVolFlowRate(i) * 1.2;
@@ -2218,7 +2218,7 @@ TEST_F(EnergyPlusFixture, HVACMSHP_UnitarySystemElectricityRateTest)
     zoneAirNode.Temp = 21.1;
     zoneAirNode.HumRat = 0.0035;
     zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
-    // set maixed air node conditions
+    // set mixed air node conditions
     auto &mixedAirNode =
         state->dataLoopNodes->Node(Util::FindItemInList("AC-24 SF INLET AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     mixedAirNode.Temp = 10.0;
