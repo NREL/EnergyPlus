@@ -3563,9 +3563,9 @@ namespace CondenserLoopTowers {
                                       format("is inconsistent with Design Loop Delta Temperature specified in Sizing:Plant object = {}.",
                                              PlantSizData(PltSizCondNum).PlantLoopName));
                     ShowContinueError(state, format("..The Design Range Temperature specified in tower is = {:.2T}", this->DesRange));
-                    ShowContinueError(state,
-                                      format("..The Design Loop Delta Temperature specified in plant sizing data is = {:.2T}",
-                                             PlantSizData(PltSizCondNum).DeltaT));
+                    ShowContinueError(
+                        state,
+                        format("..The Design Loop Delta Temperature specified in plant sizing data is = {:.2T}", PlantSizData(PltSizCondNum).DeltaT));
                 }
                 // check if the tower approach is different from plant sizing data
                 DesTowerApproachFromPlant = PlantSizData(PltSizCondNum).ExitTemp - this->DesInletAirWBTemp;

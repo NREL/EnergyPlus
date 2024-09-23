@@ -913,8 +913,8 @@ namespace EcoRoofManager {
         if (matER->calcMethod == Material::EcoRoofCalcMethod::Simple) {
 
             // THE SECTION BELOW WAS THE INITIAL MOISTURE DISTRIBUTION MODEL.
-            // Any line with "!-" was code.  A line with "!" was just a comment.  This is done in case this code needs to be resurrected in the future.
-            // See below this commented out code for the new moisture distribution model.
+            // Any line with "!-" was code.  A line with "!" was just a comment.  This is done in case this code needs to be resurrected in the
+            // future. See below this commented out code for the new moisture distribution model.
             //*********************************************************************************************************
             //*********************************************************************************************************
             // NEXT Redistribute moisture based on moisture diffusion.

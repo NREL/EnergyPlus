@@ -3829,7 +3829,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
         if (!thisZoneEquipConfig.IsControlled) continue;
 
         Real64 ZAirSysZoneVentLoad = 0.0; // ventilation load attributed to a particular zone from all primary air systems serving the zone [J]
-        Real64 ZAirSysOutAirFlow = 0.0;   // outside air flow rate for zone from all primary air systems serving thezone [kg/s]
+        Real64 ZAirSysOutAirFlow = 0.0;   // outside air flow rate for zone from all primary air systems serving the zone [kg/s]
         Real64 ZFAUFlowRate = 0.0;        // Zone forced Air unit air mass flow rate [kg/s]
         Real64 ZFAUZoneVentLoad = 0.0;    // ventilation load attributed to a particular zone from zone forced air units [J]
         Real64 ZFAUOutAirFlow = 0.0;      // outside air flow rate for zone from zone forced air units. [kg/s]
@@ -4138,7 +4138,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 AirSysZoneVentLoad = 0.0;
                 AirSysOutAirFlow = 0.0;
             } else {
-                // Calculate return and mixed air ethalpies
+                // Calculate return and mixed air enthalpies
                 AirSysEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                 AirSysEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
 
@@ -4473,7 +4473,7 @@ void FindDemandSideMatch(EnergyPlusData &state,
     //       DATE WRITTEN   September 2004
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine intializes the connections between various loops.
+    // This subroutine initializes the connections between various loops.
     // Due to the fact that this requires numerous string compares, it
     // is much more efficient to find this information once and then
     // store it in module level variables (LoopConnect derived type).

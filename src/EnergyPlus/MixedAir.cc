@@ -431,7 +431,7 @@ void SimOAComponent(EnergyPlusData &state,
                     bool const FirstHVACIteration,
                     int &CompIndex,
                     int const AirLoopNum, // air loop index for economizer lockout coordination
-                    bool const Sim,       // if TRUE, simulate component; if FALSE, just set the coil exisitence flags
+                    bool const Sim,       // if TRUE, simulate component; if FALSE, just set the coil existence flags
                     int const OASysNum,   // index to outside air system
                     bool &OAHeatingCoil,  // TRUE indicates a heating coil has been found
                     bool &OACoolingCoil,  // TRUE indicates a cooling coil has been found
@@ -1238,7 +1238,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                                       ErrorsFound);
 
             // add applicable faults identifier to avoid string comparison at each time step
-            //  loop through each fault for each OA controller and determine economizer faultys
+            //  loop through each fault for each OA controller and determine economizer faults
             for (int i = 1; i <= state.dataFaultsMgr->NumFaultyEconomizer; ++i) {
                 if (state.dataFaultsMgr->FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
                 if (Util::SameString(state.dataMixedAir->OAController(OutAirNum).Name, state.dataFaultsMgr->FaultsEconomizer(i).ControllerName)) {
@@ -3127,7 +3127,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 vent_mech.TotPeopleOAFlow = TotalPeopleOAFlow;
             }
         } else {
-            // Stand Alone ERV does not require a termperature setpoint schedule, make setpoint equal to lower economizer limit
+            // Stand Alone ERV does not require a temperature setpoint schedule, make setpoint equal to lower economizer limit
             thisOAController.MixSetTemp = thisOAController.TempLowLim;
         }
     }
@@ -3365,7 +3365,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         this->HeatRecoveryBypassStatus = 0;                                            // HR bypass status for reporting
         this->HRHeatingCoilActive = 0;                                                 // resets report variable
         this->MixedAirTempAtMinOAFlow = state.dataLoopNodes->Node(this->RetNode).Temp; // track return T
-        this->HighHumCtrlStatus = 0;                                                   // high humdity control status for reporting
+        this->HighHumCtrlStatus = 0;                                                   // high humidity control status for reporting
         this->OAFractionRpt = 0.0;                                                     // actual OA fraction for reporting
 
         this->EconoActive = false;       // DataAirLoop variable (OA Controllers)
@@ -3665,7 +3665,7 @@ Real64 VentilationMechanicalProps::CalcMechVentController(EnergyPlusData &state,
     Real64 SysEv;            // System ventilation efficiency
     Real64 NodeTemp;         // node temperature
     Real64 NodeHumRat;       // node humidity ratio
-    Real64 ZoneMaxCO2 = 0.0; // Breathing-zone CO2 concentartion
+    Real64 ZoneMaxCO2 = 0.0; // Breathing-zone CO2 concentration
     Real64 ZoneMinCO2 = 0.0; // Minimum CO2 concentration in zone
     Real64 ZoneOAMin = 0.0;  // Minimum Zone OA flow rate when the zone is unoccupied (i.e. ZoneOAPeople = 0)
     Real64 ZoneOAMax = 0.0;  // Maximum Zone OA flow rate (ZoneOAPeople + ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)])
@@ -4444,7 +4444,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
 
             } else {
 
-                // simulate OA System if equipment exists other than the mixer (e.g., heating/cooling coil, HX, ect.)
+                // simulate OA System if equipment exists other than the mixer (e.g., heating/cooling coil, HX, etc.)
 
                 // 1 - check min OA flow result
                 if (this->FixedMin) {
@@ -4637,7 +4637,7 @@ void OAMixerProps::CalcOAMixer(EnergyPlusData &state)
     // Define a recirculation mass flow rate
     Real64 RecircMassFlowRate = this->RetMassFlowRate - this->RelMassFlowRate;
     // In certain low flow conditions the return air mass flow rate can be below the outside air value established
-    //  by the user.  This check will ensure that this condition does not result in unphysical air properties.
+    //  by the user.  This check will ensure that this condition does not result in non-physical air properties.
     if (RecircMassFlowRate < 0.0) {
         RecircMassFlowRate = 0.0;
         this->RelMassFlowRate = this->RetMassFlowRate;
@@ -5340,7 +5340,7 @@ bool CheckForControllerWaterCoil(EnergyPlusData &state,
     //       DATE WRITTEN   May 2009
 
     // PURPOSE OF THIS FUNCTION:
-    // This routine checks the controller list for existance of the reference coil.
+    // This routine checks the controller list for existence of the reference coil.
 
     if (state.dataMixedAir->GetOASysInputFlag) {
         GetOutsideAirSysInputs(state);
