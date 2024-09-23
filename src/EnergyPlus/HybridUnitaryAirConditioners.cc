@@ -1129,7 +1129,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
-                            "Zone Hybrid Unitary HVAC DehumidificationLoad to Humidistat Setpoint Heat Transfer Energy",
+                            "Zone Hybrid Unitary HVAC Dehumidification Load to Humidistat Setpoint Heat Transfer Energy",
                             Constant::Units::J,
                             hybridUnitaryAC.RequestedDeHumidificationEnergy,
                             OutputProcessor::TimeStepType::System,
