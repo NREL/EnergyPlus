@@ -53,84 +53,82 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Copies the Python standard library to the target dir
-# If the target_dir already exists, it doesn't do anything
-# an easy way is to find the __init__ file for a known standard lib package and go two parents up
-# should result in something like `/usr/lib/python3.7`
-
-# this script must be called with two args:
-# 1 - the path to the EnergyPlus executable in the install-tree, which is used to determine where to copy the library
-#     since this is in the install-tree, you'll need to use a cmake generator expression
-# 2 - name of the folder to create to store the copied in python standard library, usually python_lib
-import ctypes
-import os
 import platform
+import re
 import shutil
+import subprocess
 import sys
-import glob as gb
-
-print("PYTHON: Copying standard library files")
-
-if len(sys.argv) == 3:
-    exe_path = sys.argv[1]
-    folder_name = sys.argv[2]
-else:
-    print("Must call " + sys.argv[0] + "with two command line arguments: the path to the energyplus exe and the name "
-                                       "of the new library directory")
-    sys.exit(1)
-exe_dir = os.path.dirname(exe_path)
-target_dir = os.path.join(exe_dir, folder_name)
-
-ctypes_import_file = os.path.abspath(ctypes.__file__)
-ctypes_package_dir = os.path.dirname(ctypes_import_file)
-standard_lib_dir = os.path.dirname(ctypes_package_dir)
-
-print(f"PYTHON: Analyzing standard library directory at {standard_lib_dir}") 
-
-if os.path.exists(target_dir):
-    # Let's check the library files to see if the ABI matches
-    # Otherwise if you build with say python 3.8 initially, and then switch to
-    # python 3.9, your lib-dynload will still have the 38 .so files
-
-    def find_libs(dir_path):
-        sos = []
-        for ext in ['a', 'so', 'lib']:
-            sos += gb.glob(os.path.join(dir_path, "**/*.{}*".format(ext)),
-                           recursive=True)
-        return [os.path.basename(f) for f in sos]
+from pathlib import Path
+import os
+import stat
 
 
-    std_lib_ctypes_sos = find_libs(standard_lib_dir)
-    this_lib_ctypes_sos = find_libs(target_dir)
+def locate_tk_so(python_dir: Path) -> Path:
+    print(f"Searching for _tkinter so in {python_dir}")
+    sos = list(python_dir.glob("lib-dynload/_tkinter*.so"))
+    assert len(sos) == 1, "Unable to locate _tkinter so"
+    return sos[0]
 
-    if ((set(std_lib_ctypes_sos) - set(this_lib_ctypes_sos)) or
-            (set(this_lib_ctypes_sos) - set(std_lib_ctypes_sos))):
-        print("Detected changes in the python libs, wiping and recopying")
-        shutil.rmtree(target_dir)
-    else:
-        # File names match
+
+LINKED_RE = re.compile(
+    r"(?P<libname>.*) \(compatibility version (?P<compat_version>\d+\.\d+\.\d+), "
+    r"current version (?P<current_version>\d+\.\d+\.\d+)(?:, \w+)?\)"
+)
+
+LINKED_RE_ARM64 = re.compile(r"(?P<libname>.*) \(architecture arm64\)")
+
+
+def get_linked_libraries(p: Path):
+    linked_libs = []
+    lines = subprocess.check_output(["otool", "-L", str(p)], encoding="utf-8", universal_newlines=True).splitlines()
+    if "is not an object file" in lines[0]:
+        return None
+    lines = [x.strip() for x in lines[1:]]
+
+    for line in lines:
+        if 'compatibility version' in line and (m := LINKED_RE.match(line)):
+            linked_libs.append(m.groupdict())
+        elif 'architecture arm64' in line and (m := LINKED_RE_ARM64.match(line)):
+            linked_libs.append(m.groupdict())  # it will only have a libname key, I think that's fine
+        else:
+            raise ValueError(f"For {p}, cannot parse line: '{line}'")
+    return linked_libs
+
+
+if __name__ == "__main__":
+
+    if platform.system() != "Darwin":
         sys.exit(0)
 
-shutil.copytree(standard_lib_dir, target_dir)
+    print("PYTHON: Copying and fixing up Tcl/Tk")
 
-# On Windows, we also need to grab the DLLs folder, which is one folder up
-if platform.system() == 'Windows':
-    python_root_dir = os.path.dirname(standard_lib_dir)
-    dll_dir = os.path.join(python_root_dir, 'DLLs')
-    shutil.copytree(dll_dir, target_dir, dirs_exist_ok=True)
+    if len(sys.argv) == 2:
+        python_dir = Path(sys.argv[1])
+    else:
+        print("Must call " + sys.argv[0] + "with one command line argument: the path to the python_lib directory")
+        sys.exit(1)
 
-# And also on Windows, we now need the grab the Tcl/Tk folder that contains config, scripts, and blobs
-if platform.system() == 'Windows':
-    python_root_dir = os.path.dirname(standard_lib_dir)
-    tcl_dir = os.path.join(python_root_dir, 'tcl')
-    shutil.copytree(tcl_dir, target_dir, dirs_exist_ok=True)
+    assert python_dir.is_dir()
+    lib_dynload_dir = python_dir / "lib-dynload"
 
-# then I'm going to try to clean up any __pycache__ folders in the target dir to reduce installer size
-for root, dirs, _ in os.walk(target_dir):
-    for this_dir in dirs:
-        if this_dir == "__pycache__":
-            shutil.rmtree(os.path.join(root, this_dir))
+    tk_so = locate_tk_so(python_dir)
+    tcl_tk_sos = [Path(t["libname"]) for t in get_linked_libraries(tk_so) if "libt" in t["libname"]]
 
-# on Windows the site_packages folder is inside the standard lib folder, so we need to delete that too
-if os.path.exists(os.path.join(target_dir, 'site-packages')):
-    shutil.rmtree(os.path.join(target_dir, 'site-packages'))
+    for tcl_tk_so in tcl_tk_sos:
+        new_tcl_tk_so = lib_dynload_dir / tcl_tk_so.name
+        if str(tcl_tk_so).startswith('@loader_path'):
+            assert new_tcl_tk_so.is_file(), f"{new_tcl_tk_so} missing when the tkinter so is already adjusted. Wipe the dir"
+            print("Already fixed up the libtcl and libtk, nothing to do here")
+            continue
+        shutil.copy(tcl_tk_so, new_tcl_tk_so)
+        # during testing, the brew installed tcl and tk libraries were installed without write permission
+        # the workaround was to manually chmod u+w those files in the brew install folder
+        # instead let's just fix them up once we copy them here
+        current_perms = os.stat(str(new_tcl_tk_so)).st_mode
+        os.chmod(str(new_tcl_tk_so), current_perms | stat.S_IWUSR)
+        # now that it can definitely be written, we can run install_name_tool on it
+        lines = subprocess.check_output(
+            ["install_name_tool", "-change", str(tcl_tk_so), f"@loader_path/{new_tcl_tk_so.name}", str(tk_so)]
+        )
+        # Change the id that's the first line of the otool -L in this case and it's confusing
+        lines = subprocess.check_output(["install_name_tool", "-id", str(new_tcl_tk_so.name), str(new_tcl_tk_so)])
