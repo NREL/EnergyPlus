@@ -2765,7 +2765,23 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlowMax = 1.6;
     thisSys.SizeSys(*state);
     Real64 expectedZoneMinAirFracDes = std::min(1.0, state->dataSize->TermUnitFinalZoneSizing(1).DesCoolVolFlowMin / thisSys.MaxAirVolFlowRate);
+    // DesHeatVolFlowMax is limiting flow rate
     Real64 expectedMaxAirVolFractionDuringReheat = state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlowMax / thisSys.MaxAirVolFlowRate;
+    EXPECT_EQ(expectedZoneMinAirFracDes, thisSys.ZoneMinAirFracDes);
+    EXPECT_EQ(1.0, thisSys.MaxAirVolFractionDuringReheat);
+    EXPECT_EQ(expectedMaxAirVolFractionDuringReheat, thisSys.MaxAirVolFractionDuringReheat);
+
+    // switch magnitude of DesHeatVolFlow and DesHeatVolFlowMax, still heating dominated
+    thisSys.MaxAirVolFlowRate = DataSizing::AutoSize;
+    thisSys.ZoneMinAirFracDes = DataSizing::AutoSize;
+    thisSys.MaxAirVolFlowRateDuringReheat = DataSizing::AutoSize;
+    thisSys.MaxAirVolFractionDuringReheat = DataSizing::AutoSize;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlow = 1.6;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlowMax = 1.7;
+    thisSys.SizeSys(*state);
+    expectedZoneMinAirFracDes = std::min(1.0, state->dataSize->TermUnitFinalZoneSizing(1).DesCoolVolFlowMin / thisSys.MaxAirVolFlowRate);
+    // DesHeatVolFlowMax is NOT limiting flow rate
+    expectedMaxAirVolFractionDuringReheat = state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlow / thisSys.MaxAirVolFlowRate;
     EXPECT_EQ(expectedZoneMinAirFracDes, thisSys.ZoneMinAirFracDes);
     EXPECT_EQ(1.0, thisSys.MaxAirVolFractionDuringReheat);
     EXPECT_EQ(expectedMaxAirVolFractionDuringReheat, thisSys.MaxAirVolFractionDuringReheat);
@@ -2779,6 +2795,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlowMax = 1.3;
     thisSys.SizeSys(*state);
     expectedZoneMinAirFracDes = std::min(1.0, state->dataSize->TermUnitFinalZoneSizing(1).DesCoolVolFlowMin / thisSys.MaxAirVolFlowRate);
+    // DesHeatVolFlowMax is limiting flow rate
     expectedMaxAirVolFractionDuringReheat = state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlowMax / thisSys.MaxAirVolFlowRate;
     EXPECT_EQ(expectedZoneMinAirFracDes, thisSys.ZoneMinAirFracDes);
     EXPECT_EQ(1.0, thisSys.MaxAirVolFractionDuringReheat);

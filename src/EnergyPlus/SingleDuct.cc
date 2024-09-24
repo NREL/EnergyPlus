@@ -2877,9 +2877,14 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
 
             CheckZoneSizing(state, this->sysType, this->SysName);
 
-            Real64 heatingMaxFlow = (this->DamperHeatingAction == Action::ReverseWithLimits)
-                                        ? state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlowMax
-                                        : state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow;
+            Real64 heatingMaxFlow;
+            if (this->DamperHeatingAction == Action::ReverseWithLimits &&
+                state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow >
+                    state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlowMax) {
+                heatingMaxFlow = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlowMax;
+            } else {
+                heatingMaxFlow = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow;
+            }
             MaxAirVolFlowRateDes = max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, heatingMaxFlow);
 
             if (MaxAirVolFlowRateDes < SmallAirVolFlow) {
@@ -2929,7 +2934,9 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             }
         } else {
             CheckZoneSizing(state, this->sysType, this->SysName);
-            if (this->DamperHeatingAction == Action::ReverseWithLimits) {
+            if (this->DamperHeatingAction == Action::ReverseWithLimits &&
+                state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow >
+                    state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlowMax) {
                 MaxHeatAirVolFlowRateDes = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlowMax;
             } else {
                 MaxHeatAirVolFlowRateDes = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow;
@@ -3221,7 +3228,13 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         if (state.dataSize->ZoneSizingRunDone) {
             if (state.dataSize->CurTermUnitSizingNum > 0) {
                 // if zone sizing run done, set the design max reheat air flow to the value from the design calcs
-                MaxAirVolFlowRateDuringReheatDes = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlowMax;
+                if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow >
+                    state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlowMax) {
+                    MaxAirVolFlowRateDuringReheatDes =
+                        state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlowMax;
+                } else {
+                    MaxAirVolFlowRateDuringReheatDes = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow;
+                }
             }
         } else {
             // if no design calc use 0.002032 [m3/s-m2] times floor area. That's .40 cfm/ft2
