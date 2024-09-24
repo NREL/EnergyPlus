@@ -53,7 +53,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // Third-party Headers
