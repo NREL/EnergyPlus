@@ -2737,23 +2737,52 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     EXPECT_TRUE(compare_err_stream(""));
 
     int SysNum = 1;
+    auto &thisSys = state->dataSingleDuct->sd_airterminal(SysNum);
 
     // First test -  design min flow < max flow
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurTermUnitSizingNum = 1;
     state->dataSize->TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 0.5;
-    state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
-    EXPECT_EQ(0.5, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
+    thisSys.SizeSys(*state);
+    EXPECT_EQ(0.5, thisSys.ZoneMinAirFracDes);
 
     // Second test -  design min flow > max flow
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurTermUnitSizingNum = 1;
-    state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes = AutoSize; // need to reset this so it sizes again
+    thisSys.ZoneMinAirFracDes = AutoSize; // need to reset this so it sizes again
     state->dataSize->TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 1.5;
-    state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
-    EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
+    thisSys.SizeSys(*state);
+    EXPECT_EQ(1.0, thisSys.ZoneMinAirFracDes);
+
+    // test Maximum Flow Fraction During Reheat for heating dominated
+    thisSys.MaxAirVolFlowRate = DataSizing::AutoSize;
+    thisSys.ZoneMinAirFracDes = DataSizing::AutoSize;
+    thisSys.MaxAirVolFlowRateDuringReheat = DataSizing::AutoSize;
+    thisSys.MaxAirVolFractionDuringReheat = DataSizing::AutoSize;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlow = 1.7;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlowMax = 1.6;
+    thisSys.SizeSys(*state);
+    Real64 expectedZoneMinAirFracDes = std::min(1.0, state->dataSize->TermUnitFinalZoneSizing(1).DesCoolVolFlowMin / thisSys.MaxAirVolFlowRate);
+    Real64 expectedMaxAirVolFractionDuringReheat = state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlowMax / thisSys.MaxAirVolFlowRate;
+    EXPECT_EQ(expectedZoneMinAirFracDes, thisSys.ZoneMinAirFracDes);
+    EXPECT_EQ(1.0, thisSys.MaxAirVolFractionDuringReheat);
+    EXPECT_EQ(expectedMaxAirVolFractionDuringReheat, thisSys.MaxAirVolFractionDuringReheat);
+
+    // test Maximum Flow Fraction During Reheat for cooling dominated
+    thisSys.MaxAirVolFlowRate = DataSizing::AutoSize;
+    thisSys.ZoneMinAirFracDes = DataSizing::AutoSize;
+    thisSys.MaxAirVolFlowRateDuringReheat = DataSizing::AutoSize;
+    thisSys.MaxAirVolFractionDuringReheat = DataSizing::AutoSize;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlow = 1.4;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlowMax = 1.3;
+    thisSys.SizeSys(*state);
+    expectedZoneMinAirFracDes = std::min(1.0, state->dataSize->TermUnitFinalZoneSizing(1).DesCoolVolFlowMin / thisSys.MaxAirVolFlowRate);
+    expectedMaxAirVolFractionDuringReheat = state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlowMax / thisSys.MaxAirVolFlowRate;
+    EXPECT_EQ(expectedZoneMinAirFracDes, thisSys.ZoneMinAirFracDes);
+    EXPECT_EQ(1.0, thisSys.MaxAirVolFractionDuringReheat);
+    EXPECT_EQ(expectedMaxAirVolFractionDuringReheat, thisSys.MaxAirVolFractionDuringReheat);
 }
 
 TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
