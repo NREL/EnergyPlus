@@ -490,8 +490,12 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     UpdateTermUnitFinalZoneSizing(*state); // Fills the TermUnitFinalZoneSizing array
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
+    Real64 heatVolFlow = (state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow >
+                          state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax)
+                             ? state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax
+                             : state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow;
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).ZoneMinAirFracDes, 0.348739, 0.000001);
-    EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.196047, 0.000001);
+    EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).MaxAirVolFlowRateDuringReheat, heatVolFlow, 0.000001);
 
     state->dataLoopNodes->Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();

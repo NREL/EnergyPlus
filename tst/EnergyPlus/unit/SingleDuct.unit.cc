@@ -1282,7 +1282,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
     // zone floor area of zone 1 = 0, zone 2 > 0. Expect TU MaxAirVolFlowRateDuringReheat = 0 only for zone 1.
     // this test isn't relevant anymore since defaulting is done differently
     Real64 MaxAirVolFlowRateDuringReheatDes =
-        min(state->dataSize->FinalZoneSizing(1).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);
+        min(state->dataSize->FinalZoneSizing(1).DesHeatVolFlow, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);
     // Real64 MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea,
     // state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate ); apply limit based on min stop
     MaxAirVolFlowRateDuringReheatDes =
@@ -1291,7 +1291,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
 
     // This isn't relevant any more since the default is calculated differently
     Real64 MaxAirVolFractionDuringReheatDes =
-        min(1.0, (state->dataSize->FinalZoneSizing(1).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate));
+        min(1.0, (state->dataSize->FinalZoneSizing(1).DesHeatVolFlow / state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate));
     // Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea /
     // state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate )
     // ); apply limit based on min stop
@@ -1306,12 +1306,12 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
     EXPECT_NEAR(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFractionDuringReheat, 0.0000000000001);
 
     MaxAirVolFlowRateDuringReheatDes =
-        min(state->dataSize->FinalZoneSizing(2).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate);
+        min(state->dataSize->FinalZoneSizing(2).DesHeatVolFlow, state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate);
     MaxAirVolFlowRateDuringReheatDes =
         max(MaxAirVolFlowRateDuringReheatDes,
             (state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate * state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFrac));
     MaxAirVolFractionDuringReheatDes =
-        min(1.0, (state->dataSize->FinalZoneSizing(2).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate));
+        min(1.0, (state->dataSize->FinalZoneSizing(2).DesHeatVolFlow / state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate));
     MaxAirVolFractionDuringReheatDes = max(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFrac);
     MaxAirVolFlowRateDuringReheatDes =
         min(max(MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate),
