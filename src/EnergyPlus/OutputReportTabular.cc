@@ -14473,13 +14473,10 @@ void AllocateLoadComponentArrays(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer
     //       DATE WRITTEN   April 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //   Allocate the arrays related to the load component report
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto const &ort = state.dataOutRptTab;
 
     if (!ort->AllocateLoadComponentArraysDoAllocate) {
@@ -14490,29 +14487,20 @@ void AllocateLoadComponentArrays(EnergyPlusData &state)
     ort->radiantPulseTimestep = 0;
     ort->radiantPulseReceived.allocate({0, state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays}, state.dataSurface->TotSurfaces);
     ort->radiantPulseReceived = 0.0;
-    ort->loadConvectedNormal.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays,
-                                      {0, state.dataGlobal->NumOfTimeStepInHour * 24},
-                                      state.dataSurface->TotSurfaces);
-    ort->loadConvectedNormal = 0.0;
-    ort->loadConvectedWithPulse.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays,
-                                         {0, state.dataGlobal->NumOfTimeStepInHour * 24},
-                                         state.dataSurface->TotSurfaces);
-    ort->loadConvectedWithPulse = 0.0;
-    ort->netSurfRadSeq.allocate(
-        state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
-    ort->netSurfRadSeq = 0.0;
     ort->decayCurveCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
     ort->decayCurveCool = 0.0;
     ort->decayCurveHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
     ort->decayCurveHeat = 0.0;
-    ort->ITABSFseq.allocate(
-        state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
-    ort->ITABSFseq = 0.0;
-    ort->TMULTseq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays,
-                           state.dataGlobal->NumOfTimeStepInHour * 24,
-                           state.dataViewFactor->NumOfRadiantEnclosures);
-    ort->TMULTseq = 0.0;
-    Real64 numTSinDay = state.dataGlobal->NumOfTimeStepInHour * 24;
+
+    Real64 const numTSinDay = state.dataGlobal->NumOfTimeStepInHour * 24;
+
+    ort->surfCompLoadsDays.resize(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
+    for (auto &day : ort->surfCompLoadsDays) {
+        day.ts.resize(numTSinDay);
+        for (auto &ts : day.ts) {
+            ts.surf.resize(state.dataSurface->TotSurfaces);
+        }
+    }
 
     ort->znCompLoads.resize(state.dataGlobal->NumOfZones);
     for (auto &zone : ort->znCompLoads) {
@@ -14530,12 +14518,7 @@ void AllocateLoadComponentArrays(EnergyPlusData &state)
             }
         }
     }
-    ort->lightSWRadSeq.allocate(
-        state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
-    ort->lightSWRadSeq = 0.0;
-    ort->feneSolarRadSeq.allocate(
-        state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
-    ort->feneSolarRadSeq = 0.0;
+
     ort->AllocateLoadComponentArraysDoAllocate = false;
 }
 
@@ -14555,7 +14538,6 @@ void DeallocateLoadComponentArrays(EnergyPlusData &state)
     auto const &ort = state.dataOutRptTab;
     ort->radiantPulseTimestep.deallocate();
     ort->radiantPulseReceived.deallocate();
-    ort->loadConvectedWithPulse.deallocate();
 }
 
 void ComputeLoadComponentDecayCurve(EnergyPlusData &state)
@@ -14564,8 +14546,6 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer
     //       DATE WRITTEN   August 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Determines the load component decay curve based on normal and pulse results from zone sizing.
@@ -14574,7 +14554,6 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state)
     // Decay curve is the fraction of the heat convected from a surface over the initial radiant heat
     // absorbed by the surface.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 diff;
     auto const &ort = state.dataOutRptTab;
 
@@ -14586,6 +14565,7 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state)
         state.dataOutRptTab->CoolDesSelectedCLCDC = state.dataSize->CalcFinalZoneSizing(state.dataOutRptTab->ZoneNumCLCDC).CoolDDNum;
         // loop over timesteps after pulse occurred
         if (state.dataOutRptTab->CoolDesSelectedCLCDC != 0) {
+            auto &surfCLClDay = ort->surfCompLoadsDays[state.dataOutRptTab->CoolDesSelectedCLCDC - 1];
             state.dataOutRptTab->TimeOfPulseCLCDC =
                 ort->radiantPulseTimestep(state.dataOutRptTab->CoolDesSelectedCLCDC, state.dataOutRptTab->ZoneNumCLCDC);
             // if the CoolDesSelected time is on a different day than
@@ -14602,10 +14582,8 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state)
                  state.dataOutRptTab->TimeStepCLCDC <= state.dataGlobal->NumOfTimeStepInHour * 24;
                  ++state.dataOutRptTab->TimeStepCLCDC) {
                 if (ort->radiantPulseReceived(state.dataOutRptTab->CoolDesSelectedCLCDC, state.dataOutRptTab->SurfNumCLCDC) != 0.0) {
-                    diff = ort->loadConvectedWithPulse(
-                               state.dataOutRptTab->CoolDesSelectedCLCDC, state.dataOutRptTab->TimeStepCLCDC, state.dataOutRptTab->SurfNumCLCDC) -
-                           ort->loadConvectedNormal(
-                               state.dataOutRptTab->CoolDesSelectedCLCDC, state.dataOutRptTab->TimeStepCLCDC, state.dataOutRptTab->SurfNumCLCDC);
+                    auto &surfClDayTS = surfCLClDay.ts[state.dataOutRptTab->TimeStepCLCDC - 1].surf[state.dataOutRptTab->SurfNumCLCDC - 1];
+                    diff = surfClDayTS.loadConvectedWithPulse - surfClDayTS.loadConvectedNormal;
                     ort->decayCurveCool(state.dataOutRptTab->TimeStepCLCDC - state.dataOutRptTab->TimeOfPulseCLCDC + 1,
                                         state.dataOutRptTab->SurfNumCLCDC) =
                         -diff / ort->radiantPulseReceived(state.dataOutRptTab->CoolDesSelectedCLCDC, state.dataOutRptTab->SurfNumCLCDC);
@@ -14617,6 +14595,7 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state)
         }
         state.dataOutRptTab->HeatDesSelectedCLCDC = state.dataSize->CalcFinalZoneSizing(state.dataOutRptTab->ZoneNumCLCDC).HeatDDNum;
         if (state.dataOutRptTab->HeatDesSelectedCLCDC != 0) {
+            auto &surfCLHtDay = ort->surfCompLoadsDays[state.dataOutRptTab->HeatDesSelectedCLCDC - 1];
             state.dataOutRptTab->TimeOfPulseCLCDC =
                 ort->radiantPulseTimestep(state.dataOutRptTab->HeatDesSelectedCLCDC, state.dataOutRptTab->ZoneNumCLCDC);
             // scan back to the day that the heating pulse occurs, if necessary
@@ -14631,10 +14610,8 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state)
                  state.dataOutRptTab->TimeStepCLCDC <= state.dataGlobal->NumOfTimeStepInHour * 24;
                  ++state.dataOutRptTab->TimeStepCLCDC) {
                 if (ort->radiantPulseReceived(state.dataOutRptTab->HeatDesSelectedCLCDC, state.dataOutRptTab->SurfNumCLCDC) != 0.0) {
-                    diff = ort->loadConvectedWithPulse(
-                               state.dataOutRptTab->HeatDesSelectedCLCDC, state.dataOutRptTab->TimeStepCLCDC, state.dataOutRptTab->SurfNumCLCDC) -
-                           ort->loadConvectedNormal(
-                               state.dataOutRptTab->HeatDesSelectedCLCDC, state.dataOutRptTab->TimeStepCLCDC, state.dataOutRptTab->SurfNumCLCDC);
+                    auto &surfHtDayTS = surfCLHtDay.ts[state.dataOutRptTab->TimeStepCLCDC - 1].surf[state.dataOutRptTab->SurfNumCLCDC - 1];
+                    diff = surfHtDayTS.loadConvectedWithPulse - surfHtDayTS.loadConvectedNormal;
                     ort->decayCurveHeat(state.dataOutRptTab->TimeStepCLCDC - state.dataOutRptTab->TimeOfPulseCLCDC + 1,
                                         state.dataOutRptTab->SurfNumCLCDC) =
                         -diff / ort->radiantPulseReceived(state.dataOutRptTab->HeatDesSelectedCLCDC, state.dataOutRptTab->SurfNumCLCDC);
@@ -15631,6 +15608,7 @@ void GetDelaySequences(EnergyPlusData &state,
     auto &ort = state.dataOutRptTab;
 
     if (desDaySelected != 0) {
+        auto &surfCLDay = ort->surfCompLoadsDays[desDaySelected - 1];
 
         Array2D<Real64> decayCurve;
         if (isCooling) {
@@ -15667,17 +15645,17 @@ void GetDelaySequences(EnergyPlusData &state,
                     for (int mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack) {
                         int sourceStep = kTimeStep - mStepBack + 1;
                         auto &compLoadTS = szCompLoadLoc.day[desDaySelected - 1].ts[sourceStep - 1];
-                        Real64 thisQRadThermInAbsMult = ort->TMULTseq(desDaySelected, sourceStep, radEnclosureNum) *
-                                                        ort->ITABSFseq(desDaySelected, sourceStep, jSurf) * state.dataSurface->Surface(jSurf).Area *
-                                                        decayCurve(mStepBack, jSurf);
+                        auto &surfCLDayTS = surfCLDay.ts[sourceStep - 1].surf[jSurf - 1];
+                        Real64 thisQRadThermInAbsMult =
+                            surfCLDayTS.TMULTseq * surfCLDayTS.ITABSFseq * state.dataSurface->Surface(jSurf).Area * decayCurve(mStepBack, jSurf);
                         peopleConvFromSurf += compLoadTS.peopleRadSeq * thisQRadThermInAbsMult;
                         equipConvFromSurf += compLoadTS.equipRadSeq * thisQRadThermInAbsMult;
                         hvacLossConvFromSurf += compLoadTS.hvacLossRadSeq * thisQRadThermInAbsMult;
                         powerGenConvFromSurf += compLoadTS.powerGenRadSeq * thisQRadThermInAbsMult;
                         lightLWConvFromSurf += compLoadTS.lightLWRadSeq * thisQRadThermInAbsMult;
                         // short wave is already accumulated by surface
-                        lightSWConvFromSurf += ort->lightSWRadSeq(desDaySelected, sourceStep, jSurf) * decayCurve(mStepBack, jSurf);
-                        feneSolarConvFromSurf += ort->feneSolarRadSeq(desDaySelected, sourceStep, jSurf) * decayCurve(mStepBack, jSurf);
+                        lightSWConvFromSurf += surfCLDayTS.lightSWRadSeq * decayCurve(mStepBack, jSurf);
+                        feneSolarConvFromSurf += surfCLDayTS.feneSolarRadSeq * decayCurve(mStepBack, jSurf);
                     } // for mStepBack
 
                     peopleConvIntoZone += peopleConvFromSurf;
@@ -15691,14 +15669,15 @@ void GetDelaySequences(EnergyPlusData &state,
                     // determine the remaining convective heat from the surfaces that are not based
                     // on any of these other loads
                     // negative because heat from surface should be positive
+                    auto &surfCLDaykTS = surfCLDay.ts[kTimeStep - 1].surf[jSurf - 1];
                     surfDelaySeq(kTimeStep, jSurf) =
-                        -ort->loadConvectedNormal(desDaySelected, kTimeStep, jSurf) - ort->netSurfRadSeq(desDaySelected, kTimeStep, jSurf) -
+                        -surfCLDaykTS.loadConvectedNormal - surfCLDaykTS.netSurfRadSeq -
                         (peopleConvFromSurf + equipConvFromSurf + hvacLossConvFromSurf + powerGenConvFromSurf + lightLWConvFromSurf +
                          lightSWConvFromSurf +
                          feneSolarConvFromSurf); // remove net radiant for the surface
                                                  // also remove the net radiant component on the instanteous conduction for fenestration
                     if (state.dataSurface->Surface(jSurf).Class == DataSurfaces::SurfaceClass::Window) {
-                        adjFeneSurfNetRadSeq += ort->netSurfRadSeq(desDaySelected, kTimeStep, jSurf);
+                        adjFeneSurfNetRadSeq += surfCLDaykTS.netSurfRadSeq;
                     }
                 } // for jSurf
             }

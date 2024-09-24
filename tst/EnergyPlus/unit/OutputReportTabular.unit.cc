@@ -518,35 +518,23 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     // radiantPulseReceived.allocate( { 0, TotDesDays + TotRunDesPersDays }, TotSurfaces );
     EXPECT_EQ(state->dataOutRptTab->radiantPulseReceived.size(), 42u);
 
-    // loadConvectedNormal.allocate( TotDesDays + TotRunDesPersDays, { 0, NumOfTimeStepInHour * 24 }, TotSurfaces );
-    EXPECT_EQ(state->dataOutRptTab->loadConvectedNormal.size(), 3395u);
-
-    // loadConvectedWithPulse.allocate( TotDesDays + TotRunDesPersDays, { 0, NumOfTimeStepInHour * 24 }, TotSurfaces );
-    EXPECT_EQ(state->dataOutRptTab->loadConvectedWithPulse.size(), 3395u);
-
-    // netSurfRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
-    EXPECT_EQ(state->dataOutRptTab->netSurfRadSeq.size(), 3360u);
-
     // decayCurveCool.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
     EXPECT_EQ(state->dataOutRptTab->decayCurveCool.size(), 672u);
 
     // decayCurveHeat.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
     EXPECT_EQ(state->dataOutRptTab->decayCurveHeat.size(), 672u);
 
-    // ITABSFseq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
-    EXPECT_EQ(state->dataOutRptTab->ITABSFseq.size(), 3360u);
-
-    // TMULTseq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(state->dataOutRptTab->TMULTseq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->surfCompLoadsDays.size(), 5u);
+    EXPECT_EQ(state->dataOutRptTab->surfCompLoadsDays[0].ts.size(), 96u);
+    EXPECT_EQ(state->dataOutRptTab->surfCompLoadsDays[0].ts[0].surf.size(), 7u);
+    EXPECT_EQ(state->dataOutRptTab->surfCompLoadsDays[4].ts.size(), 96u);
+    EXPECT_EQ(state->dataOutRptTab->surfCompLoadsDays[4].ts[0].surf.size(), 7u);
 
     EXPECT_EQ(state->dataOutRptTab->znCompLoads.size(), 4u);
     EXPECT_EQ(state->dataOutRptTab->znCompLoads[0].day.size(), 5u);
     EXPECT_EQ(state->dataOutRptTab->znCompLoads[0].day[0].ts.size(), 96u);
     EXPECT_EQ(state->dataOutRptTab->znCompLoads[3].day.size(), 5u);
     EXPECT_EQ(state->dataOutRptTab->znCompLoads[3].day[4].ts.size(), 96u);
-
-    // lightSWRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
-    EXPECT_EQ(state->dataOutRptTab->lightSWRadSeq.size(), 3360u);
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConvertToEscaped)
@@ -6946,7 +6934,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     auto &znCL = state->dataOutRptTab->znCompLoads[iZone - 1];
     znCL.day[coolDesSelected - 1].ts[0].feneCondInstantSeq = 0.88;
 
-    state->dataOutRptTab->netSurfRadSeq(coolDesSelected, 1, 1) = 0.05;
+    state->dataOutRptTab->surfCompLoadsDays[coolDesSelected - 1].ts[0].surf[0].netSurfRadSeq = 0.05;
 
     GetDelaySequences(*state,
                       coolDesSelected,
@@ -8337,8 +8325,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
             auto &znCLDayTS = znCL.day[coolDesSelected - 1].ts[step - 1];
-            state->dataOutRptTab->TMULTseq(coolDesSelected, step, radEnclosureNum) = 0.1 * step;
-            state->dataOutRptTab->ITABSFseq(coolDesSelected, step, jSurf) = 0.2 * step * surfBaseValue[jSurf - 1];
+            auto &surfCLDayTS = state->dataOutRptTab->surfCompLoadsDays[coolDesSelected - 1].ts[step - 1].surf[jSurf - 1];
+            surfCLDayTS.TMULTseq = 0.1 * step;
+            surfCLDayTS.ITABSFseq = 0.2 * step * surfBaseValue[jSurf - 1];
             state->dataOutRptTab->decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
             znCLDayTS.peopleRadSeq = 0.4 * step;
             znCLDayTS.equipRadSeq = 0.5 * step;
@@ -8391,8 +8380,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
             auto &znCLDayTS = znCL.day[coolDesSelected - 1].ts[step - 1];
-            state->dataOutRptTab->TMULTseq(coolDesSelected, step, radEnclosureNum) = 0.1 * step;
-            state->dataOutRptTab->ITABSFseq(coolDesSelected, step, jSurf) = 0.2 * step * surfBaseValue[jSurf - 1];
+            auto &surfCLDayTS = state->dataOutRptTab->surfCompLoadsDays[coolDesSelected - 1].ts[step - 1].surf[jSurf - 1];
+            surfCLDayTS.TMULTseq = 0.1 * step;
+            surfCLDayTS.ITABSFseq = 0.2 * step * surfBaseValue[jSurf - 1];
             state->dataOutRptTab->decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
             znCLDayTS.peopleRadSeq = 0.4 * step;
             znCLDayTS.equipRadSeq = 0.5 * step;

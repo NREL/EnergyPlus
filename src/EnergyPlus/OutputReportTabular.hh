@@ -491,6 +491,27 @@ namespace OutputReportTabular {
         }
     };
 
+    struct compLoadsSurface
+    {
+        Real64 loadConvectedNormal = 0.0;
+        Real64 loadConvectedWithPulse = 0.0;
+        Real64 netSurfRadSeq = 0.0;
+        Real64 ITABSFseq = 0.0;     // used for determining the radiant fraction on each surface
+        Real64 TMULTseq = 0.0;      // used for determining the radiant fraction on each surface
+        Real64 lightSWRadSeq = 0.0; // short wave visible radiation
+        Real64 feneSolarRadSeq = 0.0;
+    };
+
+    struct compLoadsTimeStepSurfaces
+    {
+        std::vector<compLoadsSurface> surf;
+    };
+
+    struct componentLoadsDaySurfaces
+    {
+        std::vector<compLoadsTimeStepSurfaces> ts;
+    };
+
     struct compLoadsTimeStep
     {
         Real64 peopleInstantSeq = 0.0;
@@ -1227,17 +1248,10 @@ struct OutputReportTabularData : BaseGlobalStruct
     // arrays related to pulse and load component reporting
     Array2D_int radiantPulseTimestep;
     Array2D<Real64> radiantPulseReceived;
-    Array3D<Real64> loadConvectedNormal;
-    Array3D<Real64> loadConvectedWithPulse;
-    Array3D<Real64> netSurfRadSeq;
     Array2D<Real64> decayCurveCool;
     Array2D<Real64> decayCurveHeat;
-    Array3D<Real64> ITABSFseq; // used for determining the radiant fraction on each surface
-    Array3D<Real64> TMULTseq;  // used for determining the radiant fraction on each surface
 
-    Array3D<Real64> lightSWRadSeq; // short wave visible radiation
-    Array3D<Real64> feneSolarRadSeq;
-
+    std::vector<OutputReportTabular::componentLoadsDaySurfaces> surfCompLoadsDays;
     std::vector<OutputReportTabular::componentLoads> znCompLoads; // Zone component loads
     std::vector<OutputReportTabular::componentLoads> spCompLoads; // Space component loads
 
@@ -1510,14 +1524,12 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->DesignDayCount = 0;
         this->radiantPulseTimestep.deallocate();
         this->radiantPulseReceived.deallocate();
-        this->loadConvectedNormal.deallocate();
-        this->loadConvectedWithPulse.deallocate();
-        this->netSurfRadSeq.deallocate();
         this->decayCurveCool.deallocate();
         this->decayCurveHeat.deallocate();
-        this->ITABSFseq.deallocate();
-        this->TMULTseq.deallocate();
-        this->feneSolarRadSeq.deallocate();
+        this->surfCompLoadsDays.clear();
+        this->znCompLoads.clear();
+        this->spCompLoads.clear();
+
         this->maxUniqueKeyCount = 0;
         this->activeSubTableName.clear();
         this->activeReportNameNoSpace.clear();
