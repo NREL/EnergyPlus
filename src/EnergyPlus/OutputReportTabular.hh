@@ -825,6 +825,10 @@ namespace OutputReportTabular {
 
     void GatherComponentLoadsHVAC(EnergyPlusData &state);
 
+    void gatherSpaceZoneCompLoadsHVAC(OutputReportTabular::compLoadsTimeStep &compLoadDayTS,
+                                      DataHeatBalance::AirReportVars const &szAirRpt,
+                                      Real64 const timeStepSysSec);
+
     void WriteLoadComponentSummaryTables(EnergyPlusData &state);
 
     void computeSpaceZoneCompLoads(EnergyPlusData &state,
