@@ -507,12 +507,12 @@ namespace OutputReportTabular {
         std::vector<compLoadsSurface> surf;
     };
 
-    struct componentLoadsDaySurfaces
+    struct componentLoadsSurf
     {
         std::vector<compLoadsTimeStepSurfaces> ts;
     };
 
-    struct compLoadsTimeStep
+    struct compLoadsSpaceZone
     {
         Real64 peopleInstantSeq = 0.0;
         Real64 peopleLatentSeq = 0.0;
@@ -550,14 +550,13 @@ namespace OutputReportTabular {
         Real64 feneCondInstantSeq = 0.0;
         bool adjFenDone = false;
     };
-    struct compLoadsDay
+    struct compLoadsTimeStepSpZn
     {
-
-        std::vector<OutputReportTabular::compLoadsTimeStep> ts;
+        std::vector<compLoadsSpaceZone> spacezone;
     };
-    struct componentLoads
+    struct componentLoadsSpZn
     {
-        std::vector<compLoadsDay> day;
+        std::vector<compLoadsTimeStepSpZn> ts;
     };
 
     // Functions
@@ -846,7 +845,7 @@ namespace OutputReportTabular {
 
     void GatherComponentLoadsHVAC(EnergyPlusData &state);
 
-    void gatherSpaceZoneCompLoadsHVAC(OutputReportTabular::compLoadsTimeStep &compLoadDayTS,
+    void gatherSpaceZoneCompLoadsHVAC(OutputReportTabular::compLoadsSpaceZone &compLoadDayTS,
                                       DataHeatBalance::AirReportVars const &szAirRpt,
                                       Real64 const timeStepSysSec);
 
@@ -862,7 +861,7 @@ namespace OutputReportTabular {
                                    Array1D<Real64> &powerGenDelaySeq,
                                    Array1D<Real64> &lightDelaySeq,
                                    Array1D<Real64> &feneSolarDelaySeq,
-                                   OutputReportTabular::componentLoads &zsCompLoadLoc,
+                                   std::vector<OutputReportTabular::componentLoadsSpZn> &szCompLoadLoc,
                                    Array2D<Real64> &surfDelaySeq,
                                    ZompComponentAreasType &componentAreas,
                                    int const iZone,
@@ -878,8 +877,9 @@ namespace OutputReportTabular {
                            Array1D<Real64> &powerGenDelaySeq,
                            Array1D<Real64> &lightDelaySeq,
                            Array1D<Real64> &feneSolarDelaySeq,
-                           OutputReportTabular::componentLoads &zsCompLoadLoc,
-                           Array2D<Real64> &surfDelaySeq);
+                           std::vector<OutputReportTabular::componentLoadsSpZn> &szCompLoadLoc,
+                           Array2D<Real64> &surfDelaySeq,
+                           int const iSpace = 0);
 
     void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                                         Array2D<Real64> &resultCells,
@@ -893,8 +893,9 @@ namespace OutputReportTabular {
                                         Array1D<Real64> const &powerGenDelaySeq,
                                         Array1D<Real64> const &lightDelaySeq,
                                         Array1D<Real64> const &feneSolarDelaySeq,
-                                        OutputReportTabular::componentLoads &zsCompLoadLoc,
-                                        Array2D<Real64> const &surfDelaySeq);
+                                        std::vector<OutputReportTabular::componentLoadsSpZn> &szCompLoadLoc,
+                                        Array2D<Real64> const &surfDelaySeq,
+                                        int const iSpace = 0);
 
     void CollectPeakZoneConditions(
         EnergyPlusData &state, CompLoadTablesType &compLoad, int desDaySelected, int timeOfMax, int zoneIndex, bool isCooling, int spaceIndex = 0);
@@ -1251,9 +1252,9 @@ struct OutputReportTabularData : BaseGlobalStruct
     Array2D<Real64> decayCurveCool;
     Array2D<Real64> decayCurveHeat;
 
-    std::vector<OutputReportTabular::componentLoadsDaySurfaces> surfCompLoadsDays;
-    std::vector<OutputReportTabular::componentLoads> znCompLoads; // Zone component loads
-    std::vector<OutputReportTabular::componentLoads> spCompLoads; // Space component loads
+    std::vector<OutputReportTabular::componentLoadsSurf> surfCompLoads; // Surface component loads by day, timestep, then surface
+    std::vector<OutputReportTabular::componentLoadsSpZn> znCompLoads;   // Zone component loads by day, timestep, then zone
+    std::vector<OutputReportTabular::componentLoadsSpZn> spCompLoads;   // Space component loads by day, timestep, then space
 
     int maxUniqueKeyCount = 0;
 
@@ -1526,7 +1527,7 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->radiantPulseReceived.deallocate();
         this->decayCurveCool.deallocate();
         this->decayCurveHeat.deallocate();
-        this->surfCompLoadsDays.clear();
+        this->surfCompLoads.clear();
         this->znCompLoads.clear();
         this->spCompLoads.clear();
 

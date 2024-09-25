@@ -14494,27 +14494,27 @@ void AllocateLoadComponentArrays(EnergyPlusData &state)
 
     Real64 const numTSinDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
-    ort->surfCompLoadsDays.resize(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
-    for (auto &day : ort->surfCompLoadsDays) {
+    ort->surfCompLoads.resize(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
+    for (auto &day : ort->surfCompLoads) {
         day.ts.resize(numTSinDay);
         for (auto &ts : day.ts) {
             ts.surf.resize(state.dataSurface->TotSurfaces);
         }
     }
 
-    ort->znCompLoads.resize(state.dataGlobal->NumOfZones);
-    for (auto &zone : ort->znCompLoads) {
-        zone.day.resize(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
-        for (auto &day : zone.day) {
-            day.ts.resize(numTSinDay);
+    ort->znCompLoads.resize(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
+    for (auto &day : ort->znCompLoads) {
+        day.ts.resize(numTSinDay);
+        for (auto &ts : day.ts) {
+            ts.spacezone.resize(state.dataGlobal->NumOfZones);
         }
     }
     if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
-        ort->spCompLoads.resize(state.dataGlobal->numSpaces);
-        for (auto &space : ort->spCompLoads) {
-            space.day.resize(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
-            for (auto &day : space.day) {
-                day.ts.resize(numTSinDay);
+        ort->spCompLoads.resize(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
+        for (auto &day : ort->spCompLoads) {
+            day.ts.resize(numTSinDay);
+            for (auto &ts : day.ts) {
+                ts.spacezone.resize(state.dataGlobal->numSpaces);
             }
         }
     }
@@ -14565,7 +14565,7 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state)
         state.dataOutRptTab->CoolDesSelectedCLCDC = state.dataSize->CalcFinalZoneSizing(state.dataOutRptTab->ZoneNumCLCDC).CoolDDNum;
         // loop over timesteps after pulse occurred
         if (state.dataOutRptTab->CoolDesSelectedCLCDC != 0) {
-            auto &surfCLClDay = ort->surfCompLoadsDays[state.dataOutRptTab->CoolDesSelectedCLCDC - 1];
+            auto &surfCLClDay = ort->surfCompLoads[state.dataOutRptTab->CoolDesSelectedCLCDC - 1];
             state.dataOutRptTab->TimeOfPulseCLCDC =
                 ort->radiantPulseTimestep(state.dataOutRptTab->CoolDesSelectedCLCDC, state.dataOutRptTab->ZoneNumCLCDC);
             // if the CoolDesSelected time is on a different day than
@@ -14595,7 +14595,7 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state)
         }
         state.dataOutRptTab->HeatDesSelectedCLCDC = state.dataSize->CalcFinalZoneSizing(state.dataOutRptTab->ZoneNumCLCDC).HeatDDNum;
         if (state.dataOutRptTab->HeatDesSelectedCLCDC != 0) {
-            auto &surfCLHtDay = ort->surfCompLoadsDays[state.dataOutRptTab->HeatDesSelectedCLCDC - 1];
+            auto &surfCLHtDay = ort->surfCompLoads[state.dataOutRptTab->HeatDesSelectedCLCDC - 1];
             state.dataOutRptTab->TimeOfPulseCLCDC =
                 ort->radiantPulseTimestep(state.dataOutRptTab->HeatDesSelectedCLCDC, state.dataOutRptTab->ZoneNumCLCDC);
             // scan back to the day that the heating pulse occurs, if necessary
@@ -14670,8 +14670,6 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer
     //       DATE WRITTEN   September 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //   Gather values during sizing used for loads component report.
@@ -14684,14 +14682,14 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
 
     if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
         int timeStepInDayGCLS = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-        for (auto &zoneCL : ort->znCompLoads) {
-            auto &day = zoneCL.day[state.dataSize->CurOverallSimDay - 1];
-            day.ts[timeStepInDayGCLS - 1].feneCondInstantSeq = 0.0;
+        auto &znCLDayTS = ort->znCompLoads[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1];
+        for (auto &zone : znCLDayTS.spacezone) {
+            zone.feneCondInstantSeq = 0.0;
         }
         if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
-            for (auto &spaceCL : ort->spCompLoads) {
-                auto &day = spaceCL.day[state.dataSize->CurOverallSimDay - 1];
-                day.ts[timeStepInDayGCLS - 1].feneCondInstantSeq = 0.0;
+            auto &spCLDayTS = ort->spCompLoads[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1];
+            for (auto &space : spCLDayTS.spacezone) {
+                space.feneCondInstantSeq = 0.0;
             }
         }
         for (int iSurfGCLS = 1; iSurfGCLS <= state.dataSurface->TotSurfaces; ++iSurfGCLS) {
@@ -14702,11 +14700,12 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
             Real64 surfCond = state.dataSurface->SurfWinGainConvGlazToZoneRep(iSurfGCLS) + state.dataSurface->SurfWinConvHeatFlowNatural(iSurfGCLS) +
                               state.dataSurface->SurfWinGainConvShadeToZoneRep(iSurfGCLS) +
                               state.dataSurface->SurfWinGainFrameDividerToZoneRep(iSurfGCLS);
-            ort->znCompLoads[zoneNumGCLS - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq += surfCond;
+            znCLDayTS.spacezone[zoneNumGCLS - 1].feneCondInstantSeq += surfCond;
 
             if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
                 int spaceNum = state.dataSurface->Surface(iSurfGCLS).spaceNum;
-                ort->spCompLoads[spaceNum - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq += surfCond;
+                ort->spCompLoads[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].spacezone[spaceNum - 1].feneCondInstantSeq +=
+                    surfCond;
             }
 
             // for now assume zero instant solar - may change related
@@ -14718,14 +14717,15 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
         for (int izone = 1; izone <= state.dataGlobal->NumOfZones; ++izone) {
             Real64 tubularGain = 0.0;
             tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, OutputReportTabular::IntGainTypesTubularGCLS);
-            ort->znCompLoads[izone - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq += tubularGain;
+            znCLDayTS.spacezone[izone - 1].feneCondInstantSeq += tubularGain;
         }
         if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+            auto &spCLDayTS = ort->spCompLoads[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1];
             for (int ispace = 1; ispace <= state.dataGlobal->NumOfZones; ++ispace) {
                 Real64 tubularGain = 0.0;
                 int zone = state.dataHeatBal->space(ispace).zoneNum;
                 tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, zone, OutputReportTabular::IntGainTypesTubularGCLS, ispace);
-                ort->znCompLoads[ispace - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLS - 1].feneCondInstantSeq += tubularGain;
+                spCLDayTS.spacezone[ispace - 1].feneCondInstantSeq += tubularGain;
             }
         }
     }
@@ -14747,56 +14747,56 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
         return;
     }
     int timeStepInDayGCLH = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+    auto &znCompLoadDayTS = state.dataOutRptTab->znCompLoads[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLH - 1];
     for (int iZoneGCLH = 1; iZoneGCLH <= state.dataGlobal->NumOfZones; ++iZoneGCLH) {
-        auto &zoneCompLoadDayTS = state.dataOutRptTab->znCompLoads[iZoneGCLH - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLH - 1];
+        auto &znCompLoadDayTSZone = znCompLoadDayTS.spacezone[iZoneGCLH - 1];
         auto &zoneAirRpt = state.dataHeatBal->ZnAirRpt(iZoneGCLH);
-        gatherSpaceZoneCompLoadsHVAC(zoneCompLoadDayTS, zoneAirRpt, state.dataHVACGlobal->TimeStepSysSec);
+        gatherSpaceZoneCompLoadsHVAC(znCompLoadDayTSZone, zoneAirRpt, state.dataHVACGlobal->TimeStepSysSec);
         if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
-            zoneCompLoadDayTS.infilInstantSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiSenGainW -
-                                                  state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiSenLossW); // air flow network
-            zoneCompLoadDayTS.infilLatentSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiLatGainW -
-                                                 state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiLatLossW); // air flow network
-            zoneCompLoadDayTS.zoneVentInstantSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentSenGainW -
-                                                     state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentSenLossW); // air flow network
-            zoneCompLoadDayTS.zoneVentInstantSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentLatGainW -
-                                                     state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentLatLossW); // air flow network
-            zoneCompLoadDayTS.interZoneMixInstantSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixSenGainW -
-                                                         state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixSenLossW); // air flow network
-            zoneCompLoadDayTS.interZoneMixLatentSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixLatGainW -
-                                                        state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixLatLossW); // air flow network
+            znCompLoadDayTSZone.infilInstantSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiSenGainW -
+                                                    state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiSenLossW); // air flow network
+            znCompLoadDayTSZone.infilLatentSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiLatGainW -
+                                                   state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneInfiLatLossW); // air flow network
+            znCompLoadDayTSZone.zoneVentInstantSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentSenGainW -
+                                                       state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentSenLossW); // air flow network
+            znCompLoadDayTSZone.zoneVentInstantSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentLatGainW -
+                                                       state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneVentLatLossW); // air flow network
+            znCompLoadDayTSZone.interZoneMixInstantSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixSenGainW -
+                                                           state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixSenLossW); // air flow network
+            znCompLoadDayTSZone.interZoneMixLatentSeq += (state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixLatGainW -
+                                                          state.afn->AirflowNetworkReportData(iZoneGCLH).MultiZoneMixLatLossW); // air flow network
         }
     }
     if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+        auto &spCompLoadDayTS = state.dataOutRptTab->spCompLoads[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLH - 1];
         for (int iSpace = 1; iSpace <= state.dataGlobal->numSpaces; ++iSpace) {
-            auto &spaceCompLoadDayTS =
-                state.dataOutRptTab->spCompLoads[iSpace - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLH - 1];
+            auto &spCompLoadDayTSSpace = spCompLoadDayTS.spacezone[iSpace - 1];
             auto &spaceAirRpt = state.dataHeatBal->spaceAirRpt(iSpace);
-            gatherSpaceZoneCompLoadsHVAC(spaceCompLoadDayTS, spaceAirRpt, state.dataHVACGlobal->TimeStepSysSec);
+            gatherSpaceZoneCompLoadsHVAC(spCompLoadDayTSSpace, spaceAirRpt, state.dataHVACGlobal->TimeStepSysSec);
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 auto &space = state.dataHeatBal->space(iSpace);
-                auto const &zoneCompLoadDayTS =
-                    state.dataOutRptTab->znCompLoads[space.zoneNum - 1].day[state.dataSize->CurOverallSimDay - 1].ts[timeStepInDayGCLH - 1];
-                spaceCompLoadDayTS.infilInstantSeq = space.fracZoneVolume * zoneCompLoadDayTS.infilInstantSeq;
-                spaceCompLoadDayTS.infilLatentSeq = space.fracZoneVolume * zoneCompLoadDayTS.infilLatentSeq;
-                spaceCompLoadDayTS.zoneVentInstantSeq = space.fracZoneVolume * zoneCompLoadDayTS.zoneVentInstantSeq;
-                spaceCompLoadDayTS.zoneVentInstantSeq = space.fracZoneVolume * zoneCompLoadDayTS.zoneVentInstantSeq;
-                spaceCompLoadDayTS.interZoneMixInstantSeq = space.fracZoneVolume * zoneCompLoadDayTS.interZoneMixInstantSeq;
-                spaceCompLoadDayTS.interZoneMixLatentSeq = space.fracZoneVolume * zoneCompLoadDayTS.interZoneMixLatentSeq;
+                auto const &znCompLoadDayTSZone = znCompLoadDayTS.spacezone[space.zoneNum - 1];
+                spCompLoadDayTSSpace.infilInstantSeq = space.fracZoneVolume * znCompLoadDayTSZone.infilInstantSeq;
+                spCompLoadDayTSSpace.infilLatentSeq = space.fracZoneVolume * znCompLoadDayTSZone.infilLatentSeq;
+                spCompLoadDayTSSpace.zoneVentInstantSeq = space.fracZoneVolume * znCompLoadDayTSZone.zoneVentInstantSeq;
+                spCompLoadDayTSSpace.zoneVentInstantSeq = space.fracZoneVolume * znCompLoadDayTSZone.zoneVentInstantSeq;
+                spCompLoadDayTSSpace.interZoneMixInstantSeq = space.fracZoneVolume * znCompLoadDayTSZone.interZoneMixInstantSeq;
+                spCompLoadDayTSSpace.interZoneMixLatentSeq = space.fracZoneVolume * znCompLoadDayTSZone.interZoneMixLatentSeq;
             }
         }
     }
 }
 
-void gatherSpaceZoneCompLoadsHVAC(OutputReportTabular::compLoadsTimeStep &compLoadDayTS,
+void gatherSpaceZoneCompLoadsHVAC(OutputReportTabular::compLoadsSpaceZone &szCompLoadDayTS,
                                   DataHeatBalance::AirReportVars const &szAirRpt,
                                   Real64 const timeStepSysSec)
 {
-    compLoadDayTS.infilInstantSeq = ((szAirRpt.InfilHeatGain - szAirRpt.InfilHeatLoss) / timeStepSysSec);         // zone infiltration
-    compLoadDayTS.infilLatentSeq = ((szAirRpt.InfilLatentGain - szAirRpt.InfilLatentLoss) / timeStepSysSec);      // zone infiltration
-    compLoadDayTS.zoneVentInstantSeq = ((szAirRpt.VentilHeatGain - szAirRpt.VentilHeatLoss) / timeStepSysSec);    // zone ventilation
-    compLoadDayTS.zoneVentLatentSeq = ((szAirRpt.VentilLatentGain - szAirRpt.VentilLatentLoss) / timeStepSysSec); // zone ventilation
-    compLoadDayTS.interZoneMixInstantSeq = ((szAirRpt.MixHeatGain - szAirRpt.MixHeatLoss) / timeStepSysSec);      // zone mixing
-    compLoadDayTS.interZoneMixLatentSeq = ((szAirRpt.MixLatentGain - szAirRpt.MixLatentLoss) / timeStepSysSec);   // zone mixing
+    szCompLoadDayTS.infilInstantSeq = ((szAirRpt.InfilHeatGain - szAirRpt.InfilHeatLoss) / timeStepSysSec);         // zone infiltration
+    szCompLoadDayTS.infilLatentSeq = ((szAirRpt.InfilLatentGain - szAirRpt.InfilLatentLoss) / timeStepSysSec);      // zone infiltration
+    szCompLoadDayTS.zoneVentInstantSeq = ((szAirRpt.VentilHeatGain - szAirRpt.VentilHeatLoss) / timeStepSysSec);    // zone ventilation
+    szCompLoadDayTS.zoneVentLatentSeq = ((szAirRpt.VentilLatentGain - szAirRpt.VentilLatentLoss) / timeStepSysSec); // zone ventilation
+    szCompLoadDayTS.interZoneMixInstantSeq = ((szAirRpt.MixHeatGain - szAirRpt.MixHeatLoss) / timeStepSysSec);      // zone mixing
+    szCompLoadDayTS.interZoneMixLatentSeq = ((szAirRpt.MixLatentGain - szAirRpt.MixLatentLoss) / timeStepSysSec);   // zone mixing
 }
 
 void WriteLoadComponentSummaryTables(EnergyPlusData &state)
@@ -15042,7 +15042,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                                   powerGenDelaySeq,
                                                   lightDelaySeq,
                                                   feneSolarDelaySeq,
-                                                  ort->spCompLoads[iSpace - 1],
+                                                  ort->spCompLoads,
                                                   surfDelaySeq,
                                                   spaceComponentAreas(iSpace),
                                                   zoneNum,
@@ -15063,7 +15063,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                               powerGenDelaySeq,
                                               lightDelaySeq,
                                               feneSolarDelaySeq,
-                                              ort->znCompLoads[iZone - 1],
+                                              ort->znCompLoads,
                                               surfDelaySeq,
                                               ZoneComponentAreas(iZone),
                                               iZone);
@@ -15163,7 +15163,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                           powerGenDelaySeq,
                                           lightDelaySeq,
                                           feneSolarDelaySeq,
-                                          ort->znCompLoads[iZone - 1],
+                                          ort->znCompLoads,
                                           surfDelaySeq);
                         ComputeTableBodyUsingMovingAvg(state,
                                                        airLoopZonesCoolCompLoadTables.cells,
@@ -15177,7 +15177,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                                        powerGenDelaySeq,
                                                        lightDelaySeq,
                                                        feneSolarDelaySeq,
-                                                       ort->znCompLoads[iZone - 1],
+                                                       ort->znCompLoads,
                                                        surfDelaySeq);
                         CollectPeakZoneConditions(state, airLoopZonesCoolCompLoadTables, coolDesSelected, timeCoolMax, iZone, true);
                         AddAreaColumnForZone(ZoneComponentAreas(iZone), airLoopZonesCoolCompLoadTables);
@@ -15200,7 +15200,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                           powerGenDelaySeq,
                                           lightDelaySeq,
                                           feneSolarDelaySeq,
-                                          ort->znCompLoads[iZone - 1],
+                                          ort->znCompLoads,
                                           surfDelaySeq);
                         ComputeTableBodyUsingMovingAvg(state,
                                                        airLoopZonesHeatCompLoadTables.cells,
@@ -15214,7 +15214,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                                        powerGenDelaySeq,
                                                        lightDelaySeq,
                                                        feneSolarDelaySeq,
-                                                       ort->znCompLoads[iZone - 1],
+                                                       ort->znCompLoads,
                                                        surfDelaySeq);
                         CollectPeakZoneConditions(state, airLoopZonesHeatCompLoadTables, heatDesSelected, timeHeatMax, iZone, false);
                         AddAreaColumnForZone(ZoneComponentAreas(iZone), airLoopZonesHeatCompLoadTables);
@@ -15318,7 +15318,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                       powerGenDelaySeq,
                                       lightDelaySeq,
                                       feneSolarDelaySeq,
-                                      ort->znCompLoads[iZone - 1],
+                                      ort->znCompLoads,
                                       surfDelaySeq);
                     ComputeTableBodyUsingMovingAvg(state,
                                                    facilityZonesCoolCompLoadTables.cells,
@@ -15332,7 +15332,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                                    powerGenDelaySeq,
                                                    lightDelaySeq,
                                                    feneSolarDelaySeq,
-                                                   ort->znCompLoads[iZone - 1],
+                                                   ort->znCompLoads,
                                                    surfDelaySeq);
                     CollectPeakZoneConditions(state, facilityZonesCoolCompLoadTables, coolDesSelected, timeCoolMax, iZone, true);
                     AddAreaColumnForZone(ZoneComponentAreas(iZone), facilityZonesCoolCompLoadTables);
@@ -15355,7 +15355,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                       powerGenDelaySeq,
                                       lightDelaySeq,
                                       feneSolarDelaySeq,
-                                      ort->znCompLoads[iZone - 1],
+                                      ort->znCompLoads,
                                       surfDelaySeq);
                     ComputeTableBodyUsingMovingAvg(state,
                                                    facilityZonesHeatCompLoadTables.cells,
@@ -15369,7 +15369,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                                                    powerGenDelaySeq,
                                                    lightDelaySeq,
                                                    feneSolarDelaySeq,
-                                                   ort->znCompLoads[iZone - 1],
+                                                   ort->znCompLoads,
                                                    surfDelaySeq);
                     CollectPeakZoneConditions(state, facilityZonesHeatCompLoadTables, heatDesSelected, timeHeatMax, iZone, false);
                     AddAreaColumnForZone(ZoneComponentAreas(iZone), facilityZonesHeatCompLoadTables);
@@ -15501,7 +15501,7 @@ void computeSpaceZoneCompLoads(EnergyPlusData &state,
                                Array1D<Real64> &powerGenDelaySeq,
                                Array1D<Real64> &lightDelaySeq,
                                Array1D<Real64> &feneSolarDelaySeq,
-                               OutputReportTabular::componentLoads &szCompLoadLoc,
+                               std::vector<OutputReportTabular::componentLoadsSpZn> &szCompLoadLoc,
                                Array2D<Real64> &surfDelaySeq,
                                ZompComponentAreasType &componentAreas,
                                int const iZone,
@@ -15523,7 +15523,8 @@ void computeSpaceZoneCompLoads(EnergyPlusData &state,
                       lightDelaySeq,
                       feneSolarDelaySeq,
                       szCompLoadLoc,
-                      surfDelaySeq);
+                      surfDelaySeq,
+                      iSpace);
     ComputeTableBodyUsingMovingAvg(state,
                                    coolCompLoadTables.cells,
                                    coolCompLoadTables.cellUsed,
@@ -15537,7 +15538,8 @@ void computeSpaceZoneCompLoads(EnergyPlusData &state,
                                    lightDelaySeq,
                                    feneSolarDelaySeq,
                                    szCompLoadLoc,
-                                   surfDelaySeq);
+                                   surfDelaySeq,
+                                   iSpace);
     CollectPeakZoneConditions(state, coolCompLoadTables, coolDesSelected, timeCoolMax, iZone, true, iSpace);
     // send latent load info to coil summary report
     state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(
@@ -15559,7 +15561,8 @@ void computeSpaceZoneCompLoads(EnergyPlusData &state,
                       lightDelaySeq,
                       feneSolarDelaySeq,
                       szCompLoadLoc,
-                      surfDelaySeq);
+                      surfDelaySeq,
+                      iSpace);
     ComputeTableBodyUsingMovingAvg(state,
                                    heatCompLoadTables.cells,
                                    heatCompLoadTables.cellUsed,
@@ -15573,7 +15576,8 @@ void computeSpaceZoneCompLoads(EnergyPlusData &state,
                                    lightDelaySeq,
                                    feneSolarDelaySeq,
                                    szCompLoadLoc,
-                                   surfDelaySeq);
+                                   surfDelaySeq,
+                                   iSpace);
     CollectPeakZoneConditions(state, heatCompLoadTables, heatDesSelected, timeHeatMax, iZone, false, iSpace);
 
     // send latent load info to coil summary report
@@ -15600,15 +15604,18 @@ void GetDelaySequences(EnergyPlusData &state,
                        Array1D<Real64> &powerGenDelaySeq,
                        Array1D<Real64> &lightDelaySeq,
                        Array1D<Real64> &feneSolarDelaySeq,
-                       OutputReportTabular::componentLoads &szCompLoadLoc,
-                       Array2D<Real64> &surfDelaySeq)
+                       std::vector<OutputReportTabular::componentLoadsSpZn> &szCompLoadLoc,
+                       Array2D<Real64> &surfDelaySeq,
+                       int const iSpace)
 {
 
     // static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
     auto &ort = state.dataOutRptTab;
+    int const szNumMinus1 = (iSpace == 0) ? zoneIndex - 1 : iSpace - 1; // space or zone num minus 1 for vector
 
     if (desDaySelected != 0) {
-        auto &surfCLDay = ort->surfCompLoadsDays[desDaySelected - 1];
+        auto &surfCLDay = ort->surfCompLoads[desDaySelected - 1];
+        auto &szCLDay = szCompLoadLoc[desDaySelected - 1];
 
         Array2D<Real64> decayCurve;
         if (isCooling) {
@@ -15644,7 +15651,7 @@ void GetDelaySequences(EnergyPlusData &state,
 
                     for (int mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack) {
                         int sourceStep = kTimeStep - mStepBack + 1;
-                        auto &compLoadTS = szCompLoadLoc.day[desDaySelected - 1].ts[sourceStep - 1];
+                        auto &compLoadTS = szCLDay.ts[sourceStep - 1].spacezone[szNumMinus1];
                         auto &surfCLDayTS = surfCLDay.ts[sourceStep - 1].surf[jSurf - 1];
                         Real64 thisQRadThermInAbsMult =
                             surfCLDayTS.TMULTseq * surfCLDayTS.ITABSFseq * state.dataSurface->Surface(jSurf).Area * decayCurve(mStepBack, jSurf);
@@ -15689,7 +15696,7 @@ void GetDelaySequences(EnergyPlusData &state,
             lightDelaySeq(kTimeStep) = lightLWConvIntoZone + lightSWConvIntoZone;
             feneSolarDelaySeq(kTimeStep) = feneSolarConvIntoZone;
             // also remove the net radiant component on the instanteous conduction for fenestration
-            auto &szCompLoadDayTS = szCompLoadLoc.day[desDaySelected - 1].ts[kTimeStep - 1];
+            auto &szCompLoadDayTS = szCLDay.ts[kTimeStep - 1].spacezone[szNumMinus1];
             if (!szCompLoadDayTS.adjFenDone) {
                 szCompLoadDayTS.feneCondInstantSeq -= adjFeneSurfNetRadSeq;
                 szCompLoadDayTS.adjFenDone = true;
@@ -15714,8 +15721,9 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                                     Array1D<Real64> const &powerGenDelaySeq,
                                     Array1D<Real64> const &lightDelaySeq,
                                     Array1D<Real64> const &feneSolarDelaySeq,
-                                    OutputReportTabular::componentLoads &szCompLoadLoc,
-                                    Array2D<Real64> const &surfDelaySeq)
+                                    std::vector<OutputReportTabular::componentLoadsSpZn> &szCompLoadLoc,
+                                    Array2D<Real64> const &surfDelaySeq,
+                                    int const iSpace)
 {
     Array1D<Real64> AvgData;     // sequence data to be averaging
     Array1D<Real64> delayOpaque; // hold values for report for delayed opaque
@@ -15725,19 +15733,20 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
     delayOpaque.allocate(LoadCompRow::GrdTot);
     Real64 numTSinDay = state.dataGlobal->NumOfTimeStepInHour * 24;
     AvgData.allocate(numTSinDay);
+    int const szNumMinus1 = (iSpace == 0) ? zoneIndex - 1 : iSpace - 1; // space or zone num minus 1 for vector
 
     if (desDaySelected != 0 && timeOfMax != 0) {
         // Don't update/average original array data
         // PEOPLE
-        auto &compLoadDay = szCompLoadLoc.day[desDaySelected - 1];
+        auto &compLoadDay = szCompLoadLoc[desDaySelected - 1];
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].peopleInstantSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].peopleInstantSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensInst, LoadCompRow::People) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::People) = true;
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].peopleLatentSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].peopleLatentSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::Latent, LoadCompRow::People) = AvgData(timeOfMax);
@@ -15749,13 +15758,13 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // LIGHTS
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].lightInstantSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].lightInstantSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensInst, LoadCompRow::Lights) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Lights) = true;
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].lightRetAirSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].lightRetAirSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensRA, LoadCompRow::Lights) = AvgData(timeOfMax);
@@ -15767,13 +15776,13 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // EQUIPMENT
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].equipInstantSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].equipInstantSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensInst, LoadCompRow::Equip) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Equip) = true;
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].equipLatentSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].equipLatentSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::Latent, LoadCompRow::Equip) = AvgData(timeOfMax);
@@ -15785,19 +15794,19 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // REFRIGERATION EQUIPMENT
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].refrigInstantSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].refrigInstantSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensInst, LoadCompRow::Refrig) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Refrig) = true;
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].refrigRetAirSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].refrigRetAirSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensRA, LoadCompRow::Refrig) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensRA, LoadCompRow::Refrig) = true;
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].refrigLatentSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].refrigLatentSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::Latent, LoadCompRow::Refrig) = AvgData(timeOfMax);
@@ -15805,13 +15814,13 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // WATER USE EQUIPMENT
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].waterUseInstantSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].waterUseInstantSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensInst, LoadCompRow::WaterUse) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::WaterUse) = true;
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].waterUseLatentSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].waterUseLatentSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::Latent, LoadCompRow::WaterUse) = AvgData(timeOfMax);
@@ -15819,7 +15828,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // HVAC EQUIPMENT LOSSES
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].hvacLossInstantSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].hvacLossInstantSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensInst, LoadCompRow::HvacLoss) = AvgData(timeOfMax);
@@ -15831,7 +15840,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // POWER GENERATION EQUIPMENT
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].powerGenInstantSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].powerGenInstantSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensInst, LoadCompRow::PowerGen) = AvgData(timeOfMax);
@@ -15852,13 +15861,13 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // INFILTRATION
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].infilInstantSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].infilInstantSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensInst, LoadCompRow::Infil) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Infil) = true;
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].infilLatentSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].infilLatentSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::Latent, LoadCompRow::Infil) = AvgData(timeOfMax);
@@ -15866,13 +15875,13 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // ZONE VENTILATION
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].zoneVentInstantSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].zoneVentInstantSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensInst, LoadCompRow::ZoneVent) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::ZoneVent) = true;
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].zoneVentLatentSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].zoneVentLatentSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::Latent, LoadCompRow::ZoneVent) = AvgData(timeOfMax);
@@ -15880,13 +15889,13 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // INTERZONE MIXING
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].interZoneMixInstantSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].interZoneMixInstantSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensInst, LoadCompRow::IntZonMix) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::IntZonMix) = true;
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].interZoneMixLatentSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].interZoneMixLatentSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::Latent, LoadCompRow::IntZonMix) = AvgData(timeOfMax);
@@ -15894,7 +15903,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // FENESTRATION CONDUCTION
         for (int iTS = 1; iTS <= numTSinDay; ++iTS) {
-            AvgData(iTS) = compLoadDay.ts[iTS - 1].feneCondInstantSeq;
+            AvgData(iTS) = compLoadDay.ts[iTS - 1].spacezone[szNumMinus1].feneCondInstantSeq;
         }
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
         resultCells(LoadCompCol::SensInst, LoadCompRow::FeneCond) = AvgData(timeOfMax);

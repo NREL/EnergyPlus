@@ -695,7 +695,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     state->dataGlobal->CompLoadReportIsReq = true;
     state->dataGlobal->isPulseZoneSizing = false;
     InternalHeatGains::GatherComponentLoadsIntGain(*state);
-    auto &znCompLoadDayTS = state->dataOutRptTab->znCompLoads[zoneNum - 1].day[state->dataSize->CurOverallSimDay - 1].ts[timeStepInDay - 1];
+    auto &znCompLoadDayTS = state->dataOutRptTab->znCompLoads[state->dataSize->CurOverallSimDay - 1].ts[timeStepInDay - 1].spacezone[zoneNum - 1];
     totConvGains = znCompLoadDayTS.peopleInstantSeq + znCompLoadDayTS.lightInstantSeq + znCompLoadDayTS.equipInstantSeq +
                    znCompLoadDayTS.refrigInstantSeq + znCompLoadDayTS.waterUseInstantSeq + znCompLoadDayTS.hvacLossInstantSeq +
                    znCompLoadDayTS.powerGenInstantSeq;

@@ -9509,19 +9509,21 @@ namespace InternalHeatGains {
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                auto &znCLDayTS = state.dataOutRptTab->znCompLoads[iZone - 1].day[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1];
+                auto &znCLDayTS = state.dataOutRptTab->znCompLoads[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1].spacezone[iZone - 1];
                 gatherCompLoadIntGain2(state, znCLDayTS, iZone);
             }
             if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
                 for (int iSpace = 1; iSpace <= state.dataGlobal->NumOfZones; ++iSpace) {
-                    auto &spCLDayTS = state.dataOutRptTab->spCompLoads[iSpace - 1].day[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1];
+                    auto &spCLDayTS =
+                        state.dataOutRptTab->spCompLoads[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1].spacezone[iSpace - 1];
                     gatherCompLoadIntGain2(state, spCLDayTS, state.dataHeatBal->space(iSpace).zoneNum, iSpace);
                 }
             }
         }
     }
 
-    void gatherCompLoadIntGain2(EnergyPlusData &state, OutputReportTabular::compLoadsTimeStep &szCompLoadDayTS, int const zoneNum, int const spaceNum)
+    void
+    gatherCompLoadIntGain2(EnergyPlusData &state, OutputReportTabular::compLoadsSpaceZone &szCompLoadDayTS, int const zoneNum, int const spaceNum)
     {
         static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesPeople = {DataHeatBalance::IntGainType::People};
         static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesLight = {DataHeatBalance::IntGainType::Lights};

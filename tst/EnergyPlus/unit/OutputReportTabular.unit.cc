@@ -524,17 +524,17 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     // decayCurveHeat.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
     EXPECT_EQ(state->dataOutRptTab->decayCurveHeat.size(), 672u);
 
-    EXPECT_EQ(state->dataOutRptTab->surfCompLoadsDays.size(), 5u);
-    EXPECT_EQ(state->dataOutRptTab->surfCompLoadsDays[0].ts.size(), 96u);
-    EXPECT_EQ(state->dataOutRptTab->surfCompLoadsDays[0].ts[0].surf.size(), 7u);
-    EXPECT_EQ(state->dataOutRptTab->surfCompLoadsDays[4].ts.size(), 96u);
-    EXPECT_EQ(state->dataOutRptTab->surfCompLoadsDays[4].ts[0].surf.size(), 7u);
+    EXPECT_EQ(state->dataOutRptTab->surfCompLoads.size(), 5u);
+    EXPECT_EQ(state->dataOutRptTab->surfCompLoads[0].ts.size(), 96u);
+    EXPECT_EQ(state->dataOutRptTab->surfCompLoads[0].ts[0].surf.size(), 7u);
+    EXPECT_EQ(state->dataOutRptTab->surfCompLoads[4].ts.size(), 96u);
+    EXPECT_EQ(state->dataOutRptTab->surfCompLoads[4].ts[95].surf.size(), 7u);
 
-    EXPECT_EQ(state->dataOutRptTab->znCompLoads.size(), 4u);
-    EXPECT_EQ(state->dataOutRptTab->znCompLoads[0].day.size(), 5u);
-    EXPECT_EQ(state->dataOutRptTab->znCompLoads[0].day[0].ts.size(), 96u);
-    EXPECT_EQ(state->dataOutRptTab->znCompLoads[3].day.size(), 5u);
-    EXPECT_EQ(state->dataOutRptTab->znCompLoads[3].day[4].ts.size(), 96u);
+    EXPECT_EQ(state->dataOutRptTab->znCompLoads.size(), 5u);
+    EXPECT_EQ(state->dataOutRptTab->znCompLoads[0].ts.size(), 96u);
+    EXPECT_EQ(state->dataOutRptTab->znCompLoads[0].ts[0].spacezone.size(), 4u);
+    EXPECT_EQ(state->dataOutRptTab->znCompLoads[4].ts.size(), 96u);
+    EXPECT_EQ(state->dataOutRptTab->znCompLoads[4].ts[95].spacezone.size(), 4u);
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConvertToEscaped)
@@ -6931,10 +6931,27 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 
     AllocateLoadComponentArrays(*state);
 
-    auto &znCL = state->dataOutRptTab->znCompLoads[iZone - 1];
-    znCL.day[coolDesSelected - 1].ts[0].feneCondInstantSeq = 0.88;
+    auto &znCL = state->dataOutRptTab->znCompLoads;
+    znCL[coolDesSelected - 1].ts[0].spacezone[iZone - 1].feneCondInstantSeq = 0.88;
 
-    state->dataOutRptTab->surfCompLoadsDays[coolDesSelected - 1].ts[0].surf[0].netSurfRadSeq = 0.05;
+    state->dataOutRptTab->surfCompLoads[coolDesSelected - 1].ts[0].surf[0].netSurfRadSeq = 0.05;
+
+    GetDelaySequences(*state,
+                      coolDesSelected,
+                      true,
+                      iZone,
+                      peopleDelaySeqCool,
+                      equipDelaySeqCool,
+                      hvacLossDelaySeqCool,
+                      powerGenDelaySeqCool,
+                      lightDelaySeqCool,
+                      feneSolarDelaySeqCool,
+                      znCL,
+                      surfDelaySeqCool);
+
+    EXPECT_EQ(
+        0.83,
+        znCL[coolDesSelected - 1].ts[0].spacezone[iZone - 1].feneCondInstantSeq); // the first time the subtraction operation should have occurred
 
     GetDelaySequences(*state,
                       coolDesSelected,
@@ -6950,24 +6967,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
                       surfDelaySeqCool);
 
     EXPECT_EQ(0.83,
-              znCL.day[coolDesSelected - 1].ts[0].feneCondInstantSeq); // the first time the subtraction operation should have occurred
-
-    GetDelaySequences(*state,
-                      coolDesSelected,
-                      true,
-                      iZone,
-                      peopleDelaySeqCool,
-                      equipDelaySeqCool,
-                      hvacLossDelaySeqCool,
-                      powerGenDelaySeqCool,
-                      lightDelaySeqCool,
-                      feneSolarDelaySeqCool,
-                      znCL,
-                      surfDelaySeqCool);
-
-    EXPECT_EQ(0.83,
-              znCL.day[coolDesSelected - 1].ts[0].feneCondInstantSeq); // the second time the subtraction should not have happened since it is
-                                                                       // only adjusted once so the value should be the same.
+              znCL[coolDesSelected - 1].ts[0].spacezone[iZone - 1].feneCondInstantSeq); // the second time the subtraction should not have happened
+                                                                                        // since it is
+    // only adjusted once so the value should be the same.
 }
 
 TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_ZeroDesignDay)
@@ -8324,11 +8326,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataSurface->Surface(3).RadEnclIndex = 1;
     state->dataSurface->Surface(4).RadEnclIndex = 1;
 
-    auto &znCL = state->dataOutRptTab->znCompLoads[iZone - 1];
+    auto &znCL = state->dataOutRptTab->znCompLoads;
+    auto &znCLDay = znCL[coolDesSelected - 1];
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
-            auto &znCLDayTS = znCL.day[coolDesSelected - 1].ts[step - 1];
-            auto &surfCLDayTS = state->dataOutRptTab->surfCompLoadsDays[coolDesSelected - 1].ts[step - 1].surf[jSurf - 1];
+            auto &znCLDayTS = znCLDay.ts[step - 1].spacezone[iZone - 1];
+            auto &surfCLDayTS = state->dataOutRptTab->surfCompLoads[coolDesSelected - 1].ts[step - 1].surf[jSurf - 1];
             surfCLDayTS.TMULTseq = 0.1 * step;
             surfCLDayTS.ITABSFseq = 0.2 * step * surfBaseValue[jSurf - 1];
             state->dataOutRptTab->decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
@@ -8382,8 +8385,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
-            auto &znCLDayTS = znCL.day[coolDesSelected - 1].ts[step - 1];
-            auto &surfCLDayTS = state->dataOutRptTab->surfCompLoadsDays[coolDesSelected - 1].ts[step - 1].surf[jSurf - 1];
+            auto &znCLDayTS = znCLDay.ts[step - 1].spacezone[iZone - 1];
+            auto &surfCLDayTS = state->dataOutRptTab->surfCompLoads[coolDesSelected - 1].ts[step - 1].surf[jSurf - 1];
             surfCLDayTS.TMULTseq = 0.1 * step;
             surfCLDayTS.ITABSFseq = 0.2 * step * surfBaseValue[jSurf - 1];
             state->dataOutRptTab->decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];

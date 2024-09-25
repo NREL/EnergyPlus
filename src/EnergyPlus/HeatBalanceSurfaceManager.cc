@@ -6571,7 +6571,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
     if (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq) {
         // This is by surface, so it works for both space and zone component loads
         int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-        auto &surfCLDayTS = state.dataOutRptTab->surfCompLoadsDays[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1];
+        auto &surfCLDayTS = state.dataOutRptTab->surfCompLoads[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1];
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                 auto const &thisSpace = state.dataHeatBal->space(spaceNum);
@@ -9529,7 +9529,7 @@ void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state)
     // This is by surface, so it works for both space and zone component loads
     if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
         int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-        auto &surfCLDayTS = state.dataOutRptTab->surfCompLoadsDays[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1];
+        auto &surfCLDayTS = state.dataOutRptTab->surfCompLoads[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1];
         for (int jSurf = 1; jSurf <= state.dataSurface->TotSurfaces; ++jSurf) {
             auto const &surface = state.dataSurface->Surface(jSurf);
             if (!surface.HeatTransSurf || surface.Zone == 0) continue;           // Skip non-heat transfer surfaces

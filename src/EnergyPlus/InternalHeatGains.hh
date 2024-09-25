@@ -222,8 +222,10 @@ namespace InternalHeatGains {
 
     void GatherComponentLoadsIntGain(EnergyPlusData &state);
 
-    void
-    gatherCompLoadIntGain2(EnergyPlusData &state, OutputReportTabular::compLoadsTimeStep &szCompLoadDayTS, int const zoneNum, int const spaceNum = 0);
+    void gatherCompLoadIntGain2(EnergyPlusData &state,
+                                OutputReportTabular::compLoadsSpaceZone &szCompLoadDayTS,
+                                int const zoneNum,
+                                int const spaceNum = 0);
 
 } // namespace InternalHeatGains
 
