@@ -104,8 +104,6 @@ bool ParseSQLiteInput(EnergyPlusData &state, bool &writeOutputToSQLite, bool &wr
             return input;
         };
 
-        auto &sql_ort = state.dataOutRptTab;
-
         // There can only be 1 "Output:SQLite"
         auto const instance = instances.value().begin();
         auto const &fields = instance.value();
@@ -123,6 +121,8 @@ bool ParseSQLiteInput(EnergyPlusData &state, bool &writeOutputToSQLite, bool &wr
         }
         { // "unit_conversion_for_tabular_data"
             std::string tabularDataUnitConversion = find_input(fields, "unit_conversion_for_tabular_data");
+            auto const &sql_ort = state.dataOutRptTab;
+
             if ("UseOutputControlTableStyles" == tabularDataUnitConversion) {
                 // Jan 2021 Note: Since here we do not know weather sql_ort->unitsStyle has been processed or not,
                 // the value "NotFound" is used for the option "UseOutputControlTableStyles" at this point;
@@ -1577,7 +1577,6 @@ void SQLite::createSQLiteTimeIndexRecord(OutputProcessor::ReportFreq const repor
                                          bool const warmupFlag)
 {
     if (m_writeOutputToSQLite) {
-        int intStartMinute = 0;
         int intervalInMinutes = 60;
 
         static std::vector<int> lastDayOfMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -1595,7 +1594,7 @@ void SQLite::createSQLiteTimeIndexRecord(OutputProcessor::ReportFreq const repor
             ++m_sqlDBTimeIndex;
 
             int intEndMinute = static_cast<int>(endMinute + 0.5);
-            intStartMinute = static_cast<int>(startMinute + 0.5);
+            int intStartMinute = static_cast<int>(startMinute + 0.5);
             int t_hour = hour;
             intervalInMinutes = intEndMinute - intStartMinute;
             adjustReportingHourAndMinutes(t_hour, intEndMinute);
@@ -2611,7 +2610,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
 {
     sqlite3 *m_connection = nullptr;
     if (m_writeOutputToSQLite) {
-        int rc = -1;
+        int rc;
         bool ok = true;
 
         std::string const dbName_utf8 = FileSystem::toGenericString(dbName);

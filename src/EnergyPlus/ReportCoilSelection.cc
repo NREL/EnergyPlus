@@ -575,7 +575,7 @@ void ReportCoilSelection::doAirLoopSetup(EnergyPlusData &state, int const coilVe
                     int zoneIndex = state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).HeatCtrlZoneNums(loopZone);
                     // see if this zone is new or already in list
                     bool found = false;
-                    for (auto &z : c->zoneNum) {
+                    for (auto const &z : c->zoneNum) {
                         if (z == zoneIndex) {
                             found = true;
                             break;
@@ -817,7 +817,6 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             c->coilDesWaterTempDiff = -999.0;
             c->plantDesCapacity = -999.0;
             c->coilCapPrcntPlantCap = -999.0;
-            c->coilFlowPrcntPlantFlow = -999.0;
         }
 
         c->cpDryAir = Psychrometrics::PsyCpAirFnW(0.0);
@@ -1645,7 +1644,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         }
 
     } else if (curZoneEqNum > 0 && allocated(state.dataSize->FinalZoneSizing)) {
-        auto &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
+        auto const &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
         c->zoneNum.resize(1);
         c->zoneName.resize(1);
         c->zoneNum[0] = curZoneEqNum;
@@ -1667,7 +1666,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
 
         c->rmSensibleAtPeak = finalZoneSizing.DesHeatLoad;
 
-        auto &zoneEqSizing = state.dataSize->ZoneEqSizing(curZoneEqNum);
+        auto const &zoneEqSizing = state.dataSize->ZoneEqSizing(curZoneEqNum);
         if (zoneEqSizing.OAVolFlow > 0.0) {
             c->oaPeakVolFlow = zoneEqSizing.OAVolFlow;
         } else if (zoneEqSizing.ATMixerVolFlow > 0.0) {
@@ -1809,15 +1808,15 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         if (state.dataSize->DataFlowUsedForSizing > 0.0) { // flow has been set in global, so use it
             c->coilDesVolFlow = state.dataSize->DataFlowUsedForSizing;
         } else if (curZoneEqNum > 0 && allocated(state.dataSize->FinalZoneSizing)) {
-            auto &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
+            auto const &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
             if (finalZoneSizing.DesHeatMassFlow >= HVAC::SmallMassFlow) {
                 c->coilDesMassFlow = finalZoneSizing.DesHeatMassFlow;
                 c->coilDesVolFlow = c->coilDesMassFlow / state.dataEnvrn->StdRhoAir;
             }
         } else if (curSysNum > 0 && curSysNum <= int(state.dataSize->FinalSysSizing.size())) {
-            auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
+            auto const &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
             if (curOASysNum > 0 && allocated(state.dataSize->OASysEqSizing)) {
-                auto &oASysEqSizing = state.dataSize->OASysEqSizing(curSysNum);
+                auto const &oASysEqSizing = state.dataSize->OASysEqSizing(curSysNum);
                 if (oASysEqSizing.AirFlow) {
                     c->coilDesVolFlow = oASysEqSizing.AirVolFlow;
                 } else if (oASysEqSizing.HeatingAirFlow) {
@@ -1829,7 +1828,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                 if (state.dataSize->DataFlowUsedForSizing > 0.0) {
                     c->coilDesVolFlow = state.dataSize->DataFlowUsedForSizing;
                 } else if (curSysNum > 0 && allocated(state.dataSize->UnitarySysEqSizing)) {
-                    auto &unitarySysEqSizing = state.dataSize->UnitarySysEqSizing(curSysNum);
+                    auto const &unitarySysEqSizing = state.dataSize->UnitarySysEqSizing(curSysNum);
                     if (unitarySysEqSizing.AirFlow) {
                         c->coilDesVolFlow = unitarySysEqSizing.AirVolFlow;
                     } else if (unitarySysEqSizing.HeatingAirFlow) {
@@ -2060,7 +2059,7 @@ bool ReportCoilSelection::isCompTypeCoil(std::string const &compType // string c
 void ReportCoilSelection::setZoneLatentLoadCoolingIdealPeak(int const zoneIndex, Real64 const zoneCoolingLatentLoad)
 {
     // loop over all the coils and the zones in the coils and if this zone index is in the coil
-    for (auto &c : coilSelectionDataObjs) {
+    for (auto const &c : coilSelectionDataObjs) {
 
         if (c->isCooling) {
             for (std::size_t zoneInd = 0; zoneInd < c->zoneNum.size(); ++zoneInd) {
@@ -2076,7 +2075,7 @@ void ReportCoilSelection::setZoneLatentLoadCoolingIdealPeak(int const zoneIndex,
 void ReportCoilSelection::setZoneLatentLoadHeatingIdealPeak(int const zoneIndex, Real64 const zoneHeatingLatentLoad)
 {
     // loop over all the coils and the zones in the coils and if this zone index is in the coil
-    for (auto &c : coilSelectionDataObjs) {
+    for (auto const &c : coilSelectionDataObjs) {
 
         if (c->isHeating) {
             for (std::size_t zoneInd = 0; zoneInd < c->zoneNum.size(); ++zoneInd) {

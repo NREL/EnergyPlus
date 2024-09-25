@@ -715,8 +715,6 @@ namespace ResultsFramework {
         if (data.empty()) return;
         updateReportFreq(reportingFrequency);
         std::vector<int> indices;
-        std::unordered_set<std::string> seen;
-        std::string search_string;
 
         std::string reportFrequency = data.at("ReportFrequency").get<std::string>();
         if (reportFrequency == "Detailed-HVAC" || reportFrequency == "Detailed-Zone") {
@@ -724,7 +722,7 @@ namespace ResultsFramework {
         }
         auto const &columns = data.at("Cols");
         for (auto const &column : columns) {
-            search_string =
+            std::string search_string =
                 fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), reportFrequency);
             auto found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
             if (found == outputVariables.end()) {

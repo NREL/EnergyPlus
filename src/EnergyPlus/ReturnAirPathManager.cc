@@ -111,17 +111,9 @@ namespace ReturnAirPathManager {
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
 
-        // Locals
-        int PathNum;
-        int CompNum;
-        int NumAlphas;
-        int NumNums;
-        int IOStat;
-        int Counter;
         //////////// hoisted into namespace ////////////////////////////////////////////////
         // static bool ErrorsFound( false );
         ////////////////////////////////////////////////////////////////////////////////////
-        bool IsNotOK; // Flag to verify name
 
         bool ErrorsFound = false;
 
@@ -133,10 +125,13 @@ namespace ReturnAirPathManager {
         state.dataZoneEquip->NumReturnAirPaths = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneEquip->NumReturnAirPaths > 0) {
+            int NumAlphas;
+            int NumNums;
+            int IOStat;
 
             state.dataZoneEquip->ReturnAirPath.allocate(state.dataZoneEquip->NumReturnAirPaths);
 
-            for (PathNum = 1; PathNum <= state.dataZoneEquip->NumReturnAirPaths; ++PathNum) {
+            for (int PathNum = 1; PathNum <= state.dataZoneEquip->NumReturnAirPaths; ++PathNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
@@ -170,13 +165,14 @@ namespace ReturnAirPathManager {
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName = "";
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentIndex = 0;
-                Counter = 3;
+                int Counter = 3;
 
-                for (CompNum = 1; CompNum <= state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents; ++CompNum) {
+                for (int CompNum = 1; CompNum <= state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents; ++CompNum) {
 
                     if ((Util::SameString(state.dataIPShortCut->cAlphaArgs(Counter), "AirLoopHVAC:ZoneMixer")) ||
                         (Util::SameString(state.dataIPShortCut->cAlphaArgs(Counter), "AirLoopHVAC:ReturnPlenum"))) {
 
+                        bool IsNotOK; // Flag to verify name
                         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType(CompNum) = state.dataIPShortCut->cAlphaArgs(Counter);
                         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName(CompNum) = state.dataIPShortCut->cAlphaArgs(Counter + 1);
                         ValidateComponent(state,
