@@ -98,8 +98,6 @@ namespace EnergyPlus::SingleDuct {
 // MODULE INFORMATION:
 //       AUTHOR         Richard J. Liesen
 //       DATE WRITTEN   January 2000
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // To encapsulate the data and algorithms required to
@@ -128,15 +126,11 @@ void SimulateSingleDuct(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   January 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine manages Sys system simulation.
     // It is called from the ManageZoneEquip
     // at the system time step.
-
-    // Using/Aliasing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SysNum; // The Sys that you are currently loading input into
@@ -222,8 +216,6 @@ void GetSysInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   April 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is the main routine to call other input routines and Get routines
@@ -2434,8 +2426,6 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   January 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for  initializations of the Sys Components.
@@ -2457,10 +2447,6 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InletNode;
     int OutletNode;
-    int SysIndex;
-    // static Array1D_bool MyEnvrnFlag;
-    // static Array1D_bool MySizeFlag;
-    // static Array1D_bool GetGasElecHeatCoilCap; // Gets autosized value of coil capacity
     Real64 SteamTemp;
     Real64 SteamDensity;
     Real64 rho;
@@ -2469,19 +2455,6 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     // static Array1D_bool PlantLoopScanFlag;
 
     // Do the Begin Simulation initializations
-    if (state.dataSingleDuct->InitSysFlag) {
-
-        // MyEnvrnFlag.allocate(NumSDAirTerminal);
-        // MySizeFlag.allocate(NumSDAirTerminal);
-        // PlantLoopScanFlag.allocate(NumSDAirTerminal);
-        // GetGasElecHeatCoilCap.allocate(NumSDAirTerminal);
-        // MyEnvrnFlag = true;
-        // MySizeFlag = true;
-        // PlantLoopScanFlag = true;
-        // GetGasElecHeatCoilCap = true;
-        state.dataSingleDuct->InitSysFlag = false;
-    }
-
     if (this->PlantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
         if ((this->ReheatComp_PlantType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
             (this->ReheatComp_PlantType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
@@ -2507,7 +2480,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     if (!state.dataSingleDuct->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataSingleDuct->ZoneEquipmentListChecked = true;
         // Check to see if there is a Air Distribution Unit on the Zone Equipment List
-        for (SysIndex = 1; SysIndex <= state.dataSingleDuct->NumSDAirTerminal; ++SysIndex) {
+        for (int SysIndex = 1; SysIndex <= state.dataSingleDuct->NumSDAirTerminal; ++SysIndex) {
             if (state.dataSingleDuct->sd_airterminal(SysIndex).ADUNum == 0) continue;
             if (CheckZoneEquipmentList(state,
                                        "ZoneHVAC:AirDistributionUnit",
@@ -2801,63 +2774,38 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PltSizHeatNum; // index of plant sizing object for 1st heating loop
-    Real64 DesMassFlow;
     Real64 TempSteamIn;
     Real64 EnthSteamOutWet;
     Real64 EnthSteamInDry;
     Real64 LatentHeatSteam;
     Real64 SteamDensity;
 
-    bool ErrorsFound;
     bool PlantSizingErrorsFound;
     Real64 rho; // local fluid density
     Real64 Cp;  // local fluid specific heat
-    bool IsAutoSize;
-    bool IsMaxFlowAutoSize;                   // Indicate if the maximum terminal flow is autosize
-    int AirLoopNum;                           // Air loop number
-    int SysSizNum;                            // System sizing number
-    Real64 MinMinFlowRatio(0.0);              // the minimum minimum flow ratio
-    Real64 MaxAirVolFlowRateDes;              // Autosized maximum air flow rate for reporting
-    Real64 MaxAirVolFlowRateUser;             // Hardsized maximum air flow rate for reporting
-    Real64 MaxHeatAirVolFlowRateDes;          // Autosized maximum heating air flow rate for reporting
-    Real64 MaxHeatAirVolFlowRateUser;         // Hardsized maximum heating air flow rate for reporting
-    Real64 MinAirFlowFracDes;                 // Autosized minimum cooling air flow fraction for reporting
-    Real64 MinAirFlowFracUser;                // User input minimum cooling air flow fraction for reporting
-    Real64 FixedMinAirDes;                    // Autosized minimum cooling air flow rate for reporting [m3/s]
-    Real64 FixedMinAirUser;                   // User input minimum cooling air flow rate for reporting [m3/s]
-    Real64 MaxAirVolFlowRateDuringReheatDes;  // Autosized maximum air flow durign reheat for reporting
-    Real64 MaxAirVolFlowRateDuringReheatUser; // Hardsized maximum air flow durign reheat for reporting
-    Real64 MaxAirVolFractionDuringReheatDes;  // Autosized maximum air fraction durign reheat for reporting
-    Real64 MaxAirVolFractionDuringReheatUser; // Hardsized maximum air flow durign reheat for reporting
-    Real64 MaxReheatWaterVolFlowDes;          // Autosized reheat water flow or reporting
-    Real64 MaxReheatWaterVolFlowUser;         // Hardsized reheat water flow for reporting
-    Real64 MaxReheatSteamVolFlowDes;          // Autosized reheat steam flow for reporting
-    Real64 MaxReheatSteamVolFlowUser;         // Hardsized reheat steam flow for reporting
 
-    PltSizHeatNum = 0;
-    DesMassFlow = 0.0;
-    ErrorsFound = false;
-    IsAutoSize = false;
-    IsMaxFlowAutoSize = false;
-    MaxAirVolFlowRateDes = 0.0;
-    MaxAirVolFlowRateUser = 0.0;
-    MaxHeatAirVolFlowRateDes = 0.0;
-    MaxHeatAirVolFlowRateUser = 0.0;
-    MinAirFlowFracDes = 0.0;
-    MinAirFlowFracUser = 0.0;
-    FixedMinAirDes = 0.0;
-    FixedMinAirUser = 0.0;
-    MaxAirVolFlowRateDuringReheatDes = 0.0;
-    MaxAirVolFlowRateDuringReheatUser = 0.0;
-    MaxAirVolFractionDuringReheatDes = 0.0;
-    MaxAirVolFractionDuringReheatUser = 0.0;
-    MaxReheatWaterVolFlowDes = 0.0;
-    MaxReheatWaterVolFlowUser = 0.0;
-    MaxReheatSteamVolFlowDes = 0.0;
-    MaxReheatSteamVolFlowUser = 0.0;
-    MinMinFlowRatio = 0.0;
-    AirLoopNum = 0;
-    SysSizNum = 0;
+    Real64 DesMassFlow = 0.0;
+    bool ErrorsFound = false;
+    bool IsAutoSize = false;
+    bool IsMaxFlowAutoSize = false;
+    Real64 MaxAirVolFlowRateDes = 0.0;              // Autosized maximum air flow rate for reporting
+    Real64 MaxAirVolFlowRateUser = 0.0;             // Hardsized maximum air flow rate for reporting
+    Real64 MaxHeatAirVolFlowRateDes = 0.0;          // Autosized maximum heating air flow rate for reporting
+    Real64 MaxHeatAirVolFlowRateUser = 0.0;         // Hardsized maximum heating air flow rate for reporting
+    Real64 MinAirFlowFracDes = 0.0;                 // Autosized minimum cooling air flow fraction for reporting
+    Real64 MinAirFlowFracUser = 0.0;                // User input minimum cooling air flow fraction for reporting
+    Real64 FixedMinAirDes = 0.0;                    // Autosized minimum cooling air flow rate for reporting [m3/s]
+    Real64 FixedMinAirUser = 0.0;                   // User input minimum cooling air flow rate for reporting [m3/s]
+    Real64 MaxAirVolFlowRateDuringReheatDes = 0.0;  // Autosized maximum air flow durign reheat for reporting
+    Real64 MaxAirVolFlowRateDuringReheatUser = 0.0; // Hardsized maximum air flow durign reheat for reporting
+    Real64 MaxAirVolFractionDuringReheatDes = 0.0;  // Autosized maximum air fraction durign reheat for reporting
+    Real64 MaxAirVolFractionDuringReheatUser = 0.0; // Hardsized maximum air flow durign reheat for reporting
+    Real64 MaxReheatWaterVolFlowDes = 0.0;          // Autosized reheat water flow or reporting
+    Real64 MaxReheatWaterVolFlowUser = 0.0;         // Hardsized reheat water flow for reporting
+    Real64 MaxReheatSteamVolFlowDes = 0.0;          // Autosized reheat steam flow for reporting
+    Real64 MaxReheatSteamVolFlowUser = 0.0;         // Hardsized reheat steam flow for reporting
+    Real64 MinMinFlowRatio = 0.0;                   // the minimum minimum flow ratio
+    int SysSizNum = 0;                              // System sizing number
 
     int ZoneNum = this->CtrlZoneNum;
 
@@ -2976,7 +2924,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     // if a sizing run has been done, check if system sizing has been done for this system
     bool SizingDesRunThisAirSys = false;
     if (state.dataSize->SysSizingRunDone) {
-        AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
+        int AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
         if (AirLoopNum > 0) {
             CheckThisAirSystemForSizing(state, AirLoopNum, SizingDesRunThisAirSys);
         }
@@ -3541,8 +3489,6 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                         ShowContinueError(state, format("Occurs in AirTerminal Object={}", this->SysName));
                         ErrorsFound = true;
                     }
-                }
-                if (IsAutoSize) {
                     this->MaxReheatWaterVolFlow = MaxReheatWaterVolFlowDes;
                     BaseSizer::reportSizerOutput(
                         state, this->sysType, this->SysName, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxReheatWaterVolFlowDes);
@@ -3661,8 +3607,6 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                         ShowContinueError(state, format("Occurs in AirTerminal:SingleDuct:ConstantVolume:Reheat Object={}", this->SysName));
                         ErrorsFound = true;
                     }
-                }
-                if (IsAutoSize) {
                     this->MaxReheatSteamVolFlow = MaxReheatSteamVolFlowDes;
                     BaseSizer::reportSizerOutput(
                         state, this->sysType, this->SysName, "Design Size Maximum Reheat Steam Flow Rate [m3/s]", MaxReheatSteamVolFlowDes);
@@ -3761,16 +3705,12 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     //                      TH 3/2012: added supply air flow adjustment based on zone maximum outdoor
     //                                 air fraction - a TRACE feature
     //                      Brent Griffith, 5/2012, general cleanup, fix negatives CR 8767, fix phantom coil flows CR 8854
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the simple single duct volume VAV.
 
     // METHODOLOGY EMPLOYED:
     // There is method to this madness.
-
-    // REFERENCES:
-    // na
 
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
@@ -3781,17 +3721,6 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MassFlow;     // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets
     Real64 QTotLoad;     // [Watts] Remaining load required for this zone
@@ -3801,7 +3730,6 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     Real64 DeltaTemp;
     int SysOutletNode;        // The node number of the terminal unit outlet node
     int SysInletNode;         // the node number of the terminal unit inlet node
-    int WaterControlNode;     // This is the Actuated Reheat Control Node
     Real64 MaxFlowWater;      // This is the value passed to the Controller depending if FirstHVACIteration or not
     Real64 MinFlowWater;      // This is the value passed to the Controller depending if FirstHVACIteration or not
     Real64 QActualHeating;    // the heating load seen by the reheat coil
@@ -4045,7 +3973,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                 MaxFlowWater = this->MaxReheatWaterFlow;
                 MinFlowWater = this->MinReheatWaterFlow;
             } else {
-                WaterControlNode = this->ReheatControlNode;
+                int WaterControlNode = this->ReheatControlNode;
                 MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
                 MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
             }
@@ -4245,7 +4173,6 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
     //       AUTHOR         R. Raustad (FSEC)
     //       DATE WRITTEN   Jan 2010
     //       MODIFIED       Mangesh Basarkar, 06/2011: Modifying outside air based on airloop DCV flag
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Calculates the amount of outside air required based on optional user input.
@@ -4254,25 +4181,11 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // User input defines method used to calculate OA.
 
-    // REFERENCES:
-
     // Using/Aliasing
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
     // FUNCTION PARAMETER DEFINITIONS:
     bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
@@ -4307,17 +4220,10 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   August 2006
     //       MODIFIED       KHL/TH 10/2010: added maximum supply air temperature leaving reheat coil
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the VAV box with varying airflow in heating and cooling.
     // Modified version of SimVAV.
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
 
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
@@ -4329,32 +4235,20 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     // unused   USE DataHeatBalFanSys,    ONLY: ZoneThermostatSetPointHi, ZoneThermostatSetPointLo
     using PlantUtilities::SetActuatedBranchFlowRate;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 MassFlow;      // Total Mass Flow Rate from Hot & Cold Inlets [kg/sec]
-    Real64 QTotLoad;      // Total load based on thermostat setpoint temperature [Watts]
-    Real64 QZnReq;        // Total load to be met by terminal heater [Watts]
-    Real64 QToHeatSetPt;  // Remaining load to heating setpoint [W]
-    Real64 QSupplyAir;    // Zone load met by VAVHeatandCool system
-    Real64 CpAirZn;       // Specific heat of zone air [J/kg-C]
-    Real64 CpAirSysIn;    // Specific heat of VAVHeatandCool box entering air [J/kg-C]
-    Real64 DeltaTemp;     // Temperature difference multiplied by specific heat [J/kg]
-    Real64 MaxFlowWater;  // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 MinFlowWater;  // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 LeakLoadMult;  // Load multiplier to adjust for downstream leaks
-    int SysOutletNode;    // The node number of the terminal unit outlet node
-    int SysInletNode;     // The node number of the terminal unit inlet node
-    int WaterControlNode; // This is the Actuated Reheat Control Node
+    Real64 MassFlow;     // Total Mass Flow Rate from Hot & Cold Inlets [kg/sec]
+    Real64 QTotLoad;     // Total load based on thermostat setpoint temperature [Watts]
+    Real64 QZnReq;       // Total load to be met by terminal heater [Watts]
+    Real64 QToHeatSetPt; // Remaining load to heating setpoint [W]
+    Real64 QSupplyAir;   // Zone load met by VAVHeatandCool system
+    Real64 CpAirZn;      // Specific heat of zone air [J/kg-C]
+    Real64 CpAirSysIn;   // Specific heat of VAVHeatandCool box entering air [J/kg-C]
+    Real64 DeltaTemp;    // Temperature difference multiplied by specific heat [J/kg]
+    Real64 MaxFlowWater; // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 MinFlowWater; // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 LeakLoadMult; // Load multiplier to adjust for downstream leaks
+    int SysOutletNode;   // The node number of the terminal unit outlet node
+    int SysInletNode;    // The node number of the terminal unit inlet node
     Real64 DummyMdot;
     Real64 QActualHeating;
     Real64 MinFlowFrac; // minimum flow fraction (and minimum damper position)
@@ -4500,7 +4394,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
                 MaxFlowWater = this->MaxReheatWaterFlow;
                 MinFlowWater = this->MinReheatWaterFlow;
             } else {
-                WaterControlNode = this->ReheatControlNode;
+                int WaterControlNode = this->ReheatControlNode;
                 MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
                 MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
             }
@@ -4669,8 +4563,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   July 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates a single duct VAV terminal unit with a variable-speed fan upstream
@@ -4713,7 +4605,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     Real64 QNoHeatFanOff;   // min heating - fan off, hot water at min flow [W]
     HeatingCoilType HCType; // heating coil type
     HVAC::FanType fanType;  // fan type (as a number)
-    Real64 HCLoad;          // load passed to a gas or electric heating coil [W]
     int FanOp;              // 1 if fan is on; 0 if off.
     Real64 MaxCoolMassFlow; // air flow at max cooling [kg/s]
     Real64 MaxHeatMassFlow; // air flow at max heating [kg/s]
@@ -4724,7 +4615,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     int SolFlag;
     Real64 ErrTolerance;
     Real64 MaxSteamCap; // steam coil capacity at full load
-    bool ErrorsFound;   // returned from mining function call
 
     // The calculated load from the Heat Balance
     QTotLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
@@ -4748,7 +4638,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
 
     if (HCType == HeatingCoilType::SimpleHeating) {
         WaterControlNode = this->ReheatControlNode;
-        HCLoad = 0.0;
         if (FirstHVACIteration) {
             MaxFlowWater = this->MaxReheatWaterFlow;
             MinFlowWater = this->MinReheatWaterFlow;
@@ -4759,14 +4648,12 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         }
     } else {
         WaterControlNode = 0;
-        HCLoad = BigLoad;
         MaxFlowWater = 0.0;
         MinFlowWater = 0.0;
     }
 
     if (HCType == HeatingCoilType::SteamAirHeating) {
         SteamControlNode = this->ReheatControlNode;
-        HCLoad = 0.0;
         if (FirstHVACIteration) {
             MaxFlowSteam = this->MaxReheatSteamFlow;
             MinFlowSteam = this->MinReheatSteamFlow;
@@ -4776,7 +4663,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         }
     } else {
         SteamControlNode = 0;
-        HCLoad = BigLoad;
         MaxFlowSteam = 0.0;
         MinFlowSteam = 0.0;
     }
@@ -4785,6 +4671,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     // region 1: active cooling with fan on
     FanOp = 1;
     if (HCType == HeatingCoilType::SteamAirHeating) {
+        bool ErrorsFound; // returned from mining function call
         this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, fanType, MaxCoolMassFlow, FanOp, QCoolFanOnMax);
         this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, fanType, MinMassFlow, FanOp, QCoolFanOnMin);
         // region 2: active heating with fan on
@@ -5080,16 +4967,9 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   February 2000
     //       MODIFIED       FB/KHL/TH 2/2011: added maximum supply air temperature leaving reheat coil
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the simple single duct constant volume systems.
-
-    // METHODOLOGY EMPLOYED:
-    // There is method to this madness.
-
-    // REFERENCES:
-    // na
 
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
@@ -5099,33 +4979,17 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 MassFlow;     // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets
-    Real64 QZnReq;       // [Watts]
-    Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
-    Real64 CpAir;
-    int WaterControlNode;  // This is the Actuated Reheat Control Node
-    Real64 MaxFlowWater;   // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 MinFlowWater;   // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 QActualHeating; // the heating load seen by the reheat coil
-    Real64 DummyMdot;      // local fluid mass flow rate
+    Real64 MaxFlowWater; // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 MinFlowWater; // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 DummyMdot;    // local fluid mass flow rate
 
-    QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // The calculated load from the Heat Balance
-    MassFlow = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;                                       // System massflow is set to the Available
+    Real64 QToHeatSetPt =
+        state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // The calculated load from the Heat Balance
+    Real64 MassFlow = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;                     // System massflow is set to the Available
     state.dataSingleDuct->QMax2SCV = QToHeatSetPt;
     state.dataSingleDuct->ZoneTempSCV = state.dataLoopNodes->Node(ZoneNodeNum).Temp;
-    CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat); // zone air specific heat
+    Real64 CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat); // zone air specific heat
     if (this->MaxReheatTempSetByUser) {
         state.dataSingleDuct->TAirMaxSCV = this->MaxReheatTemp;
         state.dataSingleDuct->QMaxSCV = CpAir * MassFlow * (state.dataSingleDuct->TAirMaxSCV - state.dataSingleDuct->ZoneTempSCV);
@@ -5151,11 +5015,13 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     this->sd_airterminalOutlet.AirMassFlowRateMinAvail = this->sd_airterminalInlet.AirMassFlowRateMinAvail;
     this->UpdateSys(state);
 
-    QActualHeating = QToHeatSetPt - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCV); // reheat needed
+    Real64 QActualHeating =
+        QToHeatSetPt - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCV); // reheat needed
     // Now the massflow for reheating has been determined. If it is zero, or in SetBack, or the
     // system scheduled OFF then not operational and shut the system down.
     if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) &&
         (state.dataHeatBalFanSys->TempControlType(ZoneNum) != HVAC::ThermostatType::SingleCooling)) {
+        Real64 QZnReq; // [Watts]
 
         switch (this->ReheatComp_Num) {
         case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
@@ -5175,7 +5041,7 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
                 MaxFlowWater = this->MaxReheatWaterFlow;
                 MinFlowWater = this->MinReheatWaterFlow;
             } else {
-                WaterControlNode = this->ReheatControlNode;
+                int WaterControlNode = this->ReheatControlNode;
                 MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
                 MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
             }
@@ -5289,8 +5155,6 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   July 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Simulate the components making up the VAV terminal unit with variable speed fan.
@@ -5298,26 +5162,11 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Simulates the unit components sequentially in the air flow direction.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using HeatingCoils::SimulateHeatingCoilComponents;
     using PlantUtilities::SetComponentFlowRate;
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int FanInNode;       // unit air inlet node (fan inlet)
@@ -5390,18 +5239,12 @@ void SingleDuctAirTerminal::UpdateSys(EnergyPlusData &state) const
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   january 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the Syss.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int OutletNode;
-    int InletNode;
-
-    OutletNode = this->OutletNodeNum;
-    InletNode = this->InletNodeNum;
+    int OutletNode = this->OutletNodeNum;
+    int InletNode = this->InletNodeNum;
 
     if (this->SysType_Num == SysType::SingleDuctVAVReheat || this->SysType_Num == SysType::SingleDuctCBVAVReheat ||
         this->SysType_Num == SysType::SingleDuctCBVAVNoReheat || this->SysType_Num == SysType::SingleDuctVAVNoReheat ||
@@ -5441,40 +5284,6 @@ void SingleDuctAirTerminal::UpdateSys(EnergyPlusData &state) const
 void SingleDuctAirTerminal::ReportSys(EnergyPlusData &state) // unused1208
 {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Unknown
-    //       DATE WRITTEN   Unknown
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine updates the Sys report variables.
-
-    // METHODOLOGY EMPLOYED:
-    // There is method to this madness.
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    // Still needs to report the Sys power from this component
-
     // set zone OA volume flow rate
     this->CalcOutdoorAirVolumeFlowRate(state);
 }
@@ -5492,8 +5301,6 @@ void GetHVACSingleDuctSysIndex(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Lixing Gu
     //       DATE WRITTEN   February 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine sets an index for a given single duct system -- issues error message if that system
@@ -5534,15 +5341,10 @@ void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool const Fi
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR
     //       DATE WRITTEN   March 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
     // Simulate an Air Terminal Mixer component
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     if (state.dataSingleDuct->GetATMixerFlag) {
         state.dataSingleDuct->GetATMixerFlag = false;
@@ -5569,10 +5371,7 @@ void GetATMixers(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR
     //       DATE WRITTEN   March 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
     // Get input for inlet side air terminal mixers and store it in the inlet side air terminal mixer array
@@ -6026,33 +5825,13 @@ void CalcATMixer(EnergyPlusData &state, int const SysNum)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR
     //       DATE WRITTEN   March 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
     // Calculate the mixed air flow and conditions in the air terminal mixer
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
     // Using/Aliasing
     using Psychrometrics::PsyTdbFnHW;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     state.dataSingleDuct->PriEnthalpyCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).Enthalpy;
     state.dataSingleDuct->PriHumRatCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).HumRat;
@@ -6108,17 +5887,10 @@ void UpdateATMixer(EnergyPlusData &state, int const SysNum)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR
     //       DATE WRITTEN   March 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
     // Move the results of CalcATMixer to the affected nodes
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
 
     // Using/Aliasing
     using namespace DataLoopNode;
@@ -6179,8 +5951,6 @@ void GetATMixer(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   April 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets: 1) the index of the named AT Mixer in the SysATMixer data array
@@ -6228,48 +5998,12 @@ void GetATMixer(EnergyPlusData &state,
     }
 }
 
-void SetATMixerPriFlow(EnergyPlusData &state,
-                       int const ATMixerNum,                                // Air terminal mixer index
-                       ObjexxFCL::Optional<Real64 const> PriAirMassFlowRate // Air terminal mixer primary air mass flow rate [kg/s]
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   April 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This Subroutine sets the primary air mass flow rate on the primary air inlet
-    // node of a terminal unit mixer component.
-
-    // METHODOLOGY EMPLOYED:
-    // The flow is set to either the input PriAirMassFlowRate if this optional input
-    // parameter is present, or to the maximum available mass flow rate of the primary
-    // air inlet node.
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int PriAirNode; // air terminal mixer primary air inlet node number
-
-    if (ATMixerNum <= 0) return;
-    PriAirNode = state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode;
-    if (present(PriAirMassFlowRate)) {
-        state.dataLoopNodes->Node(PriAirNode).MassFlowRate = PriAirMassFlowRate;
-    } else {
-        state.dataLoopNodes->Node(PriAirNode).MassFlowRate = state.dataLoopNodes->Node(PriAirNode).MassFlowRateMaxAvail;
-    }
-}
-
 void setATMixerSizingProperties(EnergyPlusData &state,
                                 int const inletATMixerIndex, // index to ATMixer at inlet of zone equipment
                                 int const controlledZoneNum, // controlled zone number
                                 int const curZoneEqNum       // current zone equipment being simulated
 )
 {
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
-    auto &FinalSysSizing(state.dataSize->FinalSysSizing);
-    auto &FinalZoneSizing(state.dataSize->FinalZoneSizing);
 
     if (inletATMixerIndex == 0) return; // protect this function from bad inputs
     if (controlledZoneNum == 0) return;
@@ -6279,28 +6013,29 @@ void setATMixerSizingProperties(EnergyPlusData &state,
     // ATMixer properties only affect coil sizing when the mixer is on the inlet side of zone equipment
     if (state.dataSingleDuct->SysATMixer(inletATMixerIndex).type == HVAC::MixerType::SupplySide) {
         // check if user has selected No to account for DOAS system
-        if (FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
-            if (!FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOASControl::NeutralSup) {
+        if (state.dataSize->FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
+            auto const &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
+            if (!finalZoneSizing.AccountForDOAS && finalZoneSizing.DOASControlStrategy != DOASControl::NeutralSup) {
                 ShowWarningError(state, format("AirTerminal:SingleDuct:Mixer: {}", state.dataSingleDuct->SysATMixer(inletATMixerIndex).Name));
                 ShowContinueError(
                     state,
                     " Supply side Air Terminal Mixer does not adjust zone equipment coil sizing and may result in inappropriately sized coils.");
-                ShowContinueError(state,
-                                  format(" Set Account for Dedicated Outdoor Air System = Yes in Sizing:Zone object for zone = {}",
-                                         FinalZoneSizing(curZoneEqNum).ZoneName));
+                ShowContinueError(
+                    state,
+                    format(" Set Account for Dedicated Outdoor Air System = Yes in Sizing:Zone object for zone = {}", finalZoneSizing.ZoneName));
             }
             state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning = false;
         }
         return; // do nothing else if this is a supply side ATMixer
     }
     // check if user has selected Yes to account for DOAS system
-    if (FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
-        if (FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOASControl::NeutralSup) {
+    if (state.dataSize->FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
+        auto const &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
+        if (finalZoneSizing.AccountForDOAS && finalZoneSizing.DOASControlStrategy != DOASControl::NeutralSup) {
             ShowWarningError(state, format("AirTerminal:SingleDuct:Mixer: {}", state.dataSingleDuct->SysATMixer(inletATMixerIndex).Name));
             ShowContinueError(state, " Inlet side Air Terminal Mixer automatically adjusts zone equipment coil sizing.");
-            ShowContinueError(state,
-                              format(" Set Account for Dedicated Outdoor Air System = No in Sizing:Zone object for zone = {}",
-                                     FinalZoneSizing(curZoneEqNum).ZoneName));
+            ShowContinueError(
+                state, format(" Set Account for Dedicated Outdoor Air System = No in Sizing:Zone object for zone = {}", finalZoneSizing.ZoneName));
             state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning = false;
         }
     }
@@ -6316,131 +6051,126 @@ void setATMixerSizingProperties(EnergyPlusData &state,
     CheckThisAirSystemForSizing(state, airLoopIndex, SizingDesRunThisAirSys); // check for Sizing:System object
 
     if (SizingDesRunThisAirSys) {
+        auto &finalSysSizing = state.dataSize->FinalSysSizing(airLoopIndex);
+        auto &zoneEqSizing = state.dataSize->ZoneEqSizing(curZoneEqNum);
 
         // set ATMixer outlet air flow rate in ZoneEqSizing array for ATMixer. If this value > 0, then the Sizer will know an ATMixer exists
-        ZoneEqSizing(curZoneEqNum).ATMixerVolFlow = state.dataSingleDuct->SysATMixer(inletATMixerIndex).DesignPrimaryAirVolRate;
+        zoneEqSizing.ATMixerVolFlow = state.dataSingleDuct->SysATMixer(inletATMixerIndex).DesignPrimaryAirVolRate;
 
         // If air loop has heating coil use SA conditions, else if OA sys has coils then use precool conditions, else use OA conditions
         if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).CentralHeatCoilExists) {
             // if central heating coil exists, ATMixer outlet is assumed to be at supply air conditions described in sizing input
-            ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = FinalSysSizing(airLoopIndex).HeatSupTemp;
-            ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = FinalSysSizing(airLoopIndex).HeatSupHumRat;
+            zoneEqSizing.ATMixerHeatPriDryBulb = finalSysSizing.HeatSupTemp;
+            zoneEqSizing.ATMixerHeatPriHumRat = finalSysSizing.HeatSupHumRat;
         } else if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).NumOAHeatCoils > 0) {
             // if no central heating coil exists and an outdoor air coil does exist, then ATMixer outlet is mixture of preheat and return
-            if (FinalSysSizing(airLoopIndex).DesMainVolFlow == 0.0) { // protect divide by 0
+            if (finalSysSizing.DesMainVolFlow == 0.0) { // protect divide by 0
                 // doesn't matter, just pick a condition
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = FinalSysSizing(airLoopIndex).PreheatTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = FinalSysSizing(airLoopIndex).PreheatHumRat;
+                zoneEqSizing.ATMixerHeatPriDryBulb = finalSysSizing.PreheatTemp;
+                zoneEqSizing.ATMixerHeatPriHumRat = finalSysSizing.PreheatHumRat;
             } else {
                 // mix preheat condition with return air condition based on OA frac. OA frac should nearly always be 1.
                 // OA frac is based on air loop fraction, not ATMixer flow fraction since air loop can serve multiple ATMixers
-                Real64 OutAirFrac = FinalSysSizing(airLoopIndex).DesOutAirVolFlow / FinalSysSizing(airLoopIndex).DesMainVolFlow;
+                Real64 OutAirFrac = finalSysSizing.DesOutAirVolFlow / finalSysSizing.DesMainVolFlow;
                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
 
                 // calculate humrat based on simple mixing
-                Real64 CoilInHumRatForSizing =
-                    OutAirFrac * FinalSysSizing(airLoopIndex).PreheatHumRat + (1 - OutAirFrac) * FinalSysSizing(airLoopIndex).HeatRetHumRat;
+                Real64 CoilInHumRatForSizing = OutAirFrac * finalSysSizing.PreheatHumRat + (1 - OutAirFrac) * finalSysSizing.HeatRetHumRat;
 
                 // calculate enthalpy based on simple mixing
                 Real64 CoilInEnthalpyForSizing =
-                    OutAirFrac * Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).PreheatTemp, FinalSysSizing(airLoopIndex).PreheatHumRat) +
-                    (1 - OutAirFrac) *
-                        Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).HeatRetTemp, FinalSysSizing(airLoopIndex).HeatRetHumRat);
+                    OutAirFrac * Psychrometrics::PsyHFnTdbW(finalSysSizing.PreheatTemp, finalSysSizing.PreheatHumRat) +
+                    (1 - OutAirFrac) * Psychrometrics::PsyHFnTdbW(finalSysSizing.HeatRetTemp, finalSysSizing.HeatRetHumRat);
 
                 // back calculate temperature based on humrat and enthalpy state points
                 Real64 CoilInTempForSizing = Psychrometrics::PsyTdbFnHW(CoilInEnthalpyForSizing, CoilInHumRatForSizing);
 
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = CoilInTempForSizing;
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = CoilInHumRatForSizing;
+                zoneEqSizing.ATMixerHeatPriDryBulb = CoilInTempForSizing;
+                zoneEqSizing.ATMixerHeatPriHumRat = CoilInHumRatForSizing;
             }
         } else {
             // else no coils exist in air loop so mix OA condition with return air condition
-            if (FinalSysSizing(airLoopIndex).DesMainVolFlow == 0.0) { // protect divide by 0
+            if (finalSysSizing.DesMainVolFlow == 0.0) { // protect divide by 0
                 // doesn't matter, just pick a condition
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = FinalSysSizing(airLoopIndex).HeatOutTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = FinalSysSizing(airLoopIndex).HeatOutHumRat;
+                zoneEqSizing.ATMixerHeatPriDryBulb = finalSysSizing.HeatOutTemp;
+                zoneEqSizing.ATMixerHeatPriHumRat = finalSysSizing.HeatOutHumRat;
             } else {
                 // OA frac is based on air loop fraction, not ATMixer flow fraction since air loop can serve multiple ATMixers
-                Real64 OutAirFrac = FinalSysSizing(airLoopIndex).DesOutAirVolFlow / FinalSysSizing(airLoopIndex).DesMainVolFlow;
+                Real64 OutAirFrac = finalSysSizing.DesOutAirVolFlow / finalSysSizing.DesMainVolFlow;
                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
 
                 // calculate humrat based on simple mixing
-                Real64 CoilInHumRatForSizing =
-                    OutAirFrac * FinalSysSizing(airLoopIndex).HeatOutHumRat + (1 - OutAirFrac) * FinalSysSizing(airLoopIndex).HeatRetHumRat;
+                Real64 CoilInHumRatForSizing = OutAirFrac * finalSysSizing.HeatOutHumRat + (1 - OutAirFrac) * finalSysSizing.HeatRetHumRat;
 
                 // calculate enthalpy based on simple mixing
                 Real64 CoilInEnthalpyForSizing =
-                    OutAirFrac * Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).HeatOutTemp, FinalSysSizing(airLoopIndex).HeatOutHumRat) +
-                    (1 - OutAirFrac) *
-                        Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).HeatRetTemp, FinalSysSizing(airLoopIndex).HeatRetHumRat);
+                    OutAirFrac * Psychrometrics::PsyHFnTdbW(finalSysSizing.HeatOutTemp, finalSysSizing.HeatOutHumRat) +
+                    (1 - OutAirFrac) * Psychrometrics::PsyHFnTdbW(finalSysSizing.HeatRetTemp, finalSysSizing.HeatRetHumRat);
 
                 // back calculate temperature based on humrat and enthalpy state points
                 Real64 CoilInTempForSizing = Psychrometrics::PsyTdbFnHW(CoilInEnthalpyForSizing, CoilInHumRatForSizing);
 
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = CoilInTempForSizing;
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = CoilInHumRatForSizing;
+                zoneEqSizing.ATMixerHeatPriDryBulb = CoilInTempForSizing;
+                zoneEqSizing.ATMixerHeatPriHumRat = CoilInHumRatForSizing;
             }
         }
 
         // If air loop has cooling coil use SA conditions, else if OA sys has coils then use precool conditions, else use OA conditions
         if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).CentralCoolCoilExists) {
             // if central cooling coil exists, ATMixer outlet is assumed to be at supply air conditions described in sizing input
-            ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = FinalSysSizing(airLoopIndex).CoolSupTemp;
-            ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = FinalSysSizing(airLoopIndex).CoolSupHumRat;
+            zoneEqSizing.ATMixerCoolPriDryBulb = finalSysSizing.CoolSupTemp;
+            zoneEqSizing.ATMixerCoolPriHumRat = finalSysSizing.CoolSupHumRat;
         } else if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).NumOACoolCoils > 0) {
             // if no central cooling coil exists and an outdoor air coil does exist, then ATMixer outlet is mixture of precool and return
-            if (FinalSysSizing(airLoopIndex).DesMainVolFlow == 0.0) { // protect divide by 0
+            if (finalSysSizing.DesMainVolFlow == 0.0) { // protect divide by 0
                 // doesn't matter, just pick a condition
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = FinalSysSizing(airLoopIndex).PrecoolTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = FinalSysSizing(airLoopIndex).PrecoolHumRat;
+                zoneEqSizing.ATMixerCoolPriDryBulb = finalSysSizing.PrecoolTemp;
+                zoneEqSizing.ATMixerCoolPriHumRat = finalSysSizing.PrecoolHumRat;
             } else {
                 // mix precool condition with return air condition based on OA frac. OA frac should nearly always be 1.
                 // OA frac is based on air loop fraction, not ATMixer flow fraction since air loop can serve multiple ATMixers
-                Real64 OutAirFrac = FinalSysSizing(airLoopIndex).DesOutAirVolFlow / FinalSysSizing(airLoopIndex).DesMainVolFlow;
+                Real64 OutAirFrac = finalSysSizing.DesOutAirVolFlow / finalSysSizing.DesMainVolFlow;
+                OutAirFrac = min(1.0, max(0.0, OutAirFrac));
+
+                // calculate humrat based on simple mixing
+                Real64 CoilInHumRatForSizing = OutAirFrac * finalSysSizing.PrecoolHumRat + (1 - OutAirFrac) * finalSysSizing.RetHumRatAtCoolPeak;
+
+                // calculate enthalpy based on simple mixing
+                Real64 CoilInEnthalpyForSizing =
+                    OutAirFrac * Psychrometrics::PsyHFnTdbW(finalSysSizing.PrecoolTemp, finalSysSizing.PrecoolHumRat) +
+                    (1 - OutAirFrac) * Psychrometrics::PsyHFnTdbW(finalSysSizing.RetTempAtCoolPeak, finalSysSizing.RetHumRatAtCoolPeak);
+
+                // back calculate temperature based on humrat and enthalpy state points
+                Real64 CoilInTempForSizing = Psychrometrics::PsyTdbFnHW(CoilInEnthalpyForSizing, CoilInHumRatForSizing);
+
+                zoneEqSizing.ATMixerCoolPriDryBulb = CoilInTempForSizing;
+                zoneEqSizing.ATMixerCoolPriHumRat = CoilInHumRatForSizing;
+            }
+        } else {
+            // else no coils exist in air loop so mix OA condition with return air condition
+            if (finalSysSizing.DesMainVolFlow == 0.0) { // protect divide by 0
+                // doesn't matter, just pick a condition
+                zoneEqSizing.ATMixerCoolPriDryBulb = finalSysSizing.OutTempAtCoolPeak;
+                zoneEqSizing.ATMixerCoolPriHumRat = finalSysSizing.OutHumRatAtCoolPeak;
+            } else {
+                // OA frac is based on air loop fraction, not ATMixer flow fraction since air loop can serve multiple ATMixers
+                Real64 OutAirFrac = finalSysSizing.DesOutAirVolFlow / finalSysSizing.DesMainVolFlow;
                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
 
                 // calculate humrat based on simple mixing
                 Real64 CoilInHumRatForSizing =
-                    OutAirFrac * FinalSysSizing(airLoopIndex).PrecoolHumRat + (1 - OutAirFrac) * FinalSysSizing(airLoopIndex).RetHumRatAtCoolPeak;
+                    OutAirFrac * finalSysSizing.OutHumRatAtCoolPeak + (1 - OutAirFrac) * finalSysSizing.RetHumRatAtCoolPeak;
 
                 // calculate enthalpy based on simple mixing
                 Real64 CoilInEnthalpyForSizing =
-                    OutAirFrac * Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).PrecoolTemp, FinalSysSizing(airLoopIndex).PrecoolHumRat) +
-                    (1 - OutAirFrac) *
-                        Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).RetTempAtCoolPeak, FinalSysSizing(airLoopIndex).RetHumRatAtCoolPeak);
+                    OutAirFrac * Psychrometrics::PsyHFnTdbW(finalSysSizing.OutTempAtCoolPeak, finalSysSizing.OutHumRatAtCoolPeak) +
+                    (1 - OutAirFrac) * Psychrometrics::PsyHFnTdbW(finalSysSizing.RetTempAtCoolPeak, finalSysSizing.RetHumRatAtCoolPeak);
 
                 // back calculate temperature based on humrat and enthalpy state points
                 Real64 CoilInTempForSizing = Psychrometrics::PsyTdbFnHW(CoilInEnthalpyForSizing, CoilInHumRatForSizing);
 
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = CoilInTempForSizing;
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = CoilInHumRatForSizing;
-            }
-        } else {
-            // else no coils exist in air loop so mix OA condition with return air condition
-            if (FinalSysSizing(airLoopIndex).DesMainVolFlow == 0.0) { // protect divide by 0
-                // doesn't matter, just pick a condition
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = FinalSysSizing(airLoopIndex).OutTempAtCoolPeak;
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = FinalSysSizing(airLoopIndex).OutHumRatAtCoolPeak;
-            } else {
-                // OA frac is based on air loop fraction, not ATMixer flow fraction since air loop can serve multiple ATMixers
-                Real64 OutAirFrac = FinalSysSizing(airLoopIndex).DesOutAirVolFlow / FinalSysSizing(airLoopIndex).DesMainVolFlow;
-                OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-
-                // calculate humrat based on simple mixing
-                Real64 CoilInHumRatForSizing = OutAirFrac * FinalSysSizing(airLoopIndex).OutHumRatAtCoolPeak +
-                                               (1 - OutAirFrac) * FinalSysSizing(airLoopIndex).RetHumRatAtCoolPeak;
-
-                // calculate enthalpy based on simple mixing
-                Real64 CoilInEnthalpyForSizing = OutAirFrac * Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).OutTempAtCoolPeak,
-                                                                                         FinalSysSizing(airLoopIndex).OutHumRatAtCoolPeak) +
-                                                 (1 - OutAirFrac) * Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).RetTempAtCoolPeak,
-                                                                                               FinalSysSizing(airLoopIndex).RetHumRatAtCoolPeak);
-
-                // back calculate temperature based on humrat and enthalpy state points
-                Real64 CoilInTempForSizing = Psychrometrics::PsyTdbFnHW(CoilInEnthalpyForSizing, CoilInHumRatForSizing);
-
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = CoilInTempForSizing;
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = CoilInHumRatForSizing;
+                zoneEqSizing.ATMixerCoolPriDryBulb = CoilInTempForSizing;
+                zoneEqSizing.ATMixerCoolPriHumRat = CoilInHumRatForSizing;
             }
         }
 
