@@ -253,7 +253,7 @@ namespace ScheduleManager {
 
     void ExternalInterfaceSetSchedule(EnergyPlusData &state,
                                       int &ScheduleIndex,
-                                      Real64 &Value // The new value for the schedule
+                                      Real64 const Value // The new value for the schedule
     );
 
     void ProcessIntervalFields(EnergyPlusData &state,

@@ -128,8 +128,7 @@ namespace EnergyPlus::SimAirServingZones {
 // air systems.
 
 // METHODOLOGY EMPLOYED:
-// Successive iteration forward from the return air inlet
-// to the supply air outlets.
+// Successive iteration forward from the return air inlet to the supply air outlets.
 
 using namespace DataLoopNode;
 using namespace DataAirLoop;
@@ -172,7 +171,7 @@ void ManageAirLoops(EnergyPlusData &state,
     // Call the AirLoop Simulation
     if (state.dataGlobal->SysSizingCalc) {
         SizeAirLoops(state);
-    } else if (!state.dataGlobal->SysSizingCalc) {
+    } else {
         SimAirLoops(state, FirstHVACIteration, SimZoneEquipment);
     }
 
@@ -285,16 +284,15 @@ void GetAirPathData(EnergyPlusData &state)
     int NumParams;
     int MaxNumbers;
     int MaxAlphas;
-    Array1D_string Alphas;           // alpha strings returned by GetObjectItem
-    Array1D_string cAlphaFields;     // Alpha field names
-    Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-    std::string CurrentModuleObject; // Object type for getting and error messages
-    int NumNodes;                    // number of nodes returned by GetNodeNums
-    Array1D_int NodeNums;            // node numbers returned by GetNodeNums
-    int NodeNum;                     // a node number
-    int AirSysNum;                   // an air system (air loop) number
-    int OANum;                       // outside air system index
-    int NumInList;
+    Array1D_string Alphas;            // alpha strings returned by GetObjectItem
+    Array1D_string cAlphaFields;      // Alpha field names
+    Array1D_bool lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
+    std::string CurrentModuleObject;  // Object type for getting and error messages
+    int NumNodes;                     // number of nodes returned by GetNodeNums
+    Array1D_int NodeNums;             // node numbers returned by GetNodeNums
+    int NodeNum;                      // a node number
+    int AirSysNum;                    // an air system (air loop) number
+    int OANum;                        // outside air system index
     int OAMixNum;                     // outside air mixer index
     int IOStat;                       // status number returned by GetObjectItem
     int NumControllers;               // number of controllers
@@ -1348,7 +1346,7 @@ void GetAirPathData(EnergyPlusData &state)
 
     OANum = GetNumOASystems(state);
     for (int OASysNum = 1; OASysNum <= OANum; ++OASysNum) {
-        NumInList = GetOACompListNumber(state, OASysNum);
+        int NumInList = GetOACompListNumber(state, OASysNum);
         for (int OACompNum = 1; OACompNum <= NumInList; ++OACompNum) {
             CompType_Num = GetOACompTypeNum(state, OASysNum, OACompNum);
             if (CompType_Num == CompType::WaterCoil_DetailedCool || CompType_Num == CompType::WaterCoil_SimpleHeat ||
@@ -2779,7 +2777,6 @@ void SolveAirLoopControllers(
     // SUBROUTINE INFORMATION
     //             AUTHOR:  Dimitri Curtil (LBNL)
     //       DATE WRITTEN:  Feb 2006
-    //           MODIFIED:
     //      RE-ENGINEERED:  This is reengineered code that used to be in SimAirLoops()
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -2792,8 +2789,6 @@ void SolveAirLoopControllers(
     //     is passed in the same direction.
     // (2) The controllers and their actions are simulated.
     // (3) Steps 2 and 3 are repeated until the control criteria are satisfied.
-
-    // REFERENCES: None
 
     // Using/Aliasing
     using namespace DataHVACControllers;
@@ -2813,10 +2808,6 @@ void SolveAirLoopControllers(
     // SUBROUTINE PARAMETER DEFINITIONS:
     // Maximum iterations of an air system/controllers simulation sequence
     int constexpr MaxIter(50);
-
-    // INTERFACE BLOCK DEFINITIONS: None
-
-    // DERIVED TYPE DEFINITIONS: None
 
     // SUBROUTINE LOCAL VARIABLE DEFINITIONS
     // TRUE if controller supports speculative warm restart
@@ -3225,7 +3216,6 @@ void ReSolveAirLoopControllers(
     // SUBROUTINE INFORMATION
     //             AUTHOR:  Dimitri Curtil (LBNL)
     //       DATE WRITTEN:  Feb 2006
-    //           MODIFIED:
     //      RE-ENGINEERED:  This is new code
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -3337,8 +3327,6 @@ void SimAirLoopComponents(EnergyPlusData &state,
     // SUBROUTINE INFORMATION
     //             AUTHOR:  Dimitri Curtil (LBNL)
     //       DATE WRITTEN:  Feb 2006
-    //           MODIFIED:
-    //      RE-ENGINEERED:
 
     // PURPOSE OF THIS SUBROUTINE:
     // This simulates all components on a particular air loop in the primary air system.
@@ -3354,16 +3342,9 @@ void SimAirLoopComponents(EnergyPlusData &state,
     // Sets duct type of current branch to CurDuctType defined in MODULE DataSizing
     // Upon exiting, resets both counters to 0.
 
-    // SUBROUTINE LOCAL VARIABLE DEFINITIONS: None
-    int BranchNum; // Branch DO loop index
-    int CompNum;   // Component DO loop index
-    // std::string CompType; // Component type
-    // std::string CompName; // Component name
-    CompType CompType_Num; // Numeric equivalent for CompType
-
     auto &PrimaryAirSystems = state.dataAirSystemsData->PrimaryAirSystems;
 
-    for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) { // loop over all branches in air system
+    for (int BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) { // loop over all branches in air system
 
         UpdateBranchConnections(state, AirLoopNum, BranchNum, BeforeBranchSim);
 
@@ -3371,10 +3352,10 @@ void SimAirLoopComponents(EnergyPlusData &state,
         state.dataSize->CurDuctType = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).DuctType;
 
         // Loop over components in branch
-        for (CompNum = 1; CompNum <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+        for (int CompNum = 1; CompNum <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
             // CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
             // CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name;
-            CompType_Num = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
+            CompType CompType_Num = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
 
             // Simulate each component on PrimaryAirSystem(AirLoopNum)%Branch(BranchNum)%Name
             SimAirLoopComponent(state,
