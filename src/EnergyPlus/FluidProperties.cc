@@ -3886,9 +3886,7 @@ namespace FluidProperties {
         } else { // All data is at zero: we are completely inside the saturation dome. Best thing we can do is return saturation value
             ++df->SatErrCountGetSupHeatDensityRefrig;
             // send warning
-            this->errors[(int)RefrigError::SatSupDensity].count += df->SatErrCountGetSupHeatDensityRefrig;
-            // send warning
-            if (this->errors[(int)RefrigError::SatSupDensity].count <= df->RefrigErrorLimitTest) {
+            if (df->SatErrCountGetSupHeatDensityRefrig <= df->RefrigErrorLimitTest) {
                 ShowWarningMessage(
                     state,
                     format("{}: Refrigerant [{}] is saturated at the given conditions, saturated density at given temperature returned. **",
