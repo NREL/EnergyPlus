@@ -731,7 +731,7 @@ namespace CostEstimateManager {
                     if (WildcardObjNames) {
                         Real64 Qty(0.0);
                         for (auto const &e : state.dataCoilCooingDX->coilCoolingDXs)
-                            Qty += e.performance->RatedGrossTotalCap();
+                            Qty += e.performance->ratedGrossTotalCap();
                         state.dataCostEstimateManager->CostLineItem(Item).Qty = Qty / 1000.0;
                         state.dataCostEstimateManager->CostLineItem(Item).Units = "kW (tot cool cap.)";
                         state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap;
@@ -740,7 +740,7 @@ namespace CostEstimateManager {
                     }
                     if (coilFound) {
                         state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                            state.dataCoilCooingDX->coilCoolingDXs[thisCoil].performance->RatedGrossTotalCap() / 1000.0;
+                            state.dataCoilCooingDX->coilCoolingDXs[thisCoil].performance->ratedGrossTotalCap() / 1000.0;
                         state.dataCostEstimateManager->CostLineItem(Item).Units = "kW (tot cool cap.)";
                         state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap;
                         state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal =
@@ -762,8 +762,8 @@ namespace CostEstimateManager {
                     if (WildcardObjNames) {
                         Real64 Qty(0.0);
                         for (auto const &e : state.dataCoilCooingDX->coilCoolingDXs) {
-                            Real64 COP = e.performance->GrossRatedCoolingCOPAtMaxSpeed(state);
-                            Qty += COP * e.performance->RatedGrossTotalCap();
+                            Real64 COP = e.performance->grossRatedCoolingCOPAtMaxSpeed(state);
+                            Qty += COP * e.performance->ratedGrossTotalCap();
                         }
                         state.dataCostEstimateManager->CostLineItem(Item).Qty = Qty / 1000.0;
                         state.dataCostEstimateManager->CostLineItem(Item).Units = "kW*COP (total, rated) ";
@@ -772,9 +772,9 @@ namespace CostEstimateManager {
                             state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
                     }
                     if (coilFound) {
-                        Real64 COP = state.dataCoilCooingDX->coilCoolingDXs[thisCoil].performance->GrossRatedCoolingCOPAtMaxSpeed(state);
+                        Real64 COP = state.dataCoilCooingDX->coilCoolingDXs[thisCoil].performance->grossRatedCoolingCOPAtMaxSpeed(state);
                         state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                            COP * state.dataCoilCooingDX->coilCoolingDXs[thisCoil].performance->RatedGrossTotalCap() / 1000.0;
+                            COP * state.dataCoilCooingDX->coilCoolingDXs[thisCoil].performance->ratedGrossTotalCap() / 1000.0;
                         state.dataCostEstimateManager->CostLineItem(Item).Units = "kW*COP (total, rated) ";
                         state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP;
                         state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal =

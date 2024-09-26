@@ -122,7 +122,7 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
 
     void setOperMode(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 
-    Real64 RatedCBF(EnergyPlusData &) override
+    Real64 ratedCBF(EnergyPlusData &) override
     {
         return normalMode.speeds[normalMode.nominalSpeedIndex].RatedCBF;
     }
@@ -132,17 +132,17 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
         return normalMode.speeds[normalMode.nominalSpeedIndex].grossRatedSHR;
     }
 
-    Real64 GrossRatedCoolingCOPAtMaxSpeed(EnergyPlusData &) override
+    Real64 grossRatedCoolingCOPAtMaxSpeed(EnergyPlusData &) override
     {
         return normalMode.speeds.back().original_input_specs.gross_rated_cooling_COP;
     }
 
-    const std::string_view NameAtSpeed(int speed) override
+    const std::string_view nameAtSpeed(int speed) override
     {
         return normalMode.speeds[speed].name;
     }
 
-    Real64 RatedAirMassFlowRateMaxSpeed(EnergyPlusData &, HVAC::CoilMode const mode) override
+    Real64 ratedAirMassFlowRateMaxSpeed(EnergyPlusData &, HVAC::CoilMode const mode) override
     {
         if (mode != HVAC::CoilMode::Normal) {
             return alternateMode.speeds.back().RatedAirMassFlowRate;
@@ -151,7 +151,7 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
         }
     }
 
-    Real64 RatedAirMassFlowRateMinSpeed(EnergyPlusData &, HVAC::CoilMode const mode) override
+    Real64 ratedAirMassFlowRateMinSpeed(EnergyPlusData &, HVAC::CoilMode const mode) override
     {
         if (mode != HVAC::CoilMode::Normal) {
             return alternateMode.speeds.front().RatedAirMassFlowRate;
@@ -160,7 +160,7 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
         }
     }
 
-    Real64 RatedCondAirMassFlowRateNomSpeed(EnergyPlusData &, HVAC::CoilMode const mode) override
+    Real64 ratedCondAirMassFlowRateNomSpeed(EnergyPlusData &, HVAC::CoilMode const mode) override
     {
         if (mode != HVAC::CoilMode::Normal) {
             return alternateMode.speeds[alternateMode.nominalSpeedIndex].RatedCondAirMassFlowRate;
@@ -169,22 +169,22 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
         }
     }
 
-    Real64 RatedEvapAirMassFlowRate(EnergyPlusData &) override
+    Real64 ratedEvapAirMassFlowRate(EnergyPlusData &) override
     {
         return normalMode.ratedEvapAirMassFlowRate;
     }
 
-    Real64 RatedEvapAirFlowRate(EnergyPlusData &) override
+    Real64 ratedEvapAirFlowRate(EnergyPlusData &) override
     {
         return normalMode.ratedEvapAirFlowRate;
     }
 
-    Real64 RatedGrossTotalCap() override
+    Real64 ratedGrossTotalCap() override
     {
         return normalMode.ratedGrossTotalCap;
     }
 
-    int IndexCapFT(HVAC::CoilMode const mode) override
+    int indexCapFT(HVAC::CoilMode const mode) override
     {
         if (mode != HVAC::CoilMode::Normal) {
             return alternateMode.speeds[alternateMode.nominalSpeedIndex].indexCapFT;
@@ -193,13 +193,13 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
         }
     }
 
-    bool SubcoolReheatFlag() override
+    bool subcoolReheatFlag() override
     {
         return (!original_input_specs.base_operating_mode_name.empty() && !original_input_specs.alternate_operating_mode_name.empty() &&
                 !original_input_specs.alternate_operating_mode2_name.empty());
     }
 
-    int NumSpeeds() override
+    int numSpeeds() override
     {
         return static_cast<int>(normalMode.speeds.size());
     }
@@ -218,27 +218,27 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
         }
     }
 
-    Real64 EvapAirFlowRateAtSpeed(EnergyPlusData &, int speed) override
+    Real64 evapAirFlowRateAtSpeed(EnergyPlusData &, int speed) override
     {
         return normalMode.speeds[speed].evap_air_flow_rate;
     }
 
-    Real64 RatedTotalCapacityAtSpeed(EnergyPlusData &, int speed) override
+    Real64 ratedTotalCapacityAtSpeed(EnergyPlusData &, int speed) override
     {
         return normalMode.speeds[speed].rated_total_capacity;
     }
 
-    Real64 CurrentEvapCondPumpPowerAtSpeed(EnergyPlusData &, int speed) override
+    Real64 currentEvapCondPumpPowerAtSpeed(EnergyPlusData &, int speed) override
     {
         return normalMode.getCurrentEvapCondPumpPower(speed);
     }
 
-    Real64 EvapCondenserEffectivenessAtSpeed(EnergyPlusData &, int speed) override
+    Real64 evapCondenserEffectivenessAtSpeed(EnergyPlusData &, int speed) override
     {
         return normalMode.speeds[speed].evap_condenser_effectiveness;
     }
 
-    Real64 EvapAirFlowFraction(EnergyPlusData &) override
+    Real64 evapAirFlowFraction(EnergyPlusData &) override
     {
         return normalMode.speeds.front().original_input_specs.evaporator_air_flow_fraction;
     }

@@ -11735,7 +11735,7 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_15000W_alternateMode_SEER2_2023_Valu
     ASSERT_EQ("DX COOL COOLING COIL PERFORMANCE", performance->name);
     ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE", performance->normalMode.name);
     ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE2", performance->alternateMode.name);
-    int nsp = performance->NumSpeeds();
+    int nsp = performance->numSpeeds();
     ASSERT_EQ(2, nsp);
     auto speed1 = performance->normalMode.speeds[0];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1.name);
@@ -11768,10 +11768,10 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_15000W_alternateMode_SEER2_2023_Valu
     EXPECT_EQ(0.3, maxEIRfLowPLRXInput);
 
     // Rated Total Capacity
-    EXPECT_NEAR(15000, performance->RatedGrossTotalCap(), 0.01);
+    EXPECT_NEAR(15000, performance->ratedGrossTotalCap(), 0.01);
 
     // Reated Air Vol Flow Rate | evap air flow rate and condenser air flow rate ??
-    EXPECT_NEAR(0.80, performance->RatedEvapAirFlowRate(*state), 0.01);
+    EXPECT_NEAR(0.80, performance->ratedEvapAirFlowRate(*state), 0.01);
 
     EXPECT_NEAR(7500, speed1.rated_total_capacity, 0.01);
     EXPECT_NEAR(15000, speed2.rated_total_capacity, 0.01);
@@ -12058,7 +12058,7 @@ TEST_F(EnergyPlusFixture, CurveFit_03_Speed_5000W_SEER2_2023_ValueTest)
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL", thisCoil.name);
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL PERFORMANCE", performance->name);
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL OPERATING MODE", performance->normalMode.name);
-    int nsp = performance->NumSpeeds();
+    int nsp = performance->numSpeeds();
     ASSERT_EQ(3, nsp);
     auto speed1 = performance->normalMode.speeds[0];
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1.name);
@@ -12089,10 +12089,10 @@ TEST_F(EnergyPlusFixture, CurveFit_03_Speed_5000W_SEER2_2023_ValueTest)
     EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
 
     // Rated Total Capacity
-    EXPECT_NEAR(5000, performance->RatedGrossTotalCap(), 0.01);
+    EXPECT_NEAR(5000, performance->ratedGrossTotalCap(), 0.01);
 
     // Reated Air Vol Flow Rate | evap air flow rate and condenser air flow rate ??
-    EXPECT_NEAR(0.25, performance->RatedEvapAirFlowRate(*state), 0.01);
+    EXPECT_NEAR(0.25, performance->ratedEvapAirFlowRate(*state), 0.01);
 
     EXPECT_NEAR(1666.5, speed1.rated_total_capacity, 0.01);
     EXPECT_NEAR(3333.5, speed2.rated_total_capacity, 0.01);

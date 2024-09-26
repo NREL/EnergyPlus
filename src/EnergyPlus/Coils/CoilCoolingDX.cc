@@ -199,7 +199,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
                                                                     DataLoopNode::ObjectIsNotParent);
 
     this->performance = makePerformanceSubclass(state, input_data.performance_object_name);
-    this->SubcoolReheatFlag = this->performance->SubcoolReheatFlag();
+    this->subcoolReheatFlag = this->performance->subcoolReheatFlag();
 
     if (!input_data.condensate_collection_water_storage_tank_name.empty()) {
         WaterManager::SetupTankSupplyComponent(state,
@@ -534,7 +534,7 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::Group::HVAC,
                             OutputProcessor::EndUseCat::Cooling);
     }
-    if (this->SubcoolReheatFlag) {
+    if (this->subcoolReheatFlag) {
         SetupOutputVariable(state,
                             "SubcoolReheat Cooling Coil Operation Mode",
                             Constant::Units::None,
@@ -600,7 +600,7 @@ int CoilCoolingDX::getNumModes()
 int CoilCoolingDX::getOpModeCapFTIndex(HVAC::CoilMode const mode)
 {
     // TODO: should this support all 3 modes?
-    return this->performance->IndexCapFT(mode);
+    return this->performance->indexCapFT(mode);
 }
 
 void CoilCoolingDX::setData(int fanIndex, HVAC::FanType fanType, std::string const &fanName, int _airLoopNum)
@@ -621,7 +621,7 @@ void CoilCoolingDX::getFixedData(int &_evapInletNodeIndex,
     _evapInletNodeIndex = this->evapInletNodeIndex;
     _evapOutletNodeIndex = this->evapOutletNodeIndex;
     _condInletNodeIndex = this->condInletNodeIndex;
-    _normalModeNumSpeeds = (int)this->performance->NumSpeeds();
+    _normalModeNumSpeeds = (int)this->performance->numSpeeds();
     _capacityControlMethod = this->performance->capControlMethod;
     _minOutdoorDryBulb = this->performance->minOutdoorDrybulb;
 }
@@ -632,20 +632,20 @@ void CoilCoolingDX::getDataAfterSizing(EnergyPlusData &state,
                                        std::vector<Real64> &_normalModeFlowRates,
                                        std::vector<Real64> &_normalModeRatedCapacities)
 {
-    _normalModeRatedEvapAirFlowRate = this->performance->RatedEvapAirFlowRate(state);
+    _normalModeRatedEvapAirFlowRate = this->performance->ratedEvapAirFlowRate(state);
     _normalModeFlowRates.clear();
     _normalModeRatedCapacities.clear();
-    for (auto speed = 0; speed < this->performance->NumSpeeds(); speed++) {
-        _normalModeFlowRates.push_back(performance->EvapAirFlowRateAtSpeed(state, speed));
-        _normalModeRatedCapacities.push_back(performance->RatedTotalCapacityAtSpeed(state, speed));
+    for (auto speed = 0; speed < this->performance->numSpeeds(); speed++) {
+        _normalModeFlowRates.push_back(performance->evapAirFlowRateAtSpeed(state, speed));
+        _normalModeRatedCapacities.push_back(performance->ratedTotalCapacityAtSpeed(state, speed));
     }
-    _normalModeRatedCapacity = this->performance->RatedGrossTotalCap();
+    _normalModeRatedCapacity = this->performance->ratedGrossTotalCap();
 }
 
 Real64 CoilCoolingDX::condMassFlowRate(EnergyPlusData &state, HVAC::CoilMode const mode)
 {
     // TODO: should this support all 3 modes?
-    return this->performance->RatedCondAirMassFlowRateNomSpeed(state, mode);
+    return this->performance->ratedCondAirMassFlowRateNomSpeed(state, mode);
 }
 
 void CoilCoolingDX::size(EnergyPlusData &state)
@@ -721,7 +721,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
         if (speedNum > 0) {
             Real64 condInletTemp =
                 state.dataEnvrn->OutWetBulbTemp + (state.dataEnvrn->OutDryBulbTemp - state.dataEnvrn->OutWetBulbTemp) *
-                                                      (1.0 - this->performance->EvapCondenserEffectivenessAtSpeed(state, speedNum - 1));
+                                                      (1.0 - this->performance->evapCondenserEffectivenessAtSpeed(state, speedNum - 1));
             Real64 condInletHumRat =
                 Psychrometrics::PsyWFnTdbTwbPb(state, condInletTemp, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutBaroPress, RoutineName);
             Real64 outdoorHumRat = state.dataEnvrn->OutHumRat;
@@ -731,7 +731,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
             this->evaporativeCondSupplyTankConsump = this->evaporativeCondSupplyTankVolumeFlow * reportingConstant;
             if (coilMode == HVAC::CoilMode::Normal) {
-                this->evapCondPumpElecPower = this->performance->CurrentEvapCondPumpPowerAtSpeed(state, speedNum - 1);
+                this->evapCondPumpElecPower = this->performance->currentEvapCondPumpPowerAtSpeed(state, speedNum - 1);
             }
             state.dataWaterData->WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
                 this->evaporativeCondSupplyTankVolumeFlow;
@@ -799,13 +799,13 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
 
             // report out final coil sizing info
             Real64 ratedSensCap(0.0);
-            ratedSensCap = this->performance->RatedGrossTotalCap() * this->performance->grossRatedSHR(state);
+            ratedSensCap = this->performance->ratedGrossTotalCap() * this->performance->grossRatedSHR(state);
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state,
                                                                                   this->name,
                                                                                   state.dataCoilCooingDX->coilCoolingDXObjectName,
-                                                                                  this->performance->RatedGrossTotalCap(),
+                                                                                  this->performance->ratedGrossTotalCap(),
                                                                                   ratedSensCap,
-                                                                                  this->performance->RatedEvapAirFlowRate(state),
+                                                                                  this->performance->ratedEvapAirFlowRate(state),
                                                                                   -999.0);
 
             // report out fan information
@@ -834,7 +834,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             Real64 constexpr RatedOutdoorAirTemp(35.0);    // 35 C or 95F
             Real64 ratedOutdoorAirWetBulb = 23.9;          // from I/O ref. more precise value?
 
-            Real64 ratedInletEvapMassFlowRate = this->performance->RatedEvapAirMassFlowRate(state);
+            Real64 ratedInletEvapMassFlowRate = this->performance->ratedEvapAirMassFlowRate(state);
             dummyEvapInlet.MassFlowRate = ratedInletEvapMassFlowRate;
             dummyEvapInlet.Temp = RatedInletAirTemp;
             Real64 dummyInletAirHumRat =
@@ -910,7 +910,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                                                                                        ratedOutletWetBulb,
                                                                                        RatedOutdoorAirTemp,
                                                                                        ratedOutdoorAirWetBulb,
-                                                                                       this->performance->RatedCBF(state),
+                                                                                       this->performance->ratedCBF(state),
                                                                                        -999.0);
 
             this->reportCoilFinalSizes = false;

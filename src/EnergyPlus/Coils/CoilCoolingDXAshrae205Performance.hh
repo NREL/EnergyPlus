@@ -75,19 +75,39 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
     Real64 rated_total_cooling_capacity;
     Real64 rated_steady_state_heating_capacity;
 
-    int NumSpeeds() override
+    int numSpeeds() override
     {
         return representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number.size();
     }
 
-    Real64 RatedTotalCapacityAtSpeed(EnergyPlusData &, int) override;
+    Real64 ratedCBF(EnergyPlusData &state) override
+    {
+        return 0.001;
+    };
 
-    Real64 RatedGrossTotalCap() override
+    Real64 grossRatedSHR(EnergyPlusData &state) override;
+
+    Real64 evapAirFlowRateAtSpeed(EnergyPlusData &state, int speed) override
+    {
+        return speeds[speed].evaporator_air_mass_flow;
+    }
+
+    Real64 ratedTotalCapacityAtSpeed(EnergyPlusData &, int) override;
+
+    Real64 ratedEvapAirMassFlowRate(EnergyPlusData &state) override // TODO: what speed?
+    {
+        return evapAirFlowRateAtSpeed(state, nominal_speed);
+    }
+
+    Real64 ratedEvapAirFlowRate(EnergyPlusData &state) override // TODO: what speed?
+    {
+        return evapAirFlowRateAtSpeed(state, nominal_speed) / state.dataEnvrn->StdRhoAir;
+    }
+
+    Real64 ratedGrossTotalCap() override
     {
         return rated_total_cooling_capacity;
     }
-
-    Real64 calculate_rated_capacity(EnergyPlus::EnergyPlusData &state, int speed);
 
     void size(EnergyPlusData &state) override;
 
@@ -104,13 +124,6 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
                   bool const singleMode,
                   Real64 LoadSHR = 0.0) override;
 
-    void calculate_cycling_capcacity(EnergyPlus::EnergyPlusData &state,
-                                     const DataLoopNode::NodeData &inletNode,
-                                     DataLoopNode::NodeData &outletNode,
-                                     Real64 const gross_power,
-                                     Real64 const ratio,
-                                     HVAC::FanOp const fanOpMode);
-
     void calculate(EnergyPlusData &state,
                    const DataLoopNode::NodeData &inletNode,
                    DataLoopNode::NodeData &outletNode,
@@ -122,12 +135,41 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
                    DataLoopNode::NodeData &);
 
 private:
-    void calculate_output_nodes(EnergyPlusData &state,
+    tk205::rs0004_ns::LookupVariablesCoolingStruct calculate_rated_capacities(EnergyPlus::EnergyPlusData &state, int speed) const;
+
+    Real64 calculate_air_mass_flow(EnergyPlus::EnergyPlusData &state, int speed) const;
+
+    void calculate_cycling_capcacity(EnergyPlus::EnergyPlusData &state,
+                                     const DataLoopNode::NodeData &inletNode,
+                                     DataLoopNode::NodeData &outletNode,
+                                     Real64 const gross_power,
+                                     Real64 const ratio,
+                                     HVAC::FanOp const fanOpMode);
+
+    void set_output_node_conditions(EnergyPlusData &state,
                                 const DataLoopNode::NodeData &inletNode,
                                 DataLoopNode::NodeData &outletNode,
                                 Real64 gross_total_capacity,
                                 Real64 gross_sensible_capacity,
-                                Real64 air_mass_flow_rate);
+                                Real64 air_mass_flow_rate) const;
+
+    // Rating constants
+    const double outdoor_coil_entering_dry_bulb_temperature_K{308.15}; // 95F
+    const double indoor_coil_entering_dry_bulb_temperature_K{299.82};  // 80F
+    const double reference_wb_temperature{292.59};                     // 67F
+    const double reference_pressure_sea_level{101325.0};
+    const double rating_flow{400.0}; // cfm/ton
+    double rating_humidity_ratio{0.0};
+    double rating_indoor_coil_entering_relative_humidity{0.0};
+    double rating_rho_air{0.0};
+
+    const int nominal_speed{0};
+
+    struct CoilSpeedParameters
+    {
+        double evaporator_air_mass_flow;
+    };
+    std::vector<CoilSpeedParameters> speeds;
 };
 } // namespace EnergyPlus
 #endif // ENERGYPLUS_COILS_COIL_COOLING_DX_ASHRAE205_PERFORMANCE
