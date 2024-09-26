@@ -5522,7 +5522,7 @@ void CalcThermalResilience(EnergyPlusData &state)
             Real64 const ZoneW = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRatAvg;
             Real64 const ZoneRH = Psychrometrics::PsyRhFnTdbWPb(state, ZoneT, ZoneW, state.dataEnvrn->OutBaroPress) * 100.0;
             Real64 const ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
-            if (ZoneTF * 3.0 + ZoneRH * 100.0 - 340.0 < 0.0) {
+            if (state.dataHeatBal->heatIndexMethod == DataHeatBalance::HeatIndexMethod::Simplified) {
                 Real64 constexpr c1 = -42.379;
                 Real64 constexpr c2 = 2.04901523;
                 Real64 constexpr c3 = 10.14333127;
