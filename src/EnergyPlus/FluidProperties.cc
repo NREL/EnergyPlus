@@ -3279,7 +3279,7 @@ namespace FluidProperties {
             ReturnValue = this->getSatEnthalpy(state, Temperature, 1.0, fmt::format("{}:{}", routineName, CalledFrom));
             // send warning
             if (!state.dataGlobal->WarmupFlag) {
-                this->errors[(int)RefrigError::SatSupEnthalpy].count ++;
+                this->errors[(int)RefrigError::SatSupEnthalpy].count++;
                 // send warning
                 if (this->errors[(int)RefrigError::SatTempDensity].count <= df->RefrigErrorLimitTest) {
                     ShowWarningMessage(
@@ -3886,7 +3886,7 @@ namespace FluidProperties {
         } else { // All data is at zero: we are completely inside the saturation dome. Best thing we can do is return saturation value
             ++df->SatErrCountGetSupHeatDensityRefrig;
             // send warning
-            this->errors[(int)RefrigError::SatSupDensity].count ++;
+            this->errors[(int)RefrigError::SatSupDensity].count++;
             // send warning
             if (this->errors[(int)RefrigError::SatSupDensity].count <= df->RefrigErrorLimitTest) {
                 ShowWarningMessage(
