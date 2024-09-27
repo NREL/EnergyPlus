@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
@@ -54,43 +53,82 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from os import path
-from sys import argv, exit
+import platform
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+import os
+import stat
 
-summary_input_md_file = argv[1]
-summary_output_js_file = argv[2]
-matrix_os = argv[3]
-github_sha = argv[4]
-github_run_id = argv[5]
-artifact_url = argv[6]
 
-if not path.exists(summary_input_md_file):
-    print("Regression script shows failure exit code, but could not find summary file.")
-    print("This generally indicates that the regression script had an unhandled failure.")
-    print("Check the 'Run Regressions' GitHub Action step above for more helpful information")
-    exit(1)
+def locate_tk_so(python_dir: Path) -> Path:
+    print(f"Searching for _tkinter so in {python_dir}")
+    sos = list(python_dir.glob("lib-dynload/_tkinter*.so"))
+    assert len(sos) == 1, "Unable to locate _tkinter so"
+    return sos[0]
 
-with open(summary_input_md_file) as md:
-    md_contents = md.read()
 
-fixed_up_contents = f"""
-### :warning: Regressions detected on {matrix_os} for commit {github_sha}
+LINKED_RE = re.compile(
+    r"(?P<libname>.*) \(compatibility version (?P<compat_version>\d+\.\d+\.\d+), "
+    r"current version (?P<current_version>\d+\.\d+\.\d+)(?:, \w+)?\)"
+)
 
-{md_contents}
+LINKED_RE_ARM64 = re.compile(r"(?P<libname>.*) \(architecture arm64\)")
 
- - [View Results](https://github.com/NREL/EnergyPlus/actions/runs/{github_run_id})
- - [Download Regressions]({artifact_url})
-"""
 
-with open(summary_output_js_file, 'w') as js:
-    js_contents = f"""
-module.exports = ({{github, context}}) => {{    
-    github.rest.issues.createComment({{
-        issue_number: context.issue.number,
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        body: `{fixed_up_contents}`
-    }})
-}}
-"""
-    js.write(js_contents)
+def get_linked_libraries(p: Path):
+    linked_libs = []
+    lines = subprocess.check_output(["otool", "-L", str(p)], encoding="utf-8", universal_newlines=True).splitlines()
+    if "is not an object file" in lines[0]:
+        return None
+    lines = [x.strip() for x in lines[1:]]
+
+    for line in lines:
+        if 'compatibility version' in line and (m := LINKED_RE.match(line)):
+            linked_libs.append(m.groupdict())
+        elif 'architecture arm64' in line and (m := LINKED_RE_ARM64.match(line)):
+            linked_libs.append(m.groupdict())  # it will only have a libname key, I think that's fine
+        else:
+            raise ValueError(f"For {p}, cannot parse line: '{line}'")
+    return linked_libs
+
+
+if __name__ == "__main__":
+
+    if platform.system() != "Darwin":
+        sys.exit(0)
+
+    print("PYTHON: Copying and fixing up Tcl/Tk")
+
+    if len(sys.argv) == 2:
+        python_dir = Path(sys.argv[1])
+    else:
+        print("Must call " + sys.argv[0] + "with one command line argument: the path to the python_lib directory")
+        sys.exit(1)
+
+    assert python_dir.is_dir()
+    lib_dynload_dir = python_dir / "lib-dynload"
+
+    tk_so = locate_tk_so(python_dir)
+    tcl_tk_sos = [Path(t["libname"]) for t in get_linked_libraries(tk_so) if "libt" in t["libname"]]
+
+    for tcl_tk_so in tcl_tk_sos:
+        new_tcl_tk_so = lib_dynload_dir / tcl_tk_so.name
+        if str(tcl_tk_so).startswith('@loader_path'):
+            assert new_tcl_tk_so.is_file(), f"{new_tcl_tk_so} missing when the tkinter so is already adjusted. Wipe the dir"
+            print("Already fixed up the libtcl and libtk, nothing to do here")
+            continue
+        shutil.copy(tcl_tk_so, new_tcl_tk_so)
+        # during testing, the brew installed tcl and tk libraries were installed without write permission
+        # the workaround was to manually chmod u+w those files in the brew install folder
+        # instead let's just fix them up once we copy them here
+        current_perms = os.stat(str(new_tcl_tk_so)).st_mode
+        os.chmod(str(new_tcl_tk_so), current_perms | stat.S_IWUSR)
+        # now that it can definitely be written, we can run install_name_tool on it
+        lines = subprocess.check_output(
+            ["install_name_tool", "-change", str(tcl_tk_so), f"@loader_path/{new_tcl_tk_so.name}", str(tk_so)]
+        )
+        # Change the id that's the first line of the otool -L in this case and it's confusing
+        lines = subprocess.check_output(["install_name_tool", "-id", str(new_tcl_tk_so.name), str(new_tcl_tk_so)])

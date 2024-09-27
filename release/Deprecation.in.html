@@ -134,6 +134,15 @@
         this capability are now considered potentially deprecated.
     </p>
 
+    <h3>EP-Launch (Classic)</h3>
+    <p>
+        The EP-Launch tool that has been packaged with EnergyPlus for decades is tabbed for potential removal in a
+        future release.  A new Python-based cross-platform version of EP-Launch has been developed, tested, and
+        released, but not included in the EnergyPlus installation, thus limiting adoption.  With 24.2, we are packaging
+        that new tool with EnergyPlus installations, and will await feedback from users.  Based on this, the classic
+        EP-Launch tool will be placed on the deprecation path.
+    </p>
+
     <h2>Level 2 Deprecation Status</h2>
 
     <h3>32-bit Windows Builds</h3>
@@ -169,6 +178,13 @@
     <h3>Outdated Mac Builds</h3>
     <p>
         Mac 10.15 builds will not be provided after the release of 23.2.
+    </p>
+
+    <h3>EP-Compare</h3>
+    <p>
+        The EP-Compare utility has been removed from the EnergyPlus install package.  The program had issues which
+        had not been reported, hinting that it was not being used.  The code and binaries have been archived at
+        <a href="https://github.com/JasonGlazer/ep-compare">https://github.com/JasonGlazer/ep-compare</a>.
     </p>
 
     <hr>

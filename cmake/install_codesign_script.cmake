@@ -20,7 +20,7 @@ Pre-conditions:
 
 This script will codesign the ``FILES_TO_SIGN``, as well as the globbed copied Python .so and the root dylibs (such as ``libintl8.dylib``)
 
-* ``python_standard_lib/lib-dynload/*.so``
+* ``python_lib/lib-dynload/*.so``
 * ``lib*.dylib``
 
 To do so, it uses the `CodeSigning`_ functions :cmake:command:`codesign_files_macos`
@@ -113,11 +113,11 @@ foreach(path ${_all_root_dylibs})
   endif()
 endforeach()
 
-file(GLOB PYTHON_SOS "${CMAKE_INSTALL_PREFIX}/python_standard_lib/lib-dynload/*.so")
+file(GLOB PYTHON_SOS "${CMAKE_INSTALL_PREFIX}/python_lib/lib-dynload/*.so" "${CMAKE_INSTALL_PREFIX}/python_lib/lib-dynload/*.dylib")
 
 print_relative_paths(PREFIX "FULL_PATHS=" ABSOLUTE_PATHS ${FULL_PATHS})
 print_relative_paths(PREFIX "ROOT_DYLIBS=" ABSOLUTE_PATHS ${ROOT_DYLIBS})
-print_relative_paths(PREFIX "PYTHON_SOS, in ${CMAKE_INSTALL_PREFIX}/python_standard_lib/lib-dynload/=" ABSOLUTE_PATHS ${PYTHON_SOS} NAME_ONLY)
+print_relative_paths(PREFIX "PYTHON_SOS, in ${CMAKE_INSTALL_PREFIX}/python_lib/lib-dynload/=" ABSOLUTE_PATHS ${PYTHON_SOS} NAME_ONLY)
 
 include(${CMAKE_CURRENT_LIST_DIR}/CodeSigning.cmake)
 codesign_files_macos(

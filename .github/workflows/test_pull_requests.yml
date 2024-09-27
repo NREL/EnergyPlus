@@ -58,6 +58,7 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         brew update
+        brew install tcl-tk
         brew reinstall gcc@13
         echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
         echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV

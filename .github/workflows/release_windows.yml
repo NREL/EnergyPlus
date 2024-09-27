@@ -1,4 +1,4 @@
-name: Releases
+name: Windows Releases
 
 on:
   push:
