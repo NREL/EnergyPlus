@@ -108,6 +108,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_SimInfo)
     state->dataResultsFramework->resultsFramework->SimulationInformation.setInputModelURI("");
     state->dataResultsFramework->resultsFramework->SimulationInformation.setRunTime("00hr 08min  6.67sec");
     state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary("1", "2");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsInputs("0", "0");
     state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing("0", "0");
     state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup("0", "2");
     state->dataResultsFramework->resultsFramework->SimulationInformation.setSimulationEnvironment("");
@@ -117,6 +118,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_SimInfo)
             "ErrorSummary": {
                 "NumSevere": "2",
                 "NumWarnings": "1"
+            },
+            "ErrorSummaryInputs": {
+                "NumSevere": "0",
+                "NumWarnings": "0"
             },
             "ErrorSummarySizing": {
                 "NumSevere": "0",
@@ -142,6 +147,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_SimInfo_String)
     state->dataResultsFramework->resultsFramework->SimulationInformation.setInputModelURI("");
     state->dataResultsFramework->resultsFramework->SimulationInformation.setRunTime("00hr 08min  6.67sec");
     state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary("1", "2");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsInputs("0", "0");
     state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing("0", "0");
     state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup("0", "2");
     state->dataResultsFramework->resultsFramework->SimulationInformation.setSimulationEnvironment("");
@@ -149,7 +155,8 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_SimInfo_String)
     json result = state->dataResultsFramework->resultsFramework->SimulationInformation.getJSON();
 
     std::string expectedResult =
-        "{\n    \"ErrorSummary\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"1\"\n    },\n    \"ErrorSummarySizing\": {\n        "
+        "{\n    \"ErrorSummary\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"1\"\n    },\n    \"ErrorSummaryInputs\": {\n        "
+        "\"NumSevere\": \"0\",\n        \"NumWarnings\": \"0\"\n    },\n    \"ErrorSummarySizing\": {\n        "
         "\"NumSevere\": \"0\",\n        \"NumWarnings\": \"0\"\n    },\n    \"ErrorSummaryWarmup\": {\n        \"NumSevere\": \"2\",\n        "
         "\"NumWarnings\": \"0\"\n    },\n    \"InputModelURI\": \"\",\n    \"ProgramVersion\": \"EnergyPlus, Version 8.6.0-0f5a10914b\",\n    "
         "\"RunTime\": \"00hr 08min  6.67sec\",\n    \"SimulationEnvironment\": \"\",\n    \"StartDateTimeStamp\": \"2017.03.22 11:03\"\n}";

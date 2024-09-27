@@ -19038,6 +19038,7 @@ Schedule:Compact,
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
+    state->init_state(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     InternalHeatGains::ManageInternalHeatGains(*state, true);
     std::string compName = "UNITARY SYSTEM MODEL";

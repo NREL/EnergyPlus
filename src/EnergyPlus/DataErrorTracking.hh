@@ -210,6 +210,8 @@ struct ErrorTrackingData : BaseGlobalStruct
     int NumRecurringErrors = 0;              // Number of stored recurring error messages
     int TotalSevereErrors = 0;               // Counter
     int TotalWarningErrors = 0;              // Counter
+    int TotalSevereErrorsDuringInputs = 0;   // Counter
+    int TotalWarningErrorsDuringInputs = 0;  // Counter
     int TotalSevereErrorsDuringWarmup = 0;   // Counter
     int TotalWarningErrorsDuringWarmup = 0;  // Counter
     int TotalSevereErrorsDuringSizing = 0;   // Counter

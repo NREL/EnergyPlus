@@ -573,14 +573,18 @@ void EnergyPlusData::clear_state()
 void EnergyPlusData::init_state(EnergyPlusData &state)
 {
     if (this->init_state_called) return;
+
+    state.dataGlobal->InputsFlag = true;
     this->init_state_called = true;
     // The order in which we do this matters.  We're going to try to
     // do this in "topological" order meaning the first to go are the
     // objects that do not reference any other objects, like fluids,
     // schedules, curves, etc.
-    this->dataSimulationManager->init_state(state); // GetProjectData
+    this->dataSimulationManager->init_state(state); // OpenOutputFiles, GetProjectData, SetPreConstructionInputParameters
     this->dataFluidProps->init_state(state);        // GetFluidPropertiesData
     this->dataPsychrometrics->init_state(state);    // InitializePsychRoutines
+    this->dataScheduleMgr->init_state(state);       // ProcessScheduleInput - requires NumOfTimeStepInHour and AnyEnergyManagementSystemInModel
+    this->dataCurveManager->init_state(state);      // GetCurveInput, GetPressureSystemInput
 
     this->dataAirLoop->init_state(state);
     this->dataAirLoopHVACDOAS->init_state(state);
@@ -615,7 +619,6 @@ void EnergyPlusData::init_state(EnergyPlusData &state)
     this->dataCoolTower->init_state(state);
     this->dataCostEstimateManager->init_state(state);
     this->dataCrossVentMgr->init_state(state);
-    this->dataCurveManager->init_state(state);
     this->dataDXCoils->init_state(state);
     this->dataDXFEarClipping->init_state(state);
     this->dataDaylightingDevices->init_state(state);
@@ -759,7 +762,6 @@ void EnergyPlusData::init_state(EnergyPlusData &state)
     this->dataRuntimeLang->init_state(state);
     this->dataRuntimeLangProcessor->init_state(state);
     this->dataSQLiteProcedures->init_state(state);
-    this->dataScheduleMgr->init_state(state);
     this->dataSetPointManager->init_state(state);
     this->dataShadowComb->init_state(state);
     this->dataSimAirServingZones->init_state(state);
@@ -827,6 +829,8 @@ void EnergyPlusData::init_state(EnergyPlusData &state)
     this->dataZoneEquipmentManager->init_state(state);
     this->dataZonePlenum->init_state(state);
     this->dataZoneTempPredictorCorrector->init_state(state);
+
+    state.dataGlobal->InputsFlag = false;
 }
 
 } // namespace EnergyPlus

@@ -340,7 +340,8 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
                     Which = static_cast<int>(index(v, MatchVersion));
                 }
                 if (Which != 0) {
-                    ShowWarningError(state, "Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
+                    // this is reported in GetProjectData
+                    // ShowWarningError(state, "Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
                     return false;
                 }
             }

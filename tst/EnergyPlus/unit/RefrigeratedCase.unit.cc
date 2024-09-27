@@ -387,6 +387,7 @@ Schedule:Compact,
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataGlobal->TimeStepZone = 0.25;
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -738,6 +739,7 @@ Schedule:Compact,
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataGlobal->TimeStepZone = 0.25;
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);

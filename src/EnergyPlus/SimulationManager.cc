@@ -87,7 +87,6 @@ extern "C" {
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -102,7 +101,6 @@ extern "C" {
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -211,10 +209,11 @@ namespace SimulationManager {
 
         state.init_state(state);
 
+        // these checks report warnings for SimulationControl setup, no actual inputs are read in
         CheckForMisMatchedEnvironmentSpecifications(state);
         CheckForRequestedReporting(state);
+        // set up pre-defined reports, no actual inputs are read in
         OutputReportPredefined::SetPredefinedTables(state);
-        SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
         OutputProcessor::SetupTimePointers(
             state, OutputProcessor::TimeStepType::Zone, state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
@@ -2638,7 +2637,6 @@ namespace SimulationManager {
         // there is no need to process that data if there are no DOAS used in the simulation
         state.dataGlobal->AirLoopHVACDOASUsedInSim =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem") > 0;
-        EMSManager::CheckIfAnyEMS(state);
         PlantManager::CheckIfAnyPlant(state);
         PlantPipingSystemsManager::CheckIfAnySlabs(state);
         PlantPipingSystemsManager::CheckIfAnyBasements(state);

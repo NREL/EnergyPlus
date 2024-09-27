@@ -65,12 +65,14 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/EnergyPlusLogger.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -150,7 +152,8 @@ namespace Curve {
     struct Curve
     {
         // Basic data
-        std::string Name;                         // Curve Name
+        std::string Name; // Curve Name
+        bool used = true;
         CurveType curveType = CurveType::Invalid; // Curve type (see parameter definitions above)
         // Table data stuff
         InterpType interpolationType = InterpType::Invalid; // Table interpolation method
@@ -207,6 +210,17 @@ namespace Curve {
                                        const Real64 Var4, // 4th independent variable
                                        const Real64 Var5, // 5th independent variable
                                        const Real64 Var6);
+
+        void markUsed(EnergyPlusData &state)
+        {
+            if (!this->used || this->curveType == CurveType::Invalid) return;
+            auto const find_unused =
+                state.dataInputProcessing->inputProcessor->unusedInputs.find({std::string(objectNames[int(this->curveType)]), this->Name});
+            if (find_unused != state.dataInputProcessing->inputProcessor->unusedInputs.end()) {
+                state.dataInputProcessing->inputProcessor->unusedInputs.erase(find_unused);
+            }
+            this->used = false;
+        };
     };
 
     // Table file objects
@@ -469,8 +483,11 @@ struct CurveManagerData : BaseGlobalStruct
             this->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
     }
 
-    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    void init_state(EnergyPlusData &state) override
     {
+        Curve::GetCurveInput(state);
+        Curve::GetPressureSystemInput(state);
+        state.dataCurveManager->GetCurvesInputFlag = false;
     }
 
     void clear_state() override

@@ -276,6 +276,8 @@ TEST_F(EnergyPlusFixture, OutputControlFiles)
         "   **   ~~~   **  See InputOutputReference document for more details.",
         "   ************* Object=Building=Bldg",
         "   **   ~~~   ** Object=GlobalGeometryRules",
+        "   **   ~~~   ** Object=Timestep",
+        "   **   ~~~   ** Object=Version",
     });
 
     compare_err_stream(expected_error);

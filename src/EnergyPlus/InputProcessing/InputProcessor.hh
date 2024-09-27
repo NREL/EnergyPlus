@@ -315,8 +315,10 @@ private:
     UnorderedObjectCacheMap objectCacheMap;
 
     // ObjectType to vector of ObjectName
-    UnusedObjectSet unusedInputs;
     char s[129] = {0};
+
+public:
+    UnusedObjectSet unusedInputs;
 
 }; // InputProcessor
 
