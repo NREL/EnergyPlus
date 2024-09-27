@@ -6980,7 +6980,7 @@ namespace Window {
                             auto const *matShade = dynamic_cast<Material::MaterialShade const *>(mat);
                             assert(matShade != nullptr);
 
-                            static constexpr std::string_view Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                            static constexpr std::string_view Format_703(" WindowMaterial:Shade,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                             print(state.files.eio,
                                   Format_703,
                                   matShade->Name,
