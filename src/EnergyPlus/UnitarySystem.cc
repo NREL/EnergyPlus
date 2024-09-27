@@ -910,6 +910,34 @@ namespace UnitarySystems {
             state.dataLoopNodes->Node(this->m_HeatRecoveryInletNodeNum).MassFlowRate = mdotHR;
         }
 
+        if (this->m_ControlType == UnitarySysCtrlType::Setpoint && this->m_sysType == SysType::Unitary) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0) {
+                if (this->m_LastMode == CoolingMode) {
+                    if (this->m_MultiOrVarSpeedCoolCoil) {
+                        state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->m_CoolMassFlowRate[this->m_NumOfSpeedCooling];
+                    } else {
+                        state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->MaxCoolAirMassFlow;
+                    }
+                } else if (this->m_LastMode == HeatingMode) {
+                    if (this->m_MultiOrVarSpeedHeatCoil) {
+                        state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->m_HeatMassFlowRate[this->m_NumOfSpeedHeating];
+                    } else {
+                        state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->MaxHeatAirMassFlow;
+                    }
+                } else {
+                    if (this->m_AirFlowControl == UseCompFlow::Off) {
+                        if (this->m_MultiOrVarSpeedCoolCoil) {
+                            state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                        } else {
+                            state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                        }
+                    }
+                }
+            } else {
+                state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = 0.0;
+            }
+        }
+
         // get operating capacity of water and steam coil
         if (FirstHVACIteration || this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
             if (FirstHVACIteration) {
@@ -917,31 +945,6 @@ namespace UnitarySystems {
                 std::fill(this->m_IterationMode.begin(), this->m_IterationMode.end(), 0);
 
                 // for DX systems, just read the inlet node flow rate and let air loop decide flow
-                if (this->m_ControlType == UnitarySysCtrlType::Setpoint && this->m_sysType == SysType::Unitary) {
-                    if (ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0) {
-                        if (this->m_LastMode == CoolingMode) {
-                            if (this->m_MultiOrVarSpeedCoolCoil) {
-                                state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->m_CoolMassFlowRate[this->m_NumOfSpeedCooling];
-                            } else {
-                                state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->MaxCoolAirMassFlow;
-                            }
-                        } else if (this->m_LastMode == HeatingMode) {
-                            if (this->m_MultiOrVarSpeedHeatCoil) {
-                                state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->m_HeatMassFlowRate[this->m_NumOfSpeedHeating];
-                            } else {
-                                state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->MaxHeatAirMassFlow;
-                            }
-                        } else {
-                            if (this->m_MultiOrVarSpeedCoolCoil) {
-                                state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->MaxNoCoolHeatAirMassFlow;
-                            } else {
-                                state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = this->MaxNoCoolHeatAirMassFlow;
-                            }
-                        }
-                    } else {
-                        state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = 0.0;
-                    }
-                }
                 if (this->m_WaterHRPlantLoopModel) {
                     // initialize loop water temp on FirstHVACIteration
                     Real64 airInTemp = state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).Temp;
@@ -7577,6 +7580,7 @@ namespace UnitarySystems {
                     thisSys.input_specs.design_specification_multispeed_object_name = Util::makeUPPER(it.value().get<std::string>());
                 }
 
+                thisSys.m_LastMode = CoolingMode;
                 thisSys.processInputSpec(state, thisSys.input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
                 if (sysNum == -1) {
@@ -7871,6 +7875,11 @@ namespace UnitarySystems {
                 SingleDuct::SimATMixer(state, this->m_ATMixerName, FirstHVACIteration, this->m_ATMixerIndex);
             }
         }
+
+        // set variables used in fan call inside function calcPassiveSystem
+        state.dataUnitarySystems->m_massFlow1 = state.dataLoopNodes->Node(this->AirInNode).MassFlowRate;
+        state.dataUnitarySystems->m_runTimeFraction1 = (state.dataUnitarySystems->m_massFlow1 > 0.0) ? 1.0 : 0.0; // constant fan mode is required
+
         if (this->OAMixerExists) {
             // the PTHP does one or the other, but why can't an OA Mixer exist with the AT Mixer?
             MixedAir::SimOAMixer(state, blankStdString, this->OAMixerIndex);
@@ -13890,8 +13899,9 @@ namespace UnitarySystems {
 
         if (PartLoadFrac > 1.0) {
             PartLoadFrac = 1.0;
-        } else if (PartLoadFrac < 0.0) {
+        } else if (PartLoadFrac <= 0.0) {
             PartLoadFrac = 0.0;
+            if (this->m_LastMode == CoolingMode) this->m_LastMode = 0;
         }
 
         this->m_CoolingPartLoadFrac = PartLoadFrac;
@@ -14518,8 +14528,9 @@ namespace UnitarySystems {
 
         if (PartLoadFrac > 1.0) {
             PartLoadFrac = 1.0;
-        } else if (PartLoadFrac < 0.0) {
+        } else if (PartLoadFrac <= 0.0) {
             PartLoadFrac = 0.0;
+            if (this->m_LastMode == HeatingMode) this->m_LastMode = 0;
         }
 
         if (SolFla < 0) {
@@ -14910,6 +14921,7 @@ namespace UnitarySystems {
                         PartLoadFrac = 1.0;
                     } else if (PartLoadFrac < 0.0) {
                         PartLoadFrac = 0.0;
+                        if (this->m_LastMode == HeatingMode && this->m_HeatingPartLoadFrac == 0.0) this->m_LastMode = 0;
                     }
 
                     if (SolFla == -1) {
