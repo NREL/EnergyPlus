@@ -407,7 +407,7 @@ void CoilCoolingDX205Performance::set_output_node_conditions(EnergyPlusData &sta
 
 Real64 CoilCoolingDX205Performance::grossRatedSHR(EnergyPlusData &state)
 {
-    const auto &const lookup_variables = calculate_rated_capacities(state, nominal_speed);
+    const auto &lookup_variables = calculate_rated_capacities(state, nominal_speed);
     return lookup_variables.gross_sensible_capacity / lookup_variables.gross_total_capacity;
 }
 

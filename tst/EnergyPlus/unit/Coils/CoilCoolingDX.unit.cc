@@ -723,8 +723,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     // Test 3 - dry coil - run the coil at 0.75 speed ratio
     speedNum = 2;
     speedRatio = 0.75;
-    evapInletNode.MassFlowRate =
-        speedRatio * thisCoil.performance->ratedAirMassFlowRateMaxSpeed(*state) + (1.0 - speedRatio) * thisCoil.performance->ratedAirMassFlowRateMinSpeed(*state);
+    evapInletNode.MassFlowRate = speedRatio * thisCoil.performance->ratedAirMassFlowRateMaxSpeed(*state) +
+                                 (1.0 - speedRatio) * thisCoil.performance->ratedAirMassFlowRateMinSpeed(*state);
     thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp, singleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate3, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate3, thisCoil.sensCoolingEnergyRate, 0.1);
@@ -767,8 +767,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     // Test 6 - wet coil - run the coil at 0.75 speed ratio
     speedNum = 2;
     speedRatio = 0.75;
-    evapInletNode.MassFlowRate =
-        speedRatio * thisCoil.performance->ratedAirMassFlowRateMaxSpeed(*state) + (1.0 - speedRatio) * thisCoil.performance->ratedAirMassFlowRateMinSpeed(*state);
+    evapInletNode.MassFlowRate = speedRatio * thisCoil.performance->ratedAirMassFlowRateMaxSpeed(*state) +
+                                 (1.0 - speedRatio) * thisCoil.performance->ratedAirMassFlowRateMinSpeed(*state);
     thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp, singleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate6, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate6, thisCoil.sensCoolingEnergyRate, 0.1);
@@ -1141,8 +1141,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     // Test 3 - dry coil - run the coil at 0.75 speed ratio
     speedNum = 2;
     speedRatio = 0.75;
-    evapInletNode.MassFlowRate =
-        speedRatio * thisCoil.performance->ratedAirMassFlowRateMaxSpeed(*state) + (1.0 - speedRatio) * thisCoil.performance->ratedAirMassFlowRateMinSpeed(*state);
+    evapInletNode.MassFlowRate = speedRatio * thisCoil.performance->ratedAirMassFlowRateMaxSpeed(*state) +
+                                 (1.0 - speedRatio) * thisCoil.performance->ratedAirMassFlowRateMinSpeed(*state);
     thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp, singleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate3, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate3, thisCoil.sensCoolingEnergyRate, 0.1);
@@ -1185,8 +1185,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     // Test 6 - wet coil - run the coil at 0.75 speed ratio
     speedNum = 2;
     speedRatio = 0.75;
-    evapInletNode.MassFlowRate =
-        speedRatio * thisCoil.performance->ratedAirMassFlowRateMaxSpeed(*state) + (1.0 - speedRatio) * thisCoil.performance->ratedAirMassFlowRateMinSpeed(*state);
+    evapInletNode.MassFlowRate = speedRatio * thisCoil.performance->ratedAirMassFlowRateMaxSpeed(*state) +
+                                 (1.0 - speedRatio) * thisCoil.performance->ratedAirMassFlowRateMinSpeed(*state);
     thisCoil.simulate(*state, coilMode, speedNum, speedRatio, fanOp, singleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate6, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate6, thisCoil.sensCoolingEnergyRate, 0.1);
