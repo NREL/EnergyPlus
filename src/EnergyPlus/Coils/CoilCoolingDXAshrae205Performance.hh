@@ -64,7 +64,7 @@ struct EnergyPlusData;
 
 struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
 {
-    CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state,
+    CoilCoolingDX205Performance(EnergyPlusData &state,
                                 const std::string &name_to_find);
 
     static constexpr std::string_view object_name = "Coil:DX:ASHRAE205:Performance";
@@ -115,7 +115,6 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
                   const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
                   HVAC::CoilMode mode,
-                  // Real64 &PLR,
                   int speedNum,
                   Real64 speedRatio,
                   HVAC::FanOp const fanOpMode,
