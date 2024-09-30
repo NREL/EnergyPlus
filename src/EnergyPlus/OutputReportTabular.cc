@@ -14502,6 +14502,14 @@ void AllocateLoadComponentArrays(EnergyPlusData &state)
         }
     }
 
+    ort->enclCompLoads.resize(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
+    for (auto &day : ort->enclCompLoads) {
+        day.ts.resize(numTSinDay);
+        for (auto &ts : day.ts) {
+            ts.encl.resize(state.dataViewFactor->NumOfRadiantEnclosures);
+        }
+    }
+
     ort->znCompLoads.resize(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
     for (auto &day : ort->znCompLoads) {
         day.ts.resize(numTSinDay);
@@ -15614,7 +15622,8 @@ void GetDelaySequences(EnergyPlusData &state,
     int const szNumMinus1 = (iSpace == 0) ? zoneIndex - 1 : iSpace - 1; // space or zone num minus 1 for vector
 
     if (desDaySelected != 0) {
-        auto &surfCLDay = ort->surfCompLoads[desDaySelected - 1];
+        auto const &surfCLDay = ort->surfCompLoads[desDaySelected - 1];
+        auto const &enclCLDay = ort->enclCompLoads[desDaySelected - 1];
         auto &szCLDay = szCompLoadLoc[desDaySelected - 1];
 
         Array2D<Real64> decayCurve;
@@ -15636,10 +15645,10 @@ void GetDelaySequences(EnergyPlusData &state,
 
             // code from ComputeDelayedComponents starts
             for (int spaceNum : state.dataHeatBal->Zone(zoneIndex).spaceIndexes) {
+                if ((iSpace > 0) && (spaceNum != iSpace)) continue;
                 auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 for (int jSurf = thisSpace.HTSurfaceFirst; jSurf <= thisSpace.HTSurfaceLast; ++jSurf) {
-                    int radEnclosureNum = state.dataSurface->Surface(jSurf).RadEnclIndex;
-
+                    int const radEnclosureNum = state.dataSurface->Surface(jSurf).RadEnclIndex;
                     // for each time step, step back through time and apply decay curve to radiant heat for each end use absorbed in each surface
                     Real64 peopleConvFromSurf = 0.0;
                     Real64 equipConvFromSurf = 0.0;
@@ -15652,14 +15661,15 @@ void GetDelaySequences(EnergyPlusData &state,
                     for (int mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack) {
                         int sourceStep = kTimeStep - mStepBack + 1;
                         auto &compLoadTS = szCLDay.ts[sourceStep - 1].spacezone[szNumMinus1];
-                        auto &surfCLDayTS = surfCLDay.ts[sourceStep - 1].surf[jSurf - 1];
+                        auto const &surfCLDayTS = surfCLDay.ts[sourceStep - 1].surf[jSurf - 1];
+                        auto const &enclCLDayTS = enclCLDay.ts[sourceStep - 1].encl[radEnclosureNum - 1];
                         Real64 thisQRadThermInAbsMult =
                             surfCLDayTS.TMULTseq * surfCLDayTS.ITABSFseq * state.dataSurface->Surface(jSurf).Area * decayCurve(mStepBack, jSurf);
-                        peopleConvFromSurf += compLoadTS.peopleRadSeq * thisQRadThermInAbsMult;
-                        equipConvFromSurf += compLoadTS.equipRadSeq * thisQRadThermInAbsMult;
-                        hvacLossConvFromSurf += compLoadTS.hvacLossRadSeq * thisQRadThermInAbsMult;
-                        powerGenConvFromSurf += compLoadTS.powerGenRadSeq * thisQRadThermInAbsMult;
-                        lightLWConvFromSurf += compLoadTS.lightLWRadSeq * thisQRadThermInAbsMult;
+                        peopleConvFromSurf += enclCLDayTS.peopleRadSeq * thisQRadThermInAbsMult;
+                        equipConvFromSurf += enclCLDayTS.equipRadSeq * thisQRadThermInAbsMult;
+                        hvacLossConvFromSurf += enclCLDayTS.hvacLossRadSeq * thisQRadThermInAbsMult;
+                        powerGenConvFromSurf += enclCLDayTS.powerGenRadSeq * thisQRadThermInAbsMult;
+                        lightLWConvFromSurf += enclCLDayTS.lightLWRadSeq * thisQRadThermInAbsMult;
                         // short wave is already accumulated by surface
                         lightSWConvFromSurf += surfCLDayTS.lightSWRadSeq * decayCurve(mStepBack, jSurf);
                         feneSolarConvFromSurf += surfCLDayTS.feneSolarRadSeq * decayCurve(mStepBack, jSurf);

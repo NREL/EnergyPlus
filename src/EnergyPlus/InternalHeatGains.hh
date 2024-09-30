@@ -181,6 +181,11 @@ namespace InternalHeatGains {
                                      gsl::span<const DataHeatBalance::IntGainType> GainTypeARR, // variable length 1-d array of enum valued gain types
                                      int const spaceIndex = 0);                                 // space index pointer, sum gains only for this space
 
+    Real64 SumEnclosureInternalRadiationGainsByTypes(
+        EnergyPlusData &state,
+        int const enclosureNum,                                     // enclosure to sum gains for
+        gsl::span<const DataHeatBalance::IntGainType> GainTypeARR); // variable length 1-d array of enum valued gain types
+
     void SumAllInternalLatentGains(EnergyPlusData &state,
                                    int const ZoneNum // zone index pointer for which zone to sum gains for
     );

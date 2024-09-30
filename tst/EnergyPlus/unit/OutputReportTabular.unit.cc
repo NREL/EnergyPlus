@@ -8321,10 +8321,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
     state->dataSurface->Surface(3).Class = SurfaceClass::Floor;
     state->dataSurface->Surface(4).Class = SurfaceClass::Shading;
-    state->dataSurface->Surface(1).RadEnclIndex = 1;
-    state->dataSurface->Surface(2).RadEnclIndex = 1;
-    state->dataSurface->Surface(3).RadEnclIndex = 1;
-    state->dataSurface->Surface(4).RadEnclIndex = 1;
+    state->dataSurface->Surface(1).RadEnclIndex = radEnclosureNum;
+    state->dataSurface->Surface(2).RadEnclIndex = radEnclosureNum;
+    state->dataSurface->Surface(3).RadEnclIndex = radEnclosureNum;
+    state->dataSurface->Surface(4).RadEnclIndex = radEnclosureNum;
 
     auto &znCL = state->dataOutRptTab->znCompLoads;
     auto &znCLDay = znCL[coolDesSelected - 1];
@@ -8335,12 +8335,16 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
             surfCLDayTS.TMULTseq = 0.1 * step;
             surfCLDayTS.ITABSFseq = 0.2 * step * surfBaseValue[jSurf - 1];
             state->dataOutRptTab->decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
-            znCLDayTS.peopleRadSeq = 0.4 * step;
-            znCLDayTS.equipRadSeq = 0.5 * step;
-            znCLDayTS.hvacLossRadSeq = 0.6 * step;
-            znCLDayTS.powerGenRadSeq = 0.7 * step;
-            znCLDayTS.lightLWRadSeq = 0.8 * step;
         }
+    }
+
+    for (int step = 1; step <= 10; ++step) {
+        auto &enclCLDayTS = state->dataOutRptTab->enclCompLoads[coolDesSelected - 1].ts[step - 1].encl[radEnclosureNum - 1];
+        enclCLDayTS.peopleRadSeq = 0.4 * step;
+        enclCLDayTS.equipRadSeq = 0.5 * step;
+        enclCLDayTS.hvacLossRadSeq = 0.6 * step;
+        enclCLDayTS.powerGenRadSeq = 0.7 * step;
+        enclCLDayTS.lightLWRadSeq = 0.8 * step;
     }
 
     GetDelaySequences(*state,
@@ -8390,12 +8394,16 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
             surfCLDayTS.TMULTseq = 0.1 * step;
             surfCLDayTS.ITABSFseq = 0.2 * step * surfBaseValue[jSurf - 1];
             state->dataOutRptTab->decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
-            znCLDayTS.peopleRadSeq = 0.4 * step;
-            znCLDayTS.equipRadSeq = 0.5 * step;
-            znCLDayTS.hvacLossRadSeq = 0.6 * step;
-            znCLDayTS.powerGenRadSeq = 0.7 * step;
-            znCLDayTS.lightLWRadSeq = 0.8 * step;
         }
+    }
+
+    for (int step = 1; step <= 10; ++step) {
+        auto &enclCLDayTS = state->dataOutRptTab->enclCompLoads[coolDesSelected - 1].ts[step - 1].encl[radEnclosureNum - 1];
+        enclCLDayTS.peopleRadSeq = 0.4 * step;
+        enclCLDayTS.equipRadSeq = 0.5 * step;
+        enclCLDayTS.hvacLossRadSeq = 0.6 * step;
+        enclCLDayTS.powerGenRadSeq = 0.7 * step;
+        enclCLDayTS.lightLWRadSeq = 0.8 * step;
     }
 
     GetDelaySequences(*state,

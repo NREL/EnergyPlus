@@ -516,15 +516,12 @@ namespace OutputReportTabular {
     {
         Real64 peopleInstantSeq = 0.0;
         Real64 peopleLatentSeq = 0.0;
-        Real64 peopleRadSeq = 0.0;
 
         Real64 lightInstantSeq = 0.0;
         Real64 lightRetAirSeq = 0.0;
-        Real64 lightLWRadSeq = 0.0; // long wave thermal radiation
 
         Real64 equipInstantSeq = 0.0;
         Real64 equipLatentSeq = 0.0;
-        Real64 equipRadSeq = 0.0;
 
         Real64 refrigInstantSeq = 0.0;
         Real64 refrigRetAirSeq = 0.0;
@@ -534,7 +531,6 @@ namespace OutputReportTabular {
         Real64 waterUseLatentSeq = 0.0;
 
         Real64 hvacLossInstantSeq = 0.0;
-        Real64 hvacLossRadSeq = 0.0;
 
         Real64 powerGenInstantSeq = 0.0;
         Real64 powerGenRadSeq = 0.0;
@@ -559,6 +555,22 @@ namespace OutputReportTabular {
         std::vector<compLoadsTimeStepSpZn> ts;
     };
 
+    struct compLoadsEnclosure
+    {
+        Real64 peopleRadSeq = 0.0;
+        Real64 lightLWRadSeq = 0.0; // long wave thermal radiation
+        Real64 equipRadSeq = 0.0;
+        Real64 hvacLossRadSeq = 0.0;
+        Real64 powerGenRadSeq = 0.0;
+    };
+    struct compLoadsTimeStepEncl
+    {
+        std::vector<compLoadsEnclosure> encl;
+    };
+    struct componentLoadsEncl
+    {
+        std::vector<compLoadsTimeStepEncl> ts;
+    };
     // Functions
 
     std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path const &filePath, bool output_to_file = true);
@@ -1255,6 +1267,7 @@ struct OutputReportTabularData : BaseGlobalStruct
     std::vector<OutputReportTabular::componentLoadsSurf> surfCompLoads; // Surface component loads by day, timestep, then surface
     std::vector<OutputReportTabular::componentLoadsSpZn> znCompLoads;   // Zone component loads by day, timestep, then zone
     std::vector<OutputReportTabular::componentLoadsSpZn> spCompLoads;   // Space component loads by day, timestep, then space
+    std::vector<OutputReportTabular::componentLoadsEncl> enclCompLoads; // Enclosure component loads by day, timestep, then enclsoure
 
     int maxUniqueKeyCount = 0;
 
@@ -1530,6 +1543,7 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->surfCompLoads.clear();
         this->znCompLoads.clear();
         this->spCompLoads.clear();
+        this->enclCompLoads.clear();
 
         this->maxUniqueKeyCount = 0;
         this->activeSubTableName.clear();
