@@ -64,8 +64,7 @@ struct EnergyPlusData;
 
 struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
 {
-    CoilCoolingDX205Performance(EnergyPlusData &state,
-                                const std::string &name_to_find);
+    CoilCoolingDX205Performance(EnergyPlusData &state, const std::string &name_to_find);
 
     static constexpr std::string_view object_name = "Coil:DX:ASHRAE205:Performance";
 
@@ -146,11 +145,11 @@ private:
                                      HVAC::FanOp const fanOpMode);
 
     void set_output_node_conditions(EnergyPlusData &state,
-                                const DataLoopNode::NodeData &inletNode,
-                                DataLoopNode::NodeData &outletNode,
-                                Real64 gross_total_capacity,
-                                Real64 gross_sensible_capacity,
-                                Real64 air_mass_flow_rate) const;
+                                    const DataLoopNode::NodeData &inletNode,
+                                    DataLoopNode::NodeData &outletNode,
+                                    Real64 gross_total_capacity,
+                                    Real64 gross_sensible_capacity,
+                                    Real64 air_mass_flow_rate) const;
 
     // Rating constants
     const double outdoor_coil_entering_dry_bulb_temperature_K{308.15}; // 95F

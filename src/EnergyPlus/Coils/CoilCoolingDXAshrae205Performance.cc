@@ -241,10 +241,10 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
                                             DataLoopNode::NodeData &condInletNode,
                                             DataLoopNode::NodeData &) // condOutletNode)
 {
-    //If cycling (discrete or continuous): compressor_sequence_number = 1
-    //if not cycling (discrete): compressor_sequence_number = speed -1 & speed, MFR is different for each call to 
-    //performance. Results are interpolated between the 2 performance calls;
-    //if not cycling (continuous): compressor_sequence_number = speed - 1 + ratio, MFR is scaled using the ratio
+    // If cycling (discrete or continuous): compressor_sequence_number = 1
+    // if not cycling (discrete): compressor_sequence_number = speed -1 & speed, MFR is different for each call to
+    // performance. Results are interpolated between the 2 performance calls;
+    // if not cycling (continuous): compressor_sequence_number = speed - 1 + ratio, MFR is scaled using the ratio
     static constexpr std::string_view RoutineName = "CoilCoolingDX205Performance::calculate";
 
     const auto this_speed = max(speedNum, 1); // 1 for single-speed, speedNum for multispeed. Disallow speed = 0
