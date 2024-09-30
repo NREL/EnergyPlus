@@ -201,9 +201,9 @@ namespace GroundHeatExchangers {
         int numGFuncPairs;                                       // Number of g-function pairs
         Real64 gRefRatio;                                        // Reference ratio of g-function set
         Real64 maxSimYears;                                      // Maximum length of simulation in years
-        Array1D<Real64> time;                                    // response time in seconds
-        Array1D<Real64> LNTTS;                                   // natural log of Non Dimensional Time Ln(t/ts)
-        Array1D<Real64> GFNC;                                    // G-function ( Non Dimensional temperature response factors)
+        std::vector<Real64> time;                                // response time in seconds
+        std::vector<Real64> LNTTS;                               // natural log of non-dimensional time Ln(t/ts)
+        std::vector<Real64> GFNC;                                // g-function (non-dimensional temperature response factors)
         std::shared_ptr<GLHEVertProps> props;                    // Properties
         std::vector<std::shared_ptr<GLHEVertSingle>> myBorholes; // Boreholes used by this response factors object
 
@@ -454,7 +454,7 @@ namespace GroundHeatExchangers {
 
         Real64 doubleIntegral(int m, int n, int m1, int n1, Real64 t, int I0, int J0);
 
-        Real64 integral(int m, int n, int m1, int n1, Real64 t, Real64 eta, Real64 J0);
+        Real64 integral(int m, int n, int m1, int n1, Real64 t, Real64 eta, int J0);
 
         Real64 distance(int m, int n, int m1, int n1, Real64 eta, Real64 theta);
 
