@@ -3,7 +3,7 @@
 ! Description: Residential single-family detached model with unvented attic
 !              and conditioned basement, located in Denver CO.
 ! Geometry: "Exploded" surfaces (not detailed 3D geometry). Single zone for
-            all conditioned space.
+!            all conditioned space.
 ! HVAC: Hardsized central AC/furnace and EMS duct model.
 ! DHW: Electric, conventional storage water heater.
 ! Misc: Appliances, lighting, plug loads.
