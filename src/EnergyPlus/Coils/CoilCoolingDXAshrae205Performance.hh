@@ -136,9 +136,9 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
 private:
     tk205::rs0004_ns::LookupVariablesCoolingStruct calculate_rated_capacities(EnergyPlus::EnergyPlusData &state, int speed) const;
 
-    Real64 calculate_air_mass_flow(EnergyPlus::EnergyPlusData &state, int speed) const;
+    Real64 calculate_air_mass_flow(EnergyPlusData &state, int speed) const;
 
-    void calculate_cycling_capcacity(EnergyPlus::EnergyPlusData &state,
+    void calculate_cycling_capcacity(EnergyPlusData &state,
                                      const DataLoopNode::NodeData &inletNode,
                                      DataLoopNode::NodeData &outletNode,
                                      Real64 const gross_power,
