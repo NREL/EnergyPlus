@@ -54,6 +54,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -480,58 +481,66 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     EXPECT_EQ(state->dataBaseboardRadiator->baseboards(BaseboardNum).UA, 3000.0);
 }
 
-TEST_F(EnergyPlusFixture, BaseboardConvWater_resetSizingFlagBasedOnInputTest)
+TEST_F(EnergyPlusFixture, BaseboardConvWater_checkForZoneSizingTest)
 {
     state->dataBaseboardRadiator->baseboards.allocate(1);
     auto &thisBB = state->dataBaseboardRadiator->baseboards(1);
-    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = false;
+
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** For autosizing of ZoneHVAC:Baseboard:Convective:Water , a zone sizing run must be done.\n"
+                          "   **   ~~~   ** No \"Sizing:Zone\" objects were entered.\n"
+                          "   **   ~~~   ** The \"SimulationControl\" object did not have the field \"Do Zone Sizing Calculation\" set to Yes.\n"
+                          "   **  Fatal  ** Program terminates due to previously shown condition(s).\n"
+                          "   ...Summary of Errors that led to program termination:\n"
+                          "   ..... Reference severe error count=1\n"
+                          "   ..... Last severe error=For autosizing of ZoneHVAC:Baseboard:Convective:Water , a zone sizing run must be done."});
 
     // Test 1A: UA autosized so MySizeFlag should stay true
-    thisBB.MySizeFlag = true; // reset to default/initialized value
     thisBB.UA = DataSizing::AutoSize;
     thisBB.WaterVolFlowRateMax = 0.001;
     thisBB.HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
     thisBB.ScaledHeatingCapacity = 1.0;
-    thisBB.resetSizingFlagBasedOnInput(*state);
-    EXPECT_TRUE(thisBB.MySizeFlag);
+    ASSERT_THROW(thisBB.checkForZoneSizing(*state), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 
     // Test 1B: WaterVolFlowRateMax autosized so MySizeFlag should stay true
-    thisBB.MySizeFlag = true; // reset to default/initialized value
+    state->dataErrTracking->TotalSevereErrors = 0;
     thisBB.UA = 0.5;
     thisBB.WaterVolFlowRateMax = DataSizing::AutoSize;
     thisBB.HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
     thisBB.ScaledHeatingCapacity = 1.0;
-    thisBB.resetSizingFlagBasedOnInput(*state);
-    EXPECT_TRUE(thisBB.MySizeFlag);
+    ASSERT_THROW(thisBB.checkForZoneSizing(*state), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 
     // Test 1C: Heating Capacity autosized for method HeatingDesignCapacity so MySizeFlag should stay true
-    thisBB.MySizeFlag = true; // reset to default/initialized value
+    state->dataErrTracking->TotalSevereErrors = 0;
     thisBB.UA = 0.5;
     thisBB.WaterVolFlowRateMax = 0.001;
     thisBB.HeatingCapMethod = DataSizing::HeatingDesignCapacity;
     thisBB.ScaledHeatingCapacity = DataSizing::AutoSize;
-    thisBB.resetSizingFlagBasedOnInput(*state);
-    EXPECT_TRUE(thisBB.MySizeFlag);
+    ASSERT_THROW(thisBB.checkForZoneSizing(*state), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 
     // Test 2A: Heating Capacity not autosized for method HeatingDesignCapacity and UA and WaterVolFlowRateMax not autosized
     //          so MySizeFlag should be changed to false
-    thisBB.MySizeFlag = true; // reset to default/initialized value
+    state->dataErrTracking->TotalSevereErrors = 0;
     thisBB.UA = 0.5;
     thisBB.WaterVolFlowRateMax = 0.001;
     thisBB.HeatingCapMethod = DataSizing::HeatingDesignCapacity;
     thisBB.ScaledHeatingCapacity = 1000.0;
-    thisBB.resetSizingFlagBasedOnInput(*state);
-    EXPECT_FALSE(thisBB.MySizeFlag);
+    thisBB.checkForZoneSizing(*state);
+    EXPECT_TRUE(compare_err_stream("", true));
 
     // Test 2B: CapacityPerFloorArea method and UA and WaterVolFlowRateMax not autosized
     //          so MySizeFlag should be changed to false
-    thisBB.MySizeFlag = true; // reset to default/initialized value
+    state->dataErrTracking->TotalSevereErrors = 0;
     thisBB.UA = 0.5;
     thisBB.WaterVolFlowRateMax = 0.001;
     thisBB.HeatingCapMethod = DataSizing::CapacityPerFloorArea;
     thisBB.ScaledHeatingCapacity = DataSizing::AutoSize; // this value does not mater since it is not really valid for this method
-    thisBB.resetSizingFlagBasedOnInput(*state);
-    EXPECT_FALSE(thisBB.MySizeFlag);
+    thisBB.checkForZoneSizing(*state);
+    EXPECT_TRUE(compare_err_stream("", true));
 }
 
 } // namespace EnergyPlus
