@@ -461,7 +461,7 @@ void GetPIUs(EnergyPlusData &state)
                     } else if (Util::SameString(heating_control_type, "Modulated")) {
                         thisPIU.heatingControlType = HeatCntrlBehaviorType::ModulatedHeaterBehavior;
                     } else {
-                        ShowSevereError(state, format("Illegal Heating Control Type = {}", heating_control_type));
+                        ShowSevereError(state, "Heating Control Type should be Staged or Modulared");
                         ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisPIU.Name));
                         ErrorsFound = true;
                     }
