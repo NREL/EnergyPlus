@@ -12068,6 +12068,57 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetKivaFoundationTest2)
                           "   **   ~~~   ** will be overridden with the Autoselected depth (40.0 m)"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
+TEST_F(EnergyPlusFixture, SurfaceGeometry_GetKivaFoundationTest3)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "Material,",
+        "  exterior vertical ins,                  !- Name",
+        "  Rough,                                  !- Roughness",
+        "  0.04611624,                             !- Thickness {m}",
+        "  0.029427,                               !- Conductivity {W/m-K}",
+        "  32.04,                                  !- Density {kg/m3}",
+        "  1214.23,                                !- Specific Heat {J/kg-K}",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.7;                                    !- Visible Absorptance",
+
+        "Foundation:Kiva,",
+        "  Foundation Kiva 1,                      !- Name",
+        "  20,                                     !- Initial Indoor Air Temperature {C}",
+        "  ,                                       !- Interior Horizontal Insulation Material Name",
+        "  ,                                       !- Interior Horizontal Insulation Depth {m}",
+        "  ,                                       !- Interior Horizontal Insulation Width {m}",
+        "  ,                                       !- Interior Vertical Insulation Material Name",
+        "  ,                                       !- Interior Vertical Insulation Depth {m}",
+        "  ,                                       !- Exterior Horizontal Insulation Material Name",
+        "  ,                                       !- Exterior Horizontal Insulation Depth {m}",
+        "  ,                                       !- Exterior Horizontal Insulation Width {m}",
+        "  ,                                       !- Exterior Vertical Insulation Material Name",
+        "  ,                                       !- Exterior Vertical Insulation Depth {m}",
+        "  0.3048,                                 !- Wall Height Above Grade {m}",
+        "  0.2032,                                 !- Wall Depth Below Slab {m}",
+        "  ,                                       !- Footing Wall Construction Name",
+        "  ,                                       !- Footing Material Name",
+        "  ,                                       !- Footing Depth {m}",
+        "  exterior vertical ins,                  !- Custom Block Material Name 1",
+        "  2.4384,                                 !- Custom Block Depth 1 {m}",
+        "  0.2159,                                 !- Custom Block X Position 1 {m}",
+        "  0;                                      !- Custom Block Z Position 1 {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataEnvrn->Elevation = 600.;
+
+    Material::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetFoundationData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_TRUE(compare_err_stream(""));
+}
 TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
 {
 
