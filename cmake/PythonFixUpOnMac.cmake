@@ -71,20 +71,3 @@ foreach(PREREQ IN LISTS PREREQUISITES)
     execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@loader_path/${LIB_INT_FILENAME}" "${LOCAL_PYTHON_LIBRARY}")
   endif()
 endforeach()
-
-##############3
-# we need to look into the tkinter binary's runtime dependencies, copy over the tcl and tk dylibs, update them with install_name_tool, and make sure they all get signed, like this:
-
-# libtcl
-# cp /opt/homebrew/opt/tcl-tk/lib/libtcl8.6.dylib /path/to/python_lib/lib-dynload/
-# install_name_tool -change "/opt/homebrew/opt/tcl-tk/lib/libtcl8.6.dylib" "@loader_path/libtcl8.6.dylib" /path/to/python_lib/lib-dynload/_tkinter.cpython-312-darwin.so
-
-# Do the same for libtk
-# cp /opt/homebrew/opt/tcl-tk/lib/libtk8.6.dylib /path/to/python_lib/lib-dynload/
-# install_name_tool -change "/opt/homebrew/opt/tcl-tk/lib/libtk8.6.dylib" "@loader_path/libtk8.6.dylib" /path/to/python_lib/lib-dynload/_tkinter.cpython-312-darwin.so
-
-# Resign _tkinter
-# codesign -vvvv -s "Developer ID Application: National ..." -f --timestamp -i "org.nrel.EnergyPlus" -o runtime /path/to/python_lib/lib-dynload/_tkinter.cpython-312-darwin.so
-# codesign -vvvv -s "Developer ID Application: National ..." -f --timestamp -i "org.nrel.EnergyPlus" -o runtime /path/to/python_lib/lib-dynload/libtcl8.6.dylib
-# codesign -vvvv -s "Developer ID Application: National ..." -f --timestamp -i "org.nrel.EnergyPlus" -o runtime /path/to/python_lib/lib-dynload/libtk8.6.dylib
-##############3
