@@ -98,10 +98,7 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
         return evapAirFlowRateAtSpeed(state, nominal_speed);
     }
 
-    Real64 ratedEvapAirFlowRate(EnergyPlusData &state) override // TODO: what speed?
-    {
-        return evapAirFlowRateAtSpeed(state, nominal_speed) / state.dataEnvrn->StdRhoAir;
-    }
+    Real64 ratedEvapAirFlowRate(EnergyPlusData &state) override; // TODO: what speed?
 
     Real64 ratedGrossTotalCap() override
     {

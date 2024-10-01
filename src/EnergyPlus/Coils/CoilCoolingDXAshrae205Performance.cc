@@ -413,3 +413,8 @@ Real64 CoilCoolingDX205Performance::ratedTotalCapacityAtSpeed(EnergyPlusData &st
 {
     return calculate_rated_capacities(state, speed).gross_total_capacity;
 }
+
+Real64 CoilCoolingDX205Performance::ratedEvapAirFlowRate(EnergyPlusData &state)
+{
+    return evapAirFlowRateAtSpeed(state, nominal_speed) / state.dataEnvrn->StdRhoAir;
+}
