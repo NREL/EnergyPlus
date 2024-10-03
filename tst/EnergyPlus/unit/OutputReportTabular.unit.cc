@@ -519,10 +519,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     EXPECT_EQ(state->dataOutRptTab->radiantPulseReceived.size(), 42u);
 
     // decayCurveCool.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
-    EXPECT_EQ(state->dataOutRptTab->decayCurveCool.size(), 672u);
+    EXPECT_EQ(state->dataOutRptTab->znDecayCurveCool.size(), 672u);
 
     // decayCurveHeat.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
-    EXPECT_EQ(state->dataOutRptTab->decayCurveHeat.size(), 672u);
+    EXPECT_EQ(state->dataOutRptTab->znDecayCurveHeat.size(), 672u);
 
     EXPECT_EQ(state->dataOutRptTab->surfCompLoads.size(), 5u);
     EXPECT_EQ(state->dataOutRptTab->surfCompLoads[0].ts.size(), 96u);
@@ -8334,7 +8334,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
             auto &surfCLDayTS = state->dataOutRptTab->surfCompLoads[coolDesSelected - 1].ts[step - 1].surf[jSurf - 1];
             surfCLDayTS.TMULTseq = 0.1 * step;
             surfCLDayTS.ITABSFseq = 0.2 * step * surfBaseValue[jSurf - 1];
-            state->dataOutRptTab->decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
+            state->dataOutRptTab->znDecayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
         }
     }
 
@@ -8393,7 +8393,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
             auto &surfCLDayTS = state->dataOutRptTab->surfCompLoads[coolDesSelected - 1].ts[step - 1].surf[jSurf - 1];
             surfCLDayTS.TMULTseq = 0.1 * step;
             surfCLDayTS.ITABSFseq = 0.2 * step * surfBaseValue[jSurf - 1];
-            state->dataOutRptTab->decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
+            state->dataOutRptTab->znDecayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
         }
     }
 

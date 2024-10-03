@@ -851,7 +851,7 @@ namespace OutputReportTabular {
 
     void DeallocateLoadComponentArrays(EnergyPlusData &state);
 
-    void ComputeLoadComponentDecayCurve(EnergyPlusData &state);
+    void ComputeLoadComponentDecayCurve(EnergyPlusData &state, Array2D<Real64> &szCoolCurve, Array2D<Real64> &szHeatCurve, bool forSpace = false);
 
     void GatherComponentLoadsSurface(EnergyPlusData &state);
 
@@ -1261,8 +1261,10 @@ struct OutputReportTabularData : BaseGlobalStruct
     // arrays related to pulse and load component reporting
     Array2D_int radiantPulseTimestep;
     Array2D<Real64> radiantPulseReceived;
-    Array2D<Real64> decayCurveCool;
-    Array2D<Real64> decayCurveHeat;
+    Array2D<Real64> znDecayCurveCool; // Decay curve relative to zone sensible cooling peak
+    Array2D<Real64> znDecayCurveHeat; // Decay curve relative to zone sensible heating peak
+    Array2D<Real64> spDecayCurveCool; // Decay curve relative to space sensible cooling peak
+    Array2D<Real64> spDecayCurveHeat; // Decay curve relative to space sensible heating peak
 
     std::vector<OutputReportTabular::componentLoadsSurf> surfCompLoads; // Surface component loads by day, timestep, then surface
     std::vector<OutputReportTabular::componentLoadsSpZn> znCompLoads;   // Zone component loads by day, timestep, then zone
@@ -1375,12 +1377,6 @@ struct OutputReportTabularData : BaseGlobalStruct
     int indexUnitConvWCS = 0;
     Real64 curValueSIWCS = 0.0;
     Real64 curValueWCS = 0.0;
-    int ZoneNumCLCDC = 0;
-    int SurfNumCLCDC = 0;
-    int TimeStepCLCDC = 0;
-    int TimeOfPulseCLCDC = 0;
-    int CoolDesSelectedCLCDC = 0; // design day selected for cooling
-    int HeatDesSelectedCLCDC = 0; // design day selected for heating
     Real64 BigNumRMG = 0.0;
     int foundGsui = 0;
     int iUnitGsui = 0;
@@ -1538,8 +1534,10 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->DesignDayCount = 0;
         this->radiantPulseTimestep.deallocate();
         this->radiantPulseReceived.deallocate();
-        this->decayCurveCool.deallocate();
-        this->decayCurveHeat.deallocate();
+        this->znDecayCurveCool.deallocate();
+        this->znDecayCurveHeat.deallocate();
+        this->spDecayCurveCool.deallocate();
+        this->spDecayCurveHeat.deallocate();
         this->surfCompLoads.clear();
         this->znCompLoads.clear();
         this->spCompLoads.clear();
@@ -1648,12 +1646,6 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->indexUnitConvWCS = 0;
         this->curValueSIWCS = 0.0;
         this->curValueWCS = 0.0;
-        this->ZoneNumCLCDC = 0;
-        this->SurfNumCLCDC = 0;
-        this->TimeStepCLCDC = 0;
-        this->TimeOfPulseCLCDC = 0;
-        this->CoolDesSelectedCLCDC = 0; // design day selected for cooling
-        this->HeatDesSelectedCLCDC = 0; // design day selected for heating
         this->BigNumRMG = 0.0;
         this->foundGsui = 0;
         this->iUnitGsui = 0;
