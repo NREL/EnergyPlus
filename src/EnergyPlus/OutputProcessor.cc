@@ -803,7 +803,7 @@ namespace OutputProcessor {
 
                     // Has to be a summed variable
                     if (srcDDVar->storeType != StoreType::Sum) {
-                        ShowWarningCustomMessage(state,
+                        ShowWarningCustomMessage(state, // Is clang-format formatting things like this? This is gross.
                                                  eoh,
                                                  format(R"(Meter:Custom="{}", variable not summed variable {}="{}".)",
                                                         ipsc->cAlphaArgs(1),
@@ -867,8 +867,7 @@ namespace OutputProcessor {
                                             ipsc->cAlphaFieldNames(fldIndex + 1),
                                             ipsc->cAlphaArgs(fldIndex + 1)));
                     ShowContinueError(state, "...will not be shown with the Meter results.");
-                    foundBadSrc = true;
-                    break;
+                    // Not setting the foundBadSrc flag here.
                 }
 
             } // for (fldIndex)
@@ -3058,7 +3057,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::TimeStepType timeStepType, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::StoreType storeType,       // State, Average=1, NonState, Sum=2
                          std::string const &key,                     // Associated Key for this variable
-                         int const indexGroupKey,                    // Group identifier for SQL output
+                         [[maybe_unused]] int const indexGroupKey,   // Group identifier for SQL output
                          OutputProcessor::ReportFreq freq            // Internal use -- causes reporting at this freqency
 )
 {

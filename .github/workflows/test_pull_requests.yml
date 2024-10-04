@@ -1,0 +1,196 @@
+name: Build and Test
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  FC: gfortran-13
+  Python_REQUIRED_VERSION: 3.12.3  # 3.12.2 not available on Ubuntu 24 GHA
+
+jobs:
+  build_and_test:
+    name: Testing on ${{ matrix.pretty }}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - os: macos-14
+          macos_dev_target: 13.0
+          arch: arm64
+          python-arch: arm64
+          generator: "Unix Makefiles"
+          nproc: 3
+          run_regressions: true
+          pretty: "Mac arm64"
+#        - os: ubuntu-24.04
+#          arch: x86_64
+#          python-arch: x64
+#          generator: "Unix Makefiles"
+#          nproc: 4
+#          run_regressions: false
+#          pretty: "Ubuntu 24.04"
+#        - os: windows-2022
+#          arch: x86_64
+#          python-arch: x64
+#          generator: "Visual Studio 17 2022"
+#          nproc: 4
+#          run_regressions: false
+#          pretty: "Windows x64"
+
+    steps:
+
+    - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
+      id: setup-python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.Python_REQUIRED_VERSION }}
+
+    - name: Install Dependencies for Mac  # gcc13 reinstall may not be needed
+      if: runner.os == 'macOS'
+      run: |
+        brew update
+        brew install tcl-tk
+        brew reinstall gcc@13
+        echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
+        echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
+
+    - name: Install Dependencies for Linux
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
+        if [[ "${{ matrix.os }}" == "ubuntu-24.04" ]]; then
+          # https://github.com/actions/runner-images/issues/10025
+          echo "FC=gfortran-13" >> $GITHUB_ENV
+        fi
+
+    # BUILD AND TEST INTEGRATION FILES ON THE BASELINE BRANCH
+
+    - name: Baseline Checkout
+      if: matrix.run_regressions
+      uses: actions/checkout@v4
+      with:
+        ref: develop
+        path: baseline
+
+    - name: Baseline Create Build Directory
+      if: matrix.run_regressions
+      run: cmake -E make_directory ./baseline/build/
+
+    - name: Baseline Configure CMake
+      if: matrix.run_regressions
+      working-directory: ./baseline/build
+      run: >
+        cmake
+        -G "${{ matrix.generator }}"
+        -DCMAKE_BUILD_TYPE:STRING=Release
+        -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }}
+        -DLINK_WITH_PYTHON:BOOL=ON
+        -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }}
+        -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/
+        -DBUILD_TESTING:BOOL=ON
+        -DBUILD_FORTRAN:BOOL=ON
+        -DBUILD_PACKAGE:BOOL=OFF
+        -DDOCUMENTATION_BUILD:STRING=DoNotBuild
+        -DENABLE_OPENMP:BOOL=OFF
+        -DUSE_OpenMP:BOOL=OFF
+        ../
+
+    # During baseline builds, just build specific target list so that we don't waste time building the unit test binary
+
+    - name: Baseline Build on Windows
+      if: matrix.run_regressions && runner.os == 'Windows'
+      working-directory: ./baseline/build
+      run: cmake --build . -j ${{ matrix.nproc }} --config Release --target energyplus ExpandObjects_build ReadVars_build Slab_build Basement_build AppGPostProcess_build ParametricPreprocessor_build
+
+    - name: Baseline Build on Mac/Linux
+      if: matrix.run_regressions && runner.os != 'Windows'
+      working-directory: ./baseline/build
+      run: cmake --build . -j ${{ matrix.nproc }} --target energyplus ExpandObjects ReadVarsESO Slab Basement AppGPostProcess ParametricPreprocessor
+
+    - name: Baseline Test
+      if: matrix.run_regressions
+      working-directory: ./baseline/build
+      run: ctest -C Release -R integration -j 3  # TODO: Speed up basement so we don't have to skip it.
+
+    # BUILD AND TEST EVERYTHING ON THE CURRENT BRANCH
+
+    - name: Branch Checkout
+      uses: actions/checkout@v4
+      with:
+        path: branch
+
+    - name: Branch Create Build Directory
+      run: cmake -E make_directory ./branch/build/
+
+    - name: Branch Configure CMake
+      working-directory: ./branch/build
+      run: >
+        cmake
+        -G "${{ matrix.generator }}"
+        -DCMAKE_BUILD_TYPE:STRING=Release
+        -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }}
+        -DLINK_WITH_PYTHON:BOOL=ON
+        -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }}
+        -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/
+        -DBUILD_TESTING:BOOL=ON
+        -DBUILD_FORTRAN:BOOL=ON
+        -DBUILD_PACKAGE:BOOL=OFF
+        -DDOCUMENTATION_BUILD:STRING=DoNotBuild
+        -DENABLE_OPENMP:BOOL=OFF
+        -DUSE_OpenMP:BOOL=OFF
+        ../
+
+    - name: Branch Build
+      id: branch_build
+      working-directory: ./branch/build
+      run: cmake --build . -j ${{ matrix.nproc }} --config Release
+
+    - name: Branch Test
+      working-directory: ./branch/build
+      run: ctest -C Release -j 3
+
+    - name: Install Regression Tool
+      if: always() && matrix.run_regressions && steps.branch_build.outcome != 'failure'  # always run this step as long as we actually built
+      run: pip install energyplus-regressions
+
+    - name: Run Regressions
+      if: always() && matrix.run_regressions && steps.branch_build.outcome != 'failure'  # always run this step as long as we actually built
+      id: regressions
+      # steps.regressions.conclusion is always "success", but if no regressions, steps.regressions.outcome is "success"
+      continue-on-error: true
+      run: python ./branch/scripts/dev/gha_regressions.py ./baseline/build/testfiles ./branch/build/testfiles/ ./regressions
+
+    - uses: actions/upload-artifact@v4
+      id: upload_regressions
+      if: always() && matrix.run_regressions && steps.regressions.outcome == 'failure'  # only run this if regressions were encountered "failed"
+      with:
+        name: "regressions-${{ matrix.os }}"
+        path: "${{ github.workspace }}/regressions"
+
+    - name: Generate Regression Summary GitHub Script
+      if: always() && matrix.run_regressions && steps.regressions.outcome == 'failure'
+      run: >
+        python ./branch/scripts/dev/build_regression_summary.py
+        ${{ github.workspace }}/regressions/summary.md
+        ${{ github.workspace }}/regressions/summary.js
+        ${{ matrix.os }}
+        ${{ github.sha }}
+        ${{ github.run_id }}
+        ${{ steps.upload_regressions.outputs.artifact-url }}
+
+    - uses: actions/github-script@v7
+      if: always() && matrix.run_regressions && steps.regressions.outcome == 'failure'
+      with:
+        script: |
+          const script = require('${{ github.workspace }}/regressions/summary.js')
+          console.log(script({github, context}))

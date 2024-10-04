@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -35,7 +35,8 @@
         <div class="row">
             <div class="col-md-2"></div>
             <div class="col-md-8 text-center">
-                <h1><img src="favicon.png" alt="EnergyPlus Logo" width="98" height="98"> EnergyPlus</h1>
+                <h1><!--suppress CheckImageSize -->
+                    <img src="favicon.png" alt="EnergyPlus Logo" width="98" height="98"> EnergyPlus</h1>
                 <p>
                     Version @CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@.@CMAKE_VERSION_PATCH@<br>
                     @CMAKE_PROJECTED_RELEASE_DATE@<br>
@@ -90,12 +91,41 @@
 
     <h2>* Python Ecosystem *</h2>
     <p>
-        While EnergyPlus will continue to provide users with current workflows and installation methods, we are pushing
-        toward a more flexible EnergyPlus that behaves like a standard Python library.  An upcoming version will allow
-        users to pip install energyplus, which will bring down the EnergyPlus native libraries plus the Python API
-        bindings, ready to be used by the user's desired Python environment.  This should make setting up EnergyPlus
-        much easier for many use cases!
+        The EnergyPlus-Python connections continue to grow. The Python-focused deployment via PyPi is still coming,
+        but will remain on the <a href="https://test.pypi.org/project/energyplus/">test server</a> on PyPi for now.
+        Once official releases are ready, they will be on the
+        <a href="https://pypi.org/project/energyplus/">main PyPi</a> page, so check there if interested.
+        The <code>pip install energyplus</code> experience will bring EnergyPlus native libraries plus the Python API
+        bindings, ready to be used by the user's desired Python environment. This should make setting up EnergyPlus
+        much easier for many Python-facing use cases!
     </p>
+    <p>
+        In addition to the Pip Install work coming along, we are also working to improve our Python integration for
+        traditional EnergyPlus use cases. As of 24.2, when a user downloads the install package onto their machine,
+        they will get the new cross-platform Python-based EP-Launch. The classic EP-Launch is still packaged for now,
+        but will likely be deprecated in favor of the Python tools soon. There are two ways to launch this new
+        EP-Launch:
+    <ul class="list-group">
+        <li class="list-group-item">
+            For <strong>Windows</strong>, there is a batch file right inside the EnergyPlus install folder called
+            <code>EPLaunchPython</code> that will launch the EP-Launch application:
+            <img class="center" style="display:block;margin-left:auto;margin-right:auto;border:2px solid #555;"
+                 src='data:image/png;base64,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'
+                 alt="EnergyPlus Python Launch Shortcut">
+            Just double click it! It will open a terminal window before launching the Python app, but
+            you can ignore that for now. Once we get some testing feedback, we'll include it as a proper shortcut
+            on the Start Menu and other locations.
+        </li>
+        <li class="list-group-item">
+            On all platforms, you can launch the new EP-Launch right from the command line using a new auxiliary
+            command class. Simply launch a terminal, and execute a single command. On Windows, it would be
+            <code>C:\Path\To\EnergyPlusV24-2-0\energyplus.exe auxiliary eplaunch</code>. On POSIX-y systems, it would
+            be <code>/path/to/energyplus auxiliary eplaunch</code>. Give it a try and let us know how it goes. As
+            always, we appreciate issue reports on our
+            <a href="https://github.com/NREL/EnergyPlus/issues/new">GitHub repository</a>.
+        </li>
+    </ul>
+
 
     <h2><a id="Whats_going_on"></a>What’s going on in V@CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@?</h2>
     <div class="row">
@@ -158,23 +188,21 @@
                aria-expanded="false"
                aria-controls="collapseCompatible">
                 Is version @CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@ backward compatible?
-                Can I run v@PREV_VERSION_MAJOR@.@PREV_VERSION_MINOR@ file in v@CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@?
+                Can I run v@PREV_VERSION_MAJOR@.@PREV_VERSION_MINOR@ file in
+                v@CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@?
             </a>
             <div class="collapse" id="collapseCompatible">
                 <div class="card card-body">
                     <h5 class="card-title">Some objects require transition</h5>
                     There have been changes in the following objects which require conversion. Either read and follow
-                    the Rules document or use the IDFVersionUpdater utility. The “Rules” document contains information
+                    the "Rules" document or use the IDFVersionUpdater utility. The “Rules” document contains information
                     on exact object changes that you can do by hand. The updater program is described more fully in the
                     Auxiliary Programs document.
                     <ul class="list-group">
-                        <li class="list-group-item transition-object-name">AirLoopHVAC:UnitarySystem</li>
-                        <li class="list-group-item transition-object-name">ComfortViewFactorAngles</li>
-                        <li class="list-group-item transition-object-name">HeatExchanger:AirToAir:SensibleAndLatent</li>
-                        <li class="list-group-item transition-object-name">People</li>
-                        <li class="list-group-item transition-object-name">ZoneHVAC:PackagedTerminalAirConditioner</li>
-                        <li class="list-group-item transition-object-name">ZoneHVAC:PackagedTerminalHeatPump</li>
-                        <li class="list-group-item transition-object-name">ZoneHVAC:WaterToAirHeatPump</li>
+                        <li class="list-group-item transition-object-name">HeatPump:PlantLoop:EIR:Cooling</li>
+                        <li class="list-group-item transition-object-name">HeatPump:PlantLoop:EIR:Heating</li>
+                        <li class="list-group-item transition-object-name">OutputControl:Files</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:TerminalUnit:VariableRefrigerantFlow</li>
                     </ul>
                 </div>
             </div>
@@ -215,7 +243,7 @@
             href="https://energyplus.net/documentation">online</a>. For <strong>new users</strong> of EnergyPlus, a
         guide called the EnergyPlus Essentials was developed and is available with the installed pdf documentation.
         Big Ladder Software is also hosting html versions of the
-        EnergyPlus Documentation <a href="http://bigladdersoftware.com/epx/docs/">online</a>.
+        EnergyPlus Documentation <a href="https://bigladdersoftware.com/epx/docs/">online</a>.
     </p>
     <p>There are some other documents of interest available on the EnergyPlus web site including:</p>
     <div class="list-group">
@@ -246,31 +274,32 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/10081">10081</a></td>
-            <td>API Enhancements</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10311">10311</a></td>
+            <td>NewFeature: Additional ASHRAE Metrics for E+ 24-1</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/10277">10277</a></td>
-            <td>Enhancement for Heat Exchanger for Variable-Speed Heat Recovery Ventilation</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10372">10372</a></td>
+            <td>Add Reports to Support createRMD - ruleset model description</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/10363">10363</a></td>
-            <td>Add E+ API demo to the install</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10379">10379</a></td>
+            <td>Air-To-Water Heat Pump with Heat Recovery</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/10385">10385</a></td>
-            <td>Indoor living wall module</td>
-        </tr>
-    </table>
-    <h3><a id="PerformanceFeatures"></a>Runtime Performance Enhancing Developments</h3>
-    <table class="table table-striped table-bordered">
-        <tr>
-            <th>PR #</th>
-            <th>Description</th>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10415">10415</a></td>
+            <td>Chiller economizing using thermosiphon or fluid heat exchanger free cooling</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/10231">10231</a></td>
-            <td>SetupOutputVariable wrapper to use enum type parameters (endUseCategory, ReportingFrequency, and eResouceType)</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10511">10511</a></td>
+            <td>Variable flow condenser plant control</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10658">10658</a></td>
+            <td>A couple API Endpoints</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10716">10716</a></td>
+            <td>Initial Python App Packaging</td>
         </tr>
     </table>
     <h3><a id="RefactoringEfforts"></a>Targeted Refactoring Efforts</h3>
@@ -280,24 +309,20 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/10281">10281</a></td>
-            <td>Initial WeatherManager refactor</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10323">10323</a></td>
+            <td>Reformat eplusout.dbg file for easier excel viewing</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/10289">10289</a></td>
-            <td>First (and only?) Pollution module refactor </td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10474">10474</a></td>
+            <td>Fans Refactor</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/10347">10347</a></td>
-            <td>OutputProcessor Refactor</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10720">10720</a></td>
+            <td>Material Refactor</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/10351">10351</a></td>
-            <td>DaylightingManager Refactor -- Part 2</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/10404">10404</a></td>
-            <td>Heat Pump Plant Loop EIR refactoring</td>
+            <td>Many PRs</td>
+            <td>Addressing CppCheck warnings and suggestions across our codebase</td>
         </tr>
     </table>
 
@@ -316,18 +341,18 @@
 
     <h2><a id="Platforms_90"></a>Platforms</h2>
     <p>
-        We test and develop on Windows 10 and 11, and currently produce 32 and 64 bit builds on Windows.  The 32-bit
-        build is likely to be removed at some point soon.  For Linux, we provide packages for
-        Ubuntu 20.04 and 22.04.  This release also includes an Ubuntu 18.04 build, but moving forward we will be
-        eliminating that.  On Mac, we are releasing an installer for OSX 10.15, 11, and 12, but the 10.15 will be
+        We test and develop on Windows 10 and 11, and currently produce 32 and 64 bit builds on Windows. The 32-bit
+        build is likely to be removed at some point soon. For Linux, we provide packages for
+        Ubuntu 20.04 and 22.04. This release also includes an Ubuntu 18.04 build, but moving forward we will be
+        eliminating that. On Mac, we are releasing an installer for OSX 10.15, 11, and 12, but the 10.15 will be
         eliminated soon.
     </p>
     <ul class="list-group">
-        <li class="list-group-item">Windows 10 and 11</li>
+        <li class="list-group-item">Windows 11</li>
         <li class="list-group-item">
-            Linux (Ubuntu 18.04, 20.04, 22.04) 64 bit versions
+            Linux (Ubuntu 22.04 and 24.04) 64 bit versions
         </li>
-        <li class="list-group-item">Mac OSX 10.15, 11, and 12 64 bit versions</li>
+        <li class="list-group-item">Mac OSX 12 x64 and 13 arm64</li>
         <li class="list-group-item">
             EnergyPlus V@CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@ has been tested on all of these platforms
         </li>
@@ -412,7 +437,8 @@
             University of California through Ernest Orlando Lawrence Berkeley National Laboratory, Oak Ridge National
             Laboratory, managed by
             UT-Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All rights reserved.</p>
-        <p>Other Notices and Acknowledgments are found in the <a
+        <p>Other Notices and Acknowledgments are found in the <!--suppress HtmlUnknownTarget -->
+            <a
                 href="Documentation/Acknowledgments.pdf">Acknowledgments</a>
             document.</p>
     </footer>

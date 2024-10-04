@@ -194,15 +194,15 @@ namespace HeatRecovery {
 
         // call the correct heat exchanger calculation routine
         switch (state.dataHeatRecovery->ExchCond(HeatExchNum).type) {
-        case HVAC::HXType::AirToAir_FlatPlate:
+        case HVAC::HXType::AirToAir_FlatPlate: {
             thisExch.CalcAirToAirPlateHeatExch(state, HXUnitOn, EconomizerFlag, HighHumCtrlFlag);
-            break;
+        } break;
 
-        case HVAC::HXType::AirToAir_Generic:
+        case HVAC::HXType::AirToAir_Generic: {
             thisExch.CalcAirToAirGenericHeatExch(state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag, HXPartLoadRatio);
-            break;
+        } break;
 
-        case HVAC::HXType::Desiccant_Balanced:
+        case HVAC::HXType::Desiccant_Balanced: {
             Real64 PartLoadRatio = present(HXPartLoadRatio) ? Real64(HXPartLoadRatio) : 1.0; // Part load ratio requested of DX compressor
             bool RegInIsOANode = present(RegenInletIsOANode) && bool(RegenInletIsOANode);
             thisExch.CalcDesiccantBalancedHeatExch(state,
@@ -215,7 +215,11 @@ namespace HeatRecovery {
                                                    RegInIsOANode,
                                                    EconomizerFlag,
                                                    HighHumCtrlFlag);
-            break;
+        } break;
+
+        default: {
+            assert(false);
+        } break;
         }
 
         thisExch.UpdateHeatRecovery(state);
@@ -513,7 +517,7 @@ namespace HeatRecovery {
                 thisExchanger.EconoLockOut = static_cast<bool>(toggle);
             }
 
-            // yujie: read new curves here
+            // read new curves here
             thisExchanger.HeatEffectSensibleCurveIndex =
                 Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11)); // convert curve name to number
             thisExchanger.HeatEffectLatentCurveIndex =

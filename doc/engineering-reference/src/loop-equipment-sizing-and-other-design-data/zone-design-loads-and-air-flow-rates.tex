@@ -243,6 +243,12 @@ If \emph{cooling design air flow method} is \emph{flow/zone}, then \emph{cooling
 
 If \emph{heating design air flow method} is \emph{flow/zone}, then \emph{heating design air flow rate} will be used for the design max heating air flow rate. If \emph{heating design air flow method} is \emph{design day}, then the design day calculation will set the design max heating air flow rate. If \emph{heating design air flow method} is \emph{design day with limit}, then the maximum from \emph{heating max flow per area}, \emph{heating max flow} and \emph{heating max flow fraction} will set an upper limit on the design max heating air flow rate. The design max heating air flow rate must always be \textgreater{} = the ventilation requirement. In each case, the outside airflow will be modified based on zone ventilation effectiveness specified in the zone sizing object.
 
+\subsection{Space Sizing}\label{space-sizing}
+When ZoneAirHeatBalanceAlgorithm ``Do Space Heat Balance for Sizing'' is ``Yes'', the same sizing calculations described above will be performed for each space that is part of a controlled zone, using the same thermostat setpoints as the parent zone. The space sizing results will be reported the same as zone sizing results (eio, table, and spsz outputs).
+
+\subsection{NonCoincident Zone Sizing}\label{noncoincident-zone-sizing}
+Sizing:Zone has an option for  ``Type of Space Sum to Use'', ``Coincident'' or ``NonCoincident''. Coincident zone sizing (the default) is always calculated first, with all spaces in the zone lumped together. For ``NonCoincident'' zone sizing, if the zone contains more than one space, the zone sizing results will be overwritten using the sums and averages of the space sizing results. If all spaces for a given load type (heating or cooling) peak on the same design day, then that day will be reported as the zone peak day, otherwise the zone design day will be "N/A". The zone peak time will be determined by scanning the peak zone sequential loads which are calculated by summing the space peak day sequential loads.
+
 \textbf{This concludes the calculation of the zone design flow rates and loads.}
 
 \subsection{Air Terminal Unit Sizing}\label{air-terminal-unit-sizing}

@@ -808,7 +808,6 @@ namespace DesiccantDehumidifiers {
             ErrorsFound2 = false;
             desicDehum.RegenFanIndex = Fans::GetFanIndex(state, desicDehum.RegenFanName);
             if (desicDehum.RegenFanIndex == 0) {
-                ErrorObjectHeader eoh{routineName, CurrentModuleObject, desicDehum.Name};
                 ShowSevereItemNotFound(state, eoh, cAlphaFields(7), desicDehum.RegenFanName);
                 ErrorsFoundGeneric = true;
             } else {

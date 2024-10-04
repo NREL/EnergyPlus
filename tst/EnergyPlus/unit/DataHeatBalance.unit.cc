@@ -843,9 +843,9 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(state->dataConstruction->Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
     EXPECT_EQ(state->dataConstruction->Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
 
-    EXPECT_EQ(state->dataMaterial->Material(4)->Name, "SINGLEPANE"); // single pane glass
-    EXPECT_EQ(state->dataMaterial->Material(5)->Name, "WINGAS");     // air gap
-    EXPECT_EQ(state->dataMaterial->Material(6)->Name, "BLIND");      // window blind
+    EXPECT_EQ(state->dataMaterial->materials(4)->Name, "SINGLEPANE"); // single pane glass
+    EXPECT_EQ(state->dataMaterial->materials(5)->Name, "WINGAS");     // air gap
+    EXPECT_EQ(state->dataMaterial->materials(6)->Name, "BLIND");      // window blind
 
     // construction layer material pointers. this construction has no blind
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(1), 4); // glass, outer layer
@@ -888,7 +888,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     SetFlagForWindowConstructionWithShadeOrBlindLayer(*state);
     EXPECT_TRUE(state->dataSurface->SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has blind
     // set the blind to movable
-    state->dataSurface->SurfWinMovableSlats(windowSurfNum) = true;
+    state->dataSurface->surfShades(windowSurfNum).blind.movableSlats = true;
     // check if EMS actuator is available when blind layer is added
     SetupWindowShadingControlActuators(*state);
     EXPECT_EQ(state->dataRuntimeLang->numEMSActuatorsAvailable, 2);

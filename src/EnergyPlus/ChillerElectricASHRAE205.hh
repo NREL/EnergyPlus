@@ -150,7 +150,7 @@ struct ChillerElectricASHRAE205Data : BaseGlobalStruct
     bool getInputFlag = true;
     Array1D<ChillerElectricASHRAE205::ASHRAE205ChillerSpecs> Electric205Chiller;
 
-    void init_state([[maybe_unused]] EnergyPlusData &state)
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
 

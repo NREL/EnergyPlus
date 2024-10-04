@@ -154,6 +154,8 @@ public:
 
     int getIDFObjNum(EnergyPlusData &state, std::string_view Object, int const Number);
 
+    std::vector<std::string> getIDFOrderedKeys(EnergyPlusData &state, std::string_view Object);
+
     int getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
     int getObjectItemNum(EnergyPlusData &state,

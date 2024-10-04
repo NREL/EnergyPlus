@@ -279,8 +279,9 @@ namespace HeatBalanceIntRadExchange {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss(state, constrNum);
                 } else if (construct.WindowTypeBSDF && state.dataSurface->SurfWinShadingFlag(SurfNum) == DataSurfaces::WinShadingType::IntShade) {
+                    auto &surfShade = state.dataSurface->surfShades(SurfNum);
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
-                    SurfaceEmiss[ZoneSurfNum] = surfWindow.EffShBlindEmiss[1] + surfWindow.EffGlassEmiss[1];
+                    SurfaceEmiss[ZoneSurfNum] = surfShade.effShadeEmi + surfShade.effGlassEmi;
                 } else if (construct.WindowTypeBSDF) {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
@@ -427,10 +428,8 @@ namespace HeatBalanceIntRadExchange {
 
         if (state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) != state.dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(SurfNum)) {
             auto const &thissurf = state.dataSurface->Surface(SurfNum);
-            Real64 AbsorpDiff =
-                std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal -
-                         dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum)))
-                             ->AbsorpThermal);
+            Real64 AbsorpDiff = std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal -
+                                         state.dataMaterial->materials(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->AbsorpThermal);
             if (AbsorpDiff > 0.01) {
                 MovableInsulationChange = true;
             }

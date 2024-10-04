@@ -109,33 +109,43 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     state->dataScheduleMgr->ScheduleInputProcessed = true;
 
-    for (int i = 0; i < 3; i++) {
-        Material::MaterialBase *p = new Material::MaterialChild;
-        state->dataMaterial->Material.push_back(p);
-    }
-    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
-    thisMaterial_1->Name = "WALL_1";
-    thisMaterial_1->group = Material::Group::Regular;
-    auto *thisMaterial_2 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(2));
-    thisMaterial_2->Name = "WALL_2";
-    thisMaterial_2->group = Material::Group::Regular;
-    auto *thisMaterial_3 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(3));
-    thisMaterial_3->Name = "WALL_3";
-    thisMaterial_3->group = Material::Group::Regular;
+    auto &s_mat = state->dataMaterial;
+
+    auto *mat1 = new Material::MaterialBase;
+    mat1->Name = "WALL_1";
+    mat1->group = Material::Group::Regular;
+    s_mat->materials.push_back(mat1);
+    mat1->Num = s_mat->materials.isize();
+    s_mat->materialMap.insert_or_assign(mat1->Name, mat1->Num);
+
+    auto *mat2 = new Material::MaterialBase;
+    mat2->Name = "WALL_2";
+    mat2->group = Material::Group::Regular;
+    s_mat->materials.push_back(mat2);
+    mat2->Num = s_mat->materials.isize();
+    s_mat->materialMap.insert_or_assign(mat2->Name, mat2->Num);
+
+    auto *mat3 = new Material::MaterialBase;
+    mat3->Name = "WALL_3";
+    mat3->group = Material::Group::Regular;
+    s_mat->materials.push_back(mat3);
+    mat3->Num = s_mat->materials.isize();
+    s_mat->materialMap.insert_or_assign(mat3->Name, mat3->Num);
+
     state->dataCurveManager->allocateCurveVector(2);
     state->dataCurveManager->PerfCurve(1)->Name = "THERMAL_ABSORPTANCE_TABLE";
     state->dataCurveManager->PerfCurve(2)->Name = "SOLAR_ABSORPTANCE_CURVE";
     state->dataCurveManager->GetCurvesInputFlag = false;
     bool errors_found(false);
     Material::GetVariableAbsorptanceInput(*state, errors_found);
-    EXPECT_ENUM_EQ(thisMaterial_1->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceTemperature);
-    EXPECT_EQ(thisMaterial_1->absorpThermalVarFuncIdx, 1);
-    EXPECT_EQ(thisMaterial_1->absorpSolarVarFuncIdx, 2);
-    EXPECT_ENUM_EQ(thisMaterial_2->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation);
-    EXPECT_EQ(thisMaterial_2->absorpSolarVarFuncIdx, 2);
-    EXPECT_ENUM_EQ(thisMaterial_3->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::Scheduled);
-    EXPECT_EQ(thisMaterial_3->absorpThermalVarSchedIdx, 1);
-    EXPECT_EQ(thisMaterial_3->absorpSolarVarSchedIdx, 1);
+    EXPECT_ENUM_EQ(mat1->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceTemperature);
+    EXPECT_EQ(mat1->absorpThermalVarFuncIdx, 1);
+    EXPECT_EQ(mat1->absorpSolarVarFuncIdx, 2);
+    EXPECT_ENUM_EQ(mat2->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation);
+    EXPECT_EQ(mat2->absorpSolarVarFuncIdx, 2);
+    EXPECT_ENUM_EQ(mat3->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::Scheduled);
+    EXPECT_EQ(mat3->absorpThermalVarSchedIdx, 1);
+    EXPECT_EQ(mat3->absorpSolarVarSchedIdx, 1);
 
     std::string idf_objects_bad_inputs = delimited_string({
         "MaterialProperty:VariableAbsorptance,",
@@ -223,8 +233,8 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     });
     ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
     Material::GetVariableAbsorptanceInput(*state, errors_found);
-    compare_err_stream("   ** Severe  ** MaterialProperty:VariableAbsorptance: invalid Reference Material Name entered=WALL_0, must match to a valid "
-                       "Material name.\n",
+    compare_err_stream("   ** Severe  ** GetVariableAbsorptanceInput: MaterialProperty:VariableAbsorptance = VARIABLETHERMAL_WALL_1\n   **   ~~~   "
+                       "** Reference Material Name = WALL_0, item not found.\n",
                        true);
 
     // wrong material group
@@ -239,11 +249,9 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
         ";                        !- Solar Absorptance Schedule Name",
     });
     ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
-    thisMaterial_1->group = Material::Group::WindowGlass;
+    mat1->group = Material::Group::Glass;
     Material::GetVariableAbsorptanceInput(*state, errors_found);
-    compare_err_stream(
-        "   ** Severe  ** MaterialProperty:VariableAbsorptance: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, "
-        "material=WALL_1, must have regular "
-        "properties (Thermal/Solar Absorptance)\n",
-        true);
+    compare_err_stream("   ** Severe  ** MaterialProperty:VariableAbsorptance: Reference Material is not appropriate type for Thermal/Solar "
+                       "Absorptance properties, material=WALL_1, must have regular properties (Thermal/Solar Absorptance)\n",
+                       true);
 }
