@@ -948,9 +948,8 @@ namespace HVACHXAssistedCoolingCoil {
                     mCoolingSpeedNum = 1; // Bypass mixed-speed calculations in called functions
                 } else {
                     if (singleMode) {
-                        CoilPLR = (mCoolingSpeedNum == 1)
-                                        ? PartLoadRatio
-                                        : 0.0; // singleMode allows cycling, but not part load operation at higher speeds
+                        CoilPLR =
+                            (mCoolingSpeedNum == 1) ? PartLoadRatio : 0.0; // singleMode allows cycling, but not part load operation at higher speeds
                     } else {
                         CoilPLR = PartLoadRatio;
                     }
