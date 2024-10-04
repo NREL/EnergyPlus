@@ -3819,16 +3819,17 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                             state.dataViewFactor->EnclRadInfo(radEnclosureNum).radQThermalRad *
                             state.dataViewFactor->EnclRadInfo(radEnclosureNum).radThermAbsMult * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                     } else {
-                        state.dataHeatBalSurfMgr->curQL = state.dataViewFactor->EnclRadInfo(radEnclosureNum).radQThermalRad;
+                        // radiant value prior to adjustment for pulse for load component report
+                        Real64 const curQL = state.dataViewFactor->EnclRadInfo(radEnclosureNum).radQThermalRad;
                         // for the loads component report during the special sizing run increase the radiant portion
                         // a small amount to create a "pulse" of heat that is used for the
-                        state.dataHeatBalSurfMgr->adjQL =
-                            state.dataHeatBalSurfMgr->curQL + state.dataViewFactor->EnclRadInfo(radEnclosureNum).FloorArea * pulseMultipler;
+                        // radiant value including adjustment for pulse for load component report
+                        Real64 const adjQL = curQL + state.dataViewFactor->EnclRadInfo(radEnclosureNum).FloorArea * pulseMultipler;
                         // ITABSF is the Inside Thermal Absorptance
                         // EnclRadThermAbsMult is a multiplier for each zone/enclosure
                         // SurfQdotRadIntGainsInPerArea is the thermal radiation absorbed on inside surfaces
                         state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) =
-                            state.dataHeatBalSurfMgr->adjQL * state.dataViewFactor->EnclRadInfo(radEnclosureNum).radThermAbsMult *
+                            adjQL * state.dataViewFactor->EnclRadInfo(radEnclosureNum).radThermAbsMult *
                             state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                     }
 
@@ -3956,16 +3957,17 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                             state.dataViewFactor->EnclRadInfo(radEnclosureNum).radQThermalRad *
                             state.dataViewFactor->EnclRadInfo(radEnclosureNum).radThermAbsMult * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                     } else {
-                        state.dataHeatBalSurfMgr->curQL = state.dataViewFactor->EnclRadInfo(radEnclosureNum).radQThermalRad;
+                        // radiant value prior to adjustment for pulse for load component report
+                        Real64 const curQL = state.dataViewFactor->EnclRadInfo(radEnclosureNum).radQThermalRad;
                         // for the loads component report during the special sizing run increase the radiant portion
                         // a small amount to create a "pulse" of heat that is used for the
-                        state.dataHeatBalSurfMgr->adjQL =
-                            state.dataHeatBalSurfMgr->curQL + state.dataViewFactor->EnclRadInfo(radEnclosureNum).FloorArea * pulseMultipler;
+                        // radiant value including adjustment for pulse for load component report
+                        Real64 const adjQL = curQL + state.dataViewFactor->EnclRadInfo(radEnclosureNum).FloorArea * pulseMultipler;
                         // ITABSF is the Inside Thermal Absorptance
                         // EnclRadThermAbsMult is a multiplier for each zone/radiant enclosure
                         // SurfQdotRadIntGainsInPerArea is the thermal radiation absorbed on inside surfaces
                         state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) =
-                            state.dataHeatBalSurfMgr->adjQL * state.dataViewFactor->EnclRadInfo(radEnclosureNum).radThermAbsMult *
+                            adjQL * state.dataViewFactor->EnclRadInfo(radEnclosureNum).radThermAbsMult *
                             state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                     }
                     // Radiations absorbed by the window layers coming from zone side

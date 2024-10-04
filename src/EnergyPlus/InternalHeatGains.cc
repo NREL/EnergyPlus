@@ -7914,11 +7914,11 @@ namespace InternalHeatGains {
                             thisEnclosure.radQThermalRad * thisEnclosure.radThermAbsMult * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                     } else {
                         // radiant value prior to adjustment for pulse for load component report
-                        Real64 curQL = thisEnclosure.radQThermalRad;
+                        Real64 const curQL = thisEnclosure.radQThermalRad;
                         // for the loads component report during the special sizing run increase the radiant portion
                         // a small amount to create a "pulse" of heat that is used for the delayed loads
                         // radiant value including adjustment for pulse for load component report
-                        Real64 adjQL = curQL + thisEnclosure.FloorArea * pulseMultipler;
+                        Real64 const adjQL = curQL + thisEnclosure.FloorArea * pulseMultipler;
                         // ITABSF is the Inside Thermal Absorptance
                         // EnclRadThermAbsMult is a multiplier for each zone
                         // SurfQdotRadIntGainsInPerArea is the thermal radiation absorbed on inside surfaces
