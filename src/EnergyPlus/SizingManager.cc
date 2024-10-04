@@ -431,12 +431,8 @@ void ManageSizing(EnergyPlusData &state)
         // both the pulse and normal zone sizing is complete so now post processing of the results is performed
         if (state.dataGlobal->CompLoadReportIsReq) {
             // call the routine that computes the decay curve
-            ComputeLoadComponentDecayCurve(state, state.dataOutRptTab->znDecayCurveCool, state.dataOutRptTab->znDecayCurveHeat);
+            ComputeLoadComponentDecayCurve(state);
             // remove some of the arrays used to derive the decay curves
-            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
-                bool forSpace = true;
-                ComputeLoadComponentDecayCurve(state, state.dataOutRptTab->spDecayCurveCool, state.dataOutRptTab->spDecayCurveHeat, forSpace);
-            }
             DeallocateLoadComponentArrays(state);
         }
     }

@@ -851,7 +851,7 @@ namespace OutputReportTabular {
 
     void DeallocateLoadComponentArrays(EnergyPlusData &state);
 
-    void ComputeLoadComponentDecayCurve(EnergyPlusData &state, Array2D<Real64> &szCoolCurve, Array2D<Real64> &szHeatCurve, bool forSpace = false);
+    void ComputeLoadComponentDecayCurve(EnergyPlusData &state);
 
     void GatherComponentLoadsSurface(EnergyPlusData &state);
 
@@ -1261,10 +1261,8 @@ struct OutputReportTabularData : BaseGlobalStruct
     // arrays related to pulse and load component reporting
     Array2D_int radiantPulseTimestep;
     Array2D<Real64> radiantPulseReceived;
-    Array2D<Real64> znDecayCurveCool; // Decay curve relative to zone sensible cooling peak
-    Array2D<Real64> znDecayCurveHeat; // Decay curve relative to zone sensible heating peak
-    Array2D<Real64> spDecayCurveCool; // Decay curve relative to space sensible cooling peak
-    Array2D<Real64> spDecayCurveHeat; // Decay curve relative to space sensible heating peak
+    Array2D<Real64> decayCurveCool;
+    Array2D<Real64> decayCurveHeat;
 
     std::vector<OutputReportTabular::componentLoadsSurf> surfCompLoads; // Surface component loads by day, timestep, then surface
     std::vector<OutputReportTabular::componentLoadsSpZn> znCompLoads;   // Zone component loads by day, timestep, then zone
@@ -1534,10 +1532,8 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->DesignDayCount = 0;
         this->radiantPulseTimestep.deallocate();
         this->radiantPulseReceived.deallocate();
-        this->znDecayCurveCool.deallocate();
-        this->znDecayCurveHeat.deallocate();
-        this->spDecayCurveCool.deallocate();
-        this->spDecayCurveHeat.deallocate();
+        this->decayCurveCool.deallocate();
+        this->decayCurveHeat.deallocate();
         this->surfCompLoads.clear();
         this->znCompLoads.clear();
         this->spCompLoads.clear();

@@ -14487,16 +14487,10 @@ void AllocateLoadComponentArrays(EnergyPlusData &state)
     ort->radiantPulseTimestep = 0;
     ort->radiantPulseReceived.allocate({0, state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays}, state.dataSurface->TotSurfaces);
     ort->radiantPulseReceived = 0.0;
-    ort->znDecayCurveCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
-    ort->znDecayCurveCool = 0.0;
-    ort->znDecayCurveHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
-    ort->znDecayCurveHeat = 0.0;
-    if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
-        ort->spDecayCurveCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
-        ort->spDecayCurveCool = 0.0;
-        ort->spDecayCurveHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
-        ort->spDecayCurveHeat = 0.0;
-    }
+    ort->decayCurveCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
+    ort->decayCurveCool = 0.0;
+    ort->decayCurveHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
+    ort->decayCurveHeat = 0.0;
 
     Real64 const numTSinDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
@@ -14551,7 +14545,7 @@ void DeallocateLoadComponentArrays(EnergyPlusData &state)
     ort->radiantPulseReceived.deallocate();
 }
 
-void ComputeLoadComponentDecayCurve(EnergyPlusData &state, Array2D<Real64> &szCoolCurve, Array2D<Real64> &szHeatCurve, bool forSpace)
+void ComputeLoadComponentDecayCurve(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -14573,8 +14567,7 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state, Array2D<Real64> &szCo
         if (zoneNum == 0) continue;
         if (!state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) continue;
         int const spaceNum = state.dataSurface->Surface(surfNum).spaceNum;
-        int coolDesSelected =
-            (forSpace) ? state.dataSize->CalcFinalSpaceSizing(spaceNum).CoolDDNum : state.dataSize->CalcFinalZoneSizing(zoneNum).CoolDDNum;
+        int coolDesSelected = state.dataSize->CalcFinalZoneSizing(zoneNum).CoolDDNum;
         // loop over timesteps after pulse occurred
         if (coolDesSelected != 0) {
             auto &surfCLClDay = ort->surfCompLoads[coolDesSelected - 1];
@@ -14593,14 +14586,13 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state, Array2D<Real64> &szCo
                 if (ort->radiantPulseReceived(coolDesSelected, surfNum) != 0.0) {
                     auto &surfClDayTS = surfCLClDay.ts[timeStep - 1].surf[surfNum - 1];
                     diff = surfClDayTS.loadConvectedWithPulse - surfClDayTS.loadConvectedNormal;
-                    szCoolCurve(timeStep - timeOfPulse + 1, surfNum) = -diff / ort->radiantPulseReceived(coolDesSelected, surfNum);
+                    ort->decayCurveCool(timeStep - timeOfPulse + 1, surfNum) = -diff / ort->radiantPulseReceived(coolDesSelected, surfNum);
                 } else {
-                    szCoolCurve(timeStep - timeOfPulse + 1, surfNum) = 0.0;
+                    ort->decayCurveCool(timeStep - timeOfPulse + 1, surfNum) = 0.0;
                 }
             }
         }
-        int const heatDesSelected =
-            (forSpace) ? state.dataSize->CalcFinalSpaceSizing(spaceNum).HeatDDNum : state.dataSize->CalcFinalZoneSizing(zoneNum).HeatDDNum;
+        int const heatDesSelected = state.dataSize->CalcFinalZoneSizing(zoneNum).HeatDDNum;
         if (heatDesSelected != 0) {
             auto &surfCLHtDay = ort->surfCompLoads[heatDesSelected - 1];
             int timeOfPulse = ort->radiantPulseTimestep(heatDesSelected, zoneNum);
@@ -14616,9 +14608,9 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state, Array2D<Real64> &szCo
                 if (ort->radiantPulseReceived(heatDesSelected, surfNum) != 0.0) {
                     auto &surfHtDayTS = surfCLHtDay.ts[timeStep - 1].surf[surfNum - 1];
                     diff = surfHtDayTS.loadConvectedWithPulse - surfHtDayTS.loadConvectedNormal;
-                    szHeatCurve(timeStep - timeOfPulse + 1, surfNum) = -diff / ort->radiantPulseReceived(heatDesSelected, surfNum);
+                    ort->decayCurveHeat(timeStep - timeOfPulse + 1, surfNum) = -diff / ort->radiantPulseReceived(heatDesSelected, surfNum);
                 } else {
-                    szHeatCurve(timeStep - timeOfPulse + 1, surfNum) = 0.0;
+                    ort->decayCurveHeat(timeStep - timeOfPulse + 1, surfNum) = 0.0;
                 }
             }
         }
@@ -14626,38 +14618,38 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state, Array2D<Real64> &szCo
 
     if (state.dataGlobal->ShowDecayCurvesInEIO) {
         // show the line definition for the decay curves
-        std::string_view const spaceZone = (forSpace) ? "Space" : "Zone";
         print(state.files.eio,
-              format("! <Radiant to Convective Decay Curves for Cooling>,{} Name, Surface Name, Time "
-                     "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n",
-                     spaceZone));
+              "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
+              "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n");
         print(state.files.eio,
-              format("! <Radiant to Convective Decay Curves for Heating>,{} Name, Surface Name, Time "
-                     "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n",
-                     spaceZone));
+              "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
+              "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n");
         // Put the decay curve into the EIO file
-        int numSpZn = (forSpace) ? state.dataGlobal->numSpaces : state.dataGlobal->NumOfZones;
-        for (int iSpZn = 1; iSpZn <= numSpZn; ++iSpZn) {
-            std::string_view const spZnName = (forSpace) ? state.dataHeatBal->space(iSpZn).Name : state.dataHeatBal->Zone(iSpZn).Name;
+        for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+            auto &thisZone = state.dataHeatBal->Zone(iZone);
             for (int kSurf : state.dataSurface->AllSurfaceListReportOrder) {
-                int const surfSpZnNum = (forSpace) ? state.dataSurface->Surface(kSurf).spaceNum : state.dataSurface->Surface(kSurf).Zone;
-                if (surfSpZnNum != iSpZn) continue;
-                print(
-                    state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", spZnName, state.dataSurface->Surface(kSurf).Name);
+                if (state.dataSurface->Surface(kSurf).Zone != iZone) continue;
+                print(state.files.eio,
+                      "{},{},{}",
+                      "Radiant to Convective Decay Curves for Cooling",
+                      thisZone.Name,
+                      state.dataSurface->Surface(kSurf).Name);
                 for (int jTime = 1; jTime <= min(state.dataGlobal->NumOfTimeStepInHour * 24, 36); ++jTime) {
-                    print(state.files.eio, ",{:6.3F}", szCoolCurve(jTime, kSurf));
+                    print(state.files.eio, ",{:6.3F}", ort->decayCurveCool(jTime, kSurf));
                 }
                 // put a line feed at the end of the line
                 print(state.files.eio, "\n");
             }
 
             for (int kSurf : state.dataSurface->AllSurfaceListReportOrder) {
-                int const surfSpZnNum = (forSpace) ? state.dataSurface->Surface(kSurf).spaceNum : state.dataSurface->Surface(kSurf).Zone;
-                if (surfSpZnNum != iSpZn) continue;
-                print(
-                    state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", spZnName, state.dataSurface->Surface(kSurf).Name);
+                if (state.dataSurface->Surface(kSurf).Zone != iZone) continue;
+                print(state.files.eio,
+                      "{},{},{}",
+                      "Radiant to Convective Decay Curves for Heating",
+                      thisZone.Name,
+                      state.dataSurface->Surface(kSurf).Name);
                 for (int jTime = 1; jTime <= min(state.dataGlobal->NumOfTimeStepInHour * 24, 36); ++jTime) {
-                    print(state.files.eio, ",{:6.3F}", szHeatCurve(jTime, kSurf));
+                    print(state.files.eio, ",{:6.3F}", ort->decayCurveHeat(jTime, kSurf));
                 }
                 // put a line feed at the end of the line
                 print(state.files.eio, "\n");
@@ -15621,17 +15613,9 @@ void GetDelaySequences(EnergyPlusData &state,
 
         Array2D<Real64> decayCurve;
         if (isCooling) {
-            if (iSpace == 0) {
-                decayCurve = ort->znDecayCurveCool;
-            } else {
-                decayCurve = ort->spDecayCurveCool;
-            }
+            decayCurve = ort->decayCurveCool;
         } else {
-            if (iSpace == 0) {
-                decayCurve = ort->znDecayCurveHeat;
-            } else {
-                decayCurve = ort->spDecayCurveHeat;
-            }
+            decayCurve = ort->decayCurveHeat;
         }
 
         for (int kTimeStep = 1; kTimeStep <= state.dataGlobal->NumOfTimeStepInHour * 24; ++kTimeStep) {
