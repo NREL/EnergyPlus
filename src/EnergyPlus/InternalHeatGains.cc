@@ -695,7 +695,7 @@ namespace InternalHeatGains {
 
                     if (IHGNumAlphas > 6) { // Optional parameters present--thermal comfort data follows...
                         int lastOption = 0;
-                        state.dataInternalHeatGains->UsingThermalComfort = false;
+                        bool usingThermalComfort = false;
                         if (IHGNumAlphas > 20) {
                             lastOption = 20;
                         } else {
@@ -735,37 +735,37 @@ namespace InternalHeatGains {
 
                                 if (thermalComfortType == "FANGER") {
                                     thisPeople.Fanger = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "PIERCE") {
                                     thisPeople.Pierce = true;
                                     state.dataHeatBal->AnyThermalComfortPierceModel = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "KSU") {
                                     thisPeople.KSU = true;
                                     state.dataHeatBal->AnyThermalComfortKSUModel = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVEASH55") {
                                     thisPeople.AdaptiveASH55 = true;
                                     state.dataHeatBal->AdaptiveComfortRequested_ASH55 = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVECEN15251") {
                                     thisPeople.AdaptiveCEN15251 = true;
                                     state.dataHeatBal->AdaptiveComfortRequested_CEN15251 = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "COOLINGEFFECTASH55") {
                                     thisPeople.CoolingEffectASH55 = true;
                                     state.dataHeatBal->AnyThermalComfortCoolingEffectModel = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ANKLEDRAFTASH55") {
                                     thisPeople.AnkleDraftASH55 = true;
                                     state.dataHeatBal->AnyThermalComfortAnkleDraftModel = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "") { // Blank input field--just ignore this
 
@@ -786,7 +786,7 @@ namespace InternalHeatGains {
                             }
                         }
 
-                        if (state.dataInternalHeatGains->UsingThermalComfort) {
+                        if (usingThermalComfort) {
 
                             // Set the default value of MRTCalcType as 'EnclosureAveraged'
                             thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::EnclosureAveraged;
@@ -1250,6 +1250,8 @@ namespace InternalHeatGains {
         // Lights
         // Declared in state because the lights inputs are needed for demand manager
         int numLightsStatements = 0;
+        Real64 sumArea = 0.0;  // sum of floor area for all lights objects
+        Real64 sumPower = 0.0; // sum of power for all lights objects
         setupIHGZonesAndSpaces(
             state, lightsModuleObject, state.dataInternalHeatGains->lightsObjects, numLightsStatements, state.dataHeatBal->TotLights, ErrorsFound);
 
@@ -1629,8 +1631,8 @@ namespace InternalHeatGains {
                 std::string liteName = state.dataHeatBal->Lights(lightsNum2).Name;
                 Real64 mult = state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
                 Real64 spaceArea = state.dataHeatBal->space(spaceNum).FloorArea;
-                state.dataInternalHeatGains->sumArea += spaceArea * mult;
-                state.dataInternalHeatGains->sumPower += state.dataHeatBal->Lights(lightsNum2).DesignLevel * mult;
+                sumArea += spaceArea * mult;
+                sumPower += state.dataHeatBal->Lights(lightsNum2).DesignLevel * mult;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtZone, liteName, state.dataHeatBal->Zone(zoneNum).Name);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtSpace, liteName, state.dataHeatBal->space(spaceNum).Name);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtSpaceType, liteName, state.dataHeatBal->space(spaceNum).spaceType);
@@ -1685,17 +1687,14 @@ namespace InternalHeatGains {
             }
         } // TotLights > 0 check
         // add total line to lighting summary table
-        if (state.dataInternalHeatGains->sumArea > 0.0) {
-            PreDefTableEntry(state,
-                             state.dataOutRptPredefined->pdchInLtDens,
-                             "Interior Lighting Total",
-                             state.dataInternalHeatGains->sumPower / state.dataInternalHeatGains->sumArea,
+        if (sumArea > 0.0) {
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, "Interior Lighting Total", sumPower / sumArea,
                              4); // line 792
         } else {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, "Interior Lighting Total", DataPrecisionGlobals::constant_zero, 4);
         }
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, "Interior Lighting Total", state.dataInternalHeatGains->sumArea);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, "Interior Lighting Total", state.dataInternalHeatGains->sumPower);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, "Interior Lighting Total", sumArea);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, "Interior Lighting Total", sumPower);
 
         // ElectricEquipment
         // Declared in state because the lights inputs are needed for demand manager
@@ -7914,21 +7913,23 @@ namespace InternalHeatGains {
                         state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) =
                             thisEnclosure.radQThermalRad * thisEnclosure.radThermAbsMult * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                     } else {
-                        state.dataInternalHeatGains->curQL = thisEnclosure.radQThermalRad;
+                        // radiant value prior to adjustment for pulse for load component report
+                        Real64 curQL = thisEnclosure.radQThermalRad;
                         // for the loads component report during the special sizing run increase the radiant portion
                         // a small amount to create a "pulse" of heat that is used for the delayed loads
-                        state.dataInternalHeatGains->adjQL = state.dataInternalHeatGains->curQL + thisEnclosure.FloorArea * pulseMultipler;
+                        // radiant value including adjustment for pulse for load component report
+                        Real64 adjQL = curQL + thisEnclosure.FloorArea * pulseMultipler;
                         // ITABSF is the Inside Thermal Absorptance
                         // EnclRadThermAbsMult is a multiplier for each zone
                         // SurfQdotRadIntGainsInPerArea is the thermal radiation absorbed on inside surfaces
                         state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) =
-                            state.dataInternalHeatGains->adjQL * thisEnclosure.radThermAbsMult * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
+                            adjQL * thisEnclosure.radThermAbsMult * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                         // store the magnitude and time of the pulse
                         state.dataOutRptTab->radiantPulseTimestep(state.dataSize->CurOverallSimDay, zoneNum) =
                             (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                         state.dataOutRptTab->radiantPulseReceived(state.dataSize->CurOverallSimDay, SurfNum) =
-                            (state.dataInternalHeatGains->adjQL - state.dataInternalHeatGains->curQL) * thisEnclosure.radThermAbsMult *
-                            state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) * state.dataSurface->Surface(SurfNum).Area;
+                            (adjQL - curQL) * thisEnclosure.radThermAbsMult * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) *
+                            state.dataSurface->Surface(SurfNum).Area;
                     }
                 }
             }
