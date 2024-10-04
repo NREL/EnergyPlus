@@ -76,6 +76,7 @@ using namespace EnergyPlus::Window;
 
 TEST_F(EnergyPlusFixture, test_overallUfactorFromFilmsAndCond)
 {
+    auto &s_mat = state->dataMaterial;
     // set up for using CWCEHeatTransferFactory
     int numSurf = 1;
     state->dataSurface->Surface.allocate(numSurf);
@@ -92,12 +93,10 @@ TEST_F(EnergyPlusFixture, test_overallUfactorFromFilmsAndCond)
     state->dataConstruction->Construct(numCons).LayerPoint(numLayers) = materialInside;
     state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
     int numMaterials = materialInside;
-    for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialBase *p = new Material::MaterialBase;
-        state->dataMaterial->Material.push_back(p);
-    }
-    state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowGlass;
-    state->dataMaterial->Material(materialInside)->group = Material::Group::WindowGlass;
+
+    s_mat->materials.push_back(new Material::MaterialGlass);
+    s_mat->materials.push_back(new Material::MaterialGlass);
+
     auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, numCons);
 
     double hIntConvCoeff = 0.;
@@ -132,6 +131,7 @@ TEST_F(EnergyPlusFixture, test_overallUfactorFromFilmsAndCond)
 
 TEST_F(EnergyPlusFixture, test_getOutdoorNfrc)
 {
+    auto &s_mat = state->dataMaterial;
     // set up for using CWCEHeatTransferFactory
     int numSurf = 1;
     state->dataSurface->Surface.allocate(numSurf);
@@ -148,12 +148,12 @@ TEST_F(EnergyPlusFixture, test_getOutdoorNfrc)
     state->dataConstruction->Construct(numCons).LayerPoint(numLayers) = materialInside;
     state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
     int numMaterials = materialInside;
-    for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialBase *p = new Material::MaterialBase;
-        state->dataMaterial->Material.push_back(p);
-    }
-    state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowGlass;
-    state->dataMaterial->Material(materialInside)->group = Material::Group::WindowGlass;
+
+    auto *matOutside = new Material::MaterialGlass;
+    s_mat->materials.push_back(matOutside);
+    auto *matInside = new Material::MaterialGlass;
+    s_mat->materials.push_back(matInside);
+
     auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, numCons);
 
     auto indoor = aFactory.getOutdoorNfrc(true);
@@ -167,6 +167,7 @@ TEST_F(EnergyPlusFixture, test_getOutdoorNfrc)
 
 TEST_F(EnergyPlusFixture, test_getIndoorNfrc)
 {
+    auto &s_mat = state->dataMaterial;
     // set up for using CWCEHeatTransferFactory
     int numSurf = 1;
     state->dataSurface->Surface.allocate(numSurf);
@@ -182,13 +183,9 @@ TEST_F(EnergyPlusFixture, test_getIndoorNfrc)
     state->dataConstruction->Construct(numCons).LayerPoint(1) = materialOutside;
     state->dataConstruction->Construct(numCons).LayerPoint(numLayers) = materialInside;
     state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
-    int numMaterials = materialInside;
-    for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialBase *p = new Material::MaterialBase;
-        state->dataMaterial->Material.push_back(p);
-    }
-    state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowGlass;
-    state->dataMaterial->Material(materialInside)->group = Material::Group::WindowGlass;
+    s_mat->materials.push_back(new Material::MaterialGlass);
+    s_mat->materials.push_back(new Material::MaterialGlass);
+
     auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, numCons);
 
     auto indoor = aFactory.getIndoorNfrc(true);
@@ -200,6 +197,7 @@ TEST_F(EnergyPlusFixture, test_getIndoorNfrc)
 
 TEST_F(EnergyPlusFixture, test_getShadeType)
 {
+    auto &s_mat = state->dataMaterial;
     // set up for using CWCEHeatTransferFactory
     int numSurf = 1;
     state->dataSurface->Surface.allocate(numSurf);
@@ -218,41 +216,42 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
     state->dataConstruction->Construct(simpleCons).LayerPoint(numLayers) = materialInside;
     state->dataConstruction->Construct(simpleCons).AbsDiff.allocate(2);
     int numMaterials = materialInside + 1;
-    for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialBase *p = new Material::MaterialBase;
-        state->dataMaterial->Material.push_back(p);
-    }
-    state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowGlass;
-    state->dataMaterial->Material(materialInside)->group = Material::Group::WindowGlass;
+    s_mat->materials.push_back(new Material::MaterialGlass);
+    s_mat->materials.push_back(new Material::MaterialGlass);
     auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, simpleCons);
 
     // outside
     auto typeOfShade = aFactory.getShadeType(*state, simpleCons);
     EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::NoShade);
 
-    state->dataMaterial->Material(materialOutside)->group = Material::Group::Shade;
+    delete s_mat->materials(materialOutside);
+    s_mat->materials(materialOutside) = new Material::MaterialShade;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
     EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::ExtShade);
 
-    state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowBlind;
+    delete s_mat->materials(materialOutside);
+    s_mat->materials(materialOutside) = new Material::MaterialBlind;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
     EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::ExtBlind);
 
     // reset the outside to glass
-    state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowGlass;
+    delete s_mat->materials(materialOutside);
+    s_mat->materials(materialOutside) = new Material::MaterialGlass;
 
     // inside
-    state->dataMaterial->Material(materialInside)->group = Material::Group::Shade;
+    delete s_mat->materials(materialInside);
+    s_mat->materials(materialInside) = new Material::MaterialShade;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
     EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::IntShade);
 
-    state->dataMaterial->Material(materialInside)->group = Material::Group::WindowBlind;
+    delete s_mat->materials(materialInside);
+    s_mat->materials(materialInside) = new Material::MaterialBlind;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
     EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::IntBlind);
 
     // reset the outside to glass
-    state->dataMaterial->Material(materialInside)->group = Material::Group::WindowGlass;
-    state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowGlass;
+    delete s_mat->materials(materialInside);
+    s_mat->materials(materialInside) = new Material::MaterialGlass;
 
     // between glass - double pane
     int betweenCons = 2;
@@ -268,17 +267,19 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
     state->dataConstruction->Construct(betweenCons).LayerPoint(numLayers) = materialInside;
     state->dataConstruction->Construct(betweenCons).AbsDiff.allocate(2);
 
-    state->dataMaterial->Material(materialShade)->group = Material::Group::Shade;
+    s_mat->materials.push_back(new Material::MaterialShade);
     typeOfShade = aFactory.getShadeType(*state, betweenCons);
     EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::BGShade);
 
-    state->dataMaterial->Material(materialShade)->group = Material::Group::WindowBlind;
+    delete s_mat->materials(materialShade);
+    s_mat->materials(materialShade) = new Material::MaterialBlind;
     typeOfShade = aFactory.getShadeType(*state, betweenCons);
     EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::BGBlind);
 }
 
 TEST_F(EnergyPlusFixture, test_getActiveConstructionNumber)
 {
+    auto &s_mat = state->dataMaterial;
     // set up for using CWCEHeatTransferFactory
     int numSurf = 1;
     state->dataSurface->Surface.allocate(numSurf);
@@ -298,12 +299,9 @@ TEST_F(EnergyPlusFixture, test_getActiveConstructionNumber)
     state->dataConstruction->Construct(numCons).LayerPoint(numLayers) = materialInside;
     state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
     int numMaterials = materialInside;
-    for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialBase *p = new Material::MaterialBase;
-        state->dataMaterial->Material.push_back(p);
-    }
-    state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowGlass;
-    state->dataMaterial->Material(materialInside)->group = Material::Group::WindowGlass;
+
+    s_mat->materials.push_back(new Material::MaterialGlass);
+    s_mat->materials.push_back(new Material::MaterialGlass);
 
     auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, numCons);
 
@@ -322,6 +320,7 @@ TEST_F(EnergyPlusFixture, test_getActiveConstructionNumber)
 
 TEST_F(EnergyPlusFixture, test_getIGU)
 {
+    auto &s_mat = state->dataMaterial;
     // set up for using CWCEHeatTransferFactory
     int numSurf = 1;
     state->dataSurface->Surface.allocate(numSurf);
@@ -338,12 +337,10 @@ TEST_F(EnergyPlusFixture, test_getIGU)
     state->dataConstruction->Construct(numCons).LayerPoint(numLayers) = materialInside;
     state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
     int numMaterials = materialInside;
-    for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialBase *p = new Material::MaterialBase;
-        state->dataMaterial->Material.push_back(p);
-    }
-    state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowGlass;
-    state->dataMaterial->Material(materialInside)->group = Material::Group::WindowGlass;
+
+    s_mat->materials.push_back(new Material::MaterialGlass);
+    s_mat->materials.push_back(new Material::MaterialGlass);
+
     auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, numCons);
 
     double width = 10.;

@@ -365,6 +365,7 @@ namespace IndoorGreen {
                                   DataHeatBalance::IntGainType::IndoorGreen,
                                   &ig.SensibleRate,
                                   nullptr,
+                                  nullptr,
                                   &ig.LatentRate,
                                   nullptr,
                                   nullptr,
@@ -377,14 +378,13 @@ namespace IndoorGreen {
                                 OutputProcessor::TimeStepType::Zone,
                                 OutputProcessor::StoreType::Average,
                                 ig.Name);
-            SetupOutputVariable(
-                state,
-                "Indoor Living Wall Sensible Heat Gain Rate",
-                Constant::Units::W,
-                state.dataHeatBalSurf->SurfQConvInRep(ig.SurfPtr), // positive sign: heat loss from plants; negative sign: heat gain to plants
-                OutputProcessor::TimeStepType::Zone,
-                OutputProcessor::StoreType::Average,
-                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall Sensible Heat Gain Rate",
+                                Constant::Units::W,
+                                ig.SensibleRate,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
+                                ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall Latent Heat Gain Rate",
                                 Constant::Units::W,
@@ -430,7 +430,7 @@ namespace IndoorGreen {
             SetupOutputVariable(state,
                                 "Indoor Living Wall LED Sensible Heat Gain Rate",
                                 Constant::Units::W,
-                                ig.SensibleRate,
+                                ig.SensibleRateLED,
                                 OutputProcessor::TimeStepType::Zone,
                                 OutputProcessor::StoreType::Average,
                                 ig.Name);
@@ -464,6 +464,7 @@ namespace IndoorGreen {
         // Set the reporting variables to zero at each timestep.
         for (auto &ig : state.dataIndoorGreen->indoorGreens) {
             ig.SensibleRate = 0.0;
+            ig.SensibleRateLED = 0.0;
             ig.LatentRate = 0.0;
             ig.ZCO2 = 400;
             ig.ZPPFD = 0;
@@ -581,13 +582,12 @@ namespace IndoorGreen {
                 ZoneNewHum = ZoneSatHum;
             }
             HMid = Psychrometrics::PsyHFnTdbW(ZoneNewTemp, ZonePreHum);
-            ig.SensibleRate = (1 - ig.LEDRadFraction) * ig.LEDActualEleP; // convective heat gain from LED lights when LED is on; heat convection from
-                                                                          // plants was considered and counted from plant surface heat balance.
             ig.LatentRate = ZoneAirVol * rhoair * (HCons - HMid) / Timestep; // unit W
+            ig.SensibleRateLED = (1 - ig.LEDRadFraction) * ig.LEDActualEleP; // convective heat gain from LED lights when LED is on;
+            ig.SensibleRate = -1.0 * ig.LatentRate + ig.SensibleRateLED;
             state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(ig.SurfPtr) =
-                -1.0 * ig.LambdaET +
                 ig.LEDRadFraction * 0.9 * ig.LEDActualEleP /
-                    state.dataSurface->Surface(ig.SurfPtr).Area; // assume the energy from radiation for photosynthesis is only 10%.
+                state.dataSurface->Surface(ig.SurfPtr).Area; // assume the energy from radiation for photosynthesis is only 10%.
         }
     }
 

@@ -107,6 +107,8 @@ namespace BaseboardRadiator {
         void InitBaseboard(EnergyPlusData &state, int baseboardNum);
 
         void SizeBaseboard(EnergyPlusData &state, int baseboardNum);
+
+        void checkForZoneSizing(EnergyPlusData &state);
     };
 
     void SimBaseboard(

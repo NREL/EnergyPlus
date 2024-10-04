@@ -1064,9 +1064,9 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
                            NumericFieldNames);
     }
 
-    size_t extensible_count = 0;
     auto const legacy_idd_extensibles_iter = legacy_idd.find("extensibles");
     if (legacy_idd_extensibles_iter != legacy_idd.end()) {
+        size_t extensible_count = 0;
         auto const epJSON_extensions_array_itr = obj_val.find(extension_key);
         if (epJSON_extensions_array_itr != obj_val.end()) {
             auto const &legacy_idd_extensibles = legacy_idd_extensibles_iter.value();
@@ -1151,6 +1151,52 @@ int InputProcessor::getIDFObjNum(EnergyPlusData &state, std::string_view Object,
         }
     }
     return idfOrderNumber;
+}
+
+std::vector<std::string> InputProcessor::getIDFOrderedKeys(EnergyPlusData &state, std::string_view const Object)
+{
+    // Given the number (index) of an object in JSON order, return it's number in original idf order
+    std::vector<std::string> keys;
+    std::vector<int> nums;
+
+    json *obj;
+    auto obj_iter = epJSON.find(std::string(Object));
+    if (obj_iter == epJSON.end()) {
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(Object));
+        if (tmp_umit == caseInsensitiveObjectMap.end()) {
+            return keys;
+        }
+        obj = &epJSON[tmp_umit->second];
+    } else {
+        obj = &(obj_iter.value());
+    }
+
+    // Return names in JSON order
+    if (state.dataGlobal->isEpJSON || !state.dataGlobal->preserveIDFOrder) {
+        for (auto it = obj->begin(); it != obj->end(); ++it)
+            keys.emplace_back(it.key());
+
+        return keys;
+    }
+
+    // Now, the real work begins
+
+    for (auto it = obj->begin(); it != obj->end(); ++it)
+        nums.push_back(it.value()["idf_order"].get<int>());
+    std::sort(nums.begin(), nums.end());
+
+    // Reserve doesn't seem to work :(
+    for (int i = 0; i < (int)nums.size(); ++i)
+        keys.push_back("");
+
+    // get list of saved object numbers from idf processing
+    for (auto it = obj->begin(); it != obj->end(); ++it) {
+        int objNum = it.value()["idf_order"].get<int>();
+        int objIdx = std::find(nums.begin(), nums.end(), objNum) - nums.begin();
+        keys[objIdx] = it.key();
+    }
+
+    return keys;
 }
 
 int InputProcessor::getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number)
@@ -1692,21 +1738,18 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
     //    A11,       \field message line 9
     //    A12;       \field message line 10
 
-    int NumAlphas;  // Used to retrieve names from IDF
-    int NumNumbers; // Used to retrieve rNumericArgs from IDF
-    int IOStat;     // Could be used in the Get Routines, not currently checked
-    int NumParams;  // Total Number of Parameters in 'Output:PreprocessorMessage' Object
-    int NumPrePM;   // Number of Preprocessor Message objects in IDF
-    int CountP;
-    int CountM;
-    std::string Multiples;
-
     state.dataIPShortCut->cCurrentModuleObject = "Output:PreprocessorMessage";
-    NumPrePM = getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    int NumPrePM = getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
     if (NumPrePM > 0) {
+        int NumAlphas;  // Used to retrieve names from IDF
+        int NumNumbers; // Used to retrieve rNumericArgs from IDF
+        int IOStat;     // Could be used in the Get Routines, not currently checked
+        int NumParams;  // Total Number of Parameters in 'Output:PreprocessorMessage' Object
+        std::string Multiples;
+
         getObjectDefMaxArgs(state, state.dataIPShortCut->cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         state.dataIPShortCut->cAlphaArgs({1, NumAlphas}) = BlankString;
-        for (CountP = 1; CountP <= NumPrePM; ++CountP) {
+        for (int CountP = 1; CountP <= NumPrePM; ++CountP) {
             getObjectItem(state,
                           state.dataIPShortCut->cCurrentModuleObject,
                           CountP,
@@ -1751,7 +1794,7 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
                                         "\" has the following " + state.dataIPShortCut->cAlphaArgs(2) + " condition" + Multiples + ':');
                 }
             }
-            CountM = 3;
+            int CountM = 3;
             if (CountM > NumAlphas) {
                 ShowContinueError(state,
                                   state.dataIPShortCut->cCurrentModuleObject + " was blank.  Check " + state.dataIPShortCut->cAlphaArgs(1) +
