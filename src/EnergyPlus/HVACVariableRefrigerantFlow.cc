@@ -13743,13 +13743,13 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
 
 void VRFCondenserEquipment::VRFOU_CompCap(
     EnergyPlusData &state,
-    Real64 const CompSpdActual,   // Given compressor speed
-    Real64 const T_suction,    // Compressor suction temperature Te' [C]
-    Real64 const T_discharge,  // Compressor discharge temperature Tc' [C]
-    Real64 const h_IU_evap_in, // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-    Real64 const h_comp_in,    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-    Real64 &Q_c_tot,           // Compressor evaporative capacity [W]
-    Real64 &Ncomp              // Compressor power [W]
+    Real64 const CompSpdActual, // Given compressor speed
+    Real64 const T_suction,     // Compressor suction temperature Te' [C]
+    Real64 const T_discharge,   // Compressor discharge temperature Tc' [C]
+    Real64 const h_IU_evap_in,  // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 const h_comp_in,     // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 &Q_c_tot,            // Compressor evaporative capacity [W]
+    Real64 &Ncomp               // Compressor power [W]
 )
 {
 
