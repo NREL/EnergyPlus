@@ -13710,7 +13710,7 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
             CompEvaporatingCAPSpd(CounterCompSpdTemp) =
                 this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
 
-            Q_evap_req = max(0.0, Q_cond_req - CompEvaporatingPWRSpd(CounterCompSpdTemp));
+            Q_evap_req = Q_cond_req - CompEvaporatingPWRSpd(CounterCompSpdTemp);
 
             if (Q_evap_req * C_cap_operation <= CompEvaporatingCAPSpd(CounterCompSpdTemp)) {
                 // Compressor speed stage CounterCompSpdTemp need not to be increased, finish Iteration DoName1
@@ -13726,6 +13726,9 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
 
                 } else {
                     CompSpdActual = this->CompressorSpeed(1) * (Q_evap_req * C_cap_operation) / CompEvaporatingCAPSpd(1);
+                    if (Q_cond_req - CompEvaporatingPWRSpd(CounterCompSpdTemp) < 0.0) { // use compressor power to meet condenser required load
+                        CompSpdActual = this->CompressorSpeed(1) * (Q_cond_req * C_cap_operation) / CompEvaporatingPWRSpd(1);
+                    }
                 }
 
                 break; // EXIT DoName1
@@ -13740,7 +13743,7 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
 
 void VRFCondenserEquipment::VRFOU_CompCap(
     EnergyPlusData &state,
-    int const CompSpdActual,   // Given compressor speed
+    Real64 const CompSpdActual,   // Given compressor speed
     Real64 const T_suction,    // Compressor suction temperature Te' [C]
     Real64 const T_discharge,  // Compressor discharge temperature Tc' [C]
     Real64 const h_IU_evap_in, // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
