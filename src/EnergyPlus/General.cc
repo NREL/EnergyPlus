@@ -241,6 +241,14 @@ void SolveRoot(const EnergyPlusData &state,
             }
             break;
         }
+        case HVACSystemRootSolverAlgorithm::ShortBisectionThenRegulaFalsi: {
+            if (NIte < 3) {
+                XTemp = (X1 + X0) / 2.0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
         default: {
             XTemp = (Y0 * X1 - Y1 * X0) / DY;
         }

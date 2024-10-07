@@ -59,6 +59,7 @@ enum class HVACSystemRootSolverAlgorithm : int
     RegulaFalsiThenBisection,
     BisectionThenRegulaFalsi,
     Alternation,
+    ShortBisectionThenRegulaFalsi,
     Num
 };
 struct HVACSystemRootFindingAlgorithm

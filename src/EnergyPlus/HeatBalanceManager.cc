@@ -277,6 +277,8 @@ namespace HeatBalanceManager {
 
         GetIncidentSolarMultiplier(state, ErrorsFound);
 
+        GetHeatIndexMethod(state, ErrorsFound);
+
         // Added SV 6/26/2013 to load scheduled surface gains
         GetScheduledSurfaceGains(state, ErrorsFound);
 
@@ -2162,6 +2164,38 @@ namespace HeatBalanceManager {
             SurfIncSolMult.SurfaceIdx = SurfNum;
             SurfIncSolMult.Scaler = state.dataIPShortCut->rNumericArgs(1);
             SurfIncSolMult.SchedPtr = ScheduleIdx;
+        }
+    }
+
+    void GetHeatIndexMethod(EnergyPlusData &state, bool &ErrorsFound)
+    {
+        static constexpr std::string_view RoutineName("GetHeatIndexMethod: ");
+
+        Array1D_string Alphas(1);
+        Array1D<Real64> Numbers(1);
+        int NumAlpha;
+        int NumNumber;
+        int IOStat;
+
+        state.dataHeatBalMgr->CurrentModuleObject = "HeatIndexAlgorithm";
+        int NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        if (NumObjects > 0) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     1,
+                                                                     Alphas,
+                                                                     NumAlpha,
+                                                                     Numbers,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            if (NumAlpha > 0) {
+                state.dataHeatBal->heatIndexMethod =
+                    static_cast<DataHeatBalance::HeatIndexMethod>(getEnumValue(DataHeatBalance::HeatIndexMethodUC, Util::makeUPPER(Alphas(1))));
+            }
         }
     }
 

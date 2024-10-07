@@ -653,6 +653,9 @@
     7.5,                     !- Y-Coordinate of Reference Point {m}
     0.7;                     !- Z-Coordinate of Reference Point {m}
 
+  HeatIndexAlgorithm,
+    Simplified;
+
   Output:Variable,*,Site Outdoor Air Barometric Pressure,hourly;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;

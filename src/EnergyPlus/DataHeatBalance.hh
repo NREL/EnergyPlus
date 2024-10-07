@@ -547,6 +547,19 @@ namespace DataHeatBalance {
         {
         }
     };
+
+    enum class HeatIndexMethod : int
+    {
+        Invalid = -1,
+        Simplified,
+        Extended,
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(HeatIndexMethod::Num)> HeatIndexMethodUC = {
+        "SIMPLIFIED",
+        "EXTENDED",
+    };
+
     struct ZoneData : ZoneSpaceData
     {
         // Members
@@ -1847,6 +1860,7 @@ struct HeatBalanceData : BaseGlobalStruct
     bool NoRegularMaterialsUsed = true;
     bool DoLatentSizing = false; // true when latent sizing is performed during zone sizing
     bool isAnyLatentLoad = false;
+    DataHeatBalance::HeatIndexMethod heatIndexMethod = DataHeatBalance::HeatIndexMethod::Simplified;
 
     Array1D<Real64> ZoneListSNLoadHeatEnergy;
     Array1D<Real64> ZoneListSNLoadCoolEnergy;
