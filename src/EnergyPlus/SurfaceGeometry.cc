@@ -11455,7 +11455,7 @@ namespace SurfaceGeometry {
                     for (int blockNum = 0; blockNum < numBlocks; blockNum++) {
                         Kiva::InputBlock block;
                         if (!s_ipsc->lAlphaFieldBlanks(alpF)) {
-                            int index = Util::FindItemInPtrList(s_ipsc->cAlphaArgs(alpF), s_mat->materials);
+                            int index = Material::GetMaterialNum(state, s_ipsc->cAlphaArgs(alpF));
                             if (index == 0) {
                                 ErrorsFound = true;
                                 ShowSevereError(state,

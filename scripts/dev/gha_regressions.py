@@ -71,6 +71,7 @@ class RegressionManager:
     def __init__(self):
         self.root_index_files_no_diff = []
         self.root_index_files_diffs = []
+        self.root_index_files_failed = []
         self.diffs_by_idf = defaultdict(list)
         self.diffs_by_type = defaultdict(list)
         self.summary_results = {}
@@ -243,6 +244,11 @@ class RegressionManager:
         diff_content = ""
         for d in self.root_index_files_diffs:
             diff_content += f"""<a href="{d}/index.html" class="list-group-item list-group-item-action">{d}</a>\n"""
+        num_failed = len(self.root_index_files_failed)
+        nfs = 's' if num_failed == 0 or num_failed > 1 else ''
+        failed_content = ""
+        for nf in self.root_index_files_failed:
+            failed_content += f"""<li class="list-group-item">{nf}</li>\n"""
 
         # set up diff type listing
         diff_type_keys = sorted(self.diffs_by_type.keys())
@@ -370,6 +376,24 @@ class RegressionManager:
     </div>
    </div>
  
+ 
+   <div class="panel-group">
+    <div class="panel panel-default">
+     <div class="panel-heading">
+      <h4 class="panel-title">
+       <a data-toggle="collapse" href="#failed">{num_failed} File{nfs} Failed During Regression Processing</a>
+      </h4>
+     </div>
+     <div id="failed" class="panel-collapse collapse">
+      <div class="panel-body">
+       <ul class="list-group">
+{failed_content}
+       </ul>
+      </div>
+     </div>
+    </div>
+   </div>
+ 
    <hr>
   
    <h2>Summary by Diff Type</h1>
@@ -446,37 +470,42 @@ class RegressionManager:
             modified = mod_testfiles / baseline.name
             if not modified.exists():
                 continue  # TODO: Should we warn that it is missing?
-            entry, diffs = self.single_file_regressions(baseline, modified)
-            if diffs:
-                self.root_index_files_diffs.append(baseline.name)
+            try:
+                entry, diffs = self.single_file_regressions(baseline, modified)
+                if diffs:
+                    self.root_index_files_diffs.append(baseline.name)
+                    any_diffs = True
+                    potential_diff_files = baseline.glob("*.*.*")  # TODO: Could try to get this from the regression tool
+                    target_dir_for_this_file_diffs = bundle_root / baseline.name
+                    if potential_diff_files:
+                        if target_dir_for_this_file_diffs.exists():
+                            rmtree(target_dir_for_this_file_diffs)
+                        target_dir_for_this_file_diffs.mkdir()
+                        index_contents_this_file = ""
+                        for potential_diff_file in potential_diff_files:
+                            copy(potential_diff_file, target_dir_for_this_file_diffs)
+                            diff_file_with_html = target_dir_for_this_file_diffs / (potential_diff_file.name + '.html')
+                            if potential_diff_file.name.endswith('.htm'):
+                                # already a html file, just upload the raw contents but renamed as ...htm.html
+                                copy(potential_diff_file, diff_file_with_html)
+                            else:
+                                # it's not an HTML file, wrap it inside an HTML wrapper in a temp file and send it
+                                contents = potential_diff_file.read_text()
+                                wrapped_contents = self.single_diff_html(contents)
+                                diff_file_with_html.write_text(wrapped_contents)
+                            index_contents_this_file += self.regression_row_in_single_test_case_html(potential_diff_file.name)
+                        index_file = target_dir_for_this_file_diffs / 'index.html'
+                        index_this_file = self.single_test_case_html(index_contents_this_file)
+                        index_file.write_text(index_this_file)
+                else:
+                    self.root_index_files_no_diff.append(baseline.name)
+                so_far = ' Diffs! ' if any_diffs else 'No diffs'
+                if entry_num % 40 == 0:
+                    print(f"On file #{entry_num}/{len(entries)} ({baseline.name}), Diff status so far: {so_far}")
+            except Exception as e:
                 any_diffs = True
-                potential_diff_files = baseline.glob("*.*.*")  # TODO: Could try to get this from the regression tool
-                target_dir_for_this_file_diffs = bundle_root / baseline.name
-                if potential_diff_files:
-                    if target_dir_for_this_file_diffs.exists():
-                        rmtree(target_dir_for_this_file_diffs)
-                    target_dir_for_this_file_diffs.mkdir()
-                    index_contents_this_file = ""
-                    for potential_diff_file in potential_diff_files:
-                        copy(potential_diff_file, target_dir_for_this_file_diffs)
-                        diff_file_with_html = target_dir_for_this_file_diffs / (potential_diff_file.name + '.html')
-                        if potential_diff_file.name.endswith('.htm'):
-                            # already a html file, just upload the raw contents but renamed as ...htm.html
-                            copy(potential_diff_file, diff_file_with_html)
-                        else:
-                            # it's not an HTML file, wrap it inside an HTML wrapper in a temp file and send it
-                            contents = potential_diff_file.read_text()
-                            wrapped_contents = self.single_diff_html(contents)
-                            diff_file_with_html.write_text(wrapped_contents)
-                        index_contents_this_file += self.regression_row_in_single_test_case_html(potential_diff_file.name)
-                    index_file = target_dir_for_this_file_diffs / 'index.html'
-                    index_this_file = self.single_test_case_html(index_contents_this_file)
-                    index_file.write_text(index_this_file)
-            else:
-                self.root_index_files_no_diff.append(baseline.name)
-            so_far = ' Diffs! ' if any_diffs else 'No diffs'
-            if entry_num % 40 == 0:
-                print(f"On file #{entry_num}/{len(entries)} ({baseline.name}), Diff status so far: {so_far}")
+                print(f"Regression run *failed* trying to process file: {baseline.name}; reason: {e}")
+                self.root_index_files_failed.append(baseline.name)
         meta_data = [
             f"Regression time stamp in UTC: {datetime.now(UTC)}",
             f"Regression time stamp in Central Time: {datetime.now(ZoneInfo('America/Chicago'))}",

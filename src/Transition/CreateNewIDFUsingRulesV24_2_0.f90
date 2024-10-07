@@ -394,8 +394,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               OldFanVO(NumOldFanVO)%coeff5 = TRIM(IDFRecords(Num)%Numbers(12))             !- Coefficient5 x**4
               OldFanVO(NumOldFanVO)%inletAirNodeName = TRIM(IDFRecords(Num)%Alphas(4))
               OldFanVO(NumOldFanVO)%outletAirNodeName = TRIM(IDFRecords(Num)%Alphas(5))
-              IF (lEN(IDFRecords(Num)%Alphas) .eq. 6) THEN
+              IF (SIZE(IDFRecords(Num)%Alphas) .eq. 6) THEN
                 OldFanVO(NumOldFanVO)%endUseSubCat = TRIM(IDFRecords(Num)%Alphas(6))
+              ELSE
+                OldFanVO(NumOldFanVO)%endUseSubCat = ''
               ENDIF
               IF (FindItemInList(TRIM(IDFRecords(Num)%Alphas(1)), vavFanNameToDelete, NumVRFTU) /= 0) THEN
                 DeleteThisRecord(Num) = .TRUE.
@@ -583,9 +585,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CASE('ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW')
                 isVariableVolume = .FALSE.
                 CALL GetNewObjectDefInIDD(ObjectName, NwNumArgs, NwAorN, NwReqFld, NwObjMinFlds, NwFldNames, NwFldDefaults, NwFldUnits)
-                nodiff = .false.
                 OutArgs(1:13) = InArgs(1:13)
                 IF (SameString(InArgs(14), 'FAN:VARIABLEVOLUME')) THEN
+                  nodiff = .false.
                   isVariableVolume = .TRUE.
                   OutArgs(14) = 'Fan:SystemModel'
                   OutArgs(15) = TRIM(InArgs(15))
@@ -594,9 +596,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(14:15) = InArgs(14:15)
                 ENDIF
                 OutArgs(16:CurArgs) = InArgs(16:CurArgs)
-                CALL WriteOutIDFLines(DifLfn, 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow', CurArgs, OutArgs, NwFldNames, NwFldUnits)
 
                 IF (isVariableVolume) THEN
+                  CALL WriteOutIDFLines(DifLfn, 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow', CurArgs, OutArgs, NwFldNames, NwFldUnits)
                   ! create fan system model object
                   ObjectName = 'Fan:SystemModel'
                   DO Num3 = 1, NumFanVariableVolume

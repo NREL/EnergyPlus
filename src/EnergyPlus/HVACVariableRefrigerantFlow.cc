@@ -1479,8 +1479,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             state.dataHVACVarRefFlow->MaxHeatingCapacity.allocate(state.dataHVACVarRefFlow->NumVRFCond);
             state.dataHVACVarRefFlow->CoolCombinationRatio.allocate(state.dataHVACVarRefFlow->NumVRFCond);
             state.dataHVACVarRefFlow->HeatCombinationRatio.allocate(state.dataHVACVarRefFlow->NumVRFCond);
-            state.dataHVACVarRefFlow->MaxCoolingCapacity = MaxCap;
-            state.dataHVACVarRefFlow->MaxHeatingCapacity = MaxCap;
+            state.dataHVACVarRefFlow->MaxCoolingCapacity = Constant::MaxCap;
+            state.dataHVACVarRefFlow->MaxHeatingCapacity = Constant::MaxCap;
             state.dataHVACVarRefFlow->CoolCombinationRatio = 1.0;
             state.dataHVACVarRefFlow->HeatCombinationRatio = 1.0;
         }
@@ -6589,8 +6589,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
     // terminal unit will be limited to 3-tons (see SimVRFCondenser where this variable is calculated).
     if (CurrentEndTime > state.dataHVACVarRefFlow->CurrentEndTimeLast || TimeStepSysLast > state.dataHVACGlobal->TimeStepSys ||
         (FirstHVACIteration && state.dataHVACVarRefFlow->MyBeginTimeStepFlag(VRFCond))) {
-        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = MaxCap;
-        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = MaxCap;
+        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = Constant::MaxCap;
+        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = Constant::MaxCap;
         state.dataHVACVarRefFlow->MyBeginTimeStepFlag(VRFCond) = false;
     }
 
@@ -9601,8 +9601,10 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
         }
     }
     // calculate sensible load met using delta enthalpy
+    Real64 TotalOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(TempOut, SpecHumOut) -
+                                        Psychrometrics::PsyHFnTdbW(TempIn, SpecHumIn));         // total addition/removal rate, {W};
     LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-    LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn);                                     // latent {kgWater/s}
+    LatentLoadMet = TotalOutput - LoadMet;
     if (present(LatOutputProvided)) {
         //   CR9155 Remove specific humidity calculations
         LatOutputProvided = LatentLoadMet;
@@ -9748,10 +9750,7 @@ void ReportVRFTerminalUnit(EnergyPlusData &state, int const VRFTUNum) // index t
         TempOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
         TempIn = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp;
     }
-    // latent heat vaporization/condensation used in moist air psychrometrics
-    Real64 const H2OHtOfVap = PsyHgAirFnWTdb(0.0, TempOut);
-    // convert latent in kg/s to watts
-    TotalConditioning = SensibleConditioning + (LatentConditioning * H2OHtOfVap);
+    TotalConditioning = SensibleConditioning + LatentConditioning;
 
     if (TotalConditioning <= 0.0) {
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).TotalCoolingRate = std::abs(TotalConditioning);
@@ -9768,11 +9767,11 @@ void ReportVRFTerminalUnit(EnergyPlusData &state, int const VRFTUNum) // index t
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SensibleHeatingRate = SensibleConditioning;
     }
     if (LatentConditioning <= 0.0) {
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentCoolingRate = std::abs(LatentConditioning) * H2OHtOfVap;
+        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentCoolingRate = std::abs(LatentConditioning);
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentHeatingRate = 0.0;
     } else {
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentCoolingRate = 0.0;
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentHeatingRate = LatentConditioning * H2OHtOfVap;
+        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).LatentHeatingRate = LatentConditioning;
     }
     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).TotalCoolingEnergy = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).TotalCoolingRate * ReportingConstant;
     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SensibleCoolingEnergy =
@@ -10571,7 +10570,7 @@ void LimitCoilCapacity(int const NumTUInList,           // Number of terminal un
 
     // sort TU capacity from lowest to highest
     for (TempTUIndex = 1; TempTUIndex <= NumTUInList; ++TempTUIndex) {
-        MinOutput = MaxCap;
+        MinOutput = Constant::MaxCap;
         for (NumTU = 1; NumTU <= NumTUInList; ++NumTU) {
             if (Temp2(NumTU) < MinOutput) {
                 MinOutput = Temp2(NumTU);
@@ -10579,7 +10578,7 @@ void LimitCoilCapacity(int const NumTUInList,           // Number of terminal un
                 MinOutputIndex = NumTU;
             }
         }
-        Temp2(MinOutputIndex) = MaxCap;
+        Temp2(MinOutputIndex) = Constant::MaxCap;
     }
 
     // find limit of "terminal unit" capacity so that sum of all TU's does not exceed condenser capacity
@@ -11367,9 +11366,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         if (Q_c_TU_PL > CompEvaporatingCAPSpdMax) {
             // Required load is beyond the max system capacity
 
-            Q_c_TU_PL = CompEvaporatingCAPSpdMax;
-            TU_CoolingLoad = CompEvaporatingCAPSpdMax;
-            this->TUCoolingLoad = TU_CoolingLoad;
             RefTSat = this->refrig->getSatTemperature(state, max(min(Pevap, RefPHigh), RefPLow), RoutineName);
             h_IU_evap_out =
                 this->refrig->getSupHeatEnthalpy(state, max(RefTSat, this->IUEvaporatingTemp + 3), max(min(Pevap, RefPHigh), RefPLow), RoutineName);
@@ -11503,7 +11499,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
 
         this->HeatingCapacity = 0.0;         // Include the piping loss
         this->PipingCorrectionHeating = 1.0; // 1 means no piping loss
-        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = 0.0;
+        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = Constant::MaxCap;
 
         this->OUCondHeatRate = Q_h_OU;
         this->OUEvapHeatRate = 0;
@@ -11720,8 +11716,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
             this->HeatingCapacity; // for report, maximum condensing capacity the system can provide
 
         this->CoolingCapacity = 0.0; // Include the piping loss
-        this->PipingCorrectionCooling = 0.0;
-        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = 0.0; // for report
+        this->PipingCorrectionCooling = 1.0;
+        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = Constant::MaxCap; // for report
 
         this->OUCondHeatRate = 0;
         this->OUEvapHeatRate = Q_c_OU;
@@ -11957,13 +11953,13 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         this->OUFanPower = 0.0;
         this->VRFCondCyclingRatio = 0.0;
 
-        this->HeatingCapacity = 0.0;                                    // Include the piping loss
-        this->PipingCorrectionHeating = 1.0;                            // 1 means no piping loss
-        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = MaxCap; // default value is MaxCap = 1e+20, not 0
+        this->HeatingCapacity = 0.0;                                              // Include the piping loss
+        this->PipingCorrectionHeating = 1.0;                                      // 1 means no piping loss
+        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = Constant::MaxCap; // yujie: default value is MaxCap = 1e+20, not 0
 
         this->CoolingCapacity = 0.0; // Include the piping loss
         this->PipingCorrectionCooling = 1.0;
-        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = MaxCap; // for report
+        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = Constant::MaxCap; // for report
 
         this->CondensingTemp = state.dataEnvrn->OutDryBulbTemp;
         this->EvaporatingTemp = state.dataEnvrn->OutDryBulbTemp;
@@ -12718,7 +12714,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         state.dataHVACVarRefFlow->CompOffMassFlow = state.dataHVACVarRefFlow->OACompOffMassFlow;
     } else {
         // identify the air flow rate corresponding to the coil load
-        if (this->HeatingCoilPresent && state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) < MaxCap) {
+        if (this->HeatingCoilPresent && state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) < Constant::MaxCap) {
             // Only fix heating only mode for now
             state.dataHVACVarRefFlow->CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl(
                 state, VRFTUNum, PartLoadRatio, FirstHVACIteration, state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
@@ -12867,8 +12863,10 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         }
     }
     // calculate sensible load met using delta enthalpy
+    Real64 TotalOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(TempOut, SpecHumOut) -
+                                        Psychrometrics::PsyHFnTdbW(TempIn, SpecHumIn));         // total addition/removal rate, {W};
     LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-    LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn);                                     // latent {kgWater/s}
+    LatentLoadMet = TotalOutput - LoadMet;
     if (present(LatOutputProvided)) {
         LatOutputProvided = LatentLoadMet;
     }

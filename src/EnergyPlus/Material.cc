@@ -86,7 +86,7 @@ constexpr std::array<std::string_view, (int)EcoRoofCalcMethod::Num> ecoRoofCalcM
 
 int GetMaterialNum(EnergyPlusData &state, std::string const &matName)
 {
-    auto &s_mat = state.dataMaterial;
+    auto const &s_mat = state.dataMaterial;
     auto found = s_mat->materialMap.find(Util::makeUPPER(matName));
     return (found != s_mat->materialMap.end()) ? found->second : 0;
 }
@@ -1216,7 +1216,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         matGas->ROnly = true;
 
         for (NumGas = 0; NumGas < NumGases; ++NumGas) {
-            GasType gasType = matGas->gases[NumGas].type;
+            gasType = matGas->gases[NumGas].type;
             if (gasType != GasType::Custom) {
                 matGas->gasFracts[NumGas] = s_ipsc->rNumericArgs(3 + NumGas);
                 matGas->gases[NumGas] = gases[(int)gasType];
