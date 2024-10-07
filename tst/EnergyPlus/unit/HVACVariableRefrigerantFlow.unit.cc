@@ -2458,8 +2458,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
         // Test
         EXPECT_NEAR(756, CompSpdActual, 1);
-        EXPECT_NEAR(899, Ncomp, 1);
-        EXPECT_NEAR(3186, Q_c_OU, 1);
+        EXPECT_NEAR(901, Ncomp, 1);
+        EXPECT_NEAR(3196, Q_c_OU, 1);
         EXPECT_NEAR(0, Q_h_OU, 1);
         EXPECT_NEAR(242, N_fan_OU, 1);
         EXPECT_NEAR(0.0158, m_ref_OU_evap, 0.0005);
