@@ -11134,8 +11134,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
     Real64 h_comp_in_new;            // enthalpy of refrigerant at compressor inlet (new) [kJ/kg]
     Real64 h_comp_out;               // enthalpy of refrigerant at compressor outlet [kJ/kg]
     Real64 h_comp_out_new;           // enthalpy of refrigerant at compressor outlet (new) [kJ/kg]
-    Real64 h_comp_out_new_prev;      // previous value of h_comp_out_new
-    Real64 tol_h_comp_out_new;       // tolerance of h_comp_out_new change
     Real64 m_air;                    // OU coil air mass flow rate [kg/s]
     Real64 m_ref_IU_cond;            // mass flow rate of Refrigerant through IU condensers [kg/s]
     Real64 m_ref_IU_cond_i;          // mass flow rate of Refrigerant through an individual IU condenser [kg/s]
@@ -11226,8 +11224,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
     RefTHigh = this->refrig->PsHighTempValue; // High Temperature Value for Ps (max in tables)
     RefPLow = this->refrig->PsLowPresValue;   // Low Pressure Value for Ps (>0.0)
     RefPHigh = this->refrig->PsHighPresValue; // High Pressure Value for Ps (max in tables)
-
-    tol_h_comp_out_new = 1e-10;
 
     // sum loads on TU coils
     for (NumTU = 1; NumTU <= NumTUInList; ++NumTU) {
@@ -11908,20 +11904,12 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         }
 
         //* Update h_comp_out in iteration (Label230)
-        h_comp_out_new_prev = h_comp_out_new;
         h_comp_out_new = Ncomp / (m_ref_IU_evap + m_ref_OU_evap) + h_comp_in;
 
-        if ((std::abs(h_comp_out - h_comp_out_new) > Tolerance * h_comp_out) && (h_IU_cond_in < h_IU_cond_in_up) &&
-            (h_IU_cond_in_low < h_IU_cond_in) && std::abs(h_comp_out_new - h_comp_out_new_prev) > tol_h_comp_out_new) {
-            Real64 h_IU_cond_in_old = h_IU_cond_in;
-            if (h_comp_out < h_comp_out_new) {
-                h_IU_cond_in = h_IU_cond_in + 0.1 * (h_IU_cond_in_up - h_IU_cond_in_low);
-            } else {
-                h_IU_cond_in = h_IU_cond_in - 0.1 * (h_IU_cond_in_up - h_IU_cond_in_low);
-            }
+        if ((std::abs(h_comp_out - h_comp_out_new) > Tolerance * h_comp_out) && (h_IU_cond_in < h_IU_cond_in_up)) {
+            h_IU_cond_in = h_IU_cond_in + 0.1 * (h_IU_cond_in_up - h_IU_cond_in_low);
             goto Label230;
         }
-
         if (h_IU_cond_in > h_IU_cond_in_up) {
             h_IU_cond_in = 0.5 * (h_IU_cond_in_up + h_IU_cond_in_low);
         }
