@@ -231,6 +231,8 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
 
 TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChange)
 {
+    auto &s_mat = state->dataMaterial;
+
     // create a single PCM object in the input and process it
     std::string const idf_objects = delimited_string({"  MaterialProperty:PhaseChangeHysteresis,",
                                                       "    PCMNAME,   !- Name",
@@ -257,18 +259,31 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
     SurfaceFD(surfaceIndex).PhaseChangeTemperatureReverse.allocate(1);
     SurfaceFD(surfaceIndex).PhaseChangeTemperatureReverse(finiteDiffLayerIndex) = 20.0;
     SurfaceFD(surfaceIndex).PhaseChangeState.allocate(1);
-    SurfaceFD(surfaceIndex).PhaseChangeState(finiteDiffLayerIndex) = HysteresisPhaseChange::PhaseChangeStates::LIQUID;
+    SurfaceFD(surfaceIndex).PhaseChangeState(finiteDiffLayerIndex) = Material::Phase::Liquid;
     SurfaceFD(surfaceIndex).PhaseChangeStateOld.allocate(1);
-    SurfaceFD(surfaceIndex).PhaseChangeStateOld(finiteDiffLayerIndex) = HysteresisPhaseChange::PhaseChangeStates::MELTING;
+    SurfaceFD(surfaceIndex).PhaseChangeStateOld(finiteDiffLayerIndex) = Material::Phase::Melting;
+    SurfaceFD(surfaceIndex).PhaseChangeStateRep.allocate(1);
+    SurfaceFD(surfaceIndex).PhaseChangeStateRep(finiteDiffLayerIndex) = Material::phaseInts[(int)Material::Phase::Liquid];
+    SurfaceFD(surfaceIndex).PhaseChangeStateOldRep.allocate(1);
+    SurfaceFD(surfaceIndex).PhaseChangeStateOldRep(finiteDiffLayerIndex) = Material::phaseInts[(int)Material::Phase::Melting];
 
     // create a materials data object and assign the phase change variable based on above IDF processing
-    Material::MaterialChild material;
-    material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(*state, "PCMNAME");
+    auto *mat = new Material::MaterialBase;
+    mat->Name = "PCMNAME";
+    mat->group = Material::Group::Regular;
+    s_mat->materials.push_back(mat);
+    mat->Num = s_mat->materials.isize();
+    s_mat->materialMap.insert_or_assign(mat->Name, mat->Num);
+
+    bool ErrorsFound;
+    Material::GetHysteresisData(*state, ErrorsFound);
+
+    auto *matPC = dynamic_cast<Material::MaterialPhaseChange *>(s_mat->materials(Material::GetMaterialNum(*state, "PCMNAME")));
 
     // create local variables to calculate and call the new worker function
     Real64 newSpecificHeat, newDensity, newThermalConductivity;
     adjustPropertiesForPhaseChange(
-        *state, finiteDiffLayerIndex, surfaceIndex, &material, 20.0, 20.1, newSpecificHeat, newDensity, newThermalConductivity);
+        *state, finiteDiffLayerIndex, surfaceIndex, matPC, 20.0, 20.1, newSpecificHeat, newDensity, newThermalConductivity);
 
     // check the values are correct
     EXPECT_NEAR(10187.3, newSpecificHeat, 0.1);
@@ -458,7 +473,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_findAnySurfacesUsingConstruct
 
     // call the function for initialization of finite difference calculation
     std::string const error_string = delimited_string({"   ** Severe  ** InitialInitHeatBalFiniteDiff: Found Material that is too thin and/or too "
-                                                       "highly conductive, material name = REG MAT F05 CEILING AIR SPACE RESISTANCE",
+                                                       "highly conductive, material name = Reg Mat F05 Ceiling air space resistance",
                                                        "   **   ~~~   ** High conductivity Material layers are not well supported by Conduction "
                                                        "Finite Difference, material conductivity = 2.000 [W/m-K]",
                                                        "   **   ~~~   ** Material thermal diffusivity = 1.626E-003 [m2/s]",
@@ -467,7 +482,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_findAnySurfacesUsingConstruct
                                                        "   ...Summary of Errors that led to program termination:",
                                                        "   ..... Reference severe error count=1",
                                                        "   ..... Last severe error=InitialInitHeatBalFiniteDiff: Found Material that is too thin "
-                                                       "and/or too highly conductive, material name = REG MAT F05 CEILING AIR SPACE RESISTANCE"});
+                                                       "and/or too highly conductive, material name = Reg Mat F05 Ceiling air space resistance"});
     EXPECT_ANY_THROW(InitialInitHeatBalFiniteDiff(*state));
 
     compare_err_stream(error_string, true);
