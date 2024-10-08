@@ -1341,9 +1341,9 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                         Real64 Ez_Clg = thisTermUnitFinalZoneSizing.ZoneADEffCooling; // user input in Zone Air Distribution design spec object
                         Real64 Fc_Clg = 1.0 - (1.0 - Ez_Clg) * (1.0 - Er) * (1 - Ep_Clg);
                         state.dataSize->FcByZoneCool(termUnitSizingIndex) = Fc_Clg;
-                        state.dataSize->EvzByZoneCool(termUnitSizingIndex) =
-                            (Fa_Clg + state.dataSize->XsBySysCool(AirLoopNum) * Fb_Clg - state.dataSize->ZdzClgByZone(termUnitSizingIndex) * Fc_Clg) /
-                            Fa_Clg;
+                        state.dataSize->EvzByZoneCool(termUnitSizingIndex) = (Fa_Clg + state.dataSize->XsBySysCool(AirLoopNum) * Fb_Clg -
+                                                                              state.dataSize->ZdzClgByZone(termUnitSizingIndex) * Ep_Clg * Fc_Clg) /
+                                                                             Fa_Clg;
                         // note that SimAirServingZones::LimitZoneVentEff is intended only for single path per I/O ref
 
                         // find Evz for heating
@@ -1351,13 +1351,13 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                         Real64 Fa_Htg = Ep_Htg + (1.0 - Ep_Htg) * Er;
                         state.dataSize->FaByZoneHeat(termUnitSizingIndex) = Fa_Htg;
                         Real64 Fb_Htg = Ep_Htg;
-                        state.dataSize->FbByZoneCool(termUnitSizingIndex) = Fb_Htg;
+                        state.dataSize->FbByZoneHeat(termUnitSizingIndex) = Fb_Htg;
                         Real64 Ez_Htg = thisTermUnitFinalZoneSizing.ZoneADEffHeating; // user input in Zone Air Distribution design spec object
                         Real64 Fc_Htg = 1.0 - (1.0 - Ez_Htg) * (1.0 - Er) * (1 - Ep_Htg);
                         state.dataSize->FcByZoneHeat(termUnitSizingIndex) = Fc_Htg;
-                        state.dataSize->EvzByZoneHeat(termUnitSizingIndex) =
-                            (Fa_Htg + state.dataSize->XsBySysHeat(AirLoopNum) * Fb_Htg - state.dataSize->ZdzHtgByZone(termUnitSizingIndex) * Fc_Htg) /
-                            Fa_Htg;
+                        state.dataSize->EvzByZoneHeat(termUnitSizingIndex) = (Fa_Htg + state.dataSize->XsBySysHeat(AirLoopNum) * Fb_Htg -
+                                                                              state.dataSize->ZdzHtgByZone(termUnitSizingIndex) * Ep_Htg * Fc_Htg) /
+                                                                             Fa_Htg;
 
                     } else { // 62.1 ventilation rate procedure - single path zone
                         state.dataSize->EvzByZoneCool(termUnitSizingIndex) =
