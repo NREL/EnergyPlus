@@ -276,6 +276,9 @@ void SimulateVRF(EnergyPlusData &state,
 
         if (state.dataHVACVarRefFlow->VRF(VRFCondenser).CondenserType == DataHeatBalance::RefrigCondenserType::Water)
             UpdateVRFCondenser(state, VRFCondenser);
+        // add back piping correction to coil side
+        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).TotalHeatingEnergyRate *=
+            state.dataHVACVarRefFlow->VRF(VRFCondenser).PipingCorrectionHeating;
     }
 }
 
