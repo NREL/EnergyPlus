@@ -19,6 +19,10 @@ if(LINK_WITH_PYTHON)
   add_compile_definitions(LINK_WITH_PYTHON)
 endif()
 
+if(PYTHON_CLI)
+  add_compile_definitions(PYTHON_CLI)
+endif()
+
 if(USE_PSYCHROMETRICS_CACHING)
   # Caching defaulted ON
 else()
@@ -968,10 +972,16 @@ if(LINK_WITH_PYTHON)
     TARGET energyplusapi
     POST_BUILD # TODO: I don't think we want to quote the generator expression
     COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_lib"
-    COMMAND ${CMAKE_COMMAND} -E env --unset=PIP_REQUIRE_VIRTUALENV
-            ${Python_EXECUTABLE} -m pip install --target="$<TARGET_FILE_DIR:energyplusapi>/python_lib" --upgrade energyplus-launch==3.7.2
-    COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonFixUpTclTk.py" "$<TARGET_FILE_DIR:energyplusapi>/python_lib"
   )
+  if (PYTHON_CLI)
+    add_custom_command(
+      TARGET energyplusapi
+      POST_BUILD # TODO: I don't think we want to quote the generator expression
+      COMMAND ${CMAKE_COMMAND} -E env --unset=PIP_REQUIRE_VIRTUALENV
+      ${Python_EXECUTABLE} -m pip install --target="$<TARGET_FILE_DIR:energyplusapi>/python_lib" --upgrade energyplus-launch==3.7.2
+      COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonFixUpTclTk.py" "$<TARGET_FILE_DIR:energyplusapi>/python_lib"
+    )
+  endif()
 endif()
 
 if(BUILD_PACKAGE)

@@ -184,6 +184,7 @@ endif()
 # If LINK_WITH_PYTHON, also request the Development (libs) at the same time, to ensure consistent version between interpreter and Development
 # and ask for at least 3.8 (for the PyConfig stuff).
 if(LINK_WITH_PYTHON)
+  option(PYTHON_CLI "Build the Auxiliary CLI to Call Python Utilities" OFF)
   # find_package(Python) has the problem that on github actions in particular it'll pick up the most recent python (eg 3.9) from the tool cache
   # even if you have used the setup-python action and set it to 3.8, so we make the exact version required
   set(Python_REQUIRED_VERSION "" CACHE STRING "The specific Python version you want to link to (Optional)")
