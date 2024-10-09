@@ -17403,6 +17403,7 @@ void ControlVRFIUCoil(EnergyPlusData &state,
                     Ratio1 = FanSpdRatioMin;
                 }
             }
+            FanSpdRatio = Ratio1;
             CoilOnOffRatio = 1.0;
 
             Tout = Tin + (Ts_1 - Tin) * (1 - BF);
