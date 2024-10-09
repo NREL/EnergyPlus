@@ -17396,8 +17396,13 @@ void ControlVRFIUCoil(EnergyPlusData &state,
             };
             General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, f, FanSpdRatioMin, FanSpdRatioMax);
             // this will likely cause problems eventually, -1 and -2 mean different things
-            if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
-            FanSpdRatio = Ratio1;
+            if (SolFla < 0) {
+                if (f(FanSpdRatioMin) <= 0) { // capacity <= demand
+                    Ratio1 = FanSpdRatioMax;  // over capacity
+                } else {                      // capacity > demand even for the minimum fan speed
+                    Ratio1 = FanSpdRatioMin;
+                }
+            }
             CoilOnOffRatio = 1.0;
 
             Tout = Tin + (Ts_1 - Tin) * (1 - BF);
