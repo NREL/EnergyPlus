@@ -11553,7 +11553,7 @@ namespace UnitarySystems {
                         } else {
                             if (singleMode) {
                                 CoilPLR = (m_CoolingSpeedNum == 1) ? PartLoadRatio
-                                                                   : 0.0; // singleMode allows cycling, but not part load operation at higher speeds
+                                                                   : 1.0; // singleMode allows cycling, but not part load operation at higher speeds
                             } else {
                                 CoilPLR = PartLoadRatio;
                             }
