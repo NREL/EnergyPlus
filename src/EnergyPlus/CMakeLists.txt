@@ -17,10 +17,9 @@ configure_file(ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/Configured
 
 if(LINK_WITH_PYTHON)
   add_compile_definitions(LINK_WITH_PYTHON)
-endif()
-
-if(PYTHON_CLI)
-  add_compile_definitions(PYTHON_CLI)
+  if(PYTHON_CLI)
+    add_compile_definitions(PYTHON_CLI)
+  endif()
 endif()
 
 if(USE_PSYCHROMETRICS_CACHING)
