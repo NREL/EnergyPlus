@@ -127,6 +127,67 @@ namespace InternalHeatGains {
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
 
+    static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesPeople = {DataHeatBalance::IntGainType::People};
+    static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesLight = {DataHeatBalance::IntGainType::Lights};
+    static constexpr std::array<DataHeatBalance::IntGainType, 7> IntGainTypesEquip = {DataHeatBalance::IntGainType::ElectricEquipment,
+                                                                                      DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+                                                                                      DataHeatBalance::IntGainType::GasEquipment,
+                                                                                      DataHeatBalance::IntGainType::HotWaterEquipment,
+                                                                                      DataHeatBalance::IntGainType::SteamEquipment,
+                                                                                      DataHeatBalance::IntGainType::OtherEquipment,
+                                                                                      DataHeatBalance::IntGainType::IndoorGreen};
+    static constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesRefrig = {
+        DataHeatBalance::IntGainType::RefrigerationCase,
+        DataHeatBalance::IntGainType::RefrigerationCompressorRack,
+        DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
+        DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
+        DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
+        DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
+        DataHeatBalance::IntGainType::RefrigerationWalkIn,
+        DataHeatBalance::IntGainType::RefrigerationTransSysAirCooledGasCooler,
+        DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeMT,
+        DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeLT};
+    static constexpr std::array<DataHeatBalance::IntGainType, 3> IntGainTypesWaterUse = {DataHeatBalance::IntGainType::WaterUseEquipment,
+                                                                                         DataHeatBalance::IntGainType::WaterHeaterMixed,
+                                                                                         DataHeatBalance::IntGainType::WaterHeaterStratified};
+    static constexpr std::array<DataHeatBalance::IntGainType, 20> IntGainTypesHvacLoss = {
+        DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
+        DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
+        DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
+        DataHeatBalance::IntGainType::PipeIndoor,
+        DataHeatBalance::IntGainType::Pump_VarSpeed,
+        DataHeatBalance::IntGainType::Pump_ConSpeed,
+        DataHeatBalance::IntGainType::Pump_Cond,
+        DataHeatBalance::IntGainType::PumpBank_VarSpeed,
+        DataHeatBalance::IntGainType::PumpBank_ConSpeed,
+        DataHeatBalance::IntGainType::PlantComponentUserDefined,
+        DataHeatBalance::IntGainType::CoilUserDefined,
+        DataHeatBalance::IntGainType::ZoneHVACForcedAirUserDefined,
+        DataHeatBalance::IntGainType::AirTerminalUserDefined,
+        DataHeatBalance::IntGainType::PackagedTESCoilTank,
+        DataHeatBalance::IntGainType::FanSystemModel,
+        DataHeatBalance::IntGainType::SecCoolingDXCoilSingleSpeed,
+        DataHeatBalance::IntGainType::SecHeatingDXCoilSingleSpeed,
+        DataHeatBalance::IntGainType::SecCoolingDXCoilTwoSpeed,
+        DataHeatBalance::IntGainType::SecCoolingDXCoilMultiSpeed,
+        DataHeatBalance::IntGainType::SecHeatingDXCoilMultiSpeed};
+    static constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesPowerGen = {
+        DataHeatBalance::IntGainType::GeneratorFuelCell,
+        DataHeatBalance::IntGainType::GeneratorMicroCHP,
+        DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
+        DataHeatBalance::IntGainType::ElectricLoadCenterConverter};
+    // Explicitly list internal gains not gathered here
+    static constexpr std::array<DataHeatBalance::IntGainType, 3> ExcludedIntGainTypes = {
+        DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkCarbonDioxide,
+        DataHeatBalance::IntGainType::DaylightingDeviceTubular,
+        DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam};
+
     void ManageInternalHeatGains(EnergyPlusData &state,
                                  ObjexxFCL::Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
@@ -634,7 +695,7 @@ namespace InternalHeatGains {
 
                     if (IHGNumAlphas > 6) { // Optional parameters present--thermal comfort data follows...
                         int lastOption = 0;
-                        state.dataInternalHeatGains->UsingThermalComfort = false;
+                        bool usingThermalComfort = false;
                         if (IHGNumAlphas > 20) {
                             lastOption = 20;
                         } else {
@@ -674,37 +735,37 @@ namespace InternalHeatGains {
 
                                 if (thermalComfortType == "FANGER") {
                                     thisPeople.Fanger = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "PIERCE") {
                                     thisPeople.Pierce = true;
                                     state.dataHeatBal->AnyThermalComfortPierceModel = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "KSU") {
                                     thisPeople.KSU = true;
                                     state.dataHeatBal->AnyThermalComfortKSUModel = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVEASH55") {
                                     thisPeople.AdaptiveASH55 = true;
                                     state.dataHeatBal->AdaptiveComfortRequested_ASH55 = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVECEN15251") {
                                     thisPeople.AdaptiveCEN15251 = true;
                                     state.dataHeatBal->AdaptiveComfortRequested_CEN15251 = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "COOLINGEFFECTASH55") {
                                     thisPeople.CoolingEffectASH55 = true;
                                     state.dataHeatBal->AnyThermalComfortCoolingEffectModel = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ANKLEDRAFTASH55") {
                                     thisPeople.AnkleDraftASH55 = true;
                                     state.dataHeatBal->AnyThermalComfortAnkleDraftModel = true;
-                                    state.dataInternalHeatGains->UsingThermalComfort = true;
+                                    usingThermalComfort = true;
 
                                 } else if (thermalComfortType == "") { // Blank input field--just ignore this
 
@@ -725,7 +786,7 @@ namespace InternalHeatGains {
                             }
                         }
 
-                        if (state.dataInternalHeatGains->UsingThermalComfort) {
+                        if (usingThermalComfort) {
 
                             // Set the default value of MRTCalcType as 'EnclosureAveraged'
                             thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::EnclosureAveraged;
@@ -1189,6 +1250,8 @@ namespace InternalHeatGains {
         // Lights
         // Declared in state because the lights inputs are needed for demand manager
         int numLightsStatements = 0;
+        Real64 sumArea = 0.0;  // sum of floor area for all lights objects
+        Real64 sumPower = 0.0; // sum of power for all lights objects
         setupIHGZonesAndSpaces(
             state, lightsModuleObject, state.dataInternalHeatGains->lightsObjects, numLightsStatements, state.dataHeatBal->TotLights, ErrorsFound);
 
@@ -1568,8 +1631,8 @@ namespace InternalHeatGains {
                 std::string liteName = state.dataHeatBal->Lights(lightsNum2).Name;
                 Real64 mult = state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
                 Real64 spaceArea = state.dataHeatBal->space(spaceNum).FloorArea;
-                state.dataInternalHeatGains->sumArea += spaceArea * mult;
-                state.dataInternalHeatGains->sumPower += state.dataHeatBal->Lights(lightsNum2).DesignLevel * mult;
+                sumArea += spaceArea * mult;
+                sumPower += state.dataHeatBal->Lights(lightsNum2).DesignLevel * mult;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtZone, liteName, state.dataHeatBal->Zone(zoneNum).Name);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtSpace, liteName, state.dataHeatBal->space(spaceNum).Name);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtSpaceType, liteName, state.dataHeatBal->space(spaceNum).spaceType);
@@ -1624,17 +1687,14 @@ namespace InternalHeatGains {
             }
         } // TotLights > 0 check
         // add total line to lighting summary table
-        if (state.dataInternalHeatGains->sumArea > 0.0) {
-            PreDefTableEntry(state,
-                             state.dataOutRptPredefined->pdchInLtDens,
-                             "Interior Lighting Total",
-                             state.dataInternalHeatGains->sumPower / state.dataInternalHeatGains->sumArea,
+        if (sumArea > 0.0) {
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, "Interior Lighting Total", sumPower / sumArea,
                              4); // line 792
         } else {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, "Interior Lighting Total", DataPrecisionGlobals::constant_zero, 4);
         }
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, "Interior Lighting Total", state.dataInternalHeatGains->sumArea);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, "Interior Lighting Total", state.dataInternalHeatGains->sumPower);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, "Interior Lighting Total", sumArea);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, "Interior Lighting Total", sumPower);
 
         // ElectricEquipment
         // Declared in state because the lights inputs are needed for demand manager
@@ -7853,21 +7913,23 @@ namespace InternalHeatGains {
                         state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) =
                             thisEnclosure.radQThermalRad * thisEnclosure.radThermAbsMult * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                     } else {
-                        state.dataInternalHeatGains->curQL = thisEnclosure.radQThermalRad;
+                        // radiant value prior to adjustment for pulse for load component report
+                        Real64 const curQL = thisEnclosure.radQThermalRad;
                         // for the loads component report during the special sizing run increase the radiant portion
                         // a small amount to create a "pulse" of heat that is used for the delayed loads
-                        state.dataInternalHeatGains->adjQL = state.dataInternalHeatGains->curQL + thisEnclosure.FloorArea * pulseMultipler;
+                        // radiant value including adjustment for pulse for load component report
+                        Real64 const adjQL = curQL + thisEnclosure.FloorArea * pulseMultipler;
                         // ITABSF is the Inside Thermal Absorptance
                         // EnclRadThermAbsMult is a multiplier for each zone
                         // SurfQdotRadIntGainsInPerArea is the thermal radiation absorbed on inside surfaces
                         state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) =
-                            state.dataInternalHeatGains->adjQL * thisEnclosure.radThermAbsMult * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
+                            adjQL * thisEnclosure.radThermAbsMult * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                         // store the magnitude and time of the pulse
                         state.dataOutRptTab->radiantPulseTimestep(state.dataSize->CurOverallSimDay, zoneNum) =
                             (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                         state.dataOutRptTab->radiantPulseReceived(state.dataSize->CurOverallSimDay, SurfNum) =
-                            (state.dataInternalHeatGains->adjQL - state.dataInternalHeatGains->curQL) * thisEnclosure.radThermAbsMult *
-                            state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) * state.dataSurface->Surface(SurfNum).Area;
+                            (adjQL - curQL) * thisEnclosure.radThermAbsMult * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) *
+                            state.dataSurface->Surface(SurfNum).Area;
                     }
                 }
             }
@@ -9121,8 +9183,9 @@ namespace InternalHeatGains {
 
     Real64 SumReturnAirConvectionGainsByTypes(
         EnergyPlusData &state,
-        int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
-        gsl::span<const DataHeatBalance::IntGainType> GainTypeARR // variable length 1-d array of integer valued gain types
+        int const ZoneNum,                                         // zone index pointer for which zone to sum gains for
+        gsl::span<const DataHeatBalance::IntGainType> GainTypeARR, // variable length 1-d array of integer valued gain types
+        int const spaceIndex                                       // space index pointer, sum gains only for this space
     )
     {
 
@@ -9138,16 +9201,27 @@ namespace InternalHeatGains {
 
         int NumberOfTypes = GainTypeARR.size();
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
-                continue;
-            }
-
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+        // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
+        if (spaceIndex > 0) {
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
+                        SumReturnAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).ReturnAirConvGainRate;
+                    }
+                }
+            }
+        } else {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
+                    continue;
+                }
 
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
-                        SumReturnAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
+                for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                    for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
+
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
+                            SumReturnAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
+                        }
                     }
                 }
             }
@@ -9221,6 +9295,32 @@ namespace InternalHeatGains {
                         if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                             SumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
                         }
+                    }
+                }
+            }
+        }
+
+        return SumRadiationGainRate;
+    }
+
+    Real64 SumEnclosureInternalRadiationGainsByTypes(
+        EnergyPlusData &state,
+        int const enclosureNum,                                    // enclosure to sum gains for
+        gsl::span<const DataHeatBalance::IntGainType> GainTypeARR) // variable length 1-d array of enum valued gain types
+    {
+        // Return value
+        Real64 SumRadiationGainRate(0.0);
+
+        int NumberOfTypes = GainTypeARR.size();
+
+        for (int spaceNum : state.dataViewFactor->EnclRadInfo(enclosureNum).spaceNums) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
+                continue;
+            }
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
+                        SumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
                     }
                 }
             }
@@ -9494,120 +9594,57 @@ namespace InternalHeatGains {
         // Using/Aliasing
         using namespace DataHeatBalance;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesPeople = {DataHeatBalance::IntGainType::People};
-        static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesLight = {DataHeatBalance::IntGainType::Lights};
-        static constexpr std::array<DataHeatBalance::IntGainType, 7> IntGainTypesEquip = {DataHeatBalance::IntGainType::ElectricEquipment,
-                                                                                          DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-                                                                                          DataHeatBalance::IntGainType::GasEquipment,
-                                                                                          DataHeatBalance::IntGainType::HotWaterEquipment,
-                                                                                          DataHeatBalance::IntGainType::SteamEquipment,
-                                                                                          DataHeatBalance::IntGainType::OtherEquipment,
-                                                                                          DataHeatBalance::IntGainType::IndoorGreen};
-        static constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesRefrig = {
-            DataHeatBalance::IntGainType::RefrigerationCase,
-            DataHeatBalance::IntGainType::RefrigerationCompressorRack,
-            DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
-            DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
-            DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
-            DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
-            DataHeatBalance::IntGainType::RefrigerationWalkIn,
-            DataHeatBalance::IntGainType::RefrigerationTransSysAirCooledGasCooler,
-            DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeMT,
-            DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeLT};
-        static constexpr std::array<DataHeatBalance::IntGainType, 3> IntGainTypesWaterUse = {DataHeatBalance::IntGainType::WaterUseEquipment,
-                                                                                             DataHeatBalance::IntGainType::WaterHeaterMixed,
-                                                                                             DataHeatBalance::IntGainType::WaterHeaterStratified};
-        static constexpr std::array<DataHeatBalance::IntGainType, 20> IntGainTypesHvacLoss = {
-            DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
-            DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
-            DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
-            DataHeatBalance::IntGainType::PipeIndoor,
-            DataHeatBalance::IntGainType::Pump_VarSpeed,
-            DataHeatBalance::IntGainType::Pump_ConSpeed,
-            DataHeatBalance::IntGainType::Pump_Cond,
-            DataHeatBalance::IntGainType::PumpBank_VarSpeed,
-            DataHeatBalance::IntGainType::PumpBank_ConSpeed,
-            DataHeatBalance::IntGainType::PlantComponentUserDefined,
-            DataHeatBalance::IntGainType::CoilUserDefined,
-            DataHeatBalance::IntGainType::ZoneHVACForcedAirUserDefined,
-            DataHeatBalance::IntGainType::AirTerminalUserDefined,
-            DataHeatBalance::IntGainType::PackagedTESCoilTank,
-            DataHeatBalance::IntGainType::FanSystemModel,
-            DataHeatBalance::IntGainType::SecCoolingDXCoilSingleSpeed,
-            DataHeatBalance::IntGainType::SecHeatingDXCoilSingleSpeed,
-            DataHeatBalance::IntGainType::SecCoolingDXCoilTwoSpeed,
-            DataHeatBalance::IntGainType::SecCoolingDXCoilMultiSpeed,
-            DataHeatBalance::IntGainType::SecHeatingDXCoilMultiSpeed};
-        static constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesPowerGen = {
-            DataHeatBalance::IntGainType::GeneratorFuelCell,
-            DataHeatBalance::IntGainType::GeneratorMicroCHP,
-            DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
-            DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
-            DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
-            DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
-            DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
-            DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
-            DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
-            DataHeatBalance::IntGainType::ElectricLoadCenterConverter};
-        // Explicitly list internal gains not gathered here
-        static constexpr std::array<DataHeatBalance::IntGainType, 3> ExcludedIntGainTypes = {
-            DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkCarbonDioxide,
-            DataHeatBalance::IntGainType::DaylightingDeviceTubular,
-            DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam};
+        if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
+            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                auto &znCLDayTS = state.dataOutRptTab->znCompLoads[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1].spacezone[iZone - 1];
+                gatherCompLoadIntGain2(state, znCLDayTS, iZone);
+            }
+            for (int iEncl = 1; iEncl <= state.dataViewFactor->NumOfRadiantEnclosures; ++iEncl) {
+                auto &enclCLDayTS = state.dataOutRptTab->enclCompLoads[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1].encl[iEncl - 1];
+                enclCLDayTS.peopleRadSeq = SumEnclosureInternalRadiationGainsByTypes(state, iEncl, IntGainTypesPeople);
+                enclCLDayTS.lightLWRadSeq = SumEnclosureInternalRadiationGainsByTypes(state, iEncl, IntGainTypesLight);
+                enclCLDayTS.equipRadSeq = SumEnclosureInternalRadiationGainsByTypes(state, iEncl, IntGainTypesEquip);
+                enclCLDayTS.hvacLossRadSeq = SumEnclosureInternalRadiationGainsByTypes(state, iEncl, IntGainTypesHvacLoss);
+                enclCLDayTS.powerGenRadSeq = SumEnclosureInternalRadiationGainsByTypes(state, iEncl, IntGainTypesPowerGen);
+            }
+            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                for (int iSpace = 1; iSpace <= state.dataGlobal->NumOfZones; ++iSpace) {
+                    auto &spCLDayTS =
+                        state.dataOutRptTab->spCompLoads[state.dataSize->CurOverallSimDay - 1].ts[TimeStepInDay - 1].spacezone[iSpace - 1];
+                    gatherCompLoadIntGain2(state, spCLDayTS, state.dataHeatBal->space(iSpace).zoneNum, iSpace);
+                }
+            }
+        }
+    }
 
+    void
+    gatherCompLoadIntGain2(EnergyPlusData &state, OutputReportTabular::compLoadsSpaceZone &szCompLoadDayTS, int const zoneNum, int const spaceNum)
+    {
         // Make sure all types of internal gains have been gathered
         assert((int)(size(IntGainTypesPeople) + size(IntGainTypesLight) + size(IntGainTypesEquip) + size(IntGainTypesRefrig) +
                      size(IntGainTypesWaterUse) + size(IntGainTypesHvacLoss) + size(IntGainTypesPowerGen) + size(ExcludedIntGainTypes)) ==
                (int)DataHeatBalance::IntGainType::Num);
 
-        if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
-            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                state.dataOutRptTab->peopleInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesPeople);
-                state.dataOutRptTab->peopleLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalLatentGainsByTypes(state, iZone, IntGainTypesPeople);
-                state.dataOutRptTab->peopleRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesPeople);
+        szCompLoadDayTS.peopleInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesPeople, spaceNum);
+        szCompLoadDayTS.peopleLatentSeq = SumInternalLatentGainsByTypes(state, zoneNum, IntGainTypesPeople, spaceNum);
 
-                state.dataOutRptTab->lightInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesLight);
-                state.dataOutRptTab->lightRetAirSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumReturnAirConvectionGainsByTypes(state, iZone, IntGainTypesLight);
-                state.dataOutRptTab->lightLWRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesLight);
+        szCompLoadDayTS.lightInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesLight, spaceNum);
+        szCompLoadDayTS.lightRetAirSeq = SumReturnAirConvectionGainsByTypes(state, zoneNum, IntGainTypesLight, spaceNum);
 
-                state.dataOutRptTab->equipInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesEquip);
-                state.dataOutRptTab->equipLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalLatentGainsByTypes(state, iZone, IntGainTypesEquip);
-                state.dataOutRptTab->equipRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesEquip);
+        szCompLoadDayTS.equipInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesEquip, spaceNum);
+        szCompLoadDayTS.equipLatentSeq = SumInternalLatentGainsByTypes(state, zoneNum, IntGainTypesEquip, spaceNum);
 
-                state.dataOutRptTab->refrigInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesRefrig);
-                state.dataOutRptTab->refrigRetAirSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumReturnAirConvectionGainsByTypes(state, iZone, IntGainTypesRefrig);
-                state.dataOutRptTab->refrigLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalLatentGainsByTypes(state, iZone, IntGainTypesRefrig);
+        szCompLoadDayTS.refrigInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesRefrig, spaceNum);
+        szCompLoadDayTS.refrigRetAirSeq = SumReturnAirConvectionGainsByTypes(state, zoneNum, IntGainTypesRefrig, spaceNum);
+        szCompLoadDayTS.refrigLatentSeq = SumInternalLatentGainsByTypes(state, zoneNum, IntGainTypesRefrig, spaceNum);
 
-                state.dataOutRptTab->waterUseInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesWaterUse);
-                state.dataOutRptTab->waterUseLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalLatentGainsByTypes(state, iZone, IntGainTypesWaterUse);
+        szCompLoadDayTS.waterUseInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesWaterUse, spaceNum);
+        szCompLoadDayTS.waterUseLatentSeq = SumInternalLatentGainsByTypes(state, zoneNum, IntGainTypesWaterUse, spaceNum);
 
-                state.dataOutRptTab->hvacLossInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesHvacLoss);
-                state.dataOutRptTab->hvacLossRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesHvacLoss);
+        szCompLoadDayTS.hvacLossInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesHvacLoss, spaceNum);
 
-                state.dataOutRptTab->powerGenInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesPowerGen);
-                state.dataOutRptTab->powerGenRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
-                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesPowerGen);
-            }
-        }
+        szCompLoadDayTS.powerGenInstantSeq = SumInternalConvectionGainsByTypes(state, zoneNum, IntGainTypesPowerGen, spaceNum);
     }
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,

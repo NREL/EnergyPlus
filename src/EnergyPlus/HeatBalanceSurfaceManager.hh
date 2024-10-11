@@ -236,9 +236,6 @@ struct HeatBalSurfMgr : BaseGlobalStruct
 
     Array2D<Real64> DiffuseArray;
 
-    Real64 curQL = 0.0; // radiant value prior to adjustment for pulse for load component report
-    Real64 adjQL = 0.0; // radiant value including adjustment for pulse for load component report
-
     bool ManageSurfaceHeatBalancefirstTime = true;
     bool InitSurfaceHeatBalancefirstTime = true;
     bool UpdateThermalHistoriesFirstTimeFlag = true;
@@ -286,8 +283,6 @@ struct HeatBalSurfMgr : BaseGlobalStruct
         ZoneAESum.clear();
 
         DiffuseArray.clear();
-        curQL = 0.0;
-        adjQL = 0.0;
 
         ManageSurfaceHeatBalancefirstTime = true;
         InitSurfaceHeatBalancefirstTime = true;

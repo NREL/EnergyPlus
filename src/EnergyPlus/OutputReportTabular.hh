@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -198,6 +199,7 @@ namespace OutputReportTabular {
     enum class OutputType
     {
         Invalid = -1,
+        Space,
         Zone,
         AirLoop,
         Facility,
@@ -489,6 +491,86 @@ namespace OutputReportTabular {
         }
     };
 
+    struct compLoadsSurface
+    {
+        Real64 loadConvectedNormal = 0.0;
+        Real64 loadConvectedWithPulse = 0.0;
+        Real64 netSurfRadSeq = 0.0;
+        Real64 ITABSFseq = 0.0;     // used for determining the radiant fraction on each surface
+        Real64 TMULTseq = 0.0;      // used for determining the radiant fraction on each surface
+        Real64 lightSWRadSeq = 0.0; // short wave visible radiation
+        Real64 feneSolarRadSeq = 0.0;
+    };
+
+    struct compLoadsTimeStepSurfaces
+    {
+        std::vector<compLoadsSurface> surf;
+    };
+
+    struct componentLoadsSurf
+    {
+        std::vector<compLoadsTimeStepSurfaces> ts;
+    };
+
+    struct compLoadsSpaceZone
+    {
+        Real64 peopleInstantSeq = 0.0;
+        Real64 peopleLatentSeq = 0.0;
+
+        Real64 lightInstantSeq = 0.0;
+        Real64 lightRetAirSeq = 0.0;
+
+        Real64 equipInstantSeq = 0.0;
+        Real64 equipLatentSeq = 0.0;
+
+        Real64 refrigInstantSeq = 0.0;
+        Real64 refrigRetAirSeq = 0.0;
+        Real64 refrigLatentSeq = 0.0;
+
+        Real64 waterUseInstantSeq = 0.0;
+        Real64 waterUseLatentSeq = 0.0;
+
+        Real64 hvacLossInstantSeq = 0.0;
+
+        Real64 powerGenInstantSeq = 0.0;
+        Real64 powerGenRadSeq = 0.0;
+        Real64 infilInstantSeq = 0.0;
+        Real64 infilLatentSeq = 0.0;
+
+        Real64 zoneVentInstantSeq = 0.0;
+        Real64 zoneVentLatentSeq = 0.0;
+
+        Real64 interZoneMixInstantSeq = 0.0;
+        Real64 interZoneMixLatentSeq = 0.0;
+
+        Real64 feneCondInstantSeq = 0.0;
+        bool adjFenDone = false;
+    };
+    struct compLoadsTimeStepSpZn
+    {
+        std::vector<compLoadsSpaceZone> spacezone;
+    };
+    struct componentLoadsSpZn
+    {
+        std::vector<compLoadsTimeStepSpZn> ts;
+    };
+
+    struct compLoadsEnclosure
+    {
+        Real64 peopleRadSeq = 0.0;
+        Real64 lightLWRadSeq = 0.0; // long wave thermal radiation
+        Real64 equipRadSeq = 0.0;
+        Real64 hvacLossRadSeq = 0.0;
+        Real64 powerGenRadSeq = 0.0;
+    };
+    struct compLoadsTimeStepEncl
+    {
+        std::vector<compLoadsEnclosure> encl;
+    };
+    struct componentLoadsEncl
+    {
+        std::vector<compLoadsTimeStepEncl> ts;
+    };
     // Functions
 
     std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path const &filePath, bool output_to_file = true);
@@ -775,7 +857,27 @@ namespace OutputReportTabular {
 
     void GatherComponentLoadsHVAC(EnergyPlusData &state);
 
+    void gatherSpaceZoneCompLoadsHVAC(OutputReportTabular::compLoadsSpaceZone &compLoadDayTS,
+                                      DataHeatBalance::AirReportVars const &szAirRpt,
+                                      Real64 const timeStepSysSec);
+
     void WriteLoadComponentSummaryTables(EnergyPlusData &state);
+
+    void computeSpaceZoneCompLoads(EnergyPlusData &state,
+                                   DataSizing::ZoneSizingData const &calcFinalSizing,
+                                   CompLoadTablesType &coolCompLoadTables,
+                                   CompLoadTablesType &heatCompLoadTables,
+                                   Array1D<Real64> &peopleDelaySeq,
+                                   Array1D<Real64> &equipDelaySeq,
+                                   Array1D<Real64> &hvacLossDelaySeq,
+                                   Array1D<Real64> &powerGenDelaySeq,
+                                   Array1D<Real64> &lightDelaySeq,
+                                   Array1D<Real64> &feneSolarDelaySeq,
+                                   std::vector<OutputReportTabular::componentLoadsSpZn> &szCompLoadLoc,
+                                   Array2D<Real64> &surfDelaySeq,
+                                   ZompComponentAreasType &componentAreas,
+                                   int const iZone,
+                                   int const iSpace = 0);
 
     void GetDelaySequences(EnergyPlusData &state,
                            int desDaySelected,
@@ -787,8 +889,9 @@ namespace OutputReportTabular {
                            Array1D<Real64> &powerGenDelaySeq,
                            Array1D<Real64> &lightDelaySeq,
                            Array1D<Real64> &feneSolarDelaySeq,
-                           Array3D<Real64> &feneCondInstantSeq,
-                           Array2D<Real64> &surfDelaySeq);
+                           std::vector<OutputReportTabular::componentLoadsSpZn> &szCompLoadLoc,
+                           Array2D<Real64> &surfDelaySeq,
+                           int const iSpace = 0);
 
     void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                                         Array2D<Real64> &resultCells,
@@ -802,17 +905,20 @@ namespace OutputReportTabular {
                                         Array1D<Real64> const &powerGenDelaySeq,
                                         Array1D<Real64> const &lightDelaySeq,
                                         Array1D<Real64> const &feneSolarDelaySeq,
-                                        Array3D<Real64> const &feneCondInstantSeqLoc,
-                                        Array2D<Real64> const &surfDelaySeq);
+                                        std::vector<OutputReportTabular::componentLoadsSpZn> &szCompLoadLoc,
+                                        Array2D<Real64> const &surfDelaySeq,
+                                        int const iSpace = 0);
 
-    void
-    CollectPeakZoneConditions(EnergyPlusData &state, CompLoadTablesType &compLoad, int desDaySelected, int timeOfMax, int zoneIndex, bool isCooling);
+    void CollectPeakZoneConditions(
+        EnergyPlusData &state, CompLoadTablesType &compLoad, int desDaySelected, int timeOfMax, int zoneIndex, bool isCooling, int spaceIndex = 0);
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);
 
-    void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType> &areas);
+    void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType> &znAreas, Array1D<ZompComponentAreasType> &spAreas);
 
-    void AddAreaColumnForZone(int zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoadTotal);
+    void addSurfaceArea(DataSurfaces::SurfaceData const &curSurface, Array1D<ZompComponentAreasType> &areas, bool isZone);
+
+    void AddAreaColumnForZone(ZompComponentAreasType const &compAreas, CompLoadTablesType &compLoadTotal);
 
     void CombineLoadCompResults(CompLoadTablesType &compLoadTotal, CompLoadTablesType const &compLoadPartial, Real64 multiplier);
 
@@ -1155,50 +1261,13 @@ struct OutputReportTabularData : BaseGlobalStruct
     // arrays related to pulse and load component reporting
     Array2D_int radiantPulseTimestep;
     Array2D<Real64> radiantPulseReceived;
-    Array3D<Real64> loadConvectedNormal;
-    Array3D<Real64> loadConvectedWithPulse;
-    Array3D<Real64> netSurfRadSeq;
     Array2D<Real64> decayCurveCool;
     Array2D<Real64> decayCurveHeat;
-    Array3D<Real64> ITABSFseq; // used for determining the radiant fraction on each surface
-    Array3D<Real64> TMULTseq;  // used for determining the radiant fraction on each surface
 
-    Array3D<Real64> peopleInstantSeq;
-    Array3D<Real64> peopleLatentSeq;
-    Array3D<Real64> peopleRadSeq;
-
-    Array3D<Real64> lightInstantSeq;
-    Array3D<Real64> lightRetAirSeq;
-    Array3D<Real64> lightLWRadSeq; // long wave thermal radiation
-    Array3D<Real64> lightSWRadSeq; // short wave visible radiation
-
-    Array3D<Real64> equipInstantSeq;
-    Array3D<Real64> equipLatentSeq;
-    Array3D<Real64> equipRadSeq;
-
-    Array3D<Real64> refrigInstantSeq;
-    Array3D<Real64> refrigRetAirSeq;
-    Array3D<Real64> refrigLatentSeq;
-
-    Array3D<Real64> waterUseInstantSeq;
-    Array3D<Real64> waterUseLatentSeq;
-
-    Array3D<Real64> hvacLossInstantSeq;
-    Array3D<Real64> hvacLossRadSeq;
-
-    Array3D<Real64> powerGenInstantSeq;
-    Array3D<Real64> powerGenRadSeq;
-    Array3D<Real64> infilInstantSeq;
-    Array3D<Real64> infilLatentSeq;
-
-    Array3D<Real64> zoneVentInstantSeq;
-    Array3D<Real64> zoneVentLatentSeq;
-
-    Array3D<Real64> interZoneMixInstantSeq;
-    Array3D<Real64> interZoneMixLatentSeq;
-
-    Array3D<Real64> feneCondInstantSeq;
-    Array3D<Real64> feneSolarRadSeq;
+    std::vector<OutputReportTabular::componentLoadsSurf> surfCompLoads; // Surface component loads by day, timestep, then surface
+    std::vector<OutputReportTabular::componentLoadsSpZn> znCompLoads;   // Zone component loads by day, timestep, then zone
+    std::vector<OutputReportTabular::componentLoadsSpZn> spCompLoads;   // Space component loads by day, timestep, then space
+    std::vector<OutputReportTabular::componentLoadsEncl> enclCompLoads; // Enclosure component loads by day, timestep, then enclsoure
 
     int maxUniqueKeyCount = 0;
 
@@ -1306,18 +1375,6 @@ struct OutputReportTabularData : BaseGlobalStruct
     int indexUnitConvWCS = 0;
     Real64 curValueSIWCS = 0.0;
     Real64 curValueWCS = 0.0;
-    int ZoneNumCLCDC = 0;
-    int SurfNumCLCDC = 0;
-    int TimeStepCLCDC = 0;
-    int TimeOfPulseCLCDC = 0;
-    int CoolDesSelectedCLCDC = 0; // design day selected for cooling
-    int HeatDesSelectedCLCDC = 0; // design day selected for heating
-    int iSurfGCLS = 0;
-    int ZoneNumGCLS = 0;
-    int TimeStepInDayGCLS = 0;
-    int iZoneGCLH = 0;
-    int TimeStepInDayGCLH = 0;
-    Array3D_bool adjFenDone;
     Real64 BigNumRMG = 0.0;
     int foundGsui = 0;
     int iUnitGsui = 0;
@@ -1475,40 +1532,13 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->DesignDayCount = 0;
         this->radiantPulseTimestep.deallocate();
         this->radiantPulseReceived.deallocate();
-        this->loadConvectedNormal.deallocate();
-        this->loadConvectedWithPulse.deallocate();
-        this->netSurfRadSeq.deallocate();
         this->decayCurveCool.deallocate();
         this->decayCurveHeat.deallocate();
-        this->ITABSFseq.deallocate();
-        this->TMULTseq.deallocate();
-        this->peopleInstantSeq.deallocate();
-        this->peopleLatentSeq.deallocate();
-        this->peopleRadSeq.deallocate();
-        this->lightInstantSeq.deallocate();
-        this->lightRetAirSeq.deallocate();
-        this->lightLWRadSeq.deallocate();
-        this->lightSWRadSeq.deallocate();
-        this->equipInstantSeq.deallocate();
-        this->equipLatentSeq.deallocate();
-        this->equipRadSeq.deallocate();
-        this->refrigInstantSeq.deallocate();
-        this->refrigRetAirSeq.deallocate();
-        this->refrigLatentSeq.deallocate();
-        this->waterUseInstantSeq.deallocate();
-        this->waterUseLatentSeq.deallocate();
-        this->hvacLossInstantSeq.deallocate();
-        this->hvacLossRadSeq.deallocate();
-        this->powerGenInstantSeq.deallocate();
-        this->powerGenRadSeq.deallocate();
-        this->infilInstantSeq.deallocate();
-        this->infilLatentSeq.deallocate();
-        this->zoneVentInstantSeq.deallocate();
-        this->zoneVentLatentSeq.deallocate();
-        this->interZoneMixInstantSeq.deallocate();
-        this->interZoneMixLatentSeq.deallocate();
-        this->feneCondInstantSeq.deallocate();
-        this->feneSolarRadSeq.deallocate();
+        this->surfCompLoads.clear();
+        this->znCompLoads.clear();
+        this->spCompLoads.clear();
+        this->enclCompLoads.clear();
+
         this->maxUniqueKeyCount = 0;
         this->activeSubTableName.clear();
         this->activeReportNameNoSpace.clear();
@@ -1612,18 +1642,6 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->indexUnitConvWCS = 0;
         this->curValueSIWCS = 0.0;
         this->curValueWCS = 0.0;
-        this->ZoneNumCLCDC = 0;
-        this->SurfNumCLCDC = 0;
-        this->TimeStepCLCDC = 0;
-        this->TimeOfPulseCLCDC = 0;
-        this->CoolDesSelectedCLCDC = 0; // design day selected for cooling
-        this->HeatDesSelectedCLCDC = 0; // design day selected for heating
-        this->iSurfGCLS = 0;
-        this->ZoneNumGCLS = 0;
-        this->TimeStepInDayGCLS = 0;
-        this->iZoneGCLH = 0;
-        this->TimeStepInDayGCLH = 0;
-        this->adjFenDone.clear();
         this->BigNumRMG = 0.0;
         this->foundGsui = 0;
         this->iUnitGsui = 0;

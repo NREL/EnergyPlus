@@ -1405,6 +1405,8 @@ namespace DataHeatBalance {
         Real64 MixVdotStdDensity = 0.0;      // Mixing volume flow rate of Air {m3/s} at standard density (adjusted for elevation)
         Real64 MixMass = 0.0;                // Mixing mass of air {kg}
         Real64 MixMdot = 0.0;                // Mixing mass flow rate of air {kg/s}
+        Real64 MixSenLoad = 0.0;             // Heat Gain(+)/Loss(-) {J} due to mixing and cross mixing and refrigeration door mixing
+        Real64 MixLatLoad = 0.0;             // Latent Gain(+)/Loss(-) {J} due to mixing and cross mixing and refrigeration door mixing
         Real64 MixHeatLoss = 0.0;            // Heat Gain {J} due to mixing and cross mixing and refrigeration door mixing
         Real64 MixHeatGain = 0.0;            // Heat Loss {J} due to mixing and cross mixing and refrigeration door mixing
         Real64 MixLatentLoss = 0.0;          // Latent Gain {J} due to mixing and cross mixing and refrigeration door mixing
