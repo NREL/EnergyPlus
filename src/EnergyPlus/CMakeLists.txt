@@ -1,3 +1,4 @@
+
 if(WIN32)
   configure_file(energyplus.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc")
   configure_file(energyplusapi.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc")
@@ -134,6 +135,8 @@ set(SRC
     Coils/CoilCoolingDXCurveFitOperatingMode.hh
     Coils/CoilCoolingDXCurveFitPerformance.cc
     Coils/CoilCoolingDXCurveFitPerformance.hh
+    Coils/CoilCoolingDXAshrae205Performance.cc
+    Coils/CoilCoolingDXAshrae205Performance.hh
     Coils/CoilCoolingDXCurveFitSpeed.cc
     Coils/CoilCoolingDXCurveFitSpeed.hh
     CondenserLoopTowers.cc

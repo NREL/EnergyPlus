@@ -241,7 +241,8 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
     }
 }
 
-CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find)
+CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusData &state,
+                                                       const std::string &name_to_find)
     : // model inputs
       indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexSHRFT(0), indexSHRFFF(0),
 
@@ -260,7 +261,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
       ambPressure(0.0), // outdoor pressure {Pa}
       PLR(0.0),         // coil operating part load ratio
       AirFF(0.0),       // ratio of air mass flow rate to rated air mass flow rate
-                        // RatedTotCap( 0.0 ), // rated total capacity at speed {W}
+      // RatedTotCap( 0.0 ), // rated total capacity at speed {W}
 
       fullLoadPower(0.0),     // full load power at speed {W}
       fullLoadWasteHeat(0.0), // full load waste heat at speed {W}
@@ -427,7 +428,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
 void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &state,
                                                  const DataLoopNode::NodeData &inletNode,
                                                  DataLoopNode::NodeData &outletNode,
-                                                 Real64 &_PLR,
+                                                 Real64 const PLR,
                                                  HVAC::FanOp const fanOp,
                                                  const Real64 condInletTemp)
 {
@@ -435,7 +436,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcSpeedOutput: ");
 
-    if ((_PLR == 0.0) || (AirMassFlow == 0.0)) {
+    if ((PLR == 0.0) || (AirMassFlow == 0.0)) {
         outletNode.Temp = inletNode.Temp;
         outletNode.HumRat = inletNode.HumRat;
         outletNode.Enthalpy = inletNode.Enthalpy;
@@ -532,7 +533,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
 
     Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
     if (indexPLRFPLF > 0) {
-        PLF = Curve::CurveValue(state, indexPLRFPLF, _PLR); // Calculate part-load factor
+        PLF = Curve::CurveValue(state, indexPLRFPLF, PLR); // Calculate part-load factor
     }
     if (fanOp == HVAC::FanOp::Cycling) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
 
@@ -555,7 +556,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
     }
 
     Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
-    RTF = _PLR / PLF;
+    RTF = PLR / PLF;
     fullLoadPower = TotCap * EIR;
     fullLoadWasteHeat = ratedWasteHeatFractionOfPowerInput * wasteHeatTempModFac * fullLoadPower;
 

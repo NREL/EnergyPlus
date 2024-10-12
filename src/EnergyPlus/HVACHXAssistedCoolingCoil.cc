@@ -323,7 +323,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
 
-                thisHXCoil.DXCoilNumOfSpeeds = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex_temp].performance.normalMode.speeds.size();
+                thisHXCoil.DXCoilNumOfSpeeds = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex_temp].performance->numSpeeds();
                 if (thisHXCoil.DXCoilNumOfSpeeds < 1) {
                     CoolingCoilErrFlag = true;
                 }
@@ -934,37 +934,31 @@ namespace HVACHXAssistedCoolingCoil {
                 bool singleMode = (mSingleMode == 1);
 
                 Real64 mCoolingSpeedNum = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex]
-                                              .performance.normalMode.speeds.size(); // used the same for the original variable speed coil
+                                              .performance->numSpeeds(); // used the same for the original variable speed coil
 
                 HVAC::CoilMode coilMode = HVAC::CoilMode::Normal;
-                if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].SubcoolReheatFlag) {
+                if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].subcoolReheatFlag) {
                     coilMode = HVAC::CoilMode::SubcoolReheat;
                 } else if (DehumidificationMode == HVAC::CoilMode::Enhanced) {
                     coilMode = HVAC::CoilMode::Enhanced;
                 }
 
-                Real64 mCoolingSpeedRatio = 0.0; // used same setting as the original variable speed coil
-                Real64 mCoolCompPartLoadRatio = (compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0;
-
-                Real64 CoilPLR;
-                if (mCoolingSpeedNum > 1) {
-                    if (mSingleMode == 0) {
-                        mCoolCompPartLoadRatio = (compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0;
-                    } else {
-                        mCoolCompPartLoadRatio = PartLoadRatio * ((compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0);
-                        mCoolingSpeedRatio = 1.0;
-                    }
-                    CoilPLR = 1.0;
+                Real64 CoilPLR = 1.0;
+                if (compressorOp == HVAC::CompressorOp::Off) {
+                    mCoolingSpeedNum = 1; // Bypass mixed-speed calculations in called functions
                 } else {
-                    mCoolingSpeedRatio = 1.0;
-                    CoilPLR = PartLoadRatio * ((compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0);
+                    if (singleMode) {
+                        CoilPLR =
+                            (mCoolingSpeedNum == 1) ? PartLoadRatio : 0.0; // singleMode allows cycling, but not part load operation at higher speeds
+                    } else {
+                        CoilPLR = PartLoadRatio;
+                    }
                 }
 
                 state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].simulate(state,
                                                                                              coilMode, // partially implemented for HXAssistedCoil
-                                                                                             CoilPLR,  // PartLoadRatio,
                                                                                              mCoolingSpeedNum,
-                                                                                             mCoolingSpeedRatio,
+                                                                                             CoilPLR,
                                                                                              fanOp,
                                                                                              singleMode); //
 
@@ -1171,7 +1165,7 @@ namespace HVACHXAssistedCoolingCoil {
 
                 if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == HVAC::CoilDX_Cooling) {
                     int coolingCoilDXIndex = state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilIndex;
-                    CoilCapacity = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilDXIndex].performance.normalMode.ratedGrossTotalCap;
+                    CoilCapacity = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilDXIndex].performance->ratedGrossTotalCap();
                 } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed) {
                     CoilCapacity = DXCoils::GetCoilCapacity(state,
                                                             state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,

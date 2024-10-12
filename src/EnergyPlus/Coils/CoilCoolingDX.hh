@@ -51,7 +51,7 @@
 #include <string>
 #include <vector>
 
-#include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXPerformanceBase.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -78,6 +78,8 @@ struct CoilCoolingDXInputSpecification
 struct CoilCoolingDX
 {
     CoilCoolingDX() = default;
+    static std::shared_ptr<CoilCoolingDXPerformanceBase> makePerformanceSubclass(EnergyPlus::EnergyPlusData &state,
+                                                                                 const std::string &performance_object_name);
     static int factory(EnergyPlusData &state, std::string const &coilName);
     static void getInput(EnergyPlusData &state);
     static void clear_state();
@@ -86,20 +88,20 @@ struct CoilCoolingDX
     void oneTimeInit(EnergyPlusData &state);
     void simulate(EnergyPlusData &state,
                   HVAC::CoilMode coilMode,
-                  Real64 PLR,
                   int speedNum,
                   Real64 speedRatio,
                   HVAC::FanOp const fanOp,
-                  bool const singleMode,
+                  bool singleMode,
                   Real64 LoadSHR = -1.0);
     void setData(int fanIndex, HVAC::FanType fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
                       int &evapOutletNodeIndex,
                       int &condInletNodeIndex,
                       int &normalModeNumSpeeds,
-                      CoilCoolingDXCurveFitPerformance::CapControlMethod &capacityControlMethod,
+                      CoilCoolingDXPerformanceBase::CapControlMethod &capacityControlMethod,
                       Real64 &minOutdoorDryBulb);
-    void getDataAfterSizing(Real64 &normalModeRatedEvapAirFlowRate,
+    void getDataAfterSizing(EnergyPlusData &state,
+                            Real64 &normalModeRatedEvapAirFlowRate,
                             Real64 &normalModeRatedCapacity,
                             std::vector<Real64> &normalModeFlowRates,
                             std::vector<Real64> &normalModeRatedCapacities);
@@ -108,7 +110,7 @@ struct CoilCoolingDX
 
     int getNumModes();
     int getOpModeCapFTIndex(HVAC::CoilMode mode = HVAC::CoilMode::Normal);
-    Real64 condMassFlowRate(HVAC::CoilMode mode);
+    Real64 condMassFlowRate(EnergyPlusData &state, HVAC::CoilMode mode);
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;
@@ -118,7 +120,7 @@ struct CoilCoolingDX
     int availScheduleIndex = 0;
     int condInletNodeIndex = 0;
     int condOutletNodeIndex = 0;
-    CoilCoolingDXCurveFitPerformance performance;
+    std::shared_ptr<CoilCoolingDXPerformanceBase> performance; // TODO: unique_ptr and explicit copy ctor
     int condensateTankIndex = 0;
     int condensateTankSupplyARRID = 0;
     Real64 condensateVolumeFlow = 0.0;
@@ -133,10 +135,10 @@ struct CoilCoolingDX
     int supplyFanIndex = 0;
     HVAC::FanType supplyFanType = HVAC::FanType::Invalid;
     std::string supplyFanName = "";
-    bool SubcoolReheatFlag = false; // Subcool reheat coil control
+    bool subcoolReheatFlag = false; // Subcool reheat coil control
 
-    CoilCoolingDXCurveFitSpeed &normModeNomSpeed();
-    CoilCoolingDXCurveFitSpeed &altModeNomSpeed();
+    // CoilCoolingDXCurveFitSpeed &normModeNomSpeed();
+    // CoilCoolingDXCurveFitSpeed &altModeNomSpeed();
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
@@ -173,6 +175,10 @@ struct CoilCoolingDX
 
     void setToHundredPercentDOAS();
     bool isHundredPercentDOAS = false;
+
+private:
+    static bool
+    findPerformanceSubclass(EnergyPlus::EnergyPlusData &state, const std::string_view object_to_find, const std::string &idd_performance_name);
 };
 
 struct CoilCoolingDXData : BaseGlobalStruct

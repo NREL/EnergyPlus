@@ -92,7 +92,9 @@ struct CoilCoolingDXCurveFitSpeed
     std::string parentName;
 
     CoilCoolingDXCurveFitSpeed() = default;
+
     explicit CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, const std::string &name);
+
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification &input_data);
 
     CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
@@ -163,9 +165,10 @@ struct CoilCoolingDXCurveFitSpeed
     void CalcSpeedOutput(EnergyPlusData &state,
                          const DataLoopNode::NodeData &inletNode,
                          DataLoopNode::NodeData &outletNode,
-                         Real64 &PLR,
+                         Real64 PLR,
                          HVAC::FanOp const fanOp,
                          Real64 condInletTemp);
+
     void size(EnergyPlusData &state);
 
     Real64 CalcBypassFactor(EnergyPlusData &state,

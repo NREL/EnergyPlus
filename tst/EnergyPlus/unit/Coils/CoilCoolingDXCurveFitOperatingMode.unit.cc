@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -263,8 +264,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
     int coilIndex = CoilCoolingDX::factory(*state, "Coil Cooling DX 1");
     auto &thisCoil(state->dataCoilCooingDX->coilCoolingDXs[coilIndex]);
     EXPECT_EQ("COIL COOLING DX 1", thisCoil.name);
-    EXPECT_EQ("COIL COOLING DX CURVE FIT PERFORMANCE 1", thisCoil.performance.name);
-    EXPECT_EQ("HEATERCAPCURVE", Curve::GetCurveName(*state, thisCoil.performance.crankcaseHeaterCapacityCurveIndex));
+    EXPECT_EQ("COIL COOLING DX CURVE FIT PERFORMANCE 1", thisCoil.performance->name);
 
     HVAC::CoilMode coilMode = HVAC::CoilMode::Normal;
     Real64 PLR = 1.0;
@@ -279,7 +279,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
     auto &condInletNode = state->dataLoopNodes->Node(thisCoil.condInletNodeIndex);
     auto &condOutletNode = state->dataLoopNodes->Node(thisCoil.condOutletNodeIndex);
     Real64 LoadSHR = 0.0;
-    thisCoil.performance.simulate(
-        *state, evapInletNode, evapOutletNode, coilMode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode, LoadSHR);
-    EXPECT_EQ(thisCoil.performance.crankcaseHeaterPower, 120.0);
+    thisCoil.performance->simulate(
+        *state, evapInletNode, evapOutletNode, coilMode, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode, LoadSHR);
+    EXPECT_EQ(thisCoil.performance->crankcaseHeaterPower, 120.0);
 }

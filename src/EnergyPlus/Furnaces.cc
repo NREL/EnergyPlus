@@ -10895,7 +10895,7 @@ namespace Furnaces {
                     ErrorsFound = true;
                 }
                 auto const &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex_DX];
-                thisFurnace.MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
+                thisFurnace.MinOATCompressorCooling = newCoil.performance->minOutdoorDrybulb;
             } else if (Util::SameString(ChildCoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
                 int childCCIndex_VS = state.dataHVACAssistedCC->HXAssistedCoil(thisFurnace.CoolingCoilIndex).CoolingCoilIndex;
                 thisFurnace.MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, childCCIndex_VS, errFlag);
