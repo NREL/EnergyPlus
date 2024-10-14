@@ -13725,9 +13725,10 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
                                                                            (Q_evap_req * C_cap_operation - CompEvaporatingCAPSpd(CompSpdLB));
 
                 } else {
-                    CompSpdActual = this->CompressorSpeed(1) * (Q_evap_req * C_cap_operation) / CompEvaporatingCAPSpd(1);
-                    if (Q_cond_req - CompEvaporatingPWRSpd(CounterCompSpdTemp) < 0.0) { // use compressor power to meet condenser required load
+                    if (Q_evap_req < 0.0) { // use compressor power to meet condenser required load
                         CompSpdActual = this->CompressorSpeed(1) * (Q_cond_req * C_cap_operation) / CompEvaporatingPWRSpd(1);
+                    } else {
+                        CompSpdActual = this->CompressorSpeed(1) * (Q_evap_req * C_cap_operation) / CompEvaporatingCAPSpd(1);
                     }
                 }
 
